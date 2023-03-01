@@ -17,6 +17,7 @@ using Presentation.Web.Models.API.V2.Request.Interface;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Toolkit.Extensions;
+using Tests.Toolkit.TestInputs;
 
 namespace Tests.Integration.Presentation.Web.Interfaces.V2
 {
@@ -310,9 +311,103 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Arrange
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
             var organization = await CreateOrganization();
-            var exposingSystem = await ItSystemV2Helper.CreateSystemAsync(token.Token, new CreateItSystemRequestDTO() { OrganizationUuid = organization.Uuid, Name = CreateName() });
+            var input = await CreateFullItInterfaceRequestAsync(token, organization);
+
+            //Act
+            var createdItInterface = await InterfaceV2Helper.CreateItInterfaceAsync(token.Token, input);
+            using var deleteWithConflictResult = await InterfaceV2Helper.SendDeleteItInterfaceAsync(token.Token, createdItInterface.Uuid);
+            using var removeExposingSystemResult = await InterfaceV2Helper.SendPatchInterfaceAsync(token.Token, createdItInterface.Uuid, new KeyValuePair<string, object>(nameof(UpdateItInterfaceRequestDTO.ExposedBySystemUuid), null));
+            using var deleteAfterConflictResolutionResult = await InterfaceV2Helper.SendDeleteItInterfaceAsync(token.Token, createdItInterface.Uuid);
+            using var getAfterDeleteRespose = await InterfaceV2Helper.SendGetInterfaceAsync(token.Token, createdItInterface.Uuid);
+
+            //Assert
+            CheckCreatedInterface(input, createdItInterface);
+            Assert.Equal(HttpStatusCode.Conflict, deleteWithConflictResult.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, removeExposingSystemResult.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, deleteAfterConflictResolutionResult.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, getAfterDeleteRespose.StatusCode);
+        }
+
+        public static IEnumerable<object[]> Can_Patch_ItInterface_As_Rightsholder_Inputs()
+        {
+            return BooleanInputMatrixFactory.Create(11);
+        }
+
+        [Theory, MemberData(nameof(Can_Patch_ItInterface_As_Rightsholder_Inputs))]
+        public async Task Can_Patch_ItInterface_As_Rightsholder(
+           bool withName,
+           bool withInterfaceId,
+           bool withExposedBySystem,
+           bool withVersion,
+           bool withDescription,
+           bool withUrlReference,
+           bool withDeactivated,
+           bool withScope,
+           bool withNote,
+           bool withItInterfaceType,
+           bool withData)
+        {
+            //Arrange
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var organization = await CreateOrganization();
+            var creationRequest = await CreateFullItInterfaceRequestAsync(token, organization);
+            var createdInterface = await InterfaceV2Helper.CreateItInterfaceAsync(token.Token, creationRequest);
             var interfaceType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItInterfaceTypes, organization.Uuid, 10, 0)).RandomItem();
             var interfaceDataType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItInterfaceDataTypes, organization.Uuid, 10, 0)).RandomItem();
+
+            var changes = new Dictionary<string, object>();
+            if (withName) changes.Add(nameof(UpdateItInterfaceRequestDTO.Name), CreateName());
+            if (withInterfaceId) changes.Add(nameof(UpdateItInterfaceRequestDTO.InterfaceId), A<string>());
+            if (withExposedBySystem)
+            {
+                var newExposingSystem = await ItSystemV2Helper.CreateSystemAsync(token.Token, new CreateItSystemRequestDTO() { Name = CreateName(), OrganizationUuid = organization.Uuid });
+                changes.Add(nameof(UpdateItInterfaceRequestDTO.ExposedBySystemUuid), newExposingSystem.Uuid);
+            }
+            if (withVersion) changes.Add(nameof(UpdateItInterfaceRequestDTO.Version), A<string>().Substring(0, 20));
+            if (withDescription) changes.Add(nameof(UpdateItInterfaceRequestDTO.Description), A<string>());
+            if (withUrlReference) changes.Add(nameof(UpdateItInterfaceRequestDTO.UrlReference), A<string>());
+            if (withDeactivated) changes.Add(nameof(UpdateItInterfaceRequestDTO.Deactivated), !createdInterface.Deactivated);
+            if (withScope) changes.Add(nameof(UpdateItInterfaceRequestDTO.Scope), A<RegistrationScopeChoice>());
+            if (withNote) changes.Add(nameof(UpdateItInterfaceRequestDTO.Note), A<string>());
+            if (withItInterfaceType) changes.Add(nameof(UpdateItInterfaceRequestDTO.ItInterfaceTypeUuid), interfaceType.Uuid);
+            if (withData) changes.Add(nameof(UpdateItInterfaceRequestDTO.Data), new[] { new ItInterfaceDataRequestDTO() { DataTypeUuid = interfaceDataType.Uuid, Description = A<string>() } });
+
+            //Act
+            var updatedInterface = await InterfaceV2Helper.PatchInterfaceAsync(token.Token, createdInterface.Uuid, changes.ToArray());
+
+            //Assert
+            Assert.Equal(withName ? changes[nameof(UpdateItInterfaceRequestDTO.Name)] : createdInterface.Name, updatedInterface.Name);
+            Assert.Equal(withInterfaceId ? changes[nameof(UpdateItInterfaceRequestDTO.InterfaceId)] : createdInterface.InterfaceId, updatedInterface.InterfaceId);
+            Assert.Equal(withExposedBySystem ? changes[nameof(UpdateItInterfaceRequestDTO.ExposedBySystemUuid)] : createdInterface.ExposedBySystem?.Uuid, updatedInterface.ExposedBySystem?.Uuid);
+            Assert.Equal(withVersion ? changes[nameof(UpdateItInterfaceRequestDTO.Version)] : createdInterface.Version, updatedInterface.Version);
+            Assert.Equal(withDescription ? changes[nameof(UpdateItInterfaceRequestDTO.Description)] : createdInterface.Description, updatedInterface.Description);
+            Assert.Equal(withUrlReference ? changes[nameof(UpdateItInterfaceRequestDTO.UrlReference)] : createdInterface.UrlReference, updatedInterface.UrlReference);
+            Assert.Equal(withDeactivated ? changes[nameof(UpdateItInterfaceRequestDTO.Deactivated)] : createdInterface.Deactivated, updatedInterface.Deactivated);
+            Assert.Equal(withScope ? changes[nameof(UpdateItInterfaceRequestDTO.Scope)] : createdInterface.Scope, updatedInterface.Scope);
+            Assert.Equal(withNote ? changes[nameof(UpdateItInterfaceRequestDTO.Note)] : createdInterface.Notes, updatedInterface.Notes);
+            Assert.Equal(withItInterfaceType ? changes[nameof(UpdateItInterfaceRequestDTO.ItInterfaceTypeUuid)] : createdInterface.ItInterfaceType?.Uuid, updatedInterface.ItInterfaceType?.Uuid);
+            Assert.Equivalent(withData ? changes[nameof(UpdateItInterfaceRequestDTO.Data)] : createdInterface.Data?.Select(x=>new ItInterfaceDataRequestDTO(){DataTypeUuid = x.DataType?.Uuid,Description = x.Description}), updatedInterface.Data?.Select(x => new ItInterfaceDataRequestDTO() { DataTypeUuid = x.DataType?.Uuid, Description = x.Description }));
+        }
+
+        protected async Task<(string token, OrganizationDTO createdOrganization)> CreateUserInNewOrg(
+            bool stakeHolderAccess = false,
+            OrganizationRole role = OrganizationRole.User)
+        {
+            var org = await CreateOrganization();
+            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), role, org.Id, true, stakeHolderAccess);
+            return (token, org);
+        }
+
+        private async Task<CreateItInterfaceRequestDTO> CreateFullItInterfaceRequestAsync(GetTokenResponseDTO token, OrganizationDTO organization)
+        {
+            var exposingSystem = await ItSystemV2Helper.CreateSystemAsync(token.Token,
+                new CreateItSystemRequestDTO() { OrganizationUuid = organization.Uuid, Name = CreateName() });
+            var interfaceType =
+                (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItInterfaceTypes, organization.Uuid, 10,
+                    0)).RandomItem();
+            var interfaceDataType =
+                (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItInterfaceDataTypes, organization.Uuid,
+                    10, 0)).RandomItem();
             var input = new CreateItInterfaceRequestDTO
             {
                 OrganizationUuid = organization.Uuid,
@@ -341,31 +436,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
                     }
                 }
             };
-
-            //Act
-            var createdItInterface = await InterfaceV2Helper.CreateItInterfaceAsync(token.Token, input);
-            using var deleteWithConflictResult = await InterfaceV2Helper.SendDeleteItInterfaceAsync(token.Token, createdItInterface.Uuid);
-            using var removeExposingSystemResult = await InterfaceV2Helper.SendPatchInterfaceAsync(token.Token, createdItInterface.Uuid, new KeyValuePair<string, object>(nameof(UpdateItInterfaceRequestDTO.ExposedBySystemUuid), null));
-            using var deleteAfterConflictResolutionResult = await InterfaceV2Helper.SendDeleteItInterfaceAsync(token.Token, createdItInterface.Uuid);
-            using var getAfterDeleteRespose = await InterfaceV2Helper.SendGetInterfaceAsync(token.Token, createdItInterface.Uuid);
-
-            //Assert
-            CheckCreatedInterface(input, createdItInterface);
-            Assert.Equal(HttpStatusCode.Conflict, deleteWithConflictResult.StatusCode);
-            Assert.Equal(HttpStatusCode.OK, removeExposingSystemResult.StatusCode);
-            Assert.Equal(HttpStatusCode.NoContent, deleteAfterConflictResolutionResult.StatusCode);
-            Assert.Equal(HttpStatusCode.NotFound, getAfterDeleteRespose.StatusCode);
-        }
-
-        //TODO: PATCH tests
-
-        protected async Task<(string token, OrganizationDTO createdOrganization)> CreateUserInNewOrg(
-            bool stakeHolderAccess = false,
-            OrganizationRole role = OrganizationRole.User)
-        {
-            var org = await CreateOrganization();
-            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), role, org.Id, true, stakeHolderAccess);
-            return (token, org);
+            return input;
         }
     }
 }

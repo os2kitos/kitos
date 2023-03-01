@@ -33,8 +33,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         private readonly IItInterfaceResponseMapper _responseMapper;
 
         public ItInterfaceV2Controller(
-            IItInterfaceRightsHolderService rightsHolderService, 
-            IItInterfaceService itInterfaceService, 
+            IItInterfaceRightsHolderService rightsHolderService,
+            IItInterfaceService itInterfaceService,
             IItInterfaceWriteModelMapper writeModelMapper,
             IItInterfaceWriteService writeService,
             IItInterfaceResponseMapper responseMapper)
@@ -94,7 +94,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
             return _writeService
                 .Update(uuid, updateParameters)
-                .Select(ToRightsHolderItInterfaceResponseDTO)
+                .Select(ToItInterfaceResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -358,7 +358,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         private RightsHolderItInterfaceResponseDTO ToRightsHolderItInterfaceResponseDTO(ItInterface itInterface)
         {
             return _responseMapper.ToRightsHolderItInterfaceResponseDTO(itInterface);
-          
+
         }
 
         private ItInterfaceResponseDTO ToItInterfaceResponseDTO(ItInterface itInterface)
@@ -366,7 +366,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             return _responseMapper.ToItInterfaceResponseDTO(itInterface);
         }
 
-        private CreatedNegotiatedContentResult<T> MapItInterfaceCreatedResponse<T>(T dto) where T: IHasUuidExternal
+        private CreatedNegotiatedContentResult<T> MapItInterfaceCreatedResponse<T>(T dto) where T : IHasUuidExternal
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }
