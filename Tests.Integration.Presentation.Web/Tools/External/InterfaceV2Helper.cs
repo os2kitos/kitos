@@ -82,10 +82,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int? pageNumber = null,
             Guid? exposedBySystemUuid = null,
             bool? includeDeactivated = null,
-            DateTime? changedSinceGtEq = null
+            DateTime? changedSinceGtEq = null,
+            Guid? usedInOrganizationUuid = null
             )
         {
-            using var response = await SendGetStakeholderInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq);
+            using var response = await SendGetStakeholderInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, usedInOrganizationUuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItInterfaceResponseDTO>>();
@@ -97,7 +98,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int? pageNumber = null,
             Guid? exposedBySystemUuid = null,
             bool? includeDeactivated = null,
-            DateTime? changedSinceGtEq = null
+            DateTime? changedSinceGtEq = null,
+            Guid? usedInOrganizationUuid = null
             )
         {
             var path = "api/v2/it-interfaces";
@@ -117,6 +119,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (changedSinceGtEq.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("changedSinceGtEq", changedSinceGtEq.Value.ToString("O")));
+
+            if(usedInOrganizationUuid.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("usedInOrganizationUuid", usedInOrganizationUuid.Value.ToString("D")));
 
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";

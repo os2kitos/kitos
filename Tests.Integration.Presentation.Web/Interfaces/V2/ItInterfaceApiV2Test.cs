@@ -409,26 +409,26 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Arrange
             var (token, organization) = await CreateStakeHolderUserInNewOrg();
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
             var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
             var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
             var itInterface3 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
 
             await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organization.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
 
-            //Change all in a specific order
-            foreach (var interfaceDto in new[] { itInterface2, itInterface3, itInterface1 })
-            {
-                await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, interfaceDto.Id).DisposeAsync();
-            }
+            await ItSystemHelper.TakeIntoUseAsync(system.Id, organization.Id);
+            
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface1.Id).DisposeAsync();
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface2.Id).DisposeAsync();
 
-            var interface3LastModified = DatabaseAccess.MapFromEntitySet<ItInterface, DateTime>(x => x.AsQueryable().ByUuid(itInterface3.Uuid).LastChanged.Transform(dt => DateTime.SpecifyKind(dt, DateTimeKind.Utc)));
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system2.Id, itInterface3.Id).DisposeAsync();
 
             //Act
-            var dtos = (await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, changedSinceGtEq: interface3LastModified, exposedBySystemUuid: system.Uuid, pageNumber: 0, pageSize: 10)).ToList();
+            var dtos = (await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, exposedBySystemUuid: system.Uuid, pageNumber: 0, pageSize: 10)).ToList();
 
-            //Assert that the right interfaces are returned in the correct order
+            //Assert
             Assert.Equal(2, dtos.Count);
-            Assert.Equal(new[] { itInterface3.Uuid, itInterface1.Uuid }, dtos.Select(x => x.Uuid).ToArray());
+            Assert.Equal(new[] { itInterface1.Uuid, itInterface2.Uuid }, dtos.Select(x => x.Uuid).ToArray());
         }
 
         [Fact]
