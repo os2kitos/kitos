@@ -35,9 +35,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int? pageNumber = null,
             Guid? rightsHolder = null,
             bool? includeDeactivated = null,
-            DateTime? changedSinceGtEq = null
-            )
-        {
+            DateTime? changedSinceGtEq = null)
+            {
             var path = "api/v2/rightsholder/it-interfaces";
             var queryParameters = new List<KeyValuePair<string, string>>();
 
@@ -82,10 +81,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int? pageNumber = null,
             Guid? exposedBySystemUuid = null,
             bool? includeDeactivated = null,
-            DateTime? changedSinceGtEq = null
+            DateTime? changedSinceGtEq = null,
+            string nameEquals = null
             )
-        {
-            using var response = await SendGetStakeholderInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq);
+            {
+            using var response = await SendGetStakeholderInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItInterfaceResponseDTO>>();
@@ -97,9 +97,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int? pageNumber = null,
             Guid? exposedBySystemUuid = null,
             bool? includeDeactivated = null,
-            DateTime? changedSinceGtEq = null
+            DateTime? changedSinceGtEq = null,
+            string nameEquals = null
             )
-        {
+            {
             var path = "api/v2/it-interfaces";
             var queryParameters = new List<KeyValuePair<string, string>>();
 
@@ -117,6 +118,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (changedSinceGtEq.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("changedSinceGtEq", changedSinceGtEq.Value.ToString("O")));
+
+            if (nameEquals != null)
+                queryParameters.Add(new KeyValuePair<string, string>("nameEquals", nameEquals));
 
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";

@@ -213,6 +213,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <param name="exposedBySystemUuid">IT-System UUID filter</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
+        /// <param name="nameEquals">Include only interfaces with a name equal to the parameter</param>
         /// <returns></returns>
         [HttpGet]
         [Route("it-interfaces")]
@@ -224,6 +225,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             [NonEmptyGuid] Guid? exposedBySystemUuid = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
+            string nameEquals = null,
             [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
@@ -239,6 +241,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
             if (changedSinceGtEq.HasValue)
                 refinements.Add(new QueryByChangedSinceGtEq<ItInterface>(changedSinceGtEq.Value));
+
+            if(nameEquals != null)
+                refinements.Add(new QueryByName<ItInterface>(nameEquals));
 
             return _itInterfaceService
                 .GetAvailableInterfaces(refinements.ToArray())
