@@ -19,6 +19,7 @@ namespace Core.ApplicationServices.SystemUsage
         ItSystemUsage GetById(int usageId);
         Result<ItSystemUsage, OperationError> GetReadableItSystemUsageByUuid(Guid uuid);
         Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid);
+        Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid);
 
         /// <summary>
         /// Adds information about which data sensitivity levels are applied to the system usage />
