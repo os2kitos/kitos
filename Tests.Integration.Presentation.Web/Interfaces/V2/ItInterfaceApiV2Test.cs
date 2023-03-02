@@ -436,27 +436,33 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, organization) = await CreateStakeHolderUserInNewOrg();
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            var itInterface3 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            var orgId = organization.Id;
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), orgId, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), orgId, AccessModifier.Public);
+            var system3 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
 
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organization.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
+            var validDto = InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), orgId, AccessModifier.Public);
+            var invalidNoExhibitDto = InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), orgId, AccessModifier.Public);
+            var invalidNoUsageDto = InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), orgId, AccessModifier.Public);
+            var invalidWrongOrganizationDto = InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
 
-            await ItSystemHelper.TakeIntoUseAsync(system.Id, organization.Id);
+            var validInterface = await InterfaceHelper.CreateInterface(validDto);
+            await  InterfaceHelper.CreateInterface(invalidNoExhibitDto);
+            var invalidNoUsageInterface = await InterfaceHelper.CreateInterface(invalidNoUsageDto);
+            var invalidWrongOrganizationInterface = await InterfaceHelper.CreateInterface(invalidWrongOrganizationDto);
+
+            await ItSystemHelper.TakeIntoUseAsync(system.Id, orgId);
             
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface1.Id).DisposeAsync();
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface2.Id).DisposeAsync();
-
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system2.Id, itInterface3.Id).DisposeAsync();
+            await InterfaceExhibitHelper.CreateExhibit(system.Id, validInterface.Id);
+            await InterfaceExhibitHelper.CreateExhibit(system2.Id, invalidNoUsageInterface.Id);
+            await InterfaceExhibitHelper.CreateExhibit(system3.Id, invalidWrongOrganizationInterface.Id);
 
             //Act
-            var dtos = (await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, usedInOrganizationUuid: system.Uuid, pageNumber: 0, pageSize: 10)).ToList();
+            var dtos = (await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, usedInOrganizationUuid: organization.Uuid, pageNumber: 0, pageSize: 10)).ToList();
 
             //Assert
-            Assert.Equal(2, dtos.Count);
-            Assert.Equal(new[] { itInterface1.Uuid, itInterface2.Uuid }, dtos.Select(x => x.Uuid).ToArray());
+            var responseDto = Assert.Single(dtos);
+            Assert.Equal(validInterface.Uuid, responseDto.Uuid);
         }
 
         [Fact]

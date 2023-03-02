@@ -15,7 +15,7 @@ namespace Core.DomainServices.Queries.Interface
 
         public IQueryable<ItInterface> Apply(IQueryable<ItInterface> source)
         {
-            return source.Where(x => x.AssociatedSystemRelations.Any(relation => relation.FromSystemUsage.Organization.Uuid == _organizationUuid));
+            return source.Where(x => x.ExhibitedBy.ItSystem.Usages.Any(usage => usage.Organization.Uuid == _organizationUuid));
         }
     }
 }

@@ -34,18 +34,21 @@ namespace Tests.Unit.Presentation.Web.DomainServices.Interface
             return new ItInterface
             {
                 Id = A<int>(),
-                AssociatedSystemRelations = new List<SystemRelation>
+                ExhibitedBy = new ItInterfaceExhibit
                 {
-                    new SystemRelation
-                    (
-                        new ItSystemUsage
+                    ItSystem = new ItSystem
+                    {
+                        Usages = new List<ItSystemUsage>
                         {
-                            Organization = new Organization
+                            new ()
                             {
-                                Uuid = uuid
+                                Organization = new Organization
+                                {
+                                    Uuid = uuid
+                                }
                             }
                         }
-                    )
+                    }
                 }
             };
         }
