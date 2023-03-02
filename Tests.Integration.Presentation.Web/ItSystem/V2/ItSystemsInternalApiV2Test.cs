@@ -238,6 +238,25 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(new[] { system3.Uuid, system1.Uuid }, dtos.Select(x => x.Uuid).ToArray());
         }
 
+        [Fact]
+        public async Task GET_Many_Internal_As_StakeHolder_With_NameEqual_Filter()
+        {
+            //Arrange
+            var (cookie, organization) = await CreateCookieStakeHolderUserInNewOrganizationAsync();
+            var searchName = CreateName();
+            var invalidSearchName = $"{searchName}1";
+            await ItSystemHelper.CreateItSystemInOrganizationAsync(invalidSearchName, organization.Id, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(searchName, organization.Id, AccessModifier.Public);
+            
+            //Act
+            var dtos = (await ItSystemV2Helper.GetManyInternalAsync(cookie, nameEquals: system2.Name, page: 0, pageSize: 10)).ToList();
+
+            //Assert
+            var dto = Assert.Single(dtos);
+            Assert.Equal(system2.Name, dto.Name);
+            Assert.Equal(system2.Uuid, dto.Uuid);
+        }
+
         protected async Task<(Cookie cookie, OrganizationDTO createdOrganization)> CreateCookieStakeHolderUserInNewOrganizationAsync()
         {
             var organization = await CreateOrganizationAsync();

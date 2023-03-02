@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
@@ -13,7 +13,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.Interface;
 using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Time;
@@ -37,6 +36,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IInterfaceRepository> _repository;
         private readonly Mock<IOrganizationalUserContext> _userContext;
         private readonly Mock<IOperationClock> _operationClock;
+        private readonly Mock<IOrganizationService> _organizationService;
 
         public ItInterfaceServiceTest()
         {
@@ -48,6 +48,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _userContext = new Mock<IOrganizationalUserContext>();
             _repository = new Mock<IInterfaceRepository>();
             _operationClock = new Mock<IOperationClock>();
+            _organizationService = new Mock<IOrganizationService>();
             _sut = new ItInterfaceService(
                 _dataRowRepository.Object,
                 _systemRepository.Object,
@@ -56,7 +57,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 _domainEvents.Object,
                 _repository.Object,
                 _userContext.Object,
-                _operationClock.Object);
+                _operationClock.Object,
+                _organizationService.Object);
         }
 
         [Fact]
@@ -958,6 +960,83 @@ namespace Tests.Unit.Core.ApplicationServices
             _repository.Verify(x => x.Update(It.IsAny<ItInterface>()), Times.Never);
         }
 
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, false, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, false)]
+        [InlineData(false, false, false)]
+        public void Can_Get_Permissions(bool read, bool modify, bool delete)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var itInterface = new ItInterface { Uuid = uuid };
+            ExpectGetInterfaceReturns(uuid, itInterface);
+            ExpectAllowReadReturns(itInterface, read);
+            ExpectAllowModifyReturns(itInterface, modify);
+            ExpectAllowDeleteReturns(itInterface, delete);
+
+            //Act
+            var result = _sut.GetPermissions(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var permissions = result.Value;
+            Assert.Equivalent(new ResourcePermissionsResult(read, modify, delete), permissions);
+        }
+
+        [Fact]
+        public void Get_Permissions_Returns_Not_Found()
+        {
+            //Arrange
+            var wrongUuid = A<Guid>();
+            ExpectGetInterfaceReturns(wrongUuid, Maybe<ItInterface>.None);
+
+            //Act
+            var result = _sut.GetPermissions(wrongUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Get_CollectionPermissions(bool create)
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var organization = new Organization { Id = A<int>() };
+
+            ExpectGetOrganization(organizationUuid, organization);
+            ExpectAllowCreate(organization.Id, create);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(organizationUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(create, result.Value.Create);
+        }
+
+        [Fact]
+        public void Get_CollectionPermissions_Returns_OperationError_When_GetOrganization_Fails()
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var error = A<OperationError>();
+
+            ExpectGetOrganization(organizationUuid, error);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(organizationUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(error.FailureType, result.Error.FailureType);
+        }
+
         private void Test_Command_Which_Mutates_ItInterface_With_Success(
             Func<ItInterface, Result<ItInterface, OperationError>> command)
         {
@@ -1044,14 +1123,19 @@ namespace Tests.Unit.Core.ApplicationServices
             _repository.Setup(x => x.GetInterface(interfaceId)).Returns(value);
         }
 
+        private void ExpectGetInterfaceReturns(Guid interfaceUuid, Maybe<ItInterface> value)
+        {
+            _repository.Setup(x => x.GetInterface(interfaceUuid)).Returns(value);
+        }
+
         private void ExpectAllowModifyReturns(ItInterface itInterface, bool value)
         {
             _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(value);
         }
 
-        private void ExpectAllowReadReturns(ItSystem itSystem, bool value)
+        private void ExpectAllowReadReturns(IEntity entity, bool value)
         {
-            _authorizationContext.Setup(x => x.AllowReads(itSystem)).Returns(value);
+            _authorizationContext.Setup(x => x.AllowReads(entity)).Returns(value);
         }
 
         private void ExpectGetSystemReturns(int newSystemId, ItSystem value)
@@ -1062,6 +1146,11 @@ namespace Tests.Unit.Core.ApplicationServices
         private void ExpectAllowDeleteReturns(ItInterface itInterface, bool value)
         {
             _authorizationContext.Setup(x => x.AllowDelete(itInterface)).Returns(value);
+        }
+
+        private void ExpectGetOrganization(Guid orgUuid, Result<Organization, OperationError> result, OrganizationDataReadAccessLevel? accessLevel = null)
+        {
+            _organizationService.Setup(x => x.GetOrganization(orgUuid, accessLevel)).Returns(result);
         }
     }
 }

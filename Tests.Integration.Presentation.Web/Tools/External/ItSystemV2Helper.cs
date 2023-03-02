@@ -134,10 +134,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? kleUuid = null,
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
-            DateTime? changedSinceGtEq = null
+            DateTime? changedSinceGtEq = null,
+            string nameEquals = null
         )
         {
-            using var response = await SendGetManyAsync($"{BaseItSystemInternalPath}/search", page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, cookie: cookie);
+            using var response = await SendGetManyAsync($"{BaseItSystemInternalPath}/search", page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, nameEquals: nameEquals, cookie: cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemSearchResponseDTO>>();
@@ -157,7 +158,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? usedInOrganizationUuid = null
             )
         {
-            using var response = await SendGetManyAsync(BaseItSystemPath, page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, usedInOrganizationUuid, token);
+            using var response = await SendGetManyAsync(BaseItSystemPath, page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, usedInOrganizationUuid, token: token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemResponseDTO>>();
@@ -175,6 +176,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             Guid? usedInOrganizationUuid = null,
+            string nameEquals = null,
             string token = null,
             Cookie cookie = null
             )
@@ -211,6 +213,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (usedInOrganizationUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("usedInOrganizationUuid", usedInOrganizationUuid.Value.ToString("D")));
+
+            if (nameEquals != null)
+                queryParameters.Add(new KeyValuePair<string, string>("nameEquals", nameEquals));
 
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
@@ -296,6 +301,22 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             using var response = await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{systemUuid}/external-references/{externalReferenceUuid}"), token);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        public static async Task<ResourcePermissionsResponseDTO> GetPermissionsAsync(string token, Guid uuid)
+        {
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{uuid:D}/permissions"), token);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ResourcePermissionsResponseDTO>();
+        }
+
+        public static async Task<ResourceCollectionPermissionsResponseDTO> GetCollectionPermissionsAsync(string token, Guid organizationUuid)
+        {
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/permissions?organizationUuid={organizationUuid:D}"), token);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ResourceCollectionPermissionsResponseDTO>();
         }
     }
 }
