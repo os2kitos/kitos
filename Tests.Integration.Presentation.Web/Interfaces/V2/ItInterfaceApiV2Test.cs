@@ -472,6 +472,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var invalidWrongOrganizationInterface = await InterfaceHelper.CreateInterface(invalidWrongOrganizationDto);
 
             await ItSystemHelper.TakeIntoUseAsync(system.Id, orgId);
+            await ItSystemHelper.TakeIntoUseAsync(system3.Id, TestEnvironment.DefaultOrganizationId);
             
             await InterfaceExhibitHelper.CreateExhibit(system.Id, validInterface.Id);
             await InterfaceExhibitHelper.CreateExhibit(system2.Id, invalidNoUsageInterface.Id);
