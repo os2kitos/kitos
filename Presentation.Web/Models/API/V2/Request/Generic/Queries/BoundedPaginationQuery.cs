@@ -19,7 +19,7 @@ namespace Presentation.Web.Models.API.V2.Request.Generic.Queries
 
         /// <summary>
         /// Size of the page referred by 'page'.
-        /// Range: [1,250] Default: 100.
+        /// Range: [1,250] Default: 250.
         /// </summary>
         [Range(BoundedPaginationConstraints.MinPageSize, BoundedPaginationConstraints.MaxPageSize)]
         public int? PageSize { get; set; } = null;
