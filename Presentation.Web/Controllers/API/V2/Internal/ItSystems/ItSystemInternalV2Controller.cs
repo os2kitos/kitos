@@ -38,6 +38,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         /// <param name="numberOfUsers">Greater than or equal to number of users filter</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
+        /// <param name="nameEquals">Include only systems with a name equal to the parameter</param>
         /// <returns></returns>
         [HttpGet]
         [Route("search")]
@@ -53,13 +54,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
+            string nameEquals = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _itSystemService
-                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, paginationQuery: paginationQuery)
+                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, nameEquals: nameEquals, paginationQuery: paginationQuery)
                 .Select(Map)
                 .Transform(Ok);
         }

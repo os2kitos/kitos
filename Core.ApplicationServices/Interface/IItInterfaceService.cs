@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Interface;
+using Core.ApplicationServices.Authorization;
 
 namespace Core.ApplicationServices.Interface
 {
@@ -26,5 +27,7 @@ namespace Core.ApplicationServices.Interface
         Result<ItInterface, OperationError> UpdateAccessModifier(int id, AccessModifier newValue);
         Result<ItInterface, OperationError> UpdateInterfaceType(int id, Guid? interfaceTypeUuid);
         Result<ItInterface, OperationError> ReplaceInterfaceData(int id, IEnumerable<ItInterfaceDataWriteModel> newData);
+        Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid);
+        Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid);
     }
 }

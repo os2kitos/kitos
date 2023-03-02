@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -34,6 +35,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IReferenceService _referenceService;
         private readonly IGenericRepository<ArchivePeriod> _archivePeriodRepository;
         private readonly IGenericRepository<ItSystemUsagePersonalData> _personalDataRepository;
+        private readonly IOrganizationService _organizationService;
 
         public ItSystemUsageService(
             IGenericRepository<ItSystemUsage> usageRepository,
@@ -46,7 +48,8 @@ namespace Core.ApplicationServices.SystemUsage
             IOrganizationalUserContext userContext,
             IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
             IGenericRepository<ArchivePeriod> archivePeriodRepository,
-            IGenericRepository<ItSystemUsagePersonalData> personalDataRepository)
+            IGenericRepository<ItSystemUsagePersonalData> personalDataRepository, 
+            IOrganizationService organizationService)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;
@@ -59,6 +62,7 @@ namespace Core.ApplicationServices.SystemUsage
             _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _archivePeriodRepository = archivePeriodRepository;
             _personalDataRepository = personalDataRepository;
+            _organizationService = organizationService;
         }
 
         public IQueryable<ItSystemUsage> Query(params IDomainQuery<ItSystemUsage>[] conditions)
@@ -207,6 +211,13 @@ namespace Core.ApplicationServices.SystemUsage
         public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid)
         {
             return GetReadableItSystemUsageByUuid(uuid).Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
+        }
+
+        public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid)
+                .Select(result => ResourceCollectionPermissionsResult.FromOrganizationId<ItSystemUsage>(result.Id, _authorizationContext));
         }
 
         public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(int itSystemUsageId, SensitiveDataLevel sensitiveDataLevel)

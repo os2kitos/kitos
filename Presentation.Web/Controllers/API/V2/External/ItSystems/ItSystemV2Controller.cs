@@ -27,6 +27,7 @@ using Swashbuckle.Swagger.Annotations;
 using Core.ApplicationServices.System.Write;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Response.Shared;
+using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 {
@@ -97,7 +98,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 return BadRequest(ModelState);
 
             return _itSystemService
-                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, usedInOrganizationUuid, paginationQuery)
+                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, usedInOrganizationUuid, paginationQuery: paginationQuery)
                 .Select(_systemResponseMapper.ToSystemResponseDTO)
                 .Transform(Ok);
         }
@@ -436,7 +437,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystemCollectionPermissions([NonEmptyGuid] Guid organizationUuid)
+        public IHttpActionResult GetItSystemCollectionPermissions([Required][NonEmptyGuid] Guid organizationUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

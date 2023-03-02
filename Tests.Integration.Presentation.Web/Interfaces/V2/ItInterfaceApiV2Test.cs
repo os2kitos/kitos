@@ -18,6 +18,7 @@ using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.TestInputs;
+using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Tests.Integration.Presentation.Web.Interfaces.V2
 {
@@ -167,6 +168,25 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Assert that the right interfaces are returned in the correct order
             Assert.Equal(2, dtos.Count);
             Assert.Equal(new[] { itInterface3.Uuid, itInterface1.Uuid }, dtos.Select(x => x.Uuid).ToArray());
+        }
+
+        [Fact]
+        public async Task GET_Many_As_Stakeholder_With_Name_Filter()
+        {
+            //Arrange
+            var (token, _) = await CreateStakeHolderUserInNewOrg();
+            var searchName = A<string>();
+            var invalidSearchName = $"{searchName}1";
+            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(searchName, A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(invalidSearchName, A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+
+            //Act
+            var dtos = (await InterfaceV2Helper.GetInterfacesAsync(token, nameEquals: searchName, pageNumber: 0, pageSize: 10)).ToList();
+
+            //Assert
+            var dto = Assert.Single(dtos);
+            Assert.Equal(dto.Name, itInterface1.Name);
+            Assert.Equal(dto.Uuid, itInterface1.Uuid);
         }
 
         [Fact]
@@ -328,13 +348,13 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(HttpStatusCode.NotFound, getAfterDeleteRespose.StatusCode);
         }
 
-        public static IEnumerable<object[]> Can_Patch_ItInterface_As_Rightsholder_Inputs()
+        public static IEnumerable<object[]> Can_Patch_ItInterface_Inputs()
         {
             return BooleanInputMatrixFactory.Create(11);
         }
 
-        [Theory, MemberData(nameof(Can_Patch_ItInterface_As_Rightsholder_Inputs))]
-        public async Task Can_Patch_ItInterface_As_Rightsholder(
+        [Theory, MemberData(nameof(Can_Patch_ItInterface_Inputs))]
+        public async Task Can_Patch_ItInterface(
            bool withName,
            bool withInterfaceId,
            bool withExposedBySystem,
@@ -386,7 +406,58 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(withScope ? changes[nameof(UpdateItInterfaceRequestDTO.Scope)] : createdInterface.Scope, updatedInterface.Scope);
             Assert.Equal(withNote ? changes[nameof(UpdateItInterfaceRequestDTO.Note)] : createdInterface.Notes, updatedInterface.Notes);
             Assert.Equal(withItInterfaceType ? changes[nameof(UpdateItInterfaceRequestDTO.ItInterfaceTypeUuid)] : createdInterface.ItInterfaceType?.Uuid, updatedInterface.ItInterfaceType?.Uuid);
-            Assert.Equivalent(withData ? changes[nameof(UpdateItInterfaceRequestDTO.Data)] : createdInterface.Data?.Select(x=>new ItInterfaceDataRequestDTO(){DataTypeUuid = x.DataType?.Uuid,Description = x.Description}), updatedInterface.Data?.Select(x => new ItInterfaceDataRequestDTO() { DataTypeUuid = x.DataType?.Uuid, Description = x.Description }));
+            Assert.Equivalent(withData ? changes[nameof(UpdateItInterfaceRequestDTO.Data)] : createdInterface.Data?.Select(x => new ItInterfaceDataRequestDTO() { DataTypeUuid = x.DataType?.Uuid, Description = x.Description }), updatedInterface.Data?.Select(x => new ItInterfaceDataRequestDTO() { DataTypeUuid = x.DataType?.Uuid, Description = x.Description }));
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.User, true, false, false)]
+        public async Task Can_Get_ItInterface_Permissions(OrganizationRole role, bool read, bool modify, bool delete)
+        {
+            //Arrange
+            var (token, org) = await CreateUserInNewOrg(false, role);
+
+            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), org.Id, AccessModifier.Public));
+
+            //Act
+            var permissionsResponseDto = await InterfaceV2Helper.GetPermissionsAsync(token, itInterface.Uuid);
+
+            //Assert
+            var expected = new ResourcePermissionsResponseDTO
+            {
+                Read = read,
+                Modify = modify,
+                Delete = delete
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.User, false)]
+        public async Task Can_Get_ItInterface_CollectionPermissions(OrganizationRole role, bool create)
+        {
+            //Arrange
+            var (token, org) = await CreateUserInNewOrg(false, role);
+
+            //Act
+            var permissionsResponseDto = await InterfaceV2Helper.GetCollectionPermissionsAsync(token, org.Uuid);
+
+            //Assert
+            var expected = new ResourceCollectionPermissionsResponseDTO
+            {
+                Create = create
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        private async Task<(string token, OrganizationDTO createdOrganization)> CreateStakeHolderUserInNewOrg()
+        {
+            var org = await CreateOrganization();
+            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, org.Id, true, true);
+            return (token, org);
         }
 
         protected async Task<(string token, OrganizationDTO createdOrganization)> CreateUserInNewOrg(
