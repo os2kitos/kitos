@@ -119,7 +119,7 @@ namespace Presentation.Web.Controllers.API.V1
         /// <param name="body"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("api/AdviceUserRelation/{{notificationId}}/{relatedEntityType}/update-range")]
+        [Route("api/AdviceUserRelation/{notificationId}/{relatedEntityType}/update-range")]
         public HttpResponseMessage UpdateRange(int notificationId, RelatedEntityType relatedEntityType, [FromBody] IEnumerable<AdviceUserRelation> body)
         {
             var recipients = body.ToList();

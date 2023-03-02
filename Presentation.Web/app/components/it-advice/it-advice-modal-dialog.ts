@@ -135,7 +135,7 @@
                     };
 
                     function patchAdviceUserRelation(adviceId, payload) {
-                        return $http.put(`/api/AdviceUserRelation/${adviceId}/update-range`, payload.Reciepients);
+                        return $http.put(`/api/AdviceUserRelation/${adviceId}/${type}/update-range`, payload.Reciepients);
                     }
 
                     function isCurrentAdviceImmediate() {
