@@ -435,20 +435,19 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         public async Task GET_Many_As_Stakeholder_With_Name_Filter()
         {
             //Arrange
-            var (token, organization) = await CreateStakeHolderUserInNewOrg();
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var (token, _) = await CreateStakeHolderUserInNewOrg();
             var searchName = A<string>();
+            var invalidSearchName = $"{searchName}1";
             var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(searchName, A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(invalidSearchName, A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
 
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organization.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
-            
             //Act
             var dtos = (await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, nameEquals: searchName, pageNumber: 0, pageSize: 10)).ToList();
 
             //Assert
             var dto = Assert.Single(dtos);
             Assert.Equal(dto.Name, itInterface1.Name);
+            Assert.Equal(dto.Uuid, itInterface1.Uuid);
         }
 
         [Fact]

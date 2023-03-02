@@ -243,14 +243,17 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             //Arrange
             var (cookie, organization) = await CreateCookieStakeHolderUserInNewOrganizationAsync();
-            await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var searchName = CreateName();
+            var invalidSearchName = $"{searchName}1";
+            await ItSystemHelper.CreateItSystemInOrganizationAsync(invalidSearchName, organization.Id, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(searchName, organization.Id, AccessModifier.Public);
             
             //Act
             var dtos = (await ItSystemV2Helper.GetManyInternalAsync(cookie, nameEquals: system2.Name, page: 0, pageSize: 10)).ToList();
 
             //Assert
             var dto = Assert.Single(dtos);
+            Assert.Equal(system2.Name, dto.Name);
             Assert.Equal(system2.Uuid, dto.Uuid);
         }
 
