@@ -8,13 +8,14 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
 {
     public class RegistrationHierarchyNodeMapper 
     {
-        public static IEnumerable<RegistrationHierarchyNodeResponseDTO> MapHierarchyToDtos<TEntity>(IEnumerable<TEntity> hierarchy) where TEntity : class, IHierarchy<TEntity>, IHasUuid, IHasName
+        public static IEnumerable<RegistrationHierarchyNodeWithDisabledStatusResponseDTO> MapHierarchyToDtosWithDisabledStatus<TEntity>(IEnumerable<TEntity> hierarchy) where TEntity : class, IHierarchy<TEntity>, IHasUuid, IHasName, IEntityWithEnabledStatus
         {
             return hierarchy
-                .Select(x => new RegistrationHierarchyNodeResponseDTO
+                .Select(x => new RegistrationHierarchyNodeWithDisabledStatusResponseDTO
                 {
                     Node = x.MapIdentityNamePairDTO(), 
-                    Parent = x.Parent?.MapIdentityNamePairDTO()
+                    Parent = x.Parent?.MapIdentityNamePairDTO(),
+                    Deactivated = x.Disabled
                 })
                 .ToList();
         }
