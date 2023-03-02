@@ -88,10 +88,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? exposedBySystemUuid = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
+            string nameEquals = null,
             Guid? usedInOrganizationUuid = null
             )
         {
-            using var response = await SendGetStakeholderInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, usedInOrganizationUuid);
+            using var response = await SendGetStakeholderInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals, usedInOrganizationUuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItInterfaceResponseDTO>>();
@@ -104,6 +105,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? exposedBySystemUuid = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
+            string nameEquals = null,
             Guid? usedInOrganizationUuid = null
             )
         {
@@ -125,7 +127,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             if (changedSinceGtEq.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("changedSinceGtEq", changedSinceGtEq.Value.ToString("O")));
 
-            if(usedInOrganizationUuid.HasValue)
+            if (nameEquals != null)
+                queryParameters.Add(new KeyValuePair<string, string>("nameEquals", nameEquals));
+
+            if (usedInOrganizationUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("usedInOrganizationUuid", usedInOrganizationUuid.Value.ToString("D")));
 
             if (queryParameters.Any())

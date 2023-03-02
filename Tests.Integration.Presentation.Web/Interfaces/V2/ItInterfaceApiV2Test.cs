@@ -18,7 +18,6 @@ using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using Presentation.Web.Models.API.V2.Response.Shared;
-using System.Data;
 
 namespace Tests.Integration.Presentation.Web.Interfaces.V2
 {
@@ -431,6 +430,25 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Assert that the right interfaces are returned in the correct order
             Assert.Equal(2, dtos.Count);
             Assert.Equal(new[] { itInterface3.Uuid, itInterface1.Uuid }, dtos.Select(x => x.Uuid).ToArray());
+        }
+        
+        [Fact]
+        public async Task GET_Many_As_Stakeholder_With_Name_Filter()
+        {
+            //Arrange
+            var (token, _) = await CreateStakeHolderUserInNewOrg();
+            var searchName = A<string>();
+            var invalidSearchName = $"{searchName}1";
+            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(searchName, A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(invalidSearchName, A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+
+            //Act
+            var dtos = (await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, nameEquals: searchName, pageNumber: 0, pageSize: 10)).ToList();
+
+            //Assert
+            var dto = Assert.Single(dtos);
+            Assert.Equal(dto.Name, itInterface1.Name);
+            Assert.Equal(dto.Uuid, itInterface1.Uuid);
         }
 
         [Fact]
