@@ -88,10 +88,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? exposedBySystemUuid = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
-            string nameEquals = null
+            string nameEquals = null,
+            string interfaceId = null,
+            Guid? organizationUuid = null
             )
             {
-            using var response = await SendGetStakeholderInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals);
+            using var response = await SendGetStakeholderInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals, interfaceId, organizationUuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItInterfaceResponseDTO>>();
@@ -104,7 +106,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? exposedBySystemUuid = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
-            string nameEquals = null
+            string nameEquals = null,
+            string interfaceId = null,
+            Guid? organizationUuid = null
             )
         {
             var path = BasePathInterfaces;
@@ -127,6 +131,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (nameEquals != null)
                 queryParameters.Add(new KeyValuePair<string, string>("nameEquals", nameEquals));
+
+            if (interfaceId != null)
+                queryParameters.Add(new KeyValuePair<string, string>("interfaceId", interfaceId));
+
+            if (organizationUuid != null)
+                queryParameters.Add(new KeyValuePair<string, string>("organizationUuid", organizationUuid.Value.ToString("D")));
 
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";

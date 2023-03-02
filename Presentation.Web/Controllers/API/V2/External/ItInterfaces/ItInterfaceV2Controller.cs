@@ -234,6 +234,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             string nameEquals = null,
+            string interfaceId = null,
+            [NonEmptyGuid] Guid? organizationUuid = null,
             [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
@@ -252,6 +254,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
             if(nameEquals != null)
                 refinements.Add(new QueryByName<ItInterface>(nameEquals));
+
+            if(interfaceId != null)
+                refinements.Add(new QueryByInterfaceId(interfaceId));
+
+            if(organizationUuid.HasValue)
+                refinements.Add(new QueryByOrganizationUuid<ItInterface>(organizationUuid.Value));
 
             return _itInterfaceService
                 .GetAvailableInterfaces(refinements.ToArray())

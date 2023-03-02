@@ -18,7 +18,6 @@ using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using Presentation.Web.Models.API.V2.Response.Shared;
-using System.Data;
 
 namespace Tests.Integration.Presentation.Web.Interfaces.V2
 {
@@ -449,6 +448,41 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Assert
             var dto = Assert.Single(dtos);
             Assert.Equal(dto.Name, itInterface1.Name);
+            Assert.Equal(dto.Uuid, itInterface1.Uuid);
+        }
+        
+        [Fact]
+        public async Task GET_Many_As_Stakeholder_With_InterfaceId_Filter()
+        {
+            //Arrange
+            var (token, _) = await CreateStakeHolderUserInNewOrg();
+            var interfaceId = A<string>();
+            var invalidInterfaceId = $"{interfaceId}1";
+            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), interfaceId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), invalidInterfaceId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+
+            //Act
+            var dtos = (await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, interfaceId: interfaceId, pageNumber: 0, pageSize: 2)).ToList();
+
+            //Assert
+            var dto = Assert.Single(dtos);
+            Assert.Equal(dto.InterfaceId, itInterface1.ItInterfaceId);
+            Assert.Equal(dto.Uuid, itInterface1.Uuid);
+        }
+        
+        [Fact]
+        public async Task GET_Many_As_Stakeholder_With_OrganizationUuid_Filter()
+        {
+            //Arrange
+            var (token, organization) = await CreateStakeHolderUserInNewOrg();
+            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organization.Id, AccessModifier.Public));
+            await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+
+            //Act
+            var dtos = (await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, organizationUuid: organization.Uuid, pageNumber: 0, pageSize: 2)).ToList();
+
+            //Assert
+            var dto = Assert.Single(dtos);
             Assert.Equal(dto.Uuid, itInterface1.Uuid);
         }
 
