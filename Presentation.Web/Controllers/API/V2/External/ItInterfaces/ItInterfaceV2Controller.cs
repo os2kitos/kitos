@@ -222,6 +222,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
         /// <param name="nameEquals">Include only interfaces with a name equal to the parameter</param>
+        /// <param name="usedInOrganizationUuid">Filter by UUID of an organization which has taken the related it-system into use through an it-system-usage resource</param>
         /// <param name="interfaceId">Include only interfaces with an ItInterfaceId equal to the parameter</param>
         /// <param name="organizationUuid">Include only interfaces with an organizationUuid equal to the parameter</param>
         /// <returns></returns>
@@ -236,6 +237,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             string nameEquals = null,
+            [NonEmptyGuid] Guid? usedInOrganizationUuid = null,
             string interfaceId = null,
             [NonEmptyGuid] Guid? organizationUuid = null,
             [FromUri] BoundedPaginationQuery pagination = null)
@@ -256,6 +258,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
             if(nameEquals != null)
                 refinements.Add(new QueryByName<ItInterface>(nameEquals));
+
+            if(usedInOrganizationUuid.HasValue)
+                refinements.Add(new QueryInterfaceByUsedInOrganizationWithUuid(usedInOrganizationUuid.Value));
 
             if(interfaceId != null)
                 refinements.Add(new QueryByInterfaceId(interfaceId));

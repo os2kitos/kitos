@@ -89,11 +89,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             string nameEquals = null,
+            Guid? usedInOrganizationUuid = null,
             string interfaceId = null,
             Guid? organizationUuid = null
             )
             {
-            using var response = await SendGetStakeholderInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals, interfaceId, organizationUuid);
+            using var response = await SendGetStakeholderInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals, usedInOrganizationUuid, interfaceId, organizationUuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItInterfaceResponseDTO>>();
@@ -107,6 +108,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             string nameEquals = null,
+            Guid? usedInOrganizationUuid = null,
             string interfaceId = null,
             Guid? organizationUuid = null
             )
@@ -131,6 +133,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (nameEquals != null)
                 queryParameters.Add(new KeyValuePair<string, string>("nameEquals", nameEquals));
+
+            if (usedInOrganizationUuid.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("usedInOrganizationUuid", usedInOrganizationUuid.Value.ToString("D")));
 
             if (interfaceId != null)
                 queryParameters.Add(new KeyValuePair<string, string>("interfaceId", interfaceId));
