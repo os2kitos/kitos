@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
@@ -39,6 +40,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IGenericRepository<ArchivePeriod>> _archivePeriodRepositoryMock;
         private readonly Mock<IGenericRepository<ItSystemUsagePersonalData>> _personalDataOptionsRepository;
+        private readonly Mock<IOrganizationService> _organizationService;
 
         public ItSystemUsageServiceTest()
         {
@@ -52,6 +54,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _archivePeriodRepositoryMock = new Mock<IGenericRepository<ArchivePeriod>>();
             _personalDataOptionsRepository = new Mock<IGenericRepository<ItSystemUsagePersonalData>>();
+            _organizationService = new Mock<IOrganizationService>();
             _sut = new ItSystemUsageService(
                 _usageRepository.Object,
                 _authorizationContext.Object,
@@ -63,7 +66,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 _userContextMock.Object,
                 new Mock<IItSystemUsageAttachedOptionRepository>().Object,
                 _archivePeriodRepositoryMock.Object,
-                _personalDataOptionsRepository.Object);
+                _personalDataOptionsRepository.Object,
+                _organizationService.Object);
         }
 
         [Fact]
@@ -1234,6 +1238,44 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Get_CollectionPermissions(bool create)
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var organization = new Organization { Id = A<int>() };
+
+            ExpectGetOrganizationReturns(organizationUuid, organization);
+            ExpectAllowCreateReturns(organization.Id, create);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(organizationUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(create, result.Value.Create);
+        }
+
+        [Fact]
+        public void Get_CollectionPermissions_Returns_OperationError_When_GetOrganization_Fails()
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var error = A<OperationError>();
+
+            ExpectGetOrganizationReturns(organizationUuid, error);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(organizationUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(error.FailureType, result.Error.FailureType);
+        }
+
         private static void AssertArchivePeriod(ArchivePeriod expected, ArchivePeriod actual)
         {
             Assert.Equal(expected.StartDate, actual.StartDate);
@@ -1341,6 +1383,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _authorizationContext.Setup(x => x.AllowModify(source)).Returns(value);
         }
 
+        private void ExpectAllowCreateReturns(int orgId, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowCreate<ItSystemUsage>(orgId)).Returns(value);
+        }
+
         private void ExpectAllowReadReturns(IEntity entity, bool value)
         {
             _authorizationContext.Setup(x => x.AllowReads(entity)).Returns(value);
@@ -1351,6 +1398,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _usageRepository.Setup(x => x.AsQueryable()).Returns(itSystemUsages.AsQueryable());
         }
 
+        private void ExpectGetOrganizationReturns(Guid uuid, Result<Organization, OperationError> result, OrganizationDataReadAccessLevel? accessLevel = null)
+        {
+            _organizationService.Setup(x => x.GetOrganization(uuid, accessLevel)).Returns(result);
+        }
 
         /// <summary>
         /// Helper test to make it easy to cover the "Usage not found" case

@@ -5,6 +5,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
@@ -34,6 +35,7 @@ namespace Core.ApplicationServices.Interface
         private readonly IInterfaceRepository _interfaceRepository;
         private readonly IOrganizationalUserContext _userContext;
         private readonly IOperationClock _operationClock;
+        private readonly IOrganizationService _organizationService;
 
         public ItInterfaceService(
             IGenericRepository<DataRow> dataRowRepository,
@@ -43,7 +45,8 @@ namespace Core.ApplicationServices.Interface
             IDomainEvents domainEvents,
             IInterfaceRepository interfaceRepository,
             IOrganizationalUserContext userContext,
-            IOperationClock operationClock)
+            IOperationClock operationClock, 
+            IOrganizationService organizationService)
         {
             _dataRowRepository = dataRowRepository;
             _systemRepository = systemRepository;
@@ -53,7 +56,9 @@ namespace Core.ApplicationServices.Interface
             _interfaceRepository = interfaceRepository;
             _userContext = userContext;
             _operationClock = operationClock;
+            _organizationService = organizationService;
         }
+
         public Result<ItInterface, OperationFailure> Delete(int id, bool breakBindings = false)
         {
             using (var transaction = _transactionManager.Begin())
@@ -269,13 +274,25 @@ namespace Core.ApplicationServices.Interface
             });
         }
 
-        private bool ValidateName(string name)
+        public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid)
+        {
+            return GetInterface(uuid).Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
+        }
+
+        public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid)
+                .Select(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItInterface>(organization.Id, _authorizationContext));
+        }
+
+        private static bool ValidateName(string name)
         {
             return string.IsNullOrWhiteSpace(name) == false &&
                    name.Length <= ItInterface.MaxNameLength;
         }
 
-        private bool ValidateItInterfaceId(string itInterfaceId)
+        private static bool ValidateItInterfaceId(string itInterfaceId)
         {
             return itInterfaceId != null;
         }

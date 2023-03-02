@@ -4,6 +4,7 @@ using Core.DomainServices.Queries;
 using System;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
 
 namespace Core.ApplicationServices.Interface
 {
@@ -19,5 +20,7 @@ namespace Core.ApplicationServices.Interface
         Result<ItInterface, OperationError> UpdateExposingSystem(int interfaceId, int? newSystemId);
         Result<ItInterface, OperationError> UpdateNameAndInterfaceId(int id, string name, string interfaceId);
         Result<ItInterface, OperationError> Deactivate(int id);
+        Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid);
+        Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid);
     }
 }
