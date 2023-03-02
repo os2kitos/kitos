@@ -98,7 +98,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 return BadRequest(ModelState);
 
             return _itSystemService
-                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, usedInOrganizationUuid, paginationQuery)
+                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, usedInOrganizationUuid, paginationQuery: paginationQuery)
                 .Select(_systemResponseMapper.ToSystemResponseDTO)
                 .Transform(Ok);
         }
