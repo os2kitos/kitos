@@ -14,6 +14,6 @@ namespace Core.ApplicationServices.Notification
         Result<Advice, OperationError> CreateScheduledNotification(ScheduledNotificationModel notificationModel);
         Result<Advice, OperationError> Update(int notificationId, UpdateScheduledNotificationModel notification);
         Maybe<OperationError> Delete(int notificationId);
-        Result<Advice, OperationError> DeactivateNotification(int id);
+        Result<Advice, OperationError> DeactivateNotification(int notificationId);
     }
 }

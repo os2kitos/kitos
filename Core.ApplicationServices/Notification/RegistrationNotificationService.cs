@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Core.Abstractions.Types;
@@ -84,12 +85,14 @@ namespace Core.ApplicationServices.Notification
             {
                 return new OperationError($"Scheduling must be defined and cannot be {nameof(Scheduling.Immediate)} when creating advice of type {nameof(AdviceType.Repeat)}", OperationFailure.BadInput);
             }
-            if (newNotification.AlarmDate.Value.Date < _operationClock.Now.Date)
+
+            var startDate = newNotification.AlarmDate.GetValueOrDefault(DateTime.MinValue).Date;
+            if (startDate < _operationClock.Now.Date)
             {
                 return new OperationError("Start date is set before today", OperationFailure.BadInput);
             }
             
-            if (newNotification.StopDate != null && newNotification.StopDate.Value.Date < newNotification.AlarmDate.Value.Date)
+            if (newNotification.StopDate != null && newNotification.StopDate.Value.Date < startDate)
             {
                 return new OperationError("Stop date is set before Start date", OperationFailure.BadInput);
             }
@@ -101,7 +104,7 @@ namespace Core.ApplicationServices.Notification
         {
             using var transaction = _transactionManager.Begin();
 
-            var entityResult = GetNotificationById(notificationId);
+            var entityResult = GetNotificationById(notificationId).Bind(WithModifyAccess);
             if (entityResult.Failed)
                 return entityResult.Error;
             var entity = entityResult.Value;
@@ -109,9 +112,6 @@ namespace Core.ApplicationServices.Notification
                 return new OperationError("Cannot update inactive advice", OperationFailure.BadInput);
             if (entity.AdviceType == AdviceType.Immediate)
                 return new OperationError("Immediate notification cannot be updated!", OperationFailure.BadInput);
-            var validationError = WithModifyAccess(entity);
-            if (validationError.HasValue)
-                return validationError.Value;
 
             MapUpdateSchedulingModelToEntity(notificationModel, entity);
             
@@ -131,17 +131,13 @@ namespace Core.ApplicationServices.Notification
         public Maybe<OperationError> Delete(int notificationId)
         {
             using var transaction = _transactionManager.Begin();
-            var entityResult = _adviceService.GetAdviceById(notificationId);
-            if (entityResult.IsNone)
+            var entityResult = GetNotificationById(notificationId).Bind(WithModifyAccess);
+            if (entityResult.Failed)
             {
-                return new OperationError($"Notification with id {notificationId} was not found", OperationFailure.NotFound);
+                return entityResult.Error;
             }
 
             var entity = entityResult.Value;
-
-            var validationError = WithModifyAccess(entity);
-            if (validationError.HasValue)
-                return validationError.Value;
 
             if (!entity.CanBeDeleted)
             {
@@ -158,19 +154,15 @@ namespace Core.ApplicationServices.Notification
             return Maybe<OperationError>.None;
         }
 
-        public Result<Advice, OperationError> DeactivateNotification(int adviceId)
+        public Result<Advice, OperationError> DeactivateNotification(int notificationId)
         {
             using var transaction = _transactionManager.Begin();
-            var entityResult = _adviceService.GetAdviceById(adviceId);
-            if (entityResult.IsNone)
+            var entityResult = GetNotificationById(notificationId).Bind(WithModifyAccess);
+            if (entityResult.Failed)
             {
-                return new OperationError($"Notification with id {adviceId} was not found", OperationFailure.NotFound);
+                return entityResult.Error;
             }
             var entity = entityResult.Value;
-
-            var validationError = WithModifyAccess(entity);
-            if (validationError.HasValue)
-                return validationError.Value;
 
             _adviceService.Deactivate(entity);
 
@@ -186,8 +178,8 @@ namespace Core.ApplicationServices.Notification
         private Result<Advice, OperationError> Create(Advice newNotification)
         {
             var validationError = WithModifyAccess(newNotification);
-            if (validationError.HasValue)
-                return validationError.Value;
+            if (validationError.Failed)
+                return validationError.Error;
 
             if (newNotification.Reciepients.Where(x => x.RecpientType == RecipientType.USER).Any(x => !_emailValidationRegex.IsMatch(x.Email)))
             {
@@ -311,11 +303,11 @@ namespace Core.ApplicationServices.Notification
                     : new OperationError("User is not allowed to read the notification", OperationFailure.Forbidden));
         }
 
-        private Maybe<OperationError> WithModifyAccess(Advice notification)
+        private Result<Advice,OperationError> WithModifyAccess(Advice notification)
         {
             return ResolveRoot(notification)
                 .Match(root => _authorizationContext.AllowModify(root) 
-                    ? Maybe<OperationError>.None 
+                    ? Result<Advice, OperationError>.Success(notification)
                     : new OperationError($"User is not allowed to modify notification with id: {notification.Id}", OperationFailure.Forbidden),
                     error => error);
         }

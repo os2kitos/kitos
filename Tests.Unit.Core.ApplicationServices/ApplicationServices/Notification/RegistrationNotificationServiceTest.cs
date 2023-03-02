@@ -332,6 +332,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
 
             var transaction = ExpectDatabaseTransaction();
             ExpectGetByIdReturns(id, notification);
+            ExpectAllowReadsReturns(root, true);
             ExpectAllowModifyReturns(root, true);
             ExpectResolveRootReturns(id, Maybe<IEntityWithAdvices>.Some(root));
 
@@ -360,6 +361,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectDatabaseTransaction();
             ExpectGetByIdReturns(id, notification);
             ExpectResolveRootReturns(id, Maybe<IEntityWithAdvices>.Some(root));
+            ExpectAllowReadsReturns(root, true);
             ExpectAllowModifyReturns(root, true);
 
             //Act
@@ -424,6 +426,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
 
             var transaction = ExpectDatabaseTransaction();
             ExpectGetByIdReturns(id, notification);
+            ExpectAllowReadsReturns(root, true);
             ExpectAllowModifyReturns(root, true);
             ExpectResolveRootReturns(id, Maybe<IEntityWithAdvices>.Some(root));
 

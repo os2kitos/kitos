@@ -48,7 +48,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         [EnableQuery]
         public override IHttpActionResult Post(int organizationId, Advice advice)
         {
-            if (advice.RelationId == null || advice.Type == null)
+            if (advice.RelationId == null)
             {
                 //Advice cannot be an orphan - it must belong to a root
                 return BadRequest($"Both {nameof(advice.RelationId)} AND {nameof(advice.Type)} MUST be defined");
@@ -149,7 +149,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 }
 
                 return _registrationNotificationService
-                    .Update(key, new UpdateScheduledNotificationModel(update.Name, update.AlarmDate, MapBaseNotificationProperties(update)))
+                    .Update(key, new UpdateScheduledNotificationModel(update.Name, update.StopDate, MapBaseNotificationProperties(update)))
                     .Match(Ok, FromOperationError);
             }
             catch (Exception e)
@@ -224,7 +224,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 notification.Body,
                 notification.Type,
                 notification.AdviceType,
-                notification.RelationId.Value
+                notification.RelationId ?? throw new ArgumentException(nameof(Advice.RelationId))
             );
         }
 
