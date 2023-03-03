@@ -7,7 +7,6 @@ using Core.DomainServices;
 using Infrastructure.Services.DataAccess;
 using System.Linq;
 using Core.DomainModel.Shared;
-using Core.DomainModel;
 using Core.DomainServices.Advice;
 
 namespace Core.ApplicationServices.Notification
@@ -42,7 +41,10 @@ namespace Core.ApplicationServices.Notification
                 .Select(DeleteUserRelationsByAdviceId);
 
             if (notificationResult.Failed)
+            {
+                transaction.Rollback();
                 return notificationResult.Error;
+            }
             var notification = notificationResult.Value;
 
             var recipients = new List<AdviceUserRelation>();

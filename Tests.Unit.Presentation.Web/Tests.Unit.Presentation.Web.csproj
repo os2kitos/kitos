@@ -219,6 +219,7 @@
     <Compile Include="Context\OwinAuthenticationContextFactoryTest.cs" />
     <Compile Include="Controllers\CronStringHelperTests.cs" />
     <Compile Include="DomainServices\Advices\QueryByActiveAdviceTest.cs" />
+    <Compile Include="DomainServices\Advices\QueryByOwnerResourceTest.cs" />
     <Compile Include="DomainServices\Advices\QueryByOwnerResourceIdTest.cs" />
     <Compile Include="DomainServices\Contract\QueryBySupplierUuidTest.cs" />
     <Compile Include="DomainServices\Contract\QueryByResponsibleOrganizationUnitUuidTest.cs" />

@@ -68,7 +68,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var conditions = new List<IDomainQuery<Advice>>();
+            var conditions = new List<IDomainQuery<Advice>>
+            {
+                new QueryByOwnerResource(ownerResourceType.ToRelatedEntityType())
+            };
 
             if (ownerResourceUuid.HasValue)
             {
@@ -77,7 +80,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
                 if (idResult.IsNone)
                     return BadRequest($"OwnerResource with uuid: {unpackedOwnerResourceUuid} was not found");
 
-                conditions.Add(new QueryByOwnerResourceId(idResult.Value, ownerResourceType.ToRelatedEntityType()));
+                conditions.Add(new QueryByOwnerResourceId(idResult.Value));
             }
 
             if (onlyActive)

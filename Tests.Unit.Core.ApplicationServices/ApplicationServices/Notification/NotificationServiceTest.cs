@@ -97,7 +97,8 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             
             var root = ExpectGetRelatedEntityReturnsEntity(relatedEntityUuid, relatedEntityType);
             var notification = CreateNewNotification(relatedEntityType, relationId: root.Id);
-            var condition = new QueryByOwnerResourceId(root.Id, relatedEntityType);
+            var condition1 = new QueryByOwnerResource(relatedEntityType);
+            var condition2 = new QueryByOwnerResourceId(root.Id);
 
             var notifications = new List<Advice> { notification, CreateNewNotification(relatedEntityType) }.AsQueryable();
 
@@ -105,7 +106,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectGetNotificationsByOrganizationIdReturns(orgId, Result<IQueryable<Advice>, OperationError>.Success(notifications));
 
             //Act
-            var result = _sut.GetNotifications(orgUuid, 0, int.MaxValue, condition);
+            var result = _sut.GetNotifications(orgUuid, 0, int.MaxValue, condition1, condition2);
 
             //Arrange
             Assert.True(result.Ok);
@@ -123,10 +124,13 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var relatedEntityUuid = A<Guid>();
             var relatedEntityType = A<RelatedEntityType>();
             
-            var root = ExpectGetRelatedEntityReturnsEntity(relatedEntityUuid, relatedEntityType);
-            var notification = CreateNewNotification(relatedEntityType, relationId: root.Id);
 
-            var notifications = new List<Advice> { CreateNewNotification(relatedEntityType), notification, CreateNewNotification(relatedEntityType) }.AsQueryable();
+            var root = ExpectGetRelatedEntityReturnsEntity(relatedEntityUuid, relatedEntityType);
+            var notificationId = A<int>();
+            var notification2Id = notificationId + A<int>();
+            var notification = CreateNewNotification(relatedEntityType, id: notification2Id, relationId: root.Id);
+
+            var notifications = new List<Advice> { CreateNewNotification(relatedEntityType, id: notificationId), notification, CreateNewNotification(relatedEntityType, id: notification2Id + A<int>()) }.AsQueryable();
 
             ExpectResolveIdReturns<Organization>(orgUuid, orgId);
             ExpectGetNotificationsByOrganizationIdReturns(orgId, Result<IQueryable<Advice>, OperationError>.Success(notifications));

@@ -6,17 +6,15 @@ namespace Core.DomainServices.Queries.Notifications
     public class QueryByOwnerResourceId : IDomainQuery<DomainModel.Advice.Advice>
     {
         private readonly int _ownerResourceId;
-        private readonly RelatedEntityType _ownerResourceType;
 
-        public QueryByOwnerResourceId(int ownerResourceId, RelatedEntityType ownerResourceType)
+        public QueryByOwnerResourceId(int ownerResourceId)
         {
             _ownerResourceId = ownerResourceId;
-            _ownerResourceType = ownerResourceType;
         }
 
         public IQueryable<DomainModel.Advice.Advice> Apply(IQueryable<DomainModel.Advice.Advice> source)
         {
-            return source.Where(notification => notification.RelationId == _ownerResourceId && notification.Type == _ownerResourceType);
+            return source.Where(notification => notification.RelationId == _ownerResourceId);
         }
     }
 }
