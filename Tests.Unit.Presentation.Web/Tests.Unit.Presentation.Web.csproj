@@ -293,6 +293,7 @@
     <Compile Include="Models\V2\ExternalReferenceResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItContractResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItContractWriteModelMapperTest.cs" />
+    <Compile Include="Models\V2\ItInterfaceResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItInterfaceWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageResponseMapperTest.cs" />

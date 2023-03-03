@@ -303,12 +303,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Theory]
-        [InlineData(true, true, true, true)]
-        [InlineData(true, true, true, false)]
-        [InlineData(true, true, false, true)]
-        [InlineData(true, false, true, true)]
-        [InlineData(false, true, true, true)]
-        public async Task Cannot_POST_ItSystem_AsRightsHolder_WithoutAllRequiredFields(bool withoutRightsHolder, bool withoutName, bool withoutDescription, bool withoutReference)
+        [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, true)]
+        [InlineData(false, true, true)]
+        public async Task Cannot_POST_ItSystem_AsRightsHolder_WithoutAllRequiredFields(bool withoutRightsHolder, bool withoutName, bool withoutDescription)
         {
             //Arrange
             var (token, org) = await CreateRightsHolderAccessUserInNewOrganizationAsync();

@@ -1,5 +1,4 @@
-﻿using Presentation.Web.Models;
-using Presentation.Web.Models.API.V2.Request;
+﻿using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Response.Interface;
 using System;
 using System.Collections.Generic;
@@ -81,7 +80,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(url, token);
         }
 
-        public static async Task<IEnumerable<ItInterfaceResponseDTO>> GetStakeholderInterfacesAsync(
+        public static async Task<IEnumerable<ItInterfaceResponseDTO>> GetInterfacesAsync(
             string token,
             int? pageSize = null,
             int? pageNumber = null,
@@ -92,13 +91,13 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? usedInOrganizationUuid = null
             )
         {
-            using var response = await SendGetStakeholderInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals, usedInOrganizationUuid);
+            using var response = await SendGetInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals, usedInOrganizationUuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItInterfaceResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetStakeholderInterfacesAsync(
+        public static async Task<HttpResponseMessage> SendGetInterfacesAsync(
             string token,
             int? pageSize = null,
             int? pageNumber = null,
@@ -139,15 +138,15 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(path), token);
         }
 
-        public static async Task<ItInterfaceResponseDTO> GetStakeholderInterfaceAsync(string token, Guid interfaceGuid)
+        public static async Task<ItInterfaceResponseDTO> GetInterfaceAsync(string token, Guid interfaceGuid)
         {
-            using var response = await SendGetStakeholderInterfaceAsync(token, interfaceGuid);
+            using var response = await SendGetInterfaceAsync(token, interfaceGuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<ItInterfaceResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetStakeholderInterfaceAsync(string token, Guid interfaceGuid)
+        public static async Task<HttpResponseMessage> SendGetInterfaceAsync(string token, Guid interfaceGuid)
         {
             var url = TestEnvironment.CreateUrl($"{BasePathInterfaces}/{interfaceGuid}");
             return await HttpApi.GetWithTokenAsync(url, token);
@@ -212,6 +211,38 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<ResourceCollectionPermissionsResponseDTO>();
+        }
+
+        public static async Task<ItInterfaceResponseDTO> CreateItInterfaceAsync(string token, CreateItInterfaceRequestDTO request)
+        {
+            using var response = await SendCreateItInterfaceAsync(token, request);
+            var errors =  await response.Content.ReadAsStringAsync();
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ItInterfaceResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendCreateItInterfaceAsync(string token, CreateItInterfaceRequestDTO request)
+        {
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("api/v2/it-interfaces"), request, token);
+        }
+
+        public static async Task<ItInterfaceResponseDTO> PatchInterfaceAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
+        {
+            using var response = await SendPatchInterfaceAsync(token, uuid, changedProperties);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ItInterfaceResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchInterfaceAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-interfaces/{uuid}"), token, changedProperties.ToDictionary(x => x.Key, x => x.Value));
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteItInterfaceAsync(string token, Guid itInterfaceUuid)
+        {
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-interfaces/{itInterfaceUuid}"), token);
         }
     }
 }
