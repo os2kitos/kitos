@@ -4,6 +4,7 @@ namespace Core.ApplicationServices.Model.Notification.Write
 {
     public class RootRecipientModificationParameters
     {
+        public static RootRecipientModificationParameters Empty() => new (new List<EmailRecipientModificationParameters>(), new List<RoleRecipientModificationParameters>());
         public RootRecipientModificationParameters(IEnumerable<EmailRecipientModificationParameters> emailRecipients, IEnumerable<RoleRecipientModificationParameters> roleRecipients)
         {
             EmailRecipients = emailRecipients;

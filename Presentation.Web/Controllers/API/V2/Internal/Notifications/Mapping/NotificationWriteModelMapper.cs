@@ -70,7 +70,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
             (
                 MapEmailRecipients(dto.EmailRecipients),
                 MapRoleRecipients(dto.RoleRecipients)
-            ) : null;
+            ) : RootRecipientModificationParameters.Empty();
         }
 
         private static IEnumerable<EmailRecipientModificationParameters> MapEmailRecipients(IEnumerable<EmailRecipientWriteRequestDTO> dtos)

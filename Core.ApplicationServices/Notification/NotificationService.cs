@@ -6,6 +6,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Model.Notification.Read;
 using Core.ApplicationServices.Model.Notification.Write;
+using Core.ApplicationServices.Shared;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Events;
@@ -56,13 +57,12 @@ namespace Core.ApplicationServices.Notification
             _domainEvents = domainEvents;
         }
 
-        public Result<IQueryable<NotificationResultModel>, OperationError> GetNotifications(Guid organizationUuid, params IDomainQuery<Advice>[] conditions)
+        public Result<IEnumerable<NotificationResultModel>, OperationError> GetNotifications(Guid organizationUuid, int? page, int? pageSize, params IDomainQuery<Advice>[] conditions)
         {
             return ResolveOrganizationId(organizationUuid)
                 .Bind(_registrationNotificationService.GetNotificationsByOrganizationId)
-                .Select(baseQuery => ApplyQuery(baseQuery, conditions).ToList())
-                .Bind(MapNotificationsToResultModelList)
-                .Select(x => x.AsQueryable());
+                .Select(baseQuery => ApplyQuery(baseQuery, page, pageSize, conditions).ToList())
+                .Bind(MapNotificationsToResultModelList);
         }
 
         public Result<NotificationResultModel, OperationError> GetNotificationByUuid(Guid uuid, Guid relatedEntityUuid, RelatedEntityType relatedEntityType)
@@ -263,9 +263,6 @@ namespace Core.ApplicationServices.Notification
         private Result<RecipientModel, OperationError> MapRootRecipientModel(
             RootRecipientModificationParameters root, RelatedEntityType relatedEntityType)
         {
-            if (root == null)
-                return RecipientModel.Empty();
-
             return MapRoleRecipients(root.RoleRecipients, relatedEntityType)
                 .Bind<RecipientModel>(roleRecipients => new RecipientModel
                     (
@@ -318,14 +315,21 @@ namespace Core.ApplicationServices.Notification
             };
         }
 
-        private static IEnumerable<Advice> ApplyQuery(IQueryable<Advice> baseQuery, params IDomainQuery<Advice>[] conditions)
+        private static IQueryable<Advice> ApplyQuery(IQueryable<Advice> baseQuery, int? page, int? pageSize, params IDomainQuery<Advice>[] conditions)
         {
             var subQueries = new List<IDomainQuery<Advice>>();
             subQueries.AddRange(conditions);
 
-            return subQueries.Any()
+            var query = subQueries.Any()
                 ? new IntersectionQuery<Advice>(subQueries).Apply(baseQuery)
                 : baseQuery;
+
+            var offsetResult = query.OrderBy(x => x.Id)
+                .Skip(page.GetValueOrDefault(0) * pageSize.GetValueOrDefault(0));
+
+            return pageSize.HasValue
+                ? offsetResult.Take(pageSize.Value)
+                : offsetResult;
         }
 
         private Result<TSuccess, OperationError> Modify<TSuccess>(Guid relatedEntityUuid, RelatedEntityType relatedEntityType, Func<IEntityWithAdvices, Result<TSuccess, OperationError>> mutation)

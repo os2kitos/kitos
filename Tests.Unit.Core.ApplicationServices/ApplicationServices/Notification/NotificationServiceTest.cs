@@ -78,7 +78,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectGetNotificationsByOrganizationIdReturns(orgId, Result<IQueryable<Advice>, OperationError>.Success(notifications));
 
             //Act
-            var result = _sut.GetNotifications(orgUuid);
+            var result = _sut.GetNotifications(orgUuid, 0, int.MaxValue);
 
             //Arrange
             Assert.True(result.Ok);
@@ -105,7 +105,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectGetNotificationsByOrganizationIdReturns(orgId, Result<IQueryable<Advice>, OperationError>.Success(notifications));
 
             //Act
-            var result = _sut.GetNotifications(orgUuid, condition);
+            var result = _sut.GetNotifications(orgUuid, 0, int.MaxValue, condition);
 
             //Arrange
             Assert.True(result.Ok);
@@ -126,7 +126,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectGetNotificationsByOrganizationIdReturns(orgId, error);
 
             //Act
-            var result = _sut.GetNotifications(orgUuid);
+            var result = _sut.GetNotifications(orgUuid, 0, int.MaxValue);
 
             //Arrange
             Assert.True(result.Failed);
@@ -142,7 +142,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             ExpectResolveIdReturns<Organization>(orgUuid, Maybe<int>.None);
 
             //Act
-            var result = _sut.GetNotifications(orgUuid);
+            var result = _sut.GetNotifications(orgUuid, 0, int.MaxValue);
 
             //Arrange
             Assert.True(result.Failed);

@@ -85,17 +85,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
                 conditions.Add(new QueryByActiveAdvice(true));
             }
 
-            return _notificationService.GetNotifications(organizationUuid, conditions.ToArray())
-                .Select
-                (
-                    notifications =>
-                        notifications
-                            .OrderBy(x => x.Id)
-                            .Page(paginationQuery)
-                            .ToList()
-                            .Select(_responseMapper.MapNotificationResponseDTO)
-                            .ToList()
-                )
+            return _notificationService.GetNotifications(organizationUuid, paginationQuery?.Page, paginationQuery?.PageSize, conditions.ToArray())
+                .Select(notifications => notifications
+                    .Select(_responseMapper.MapNotificationResponseDTO)
+                    .ToList())
                 .Match(Ok, FromOperationError);
         }
 

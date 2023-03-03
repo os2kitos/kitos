@@ -99,7 +99,6 @@ namespace Core.ApplicationServices.Notification
 
         public Result<Advice, OperationError> Update(int notificationId, UpdateScheduledNotificationModel notificationModel)
         {
-            using var transaction = _transactionManager.Begin();
 
             var entityResult = GetNotificationById(notificationId);
             if (entityResult.Failed)
@@ -113,12 +112,19 @@ namespace Core.ApplicationServices.Notification
             if (validationError.HasValue)
                 return validationError.Value;
 
+            using var transaction = _transactionManager.Begin();
+
             MapUpdateSchedulingModelToEntity(notificationModel, entity);
             
             _adviceRepository.Update(entity);
             var error = RaiseAsRootModification(entity);
+
             if (error.HasValue)
+            {
+                transaction.Rollback();
                 return error.Value;
+            }
+
             _adviceRepository.Save();
 
             _adviceService.UpdateSchedule(entity);
@@ -130,7 +136,6 @@ namespace Core.ApplicationServices.Notification
 
         public Maybe<OperationError> Delete(int notificationId)
         {
-            using var transaction = _transactionManager.Begin();
             var entityResult = _adviceService.GetAdviceById(notificationId);
             if (entityResult.IsNone)
             {
@@ -148,10 +153,16 @@ namespace Core.ApplicationServices.Notification
                 return new OperationError("Cannot delete advice which is active or has been sent", OperationFailure.BadState);
             }
 
-            var error = RaiseAsRootModification(entity);
-            if (error.HasValue)
-                return error.Value;
+            using var transaction = _transactionManager.Begin();
+
             _adviceService.Delete(entity);
+            var error = RaiseAsRootModification(entity);
+
+            if (error.HasValue)
+            {
+                transaction.Rollback();
+                return error.Value;
+            }
             
             transaction.Commit();
 
@@ -160,7 +171,6 @@ namespace Core.ApplicationServices.Notification
 
         public Result<Advice, OperationError> DeactivateNotification(int adviceId)
         {
-            using var transaction = _transactionManager.Begin();
             var entityResult = _adviceService.GetAdviceById(adviceId);
             if (entityResult.IsNone)
             {
@@ -170,13 +180,21 @@ namespace Core.ApplicationServices.Notification
 
             var validationError = WithModifyAccess(entity);
             if (validationError.HasValue)
+            {
                 return validationError.Value;
+            }
+
+            using var transaction = _transactionManager.Begin();
 
             _adviceService.Deactivate(entity);
 
             var error = RaiseAsRootModification(entity);
+
             if (error.HasValue)
+            {
+                transaction.Rollback();
                 return error.Value;
+            }
 
             transaction.Commit();
 
@@ -199,10 +217,13 @@ namespace Core.ApplicationServices.Notification
             newNotification.IsActive = true;
 
             _adviceRepository.Insert(newNotification);
-
             var error = RaiseAsRootModification(newNotification);
+
             if (error.HasValue)
+            {
+                transaction.Rollback();
                 return error.Value;
+            }
 
             _adviceRepository.Save();
 
