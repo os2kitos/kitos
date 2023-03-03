@@ -99,7 +99,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var dpr2 = await CreateDPRAsync(organization.Id);
 
             //Act
-            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100);
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 250);
 
             //Assert
             Assert.Equal(2, dprs.Count());
@@ -164,7 +164,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var dpr2 = await CreateDPRAsync(organization2.Id);
 
             //Act
-            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100);
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 250);
 
             //Assert
             var retrievedDPR = Assert.Single(dprs);
@@ -184,7 +184,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(HttpStatusCode.OK, assignResult.StatusCode);
 
             //Act
-            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100, systemUuid: newSystem.Uuid);
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 250, systemUuid: newSystem.Uuid);
 
             //Assert
             var retrievedDPR = Assert.Single(dprs);
@@ -204,7 +204,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(HttpStatusCode.OK, assignResult.StatusCode);
 
             //Act
-            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100, systemUsageUuid: newSystemUsage.Uuid);
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 250, systemUsageUuid: newSystemUsage.Uuid);
 
             //Assert
             var retrievedDPR = Assert.Single(dprs);
@@ -223,7 +223,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(HttpStatusCode.OK, assignResult.StatusCode);
 
             //Act
-            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100, dataProcessorUuid: dataProcessor.Uuid);
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 250, dataProcessorUuid: dataProcessor.Uuid);
 
             //Assert
             var retrievedDPR = Assert.Single(dprs);
@@ -244,7 +244,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(HttpStatusCode.OK, assignResult.StatusCode);
 
             //Act
-            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100, subDataProcessorUuid: subDataProcessor.Uuid);
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 250, subDataProcessorUuid: subDataProcessor.Uuid);
 
             //Assert
             var retrievedDPR = Assert.Single(dprs);
@@ -271,7 +271,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(HttpStatusCode.OK, assignResult2.StatusCode);
 
             //Act
-            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100, agreementConcluded: isAgreementConcluded);
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 250, agreementConcluded: isAgreementConcluded);
 
             //Assert
             if (isAgreementConcluded)
