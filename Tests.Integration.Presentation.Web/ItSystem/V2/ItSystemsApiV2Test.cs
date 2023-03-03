@@ -394,7 +394,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Fact]
-        public async Task GET_Many_Internal_As_StakeHolder_With_NameContains_Filter()
+        public async Task GET_Many_As_StakeHolder_With_NameContains_Filter()
         {
             //Arrange
             var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
