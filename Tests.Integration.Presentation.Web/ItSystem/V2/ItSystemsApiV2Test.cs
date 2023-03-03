@@ -394,6 +394,27 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Fact]
+        public async Task GET_Many_Internal_As_StakeHolder_With_NameContains_Filter()
+        {
+            //Arrange
+            var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var baseName = CreateName();
+            var searchName = $"{baseName}1";
+            var validName2 = $"{searchName}2";
+
+            await ItSystemHelper.CreateItSystemInOrganizationAsync(baseName, organization.Id, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(searchName, organization.Id, AccessModifier.Public);
+            var system3 = await ItSystemHelper.CreateItSystemInOrganizationAsync(validName2, organization.Id, AccessModifier.Public);
+
+            //Act
+            var dtos = (await ItSystemV2Helper.GetManyAsync(token, nameContains: searchName, page: 0, pageSize: 10)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            Assert.Equal(new[] { system2.Uuid, system3.Uuid }, dtos.Select(x => x.Uuid).ToArray());
+        }
+
+        [Fact]
         public async Task Can_Get_Hierarchy()
         {
             //Arrange

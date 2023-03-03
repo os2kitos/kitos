@@ -88,10 +88,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             string nameEquals = null,
-            Guid? usedInOrganizationUuid = null
+            Guid? usedInOrganizationUuid = null,
+            string nameContains = null
             )
         {
-            using var response = await SendGetInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals, usedInOrganizationUuid);
+            using var response = await SendGetInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals, usedInOrganizationUuid, nameContains);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItInterfaceResponseDTO>>();
@@ -105,9 +106,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             string nameEquals = null,
-            Guid? usedInOrganizationUuid = null
+            Guid? usedInOrganizationUuid = null,
+            string nameContains = null
             )
-        {
+            {
             var path = BasePathInterfaces;
             var queryParameters = new List<KeyValuePair<string, string>>();
 
@@ -128,6 +130,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (nameEquals != null)
                 queryParameters.Add(new KeyValuePair<string, string>("nameEquals", nameEquals));
+
+            if (nameContains != null)
+                queryParameters.Add(new KeyValuePair<string, string>("nameContains", nameContains));
 
             if (usedInOrganizationUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("usedInOrganizationUuid", usedInOrganizationUuid.Value.ToString("D")));

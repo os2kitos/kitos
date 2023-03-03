@@ -190,6 +190,26 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         }
 
         [Fact]
+        public async Task GET_Many_As_Stakeholder_With_Part_Of_Name_Filter()
+        {
+            //Arrange
+            var (token, _) = await CreateStakeHolderUserInNewOrg();
+            var baseName = A<string>();
+            var searchName = $"{baseName}1";
+            var validName2 = searchName + A<string>();
+            await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(baseName, A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(searchName, A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(validName2, A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+
+            //Act
+            var dtos = (await InterfaceV2Helper.GetInterfacesAsync(token, nameContains: searchName, pageNumber: 0, pageSize: 10)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            Assert.Equal(new[] { itInterface1.Uuid, itInterface2.Uuid }, dtos.Select(x => x.Uuid).ToArray());
+        }
+
+        [Fact]
         public async Task GET_Many_As_Stakeholder_With_UsedInOrganizationUuid_Filter()
         {
             //Arrange
