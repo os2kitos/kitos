@@ -205,13 +205,13 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var invalidWrongOrganizationDto = InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
 
             var validInterface = await InterfaceHelper.CreateInterface(validDto);
-            await  InterfaceHelper.CreateInterface(invalidNoExhibitDto);
+            await InterfaceHelper.CreateInterface(invalidNoExhibitDto);
             var invalidNoUsageInterface = await InterfaceHelper.CreateInterface(invalidNoUsageDto);
             var invalidWrongOrganizationInterface = await InterfaceHelper.CreateInterface(invalidWrongOrganizationDto);
 
             await ItSystemHelper.TakeIntoUseAsync(system.Id, orgId);
             await ItSystemHelper.TakeIntoUseAsync(system3.Id, TestEnvironment.DefaultOrganizationId);
-            
+
             await InterfaceExhibitHelper.CreateExhibit(system.Id, validInterface.Id);
             await InterfaceExhibitHelper.CreateExhibit(system2.Id, invalidNoUsageInterface.Id);
             await InterfaceExhibitHelper.CreateExhibit(system3.Id, invalidWrongOrganizationInterface.Id);
@@ -486,6 +486,44 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
                 Create = create
             };
             Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        [Fact]
+        public async Task Can_Create_Update_And_Delete_Data_ItInterface()
+        {
+            //Arrange
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var organization = await CreateOrganization();
+            var input = await CreateFullItInterfaceRequestAsync(token, organization);
+            var createdItInterface = await InterfaceV2Helper.CreateItInterfaceAsync(token.Token, input);
+            var interfaceDataTypes =
+                (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItInterfaceDataTypes, organization.Uuid,
+                    10, 0)).RandomItems(2).ToList();
+            var initialType = interfaceDataTypes.First();
+            var updatedType = interfaceDataTypes.Last();
+
+            var creationRequest = new ItInterfaceDataRequestDTO
+            {
+                Description = A<string>(),
+                DataTypeUuid = initialType.Uuid
+            };
+            var updateRequest = new ItInterfaceDataRequestDTO
+            {
+                Description = A<string>(),
+                DataTypeUuid = initialType.Uuid
+            };
+
+            //Act
+            var createdData = await InterfaceV2Helper.CreateItInterfaceDataDescriptionAsync(token.Token, createdItInterface.Uuid, creationRequest);
+            var updatedData = await InterfaceV2Helper.UpdateItInterfaceDataDescriptionAsync(token.Token, createdItInterface.Uuid, createdData.Uuid, updateRequest);
+            using var deletionResponse = await InterfaceV2Helper.SendDeleteItInterfaceDataDescriptionAsync(token.Token, createdItInterface.Uuid, createdData.Uuid);
+
+            //Assert
+            Assert.Equivalent(creationRequest, ToItInterfaceDataRequestDto(createdData));
+            Assert.Equivalent(updateRequest, ToItInterfaceDataRequestDto(updatedData));
+            Assert.Equal(HttpStatusCode.NoContent, deletionResponse.StatusCode);
+            var afterDelete = await InterfaceV2Helper.GetInterfaceAsync(token.Token, createdItInterface.Uuid);
+            Assert.DoesNotContain(afterDelete.Data, x => x.Uuid == createdData.Uuid);
         }
 
         private async Task<(string token, OrganizationDTO createdOrganization)> CreateStakeHolderUserInNewOrg()

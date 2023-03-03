@@ -176,7 +176,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             return _writeService
                 .UpdateDataDescription(uuid, dataDescriptionUuid, parameters)
                 .Select(_responseMapper.ToDataResponseDTO)
-                .Match(ToCreatedResponse, FromOperationError);
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -191,7 +191,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataDescription([NonEmptyGuid] Guid uuid, [NonEmptyGuid] Guid dataDescriptionUuid)
+        public IHttpActionResult DeleteDataDescription([NonEmptyGuid] Guid uuid, [NonEmptyGuid] Guid dataDescriptionUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
