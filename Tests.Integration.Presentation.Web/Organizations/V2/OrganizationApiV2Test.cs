@@ -111,7 +111,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
 
             //Act
-            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 100);
+            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250);
 
             //Assert
             Assert.NotEmpty(organizations);
@@ -125,7 +125,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var newOrg = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
 
             //Act
-            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 100, nameContent: newOrg.Name);
+            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250, nameContent: newOrg.Name);
 
             //Assert
             var org = Assert.Single(organizations);
@@ -156,7 +156,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var newOrg = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
 
             //Act
-            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 100, cvrContent: newOrg.Cvr);
+            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250, cvrContent: newOrg.Cvr);
 
             //Assert
             var org = Assert.Single(organizations);
@@ -172,7 +172,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var newOrg = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
 
             //Act
-            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 100, nameOrCvrContent: inputIsCvr ? newOrg.Cvr : newOrg.Name);
+            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250, nameOrCvrContent: inputIsCvr ? newOrg.Cvr : newOrg.Name);
 
             //Assert
             var org = Assert.Single(organizations.Where(x=>x.Uuid == newOrg.Uuid));
