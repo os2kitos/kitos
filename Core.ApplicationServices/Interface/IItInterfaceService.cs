@@ -2,8 +2,10 @@
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.Authorization;
 
 namespace Core.ApplicationServices.Interface
@@ -20,6 +22,11 @@ namespace Core.ApplicationServices.Interface
         Result<ItInterface, OperationError> UpdateExposingSystem(int interfaceId, int? newSystemId);
         Result<ItInterface, OperationError> UpdateNameAndInterfaceId(int id, string name, string interfaceId);
         Result<ItInterface, OperationError> Deactivate(int id);
+        Result<ItInterface, OperationError> Activate(int id);
+        Result<ItInterface, OperationError> UpdateNote(int id, string newValue);
+        Result<ItInterface, OperationError> UpdateAccessModifier(int id, AccessModifier newValue);
+        Result<ItInterface, OperationError> UpdateInterfaceType(int id, Guid? interfaceTypeUuid);
+        Result<ItInterface, OperationError> ReplaceInterfaceData(int id, IEnumerable<ItInterfaceDataWriteModel> newData);
         Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid);
         Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid);
     }
