@@ -877,9 +877,7 @@ namespace Tests.Unit.Core.ApplicationServices
                     new ItInterfaceDataWriteModel(A<string>(),null),
                 };
 
-                _optionResolverMock
-                    .Setup(x => x.GetOptionType<DataRow, DataType>(itInterface.Organization.Uuid,
-                        dataType.Uuid)).Returns((dataType, true));
+                ExpectResolveDataTypeOptionReturns(itInterface, dataType.Uuid, (dataType, true));
 
                 //Act
                 var updatedInterface = _sut.ReplaceInterfaceData(itInterface.Id, rows);
@@ -902,9 +900,7 @@ namespace Tests.Unit.Core.ApplicationServices
                     new ItInterfaceDataWriteModel(A<string>(),dataType.Uuid),
                 };
 
-                _optionResolverMock
-                    .Setup(x => x.GetOptionType<DataRow, DataType>(itInterface.Organization.Uuid,
-                        dataType.Uuid)).Returns((dataType, false));
+                ExpectResolveDataTypeOptionReturns(itInterface, dataType.Uuid, (dataType, false));
 
                 return _sut.ReplaceInterfaceData(itInterface.Id, rows);
             }, error => Assert.Equal(OperationFailure.BadInput, error.FailureType));
@@ -922,9 +918,7 @@ namespace Tests.Unit.Core.ApplicationServices
                     new ItInterfaceDataWriteModel(A<string>(),dataType.Uuid),
                 };
 
-                _optionResolverMock
-                    .Setup(x => x.GetOptionType<DataRow, DataType>(itInterface.Organization.Uuid,
-                        dataType.Uuid)).Returns(error);
+                ExpectResolveDataTypeOptionReturns(itInterface, dataType.Uuid, error);
 
                 return _sut.ReplaceInterfaceData(itInterface.Id, rows);
             }, error => Assert.Equal(error.FailureType, error.FailureType));
@@ -955,9 +949,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
                 if (withDataType)
                 {
-                    _optionResolverMock
-                        .Setup(x => x.GetOptionType<DataRow, DataType>(itInterface.Organization.Uuid,
-                            dataType.Uuid)).Returns((dataType, true));
+                    ExpectResolveDataTypeOptionReturns(itInterface, dataType.Uuid, (dataType, true));
 
                 }
 
@@ -982,9 +974,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 var dataType = new DataType() { Uuid = A<Guid>() };
                 var input = new ItInterfaceDataWriteModel(A<string>(), dataType.Uuid);
 
-                _optionResolverMock
-                    .Setup(x => x.GetOptionType<DataRow, DataType>(itInterface.Organization.Uuid,
-                        dataType.Uuid)).Returns((dataType, false));
+                ExpectResolveDataTypeOptionReturns(itInterface, dataType.Uuid, (dataType, false));
 
                 return _sut.AddInterfaceData(itInterface.Id, input).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error);
             }, error => Assert.Equal(OperationFailure.BadInput, error.FailureType));
@@ -993,18 +983,16 @@ namespace Tests.Unit.Core.ApplicationServices
         [Fact]
         public void Cannot_AddInterfaceData_If_DataType_Is_Not_Found()
         {
-            var error = A<OperationError>();
+            var expectedError = A<OperationError>();
             Test_Command_Which_Fails_Mutating_ItInterface(itInterface =>
             {
                 var dataType = new DataType() { Uuid = A<Guid>() };
                 var input = new ItInterfaceDataWriteModel(A<string>(), dataType.Uuid);
 
-                _optionResolverMock
-                    .Setup(x => x.GetOptionType<DataRow, DataType>(itInterface.Organization.Uuid,
-                        dataType.Uuid)).Returns((dataType, false));
+                ExpectResolveDataTypeOptionReturns(itInterface, dataType.Uuid, expectedError);
 
-                return _sut.AddInterfaceData(itInterface.Id, input).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error);
-            }, error => Assert.Equal(error.FailureType, error.FailureType));
+                return _sut.AddInterfaceData(itInterface.Id, input).Match<Result<ItInterface, OperationError>>(_ => itInterface, operationError => operationError);
+            }, error => Assert.Equal(expectedError.FailureType, error.FailureType));
         }
 
         [Fact]
@@ -1019,12 +1007,167 @@ namespace Tests.Unit.Core.ApplicationServices
             Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.AddInterfaceData(itInterface.Id, A<ItInterfaceDataWriteModel>()).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error));
         }
 
-        /*
-         *TODO
-         * - Update
-         * - Delete
-         *
-         */
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void UpdateInterfaceData_Returns_Updated_DataRow(bool withDataType)
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Success(itInterface =>
+            {
+                //Arrange
+                var expectedUpdatedRow = new DataRow()
+                {
+                    Uuid = A<Guid>(),
+                    Data = A<string>(),
+                    DataType = new DataType() { Uuid = A<Guid>() }
+                };
+                itInterface.DataRows.Add(expectedUpdatedRow);
+                itInterface.DataRows.Add(new DataRow());
+                var dataType = new DataType() { Uuid = A<Guid>() };
+                var input = new ItInterfaceDataWriteModel(A<string>(), withDataType ? dataType.Uuid : null);
+
+                if (withDataType)
+                {
+                    ExpectResolveDataTypeOptionReturns(itInterface, dataType.Uuid, (dataType, true));
+
+                }
+
+                //Act
+                var result = _sut.UpdateInterfaceData(itInterface.Id, expectedUpdatedRow.Uuid, input);
+
+                //Assert
+                Assert.True(result.Ok);
+                var dataRow = result.Value;
+                Assert.Same(expectedUpdatedRow, dataRow);
+                Assert.Equal(input.DataDescription, dataRow.Data);
+                Assert.Equal(input.DataTypeUuid, dataRow.DataType?.Uuid);
+                return itInterface;
+            });
+        }
+
+        [Fact]
+        public void Cannot_UpdateInterfaceData_If_DataType_Is_Not_Available()
+        {
+            Test_Command_Which_Fails_Mutating_ItInterface(itInterface =>
+            {
+                //Arrange
+                var expectedUpdatedRow = new DataRow()
+                {
+                    Uuid = A<Guid>(),
+                    Data = A<string>(),
+                    DataType = new DataType() { Uuid = A<Guid>() }
+                };
+                itInterface.DataRows.Add(expectedUpdatedRow);
+                itInterface.DataRows.Add(new DataRow());
+                var dataType = new DataType() { Uuid = A<Guid>() };
+                var input = new ItInterfaceDataWriteModel(A<string>(), dataType.Uuid);
+
+                ExpectResolveDataTypeOptionReturns(itInterface, dataType.Uuid, (dataType, false));
+
+                return _sut.UpdateInterfaceData(itInterface.Id, expectedUpdatedRow.Uuid, input).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error);
+            }, error => Assert.Equal(OperationFailure.BadInput, error.FailureType));
+        }
+
+        [Fact]
+        public void Cannot_UpdateInterfaceData_If_DataType_Is_Not_Found()
+        {
+            var expectedError = A<OperationError>();
+            Test_Command_Which_Fails_Mutating_ItInterface(itInterface =>
+            {
+                //Arrange
+                var expectedUpdatedRow = new DataRow()
+                {
+                    Uuid = A<Guid>(),
+                    Data = A<string>(),
+                    DataType = new DataType() { Uuid = A<Guid>() }
+                };
+                itInterface.DataRows.Add(expectedUpdatedRow);
+                itInterface.DataRows.Add(new DataRow());
+                var dataType = new DataType() { Uuid = A<Guid>() };
+                var input = new ItInterfaceDataWriteModel(A<string>(), dataType.Uuid);
+
+                ExpectResolveDataTypeOptionReturns(itInterface, dataType.Uuid, expectedError);
+
+                return _sut.UpdateInterfaceData(itInterface.Id, expectedUpdatedRow.Uuid, input).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error);
+            }, error => Assert.Equal(expectedError.FailureType, error.FailureType));
+        }
+
+        [Fact]
+        public void Cannot_UpdateInterfaceData_If_DataRow_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_Mutating_ItInterface(itInterface =>
+            {
+                //Arrange
+                itInterface.DataRows.Add(new DataRow());
+                var input = new ItInterfaceDataWriteModel(A<string>(), null);
+
+                return _sut.UpdateInterfaceData(itInterface.Id, A<Guid>(), input).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error);
+            }, error => Assert.Equal(OperationFailure.BadInput, error.FailureType));
+        }
+
+        [Fact]
+        public void UpdateInterfaceData_Returns_Forbidden()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(itInterface => _sut.UpdateInterfaceData(itInterface.Id, A<Guid>(), A<ItInterfaceDataWriteModel>()).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error));
+        }
+
+        [Fact]
+        public void UpdateInterfaceData_Returns_NotFound()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.UpdateInterfaceData(itInterface.Id, A<Guid>(), A<ItInterfaceDataWriteModel>()).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error));
+        }
+
+        [Fact]
+        public void DeleteInterfaceData_Returns_Updated_DataRow()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Success(itInterface =>
+            {
+                //Arrange
+                var rowToDelete = new DataRow()
+                {
+                    Uuid = A<Guid>(),
+                    Data = A<string>(),
+                    DataType = new DataType() { Uuid = A<Guid>() }
+                };
+                itInterface.DataRows.Add(rowToDelete);
+                itInterface.DataRows.Add(new DataRow());
+
+                //Act
+                var result = _sut.DeleteInterfaceData(itInterface.Id, rowToDelete.Uuid);
+
+                //Assert
+                Assert.True(result.Ok);
+                var dataRow = result.Value;
+                Assert.Same(rowToDelete, dataRow);
+                Assert.False(itInterface.DataRows.Contains(dataRow));
+                _dataRowRepository.Verify(x => x.Delete(rowToDelete), Times.Once());
+                return itInterface;
+            });
+        }
+
+        [Fact]
+        public void Cannot_DeleteInterfaceData_If_DataRow_Is_Not_Found()
+        {
+            Test_Command_Which_Fails_Mutating_ItInterface(itInterface =>
+            {
+                //Arrange
+                itInterface.DataRows.Add(new DataRow());
+
+                return _sut.DeleteInterfaceData(itInterface.Id, A<Guid>()).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error);
+            }, error => Assert.Equal(OperationFailure.BadInput, error.FailureType));
+        }
+
+        [Fact]
+        public void DeleteInterfaceData_Returns_Forbidden()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(itInterface => _sut.DeleteInterfaceData(itInterface.Id, A<Guid>()).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error));
+        }
+
+        [Fact]
+        public void DeleteInterfaceData_Returns_NotFound()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.DeleteInterfaceData(itInterface.Id, A<Guid>()).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error));
+        }
 
         [Fact]
         public void UpdateDescription_Returns_Updated_Interface()
@@ -1565,6 +1708,12 @@ namespace Tests.Unit.Core.ApplicationServices
         private void ExpectGetOrganization(Guid orgUuid, Result<Organization, OperationError> result, OrganizationDataReadAccessLevel? accessLevel = null)
         {
             _organizationService.Setup(x => x.GetOrganization(orgUuid, accessLevel)).Returns(result);
+        }
+
+        private void ExpectResolveDataTypeOptionReturns(ItInterface itInterface, Guid typeUuid, Result<(DataType option, bool available), OperationError> dataType)
+        {
+            _optionResolverMock
+                .Setup(x => x.GetOptionType<DataRow, DataType>(itInterface.Organization.Uuid, typeUuid)).Returns(dataType);
         }
     }
 }

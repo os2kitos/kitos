@@ -448,6 +448,7 @@ namespace Core.ApplicationServices.Interface
                     return new OperationError("Invalid " + nameof(dataUuid), OperationFailure.BadInput);
                 deleted = dataRowResult.Value;
                 itInterface.DataRows.Remove(dataRowResult.Value);
+                _dataRowRepository.Delete(deleted);
                 return itInterface;
             }).Match(_ => Result<DataRow, OperationError>.Success(deleted), error => error);
         }
