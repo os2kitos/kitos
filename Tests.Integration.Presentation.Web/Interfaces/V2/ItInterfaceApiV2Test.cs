@@ -217,7 +217,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             await InterfaceExhibitHelper.CreateExhibit(system3.Id, invalidWrongOrganizationInterface.Id);
 
             //Act
-            var dtos = (await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, usedInOrganizationUuid: organization.Uuid, pageNumber: 0, pageSize: 10)).ToList();
+            var dtos = (await InterfaceV2Helper.GetInterfacesAsync(token, usedInOrganizationUuid: organization.Uuid, pageNumber: 0, pageSize: 10)).ToList();
 
             //Assert
             var responseDto = Assert.Single(dtos);
