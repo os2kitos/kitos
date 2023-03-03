@@ -1,10 +1,12 @@
 ﻿using System;
-using System.Data;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Model.Interface;
+using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -20,7 +22,6 @@ using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-
 using DataRow = Core.DomainModel.ItSystem.DataRow;
 
 namespace Core.ApplicationServices.Interface
@@ -35,6 +36,7 @@ namespace Core.ApplicationServices.Interface
         private readonly IInterfaceRepository _interfaceRepository;
         private readonly IOrganizationalUserContext _userContext;
         private readonly IOperationClock _operationClock;
+        private readonly IOptionResolver _optionResolver;
         private readonly IOrganizationService _organizationService;
 
         public ItInterfaceService(
@@ -45,7 +47,8 @@ namespace Core.ApplicationServices.Interface
             IDomainEvents domainEvents,
             IInterfaceRepository interfaceRepository,
             IOrganizationalUserContext userContext,
-            IOperationClock operationClock, 
+            IOperationClock operationClock,
+            IOptionResolver optionResolver,
             IOrganizationService organizationService)
         {
             _dataRowRepository = dataRowRepository;
@@ -56,54 +59,53 @@ namespace Core.ApplicationServices.Interface
             _interfaceRepository = interfaceRepository;
             _userContext = userContext;
             _operationClock = operationClock;
+            _optionResolver = optionResolver;
             _organizationService = organizationService;
         }
 
         public Result<ItInterface, OperationFailure> Delete(int id, bool breakBindings = false)
         {
-            using (var transaction = _transactionManager.Begin())
+            using var transaction = _transactionManager.Begin();
+            var getItInterfaceResult = _interfaceRepository.GetInterface(id);
+
+            if (getItInterfaceResult.IsNone)
             {
-                var getItInterfaceResult = _interfaceRepository.GetInterface(id);
-
-                if (getItInterfaceResult.IsNone)
-                {
-                    return OperationFailure.NotFound;
-                }
-
-                var itInterface = getItInterfaceResult.Value;
-                if (!_authorizationContext.AllowDelete(itInterface))
-                {
-                    return OperationFailure.Forbidden;
-                }
-
-                if (itInterface.ExhibitedBy != null)
-                {
-                    if (breakBindings)
-                    {
-                        var updateExposingSystemResult = UpdateExposingSystem(id, null);
-                        if (updateExposingSystemResult.Failed)
-                            return updateExposingSystemResult.Error.FailureType;
-                    }
-                    else
-                    {
-                        return OperationFailure.Conflict;
-                    }
-                }
-
-                var dataRows = itInterface.DataRows.ToList();
-                foreach (var dataRow in dataRows)
-                {
-                    _dataRowRepository.DeleteByKey(dataRow.Id);
-                }
-                _dataRowRepository.Save();
-
-                // delete it interface
-                _domainEvents.Raise(new EntityBeingDeletedEvent<ItInterface>(itInterface));
-                _interfaceRepository.Delete(itInterface);
-
-                transaction.Commit();
-                return itInterface;
+                return OperationFailure.NotFound;
             }
+
+            var itInterface = getItInterfaceResult.Value;
+            if (!_authorizationContext.AllowDelete(itInterface))
+            {
+                return OperationFailure.Forbidden;
+            }
+
+            if (itInterface.ExhibitedBy != null)
+            {
+                if (breakBindings)
+                {
+                    var updateExposingSystemResult = UpdateExposingSystem(id, null);
+                    if (updateExposingSystemResult.Failed)
+                        return updateExposingSystemResult.Error.FailureType;
+                }
+                else
+                {
+                    return OperationFailure.Conflict;
+                }
+            }
+
+            var dataRows = itInterface.DataRows.ToList();
+            foreach (var dataRow in dataRows)
+            {
+                _dataRowRepository.DeleteByKey(dataRow.Id);
+            }
+            _dataRowRepository.Save();
+
+            // delete it interface
+            _domainEvents.Raise(new EntityBeingDeletedEvent<ItInterface>(itInterface));
+            _interfaceRepository.Delete(itInterface);
+
+            transaction.Commit();
+            return itInterface;
         }
 
         public IQueryable<ItInterface> GetAvailableInterfaces(params IDomainQuery<ItInterface>[] conditions)
@@ -273,6 +275,120 @@ namespace Core.ApplicationServices.Interface
                 _domainEvents.Raise(new EnabledStatusChanged<ItInterface>(itInterface, false, true));
             });
         }
+
+        public Result<ItInterface, OperationError> Activate(int id)
+        {
+            return Mutate(id,
+                itInterface => itInterface.Disabled,
+                itInterface =>
+                {
+                    itInterface.Activate();
+                    _domainEvents.Raise(new EnabledStatusChanged<ItInterface>(itInterface, true, false));
+                });
+        }
+
+        public Result<ItInterface, OperationError> UpdateNote(int id, string newValue)
+        {
+            return Mutate(id,
+                itInterface => itInterface.Note != newValue,
+                itInterface =>
+                {
+                    itInterface.Note = newValue;
+                });
+        }
+
+        public Result<ItInterface, OperationError> UpdateAccessModifier(int id, AccessModifier newValue)
+        {
+            return Mutate(id,
+                itInterface => itInterface.AccessModifier != newValue,
+                updateWithResult: itInterface =>
+                {
+                    if (_authorizationContext.HasPermission(new VisibilityControlPermission(itInterface)))
+                    {
+                        itInterface.AccessModifier = newValue;
+                        return itInterface;
+                    }
+                    return new OperationError(OperationFailure.Forbidden);
+                });
+        }
+
+        public Result<ItInterface, OperationError> UpdateInterfaceType(int id, Guid? interfaceTypeUuid)
+        {
+            return Mutate(id,
+                itInterface => itInterface.Interface?.Uuid != interfaceTypeUuid,
+                updateWithResult: itInterface =>
+                {
+                    if (interfaceTypeUuid.HasValue)
+                    {
+                        var result = _optionResolver.GetOptionType<ItInterface, InterfaceType>(itInterface.Organization.Uuid, interfaceTypeUuid.Value);
+                        if (result.Failed)
+                        {
+                            return new OperationError(
+                                $"Failed to resolve interface type:{result.Error.Message.GetValueOrFallback("no_message")}", result.Error.FailureType);
+                        }
+                        var (option, available) = result.Value;
+                        if (!available)
+                        {
+                            return new OperationError($"Cannot assign unavailable InterfaceType option with uuid:{option.Uuid:D}", OperationFailure.BadInput);
+                        }
+
+                        itInterface.Interface = option;
+                    }
+                    else
+                    {
+                        itInterface.Interface = null;
+                    }
+
+                    return itInterface;
+                });
+        }
+
+        public Result<ItInterface, OperationError> ReplaceInterfaceData(int id, IEnumerable<ItInterfaceDataWriteModel> newData)
+        {
+            return Mutate(id, _ => true, updateWithResult: itInterface => ReplaceInterfaceData(itInterface, newData));
+        }
+
+        private Result<ItInterface, OperationError> ReplaceInterfaceData(ItInterface itInterface, IEnumerable<ItInterfaceDataWriteModel> newData)
+        {
+            //Clear existing data
+            if (itInterface.DataRows.Any())
+            {
+                var existingRows = itInterface.DataRows.ToList();
+                itInterface.DataRows.Clear();
+                _dataRowRepository.RemoveRange(existingRows);
+            }
+
+            //Add replacement data
+            foreach (var newRowData in newData)
+            {
+                DataType dataType = null;
+                if (newRowData.DataTypeUuid.HasValue)
+                {
+                    var result =
+                        _optionResolver.GetOptionType<DataRow, DataType>(itInterface.Organization.Uuid,
+                            newRowData.DataTypeUuid.Value);
+                    if (result.Failed)
+                    {
+                        return new OperationError(
+                            $"Failed to resolve data type:{result.Error.Message.GetValueOrFallback("no_message")}",
+                            result.Error.FailureType);
+                    }
+
+                    var (option, available) = result.Value;
+                    if (!available)
+                    {
+                        return new OperationError($"Cannot assign unavailable dataType option with uuid:{option.Uuid:D}",
+                            OperationFailure.BadInput);
+                    }
+
+                    dataType = option;
+                }
+
+                itInterface.AddDataRow(newRowData.DataDescription, dataType.FromNullable());
+            }
+
+            return itInterface;
+		}
 
         public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid)
         {

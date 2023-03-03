@@ -196,6 +196,7 @@
     <Compile Include="ApplicationServices\Handlers\AuthorizedUpdateOrganizationFromFKOrganisationCommandHandlerTest.cs" />
     <Compile Include="ApplicationServices\Handlers\RemoveUserFromKitosCommandHandler.cs" />
     <Compile Include="ApplicationServices\Handlers\SendEmailToStakeholdersOnExternalOrganizationConnectionUpdatedHandlerTest.cs" />
+    <Compile Include="ApplicationServices\Interface\ItInterfaceWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\Messages\PublicMessagesServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\OrganizationUnitServiceTest.cs" />

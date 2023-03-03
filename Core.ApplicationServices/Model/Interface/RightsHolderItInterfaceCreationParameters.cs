@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices.Model.Shared;
-using System;
+﻿using System;
 
 namespace Core.ApplicationServices.Model.Interface
 {

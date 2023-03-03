@@ -42,6 +42,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             public const string DataProcessingCountryOptions = "DataProcessingCountryOptions";
             public const string DataProcessingOversightOptions = "DataProcessingOversightOptions";
             public const string DataProcessingRegistrationRoles = "DataProcessingRegistrationRoles";
+            
+            public const string ItInterfaceTypes = "InterfaceTypes";
+            public const string ItInterfaceDataTypes = "DataTypes";
         }
 
         public static async Task<OptionDTO> CreateOptionTypeAsync(string resource, string optionName, int organizationId, Cookie optionalLogin = null, string description = null)

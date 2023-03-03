@@ -41,6 +41,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string DataProcessingRegistrationCountry = "data-processing-registration-country-types";
             public const string DataProcessingRegistrationOversight = "data-processing-registration-oversight-types";
             public const string DataProcessingRegistrationRoles = "data-processing-registration-role-types";
+
+            public const string ItInterfaceTypes = "it-interface-interface-types";
+            public const string ItInterfaceDataTypes = "it-interface-interface-data-types";
+
         }
 
         public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetOptionsAsync(string resource, Guid orgUuid, int pageSize, int pageNumber)

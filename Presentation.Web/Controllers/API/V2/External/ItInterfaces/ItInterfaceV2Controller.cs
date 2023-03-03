@@ -7,11 +7,11 @@ using System.Web.Http;
 using System.Web.Http.Results;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Interface.Write;
 using Core.ApplicationServices.RightsHolders;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Interface;
-using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using Presentation.Web.Extensions;
@@ -20,6 +20,7 @@ using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.Interface;
 using Presentation.Web.Models.API.V2.Response.Interface;
+using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Swashbuckle.Swagger.Annotations;
 
@@ -31,19 +32,102 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         private readonly IItInterfaceRightsHolderService _rightsHolderService;
         private readonly IItInterfaceService _itInterfaceService;
         private readonly IItInterfaceWriteModelMapper _writeModelMapper;
-        private readonly IResourcePermissionsResponseMapper _permissionResponseMapper;
+        private readonly IItInterfaceWriteService _writeService;
+        private readonly IItInterfaceResponseMapper _responseMapper;
+		private readonly IResourcePermissionsResponseMapper _permissionResponseMapper;
 
-        public ItInterfaceV2Controller(IItInterfaceRightsHolderService rightsHolderService,
+        public ItInterfaceV2Controller(
+            IItInterfaceRightsHolderService rightsHolderService,
             IItInterfaceService itInterfaceService,
             IItInterfaceWriteModelMapper writeModelMapper,
-            IResourcePermissionsResponseMapper permissionResponseMapper)
+            IItInterfaceWriteService writeService,
+            IItInterfaceResponseMapper responseMapper,
+			IResourcePermissionsResponseMapper permissionResponseMapper)
         {
             _rightsHolderService = rightsHolderService;
             _itInterfaceService = itInterfaceService;
             _writeModelMapper = writeModelMapper;
+            _writeService = writeService;
+            _responseMapper = responseMapper;
             _permissionResponseMapper = permissionResponseMapper;
         }
 
+        /// <summary>
+        /// Creates a new IT-Interface based on given input values
+        /// </summary>
+        /// <param name="request">A collection of specific IT-Interface values</param>
+        /// <returns>Location header is set to uri for newly created IT-Interface</returns>
+        [HttpPost]
+        [Route("it-interfaces")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItInterfaceResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public IHttpActionResult Post([FromBody] CreateItInterfaceRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var creationParameters = _writeModelMapper.FromPOST(request);
+
+            return _writeService
+                .Create(request.OrganizationUuid, creationParameters)
+                .Select(ToItInterfaceResponseDTO)
+                .Match(MapItInterfaceCreatedResponse, FromOperationError);
+        }
+
+        /// <summary>
+        /// Allows partial updates of an existing it-interface using json merge patch semantics (RFC7396)
+        /// </summary>
+        /// <param name="uuid">UUID of the interface in KITOS</param>
+        /// <param name="request">Updates for the interface</param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("it-interfaces/{uuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult Patch([NonEmptyGuid] Guid uuid, [FromBody] UpdateItInterfaceRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var updateParameters = _writeModelMapper.FromPATCH(request);
+
+            return _writeService
+                .Update(uuid, updateParameters)
+                .Select(ToItInterfaceResponseDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Delete an It-interface
+        /// Constraints:
+        /// - Exposing it-system must be reset before deleting this it-interface
+        /// </summary>
+        /// <param name="uuid">UUID of the interface in KITOS</param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("it-interfaces/{uuid}")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult Delete([NonEmptyGuid] Guid uuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .Delete(uuid)
+                .Match(NoContent, FromOperationError);
+        }
 
         /// <summary>
         /// Creates a new IT-Interface based on given input values
@@ -273,7 +357,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
                 .OrderByDefaultConventions(changedSinceGtEq.HasValue)
                 .Page(pagination)
                 .ToList()
-                .Select(ToStakeHolderItInterfaceResponseDTO)
+                .Select(ToItInterfaceResponseDTO)
                 .Transform(Ok);
         }
 
@@ -293,10 +377,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         {
             return _itInterfaceService
                 .GetInterface(uuid)
-                .Select(ToStakeHolderItInterfaceResponseDTO)
+                .Select(ToItInterfaceResponseDTO)
                 .Match(Ok, FromOperationError);
         }
-
 
         /// <summary>
         /// Returns the permissions of the authenticated client in the context of a specific IT-Interface
@@ -342,40 +425,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
                 .Match(Ok, FromOperationError);
         }
 
-        private static RightsHolderItInterfaceResponseDTO ToRightsHolderItInterfaceResponseDTO(ItInterface itInterface)
+        private RightsHolderItInterfaceResponseDTO ToRightsHolderItInterfaceResponseDTO(ItInterface itInterface)
         {
-            var dto = new RightsHolderItInterfaceResponseDTO();
-            MapBaseInformation(itInterface, dto);
-            return dto;
+            return _responseMapper.ToRightsHolderItInterfaceResponseDTO(itInterface);
+
         }
 
-        private static ItInterfaceResponseDTO ToStakeHolderItInterfaceResponseDTO(ItInterface itInterface)
+        private ItInterfaceResponseDTO ToItInterfaceResponseDTO(ItInterface itInterface)
         {
-            var dto = new ItInterfaceResponseDTO
-            {
-                LastModified = itInterface.LastChanged,
-                LastModifiedBy = itInterface.LastChangedByUser.Transform(user => user.MapIdentityNamePairDTO())
-            };
-            MapBaseInformation(itInterface, dto);
-            return dto;
+            return _responseMapper.ToItInterfaceResponseDTO(itInterface);
         }
 
-        private static void MapBaseInformation<T>(ItInterface input, T outputDTO) where T : BaseItInterfaceResponseDTO
-        {
-            outputDTO.Uuid = input.Uuid;
-            outputDTO.ExposedBySystem = input.ExhibitedBy?.ItSystem?.Transform(exposingSystem => exposingSystem.MapIdentityNamePairDTO());
-            outputDTO.Name = input.Name;
-            outputDTO.InterfaceId = input.ItInterfaceId;
-            outputDTO.Version = input.Version;
-            outputDTO.Description = input.Description;
-            outputDTO.Notes = input.Note;
-            outputDTO.UrlReference = input.Url;
-            outputDTO.Deactivated = input.Disabled;
-            outputDTO.Created = input.Created;
-            outputDTO.CreatedBy = input.ObjectOwner.MapIdentityNamePairDTO();
-        }
-
-        private CreatedNegotiatedContentResult<RightsHolderItInterfaceResponseDTO> MapItInterfaceCreatedResponse(RightsHolderItInterfaceResponseDTO dto)
+        private CreatedNegotiatedContentResult<T> MapItInterfaceCreatedResponse<T>(T dto) where T : IHasUuidExternal
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }

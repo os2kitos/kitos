@@ -132,6 +132,8 @@
     <Compile Include="Contract\ItContractSequentialTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
+    <Compile Include="Interfaces\V2\BaseItInterfaceApiV2Test.cs" />
+    <Compile Include="Interfaces\V2\RightsHolderItInterfaceApiV2Test.cs" />
     <Compile Include="Internal\Messages\PublicMessagesApiV2Test.cs" />
     <Compile Include="ItSystem\V2\BaseItSystemsApiV2Test.cs" />
     <Compile Include="ItSystem\V2\ItSystemsInternalApiV2Test.cs" />
