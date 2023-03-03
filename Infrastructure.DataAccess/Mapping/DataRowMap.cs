@@ -18,6 +18,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(d => d.DataRows)
                 .HasForeignKey(t => t.ItInterfaceId)
                 .WillCascadeOnDelete(false);
+
+            Property(x => x.Uuid)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_uuid", 0);
         }
     }
 }
