@@ -74,10 +74,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
             destination.Scope = rule.MustUpdate(x => x.Scope) ? source.Scope.FromChoice().AsChangedValue() : OptionalValueChange<AccessModifier>.None;
             destination.Data = rule.MustUpdate(x => x.Data)
                 ? (source.Data ?? Array.Empty<ItInterfaceDataRequestDTO>())
-                .Select(x => new ItInterfaceDataWriteModel(x.Description, x.DataTypeUuid))
+                .Select(MapDataDescription)
                 .ToList()
                 .AsChangedValue<IReadOnlyList<ItInterfaceDataWriteModel>>()
                 : OptionalValueChange<IReadOnlyList<ItInterfaceDataWriteModel>>.None;
+        }
+
+        public ItInterfaceDataWriteModel MapDataDescription(ItInterfaceDataRequestDTO request)
+        {
+            return new ItInterfaceDataWriteModel(request.Description, request.DataTypeUuid);
         }
 
         private void Map(IRightsHolderWritableItInterfacePropertiesDTO source, ItInterfaceWriteModelParametersBase destination, bool enforceFallbackIfNotProvided)

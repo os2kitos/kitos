@@ -364,31 +364,20 @@ namespace Core.ApplicationServices.Interface
                 DataType dataType = null;
                 if (newRowData.DataTypeUuid.HasValue)
                 {
-                    var result =
-                        _optionResolver.GetOptionType<DataRow, DataType>(itInterface.Organization.Uuid,
-                            newRowData.DataTypeUuid.Value);
-                    if (result.Failed)
+                    var availableOptionResult = LoadAvailableDataTypeOption(itInterface.Organization.Uuid, newRowData.DataTypeUuid.Value);
+                    if (availableOptionResult.Failed)
                     {
-                        return new OperationError(
-                            $"Failed to resolve data type:{result.Error.Message.GetValueOrFallback("no_message")}",
-                            result.Error.FailureType);
+                        return availableOptionResult.Error;
                     }
 
-                    var (option, available) = result.Value;
-                    if (!available)
-                    {
-                        return new OperationError($"Cannot assign unavailable dataType option with uuid:{option.Uuid:D}",
-                            OperationFailure.BadInput);
-                    }
-
-                    dataType = option;
+                    dataType = availableOptionResult.Value;
                 }
 
                 itInterface.AddDataRow(newRowData.DataDescription, dataType.FromNullable());
             }
 
             return itInterface;
-		}
+        }
 
         public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid)
         {
@@ -400,6 +389,67 @@ namespace Core.ApplicationServices.Interface
             return _organizationService
                 .GetOrganization(organizationUuid)
                 .Select(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItInterface>(organization.Id, _authorizationContext));
+        }
+
+        public Result<DataRow, OperationError> AddInterfaceData(int id, ItInterfaceDataWriteModel parameters)
+        {
+            DataRow created = null;
+            return Mutate(id, _ => true, updateWithResult: itInterface =>
+            {
+                DataType dataType = null;
+                if (parameters.DataTypeUuid.HasValue)
+                {
+                    var dataTypeResult = LoadAvailableDataTypeOption(itInterface.Organization.Uuid, parameters.DataTypeUuid.Value);
+                    if (dataTypeResult.Failed)
+                        return dataTypeResult.Error;
+                    dataType = dataTypeResult.Value;
+                }
+
+                created = itInterface.AddDataRow(parameters.DataDescription, dataType.FromNullable());
+                return itInterface;
+            }).Match(_ => Result<DataRow, OperationError>.Success(created), error => error);
+        }
+
+        public Result<DataRow, OperationError> UpdateInterfaceData(int id, Guid dataUuid, ItInterfaceDataWriteModel parameters)
+        {
+            DataRow updated = null;
+            return Mutate(id, _ => true, updateWithResult: itInterface =>
+            {
+                var dataRowResult = itInterface.GetDataRow(dataUuid);
+                if (dataRowResult.IsNone)
+                    return new OperationError("Invalid " + nameof(dataUuid), OperationFailure.BadInput);
+
+                updated = dataRowResult.Value;
+                updated.Data = parameters.DataDescription;
+
+                //If changed, update the data type option
+                if (updated.DataType?.Uuid != parameters.DataTypeUuid && parameters.DataTypeUuid.HasValue)
+                {
+                    var dataTypeResult = LoadAvailableDataTypeOption(itInterface.Organization.Uuid, parameters.DataTypeUuid.Value);
+                    if (dataTypeResult.Failed)
+                        return dataTypeResult.Error;
+                    updated.DataType = dataTypeResult.Value;
+                }
+                else if (parameters.DataTypeUuid == null)
+                {
+                    updated.ResetDataType();
+                }
+                return itInterface;
+            }).Match(_ => Result<DataRow, OperationError>.Success(updated), error => error);
+        }
+
+        public Result<DataRow, OperationError> DeleteInterfaceData(int id, Guid dataUuid)
+        {
+            DataRow deleted = null;
+            return Mutate(id, _ => true, updateWithResult: itInterface =>
+            {
+                var dataRowResult = itInterface.GetDataRow(dataUuid);
+                if (dataRowResult.IsNone)
+                    return new OperationError("Invalid " + nameof(dataUuid), OperationFailure.BadInput);
+                deleted = dataRowResult.Value;
+                itInterface.DataRows.Remove(dataRowResult.Value);
+                return itInterface;
+            }).Match(_ => Result<DataRow, OperationError>.Success(deleted), error => error);
         }
 
         private static bool ValidateName(string name)
@@ -465,6 +515,25 @@ namespace Core.ApplicationServices.Interface
                 }
             }
             return itInterface;
+        }
+
+        private Result<DataType, OperationError> LoadAvailableDataTypeOption(Guid organizationUuid, Guid optionUuid)
+        {
+            var optionResult = _optionResolver.GetOptionType<DataRow, DataType>(organizationUuid, optionUuid);
+            if (optionResult.Failed)
+            {
+                return optionResult.Error;
+            }
+
+            var option = optionResult.Value;
+            if (!option.available)
+            {
+                return new OperationError(
+                    $"Selected data type with uuid {optionUuid} is not available in the organization",
+                    OperationFailure.BadInput);
+            }
+
+            return option.option;
         }
     }
 }
