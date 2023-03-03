@@ -942,6 +942,90 @@ namespace Tests.Unit.Core.ApplicationServices
             Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.ReplaceInterfaceData(itInterface.Id, Many<ItInterfaceDataWriteModel>()));
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void AddInterfaceData_Returns_Created_DataRow(bool withDataType)
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Success(itInterface =>
+            {
+                //Arrange
+                var dataType = new DataType() { Uuid = A<Guid>() };
+                var input = new ItInterfaceDataWriteModel(A<string>(), withDataType ? dataType.Uuid : null);
+
+                if (withDataType)
+                {
+                    _optionResolverMock
+                        .Setup(x => x.GetOptionType<DataRow, DataType>(itInterface.Organization.Uuid,
+                            dataType.Uuid)).Returns((dataType, true));
+
+                }
+
+                //Act
+                var result = _sut.AddInterfaceData(itInterface.Id, input);
+
+                //Assert
+                Assert.True(result.Ok);
+                var dataRow = result.Value;
+                Assert.Equal(input.DataDescription, dataRow.Data);
+                Assert.Equal(input.DataTypeUuid, dataRow.DataType?.Uuid);
+                Assert.True(itInterface.DataRows.Contains(dataRow));
+                return itInterface;
+            });
+        }
+
+        [Fact]
+        public void Cannot_AddInterfaceData_If_DataType_Is_Not_Available()
+        {
+            Test_Command_Which_Fails_Mutating_ItInterface(itInterface =>
+            {
+                var dataType = new DataType() { Uuid = A<Guid>() };
+                var input = new ItInterfaceDataWriteModel(A<string>(), dataType.Uuid);
+
+                _optionResolverMock
+                    .Setup(x => x.GetOptionType<DataRow, DataType>(itInterface.Organization.Uuid,
+                        dataType.Uuid)).Returns((dataType, false));
+
+                return _sut.AddInterfaceData(itInterface.Id, input).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error);
+            }, error => Assert.Equal(OperationFailure.BadInput, error.FailureType));
+        }
+
+        [Fact]
+        public void Cannot_AddInterfaceData_If_DataType_Is_Not_Found()
+        {
+            var error = A<OperationError>();
+            Test_Command_Which_Fails_Mutating_ItInterface(itInterface =>
+            {
+                var dataType = new DataType() { Uuid = A<Guid>() };
+                var input = new ItInterfaceDataWriteModel(A<string>(), dataType.Uuid);
+
+                _optionResolverMock
+                    .Setup(x => x.GetOptionType<DataRow, DataType>(itInterface.Organization.Uuid,
+                        dataType.Uuid)).Returns((dataType, false));
+
+                return _sut.AddInterfaceData(itInterface.Id, input).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error);
+            }, error => Assert.Equal(error.FailureType, error.FailureType));
+        }
+
+        [Fact]
+        public void AddInterfaceData_Returns_Forbidden()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(itInterface => _sut.AddInterfaceData(itInterface.Id, A<ItInterfaceDataWriteModel>()).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error));
+        }
+
+        [Fact]
+        public void AddInterfaceData_Returns_NotFound()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.AddInterfaceData(itInterface.Id, A<ItInterfaceDataWriteModel>()).Match<Result<ItInterface, OperationError>>(_ => itInterface, error => error));
+        }
+
+        /*
+         *TODO
+         * - Update
+         * - Delete
+         *
+         */
+
         [Fact]
         public void UpdateDescription_Returns_Updated_Interface()
         {
@@ -1259,7 +1343,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _domainEvents.Verify(x => x.Raise(It.IsAny<EnabledStatusChanged<ItInterface>>()), Times.Never);
             transaction.Verify(x => x.Commit(), Times.Never);
             _repository.Verify(x => x.Update(It.IsAny<ItInterface>()), Times.Never);
-		}
+        }
 
         [Theory]
         [InlineData(true, true, true)]
