@@ -190,6 +190,41 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         }
 
         [Fact]
+        public async Task GET_Many_As_Stakeholder_With_UsedInOrganizationUuid_Filter()
+        {
+            //Arrange
+            var (token, organization) = await CreateStakeHolderUserInNewOrg();
+            var orgId = organization.Id;
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), orgId, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), orgId, AccessModifier.Public);
+            var system3 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+
+            var validDto = InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), orgId, AccessModifier.Public);
+            var invalidNoExhibitDto = InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), orgId, AccessModifier.Public);
+            var invalidNoUsageDto = InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), orgId, AccessModifier.Public);
+            var invalidWrongOrganizationDto = InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+
+            var validInterface = await InterfaceHelper.CreateInterface(validDto);
+            await  InterfaceHelper.CreateInterface(invalidNoExhibitDto);
+            var invalidNoUsageInterface = await InterfaceHelper.CreateInterface(invalidNoUsageDto);
+            var invalidWrongOrganizationInterface = await InterfaceHelper.CreateInterface(invalidWrongOrganizationDto);
+
+            await ItSystemHelper.TakeIntoUseAsync(system.Id, orgId);
+            await ItSystemHelper.TakeIntoUseAsync(system3.Id, TestEnvironment.DefaultOrganizationId);
+            
+            await InterfaceExhibitHelper.CreateExhibit(system.Id, validInterface.Id);
+            await InterfaceExhibitHelper.CreateExhibit(system2.Id, invalidNoUsageInterface.Id);
+            await InterfaceExhibitHelper.CreateExhibit(system3.Id, invalidWrongOrganizationInterface.Id);
+
+            //Act
+            var dtos = (await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, usedInOrganizationUuid: organization.Uuid, pageNumber: 0, pageSize: 10)).ToList();
+
+            //Assert
+            var responseDto = Assert.Single(dtos);
+            Assert.Equal(validInterface.Uuid, responseDto.Uuid);
+        }
+
+        [Fact]
         public async Task Can_Get_Active_Interfaces_As_Stakeholder_By_Exposing_System()
         {
             var (token, org) = await CreateUserInNewOrg(true);
