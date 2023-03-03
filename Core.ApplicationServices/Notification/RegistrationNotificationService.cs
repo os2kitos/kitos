@@ -102,7 +102,6 @@ namespace Core.ApplicationServices.Notification
 
         public Result<Advice, OperationError> Update(int notificationId, UpdateScheduledNotificationModel notificationModel)
         {
-
             var entityResult = GetNotificationById(notificationId).Bind(WithModifyAccess);
             if (entityResult.Failed)
                 return entityResult.Error;
@@ -195,7 +194,9 @@ namespace Core.ApplicationServices.Notification
         {
             var validationError = WithModifyAccess(newNotification);
             if (validationError.Failed)
+            {
                 return validationError.Error;
+            }
 
             if (newNotification.Reciepients.Where(x => x.RecpientType == RecipientType.USER).Any(x => !_emailValidationRegex.IsMatch(x.Email)))
             {

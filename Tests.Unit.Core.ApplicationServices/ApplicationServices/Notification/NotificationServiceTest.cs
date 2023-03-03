@@ -115,6 +115,32 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         }
 
         [Fact]
+        public void Can_GetNotifications_With_Pagination()
+        {
+            //Arrange
+            var orgUuid = A<Guid>();
+            var orgId = A<int>();
+            var relatedEntityUuid = A<Guid>();
+            var relatedEntityType = A<RelatedEntityType>();
+            
+            var root = ExpectGetRelatedEntityReturnsEntity(relatedEntityUuid, relatedEntityType);
+            var notification = CreateNewNotification(relatedEntityType, relationId: root.Id);
+
+            var notifications = new List<Advice> { CreateNewNotification(relatedEntityType), notification, CreateNewNotification(relatedEntityType) }.AsQueryable();
+
+            ExpectResolveIdReturns<Organization>(orgUuid, orgId);
+            ExpectGetNotificationsByOrganizationIdReturns(orgId, Result<IQueryable<Advice>, OperationError>.Success(notifications));
+
+            //Act
+            var result = _sut.GetNotifications(orgUuid, 1, 1);
+
+            //Arrange
+            Assert.True(result.Ok);
+            var resultNotification = Assert.Single(result.Value);
+            Assert.Equal(notification.Uuid, resultNotification.Uuid);
+        }
+
+        [Fact]
         public void GetNotifications_Returns_OperationError_When_Failed_To_GetNotifications()
         {
             //Arrange
