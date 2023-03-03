@@ -200,7 +200,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), invalidInterfaceId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
 
             //Act
-            var dtos = (await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, interfaceId: interfaceId, pageNumber: 0, pageSize: 2)).ToList();
+            var dtos = (await InterfaceV2Helper.GetInterfacesAsync(token, interfaceId: interfaceId, pageNumber: 0, pageSize: 2)).ToList();
 
             //Assert
             var dto = Assert.Single(dtos);
@@ -217,7 +217,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
 
             //Act
-            var dtos = (await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, organizationUuid: organization.Uuid, pageNumber: 0, pageSize: 2)).ToList();
+            var dtos = (await InterfaceV2Helper.GetInterfacesAsync(token, organizationUuid: organization.Uuid, pageNumber: 0, pageSize: 2)).ToList();
 
             //Assert
             var dto = Assert.Single(dtos);
