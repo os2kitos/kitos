@@ -290,6 +290,7 @@
     <Compile Include="Infrastructure\CurrentAspNetRequestTest.cs" />
     <Compile Include="Infrastructure\NonEmptyGuidAttributeTest.cs" />
     <Compile Include="Infrastructure\SimpleLinkNameMaxLengthAttributeTest.cs" />
+    <Compile Include="Mapping\LifeCycleStatusMappingTest.cs" />
     <Compile Include="Models\V2\BaseResponseMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationResponseMapperTest.cs" />
