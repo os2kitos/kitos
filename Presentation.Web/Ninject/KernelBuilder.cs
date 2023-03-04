@@ -119,11 +119,13 @@ using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using System.Linq;
 using Core.ApplicationServices.Messages;
 using Core.Abstractions.Caching;
+using Core.ApplicationServices.Interface.Write;
 using Core.ApplicationServices.Users.Handlers;
 using Core.DomainModel.Commands;
 using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
+using Core.ApplicationServices.System.Write;
 
 namespace Presentation.Web.Ninject
 {
@@ -282,7 +284,9 @@ namespace Presentation.Web.Ninject
             RegisterMappers(kernel);
 
             kernel.Bind<IRightsHolderSystemService>().To<RightsHolderSystemService>().InCommandScope(Mode);
+            kernel.Bind<IItSystemWriteService>().To<ItSystemWriteService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceRightsHolderService>().To<ItInterfaceRightsHolderService>().InCommandScope(Mode);
+            kernel.Bind<IItInterfaceWriteService>().To<ItInterfaceWriteService>().InCommandScope(Mode);
             kernel.Bind<IUserRightsService>().To<UserRightsService>().InCommandScope(Mode);
 
             //STS Organization
@@ -299,6 +303,7 @@ namespace Presentation.Web.Ninject
         {
             //Systems
             kernel.Bind<IItSystemWriteModelMapper>().To<ItSystemWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IItSystemResponseMapper>().To<ItSystemResponseMapper>().InCommandScope(Mode);
 
             //System usage
             kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
@@ -314,6 +319,7 @@ namespace Presentation.Web.Ninject
 
             //Interfaces
             kernel.Bind<IItInterfaceWriteModelMapper>().To<ItInterfaceWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IItInterfaceResponseMapper>().To<ItInterfaceResponseMapper>().InCommandScope(Mode);
 
             //External references
             kernel.Bind<IExternalReferenceResponseMapper>().To<ExternalReferenceResponseMapper>().InCommandScope(Mode);
@@ -409,6 +415,7 @@ namespace Presentation.Web.Ninject
             RegisterCommands<RemoveUserFromKitosCommandHandler>(kernel);
             RegisterCommands<RemoveOrganizationUnitRegistrationsCommandHandler>(kernel);
             RegisterCommands<AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler>(kernel);
+            RegisterCommands<ValidateUserCredentialsCommandHandler>(kernel);
         }
 
         private void RegisterCommands<THandler>(IKernel kernel)
@@ -423,6 +430,11 @@ namespace Presentation.Web.Ninject
 
         private void RegisterOptions(IKernel kernel)
         {
+            //IT-interface
+            RegisterOptionsService<ItInterface, InterfaceType, LocalInterfaceType>(kernel);
+            
+            RegisterOptionsService<DataRow, DataType, LocalDataType>(kernel);
+
             //Data processing registrations
             RegisterOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, LocalDataProcessingRegistrationRole>(kernel);
 

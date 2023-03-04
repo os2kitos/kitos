@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.SharedProperties;
 
 namespace Presentation.Web.Models.API.V2.Response.System
 {
-    public abstract class BaseItSystemResponseDTO : IHasNameExternal, IHasUuidExternal, IHasEntityCreator
+    public abstract class BaseItSystemResponseDTO : IHasNameExternal, IHasUuidExternal, IHasEntityCreator, IHasDeactivatedExternal
     {
         /// <summary>
         /// UUID for IT-System
@@ -19,7 +20,7 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// UUID for possible IT-System parent (if any)
         /// </summary>
         public IdentityNamePairResponseDTO ParentSystem { get; set; }
-        
+
         /// <summary>
         /// Name of IT-System
         /// </summary>
@@ -37,9 +38,10 @@ namespace Presentation.Web.Models.API.V2.Response.System
         public string Description { get; set; }
 
         /// <summary>
-        /// Url reference for further information
+        /// User defined external references
         /// </summary>
-        public string UrlReference { get; set; }
+        [Required]
+        public IEnumerable<ExternalReferenceDataResponseDTO> ExternalReferences { get; set; }
 
         /// <summary>
         /// List of KLE number representations as name and UUID pairs
@@ -62,11 +64,6 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// Organizational information for IT-System rightsholder
         /// </summary>
         public ShallowOrganizationResponseDTO RightsHolder { get; set; }
-
-        /// <summary>
-        /// List of IT-Interfaces exposed by this IT-System
-        /// </summary>
-        public IEnumerable<IdentityNamePairResponseDTO> ExposedInterfaces { get; set; }
 
         /// <summary>
         /// Date of creation (on some legacy systems , this information is not available. If so, it will be null)

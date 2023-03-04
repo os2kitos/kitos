@@ -124,5 +124,22 @@ namespace Core.DomainModel.ItSystem
             Organization = newOrganization;
             OrganizationId = newOrganization.Id;
         }
+
+        public void Activate()
+        {
+            Disabled = false;
+        }
+
+        public DataRow AddDataRow(string dataDescription, Maybe<DataType> dataType)
+        {
+            var dataRow = new DataRow
+            {
+                ItInterface = this,
+                Data = dataDescription,
+                DataType = dataType.GetValueOrDefault()
+            };
+            DataRows.Add(dataRow);
+            return dataRow;
+        }
     }
 }

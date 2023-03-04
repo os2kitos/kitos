@@ -9,13 +9,11 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
+using Core.ApplicationServices.SystemUsage.Relations;
 using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.SystemUsage;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
-using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
@@ -24,6 +22,11 @@ using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Swashbuckle.Swagger.Annotations;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Core.DomainModel.ItSystem;
+using Presentation.Web.Controllers.API.V2.Common.Helpers;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
+using Presentation.Web.Models.API.V2.Types.SystemUsage;
+using Presentation.Web.Models.API.V2.SharedProperties;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 {
@@ -39,19 +42,25 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         private readonly IItSystemUsageWriteService _writeService;
         private readonly IItSystemUsageWriteModelMapper _writeModelMapper;
         private readonly IResourcePermissionsResponseMapper _permissionsResponseMapper;
+        private readonly IItsystemUsageRelationsService _systemRelationsService;
+        private readonly IExternalReferenceResponseMapper _externalReferenceResponseMapper;
 
         public ItSystemUsageV2Controller(
             IItSystemUsageService itSystemUsageService,
             IItSystemUsageResponseMapper responseMapper,
             IItSystemUsageWriteService writeService,
             IItSystemUsageWriteModelMapper writeModelMapper,
-            IResourcePermissionsResponseMapper permissionsResponseMapper)
+            IResourcePermissionsResponseMapper permissionsResponseMapper,
+            IItsystemUsageRelationsService systemRelationsService,
+            IExternalReferenceResponseMapper externalReferenceResponseMapper)
         {
             _itSystemUsageService = itSystemUsageService;
             _responseMapper = responseMapper;
             _writeService = writeService;
             _writeModelMapper = writeModelMapper;
             _permissionsResponseMapper = permissionsResponseMapper;
+            _systemRelationsService = systemRelationsService;
+            _externalReferenceResponseMapper = externalReferenceResponseMapper;
         }
 
         /// <summary>
@@ -62,6 +71,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="relatedToSystemUsageUuid">Query by system usages with outgoing relations to a specific system usage (more narrow search than using system id)</param>
         /// <param name="relatedToContractUuid">Query by contracts which are part of a system relation</param>
         /// <param name="systemUuid">Query usages of a specific system</param>
+        /// <param name="systemNameContent">Query usages based on system name</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
         /// <returns></returns>
         [HttpGet]
@@ -82,34 +92,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var conditions = new List<IDomainQuery<ItSystemUsage>>();
-
-            if (organizationUuid.HasValue)
-                conditions.Add(new QueryByOrganizationUuid<ItSystemUsage>(organizationUuid.Value));
-
-            if (relatedToSystemUuid.HasValue)
-                conditions.Add(new QueryByRelationToSystem(relatedToSystemUuid.Value));
-
-            if (relatedToSystemUsageUuid.HasValue)
-                conditions.Add(new QueryByRelationToSystemUsage(relatedToSystemUsageUuid.Value));
-
-            if (relatedToContractUuid.HasValue)
-                conditions.Add(new QueryByRelationToContract(relatedToContractUuid.Value));
-
-            if (systemUuid.HasValue)
-                conditions.Add(new QueryBySystemUuid(systemUuid.Value));
-
-            if (changedSinceGtEq.HasValue)
-                conditions.Add(new QueryByChangedSinceGtEq<ItSystemUsage>(changedSinceGtEq.Value));
-
-            if (!string.IsNullOrWhiteSpace(systemNameContent))
-                conditions.Add(new QueryBySystemNameContent(systemNameContent));
-
             return _itSystemUsageService
-                .Query(conditions.ToArray())
-                .OrderByDefaultConventions(changedSinceGtEq.HasValue)
-                .Page(paginationQuery).AsEnumerable()
-                .Select(_responseMapper.MapSystemUsageDTO).ToList()
+                .ExecuteItSystemUsagesQuery(organizationUuid, relatedToSystemUuid, relatedToSystemUsageUuid, relatedToContractUuid, systemUuid, systemNameContent, changedSinceGtEq, paginationQuery)
+                .Select(_responseMapper.MapSystemUsageDTO)
                 .Transform(Ok);
         }
 
@@ -159,6 +144,28 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         }
 
         /// <summary>
+        /// Returns the permissions of the authenticated client for the IT-System usage resources collection in the context of an organization (IT-System usage permissions in a specific Organization)
+        /// </summary>
+        /// <param name="organizationUuid">UUID of the organization</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourceCollectionPermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItSystemUsageCollectionPermissions([Required][NonEmptyGuid] Guid organizationUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itSystemUsageService
+                .GetCollectionPermissions(organizationUuid)
+                .Select(_permissionsResponseMapper.Map)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
         /// Deletes a system usage.
         /// NOTE: this action also clears any incoming relation e.g. relations from other system usages, contracts or data processing registrations.
         /// </summary>
@@ -188,6 +195,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <returns></returns>
         [HttpPost]
         [Route]
+        [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemUsageResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Conflict, description: "Another system usage has already been created for the system within the specified organization")]
@@ -259,6 +267,26 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         }
 
         /// <summary>
+        /// Get all system relations TO the system usage FROM another system usage
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{systemUsageUuid}/incoming-system-relations")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IncomingSystemRelationResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetIncomingSystemRelations([NonEmptyGuid] Guid systemUsageUuid)
+        {
+            return _itSystemUsageService
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+                .Bind(usage => _systemRelationsService.GetRelationsTo(usage.Id))
+                .Select(relations => relations.Select(relation => _responseMapper.MapIncomingSystemRelationDTO(relation)).ToList())
+                .Match(Ok, FromOperationError);
+        }
+
         /// Add role assignment to the it-system usage
         /// Constraint: Duplicates are not allowed (existing assignment of the same user/role)
         /// </summary>
@@ -309,13 +337,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         }
 
         /// <summary>
-        /// Creates a system relation
+        /// Creates a system relation FROM the system usage to another
         /// </summary>
         /// <param name="systemUsageUuid"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("{systemUsageUuid}/system-relations")]
-        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(SystemRelationResponseDTO))]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(OutgoingSystemRelationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -328,19 +357,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
             return _writeService
                 .CreateSystemRelation(systemUsageUuid, systemRelationParameters)
-                .Select(_responseMapper.MapSystemRelationDTO)
-                .Match(relationDTO => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{systemUsageUuid}/system-relations/{relationDTO.Uuid}", relationDTO), FromOperationError);
+                .Select(_responseMapper.MapOutgoingSystemRelationDTO)
+                .Match(relationDTO => CreateCreatedResourcePath(systemUsageUuid, "system-relations", relationDTO), FromOperationError);
         }
 
         /// <summary>
-        /// Gets a specific relation
+        /// Gets a specific relation FROM the system usage to another
         /// </summary>
         /// <param name="systemUsageUuid"></param>
         /// <param name="systemRelationUuid"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("{systemUsageUuid}/system-relations/{systemRelationUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(SystemRelationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OutgoingSystemRelationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -359,19 +388,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                         systemRelation => systemRelation,
                         () => new OperationError("Relation not found on system usage", OperationFailure.NotFound))
                     )
-                .Select(_responseMapper.MapSystemRelationDTO)
+                .Select(_responseMapper.MapOutgoingSystemRelationDTO)
                 .Match(Ok, FromOperationError);
         }
 
         /// <summary>
-        /// Updates the system relation
+        /// Updates the system relation FROM the system usage to another
         /// </summary>
         /// <param name="systemUsageUuid"></param>
         /// <param name="systemRelationUuid"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("{systemUsageUuid}/system-relations/{systemRelationUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(SystemRelationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OutgoingSystemRelationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -385,12 +414,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
             return _writeService
                 .UpdateSystemRelation(systemUsageUuid, systemRelationUuid, systemRelationParameters)
-                .Select(_responseMapper.MapSystemRelationDTO)
+                .Select(_responseMapper.MapOutgoingSystemRelationDTO)
                 .Match(Ok, FromOperationError);
         }
 
         /// <summary>
-        /// Deletes a system relation
+        /// Deletes a system relation FROM the system usage to another
         /// </summary>
         /// <param name="systemUsageUuid"></param>
         /// <param name="systemRelationUuid"></param>
@@ -412,9 +441,196 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
+        /// <summary>
+        /// Creates an external reference for the system usage
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("{systemUsageUuid}/external-references")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ExternalReferenceDataResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PostExternalReference([NonEmptyGuid] Guid systemUsageUuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var properties = _writeModelMapper.MapExternalReference(dto);
+
+            return _writeService
+                .AddExternalReference(systemUsageUuid, properties)
+                .Select(_externalReferenceResponseMapper.MapExternalReference)
+                .Match(reference => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{systemUsageUuid}/external-references/{reference.Uuid}", reference), FromOperationError);
+        }
+
+        /// <summary>
+        /// Updates a system usage external reference
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="externalReferenceUuid"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("{systemUsageUuid}/external-references/{externalReferenceUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ExternalReferenceDataResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutExternalReference([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid externalReferenceUuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var properties = _writeModelMapper.MapExternalReference(dto);
+
+            return _writeService
+                .UpdateExternalReference(systemUsageUuid, externalReferenceUuid, properties)
+                .Select(_externalReferenceResponseMapper.MapExternalReference)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Deletes a system usage external reference
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="externalReferenceUuid"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("{systemUsageUuid}/external-references/{externalReferenceUuid}")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteExternalReference([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid externalReferenceUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .DeleteExternalReference(systemUsageUuid, externalReferenceUuid)
+                .Match(_ => NoContent(), FromOperationError);
+        }
+
+        /// <summary>
+        /// Add a single journal period to the system usage
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("{systemUsageUuid}/journal-periods")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(JournalPeriodResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PostJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [FromBody][Required] JournalPeriodDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var parameters = _writeModelMapper.MapJournalPeriodProperties(request);
+
+            return _writeService
+                .CreateJournalPeriod(systemUsageUuid, parameters)
+                .Select(_responseMapper.MapJournalPeriodResponseDto)
+                .Match(period => CreateCreatedResourcePath(systemUsageUuid, "journal-periods", period), FromOperationError);
+        }
+
+        /// <summary>
+        /// Get a specific journal period
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="journalPeriodUuid"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{systemUsageUuid}/journal-periods/{journalPeriodUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JournalPeriodResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid journalPeriodUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itSystemUsageService
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+                .Bind(usage =>
+                    usage.GetArchivePeriod(journalPeriodUuid)
+                        .Match<Result<ArchivePeriod, OperationError>>
+                        (
+                        period => period,
+                        () => new OperationError("Journal period not found on system usage", OperationFailure.NotFound))
+                    )
+                .Select(_responseMapper.MapJournalPeriodResponseDto)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Perform a FULL update of an existing journal period
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="journalPeriodUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("{systemUsageUuid}/journal-periods/{journalPeriodUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(JournalPeriodResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid journalPeriodUuid, [FromBody] JournalPeriodDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var parameters = _writeModelMapper.MapJournalPeriodProperties(request);
+
+            return _writeService
+                .UpdateJournalPeriod(systemUsageUuid, journalPeriodUuid, parameters)
+                .Select(_responseMapper.MapJournalPeriodResponseDto)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Delete an existing journal period
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <param name="journalPeriodUuid"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("{systemUsageUuid}/journal-periods/{journalPeriodUuid}")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteJournalPeriod([NonEmptyGuid] Guid systemUsageUuid, [NonEmptyGuid] Guid journalPeriodUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .DeleteJournalPeriod(systemUsageUuid, journalPeriodUuid)
+                .Match(_ => NoContent(), FromOperationError);
+        }
+
         private CreatedNegotiatedContentResult<ItSystemUsageResponseDTO> MapSystemCreatedResponse(ItSystemUsageResponseDTO dto)
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
+        }
+        private CreatedNegotiatedContentResult<T> CreateCreatedResourcePath<T>(Guid systemUsageUuid, string resourceUrlSegment, T resourceDTO) where T : IHasUuidExternal
+        {
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{systemUsageUuid}/{resourceUrlSegment}/{resourceDTO.Uuid}", resourceDTO);
         }
     }
 }

@@ -17,7 +17,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
-    [PublicApi]
+    [InternalApi]
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
         private readonly IItSystemService _systemService;

@@ -197,7 +197,7 @@ namespace Core.DomainModel.ItSystem
             ParentId = null;
         }
 
-        public void SetUpdateParentSystem(ItSystem parent)
+        public void UpdateParentSystem(ItSystem parent)
         {
             if (parent == null)
                 throw new ArgumentNullException(nameof(parent));
@@ -238,6 +238,11 @@ namespace Core.DomainModel.ItSystem
             Disabled = true;
         }
 
+        public void Activate()
+        {
+            Disabled = false;
+        }
+
         public void ChangeOrganization(Organization.Organization newOrganization)
         {
             if (newOrganization == null)
@@ -259,6 +264,19 @@ namespace Core.DomainModel.ItSystem
             {
                 throw new ArgumentException(nameof(child));
             }
+        }
+
+        public Maybe<OperationError> UpdateRecommendedArchiveDuty(ArchiveDutyRecommendationTypes? recommendation, string comment)
+        {
+            var noCommentAllowed = recommendation is null or ArchiveDutyRecommendationTypes.Undecided;
+            if (noCommentAllowed && !string.IsNullOrEmpty(comment))
+            {
+                return new OperationError("Comment should only be defined if an actual recommendation exists", OperationFailure.BadInput);
+            }
+
+            ArchiveDuty = recommendation;
+            ArchiveDutyComment = comment;
+            return Maybe<OperationError>.None;
         }
     }
 }

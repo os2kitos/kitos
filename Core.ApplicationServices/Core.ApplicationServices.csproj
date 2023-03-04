@@ -71,6 +71,10 @@
     <Compile Include="Authentication\AuthenticationMethod.cs" />
     <Compile Include="Authentication\AuthenticationScope.cs" />
     <Compile Include="Authentication\ApplicationAuthenticationState.cs" />
+    <Compile Include="Interface\Write\IItInterfaceWriteService.cs" />
+    <Compile Include="Interface\Write\ItInterfaceWriteService.cs" />
+    <Compile Include="Authorization\ResourceCollectionPermissionsResult.cs" />
+    <Compile Include="Model\Authentication\Commands\ValidateUserCredentialsCommand.cs" />
     <Compile Include="Authentication\IAuthenticationContext.cs" />
     <Compile Include="Authentication\IAuthenticationContextFactory.cs" />
     <Compile Include="Authentication\IApplicationAuthenticationState.cs" />
@@ -145,6 +149,7 @@
     <Compile Include="Model\Contracts\Write\ItContractProcurementModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractSupplierModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractTerminationParameters.cs" />
+    <Compile Include="Model\EventHandler\ValidateUserCredentialsCommandHandler.cs" />
     <Compile Include="Model\GDPR\Write\SubDataProcessorParameter.cs" />
     <Compile Include="Model\GDPR\Write\SubDataProcessor\SubDataProcessorDetailsParameters.cs" />
     <Compile Include="Model\GDPR\Write\SubDataProcessor\TransferToInsecureCountryParameters.cs" />
@@ -153,6 +158,9 @@
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDataParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDate.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationRoles.cs" />
+    <Compile Include="Model\Interface\ItInterfaceDataWriteModel.cs" />
+    <Compile Include="Model\Interface\ItInterfaceWriteModel.cs" />
+    <Compile Include="Model\Interface\ItInterfaceWriteModelParametersBase.cs" />
     <Compile Include="Model\Messages\WritePublicMessagesParams.cs" />
     <Compile Include="Model\Messages\PublicMessages.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
@@ -164,10 +172,12 @@
     <Compile Include="Model\Organizations\AuthorizedUpdateOrganizationFromFKOrganisationCommand.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
     <Compile Include="Model\Shared\OptionalValueChange.cs" />
+    <Compile Include="Model\Shared\Write\ExternalReferenceProperties.cs" />
     <Compile Include="Model\SystemUsage\Write\NamedLink.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemRelationParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageCreationParameters.cs" />
-    <Compile Include="Model\SystemUsage\Write\SystemUsageJournalPeriod.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemUsageJournalPeriodProperties.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemUsageJournalPeriodUpdate.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageUpdateParameters.cs" />
     <Compile Include="Model\Shared\Write\UpdatedExternalReferenceProperties.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageGDPRProperties.cs" />
@@ -178,6 +188,8 @@
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageRoles.cs" />
     <Compile Include="Model\Shared\Write\UserRolePair.cs" />
     <Compile Include="Model\System\RightsHolderSystemUpdateParameters.cs" />
+    <Compile Include="Model\System\SharedSystemUpdateParameters.cs" />
+    <Compile Include="Model\System\SystemUpdateParameters.cs" />
     <Compile Include="Model\Interface\RightsHolderItInterfaceUpdateParameters.cs" />
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
     <Compile Include="Model\UiCustomization\CustomUINodeParameters.cs" />
@@ -234,6 +246,7 @@
     <Compile Include="Organizations\OrganizationRightsService.cs" />
     <Compile Include="ScheduledJobs\AdviceTrigger.cs" />
     <Compile Include="ScheduledJobs\AdviceTriggerFactory.cs" />
+    <Compile Include="Shared\BoundedPaginationConstraints.cs" />
     <Compile Include="Shared\PagingContraints.cs" />
     <Compile Include="SSO\Factories\ISsoStateFactory.cs" />
     <Compile Include="SSO\Factories\SsoStateFactory.cs" />
@@ -288,6 +301,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SingleThreadedMailClient.cs" />
     <Compile Include="References\ReferenceService.cs" />
+    <Compile Include="System\Write\IItSystemWriteService.cs" />
+    <Compile Include="System\Write\ItSystemWriteService.cs" />
     <Compile Include="Tracking\ITrackingService.cs" />
     <Compile Include="Tracking\TrackingService.cs" />
     <Compile Include="Users\Handlers\RemoveUserFromKitosCommandHandler.cs" />

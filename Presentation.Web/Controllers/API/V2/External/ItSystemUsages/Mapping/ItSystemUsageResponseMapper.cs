@@ -11,7 +11,6 @@ using Core.DomainServices.Repositories.GDPR;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
-using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
@@ -51,7 +50,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Roles = MapRoles(systemUsage),
                 LocalKLEDeviations = MapKle(systemUsage),
                 OrganizationUsage = MapOrganizationUsage(systemUsage),
-                ExternalReferences = _externalReferenceResponseMapper.MapExternalReferences(systemUsage.ExternalReferences, systemUsage.Reference),
+                ExternalReferences = _externalReferenceResponseMapper.MapExternalReferences(systemUsage.ExternalReferences),
                 OutgoingSystemRelations = MapOutgoingSystemRelations(systemUsage),
                 Archiving = MapArchiving(systemUsage),
                 GDPR = MapGDPR(systemUsage)
@@ -121,19 +120,25 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 TestLocation = systemUsage.ArchiveTestLocation?.MapIdentityNamePairDTO(),
                 Type = systemUsage.ArchiveType?.MapIdentityNamePairDTO(),
                 Supplier = systemUsage.ArchiveSupplier?.MapShallowOrganizationResponseDTO(),
-                JournalPeriods = systemUsage.ArchivePeriods.Select(period => new JournalPeriodDTO
-                {
-                    Approved = period.Approved,
-                    ArchiveId = period.UniqueArchiveId,
-                    StartDate = period.StartDate,
-                    EndDate = period.EndDate
-                }).ToList()
+                JournalPeriods = systemUsage.ArchivePeriods.Select(period => MapJournalPeriodResponseDto(period)).ToList()
             };
         }
 
-        private IEnumerable<SystemRelationResponseDTO> MapOutgoingSystemRelations(ItSystemUsage systemUsage)
+        public JournalPeriodResponseDTO MapJournalPeriodResponseDto(ArchivePeriod period)
         {
-            return systemUsage.UsageRelations.Select(MapSystemRelationDTO).ToList();
+            return new JournalPeriodResponseDTO
+            {
+                Uuid = period.Uuid,
+                Approved = period.Approved,
+                ArchiveId = period.UniqueArchiveId,
+                StartDate = period.StartDate,
+                EndDate = period.EndDate
+            };
+        }
+
+        private IEnumerable<OutgoingSystemRelationResponseDTO> MapOutgoingSystemRelations(ItSystemUsage systemUsage)
+        {
+            return systemUsage.UsageRelations.Select(MapOutgoingSystemRelationDTO).ToList();
         }
 
         private static OrganizationUsageResponseDTO MapOrganizationUsage(ItSystemUsage systemUsage)
@@ -227,18 +232,33 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return systemUsage.LifeCycleStatus?.ToLifeCycleStatusChoice();
         }
 
-        public SystemRelationResponseDTO MapSystemRelationDTO(SystemRelation systemRelation)
+        public OutgoingSystemRelationResponseDTO MapOutgoingSystemRelationDTO(SystemRelation systemRelation)
         {
-            return new()
+            var dto = new OutgoingSystemRelationResponseDTO
             {
-                Uuid = systemRelation.Uuid,
-                Description = systemRelation.Description,
-                UrlReference = systemRelation.Reference,
-                AssociatedContract = systemRelation.AssociatedContract?.MapIdentityNamePairDTO(),
-                RelationFrequency = systemRelation.UsageFrequency?.MapIdentityNamePairDTO(),
-                RelationInterface = systemRelation.RelationInterface?.MapIdentityNamePairDTO(),
                 ToSystemUsage = systemRelation.ToSystemUsage?.MapIdentityNamePairDTO()
             };
+            return MapSharedRelationProperties(systemRelation, dto);
+        }
+
+        public IncomingSystemRelationResponseDTO MapIncomingSystemRelationDTO(SystemRelation systemRelation)
+        {
+            var dto = new IncomingSystemRelationResponseDTO
+            {
+                FromSystemUsage = systemRelation.FromSystemUsage?.MapIdentityNamePairDTO()
+            };
+            return MapSharedRelationProperties(systemRelation, dto);
+        }
+
+        private static T MapSharedRelationProperties<T>(SystemRelation systemRelation, T dto) where T : BaseSystemRelationResponseDTO
+        {
+            dto.Uuid = systemRelation.Uuid;
+            dto.Description = systemRelation.Description;
+            dto.UrlReference = systemRelation.Reference;
+            dto.AssociatedContract = systemRelation.AssociatedContract?.MapIdentityNamePairDTO();
+            dto.RelationFrequency = systemRelation.UsageFrequency?.MapIdentityNamePairDTO();
+            dto.RelationInterface = systemRelation.RelationInterface?.MapIdentityNamePairDTO();
+            return dto;
         }
 
         private static RoleAssignmentResponseDTO ToRoleResponseDTO(ItSystemRight right)

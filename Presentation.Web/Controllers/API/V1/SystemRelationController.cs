@@ -20,7 +20,7 @@ namespace Presentation.Web.Controllers.API.V1
     /// <summary>
     /// Relationer beskriver hvordan to lokale systemer er relateret til hinanden.
     /// </summary>
-    [PublicApi]
+    [InternalApi]
     [RoutePrefix("api/v1/systemrelations")]
     public class SystemRelationController : BaseApiController
     {

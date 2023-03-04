@@ -17,7 +17,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     public class EconomyStreamController : GenericApiController<EconomyStream, EconomyStreamDTO>
     {
         private readonly IGenericRepository<ItContract> _contracts;

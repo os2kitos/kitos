@@ -15,24 +15,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
     public class ItSystemTests : WithAutoFixture
     {
         [Theory]
-        [InlineData(OrganizationRole.User)]
-        [InlineData(OrganizationRole.GlobalAdmin)]
-        public async Task Api_Users_Can_Get_IT_System_Data_From_Specific_System_From_own_Organization(OrganizationRole role)
-        {
-            //Arrange
-            var token = await HttpApi.GetTokenAsync(role);
-            var url = TestEnvironment.CreateUrl($"odata/ItSystems({TestEnvironment.DefaultItSystemId})");
-
-            //Act
-            using var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token);
-            
-            //Assert
-            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-            var response = await httpResponse.ReadResponseBodyAsAsync<Core.DomainModel.ItSystem.ItSystem>();
-            Assert.NotNull(response.Name);
-        }
-
-        [Theory]
         [InlineData(OrganizationRole.User, 1)]
         [InlineData(OrganizationRole.GlobalAdmin, 2)]
         public async Task Can_Get_All_IT_Systems_Data_From_Own_Organizations(OrganizationRole role, int minimumNumberOfItSystems)

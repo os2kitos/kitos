@@ -58,7 +58,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
             _interfaceRepository = interfaceRepository;
             _logger = logger;
         }
-        
+
         public Result<SystemRelation, OperationError> AddRelation(
             int fromSystemUsageId,
             int toSystemUsageId,
@@ -242,41 +242,39 @@ namespace Core.ApplicationServices.SystemUsage.Relations
 
         public Result<SystemRelation, OperationError> RemoveRelation(int fromSystemUsageId, int relationId)
         {
-            using (var transaction = _transactionManager.Begin())
-            {
-                var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters { FromSystemUsageId = fromSystemUsageId }, new SystemRelationOperationEntities());
+            using var transaction = _transactionManager.Begin();
+            var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters { FromSystemUsageId = fromSystemUsageId }, new SystemRelationOperationEntities());
 
-                return
-                    LoadFromSystemUsage(operationContext)
-                        .Bind(WithAuthorizedModificationAccess)
-                        .Match<Result<SystemRelation, OperationError>>
-                        (
-                            onSuccess: context => context
-                                .Entities
-                                .FromSystemUsage
-                                .RemoveUsageRelation(relationId)
-                                .Match<Result<SystemRelation, OperationError>>
-                                (
-                                    onSuccess: removedRelation =>
-                                    {
-                                        var fromSystemUsage = removedRelation.FromSystemUsage;
-                                        var toSystemUsage = removedRelation.ToSystemUsage;
-                                        _relationRepository.DeleteWithReferencePreload(removedRelation);
-                                        _relationRepository.Save();
-                                        _usageRepository.Save();
-                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(fromSystemUsage));
-                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));
-                                        transaction.Commit();
-                                        return removedRelation;
-                                    },
-                                    onFailure: error =>
-                                    {
-                                        _logger.Error("Attempt to remove relation from {systemUsageId} with Id {relationId} failed with {error}", fromSystemUsageId, relationId, error);
-                                        return new OperationError(error);
-                                    }),
-                            onFailure: error => error
-                        );
-            }
+            return
+                LoadFromSystemUsage(operationContext)
+                    .Bind(WithAuthorizedModificationAccess)
+                    .Match<Result<SystemRelation, OperationError>>
+                    (
+                        onSuccess: context => context
+                            .Entities
+                            .FromSystemUsage
+                            .RemoveUsageRelation(relationId)
+                            .Match<Result<SystemRelation, OperationError>>
+                            (
+                                onSuccess: removedRelation =>
+                                {
+                                    var fromSystemUsage = removedRelation.FromSystemUsage;
+                                    var toSystemUsage = removedRelation.ToSystemUsage;
+                                    _relationRepository.DeleteWithReferencePreload(removedRelation);
+                                    _relationRepository.Save();
+                                    _usageRepository.Save();
+                                    _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(fromSystemUsage));
+                                    _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));
+                                    transaction.Commit();
+                                    return removedRelation;
+                                },
+                                onFailure: error =>
+                                {
+                                    _logger.Error("Attempt to remove relation from {systemUsageId} with Id {relationId} failed with {error}", fromSystemUsageId, relationId, error);
+                                    return new OperationError(error);
+                                }),
+                        onFailure: error => error
+                    );
         }
 
         public Result<SystemRelation, OperationFailure> GetRelationFrom(int systemUsageId, int relationId)

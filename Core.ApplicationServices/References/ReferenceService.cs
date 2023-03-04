@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -58,46 +59,65 @@ namespace Core.ApplicationServices.References
             _domainEvents = domainEvents;
         }
 
-
         public Result<ExternalReference, OperationError> AddReference(
             int rootId,
             ReferenceRootType rootType,
-            string title,
-            string externalReferenceId,
-            string url)
+            ExternalReferenceProperties externalReferenceProperties)
         {
-            return _referenceRepository
-                .GetRootEntity(rootId, rootType)
-                .Match
-                (
-                    onValue: root =>
-                    {
-                        if (!_authorizationContext.AllowModify(root))
+            return GetRootEntityAndCheckWriteAccess(rootId, rootType)
+                .Bind(root => root
+                    .AddExternalReference(new ExternalReference {Created = _operationClock.Now}
+                        .Transform(x => MapPropertiesToExternalReference(x, externalReferenceProperties))
+                    )
+                    .Match<Result<ExternalReference, OperationError>>
+                    (
+                        onSuccess: createdReference =>
                         {
-                            return new OperationError("Not allowed to modify root entity", OperationFailure.Forbidden);
-                        }
-
-                        return root
-                            .AddExternalReference(new ExternalReference
+                            _domainEvents.Raise(new EntityCreatedEvent<ExternalReference>(createdReference));
+                            if (externalReferenceProperties.MasterReference)
                             {
-                                Title = title,
-                                ExternalReferenceId = externalReferenceId,
-                                URL = url,
-                                Created = _operationClock.Now,
-                            })
-                            .Match<Result<ExternalReference, OperationError>>
-                            (
-                                onSuccess: createdReference =>
+                                root.SetMasterReference(createdReference);
+                            }
+
+                            RaiseRootUpdated(root);
+                            _referenceRepository.SaveRootEntity(root);
+                            return createdReference;
+                        },
+                        onFailure: error => error
+                    )
+                );
+        }
+
+        public Result<ExternalReference, OperationError> UpdateReference(
+            int rootId,
+            ReferenceRootType rootType,
+            Guid referenceUuid,
+            ExternalReferenceProperties externalReferenceProperties)
+        {
+            return GetRootEntityAndCheckWriteAccess(rootId, rootType)
+                .Bind(root =>
+                    _referenceRepository
+                        .GetByUuid(referenceUuid)
+                        .Match(reference =>
+                            {
+                                reference.Transform(x => MapPropertiesToExternalReference(x, externalReferenceProperties));
+
+                                if (externalReferenceProperties.MasterReference)
                                 {
-                                    _domainEvents.Raise(new EntityCreatedEvent<ExternalReference>(createdReference));
-                                    RaiseRootUpdated(root);
-                                    _referenceRepository.SaveRootEntity(root);
-                                    return createdReference;
-                                },
-                                onFailure: error => error
-                            );
-                    },
-                    onNone: () => new OperationError("Root entity could not be found", OperationFailure.NotFound)
+                                    root.SetMasterReference(reference);
+                                }
+                                else if (reference.IsMasterReference())
+                                {
+                                    return new OperationError("A master reference must be defined", OperationFailure.BadInput);
+                                }
+
+                                _domainEvents.Raise(new EntityCreatedEvent<ExternalReference>(reference));
+                                RaiseRootUpdated(root);
+                                _referenceRepository.SaveRootEntity(root);
+
+                                return Result<ExternalReference, OperationError>.Success(reference);
+                            },
+                            () => new OperationError($"Reference with uuid: {referenceUuid} was not found", OperationFailure.NotFound))
                 );
         }
 
@@ -211,38 +231,27 @@ namespace Core.ApplicationServices.References
                                 return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
                         }
 
-                        foreach (var externalReferenceProperties in referenceList)
+                        //Order to make sure the first update occurs on the future master reference. In that way, we cannot get into a situation where we temporarily have no master ref (update will fail)
+                        var referencesWithMasterAsHead = referenceList.OrderByDescending(r=>r.MasterReference).ToList();
+                        foreach (var externalReferenceProperties in referencesWithMasterAsHead)
                         {
-                            ExternalReference externalReference;
                             //Replace references, which are identified by the update using uuids
                             //If no existing reference is found by uuid, it is considered an input error
                             if (externalReferenceProperties.Uuid.HasValue)
                             {
                                 var uuid = externalReferenceProperties.Uuid.Value;
-                                var existingReferenceResult = _referenceRepository.GetByUuid(uuid);
-                                if (existingReferenceResult.IsNone)
-                                    return new OperationError($"External reference with uuid: {uuid} was not found in the {rootType} with id: {root.Id}", OperationFailure.BadInput);
-
-                                externalReference = existingReferenceResult.Value;
-                                MapExternalReference(externalReferenceProperties, externalReference);
+                                var updateReferenceResult = UpdateReference(rootId, rootType, uuid, externalReferenceProperties);
+                                if (updateReferenceResult.Failed)
+                                    return updateReferenceResult.Error;
                             }
                             //If uuid is null a new reference is going to be created
                             else
                             {
-                                var addReferenceResult = AddReference(rootId, rootType, externalReferenceProperties.Title, externalReferenceProperties.DocumentId, externalReferenceProperties.Url);
+                                var addReferenceResult = AddReference(rootId, rootType, externalReferenceProperties);
 
                                 if (addReferenceResult.Failed)
                                     return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(externalReferenceProperties)}. Error:{addReferenceResult.Error.Message.GetValueOrEmptyString()}", addReferenceResult.Error.FailureType);
-
-                                externalReference = addReferenceResult.Value;
                             }
-
-                            if (!externalReferenceProperties.MasterReference)
-                                continue;
-
-                            var masterReferenceResult = root.SetMasterReference(externalReference);
-                            if (masterReferenceResult.Failed)
-                                return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrEmptyString()}", masterReferenceResult.Error.FailureType);
                         }
 
                         _referenceRepository.SaveRootEntity(root);
@@ -260,12 +269,28 @@ namespace Core.ApplicationServices.References
             return error;
         }
 
-        private static void MapExternalReference(UpdatedExternalReferenceProperties updatedProperties,
-            ExternalReference externalReference)
+        private static ExternalReference MapPropertiesToExternalReference(ExternalReference reference, ExternalReferenceProperties properties)
         {
-            externalReference.Title = updatedProperties.Title;
-            externalReference.ExternalReferenceId = updatedProperties.DocumentId;
-            externalReference.URL = updatedProperties.Url;
+            reference.Title = properties.Title;
+            reference.ExternalReferenceId = properties.DocumentId;
+            reference.URL = properties.Url;
+
+            return reference;
+        }
+
+        private Result<IEntityWithExternalReferences, OperationError> GetRootEntityAndCheckWriteAccess(int rootId, ReferenceRootType rootType)
+        {
+            return _referenceRepository
+                .GetRootEntity(rootId, rootType)
+                .Match(WithWriteAccess,
+                    () => new OperationError("Root entity could not be found", OperationFailure.NotFound));
+        }
+
+        private Result<IEntityWithExternalReferences, OperationError> WithWriteAccess(IEntityWithExternalReferences root)
+        {
+            return _authorizationContext.AllowModify(root)
+                ? Result<IEntityWithExternalReferences, OperationError>.Success(root)
+                : new OperationError("Not allowed to modify root entity", OperationFailure.Forbidden);
         }
 
         private Result<IEnumerable<ExternalReference>, OperationFailure> DeleteExternalReferencesByRoot(IEntityWithExternalReferences root)

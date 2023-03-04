@@ -231,6 +231,7 @@
     <Compile Include="DomainServices\DPR\QueryReadModelsWhichShouldBecomeActiveTest.cs" />
     <Compile Include="DomainServices\DPR\QueryReadModelsWhichShouldExpireTest.cs" />
     <Compile Include="DomainServices\Interface\QueryByExposingSystemTest.cs" />
+    <Compile Include="DomainServices\Interface\QueryInterfaceByUsedInOrganizationUuidTest.cs" />
     <Compile Include="DomainServices\IntersectionQueryTest.cs" />
     <Compile Include="DomainServices\SystemUsage\ItSystemUsageOverviewReadModelRepositoryTest.cs" />
     <Compile Include="DomainServices\KLE\QueryByDescriptionContentTest.cs" />
@@ -268,6 +269,7 @@
     <Compile Include="DomainServices\QueryExceptEntitiesWithIdsTest.cs" />
     <Compile Include="DomainServices\QueryUserByNameOrEmailTest.cs" />
     <Compile Include="DomainServices\RejectAllResultsQueryTest.cs" />
+    <Compile Include="DomainServices\System\QuerySystemByUsedInOrganizationUuidTest.cs" />
     <Compile Include="DomainServices\Users\QueryByRoleAssignmentTest.cs" />
     <Compile Include="DomainServices\Users\QueryByCrossOrganizationPermissionsTest.cs" />
     <Compile Include="Extensions\DprExtensions.cs" />
@@ -286,12 +288,15 @@
     <Compile Include="Infrastructure\NonEmptyGuidAttributeTest.cs" />
     <Compile Include="Infrastructure\SimpleLinkNameMaxLengthAttributeTest.cs" />
     <Compile Include="Mapping\LifeCycleStatusMappingTest.cs" />
+    <Compile Include="Models\V2\BaseResponseMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationResponseMapperTest.cs" />
     <Compile Include="Models\V2\ExternalReferenceResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItContractResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItContractWriteModelMapperTest.cs" />
+    <Compile Include="Models\V2\ItInterfaceResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItInterfaceWriteModelMapperTest.cs" />
+    <Compile Include="Models\V2\ItSystemResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemWriteModelMapperTest.cs" />

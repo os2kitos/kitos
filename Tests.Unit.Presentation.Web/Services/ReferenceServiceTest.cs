@@ -23,7 +23,6 @@ using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 
 using Moq;
-using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -360,7 +359,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.None);
 
             //Act
-            var result = _sut.AddReference(id, rootType, A<string>(), A<string>(), A<string>());
+            var result = _sut.AddReference(id, rootType, new ExternalReferenceProperties(A<string>(), A<string>(), A<string>(), false));
 
             //Assert
             Assert.True(result.Failed);
@@ -378,7 +377,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowModifyReturns(entity.Object, false);
 
             //Act
-            var result = _sut.AddReference(id, rootType, A<string>(), A<string>(), A<string>());
+            var result = _sut.AddReference(id, rootType, new ExternalReferenceProperties(A<string>(), A<string>(), A<string>(), false));
 
             //Assert
             Assert.True(result.Failed);
@@ -400,11 +399,35 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAddReferenceReturns(entity, title, externalReferenceId, url, new ExternalReference());
 
             //Act
-            var result = _sut.AddReference(id, rootType, title, externalReferenceId, url);
+            var result = _sut.AddReference(id, rootType, new ExternalReferenceProperties(title, externalReferenceId, url, false));
 
             //Assert
             Assert.True(result.Ok);
             _referenceRepository.Verify(x => x.SaveRootEntity(entity.Object), Times.Once);
+        }
+
+        [Fact]
+        public void AddReference_Saves_Root_And_Updates_MasterReference()
+        {
+            //Arrange
+            var id = A<int>();
+            var rootType = A<ReferenceRootType>();
+            var title = A<string>();
+            var externalReferenceId = A<string>();
+            var url = A<string>();
+            var entity = new Mock<IEntityWithExternalReferences>();
+            var externalReference = new ExternalReference();
+
+            ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.Some(entity.Object));
+            ExpectAllowModifyReturns(entity.Object, true);
+            ExpectAddReferenceReturns(entity, title, externalReferenceId, url, externalReference);
+
+            //Act
+            var result = _sut.AddReference(id, rootType, new ExternalReferenceProperties(title, externalReferenceId, url, true));
+            //Assert
+            Assert.True(result.Ok);
+            _referenceRepository.Verify(x => x.SaveRootEntity(entity.Object), Times.Once);
+            entity.Verify(x => x.SetMasterReference(externalReference), Times.Once);
         }
 
         [Fact]
@@ -423,12 +446,147 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAddReferenceReturns(entity, title, externalReferenceId, url, operationError);
 
             //Act
-            var result = _sut.AddReference(id, rootType, title, externalReferenceId, url);
+            var result = _sut.AddReference(id, rootType, new ExternalReferenceProperties(title, externalReferenceId, url, false));
 
             //Assert
             Assert.True(result.Failed);
             Assert.Same(operationError, result.Error);
             _referenceRepository.Verify(x => x.SaveRootEntity(entity.Object), Times.Never);
+        }
+
+
+        [Fact]
+        public void UpdateReference_Returns_NotFound_If_Root_Is_NotFound()
+        {
+            //Arrange
+            var id = A<int>();
+            var referenceUuid = A<Guid>();
+            var rootType = A<ReferenceRootType>();
+            ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.None);
+
+            //Act
+            var result = _sut.UpdateReference(id, rootType, referenceUuid, new ExternalReferenceProperties(A<string>(), A<string>(), A<string>(), false));
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(new OperationError("Root entity could not be found", OperationFailure.NotFound), result.Error);
+        }
+
+        [Fact]
+        public void UpdateReference_Returns_Forbidden_If_Modification_Of_Root_Is_Denied()
+        {
+            //Arrange
+            var id = A<int>();
+            var rootType = A<ReferenceRootType>();
+            var referenceUuid = A<Guid>();
+            var entity = new Mock<IEntityWithExternalReferences>();
+            ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.Some(entity.Object));
+            ExpectAllowModifyReturns(entity.Object, false);
+
+            //Act
+            var result = _sut.UpdateReference(id, rootType, referenceUuid, new ExternalReferenceProperties(A<string>(), A<string>(), A<string>(), false));
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(new OperationError("Not allowed to modify root entity", OperationFailure.Forbidden), result.Error);
+        }
+
+        [Fact]
+        public void UpdateReference_Returns_BadInput_If_No_MasterReference_Would_Be_Present()
+        {
+            //Arrange
+            var id = A<int>();
+            var rootType = A<ReferenceRootType>();
+            var referenceUuid = A<Guid>();
+            var entity = new Mock<IEntityWithExternalReferences>();
+            var externalReference = new ExternalReference(){ Uuid = A<Guid>()};
+            SetOwnerWithMainReference(externalReference);
+
+            var externalReferenceProperties = new ExternalReferenceProperties(A<string>(), A<string>(), A<string>(), false);
+            ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.Some(entity.Object));
+            ExpectAllowModifyReturns(entity.Object, true);
+            ExpectGetByUuid(referenceUuid, externalReference);
+
+            //Act
+            var result = _sut.UpdateReference(id, rootType, referenceUuid, externalReferenceProperties);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(new OperationError("A master reference must be defined", OperationFailure.BadInput), result.Error);
+        }
+
+        [Fact]
+        public void UpdateReference_Returns_NotFound_If_Reference_Is_Not_Found()
+        {
+            //Arrange
+            var id = A<int>();
+            var rootType = A<ReferenceRootType>();
+            var referenceUuid = A<Guid>();
+            var entity = new Mock<IEntityWithExternalReferences>();
+            ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.Some(entity.Object));
+            ExpectAllowModifyReturns(entity.Object, true);
+            ExpectGetByUuid(referenceUuid, Maybe<ExternalReference>.None);
+
+            //Act
+            var result = _sut.UpdateReference(id, rootType, referenceUuid, new ExternalReferenceProperties(A<string>(), A<string>(), A<string>(), false));
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(new OperationError($"Reference with uuid: {referenceUuid} was not found", OperationFailure.NotFound), result.Error);
+        }
+
+        [Fact]
+        public void UpdateReference_Saves_Root_If_Update_Succeeds()
+        {
+            //Arrange
+            var id = A<int>();
+            var rootType = A<ReferenceRootType>();
+            var referenceUuid = A<Guid>();
+            var properties = A<ExternalReferenceProperties>();
+            var entity = new Mock<IEntityWithExternalReferences>();
+            var externalReference = new ExternalReference(){Uuid = referenceUuid};
+            ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.Some(entity.Object));
+            ExpectAllowModifyReturns(entity.Object, true);
+            ExpectGetByUuid(referenceUuid, externalReference);
+
+            //Act
+            var result = _sut.UpdateReference(id, rootType, referenceUuid, properties);
+
+            //Assert
+            Assert.True(result.Ok);
+            var updatedExternalReference = result.Value;
+
+            AssertExternalReference(properties, updatedExternalReference);
+            Assert.Equal(referenceUuid, updatedExternalReference.Uuid);
+
+            _referenceRepository.Verify(x => x.SaveRootEntity(entity.Object), Times.Once);
+        }
+
+        [Fact]
+        public void UpdateReference_Saves_Root_And_Updates_MasterReference()
+        {
+            //Arrange
+            var id = A<int>();
+            var rootType = A<ReferenceRootType>();
+            var referenceUuid = A<Guid>();
+            var properties = A<ExternalReferenceProperties>();
+            var entity = new Mock<IEntityWithExternalReferences>();
+            var externalReference = new ExternalReference() { Uuid = referenceUuid };
+            ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.Some(entity.Object));
+            ExpectAllowModifyReturns(entity.Object, true);
+            ExpectGetByUuid(referenceUuid, externalReference);
+
+            //Act
+            var result = _sut.UpdateReference(id, rootType, referenceUuid, new ExternalReferenceProperties(properties.Title, properties.DocumentId, properties.Url, true));
+
+            //Assert
+            Assert.True(result.Ok);
+            var updatedExternalReference = result.Value;
+            AssertExternalReference(properties, updatedExternalReference);
+            Assert.Equal(referenceUuid, updatedExternalReference.Uuid);
+
+            _referenceRepository.Verify(x => x.SaveRootEntity(entity.Object), Times.Once);
+            entity.Verify(x => x.SetMasterReference(externalReference), Times.Once);
         }
 
         [Fact]
@@ -439,9 +597,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var rootId = A<int>();
             var root = new Mock<IEntityWithExternalReferences>();
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var externalReferencePropertiesList = CreateExternalReferenceProperties(false).ToList();
-            var expectedMaster = externalReferencePropertiesList.RandomItem();
-            expectedMaster.MasterReference = true;
+            var externalReferencePropertiesList = CreateExternalReferenceProperties(false, true).ToList();
+            var expectedMaster = Assert.Single(externalReferencePropertiesList, x => x.MasterReference);
 
             var entity = root.Object.FromNullable();
             var masterReference = CreateExternalReference(expectedMaster);
@@ -473,7 +630,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void UpdateExternalReferences_Updates_Existing_ExternalReferences()
+        public void UpdateExternalReferences_Updates_Existing_ExternalReferences_In_Correct_Order()
         {
             //Arrange
             var rootType = A<ReferenceRootType>();
@@ -482,27 +639,35 @@ namespace Tests.Unit.Presentation.Web.Services
             {
                 Uuid = Guid.NewGuid()
             };
+            var masterExternalReference = new ExternalReference
+            {
+                Uuid = Guid.NewGuid()
+            };
             var externalReferenceList = new List<ExternalReference>
             {
-                externalReference
+                externalReference,
+                masterExternalReference
             };
             var root = new Mock<IEntityWithExternalReferences>();
             root.SetupGet(x => x.ExternalReferences).Returns(externalReferenceList);
             var rootEntity = root.Object;
+            rootEntity.Reference = masterExternalReference;
 
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var updatedReference = new UpdatedExternalReferenceProperties()
+            var updatedReference = new UpdatedExternalReferenceProperties(A<string>(), A<string>(), A<string>(), true)
             {
-                Uuid = externalReference.Uuid,
-                DocumentId = A<string>(),
-                Title = A<string>(),
-                Url = A<string>(),
-                MasterReference = true
+                Uuid = externalReference.Uuid
             };
-            var externalReferencePropertiesList = new List<UpdatedExternalReferenceProperties>()
+            var updatedMasterReference = new UpdatedExternalReferenceProperties(A<string>(), A<string>(), A<string>(), false)
             {
-                updatedReference
+                Uuid = masterExternalReference.Uuid
             };
+
+            var externalReferencePropertiesList = new List<UpdatedExternalReferenceProperties>
+            {
+                updatedReference,
+                updatedMasterReference
+            }.OrderBy(x => x.MasterReference).ToList();
 
             ExpectRootDeleteAndAdd(root, externalReferencePropertiesList, externalReferenceList);
             ExpectMasterReference(root, externalReference);
@@ -517,14 +682,13 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.IsNone);
             _dbTransaction.Verify(x => x.Commit());
-            Assert.Equal(updatedReference.DocumentId, externalReference.ExternalReferenceId);
-            Assert.Equal(updatedReference.Title, externalReference.Title);
-            Assert.Equal(updatedReference.Url, externalReference.URL);
+            AssertExternalReference(updatedReference, externalReference);
+            AssertExternalReference(updatedMasterReference, masterExternalReference);
             root.Verify(x => x.SetMasterReference(externalReference));
             _referenceRepository.Verify
             (
                 repository => repository.SaveRootEntity(It.Is<IEntityWithExternalReferences>(x => x.Id == rootEntity.Id)),
-                Times.Once
+                Times.Exactly(3) //Twice when updating a reference, once after performing each loop iteration
             );
         }
 
@@ -536,9 +700,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var rootId = A<int>();
             var root = new Mock<IEntityWithExternalReferences>();
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            foreach (var master in externalReferences.Take(2))
-                master.MasterReference = true;
+            var externalReferences = CreateExternalReferenceProperties(true, true).ToList();
+            externalReferences.Add(CreateExternalReference(false, true));
 
             ExpectRootDeleteAndAdd(root, externalReferences, externalReferences.Select(CreateExternalReference).ToList());
             ExpectAllowModifyReturns(root.Object, true);
@@ -574,35 +737,6 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.HasValue);
             Assert.Equal(new OperationError("A master reference must be defined", OperationFailure.BadInput), result.Value);
-        }
-
-        [Fact]
-        public void Cannot_UpdateExternalReferences_If_Set_Master_Fails()
-        {
-            //Arrange
-            var rootType = A<ReferenceRootType>();
-            var rootId = A<int>();
-            var root = new Mock<IEntityWithExternalReferences>();
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var externalReferences = CreateExternalReferenceProperties(false).ToList();
-            var expectedMaster = externalReferences.RandomItem();
-            expectedMaster.MasterReference = true;
-
-            var operationError = A<OperationError>();
-            root.Setup(x => x.SetMasterReference(It.IsAny<ExternalReference>())).Returns(operationError);
-
-            ExpectRootDeleteAndAdd(root, externalReferences, new List<ExternalReference>());
-            ExpectAllowModifyReturns(root.Object, true);
-            ExpectTransactionToBeSet();
-            ExpectGetRootEntityReturns(rootId, rootType, root.Object.FromNullable());
-
-            //Act
-            var result = _sut.UpdateExternalReferences(rootType, rootId, externalReferences);
-
-            //Assert
-            Assert.True(result.HasValue);
-            Assert.Equal(operationError.FailureType, result.Value.FailureType);
-            Assert.Contains("Failed while setting the master reference:", result.Value.Message.GetValueOrEmptyString());
         }
 
         [Fact]
@@ -662,9 +796,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var rootId = A<int>();
             var root = new Mock<IEntityWithExternalReferences>();
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var externalReferences = CreateExternalReferenceProperties(false).ToList();
-            var expectedMaster = externalReferences.RandomItem();
-            expectedMaster.MasterReference = true;
+            var externalReferences = CreateExternalReferenceProperties(false, true).ToList();
 
             root.Setup(x => x.ExternalReferences).Returns(new List<ExternalReference>());
             ExpectAllowModifyReturns(root.Object, true);
@@ -830,13 +962,19 @@ namespace Tests.Unit.Presentation.Web.Services
             return system;
         }
 
-        private IEnumerable<UpdatedExternalReferenceProperties> CreateExternalReferenceProperties(bool hasUuid)
+        private IEnumerable<UpdatedExternalReferenceProperties> CreateExternalReferenceProperties(bool hasUuid, bool withMasterReference = false)
         {
-            return Many<UpdatedExternalReferenceProperties>().Select(x =>
+            var properties = Many<UpdatedExternalReferenceProperties>().Select(x =>
             {
                 x.Uuid = hasUuid ? x.Uuid : null;
                 return x;
-            });
+            }).ToList();
+            if (withMasterReference)
+            {
+                properties.Add(CreateExternalReference(false, true));
+            }
+
+            return properties;
         }
 
         private IEnumerable<ExternalReference> CreateExternalReferences()
@@ -850,5 +988,41 @@ namespace Tests.Unit.Presentation.Web.Services
             };
         }
 
+        private UpdatedExternalReferenceProperties CreateExternalReference(bool hasUuid, bool withMasterReference)
+        {
+            return new UpdatedExternalReferenceProperties(A<string>(), A<string>(), A<string>(), true)
+            {
+                Uuid = hasUuid ? A<Guid>() : null
+            };
+        }
+
+        private void SetOwnerWithMainReference(ExternalReference reference)
+        {
+            var randomType = A<ReferenceRootType>();
+            switch (randomType)
+            {
+                case ReferenceRootType.SystemUsage:
+                    reference.ItSystemUsage = new ItSystemUsage { Reference = reference };
+                    break;
+                case ReferenceRootType.Contract:
+                    reference.ItContract = new ItContract { Reference = reference };
+                    break;
+                case ReferenceRootType.DataProcessingRegistration:
+                    reference.DataProcessingRegistration = new DataProcessingRegistration { Reference = reference };
+                    break;
+                case ReferenceRootType.System:
+                    reference.ItSystem = new ItSystem { Reference = reference };
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(randomType), randomType, null);
+            }
+        }
+
+        private static void AssertExternalReference(ExternalReferenceProperties expected, ExternalReference actual)
+        {
+            Assert.Equal(expected.DocumentId, actual.ExternalReferenceId);
+            Assert.Equal(expected.Title, actual.Title);
+            Assert.Equal(expected.Url, actual.URL);
+        }
     }
 }

@@ -4,10 +4,12 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.System;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
@@ -16,7 +18,6 @@ using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainModel.References;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
@@ -48,6 +49,7 @@ namespace Core.ApplicationServices.System
         private readonly IOperationClock _operationClock;
         private readonly IItInterfaceService _interfaceService;
         private readonly IItSystemUsageService _systemUsageService;
+        private readonly IOrganizationService _organizationService;
 
         public ItSystemService(
             IItSystemRepository itSystemRepository,
@@ -62,8 +64,8 @@ namespace Core.ApplicationServices.System
             IDomainEvents domainEvents,
             IOperationClock operationClock,
             IItInterfaceService interfaceService,
-            IItSystemUsageService systemUsageService
-            )
+            IItSystemUsageService systemUsageService,
+            IOrganizationService organizationService)
         {
             _itSystemRepository = itSystemRepository;
             _authorizationContext = authorizationContext;
@@ -78,6 +80,7 @@ namespace Core.ApplicationServices.System
             _operationClock = operationClock;
             _interfaceService = interfaceService;
             _systemUsageService = systemUsageService;
+            _organizationService = organizationService;
         }
 
         public Result<ItSystem, OperationError> GetSystem(Guid uuid)
@@ -320,6 +323,18 @@ namespace Core.ApplicationServices.System
             return ValidateNameChange(organizationId, systemId, newName).IsNone;
         }
 
+        public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid)
+        {
+            return GetSystem(uuid).Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
+        }
+
+        public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid)
+                .Select(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItSystem>(organization.Id, _authorizationContext));
+        }
+
         private Maybe<OperationError> ValidateNameChange(int organizationId, int systemId, string newName)
         {
             if (!ItSystem.IsValidName(newName))
@@ -333,30 +348,6 @@ namespace Core.ApplicationServices.System
         public bool CanCreateSystemWithName(int organizationId, string name)
         {
             return ValidateNewSystemName(organizationId, name).IsNone;
-        }
-
-        public Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference)
-        {
-            return Mutate(systemId, system => system.Reference?.URL != urlReference, updateWithResult: system =>
-            {
-                if (string.IsNullOrWhiteSpace(urlReference))
-                    return new OperationError("Url must be defined", OperationFailure.BadInput);
-
-                var existingReference = system.Reference;
-                if (existingReference != null)
-                {
-                    existingReference.URL = urlReference;
-                    return system;
-                }
-
-                var addReferenceResult = _referenceService.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference);
-                if (addReferenceResult.Failed)
-                {
-                    return addReferenceResult.Error;
-                }
-
-                return system.SetMasterReference(addReferenceResult.Value).Match(_ => Result<ItSystem, OperationError>.Success(system), error => error);
-            });
         }
 
         public Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> newTaskRefState)
@@ -444,7 +435,7 @@ namespace Core.ApplicationServices.System
                     if (!_authorizationContext.AllowReads(parent))
                         return new OperationError("Access to parent system is denied", OperationFailure.Forbidden);
 
-                    system.SetUpdateParentSystem(parent);
+                    system.UpdateParentSystem(parent);
                 }
                 else
                 {
@@ -455,12 +446,34 @@ namespace Core.ApplicationServices.System
             });
         }
 
+        public Result<ItSystem, OperationError> Activate(int itSystemId)
+        {
+            return Mutate(itSystemId, system => system.Disabled, system =>
+            {
+                system.Activate();
+                _domainEvents.Raise(new EnabledStatusChanged<ItSystem>(system, true, false));
+            });
+        }
+
         public Result<ItSystem, OperationError> Deactivate(int systemId)
         {
             return Mutate(systemId, system => system.Disabled == false, system =>
             {
                 system.Deactivate();
                 _domainEvents.Raise(new EnabledStatusChanged<ItSystem>(system, false, true));
+            });
+        }
+
+        public Result<ItSystem, OperationError> UpdateAccessModifier(int itSystemId, AccessModifier accessModifier)
+        {
+            return Mutate(itSystemId, system => system.AccessModifier != accessModifier, updateWithResult: system =>
+            {
+                if (!_authorizationContext.HasPermission(new VisibilityControlPermission(system)))
+                {
+                    return new OperationError(OperationFailure.Forbidden);
+                }
+                system.AccessModifier = accessModifier;
+                return system;
             });
         }
 

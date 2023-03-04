@@ -10,6 +10,7 @@ using Serilog;
 namespace Presentation.Web.Controllers.SSO
 {
     [RoutePrefix("SSO")]
+    [InternalApi]
     public class SSOController : ApiController
     {
         private readonly ISsoFlowApplicationService _ssoFlowApplicationService;
@@ -21,7 +22,6 @@ namespace Presentation.Web.Controllers.SSO
             _logger = logger;
         }
 
-        [InternalApi]
         [HttpGet]
         [Route("")]
         public IHttpActionResult SSO()
