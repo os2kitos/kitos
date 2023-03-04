@@ -22,7 +22,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var body = new
             {
                 RelationId = advice.RelationId,
-                Type = advice.Type?.ToString("G"),
+                Type = advice.Type.ToString("G"),
                 Scheduling = advice.Scheduling?.ToString(),
                 Subject = advice.Subject,
                 Body = advice.Body,
@@ -46,11 +46,11 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"odata/DeactivateAdvice?key={adviceId}"), cookie, null);
         }
 
-        public static async Task<HttpResponseMessage> GetContractAdvicesAsync(int contractId)
+        public static async Task<HttpResponseMessage> GetContractAdvicesAsync(int orgId, int contractId)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"/Odata/advice?$filter=type eq '0' and RelationId eq {contractId}"), cookie);
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"/Odata/GetAdvicesByOrganizationId(organizationId={orgId})?$filter=type eq '0' and RelationId eq {contractId}"), cookie);
         }
     }
 }

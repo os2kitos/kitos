@@ -1,9 +1,9 @@
 ﻿using Core.DomainModel.Advice;
 using Core.DomainServices;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Net.Http;
-using System.Web.Mvc;
+using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
@@ -14,25 +14,31 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models.API.V1;
+using Core.ApplicationServices.Notification;
+using Core.ApplicationServices.Model.Notification;
+using System.Linq;
+using Core.Abstractions.Types;
+using Core.DomainModel.Shared;
 
 namespace Presentation.Web.Controllers.API.V1
 {
     [InternalApi]
     public class AdviceUserRelationController : GenericApiController<AdviceUserRelation, AdviceUserRelationDTO>
     {
-        private readonly IGenericRepository<AdviceUserRelation> _repository;
         private readonly IGenericRepository<Advice> _adviceRepository;
         private readonly IAdviceRootResolution _adviceRootResolution;
+        private readonly IRegistrationNotificationUserRelationsService _registrationNotificationUserRelationsService;
 
         public AdviceUserRelationController(
             IGenericRepository<AdviceUserRelation> repository,
             IGenericRepository<Advice> adviceRepository,
-            IAdviceRootResolution adviceRootResolution)
+            IAdviceRootResolution adviceRootResolution,
+            IRegistrationNotificationUserRelationsService registrationNotificationUserRelationsService)
             : base(repository)
         {
-            _repository = repository;
             _adviceRepository = adviceRepository;
             _adviceRootResolution = adviceRootResolution;
+            _registrationNotificationUserRelationsService = registrationNotificationUserRelationsService;
         }
 
         [NonAction]
@@ -104,29 +110,62 @@ namespace Presentation.Web.Controllers.API.V1
         /// </summary>
         /// <param name="adviceId"></param>
         /// <returns></returns>
-        [HttpDelete]
-        public virtual HttpResponseMessage DeleteByAdviceId(int adviceId)
+        [NonAction]
+        public virtual HttpResponseMessage DeleteByAdviceId(int adviceId) => throw new NotSupportedException();
+        /// <summary>
+        /// Update range
+        /// </summary>
+        /// <param name="adviceId"></param>
+        /// <param name="body"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("api/AdviceUserRelation/{notificationId}/{relatedEntityType}/update-range")]
+        public HttpResponseMessage UpdateRange(int notificationId, RelatedEntityType relatedEntityType, [FromBody] IEnumerable<AdviceUserRelation> body)
         {
-            try
+            var recipients = body.ToList();
+            return MapRecipients(recipients, RecieverType.CC)
+                .Bind(ccs => MapRecipients(recipients, RecieverType.RECIEVER)
+                    .Select(receivers => (ccs, receivers)))
+                .Bind(result => _registrationNotificationUserRelationsService.UpdateNotificationUserRelations(notificationId, result.ccs, result.receivers, relatedEntityType))
+                .Match(Ok, FromOperationError);
+        }
+
+        private static Result<RecipientModel, OperationError> MapRecipients(IEnumerable<AdviceUserRelation> recipients, RecieverType receiverType)
+        {
+            var recipientList = recipients.ToList();
+            var roleRecipientsResult = MapRoleModels(recipientList, receiverType);
+            if (roleRecipientsResult.Failed)
+                return roleRecipientsResult.Error;
+
+            var emailRecipients = recipientList
+                .Where(x => x.RecpientType == RecipientType.USER && x.RecieverType == receiverType)
+                .Select(x => new EmailRecipientModel (x.Email))
+                .ToList();
+
+            var recipient = new RecipientModel(emailRecipients, roleRecipientsResult.Value);
+            
+            return recipient;
+        }
+
+        private static Result<IEnumerable<RoleRecipientModel>, OperationError> MapRoleModels(IEnumerable<AdviceUserRelation> recipients,
+            RecieverType receiverType)
+        {
+            var result = new List<RoleRecipientModel>();
+            foreach (var adviceUserRelation in recipients.Where(x => x.RecpientType == RecipientType.ROLE && x.RecieverType == receiverType))
             {
-                foreach (var d in _repository.AsQueryable().Where(d => d.AdviceId == adviceId).ToList())
-                {
-                    if (AllowDelete(d))
-                    {
-                        _repository.Delete(d);
-                        _repository.Save();
-                    }
-                    else
-                    {
-                        return Forbidden();
-                    }
-                }
-                return Ok();
+                var idResult = ResolveRoleId(adviceUserRelation);
+                if (idResult.IsNone)
+                    return new OperationError("Role id cannot be null", OperationFailure.BadInput);
+
+                result.Add(new RoleRecipientModel(idResult.Value));
             }
-            catch (Exception e)
-            {
-                return LogError(e);
-            }
+
+            return result;
+        }
+
+        private static Maybe<int> ResolveRoleId(AdviceUserRelation recipient)
+        {
+            return recipient.DataProcessingRegistrationRoleId ?? recipient.ItContractRoleId ?? recipient.ItSystemRoleId;
         }
     }
 }

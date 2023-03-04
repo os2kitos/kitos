@@ -70,6 +70,7 @@
     <Compile Include="GDPR\DataProcessingRegistrationValidationResult.cs" />
     <Compile Include="GDPR\Events\DataProcessingRegistrationRemovedFromItContractEvent.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
+    <Compile Include="IHasReadonlyName.cs" />
     <Compile Include="ISupportsUserSpecificAccessControl.cs" />
     <Compile Include="ItContract\CriticalityType.cs" />
     <Compile Include="ItContract\ItContractValidationCategory.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="KendoConfig\KendoColumnConfiguration.cs" />
     <Compile Include="LocalOptions\LocalCriticalityType.cs" />
     <Compile Include="Notification\IEntityWithUserNotification.cs" />
+    <Compile Include="Notification\IHasToDate.cs" />
     <Compile Include="Notification\NotificationType.cs" />
     <Compile Include="KendoConfig\OverviewType.cs" />
     <Compile Include="Organization\ConnectionUpdateOrganizationUnitChangeType.cs" />

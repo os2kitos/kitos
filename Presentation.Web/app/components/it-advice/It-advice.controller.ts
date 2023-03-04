@@ -2,8 +2,9 @@
 
     app.controller("object.EditAdviceCtrl",
         [
-            "$", "$scope", "$http", "notify", "$uibModal", "object", "type", "advicename", "hasWriteAccess", "localOptionServiceFactory",
-            ($, $scope, $http, notify, $modal, object, type: Kitos.Models.Advice.AdviceType, advicename, hasWriteAccess, localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) => {
+            "$", "$scope", "$http", "notify", "$uibModal", "object", "type", "advicename", "hasWriteAccess", "localOptionServiceFactory", "currentUser",
+            ($, $scope, $http, notify, $modal, object, type: Kitos.Models.Advice.AdviceType, advicename, hasWriteAccess,
+                localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory, currentUser: Kitos.Services.IUser) => {
                 $scope.type = type;
                 $scope.object = object;
                 $scope.advicename = advicename;
@@ -26,7 +27,7 @@
                             type: "odata-v4",
                             transport: {
                                 read: {
-                                    url: `/Odata/advice?$filter=type eq '${type}' and RelationId eq ${object.id
+                                    url: `/Odata/GetAdvicesByOrganizationId(organizationId=${currentUser.currentOrganizationId})?$filter=type eq '${type}' and RelationId eq ${object.id
                                         }&$expand=Reciepients($expand=${roleProperty}), Advicesent`,
                                     dataType: "json"
                                 },
