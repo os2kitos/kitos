@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Core.DomainModel.Shared;
 
 namespace Core.DomainServices.Queries.Notifications
 {

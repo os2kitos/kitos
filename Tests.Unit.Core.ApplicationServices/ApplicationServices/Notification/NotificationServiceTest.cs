@@ -97,7 +97,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             
             var root = ExpectGetRelatedEntityReturnsEntity(relatedEntityUuid, relatedEntityType);
             var notification = CreateNewNotification(relatedEntityType, relationId: root.Id);
-            var condition1 = new QueryByOwnerResource(relatedEntityType);
+            var condition1 = new QueryByOwnerResourceType(relatedEntityType);
             var condition2 = new QueryByOwnerResourceId(root.Id);
 
             var notifications = new List<Advice> { notification, CreateNewNotification(relatedEntityType) }.AsQueryable();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -14,7 +15,6 @@ using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Notifications;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
-using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
 using Presentation.Web.Models.API.V2.Internal.Response.Notifications;
@@ -46,11 +46,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         /// <summary>
         /// Gets all notifications owned by the specified ownerResourceType with a matching organizationUuid, which become active after the specified fromDate
         /// </summary>
-        /// <param name="ownerResourceType"></param>
-        /// <param name="organizationUuid"></param>
-        /// <param name="ownerResourceUuid"></param>
-        /// <param name="onlyActive"></param>
-        /// <param name="paginationQuery"></param>
+        /// <param name="ownerResourceType">Filter by owner resource type</param>
+        /// <param name="organizationUuid">Filter by organization owning the owner resource</param>
+        /// <param name="ownerResourceUuid">Filter by uuid of owner resource</param>
+        /// <param name="onlyActive">Only include active notifications</param>
+        /// <param name="paginationQuery">pagination</param>
         /// <returns></returns>
         [HttpGet]
         [Route("{ownerResourceType}")]
@@ -59,8 +59,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetNotifications(OwnerResourceType ownerResourceType, 
-            [NonEmptyGuid] Guid organizationUuid, 
+        public IHttpActionResult GetNotifications(
+            OwnerResourceType ownerResourceType,
+            [Required][NonEmptyGuid] Guid organizationUuid,
             Guid? ownerResourceUuid = null,
             bool onlyActive = false,
             [FromUri] UnboundedPaginationQuery paginationQuery = null)
@@ -70,7 +71,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
 
             var conditions = new List<IDomainQuery<Advice>>
             {
-                new QueryByOwnerResource(ownerResourceType.ToRelatedEntityType())
+                new QueryByOwnerResourceType(ownerResourceType.ToRelatedEntityType())
             };
 
             if (ownerResourceUuid.HasValue)
@@ -198,7 +199,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult UpdateScheduledNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid ownerResourceUuid, [NonEmptyGuid] Guid notificationUuid, [FromBody] UpdateScheduledNotificationWriteRequestDTO request)
         {
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return BadRequest();
 
             var parameters = _writeModelMapper.FromScheduledPUT(request, ownerResourceUuid, ownerResourceType);
@@ -224,7 +225,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult DeactivateScheduledNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid ownerResourceUuid, [NonEmptyGuid] Guid notificationUuid)
         {
-            if (!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return BadRequest();
 
             return _notificationService.DeactivateNotification(notificationUuid, ownerResourceUuid, ownerResourceType.ToRelatedEntityType())
@@ -272,7 +273,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetSentNotification(OwnerResourceType ownerResourceType, [NonEmptyGuid] Guid ownerResourceUuid, [NonEmptyGuid] Guid notificationUuid)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
                 return BadRequest();
 
             return _notificationService.GetNotificationSentByUuid(notificationUuid, ownerResourceUuid, ownerResourceType.ToRelatedEntityType())

@@ -37,7 +37,7 @@ namespace Core.ApplicationServices.Notification
             using var transaction = _transactionManager.Begin();
 
             var notificationResult = _registrationNotificationService.GetNotificationById(notificationId)
-                .Bind(WithModifyAccess)
+                .Bind(WithWriteAccess)
                 .Select(DeleteUserRelationsByAdviceId);
 
             if (notificationResult.Failed)
@@ -60,10 +60,10 @@ namespace Core.ApplicationServices.Notification
 
         private Advice DeleteUserRelationsByAdviceId(Advice notification)
         {
-            foreach (var d in _adviceUserRelationRepository.AsQueryable().Where(d => d.AdviceId == notification.Id).ToList())
+            var adviceUserRelations = _adviceUserRelationRepository.AsQueryable().Where(d => d.AdviceId == notification.Id).ToList();
+            if (adviceUserRelations.Any())
             {
-                    _adviceUserRelationRepository.Delete(d);
-                    _adviceUserRelationRepository.Save();
+                _adviceUserRelationRepository.RemoveRange(adviceUserRelations);
             }
             return notification;
         }
@@ -90,7 +90,7 @@ namespace Core.ApplicationServices.Notification
 
             return recipients;
         }
-        private Result<Advice, OperationError> WithModifyAccess(Advice notification)
+        private Result<Advice, OperationError> WithWriteAccess(Advice notification)
         {
             return _adviceRootResolution.Resolve(notification)
                 .Match<Result<Advice, OperationError>>(root => _authorizationContext.AllowModify(root)

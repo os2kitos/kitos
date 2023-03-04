@@ -6,7 +6,6 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Model.Notification.Read;
 using Core.ApplicationServices.Model.Notification.Write;
-using Core.ApplicationServices.Shared;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Events;
@@ -387,20 +386,20 @@ namespace Core.ApplicationServices.Notification
             switch (relatedEntityType)
             {
                 case RelatedEntityType.dataProcessingRegistration:
-                    var dpr = entity as DataProcessingRegistration;
-                    _dprRepository.Update(dpr);
+                    var dpr = (DataProcessingRegistration)entity;
+                    dpr.MarkAsDirty();
                     _domainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(dpr));
                     _dprRepository.Save();
                     break;
                 case RelatedEntityType.itContract:
-                    var contract = entity as ItContract;
-                    _contractRepository.Update(contract);
+                    var contract = (ItContract)entity;
+                    contract.MarkAsDirty();
                     _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
                     _contractRepository.Save();
                     break;
                 case RelatedEntityType.itSystemUsage:
-                    var usage = entity as ItSystemUsage;
-                    _usageRepository.Update(usage);
+                    var usage = (ItSystemUsage)entity;
+                    usage.MarkAsDirty();
                     _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
                     _usageRepository.Save();
                     break;
@@ -409,11 +408,10 @@ namespace Core.ApplicationServices.Notification
             }
         }
 
-        private Result<IEnumerable<NotificationResultModel>, OperationError> MapNotificationsToResultModelList(
-            IEnumerable<Advice> notifications)
+        private Result<IEnumerable<NotificationResultModel>, OperationError> MapNotificationsToResultModelList(IEnumerable<Advice> notifications)
         {
             var result = new List<NotificationResultModel>();
-            foreach (var notification in notifications)
+            foreach (var notification in notifications.ToList())
             {
                 var modelResult = MapNotificationToResultModel(notification);
                 if (modelResult.Failed)
@@ -476,15 +474,20 @@ namespace Core.ApplicationServices.Notification
                 );
         }
 
-        private IEnumerable<EmailRecipientResultModel> MapEmailRecipientToResponse(IEnumerable<AdviceUserRelation> recipients, RecieverType receiverType)
+        private static IEnumerable<EmailRecipientResultModel> MapEmailRecipientToResponse(IEnumerable<AdviceUserRelation> recipients, RecieverType receiverType)
         {
-            return recipients.Where(x => x.RecieverType == receiverType && x.RecpientType == RecipientType.USER).Select(x => new EmailRecipientResultModel(x.Email)).ToList();
+            return recipients
+                .Where(x => x.RecieverType == receiverType && x.RecpientType == RecipientType.USER)
+                .Select(x => new EmailRecipientResultModel(x.Email))
+                .ToList();
         }
 
         private static Result<IEnumerable<RoleRecipientResultModel>, OperationError> MapRoleRecipientToResponse(IEnumerable<AdviceUserRelation> recipients, RecieverType receiverType)
         {
             var result = new List<RoleRecipientResultModel>();
-            var roleRecipients = recipients.Where(x => x.RecieverType == receiverType && x.RecpientType == RecipientType.ROLE);
+            var roleRecipients = recipients
+                .Where(x => x.RecieverType == receiverType && x.RecpientType == RecipientType.ROLE)
+                .ToList();
 
             foreach (var roleRecipient in roleRecipients)
             {
