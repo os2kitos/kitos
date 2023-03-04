@@ -272,13 +272,13 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(path), token);
         }
 
-        public static async Task<IEnumerable<RegistrationHierarchyNodeResponseDTO>> GetHierarchyAsync(string token, Guid systemUuid)
+        public static async Task<IEnumerable<RegistrationHierarchyNodeWithActivationStatusResponseDTO>> GetHierarchyAsync(string token, Guid systemUuid)
         {
             var path = $"{BaseItSystemPath}/{systemUuid}/hierarchy";
             using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(path), token);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            return await response.ReadResponseBodyAsAsync<IEnumerable<RegistrationHierarchyNodeResponseDTO>>();
+            return await response.ReadResponseBodyAsAsync<IEnumerable<RegistrationHierarchyNodeWithActivationStatusResponseDTO>>();
         }
 
         public static async Task<ExternalReferenceDataResponseDTO> AddExternalReferenceAsync(string token, Guid systemUuid, ExternalReferenceDataWriteRequestDTO request)
