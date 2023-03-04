@@ -109,7 +109,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             DateTime? changedSinceGtEq = null,
             string nameEquals = null,
             Guid? usedInOrganizationUuid = null,
-            string nameContains = null
+            string nameContains = null,
             string interfaceId = null,
             Guid? organizationUuid = null
             )
