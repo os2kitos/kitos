@@ -431,6 +431,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             foreach (var node in hierarchy)
             {
                 var system = Assert.Single(createdSystems, x => x.Uuid == node.Node.Uuid);
+                Assert.Equal(node.Deactivated, system.Disabled);
                 if (system.Uuid == rootUuid)
                 {
                     Assert.Null(node.Parent);

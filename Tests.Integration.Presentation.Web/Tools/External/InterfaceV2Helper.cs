@@ -89,10 +89,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             DateTime? changedSinceGtEq = null,
             string nameEquals = null,
             Guid? usedInOrganizationUuid = null,
-            string nameContains = null
+            string nameContains = null,
+            string interfaceId = null,
+            Guid? organizationUuid = null
             )
         {
-            using var response = await SendGetInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals, usedInOrganizationUuid, nameContains);
+            using var response = await SendGetInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals, usedInOrganizationUuid, nameContains, interfaceId, organizationUuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItInterfaceResponseDTO>>();
@@ -108,6 +110,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             string nameEquals = null,
             Guid? usedInOrganizationUuid = null,
             string nameContains = null
+            string interfaceId = null,
+            Guid? organizationUuid = null
             )
             {
             var path = BasePathInterfaces;
@@ -136,6 +140,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (usedInOrganizationUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("usedInOrganizationUuid", usedInOrganizationUuid.Value.ToString("D")));
+
+            if (interfaceId != null)
+                queryParameters.Add(new KeyValuePair<string, string>("interfaceId", interfaceId));
+
+            if (organizationUuid != null)
+                queryParameters.Add(new KeyValuePair<string, string>("organizationUuid", organizationUuid.Value.ToString("D")));
 
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
