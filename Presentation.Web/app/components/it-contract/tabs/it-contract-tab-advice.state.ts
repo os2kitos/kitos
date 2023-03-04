@@ -20,6 +20,10 @@
                             return result.data.response;
                         });
                     }
+                ],
+                currentUser: [
+                    "userService",
+                    (userService: Kitos.Services.IUserService) => userService.getUser()
                 ]
             }
         });

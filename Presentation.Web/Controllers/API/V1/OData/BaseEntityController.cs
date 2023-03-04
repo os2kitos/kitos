@@ -15,6 +15,7 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
+using System.Net.Http;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
@@ -278,6 +279,13 @@ namespace Presentation.Web.Controllers.API.V1.OData
         protected IHttpActionResult FromOperationFailure(OperationFailure failure)
         {
             return StatusCode(failure.ToHttpStatusCode());
+        }
+
+        protected IHttpActionResult FromOperationError(OperationError failure)
+        {
+            var statusCode = failure.FailureType.ToHttpStatusCode();
+
+            return ResponseMessage(new HttpResponseMessage(statusCode) { Content = new StringContent(failure.Message.GetValueOrFallback(statusCode.ToString("G"))) });
         }
     }
 }

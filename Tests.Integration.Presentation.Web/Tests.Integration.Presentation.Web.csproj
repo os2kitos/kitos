@@ -138,7 +138,9 @@
     <Compile Include="ItSystem\V2\BaseItSystemsApiV2Test.cs" />
     <Compile Include="ItSystem\V2\ItSystemsInternalApiV2Test.cs" />
     <Compile Include="ItSystem\V2\ItSystemsApiV2RightsHoldersTest.cs" />
+    <Compile Include="Notifications\NotificationApiV2Test.cs" />
     <Compile Include="Options\V1\OptionApiTests.cs" />
+    <Compile Include="Tools\Internal\Notifications\NotificationV2Helper.cs" />
     <Compile Include="Users\OrganizationRightApiTest.cs" />
     <Compile Include="Organizations\OrganizationUnitTests.cs" />
     <Compile Include="Organizations\OrganizationUnitRegistrationTests.cs" />

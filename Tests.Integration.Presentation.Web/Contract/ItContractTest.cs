@@ -127,9 +127,9 @@ namespace Tests.Integration.Presentation.Web.Contract
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
 
             // Assert
-            using var advicesResponse = AdviceHelper.GetContractAdvicesAsync(contract.Id);
-            var deletedContractAdvices = await advicesResponse.Result.ReadOdataListResponseBodyAsAsync<Core.DomainModel.Advice.Advice>();
-            Assert.True(deletedContractAdvices.Count == 0);
+            using var advicesResponse =await AdviceHelper.GetContractAdvicesAsync(organizationId, contract.Id);
+            var deletedContractAdvices = await advicesResponse.ReadOdataListResponseBodyAsAsync<Core.DomainModel.Advice.Advice>();
+            Assert.Empty(deletedContractAdvices);
         }
 
         [Fact]
