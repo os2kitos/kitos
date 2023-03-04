@@ -74,7 +74,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         }
 
-        public void AssertSystemResponseProperties(ItSystem src, IEnumerable<ExternalReferenceDataResponseDTO> expectedExternalReferences, ItSystemResponseDTO mapped)
+        private void AssertSystemResponseProperties(ItSystem src, IEnumerable<ExternalReferenceDataResponseDTO> expectedExternalReferences, ItSystemResponseDTO mapped)
         {
             AssertBaseResponseProperties(src, expectedExternalReferences, mapped);
             Assert.Equal(src.AccessModifier.ToChoice(), mapped.Scope);
@@ -84,7 +84,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertOptionalOrganizationIdentities(src.Usages.Select(x => x.Organization), mapped.UsingOrganizations);
         }
 
-        public void AssertBaseResponseProperties(ItSystem src, IEnumerable<ExternalReferenceDataResponseDTO> expectedExternalReferences, BaseItSystemResponseDTO mapped)
+        private void AssertBaseResponseProperties(ItSystem src, IEnumerable<ExternalReferenceDataResponseDTO> expectedExternalReferences, BaseItSystemResponseDTO mapped)
         {
             Assert.Equal(src.Uuid, mapped.Uuid);
             Assert.Equal(src.Name, mapped.Name);

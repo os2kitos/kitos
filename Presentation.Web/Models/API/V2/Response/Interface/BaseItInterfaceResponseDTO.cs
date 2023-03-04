@@ -14,7 +14,7 @@ namespace Presentation.Web.Models.API.V2.Response.Interface
         public Guid Uuid { get; set; }
 
         /// <summary>
-        /// UUID for IT-System exposing this IT-Interface
+        /// IT-System exposing this IT-Interface
         /// </summary>
         public IdentityNamePairResponseDTO ExposedBySystem { get; set; }
 

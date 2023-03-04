@@ -72,7 +72,7 @@ namespace Presentation.Web.Extensions
 
         private static int GetPaginationPageSize(BoundedPaginationQuery pagination)
         {
-            return pagination?.PageSize.GetValueOrDefault(PagingContraints.MaxPageSize) ?? PagingContraints.MaxPageSize;
+            return pagination?.PageSize.GetValueOrDefault(BoundedPaginationConstraints.MaxPageSize) ?? BoundedPaginationConstraints.MaxPageSize;
         }
 
         private static int GetPaginationPage(IStandardPaginationQueryParameters pagination)

@@ -157,6 +157,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <summary>
         /// DELETE an existing it-system
         /// NOTE: This is for master data only. Local usages extend this with local data, and are managed through the it-system-usage resource
+        /// Constraints:
+        /// - All usages must be removed before deletion
+        /// - All child systems must be removed
+        /// - No interfaces may still be exposed on the it-system
         /// </summary>
         /// <returns></returns>
         [HttpDelete]
@@ -207,7 +211,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems/{uuid}/hierarchy")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegistrationHierarchyNodeWithDisabledStatusResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegistrationHierarchyNodeWithActivationStatusResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]

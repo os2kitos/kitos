@@ -4,7 +4,6 @@ using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.RightsHolders;
-using Core.ApplicationServices.System;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
@@ -13,7 +12,6 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-
 using Moq;
 using Serilog;
 using System;
@@ -21,7 +19,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
-using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Interface.Write;
+using Core.DomainModel.Events;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -32,19 +31,20 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private readonly ItInterfaceRightsHolderService _sut;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
-        private readonly Mock<IItSystemService> _itSystemServiceMock;
         private readonly Mock<IItInterfaceService> _interfaceServiceMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<ILogger> _logger;
         private readonly Mock<IGlobalAdminNotificationService> _globalAdminNotificationServiceMock;
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<IOperationClock> _operationClockMock;
+        private readonly Mock<IItInterfaceWriteService> _writeServiceMock;
+        private readonly Mock<IDomainEvents> _domainEventsMock;
+        private readonly Mock<IDatabaseControl> _databaseControlMock;
 
         public ItInterfaceRightsHolderServiceTest()
         {
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();
-            _itSystemServiceMock = new Mock<IItSystemService>();
             _interfaceServiceMock = new Mock<IItInterfaceService>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _logger = new Mock<ILogger>();
@@ -52,16 +52,21 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _userRepositoryMock = new Mock<IUserRepository>();
             _operationClockMock = new Mock<IOperationClock>();
 
+            _writeServiceMock = new Mock<IItInterfaceWriteService>();
+            _domainEventsMock = new Mock<IDomainEvents>();
+            _databaseControlMock = new Mock<IDatabaseControl>();
             _sut = new ItInterfaceRightsHolderService(
                 _userContextMock.Object,
                 _organizationRepositoryMock.Object,
-                _itSystemServiceMock.Object,
                 _interfaceServiceMock.Object,
                 _transactionManagerMock.Object,
                 _logger.Object,
                 _globalAdminNotificationServiceMock.Object,
                 _userRepositoryMock.Object,
-                _operationClockMock.Object);
+                _operationClockMock.Object,
+                _writeServiceMock.Object,
+                _domainEventsMock.Object,
+                _databaseControlMock.Object);
         }
 
         [Fact]
@@ -200,17 +205,20 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var transactionMock = ExpectTransactionBegins();
             var orgId = A<int>();
             var itInterface = new ItInterface { Id = A<int>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
 
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
-            ExpectGetSystemReturns(inputParameters.AdditionalValues.ExposingSystemUuid.NewValue, exposingSystem);
             ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
-
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
-            ExpectUpdateExposingSystemReturns(itInterface.Id, exposingSystem.Id, itInterface);
-            ExpectUpdateVersionReturns(itInterface.Id, inputParameters.AdditionalValues, itInterface);
-            ExpectUpdateDescriptionReturns(itInterface.Id, inputParameters.AdditionalValues, itInterface);
-            ExpectUpdateUrlReferenceReturns(itInterface.Id, inputParameters.AdditionalValues, itInterface);
+            _writeServiceMock.Setup(x => x.Update(itInterface.Uuid, It.Is<ItInterfaceWriteModel>(p =>
+                //First two are used during creation and reset before calling update
+                p.Name.IsUnchanged &&
+                p.InterfaceId.IsUnchanged &&
+                //The rest of the params should be passed as-is
+                p.Description == inputParameters.AdditionalValues.Description &&
+                p.ExposingSystemUuid == inputParameters.AdditionalValues.ExposingSystemUuid &&
+                p.Version == inputParameters.AdditionalValues.Version &&
+                p.UrlReference == inputParameters.AdditionalValues.UrlReference
+            ))).Returns(itInterface);
 
             //Act
             var result = _sut.CreateNewItInterface(rightsHolderUuid, inputParameters);
@@ -221,121 +229,6 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewItInterface_Returns_BadInput_If_ExposingSystem_Has_No_Changes()
-        {
-            //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
-            var transactionMock = ExpectTransactionBegins();
-
-            inputParameters.AdditionalValues.ExposingSystemUuid = OptionalValueChange<Guid>.None;
-
-            //Act
-            var result = _sut.CreateNewItInterface(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewItInterface_Returns_BadInput_If_Name_Has_No_Changes()
-        {
-            //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
-            var transactionMock = ExpectTransactionBegins();
-
-            inputParameters.AdditionalValues.Name = OptionalValueChange<string>.None;
-
-            //Act
-            var result = _sut.CreateNewItInterface(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewItInterface_Returns_BadInput_If_GetRightsHolderOrganizationFails()
-        {
-            //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
-            var transactionMock = ExpectTransactionBegins();
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, Maybe<Organization>.None);
-
-            //Act
-            var result = _sut.CreateNewItInterface(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewItInterface_Returns_BadInput_If_GetExposingSystemFails_With_NotFound()
-        {
-            //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var orgId = A<int>();
-            var inputParameters =  new RightsHolderItInterfaceCreationParameters(null, new RightsHolderItInterfaceUpdateParameters()
-            {
-                ExposingSystemUuid = A<Guid>().AsChangedValue(),
-                Name = A<string>().AsChangedValue(),
-                InterfaceId = A<string>().AsChangedValue()
-            });
-            var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>() };
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
-            ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
-            ExpectGetSystemReturns(inputParameters.AdditionalValues.ExposingSystemUuid.NewValue, new OperationError(OperationFailure.NotFound));
-
-            //Act
-            var result = _sut.CreateNewItInterface(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewItInterface_Returns_Forbidden_If_GetExposingSystemFails_With_Forbidden()
-        {
-            //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var orgId = A<int>();
-            var inputParameters = new RightsHolderItInterfaceCreationParameters(null, new RightsHolderItInterfaceUpdateParameters()
-            {
-                ExposingSystemUuid = A<Guid>().AsChangedValue(),
-                Name = A<string>().AsChangedValue(),
-                InterfaceId = A<string>().AsChangedValue()
-            });
-            var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>() };
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
-            ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
-            ExpectGetSystemReturns(inputParameters.AdditionalValues.ExposingSystemUuid.NewValue, new OperationError(OperationFailure.Forbidden));
-
-            //Act
-            var result = _sut.CreateNewItInterface(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
         public void CreateNewItInterface_Returns_Forbidden_If_No_RightsHolderAccess_In_Target_Organization()
         {
             //Arrange
@@ -343,10 +236,8 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var orgId = A<int>();
             var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
 
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
-            ExpectGetSystemReturns(inputParameters.AdditionalValues.ExposingSystemUuid.NewValue, exposingSystem);
             ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, false);
 
             //Act
@@ -366,12 +257,10 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var orgId = A<int>();
             var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
 
             var operationError = A<OperationError>();
 
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
-            ExpectGetSystemReturns(inputParameters.AdditionalValues.ExposingSystemUuid.NewValue, exposingSystem);
             ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, operationError);
 
@@ -385,27 +274,21 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewItInterface_Returns_Error_If_UpdateExposingSystem_Fails()
+        public void CreateNewItInterface_Returns_Error_If_Update_After_Create_Fails()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
-            var orgId = A<int>(); var inputParameters = new RightsHolderItInterfaceCreationParameters(null, new RightsHolderItInterfaceUpdateParameters()
-            {
-                ExposingSystemUuid = A<Guid>().AsChangedValue(),
-                Name = A<string>().AsChangedValue(),
-                InterfaceId = A<string>().AsChangedValue()
-            });
+            var orgId = A<int>();
+            var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var itInterface = new ItInterface { Id = A<int>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
 
             var operationError = A<OperationError>();
 
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
-            ExpectGetSystemReturns(inputParameters.AdditionalValues.ExposingSystemUuid.NewValue, exposingSystem);
             ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
             ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
-            ExpectUpdateExposingSystemReturns(itInterface.Id, exposingSystem.Id, operationError);
+            _writeServiceMock.Setup(x => x.Update(itInterface.Uuid, It.IsAny<ItInterfaceWriteModel>())).Returns(operationError);
 
             //Act
             var result = _sut.CreateNewItInterface(rightsHolderUuid, inputParameters);
@@ -417,250 +300,47 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewItInterface_Returns_Error_If_UpdateVersion_Fails()
+        public void UpdateItInterface_Returns_Ok()
         {
             //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var orgId = A<int>();
-            var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
+            var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
-
-            var operationError = A<OperationError>();
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
-            ExpectGetSystemReturns(inputParameters.AdditionalValues.ExposingSystemUuid.NewValue, exposingSystem);
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
-            ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
-            ExpectUpdateExposingSystemReturns(itInterface.Id, exposingSystem.Id, itInterface);
-            ExpectUpdateVersionReturns(itInterface.Id, inputParameters.AdditionalValues, operationError);
-
-            //Act
-            var result = _sut.CreateNewItInterface(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewItInterface_Returns_Error_If_UpdateDescription_Fails()
-        {
-            //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var orgId = A<int>();
-            var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
-            var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
-
-            var operationError = A<OperationError>();
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
-            ExpectGetSystemReturns(inputParameters.AdditionalValues.ExposingSystemUuid.NewValue, exposingSystem);
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
-            ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
-            ExpectUpdateExposingSystemReturns(itInterface.Id, exposingSystem.Id, itInterface);
-            ExpectUpdateVersionReturns(itInterface.Id, inputParameters.AdditionalValues, itInterface);
-            ExpectUpdateDescriptionReturns(itInterface.Id, inputParameters.AdditionalValues, operationError);
-
-            //Act
-            var result = _sut.CreateNewItInterface(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewItInterface_Returns_Error_If_UpdateUrlReference_Fails()
-        {
-            //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var orgId = A<int>();
-            var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
-            var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
-
-            var operationError = A<OperationError>();
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
-            ExpectGetSystemReturns(inputParameters.AdditionalValues.ExposingSystemUuid.NewValue, exposingSystem);
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgId, true);
-            ExpectItInterfaceServiceCreateItInterfaceReturns(orgId, inputParameters, itInterface);
-            ExpectUpdateExposingSystemReturns(itInterface.Id, exposingSystem.Id, itInterface);
-            ExpectUpdateVersionReturns(itInterface.Id, inputParameters.AdditionalValues, itInterface);
-            ExpectUpdateDescriptionReturns(itInterface.Id, inputParameters.AdditionalValues, itInterface);
-            ExpectUpdateUrlReferenceReturns(itInterface.Id, inputParameters.AdditionalValues, operationError);
-
-            //Act
-            var result = _sut.CreateNewItInterface(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Theory]
-        [InlineData(true, true, true, true, true, true)]
-        [InlineData(false, false, false, false, false, true)]
-        [InlineData(false, false, false, false, true, false)]
-        [InlineData(false, false, false, true, false, false)]
-        [InlineData(false, false, true, false, false, false)]
-        [InlineData(false, true, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false)]
-        public void UpdateItInterface_Returns_Ok_And_Only_Updates_Parameters_With_Changes(
-            bool withNameChange, 
-            bool withInterfaceIdChange, 
-            bool withExposingSystemChange, 
-            bool withVersionChange, 
-            bool withDescriptionChange,
-            bool withUrlReferenceChange)
-        {
-            //Arrange
-            var inputParameters = new RightsHolderItInterfaceUpdateParameters
-            {
-                Name = withNameChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
-                InterfaceId = withInterfaceIdChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
-                ExposingSystemUuid = withExposingSystemChange ? A<Guid>().AsChangedValue() : OptionalValueChange<Guid>.None,
-                Version = withVersionChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
-                Description = withDescriptionChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
-                UrlReference = withUrlReferenceChange ? A<string>().AsChangedValue() : OptionalValueChange<string>.None,
-            };
-            var transactionMock = ExpectTransactionBegins();
-            var originalExposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = originalExposingSystem }, ItInterfaceId = A<string>() };
-            var newExposingSystem = new ItSystem { Id = A<int>(), Uuid = withExposingSystemChange ? inputParameters.ExposingSystemUuid.NewValue : A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit() { ItSystem = new ItSystem() { BelongsToId = A<int>() } } };
 
             ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            _writeServiceMock.Setup(x => x.Update(itInterface.Uuid, It.Is<ItInterfaceWriteModel>(p =>
+                p.Name == inputParameters.Name &&
+                p.InterfaceId == inputParameters.InterfaceId &&
+                p.Description == inputParameters.Description &&
+                p.ExposingSystemUuid == inputParameters.ExposingSystemUuid &&
+                p.Version == inputParameters.Version &&
+                p.UrlReference == inputParameters.UrlReference
+            ))).Returns(itInterface);
 
-            if(withNameChange || withInterfaceIdChange)
-                _interfaceServiceMock.Setup(x => x.UpdateNameAndInterfaceId(itInterface.Id, withNameChange ? inputParameters.Name.NewValue : itInterface.Name, withInterfaceIdChange ? inputParameters.InterfaceId.NewValue : itInterface.ItInterfaceId)).Returns(itInterface);
-
-            if (withExposingSystemChange)
-            {
-                ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, newExposingSystem);
-                ExpectUpdateExposingSystemReturns(itInterface.Id, newExposingSystem.Id, itInterface);
-            }
-
-            if(withVersionChange)
-                ExpectUpdateVersionReturns(itInterface.Id, inputParameters, itInterface);
-
-            if (withDescriptionChange)
-                ExpectUpdateDescriptionReturns(itInterface.Id, inputParameters, itInterface);
-
-            if (withUrlReferenceChange)
-                ExpectUpdateUrlReferenceReturns(itInterface.Id, inputParameters, itInterface);
-
-            
             //Act
             var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
 
             //Assert
             Assert.True(result.Ok);
             transactionMock.Verify(x => x.Commit(), Times.Once);
-
-            if (withNameChange || withInterfaceIdChange)
-                _interfaceServiceMock.Verify(x => x.UpdateNameAndInterfaceId(itInterface.Id, withNameChange ? inputParameters.Name.NewValue : itInterface.Name, withInterfaceIdChange ? inputParameters.InterfaceId.NewValue : itInterface.ItInterfaceId), Times.Once);
-            else
-                _interfaceServiceMock.Verify(x => x.UpdateNameAndInterfaceId(itInterface.Id, It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-
-
-            if (withExposingSystemChange)
-                _interfaceServiceMock.Verify(x => x.UpdateExposingSystem(itInterface.Id, newExposingSystem.Id), Times.Once);
-            else
-                _interfaceServiceMock.Verify(x => x.UpdateExposingSystem(itInterface.Id, It.IsAny<int?>()), Times.Never);
-
-
-            if (withVersionChange)
-                _interfaceServiceMock.Verify(x => x.UpdateVersion(itInterface.Id, inputParameters.Version.NewValue), Times.Once);
-            else
-                _interfaceServiceMock.Verify(x => x.UpdateVersion(itInterface.Id, It.IsAny<string>()), Times.Never);
-
-
-            if (withDescriptionChange)
-                _interfaceServiceMock.Verify(x => x.UpdateDescription(itInterface.Id, inputParameters.Description.NewValue), Times.Once);
-            else
-                _interfaceServiceMock.Verify(x => x.UpdateDescription(itInterface.Id, It.IsAny<string>()), Times.Never);
-
-
-            if (withUrlReferenceChange)
-                _interfaceServiceMock.Verify(x => x.UpdateUrlReference(itInterface.Id, inputParameters.UrlReference.NewValue), Times.Once);
-            else
-                _interfaceServiceMock.Verify(x => x.UpdateUrlReference(itInterface.Id, It.IsAny<string>()), Times.Never);
-
         }
 
         [Fact]
-        public void UpdateItInterface_Returns_BadInput_If_GetExposingSystemFails_With_NotFound()
+        public void UpdateItInterface_Returns_Error_If_WriteServiceUpdate_Fails()
         {
             //Arrange
             var inputParameters = new RightsHolderItInterfaceUpdateParameters()
             {
-                ExposingSystemUuid = A<Guid>().AsChangedValue()
+                ExposingSystemUuid = A<Guid?>().AsChangedValue()
             };
             var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
-
-            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface); 
-            ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, new OperationError(OperationFailure.NotFound));
-
-            //Act
-            var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void UpdateItInterface_Returns_Forbidden_If_GetExposingSystemFails_With_Forbidden()
-        {
-            //Arrange
-            var inputParameters = new RightsHolderItInterfaceUpdateParameters()
-            {
-                ExposingSystemUuid = A<Guid>().AsChangedValue()
-            };
-            var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit() { ItSystem = new ItSystem() { BelongsToId = A<int>() } } };
+            var operationError = A<OperationError>();
 
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, new OperationError(OperationFailure.Forbidden));
-
-            //Act
-            var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void UpdateItInterface_Returns_Error_If_GetInterface_Fails()
-        {
-            //Arrange
-            var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
-            var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
-
-            var operationError = A<OperationError>();
-
-            ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
-            ExpectGetItInterfaceReturns(itInterface.Uuid, operationError);
+            _writeServiceMock.Setup(x => x.Update(itInterface.Uuid, It.IsAny<ItInterfaceWriteModel>())).Returns(operationError);
 
             //Act
             var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
@@ -677,11 +357,9 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit() { ItSystem = new ItSystem() { BelongsToId = A<int>() } } };
 
             ExpectHasSpecificAccessReturns(itInterface, false);
-            ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
 
             //Act
@@ -699,11 +377,9 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem }, Disabled = true };
+            var itInterface = new ItInterface { Disabled = true, Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit() { ItSystem = new ItSystem { BelongsToId = A<int>() } } };
 
             ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
 
             //Act
@@ -712,143 +388,6 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void UpdateItInterface_Returns_Error_If_UpdateNameAndInterfaceId_Fails()
-        {
-            //Arrange
-            var inputParameters = new RightsHolderItInterfaceUpdateParameters()
-            {
-                Name = A<string>().AsChangedValue(),
-                InterfaceId = A<string>().AsChangedValue()
-            };
-            var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
-
-            var operationError = A<OperationError>();
-
-            ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
-            ExpectUpdateNameAndInterfaceIdReturns(itInterface.Id, inputParameters, operationError);
-
-            //Act
-            var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void UpdateItInterface_Returns_Error_If_UpdateExposingSystem_Fails()
-        {
-            //Arrange
-            var inputParameters = new RightsHolderItInterfaceUpdateParameters()
-            {
-                ExposingSystemUuid = A<Guid>().AsChangedValue()
-            };
-            var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
-
-            var operationError = A<OperationError>();
-
-            ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
-            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
-            ExpectUpdateExposingSystemReturns(itInterface.Id, exposingSystem.Id, operationError);
-
-            //Act
-            var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void UpdateItInterface_Returns_Error_If_UpdateVersion_Fails()
-        {
-            //Arrange
-            var inputParameters = new RightsHolderItInterfaceUpdateParameters()
-            {
-                Version = A<string>().AsChangedValue()
-            };
-            var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
-
-            var operationError = A<OperationError>();
-
-            ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
-            ExpectUpdateVersionReturns(itInterface.Id, inputParameters, operationError);
-
-            //Act
-            var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void UpdateItInterface_Returns_Error_If_UpdateDescription_Fails()
-        {
-            //Arrange
-            var inputParameters = new RightsHolderItInterfaceUpdateParameters()
-            {
-                Description = A<string>().AsChangedValue()
-            };
-            var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
-
-            var operationError = A<OperationError>();
-
-            ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
-            ExpectUpdateDescriptionReturns(itInterface.Id, inputParameters, operationError);
-
-            //Act
-            var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void UpdateItInterface_Returns_Error_If_UpdateUrlReference_Fails()
-        {
-            //Arrange
-            var inputParameters = new RightsHolderItInterfaceUpdateParameters()
-            {
-                UrlReference = A<string>().AsChangedValue()
-            };
-            var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
-
-            var operationError = A<OperationError>();
-
-            ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
-            ExpectUpdateUrlReferenceReturns(itInterface.Id, inputParameters, operationError);
-
-            //Act
-            var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
             transactionMock.Verify(x => x.Commit(), Times.Never);
         }
 
@@ -864,7 +403,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
 
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectDeactivateReturns(itInterface.Id, itInterface);
+            ExpectDeactivateReturns(itInterface.Uuid, itInterface);
             _userContextMock.Setup(x => x.UserId).Returns(userId);
             _userRepositoryMock.Setup(x => x.GetById(userId)).Returns(new User { Email = A<string>() });
 
@@ -890,7 +429,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
 
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectDeactivateReturns(itInterface.Id, operationError);
+            ExpectDeactivateReturns(itInterface.Uuid, operationError);
 
             //Act
             var result = _sut.Deactivate(itInterface.Uuid, reason);
@@ -925,7 +464,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Deactivate_Does_Not_Notify_Global_Admin_If_Alreadly_Deactivated()
+        public void Deactivate_Does_Not_Notify_Global_Admin_If_Already_Deactivated()
         {
             //Arrange
             var reason = A<string>();
@@ -967,9 +506,9 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             transaction.Verify(x => x.Commit(), Times.Never);
         }
 
-        private void ExpectDeactivateReturns(int itInterfaceId, Result<ItInterface, OperationError> result)
+        private void ExpectDeactivateReturns(Guid interfaceUuid, Result<ItInterface, OperationError> result)
         {
-            _interfaceServiceMock.Setup(x => x.Deactivate(itInterfaceId)).Returns(result);
+            _writeServiceMock.Setup(x => x.Update(interfaceUuid, It.Is<ItInterfaceWriteModel>(wm => wm.Deactivated.HasChange && wm.Deactivated.NewValue))).Returns(result);
         }
 
         private void ExpectGetItInterfaceReturns(Guid itInterfaceUuid, Result<ItInterface, OperationError> result)
@@ -977,41 +516,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _interfaceServiceMock.Setup(x => x.GetInterface(itInterfaceUuid)).Returns(result);
         }
 
-        private void ExpectUpdateExposingSystemReturns(int interfaceId, int exposingSystemId, Result<ItInterface, OperationError> result)
-        {
-            _interfaceServiceMock.Setup(x => x.UpdateExposingSystem(interfaceId, exposingSystemId)).Returns(result);
-        }
-
-        private void ExpectUpdateNameAndInterfaceIdReturns(int interfaceId, RightsHolderItInterfaceUpdateParameters inputParameters, Result<ItInterface, OperationError> result)
-        {
-            _interfaceServiceMock.Setup(x => x.UpdateNameAndInterfaceId(interfaceId, inputParameters.Name.NewValue, inputParameters.InterfaceId.NewValue)).Returns(result);
-        }
-
-        private void ExpectUpdateUrlReferenceReturns(int interfaceId, RightsHolderItInterfaceUpdateParameters inputParameters, Result<ItInterface, OperationError> result)
-        {
-            _interfaceServiceMock.Setup(x => x.UpdateUrlReference(interfaceId, inputParameters.UrlReference.NewValue)).Returns(result);
-        }
-
-        private void ExpectUpdateVersionReturns(int interfaceId, RightsHolderItInterfaceUpdateParameters inputParameters, Result<ItInterface, OperationError> result)
-        {
-            _interfaceServiceMock.Setup(x => x.UpdateVersion(interfaceId, inputParameters.Version.NewValue)).Returns(result);
-        }
-
-        private void ExpectUpdateDescriptionReturns(int interfaceId, RightsHolderItInterfaceUpdateParameters inputParameters, Result<ItInterface, OperationError> result)
-        {
-            _interfaceServiceMock.Setup(x => x.UpdateDescription(interfaceId, inputParameters.Description.NewValue)).Returns(result);
-        }
-
         private void ExpectItInterfaceServiceCreateItInterfaceReturns(int orgId, RightsHolderItInterfaceCreationParameters inputParameters, Result<ItInterface, OperationError> result)
         {
             _interfaceServiceMock
                 .Setup(x => x.CreateNewItInterface(orgId, inputParameters.AdditionalValues.Name.NewValue, inputParameters.AdditionalValues.InterfaceId.NewValue, inputParameters.RightsHolderProvidedUuid, null))
                 .Returns(result);
-        }
-
-        private void ExpectGetSystemReturns(Guid systemUuid, Result<ItSystem, OperationError> system)
-        {
-            _itSystemServiceMock.Setup(x => x.GetSystem(systemUuid)).Returns(system);
         }
 
         private void ExpectGetOrganizationReturns(Guid rightsHolderUuid, Maybe<Organization> organization)

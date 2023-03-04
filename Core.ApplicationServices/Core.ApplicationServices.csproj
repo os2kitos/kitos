@@ -71,6 +71,8 @@
     <Compile Include="Authentication\AuthenticationMethod.cs" />
     <Compile Include="Authentication\AuthenticationScope.cs" />
     <Compile Include="Authentication\ApplicationAuthenticationState.cs" />
+    <Compile Include="Interface\Write\IItInterfaceWriteService.cs" />
+    <Compile Include="Interface\Write\ItInterfaceWriteService.cs" />
     <Compile Include="Authorization\ResourceCollectionPermissionsResult.cs" />
     <Compile Include="Model\Authentication\Commands\ValidateUserCredentialsCommand.cs" />
     <Compile Include="Authentication\IAuthenticationContext.cs" />
@@ -156,6 +158,9 @@
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDataParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDate.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationRoles.cs" />
+    <Compile Include="Model\Interface\ItInterfaceDataWriteModel.cs" />
+    <Compile Include="Model\Interface\ItInterfaceWriteModel.cs" />
+    <Compile Include="Model\Interface\ItInterfaceWriteModelParametersBase.cs" />
     <Compile Include="Model\Messages\WritePublicMessagesParams.cs" />
     <Compile Include="Model\Messages\PublicMessages.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
@@ -241,6 +246,7 @@
     <Compile Include="Organizations\OrganizationRightsService.cs" />
     <Compile Include="ScheduledJobs\AdviceTrigger.cs" />
     <Compile Include="ScheduledJobs\AdviceTriggerFactory.cs" />
+    <Compile Include="Shared\BoundedPaginationConstraints.cs" />
     <Compile Include="Shared\PagingContraints.cs" />
     <Compile Include="SSO\Factories\ISsoStateFactory.cs" />
     <Compile Include="SSO\Factories\SsoStateFactory.cs" />

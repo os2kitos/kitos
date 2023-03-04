@@ -17,10 +17,7 @@ namespace Presentation.Web.Models.API.V1
         public string OrganizationName { get; set; }
         public string ObjectOwnerName { get; set; }
         public string ObjectOwnerLastName { get; set; }
-        public string ObjectOwnerFullName
-        {
-            get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
-        }
+        public string ObjectOwnerFullName => ObjectOwnerName + " " + ObjectOwnerLastName;
         public AccessModifier? AccessModifier { get; set; }
         public int? ExhibitedById { get; set; }
         public int? ExhibitedByItSystemId { get; set; }

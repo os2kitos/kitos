@@ -2,7 +2,7 @@
 
 namespace Presentation.Web.Models.API.V2.Response.Generic.Hierarchy
 {
-    public class RegistrationHierarchyNodeWithDisabledStatusResponseDTO : RegistrationHierarchyNodeResponseDTO, IHasDeactivatedExternal
+    public class RegistrationHierarchyNodeWithActivationStatusResponseDTO : RegistrationHierarchyNodeResponseDTO, IHasDeactivatedExternal
     {
         /// <summary>
         /// Active status of the node

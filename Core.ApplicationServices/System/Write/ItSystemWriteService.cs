@@ -137,7 +137,7 @@ namespace Core.ApplicationServices.System.Write
                 .GetSystem(systemUuid)
                 .Bind<ItSystem>(system =>
                 {
-                    var deleteResult = _systemService.Delete(system.Id, true);
+                    var deleteResult = _systemService.Delete(system.Id, false /*Do not break binding. Dependencies must be removed before deleting master data through this service*/);
                     if (deleteResult == SystemDeleteResult.Ok)
                     {
                         return system;
