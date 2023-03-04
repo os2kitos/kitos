@@ -26,6 +26,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Helpers
             DateTime? changedSinceGtEq = null,
             Guid? usedInOrganizationUuid = null,
             string nameEquals = null,
+            string nameContains = null,
             BoundedPaginationQuery paginationQuery = null)
         {
             var refinements = new List<IDomainQuery<ItSystem>>();
@@ -53,6 +54,9 @@ namespace Presentation.Web.Controllers.API.V2.Common.Helpers
 
             if(nameEquals != null)
                 refinements.Add(new QueryByName<ItSystem>(nameEquals));
+
+            if(nameContains != null)
+                refinements.Add(new QueryByPartOfName<ItSystem>(nameContains));
 
             return service.GetAvailableSystems(refinements.ToArray())
                 .OrderByDefaultConventions(changedSinceGtEq.HasValue)

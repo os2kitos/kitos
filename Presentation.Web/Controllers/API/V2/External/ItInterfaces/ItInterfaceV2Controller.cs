@@ -307,6 +307,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
         /// <param name="nameEquals">Include only interfaces with a name equal to the parameter</param>
         /// <param name="usedInOrganizationUuid">Filter by UUID of an organization which has taken the related it-system into use through an it-system-usage resource</param>
+        /// <param name="nameContains">Filter by contents of the name</param>
         /// <param name="interfaceId">Include only interfaces with an InterfaceId equal to the parameter</param>
         /// <param name="organizationUuid">Query it-interfaces created in a specific organization</param>
         /// <returns></returns>
@@ -322,6 +323,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             DateTime? changedSinceGtEq = null,
             string nameEquals = null,
             [NonEmptyGuid] Guid? usedInOrganizationUuid = null,
+            string nameContains = null,
             string interfaceId = null,
             [NonEmptyGuid] Guid? organizationUuid = null,
             [FromUri] BoundedPaginationQuery pagination = null)
@@ -345,6 +347,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
             if(usedInOrganizationUuid.HasValue)
                 refinements.Add(new QueryInterfaceByUsedInOrganizationWithUuid(usedInOrganizationUuid.Value));
+
+            if(nameContains != null)
+                refinements.Add(new QueryByPartOfName<ItInterface>(nameContains));
 
             if(interfaceId != null)
                 refinements.Add(new QueryByInterfaceId(interfaceId));
