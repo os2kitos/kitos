@@ -218,6 +218,9 @@
     <Compile Include="Authorization\RootEntityCrudAuthorizationTest.cs" />
     <Compile Include="Context\OwinAuthenticationContextFactoryTest.cs" />
     <Compile Include="Controllers\CronStringHelperTests.cs" />
+    <Compile Include="DomainServices\Advices\QueryByActiveAdviceTest.cs" />
+    <Compile Include="DomainServices\Advices\QueryByOwnerResourceTypeTest.cs" />
+    <Compile Include="DomainServices\Advices\QueryByOwnerResourceIdTest.cs" />
     <Compile Include="DomainServices\Contract\QueryBySupplierUuidTest.cs" />
     <Compile Include="DomainServices\Contract\QueryByResponsibleOrganizationUnitUuidTest.cs" />
     <Compile Include="DomainServices\Contract\QueryByDataProcessingRegistrationUuidTest.cs" />
@@ -301,6 +304,8 @@
     <Compile Include="Models\V2\ItSystemUsageResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemWriteModelMapperTest.cs" />
+    <Compile Include="Models\V2\NotificationResponseMapperTest.cs" />
+    <Compile Include="Models\V2\NotificationWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\PublicMessagesWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\WriteModelMapperTestBase.cs" />
     <Compile Include="Services\ItSystemServiceTest.cs" />

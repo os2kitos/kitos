@@ -16,6 +16,10 @@
                         var systemName = Kitos.Helpers.SystemNameFormat.apply(`${itSystemUsage.itSystem.name} i ${itSystemUsage.organization.name}`,itSystemUsage.itSystem.disabled);
                         return { name: systemName };
                     })
+                ],
+                currentUser: [
+                    "userService",
+                    (userService: Kitos.Services.IUserService) => userService.getUser()
                 ]
             }
         });

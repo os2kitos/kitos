@@ -1,6 +1,5 @@
-﻿using System.Linq;
-using System.Web.Http;
-using Core.ApplicationServices;
+﻿using System.Web.Http;
+using Core.ApplicationServices.Notification;
 using Microsoft.AspNet.OData;
 using Presentation.Web.Infrastructure.Attributes;
 
@@ -9,21 +8,17 @@ namespace Presentation.Web.Controllers.API.V1.OData
     [InternalApi]
     public class AdviceSentController : BaseOdataController
     {
-        private readonly IAdviceService _adviceService;
+        private readonly IRegistrationNotificationService _registrationNotificationService;
 
-        public AdviceSentController(IAdviceService adviceService)
+        public AdviceSentController(IRegistrationNotificationService registrationNotificationService)
         {
-            _adviceService = adviceService;
+            _registrationNotificationService = registrationNotificationService;
         }
 
         [EnableQuery]
         public IHttpActionResult Get()
         {
-            var sentFromAll = _adviceService
-                .GetAdvicesAccessibleToCurrentUser()
-                .SelectMany(x => x.AdviceSent);
-
-            return Ok(sentFromAll);
+            return Ok(_registrationNotificationService.GetSent());
         }
     }
 }

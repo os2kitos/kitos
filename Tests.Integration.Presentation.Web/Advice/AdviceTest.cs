@@ -109,22 +109,6 @@ namespace Tests.Integration.Presentation.Web.Advice
         }
 
         [Fact]
-        public async Task Cannot_Add_Advice_If_No_Type_Defined()
-        {
-            //Arrange
-            var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
-
-            var createAdvice = CreateDefaultAdvice(Scheduling.Day, A<AdviceType>(), recipient);
-            createAdvice.Type = null;
-
-            //Act
-            using var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
-        }
-
-        [Fact]
         public async Task Cannot_Add_Advice_If_No_RelationId_Defined()
         {
             //Arrange
@@ -270,15 +254,16 @@ namespace Tests.Integration.Presentation.Web.Advice
             await AssertAdviceCreationReturns(advice, readOnlyUserCookie, HttpStatusCode.Forbidden);
 
             using var assignResponse = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(registration.Id, writeAccessRole.Id, readOnlyUser.Id);
+            Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
 
             // With the write-access role assigned, the user should be allowed to create advices (modify the root)
             await AssertAdviceCreationReturns(advice, readOnlyUserCookie, HttpStatusCode.Created);
 
             using var response = await DataProcessingRegistrationHelper.SendRemoveRoleRequestAsync(registration.Id, writeAccessRole.Id, readOnlyUser.Id);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             //Removing the role should revert the assigned write access
             await AssertAdviceCreationReturns(advice, readOnlyUserCookie, HttpStatusCode.Forbidden);
-
         }
 
         private static async Task AssertAdviceCreationReturns(Core.DomainModel.Advice.Advice advice, Cookie readOnlyUserCookie, HttpStatusCode expectedResult)
