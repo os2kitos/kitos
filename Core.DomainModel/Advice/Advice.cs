@@ -7,17 +7,16 @@ using Core.DomainModel.Shared;
 
 namespace Core.DomainModel.Advice
 {
-
     public enum Scheduling
     {
-       Immediate = 0,
-       Hour = 1,
-       Day = 2,
-       Week = 3,
-       Month = 4,
-       Year = 5,
-       Quarter = 6,
-       Semiannual = 7
+        Immediate = 0,
+        Hour = 1,
+        Day = 2,
+        Week = 3,
+        Month = 4,
+        Year = 5,
+        Quarter = 6,
+        Semiannual = 7
     }
 
     public enum AdviceType
@@ -29,22 +28,24 @@ namespace Core.DomainModel.Advice
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
-    public class Advice : Entity, ISystemModule, IContractModule
+    public class Advice : Entity, ISystemModule, IContractModule, IHasUuid
     {
         public Advice() {
             AdviceSent = new List<AdviceSent>();
             Reciepients = new List<AdviceUserRelation>();
+            Uuid = Guid.NewGuid();
         }
 
         public static string CreateJobId(int adviceId)
         {
             return $"Advice: {adviceId}";
         }
+        public Guid Uuid { get; set; }
 
         public virtual ICollection<AdviceSent> AdviceSent { get; set; }
         public virtual ICollection<AdviceUserRelation> Reciepients { get; set; }
         public int? RelationId { get; set; }
-        public RelatedEntityType? Type { get; set; }
+        public RelatedEntityType Type { get; set; }
 
         public Scheduling? Scheduling { get; set; }
 
@@ -132,18 +133,13 @@ namespace Core.DomainModel.Advice
                 {
                     return false;
                 }
-                if (IsActive)
-                {
-                    return false;
-                }
-
-                return true;
+                return !IsActive;
             }
         }
 
         public bool HasInvalidState()
         {
-            return ObjectOwnerId == null || RelationId == null || Type == null;
+            return ObjectOwnerId == null || RelationId == null;
         }
 
         public static string CreatePartitionJobId(int adviceId,int partition)

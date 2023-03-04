@@ -72,7 +72,7 @@ namespace Presentation.Web.Infrastructure.Filters
                                     return;
                                 }
                                 var nameForNotification = advice.Name ?? "Ikke navngivet";
-                                userNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.Value, nameForNotification, $"Afsendelse af advis fejlede efter {KitosConstants.MaxHangfireRetries} forsøg. Undersøg gerne nærmere og rapportér evt. fejlen.", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
+                                userNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.Value, nameForNotification, $"Afsendelse af advis fejlede efter {KitosConstants.MaxHangfireRetries} forsøg. Undersøg gerne nærmere og rapportér evt. fejlen.", advice.RelationId.Value, advice.Type, NotificationType.Advice);
                             }
                         }
                         catch(Exception e)
