@@ -365,6 +365,9 @@
     <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\ItSystemResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystems\ItSystemInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\ItSystemUsageInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\ItSystemUsageMigrationV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\Mapping\IItSystemUsageMigrationResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\Mapping\ItSystemUsageMigrationResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Mapping\InternalDtoModelV2MappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemUsageV2QueryHandler.cs" />
     <Compile Include="Infrastructure\Attributes\V2StyleJsonResponseSerializationAttribute.cs" />
@@ -374,6 +377,8 @@
     <Compile Include="Models\API\V2\Internal\Request\Notifications\BaseNotificationPropertiesWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\IHasBaseWriteProperties.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\NotificationSentResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationV2ResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageRelationMigrationV2ResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Notifications\NotificationResourcePermissionsDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageSearchResultResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageSystemContextResponseDTO.cs" />
@@ -414,6 +419,7 @@
     <Compile Include="Models\API\V2\Request\System\Regular\RecommendedArchiveDutyRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\System\Shared\IItSystemWriteRequestCommonPropertiesDTO.cs" />
     <Compile Include="Models\API\V2\Response\Generic\Hierarchy\RegistrationHierarchyNodeWithActivationStatusResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Generic\Identity\IdentityNamePairWithDeactivatedStatusDTO.cs" />
     <Compile Include="Models\API\V2\Response\Interface\ItInterfaceDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Shared\ResourceCollectionPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\BaseSystemRelationResponseDTO.cs" />

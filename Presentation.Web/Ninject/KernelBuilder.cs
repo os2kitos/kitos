@@ -126,6 +126,7 @@ using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
 using Core.ApplicationServices.System.Write;
+using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
 
 namespace Presentation.Web.Ninject
@@ -217,6 +218,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InCommandScope(Mode);
             kernel.Bind<IItSystemService>().To<ItSystemService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageMigrationServiceAdapter>().To<ItSystemUsageMigrationServiceAdapter>().InCommandScope(Mode);
             kernel.Bind<IItsystemUsageRelationsService>().To<ItsystemUsageRelationsService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageWriteService>().To<ItSystemUsageWriteService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceService>().To<ItInterfaceService>().InCommandScope(Mode);
@@ -312,6 +314,7 @@ namespace Presentation.Web.Ninject
             //System usage
             kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageWriteModelMapper>().To<ItSystemUsageWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageMigrationResponseMapper>().To<ItSystemUsageMigrationResponseMapper>().InCommandScope(Mode);
 
             //Data processing
             kernel.Bind<IDataProcessingRegistrationWriteModelMapper>().To<DataProcessingRegistrationWriteModelMapper>().InCommandScope(Mode);

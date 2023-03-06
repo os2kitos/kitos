@@ -8,9 +8,9 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 {
     public interface IItSystemUsageMigrationService
     {
-        Result<IReadOnlyList<ItSystem>,OperationFailure> GetUnusedItSystemsByOrganization(int organizationId, string nameContent, int numberOfItSystems, bool getPublicFromOtherOrganizations);
-        Result<ItSystemUsageMigration, OperationFailure> GetSystemUsageMigration(int usageId, int toSystemId);
-        Result<ItSystemUsage, OperationFailure> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId);
+        Result<IReadOnlyList<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(int organizationId, string nameContent, int numberOfItSystems, bool getPublicFromOtherOrganizations);
+        Result<ItSystemUsageMigration, OperationError> GetSystemUsageMigration(int usageId, int toSystemId);
+        Result<ItSystemUsage, OperationError> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId);
         bool CanExecuteMigration();
     }
 }

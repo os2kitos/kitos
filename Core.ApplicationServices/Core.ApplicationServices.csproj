@@ -302,6 +302,8 @@
     <Compile Include="SSO\StsAdgangsStyringConstants.cs" />
     <Compile Include="SystemUsage\GDPR\GDPRExportService.cs" />
     <Compile Include="SystemUsage\GDPR\IGDPRExportService.cs" />
+    <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationServiceAdapter.cs" />
+    <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationServiceAdapter.cs" />
     <Compile Include="SystemUsage\ReadModels\IItsystemUsageOverviewReadModelsService.cs" />
     <Compile Include="SystemUsage\Relations\IItsystemUsageRelationsService.cs" />
     <Compile Include="SystemUsage\IItSystemUsageService.cs" />

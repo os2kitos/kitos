@@ -15,6 +15,16 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
             return new(source.Uuid, source.Name);
         }
 
+        public static IdentityNamePairWithDeactivatedStatusDTO MapIdentityNamePairWithDeactivatedStatusDTO<T>(this T source) where T : IHasUuid, IHasName, IEntityWithEnabledStatus
+        {
+            return new(source.Uuid, source.Name, source.Disabled);
+        }
+
+        public static IdentityNamePairWithDeactivatedStatusDTO MapIdentityNamePairWithDeactivatedStatusDTO(this ItSystemUsage source)
+        {
+            return new(source.Uuid, source.ItSystem.Name, source.ItSystem.Disabled);
+        }
+
         public static IdentityNamePairResponseDTO MapIdentityNamePairDTO(this TaskRef source)
         {
             return new(source.Uuid, source.TaskKey);

@@ -27,7 +27,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly ILogger _logger;
         private readonly IItSystemRepository _systemRepository;
         private readonly IItSystemUsageRepository _systemUsageRepository;
-        private readonly IItsystemUsageRelationsService _itsystemUsageRelationsService;
+        private readonly IItsystemUsageRelationsService _itSystemUsageRelationsService;
         private readonly IDomainEvents _domainEvents;
 
         public ItSystemUsageMigrationService(
@@ -36,7 +36,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             ILogger logger,
             IItSystemRepository systemRepository,
             IItSystemUsageRepository systemUsageRepository,
-            IItsystemUsageRelationsService itsystemUsageRelationsService,
+            IItsystemUsageRelationsService itSystemUsageRelationsService,
             IDomainEvents domainEvents)
         {
             _authorizationContext = authorizationContext;
@@ -44,11 +44,11 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             _logger = logger;
             _systemRepository = systemRepository;
             _systemUsageRepository = systemUsageRepository;
-            _itsystemUsageRelationsService = itsystemUsageRelationsService;
+            _itSystemUsageRelationsService = itSystemUsageRelationsService;
             _domainEvents = domainEvents;
         }
 
-        public Result<IReadOnlyList<ItSystem>, OperationFailure> GetUnusedItSystemsByOrganization(
+        public Result<IReadOnlyList<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(
             int organizationId,
             string nameContent,
             int numberOfItSystems,
@@ -56,18 +56,18 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         {
             if (string.IsNullOrWhiteSpace(nameContent))
             {
-                throw new ArgumentException(nameof(nameContent) + " must be string containing more than whitespaces");
+                return new OperationError(nameof(nameContent) + " must be string containing more than whitespaces", OperationFailure.BadInput);
             }
-            if (numberOfItSystems < 1)
+            if (numberOfItSystems is < 1 or > 25)
             {
-                throw new ArgumentException(nameof(numberOfItSystems) + " Cannot be less than 1");
+                return new OperationError($"{nameof(numberOfItSystems)} must satisfy constraint: 1 <= n <= 25", OperationFailure.BadInput);
             }
 
             var dataAccessLevel = _authorizationContext.GetDataAccessLevel(organizationId);
 
             if (dataAccessLevel.CurrentOrganization < OrganizationDataReadAccessLevel.Public)
             {
-                return OperationFailure.Forbidden;
+                return new OperationError("User is not allowed to access organization", OperationFailure.Forbidden);
             }
 
             var queryBreadth = getPublicFromOtherOrganizations ? OrganizationDataQueryBreadth.IncludePublicDataFromOtherOrganizations : OrganizationDataQueryBreadth.TargetOrganization;
@@ -85,38 +85,38 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             return result;
         }
 
-        public Result<ItSystemUsageMigration, OperationFailure> GetSystemUsageMigration(int usageId, int toSystemId)
+        public Result<ItSystemUsageMigration, OperationError> GetSystemUsageMigration(int usageId, int toSystemId)
         {
             if (!CanExecuteMigration())
             {
-                return OperationFailure.Forbidden;
+                return new OperationError("User doesn't have proper permissions to access the migration", OperationFailure.Forbidden);
             }
 
             // Get usage
             var itSystemUsage = _systemUsageRepository.GetSystemUsage(usageId);
             if (itSystemUsage == null)
             {
-                return OperationFailure.BadInput;
+                return new OperationError($"ItSystemUsage with id: {usageId} was not found", OperationFailure.NotFound);
             }
             if (!_authorizationContext.AllowReads(itSystemUsage))
             {
-                return OperationFailure.Forbidden;
+                return new OperationError($"User doesn't have read access to it system usage with id: {usageId}", OperationFailure.Forbidden);
             }
 
             // Get system
             var toItSystem = _systemRepository.GetSystem(toSystemId);
             if (toItSystem == null)
             {
-                return OperationFailure.BadInput;
+                return new OperationError($"Target ItSystem with id: {toSystemId} was not found", OperationFailure.NotFound);
             }
             if (!_authorizationContext.AllowReads(toItSystem))
             {
-                return OperationFailure.Forbidden;
+                return new OperationError($"User doesn't have read access to it system with id: {usageId}", OperationFailure.Forbidden);
             }
 
             if (toItSystem.Disabled)
             {
-                return OperationFailure.BadInput;
+                return new OperationError("Target ItSystem cannot be disabled", OperationFailure.BadState);
             }
 
             // Get contracts
@@ -137,11 +137,11 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 affectedDataProcessingRegistrations: dprs);
         }
 
-        public Result<ItSystemUsage, OperationFailure> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId)
+        public Result<ItSystemUsage, OperationError> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId)
         {
             if (!CanExecuteMigration())
             {
-                return OperationFailure.Forbidden;
+                return new OperationError("User doesn't have proper permissions to access the migration", OperationFailure.Forbidden);
             }
 
             using var transaction = _transactionManager.Begin();
@@ -166,7 +166,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 //If modification of the target usage is not allowed, bail out
                 if (!_authorizationContext.AllowModify(systemUsage))
                 {
-                    return OperationFailure.Forbidden;
+                    return new OperationError($"User is not allowed to modify it system usage with id: {usageSystemId}", OperationFailure.Forbidden);
                 }
 
                 // If target equals current system, bail out
@@ -184,7 +184,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 if (relationsMigrated == false)
                 {
                     transaction.Rollback();
-                    return OperationFailure.UnknownError;
+                    return new OperationError("Unknown error occurred while performing the relation migration", OperationFailure.UnknownError);
                 }
                 //***********************************************
                 //Perform final switchover of "source IT-System"
@@ -205,7 +205,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             {
                 _logger.Error(e, $"Migrating usageSystem with id: {usageSystemId}, to system with id: {toSystemId} failed");
                 transaction.Rollback();
-                return OperationFailure.UnknownError;
+                return new OperationError($"Unknown error occurred while performing the usage migration with id: {usageSystemId} to system with id: {toSystemId}", OperationFailure.UnknownError);
             }
         }
 
@@ -228,7 +228,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         {
             foreach (var relation in migration.AffectedSystemRelations)
             {
-                var modifyStatus = _itsystemUsageRelationsService.ModifyRelation(
+                var modifyStatus = _itSystemUsageRelationsService.ModifyRelation(
                     relation.FromSystemUsageId,
                     relation.Id,
                     relation.ToSystemUsageId,
