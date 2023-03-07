@@ -10,5 +10,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
         RightsHolderItInterfaceUpdateParameters FromPUT(RightsHolderWritableItInterfacePropertiesDTO dto);
         ItInterfaceWriteModel FromPOST(CreateItInterfaceRequestDTO request);
         ItInterfaceWriteModel FromPATCH(UpdateItInterfaceRequestDTO request);
+        ItInterfaceDataWriteModel MapDataDescription(ItInterfaceDataRequestDTO request);
     }
 }

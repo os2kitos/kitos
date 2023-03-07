@@ -7,5 +7,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
     {
         ItInterfaceResponseDTO ToItInterfaceResponseDTO(ItInterface itInterface);
         RightsHolderItInterfaceResponseDTO ToRightsHolderItInterfaceResponseDTO(ItInterface itInterface);
+        ItInterfaceDataResponseDTO ToDataResponseDTO(DataRow row);
     }
 }

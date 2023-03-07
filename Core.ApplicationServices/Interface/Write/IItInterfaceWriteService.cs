@@ -10,5 +10,8 @@ namespace Core.ApplicationServices.Interface.Write
         Result<ItInterface, OperationError> Create(Guid organizationUuid, ItInterfaceWriteModel parameters);
         Result<ItInterface, OperationError> Update(Guid interfaceUuid, ItInterfaceWriteModel parameters);
         Result<ItInterface, OperationError> Delete(Guid interfaceUuid);
+        Result<DataRow, OperationError> AddDataDescription(Guid interfaceUuid, ItInterfaceDataWriteModel parameters);
+        Result<DataRow, OperationError> UpdateDataDescription(Guid interfaceUuid, Guid dataDescriptionUuid, ItInterfaceDataWriteModel parameters);
+        Maybe<OperationError> DeleteDataDescription(Guid interfaceUuid, Guid dataDescriptionUuid);
     }
 }
