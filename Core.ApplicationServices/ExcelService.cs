@@ -277,7 +277,7 @@ namespace Core.ApplicationServices
 
                 if (!rowErrors.Any())
                 {
-                    var creationResult = _contractWriteService.Create(organization.Uuid, new ItContractModificationParameters()
+                    var creationResult = _contractWriteService.Create(organization.Uuid, new ItContractModificationParameters
                     {
                         Name = contractRow.Name.AsChangedValue(),
                         General = new ItContractGeneralDataModificationParameters
@@ -314,7 +314,7 @@ namespace Core.ApplicationServices
 
                 rowIndex++;
             }
-            // no errors found, it's safe to save to DB
+
             if (errors.Any())
             {
                 transaction.Rollback();
