@@ -160,7 +160,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
                 {
-                    Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
+                    Content = body as HttpContent ?? new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
                 };
 
                 return await SendWithCookieAsync(cookie, requestMessage);
