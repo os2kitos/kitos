@@ -1451,8 +1451,10 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var permissions = result.Value;
-            Assert.Equivalent(new ResourcePermissionsResult(read, modify, delete), permissions);
+            Assert.Equivalent(new SystemPermissions(new ResourcePermissionsResult(read, modify, delete),Array.Empty<SystemDeletionConflict>()), permissions);
         }
+
+        //TODO: Extende with conflicts
 
         [Fact]
         public void Get_Permissions_Returns_Not_Found()

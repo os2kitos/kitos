@@ -381,7 +381,8 @@ namespace Core.ApplicationServices.Interface
 
         public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid)
         {
-            return GetInterface(uuid).Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
+            return GetInterface(uuid)
+                .Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
         }
 
         public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
