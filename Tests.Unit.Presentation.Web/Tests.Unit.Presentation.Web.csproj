@@ -291,7 +291,9 @@
     <Compile Include="Infrastructure\CurrentAspNetRequestTest.cs" />
     <Compile Include="Infrastructure\NonEmptyGuidAttributeTest.cs" />
     <Compile Include="Infrastructure\SimpleLinkNameMaxLengthAttributeTest.cs" />
-    <Compile Include="Mapping\LifeCycleStatusMappingTest.cs" />
+    <Compile Include="Models\V2\Enums\BaseEnumMapperTest.cs" />
+    <Compile Include="Models\V2\Enums\SystemDeletionConflictMappingExtensionsTest.cs" />
+    <Compile Include="Models\V2\Enums\LifeCycleStatusMappingTest.cs" />
     <Compile Include="Models\V2\BaseResponseMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationResponseMapperTest.cs" />
@@ -362,7 +364,9 @@
     <Analyzer Include="..\packages\xunit.analyzers.1.0.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
     <Analyzer Include="..\packages\xunit.analyzers.1.0.0\analyzers\dotnet\cs\xunit.analyzers.fixes.dll" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Mapping\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
