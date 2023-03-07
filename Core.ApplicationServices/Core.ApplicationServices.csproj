@@ -71,6 +71,7 @@
     <Compile Include="Authentication\AuthenticationMethod.cs" />
     <Compile Include="Authentication\AuthenticationScope.cs" />
     <Compile Include="Authentication\ApplicationAuthenticationState.cs" />
+    <Compile Include="Authorization\CommandPermissionResult.cs" />
     <Compile Include="Interface\Write\IItInterfaceWriteService.cs" />
     <Compile Include="Interface\Write\ItInterfaceWriteService.cs" />
     <Compile Include="Authorization\ResourceCollectionPermissionsResult.cs" />
@@ -276,6 +277,7 @@
     <Compile Include="ScheduledJobs\AdviceTrigger.cs" />
     <Compile Include="ScheduledJobs\AdviceTriggerFactory.cs" />
     <Compile Include="Shared\BoundedPaginationConstraints.cs" />
+    <Compile Include="Shared\CommandPermissionConstraints.cs" />
     <Compile Include="Shared\PagingContraints.cs" />
     <Compile Include="SSO\Factories\ISsoStateFactory.cs" />
     <Compile Include="SSO\Factories\SsoStateFactory.cs" />

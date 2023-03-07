@@ -17,6 +17,8 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.DomainModel.Events;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.SystemUsage;
 
 namespace Core.ApplicationServices.SystemUsage.Migration
 {
@@ -48,16 +50,12 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             _domainEvents = domainEvents;
         }
 
-        public Result<IReadOnlyList<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(
+        public Result<IQueryable<ItSystem>, OperationError> GetUnusedItSystemsByOrganizationQuery(
             int organizationId,
-            string nameContent,
             int numberOfItSystems,
-            bool getPublicFromOtherOrganizations)
+            bool getPublicFromOtherOrganizations,
+            params IDomainQuery<ItSystem>[] conditions)
         {
-            if (string.IsNullOrWhiteSpace(nameContent))
-            {
-                return new OperationError(nameof(nameContent) + " must be string containing more than whitespaces", OperationFailure.BadInput);
-            }
             if (numberOfItSystems is < 1 or > 25)
             {
                 return new OperationError($"{nameof(numberOfItSystems)} must satisfy constraint: 1 <= n <= 25", OperationFailure.BadInput);
@@ -70,19 +68,43 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 return new OperationError("User is not allowed to access organization", OperationFailure.Forbidden);
             }
 
-            var queryBreadth = getPublicFromOtherOrganizations ? OrganizationDataQueryBreadth.IncludePublicDataFromOtherOrganizations : OrganizationDataQueryBreadth.TargetOrganization;
-            var unusedSystems = _systemRepository.GetUnusedSystems(new OrganizationDataQueryParameters(organizationId, queryBreadth, dataAccessLevel));
+            var subQueries = new List<IDomainQuery<ItSystem>>();
 
-            //Refine, order and take the amount requested
-            var result = unusedSystems
-                .ByPartOfName(nameContent)
+            subQueries.AddRange(conditions);
+
+            var queryBreadth = getPublicFromOtherOrganizations ? OrganizationDataQueryBreadth.IncludePublicDataFromOtherOrganizations : OrganizationDataQueryBreadth.TargetOrganization;
+            var baseQuery = _systemRepository.GetUnusedSystems(new OrganizationDataQueryParameters(organizationId, queryBreadth, dataAccessLevel));
+
+            var result = subQueries.Any()
+                ? new IntersectionQuery<ItSystem>(subQueries).Apply(baseQuery)
+                : baseQuery;
+
+            var finalQuery = result
                 .Where(x => x.Disabled == false)
                 .OrderBy(x => x.Name)
-                .Take(numberOfItSystems)
-                .ToList()
-                .AsReadOnly();
+                .Take(numberOfItSystems);
 
-            return result;
+            return Result<IQueryable<ItSystem>, OperationError>.Success(finalQuery);
+        }
+
+        public Result<IReadOnlyList<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(
+            int organizationId,
+            string nameContent,
+            int numberOfItSystems,
+            bool getPublicFromOtherOrganizations)
+        {
+            if (string.IsNullOrWhiteSpace(nameContent))
+            {
+                return new List<ItSystem>();
+            }
+
+            var conditions = new List<IDomainQuery<ItSystem>>
+            {
+                new QueryByPartOfName<ItSystem>(nameContent)
+            };
+            
+            return GetUnusedItSystemsByOrganizationQuery(organizationId, numberOfItSystems, getPublicFromOtherOrganizations, conditions.ToArray())
+                .Select<IReadOnlyList<ItSystem>>(unusedSystems => unusedSystems.ToList().AsReadOnly());
         }
 
         public Result<ItSystemUsageMigration, OperationError> GetSystemUsageMigration(int usageId, int toSystemId)

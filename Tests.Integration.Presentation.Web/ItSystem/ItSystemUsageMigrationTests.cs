@@ -119,6 +119,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.User)]
         public async Task GetUnusedItSystems_Can_Include_It_Systems_From_Own_Organization_Only(OrganizationRole role)
         {
             //Arrange
@@ -341,6 +342,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             }
         }
 
+        //TODO: Next test to move:
         [Fact]
         public async Task GetMigration_When_System_Has_Relation_With_No_RelationInterface()
         {

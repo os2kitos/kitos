@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
+using Core.ApplicationServices.Shared;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
+using Core.DomainServices.Queries;
 
 namespace Core.ApplicationServices.SystemUsage.Migration
 {
@@ -15,14 +18,17 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly IEntityIdentityResolver _identityResolver;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IItSystemUsageMigrationService _systemUsageMigrationService;
+        private readonly IItSystemUsageService _systemUsageService;
 
         public ItSystemUsageMigrationServiceAdapter(IEntityIdentityResolver identityResolver, 
             IItSystemUsageMigrationService systemUsageMigrationService, 
-            IAuthorizationContext authorizationContext)
+            IAuthorizationContext authorizationContext,
+            IItSystemUsageService systemUsageService)
         {
             _identityResolver = identityResolver;
             _systemUsageMigrationService = systemUsageMigrationService;
             _authorizationContext = authorizationContext;
+            _systemUsageService = systemUsageService;
         }
 
         public Result<ItSystemUsageMigration, OperationError> GetMigration(Guid usageUuid, Guid toSystemUuid)
@@ -46,13 +52,39 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 );
         }
 
-        public Result<IReadOnlyList<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(Guid organizationUuid,
-            string nameContent, int numberOfItSystems, bool getPublicFromOtherOrganization)
+        public Result<IEnumerable<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(Guid organizationUuid,
+            int numberOfItSystems,
+            bool getPublicFromOtherOrganizations,
+            params IDomainQuery<ItSystem>[] conditions)
         {
             return _identityResolver.ResolveDbId<Organization>(organizationUuid)
-                .Match(id => _systemUsageMigrationService.GetUnusedItSystemsByOrganization(id, nameContent, numberOfItSystems, getPublicFromOtherOrganization), 
-                    () => new OperationError($"Organization with uuid: {organizationUuid} was not found", OperationFailure.NotFound)
-                );
+                .Match(
+                    id => _systemUsageMigrationService.GetUnusedItSystemsByOrganizationQuery(id, numberOfItSystems,
+                        getPublicFromOtherOrganizations, conditions),
+                    () => new OperationError($"Organization with uuid: {organizationUuid} was not found",
+                        OperationFailure.NotFound)
+                ).Select(x => x.ToList().AsEnumerable());
+        }
+
+        public Result<IEnumerable<CommandPermissionResult>, OperationError> GetCommandPermission(Guid usageUuid)
+        {
+            return ResolveUsageId(usageUuid)
+                .Select(_systemUsageService.GetById)
+                .Bind(usage =>
+                {
+                    if (usage == null)
+                    {
+                        return new OperationError($"ItSystemUsage with uuid: {usageUuid} was not found",
+                            OperationFailure.NotFound);
+                    }
+
+                    var commandPermissions = new List<CommandPermissionResult>
+                    {
+                        new (CommandPermissionConstraints.UsageMigration.Execute, _systemUsageMigrationService.CanExecuteMigration())
+                    };
+
+                    return Result<IEnumerable<CommandPermissionResult>, OperationError>.Success(commandPermissions);
+                });
         }
 
         private Result<(int usageId, int systemId), OperationError> ResolveUsageAndSystemIds(Guid usageUuid, Guid systemUuid)

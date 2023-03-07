@@ -25,7 +25,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
 
             using var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("api/itsystem"), cookie, itSystem);
-            var test = await createdResponse.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
             var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemDTO>();
 

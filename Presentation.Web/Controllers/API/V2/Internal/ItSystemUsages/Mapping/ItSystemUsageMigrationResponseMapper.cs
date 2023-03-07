@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping
 {
@@ -27,6 +29,17 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping
         public IEnumerable<IdentityNamePairWithDeactivatedStatusDTO> MapUnusedSystems(IEnumerable<ItSystem> systems)
         {
             return systems.Select(x => x.MapIdentityNamePairWithDeactivatedStatusDTO()).ToList();
+        }
+
+        public ItSystemUsageMigrationPermissionsResponseDTO MapCommandPermissions(IEnumerable<CommandPermissionResult> permissionResult)
+        {
+            return new ItSystemUsageMigrationPermissionsResponseDTO(permissionResult.Select(x =>
+                new CommandPermissionResponseDTO
+                {
+                    Id = x.Id,
+                    CanExecute = x.CanExecute
+                })
+            );
         }
 
         private ItSystemUsageRelationMigrationV2ResponseDTO MapRelationMigration(SystemRelation entity)

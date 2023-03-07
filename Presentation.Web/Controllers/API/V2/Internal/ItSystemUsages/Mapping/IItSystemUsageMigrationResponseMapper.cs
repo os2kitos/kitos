@@ -1,4 +1,5 @@
-﻿using Core.ApplicationServices.Model.SystemUsage.Migration;
+﻿using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
@@ -10,5 +11,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping
     {
         ItSystemUsageMigrationV2ResponseDTO MapMigration(ItSystemUsageMigration entity);
         IEnumerable<IdentityNamePairWithDeactivatedStatusDTO> MapUnusedSystems(IEnumerable<ItSystem> systems);
+        ItSystemUsageMigrationPermissionsResponseDTO MapCommandPermissions(IEnumerable<CommandPermissionResult> permissionResult);
     }
 }

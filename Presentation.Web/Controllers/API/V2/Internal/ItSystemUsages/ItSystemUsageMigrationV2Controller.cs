@@ -5,6 +5,10 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage.Migration;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.SystemUsage;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
@@ -63,14 +67,19 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
 
         [HttpGet]
         [Route("{usageUuid}/migration/permissions")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageMigrationPermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetPermissions([Required][NonEmptyGuid] Guid usageUuid)
         {
-            return Ok();
+            if (!ModelState.IsValid)
+                return BadRequest();
+
+            return _adapter.GetCommandPermission(usageUuid)
+                .Select(_responseMapper.MapCommandPermissions)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpGet]
@@ -81,14 +90,19 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetUnusedItSystemsBySearchAndOrganization([Required][NonEmptyGuid] Guid organizationUuid,
-            string nameContent,
-            int numberOfItSystems,
-            bool getPublicFromOtherOrganizations)
+            [Required] int numberOfItSystems,
+            [Required] bool getPublicFromOtherOrganizations,
+            string nameContent = null)
         {
             if(!ModelState.IsValid)
                 return BadRequest();
 
-            return _adapter.GetUnusedItSystemsByOrganization(organizationUuid, nameContent, numberOfItSystems, getPublicFromOtherOrganizations)
+            var conditions = new List<IDomainQuery<ItSystem>>();
+
+            if (nameContent != null)
+                conditions.Add(new QueryByPartOfName<ItSystem>(nameContent));
+
+            return _adapter.GetUnusedItSystemsByOrganization(organizationUuid, numberOfItSystems, getPublicFromOtherOrganizations, conditions.ToArray())
                 .Select(x=> x.Select(system => system.MapIdentityNamePairWithDeactivatedStatusDTO()))
                 .Match(Ok, FromOperationError);
         }
