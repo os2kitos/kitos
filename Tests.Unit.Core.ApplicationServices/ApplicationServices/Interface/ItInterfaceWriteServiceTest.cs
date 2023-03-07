@@ -480,8 +480,8 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             }
             else
             {
-                _interfaceServiceMock.Verify(x=>x.Deactivate(itInterface.Id),Times.Never());
-                _interfaceServiceMock.Verify(x=>x.Activate(itInterface.Id),Times.Never());
+                _interfaceServiceMock.Verify(x => x.Deactivate(itInterface.Id), Times.Never());
+                _interfaceServiceMock.Verify(x => x.Activate(itInterface.Id), Times.Never());
             }
         }
 
@@ -875,6 +875,179 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_AddDataDescription()
+        {
+            //Arrange
+            var itInterface = new ItInterface() { Id = A<int>() };
+            var writeModel = A<ItInterfaceDataWriteModel>();
+            var transaction = ExpectTransactionBegins();
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasWriteAccess(itInterface, true);
+            var createdRow = new DataRow();
+            _interfaceServiceMock.Setup(x => x.AddInterfaceData(itInterface.Id, writeModel)).Returns(createdRow).Verifiable();
+
+            //Act
+            var result = _sut.AddDataDescription(itInterface.Uuid, writeModel);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(createdRow, result.Value);
+            transaction.Verify(x => x.Commit(), Times.Once());
+            _interfaceServiceMock.VerifyAll();
+        }
+
+        [Fact]
+        public void Cannot_AddDataDescription_If_No_WriteAccess()
+        {
+            //Arrange
+            var itInterface = new ItInterface() { Id = A<int>() };
+            var writeModel = A<ItInterfaceDataWriteModel>();
+            var transaction = ExpectTransactionBegins();
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasWriteAccess(itInterface, false);
+
+            //Act
+            var result = _sut.AddDataDescription(itInterface.Uuid, writeModel);
+
+            //Assert
+            Assert.True(result.Failed);
+            transaction.Verify(x => x.Rollback(), Times.Once());
+        }
+
+        [Fact]
+        public void Cannot_AddDataDescription_If_Interface_Not_Found()
+        {
+            //Arrange
+            var itInterface = new ItInterface() { Id = A<int>() };
+            var writeModel = A<ItInterfaceDataWriteModel>();
+            ExpectTransactionBegins();
+            ExpectGetItInterfaceReturns(itInterface.Uuid, A<OperationError>());
+
+            //Act
+            var result = _sut.AddDataDescription(itInterface.Uuid, writeModel);
+
+            //Assert
+            Assert.True(result.Failed);
+        }
+
+        [Fact]
+        public void Can_UpdateDataDescription()
+        {
+            //Arrange
+            var itInterface = new ItInterface() { Id = A<int>() };
+            var writeModel = A<ItInterfaceDataWriteModel>();
+            var transaction = ExpectTransactionBegins();
+            var dataUuid = A<Guid>();
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasWriteAccess(itInterface, true);
+            var expected = new DataRow();
+            _interfaceServiceMock.Setup(x => x.UpdateInterfaceData(itInterface.Id, dataUuid, writeModel)).Returns(expected).Verifiable();
+
+            //Act
+            var result = _sut.UpdateDataDescription(itInterface.Uuid, dataUuid, writeModel);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(expected, result.Value);
+            transaction.Verify(x => x.Commit(), Times.Once());
+            _interfaceServiceMock.VerifyAll();
+        }
+
+        [Fact]
+        public void Cannot_UpdateDataDescription_If_No_WriteAccess()
+        {
+            //Arrange
+            var itInterface = new ItInterface() { Id = A<int>() };
+            var writeModel = A<ItInterfaceDataWriteModel>();
+            var transaction = ExpectTransactionBegins();
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasWriteAccess(itInterface, false);
+            var dataUuid = A<Guid>();
+
+            //Act
+            var result = _sut.UpdateDataDescription(itInterface.Uuid, dataUuid, writeModel);
+
+            //Assert
+            Assert.True(result.Failed);
+            transaction.Verify(x => x.Rollback(), Times.Once());
+        }
+
+        [Fact]
+        public void Cannot_UpdateDataDescription_If_Interface_Not_Found()
+        {
+            //Arrange
+            var itInterface = new ItInterface() { Id = A<int>() };
+            var writeModel = A<ItInterfaceDataWriteModel>();
+            ExpectTransactionBegins();
+            ExpectGetItInterfaceReturns(itInterface.Uuid, A<OperationError>());
+
+            var dataUuid = A<Guid>();
+
+            //Act
+            var result = _sut.UpdateDataDescription(itInterface.Uuid, dataUuid, writeModel);
+
+            //Assert
+            Assert.True(result.Failed);
+        }
+
+        [Fact]
+        public void Can_DeleteDataDescription()
+        {
+            //Arrange
+            var itInterface = new ItInterface() { Id = A<int>() };
+            var transaction = ExpectTransactionBegins();
+            var dataUuid = A<Guid>();
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasWriteAccess(itInterface, true);
+            _interfaceServiceMock.Setup(x => x.DeleteInterfaceData(itInterface.Id, dataUuid)).Returns(new DataRow()).Verifiable();
+
+            //Act
+            var result = _sut.DeleteDataDescription(itInterface.Uuid, dataUuid);
+
+            //Assert
+            Assert.True(result.IsNone);
+            transaction.Verify(x => x.Commit(), Times.Once());
+            _interfaceServiceMock.VerifyAll();
+        }
+
+        [Fact]
+        public void Cannot_DeleteDataDescription_If_No_WriteAccess()
+        {
+            //Arrange
+            var itInterface = new ItInterface() { Id = A<int>() };
+            var transaction = ExpectTransactionBegins();
+            var dataUuid = A<Guid>();
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasWriteAccess(itInterface, false);
+
+            //Act
+            var result = _sut.DeleteDataDescription(itInterface.Uuid, dataUuid);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
+            transaction.Verify(x => x.Rollback(), Times.Once());
+        }
+
+        [Fact]
+        public void Cannot_DeleteDataDescription_If_Interface_Not_Found()
+        {
+            //Arrange
+            var itInterface = new ItInterface() { Id = A<int>() };
+            var writeModel = A<ItInterfaceDataWriteModel>();
+            ExpectTransactionBegins();
+            ExpectGetItInterfaceReturns(itInterface.Uuid, A<OperationError>());
+
+            var dataUuid = A<Guid>();
+
+            //Act
+            var result = _sut.DeleteDataDescription(itInterface.Uuid, dataUuid);
+
+            //Assert
+            Assert.True(result.HasValue);
         }
 
         private void ExpectGetItInterfaceReturns(Guid itInterfaceUuid, Result<ItInterface, OperationError> result)

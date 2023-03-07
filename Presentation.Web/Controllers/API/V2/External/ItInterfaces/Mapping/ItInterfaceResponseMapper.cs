@@ -16,7 +16,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
                 LastModifiedBy = itInterface.LastChangedByUser?.MapIdentityNamePairDTO(),
                 Scope = itInterface.AccessModifier.ToChoice(),
                 ItInterfaceType = itInterface.Interface?.MapIdentityNamePairDTO(),
-                Data = itInterface.DataRows.Select(ToDTO).ToList(),
+                Data = itInterface.DataRows.Select(ToDataResponseDTO).ToList(),
                 OrganizationContext = itInterface.Organization?.MapShallowOrganizationResponseDTO()
             };
             MapBaseInformation(itInterface, dto);
@@ -30,13 +30,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
             return dto;
         }
 
-        private static ItInterfaceDataResponseDTO ToDTO(DataRow arg)
+        public ItInterfaceDataResponseDTO ToDataResponseDTO(DataRow row)
         {
             return new ItInterfaceDataResponseDTO
             {
-                DataType = arg.DataType?.MapIdentityNamePairDTO(),
-                Uuid = arg.Uuid,
-                Description = arg.Data
+                DataType = row.DataType?.MapIdentityNamePairDTO(),
+                Uuid = row.Uuid,
+                Description = row.Data
             };
         }
 

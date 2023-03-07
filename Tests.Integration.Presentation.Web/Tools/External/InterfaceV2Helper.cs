@@ -231,7 +231,6 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<ItInterfaceResponseDTO> CreateItInterfaceAsync(string token, CreateItInterfaceRequestDTO request)
         {
             using var response = await SendCreateItInterfaceAsync(token, request);
-            var errors =  await response.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<ItInterfaceResponseDTO>();
@@ -258,6 +257,37 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendDeleteItInterfaceAsync(string token, Guid itInterfaceUuid)
         {
             return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-interfaces/{itInterfaceUuid}"), token);
+        }
+
+        public static async Task<ItInterfaceDataResponseDTO> CreateItInterfaceDataDescriptionAsync(string token, Guid uuid, ItInterfaceDataRequestDTO request)
+        {
+            using var response = await SendCreateItInterfaceDataDescriptionAsync(token, uuid, request);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ItInterfaceDataResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendCreateItInterfaceDataDescriptionAsync(string token, Guid uuid, ItInterfaceDataRequestDTO request)
+        {
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-interfaces/{uuid}/data"), request, token);
+        }
+
+        public static async Task<ItInterfaceDataResponseDTO> UpdateItInterfaceDataDescriptionAsync(string token, Guid uuid, Guid dataUuid, ItInterfaceDataRequestDTO request)
+        {
+            using var response = await SendUpdateItInterfaceDataDescriptionAsync(token, uuid, dataUuid, request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ItInterfaceDataResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendUpdateItInterfaceDataDescriptionAsync(string token, Guid uuid, Guid dataUuid, ItInterfaceDataRequestDTO request)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-interfaces/{uuid}/data/{dataUuid}"), token, request);
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteItInterfaceDataDescriptionAsync(string token, Guid uuid, Guid dataUuid)
+        {
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-interfaces/{uuid}/data/{dataUuid}"), token);
         }
     }
 }
