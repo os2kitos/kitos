@@ -119,9 +119,16 @@ namespace Tests.Integration.Presentation.Web.Tools
             ServicePointManager.Expect100Continue = false;
         }
 
-        public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token)
+        public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token, IEnumerable<KeyValuePair<string, string>> headers = null)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+            if (headers != null)
+            {
+                foreach (var nameAndValue in headers)
+                {
+                    requestMessage.Headers.Add(nameAndValue.Key, nameAndValue.Value);
+                }
+            }
             requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
             return StatelessHttpClient.SendAsync(requestMessage);
         }
@@ -442,7 +449,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<(int userId, KitosCredentials credentials, Cookie loginCookie)> CreateUserAndLogin(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false, bool hasStakeHolderAccess = false)
         {
-            var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess,hasStakeHolderAccess), role, organizationId);
+            var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess, hasStakeHolderAccess), role, organizationId);
             var password = Guid.NewGuid().ToString("N");
             DatabaseAccess.MutateEntitySet<User>(x =>
             {
