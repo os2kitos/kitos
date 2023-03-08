@@ -15,10 +15,12 @@ using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Interface;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
+using Presentation.Web.Models.API.V2.Response.Interface;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.TestInputs;
 using Presentation.Web.Models.API.V2.Response.Shared;
+using Presentation.Web.Models.API.V2.Types.Interface;
 
 namespace Tests.Integration.Presentation.Web.Interfaces.V2
 {
@@ -188,7 +190,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(dto.Name, itInterface1.Name);
             Assert.Equal(dto.Uuid, itInterface1.Uuid);
         }
-        
+
         [Fact]
         public async Task GET_Many_As_Stakeholder_With_InterfaceId_Filter()
         {
@@ -207,7 +209,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(dto.InterfaceId, itInterface1.ItInterfaceId);
             Assert.Equal(dto.Uuid, itInterface1.Uuid);
         }
-        
+
         [Fact]
         public async Task GET_Many_As_Stakeholder_With_OrganizationUuid_Filter()
         {
@@ -507,18 +509,60 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, org) = await CreateUserInNewOrg(false, role);
-
-            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), org.Id, AccessModifier.Public));
+            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var itInterface = await InterfaceV2Helper.CreateItInterfaceAsync(globalAdminToken.Token, new CreateItInterfaceRequestDTO
+            {
+                Name = A<string>(),
+                OrganizationUuid = org.Uuid
+            });
 
             //Act
             var permissionsResponseDto = await InterfaceV2Helper.GetPermissionsAsync(token, itInterface.Uuid);
 
             //Assert
-            var expected = new ResourcePermissionsResponseDTO
+            var expected = new ItInterfacePermissionsResponseDTO
+
             {
                 Read = read,
                 Modify = modify,
-                Delete = delete
+                Delete = delete,
+                DeletionConflicts = new List<ItInterfaceDeletionConflict>()
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        [Fact]
+        public async Task Can_Get_ItInterface_Permissions_With_ExposedBySystemConflict()
+        {
+            //Arrange
+            var (token, org) = await CreateUserInNewOrg(false, OrganizationRole.GlobalAdmin);
+
+            var system = await ItSystemV2Helper.CreateSystemAsync(token, new CreateItSystemRequestDTO
+            {
+                Name = A<string>(),
+                OrganizationUuid = org.Uuid
+            });
+            var itInterface = await InterfaceV2Helper.CreateItInterfaceAsync(token, new CreateItInterfaceRequestDTO
+            {
+                Name = A<string>(),
+                OrganizationUuid = org.Uuid,
+                ExposedBySystemUuid = system.Uuid
+            });
+
+            //Act
+            var permissionsResponseDto = await InterfaceV2Helper.GetPermissionsAsync(token, itInterface.Uuid);
+
+            //Assert
+            var expected = new ItInterfacePermissionsResponseDTO
+
+            {
+                Read = true,
+                Modify = true,
+                Delete = true,
+                DeletionConflicts = new List<ItInterfaceDeletionConflict>()
+                {
+                    ItInterfaceDeletionConflict.ExposedByItSystem
+                }
             };
             Assert.Equivalent(expected, permissionsResponseDto);
         }

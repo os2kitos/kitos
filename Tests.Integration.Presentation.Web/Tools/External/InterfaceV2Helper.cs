@@ -113,7 +113,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             string interfaceId = null,
             Guid? organizationUuid = null
             )
-            {
+        {
             var path = BasePathInterfaces;
             var queryParameters = new List<KeyValuePair<string, string>>();
 
@@ -212,12 +212,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"{BasePathRightHolders}/{uuid}"), token, changedProperties.ToDictionary(x => x.Key, x => x.Value));
         }
 
-        public static async Task<ResourcePermissionsResponseDTO> GetPermissionsAsync(string token, Guid uuid)
+        public static async Task<ItInterfacePermissionsResponseDTO> GetPermissionsAsync(string token, Guid uuid)
         {
             using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{BasePathInterfaces}/{uuid:D}/permissions"), token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<ResourcePermissionsResponseDTO>();
+            return await response.ReadResponseBodyAsAsync<ItInterfacePermissionsResponseDTO>();
         }
 
         public static async Task<ResourceCollectionPermissionsResponseDTO> GetCollectionPermissionsAsync(string token, Guid organizationUuid)
