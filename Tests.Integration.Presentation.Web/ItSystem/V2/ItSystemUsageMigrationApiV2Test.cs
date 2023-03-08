@@ -1,17 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.ApplicationServices.Shared;
 using Core.DomainModel;
-using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using ExpectedObjects.Strategies;
 using Presentation.Web.Models.API.V1;
-using Presentation.Web.Models.API.V1.ItSystemUsageMigration;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
 using Tests.Integration.Presentation.Web.Tools;
@@ -62,7 +57,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             //Assert
             var systemList = systems.ToList();
-            Assert.Equal(expectedNumberOfSystems, systemList.Count());
+            Assert.Equal(expectedNumberOfSystems, systemList.Count);
             Assert.True(systemList.All(x => createdSystemsUuids.Contains(x.Uuid)));
         }
 
@@ -83,7 +78,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var createdSystemsUuids = new[] { ownLocalSystem.Uuid, itSystem2.Uuid};
 
             //Act
-            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 10, true, prefix, cookie);
+            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 3, true, prefix, cookie);
 
             //Assert
             var systemList = systems.ToList();

@@ -68,7 +68,12 @@ namespace Presentation.Web.Controllers.API.V1
             [FromUri] int numberOfItSystems,
             [FromUri] bool getPublicFromOtherOrganizations)
         {
-            return _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, numberOfItSystems, getPublicFromOtherOrganizations)
+            if (string.IsNullOrWhiteSpace(nameContent))
+            {
+                return Ok(Enumerable.Empty<NamedEntityDTO>().ToList());
+            }
+
+            return _itSystemUsageMigrationService.GetUnusedItSystemsByOrganizationByName(organizationId, nameContent, numberOfItSystems, getPublicFromOtherOrganizations)
                 .Select(x => x.Select(DTOMappingExtensions.MapToNamedEntityWithEnabledStatusDTO).ToList())
                 .Match(Ok, FromOperationError);
         }

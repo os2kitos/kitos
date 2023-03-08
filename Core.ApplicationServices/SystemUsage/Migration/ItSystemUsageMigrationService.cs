@@ -87,7 +87,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             return Result<IQueryable<ItSystem>, OperationError>.Success(finalQuery);
         }
 
-        public Result<IReadOnlyList<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(
+        public Result<IReadOnlyList<ItSystem>, OperationError> GetUnusedItSystemsByOrganizationByName(
             int organizationId,
             string nameContent,
             int numberOfItSystems,
@@ -95,7 +95,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         {
             if (string.IsNullOrWhiteSpace(nameContent))
             {
-                return new List<ItSystem>();
+                return new OperationError($"{nameof(nameContent)} cannot be empty or null", OperationFailure.BadInput);
             }
 
             var conditions = new List<IDomainQuery<ItSystem>>
