@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainModel;
@@ -12,6 +13,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Infrastructure.Services.DataAccess;
@@ -28,6 +30,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IItSystemUsageService> _systemUsageService;
         private readonly Mock<ITransactionManager> _transactionManager;
+        private readonly Mock<IOrganizationService> _organizationService;
 
         private readonly ItSystemUsageMigrationServiceAdapter _sut;
 
@@ -38,13 +41,15 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _authorizationContext = new Mock<IAuthorizationContext>();
             _systemUsageService = new Mock<IItSystemUsageService>();
             _transactionManager = new Mock<ITransactionManager>();
+            _organizationService = new Mock<IOrganizationService>();
 
             _sut = new ItSystemUsageMigrationServiceAdapter(
                 _identityResolver.Object,
                 _systemUsageMigrationService.Object,
                 _authorizationContext.Object,
                 _systemUsageService.Object,
-                _transactionManager.Object);
+                _transactionManager.Object,
+                _organizationService.Object);
         }
 
         [Fact]
@@ -285,7 +290,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             var expectedResult = new List<ItSystem> {new(), new()};
 
-            ExpectResolveIdReturns<Organization>(organizationUuid, organizationId);
+            ExpectGetOrganizationReturns(organizationUuid, new Organization{Id = organizationId});
             ExpectGetUnusedItSystemsByOrganizationQuery(organizationId, numberOfItSystems, getPublicFromTheOrganization, conditions, Result<IQueryable<ItSystem>, OperationError>.Success(expectedResult.AsQueryable()));
 
             //Act
@@ -308,7 +313,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             var expectedResult = A<OperationError>();
 
-            ExpectResolveIdReturns<Organization>(organizationUuid, organizationId);
+            ExpectGetOrganizationReturns(organizationUuid, new Organization{Id = organizationId});
             ExpectGetUnusedItSystemsByOrganizationQuery(organizationId, numberOfItSystems, getPublicFromTheOrganization, conditions, expectedResult);
 
             //Act
@@ -328,14 +333,28 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var getPublicFromTheOrganization = A<bool>();
             var conditions = new QueryByPartOfName<ItSystem>(A<string>());
 
-            ExpectResolveIdReturns<Organization>(organizationUuid, Maybe<int>.None);
+            var expectedResult = A<OperationError>();
+
+            ExpectGetOrganizationReturns(organizationUuid, expectedResult);
 
             //Act
             var result = _sut.GetUnusedItSystemsByOrganization(organizationUuid, numberOfItSystems, getPublicFromTheOrganization, conditions);
 
             //Assert
             Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Assert.Equal(expectedResult.FailureType, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_GetCommandPermissions()
+        {
+            //Arrange
+
+
+            //Act
+
+
+            //Assert
         }
 
         private static ItSystemUsageMigration CreateItSystemUsageMigration(Guid fromUsageUuid, Guid toSystemUuid)
@@ -354,6 +373,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private void ExpectAllowModify(IEntity entity, bool result)
         {
             _authorizationContext.Setup(x => x.AllowModify(entity)).Returns(result);
+        }
+
+        private void ExpectGetOrganizationReturns(Guid uuid, Result<Organization, OperationError> result, OrganizationDataReadAccessLevel? accessLevel = null)
+        {
+            _organizationService.Setup(x => x.GetOrganization(uuid, accessLevel)).Returns(result);
         }
 
         private Mock<IDatabaseTransaction> ExpectTransactionBegins()

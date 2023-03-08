@@ -77,7 +77,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            return _adapter.GetCommandPermission(usageUuid)
+            return _adapter.GetCommandPermissions(usageUuid)
                 .Select(_responseMapper.MapCommandPermissions)
                 .Match(Ok, FromOperationError);
         }

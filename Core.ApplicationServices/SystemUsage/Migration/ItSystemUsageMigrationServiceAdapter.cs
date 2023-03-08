@@ -4,8 +4,8 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Shared;
-using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -22,18 +22,21 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IItSystemUsageService _systemUsageService;
         private readonly ITransactionManager _transactionManager;
+        private readonly IOrganizationService _organizationService;
 
         public ItSystemUsageMigrationServiceAdapter(IEntityIdentityResolver identityResolver, 
             IItSystemUsageMigrationService systemUsageMigrationService, 
             IAuthorizationContext authorizationContext,
             IItSystemUsageService systemUsageService,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager, 
+            IOrganizationService organizationService)
         {
             _identityResolver = identityResolver;
             _systemUsageMigrationService = systemUsageMigrationService;
             _authorizationContext = authorizationContext;
             _systemUsageService = systemUsageService;
             _transactionManager = transactionManager;
+            _organizationService = organizationService;
         }
 
         public Result<ItSystemUsageMigration, OperationError> GetMigration(Guid usageUuid, Guid toSystemUuid)
@@ -74,16 +77,17 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             params IDomainQuery<ItSystem>[] conditions)
         {
             //TODO: AsEnumerable?
-            return _identityResolver.ResolveDbId<Organization>(organizationUuid)
-                .Match(
-                    id => _systemUsageMigrationService.GetUnusedItSystemsByOrganizationQuery(id, numberOfItSystems, getPublicFromOtherOrganizations, conditions)
-                        .Select(x => x.ToList().AsEnumerable()),
-                    () => new OperationError($"Organization with uuid: {organizationUuid} was not found",
-                        OperationFailure.NotFound)
+            return _organizationService.GetOrganization(organizationUuid)
+                .Bind(organization => _systemUsageMigrationService
+                    .GetUnusedItSystemsByOrganizationQuery(organization.Id, numberOfItSystems, getPublicFromOtherOrganizations, conditions)
+                    .Select(x => x
+                        .ToList()
+                        .AsEnumerable()
+                    )
                 );
         }
 
-        public Result<IEnumerable<CommandPermissionResult>, OperationError> GetCommandPermission(Guid usageUuid)
+        public Result<IEnumerable<CommandPermissionResult>, OperationError> GetCommandPermissions(Guid usageUuid)
         {
             return ResolveUsageId(usageUuid)
                 .Select(_systemUsageService.GetById)
