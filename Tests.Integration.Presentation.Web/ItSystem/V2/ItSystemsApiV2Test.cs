@@ -11,13 +11,16 @@ using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
+using Presentation.Web.Models.API.V2.Request.Interface;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
+using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.KLE;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.System;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Types.System;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
@@ -327,7 +330,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             await ItSystemHelper.TakeIntoUseAsync(system1.dbId, org.Id);
             await ItSystemHelper.TakeIntoUseAsync(system2.dbId, org.Id);
             await ItSystemHelper.TakeIntoUseAsync(system3.dbId, org2.Id);
-            
+
             //Act
             var systems = (await ItSystemV2Helper.GetManyAsync(token, usedInOrganizationUuid: org.Uuid)).ToList();
 
@@ -651,20 +654,86 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
-            
+
             //Act
             var permissionsResponseDto = await ItSystemV2Helper.GetPermissionsAsync(token, system.Uuid);
 
             //Assert
-            var expected = new ResourcePermissionsResponseDTO
+            var expected = new ItSystemPermissionsResponseDTO
             {
                 Read = read,
                 Modify = modify,
-                Delete = delete
+                Delete = delete,
+                DeletionConflicts = new List<SystemDeletionConflict>()
             };
             Assert.Equivalent(expected, permissionsResponseDto);
         }
-        
+
+        [Fact]
+        public async Task Can_Get_ItSystem_Permissions_With_InUse_Deletion_Conflicts()
+        {
+            await Test_Get_ItSystem_Permissions_With_Deletion_Conflicts((token, system) => ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO
+            {
+                OrganizationUuid = system.OrganizationContext.Uuid,
+                SystemUuid = system.Uuid
+            }), SystemDeletionConflict.HasItSystemUsages);
+        }
+
+        [Fact]
+        public async Task Can_Get_ItSystem_Permissions_With_HasChildren_Deletion_Conflicts()
+        {
+            await Test_Get_ItSystem_Permissions_With_Deletion_Conflicts((token, system) => ItSystemV2Helper.CreateSystemAsync(token, new CreateItSystemRequestDTO
+            {
+                Name = A<string>(),
+                OrganizationUuid = system.OrganizationContext.Uuid,
+                Scope = RegistrationScopeChoice.Global,
+                ParentUuid = system.Uuid
+            }), SystemDeletionConflict.HasChildSystems);
+        }
+
+        [Fact]
+        public async Task Can_Get_ItSystem_Permissions_With_InterfaceExposure_Deletion_Conflicts()
+        {
+            await Test_Get_ItSystem_Permissions_With_Deletion_Conflicts((token, system) => InterfaceV2Helper.CreateItInterfaceAsync(token, new CreateItInterfaceRequestDTO()
+            {
+                Name = A<string>(),
+                OrganizationUuid = system.OrganizationContext.Uuid,
+                ExposedBySystemUuid = system.Uuid
+            }), SystemDeletionConflict.HasInterfaceExposures);
+        }
+
+        private async Task Test_Get_ItSystem_Permissions_With_Deletion_Conflicts(Func<string, ItSystemResponseDTO, Task> createConflict, SystemDeletionConflict expectedConflict)
+        {
+            //Arrange
+            var org = await CreateOrganizationAsync();
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+
+            var system = await ItSystemV2Helper.CreateSystemAsync(token.Token, new CreateItSystemRequestDTO
+            {
+                Name = A<string>(),
+                OrganizationUuid = org.Uuid,
+                Scope = RegistrationScopeChoice.Global,
+            });
+            await createConflict(token.Token, system);
+
+            //Act
+            var permissionsResponseDto = await ItSystemV2Helper.GetPermissionsAsync(token.Token, system.Uuid);
+
+            //Assert
+            var expected = new ItSystemPermissionsResponseDTO
+            {
+                Read = true,
+                Modify = true,
+                Delete = true,
+                DeletionConflicts = new List<SystemDeletionConflict>
+                {
+                    expectedConflict
+                }
+
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin, true)]
         [InlineData(OrganizationRole.LocalAdmin, false)]
