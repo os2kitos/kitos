@@ -1510,7 +1510,40 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(result.Ok);
             var permissions = result.Value;
-            Assert.Equivalent(new ResourcePermissionsResult(read, modify, delete), permissions);
+            Assert.Equivalent(new ItInterfacePermissions(new ResourcePermissionsResult(read, modify, delete), new List<ItInterfaceDeletionConflict>()), permissions);
+        }
+
+        [Fact]
+        public void Can_Get_Permissions_With_DeletionConflict()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var itInterface = new ItInterface
+            {
+                Uuid = uuid,
+                ExhibitedBy = new ItInterfaceExhibit()
+                {
+                    ItSystem = new ItSystem()
+                }
+            };
+            ExpectGetInterfaceReturns(uuid, itInterface);
+            ExpectAllowReadReturns(itInterface, true);
+            ExpectAllowModifyReturns(itInterface, true);
+            ExpectAllowDeleteReturns(itInterface, true);
+
+            //Act
+            var result = _sut.GetPermissions(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var permissions = result.Value;
+            var basePermissions = new ResourcePermissionsResult(true, true, true);
+            var conflicts = new List<ItInterfaceDeletionConflict>()
+            {
+                ItInterfaceDeletionConflict.ExposedByItSystem
+            };
+            var expectedPermissions = new ItInterfacePermissions(basePermissions, conflicts);
+            Assert.Equivalent(expectedPermissions, permissions);
         }
 
         [Fact]

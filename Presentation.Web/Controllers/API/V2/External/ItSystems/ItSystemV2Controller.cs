@@ -412,7 +412,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems/{systemUuid}/permissions")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemPermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -423,7 +423,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
             return _itSystemService
                 .GetPermissions(systemUuid)
-                .Select(_permissionResponseMapper.Map)
+                .Select(_systemResponseMapper.MapPermissions)
                 .Match(Ok, FromOperationError);
         }
 

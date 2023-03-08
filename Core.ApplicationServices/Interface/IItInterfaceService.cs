@@ -27,7 +27,7 @@ namespace Core.ApplicationServices.Interface
         Result<ItInterface, OperationError> UpdateAccessModifier(int id, AccessModifier newValue);
         Result<ItInterface, OperationError> UpdateInterfaceType(int id, Guid? interfaceTypeUuid);
         Result<ItInterface, OperationError> ReplaceInterfaceData(int id, IEnumerable<ItInterfaceDataWriteModel> newData);
-        Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid);
+        Result<ItInterfacePermissions, OperationError> GetPermissions(Guid uuid);
         Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid);
         Result<DataRow, OperationError> AddInterfaceData(int id, ItInterfaceDataWriteModel parameters);
         Result<DataRow, OperationError> UpdateInterfaceData(int id, Guid dataUuid, ItInterfaceDataWriteModel parameters);

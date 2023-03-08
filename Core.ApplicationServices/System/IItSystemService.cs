@@ -32,7 +32,7 @@ namespace Core.ApplicationServices.System
         Result<ItSystem, OperationError> Activate(int itSystemId);
         Result<ItSystem, OperationError> Deactivate(int systemId);
         Result<ItSystem, OperationError> UpdateAccessModifier(int itSystemId, AccessModifier accessModifier);
-        Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid);
+        Result<SystemPermissions, OperationError> GetPermissions(Guid uuid);
         Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid);
     }
 }

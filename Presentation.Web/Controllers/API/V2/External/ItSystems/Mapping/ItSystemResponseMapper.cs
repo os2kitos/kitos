@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Core.Abstractions.Extensions;
+using Core.ApplicationServices.Model.System;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.Generic;
@@ -42,6 +43,22 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
             MapBaseInformation(itSystem, dto);
 
             return dto;
+        }
+
+        public ItSystemPermissionsResponseDTO MapPermissions(SystemPermissions permissions)
+        {
+            return new ItSystemPermissionsResponseDTO
+            {
+                Delete = permissions.BasePermissions.Delete,
+                Modify = permissions.BasePermissions.Modify,
+                Read = permissions.BasePermissions.Read,
+                DeletionConflicts = permissions.DeletionConflicts.Select(MapConflict).ToList()
+            };
+        }
+
+        private static Presentation.Web.Models.API.V2.Types.System.SystemDeletionConflict MapConflict(SystemDeletionConflict arg)
+        {
+            return arg.ToChoice();
         }
 
         private void MapBaseInformation<T>(ItSystem arg, T dto) where T : BaseItSystemResponseDTO

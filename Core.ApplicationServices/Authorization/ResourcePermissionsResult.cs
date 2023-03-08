@@ -23,12 +23,19 @@ namespace Core.ApplicationServices.Authorization
             IAuthorizationContext authorizationContext) where T : IEntity
         {
             return getEntityResult
-                .Select(entity => new ResourcePermissionsResult(true, authorizationContext.AllowModify(entity), authorizationContext.AllowDelete(entity)))
-                .Match<Result<ResourcePermissionsResult, OperationError>>
+                .Select(entity => FromEntity(entity, authorizationContext))
+                .Match
                 (
                     result => result,
                     error => error.FailureType == OperationFailure.Forbidden ? Empty : error
                 );
+        }
+
+        public static Result<ResourcePermissionsResult, OperationError> FromEntity<T>(
+            T entity,
+            IAuthorizationContext authorizationContext) where T : IEntity
+        {
+            return new ResourcePermissionsResult(true, authorizationContext.AllowModify(entity), authorizationContext.AllowDelete(entity));
         }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Shared.Write;
+using Core.ApplicationServices.Model.System;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -13,6 +15,7 @@ using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Models.API.V2.Response.KLE;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.System;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.TestInputs;
 using Xunit;
 
@@ -74,17 +77,23 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         }
 
-        private void AssertSystemResponseProperties(ItSystem src, IEnumerable<ExternalReferenceDataResponseDTO> expectedExternalReferences, ItSystemResponseDTO mapped)
+        [Fact]
+        public void Can_Map_Permissions()
         {
-            AssertBaseResponseProperties(src, expectedExternalReferences, mapped);
-            Assert.Equal(src.AccessModifier.ToChoice(), mapped.Scope);
-            Assert.Equal(src.LastChanged, mapped.LastModified);
-            AssertOptionalUser(src.LastChangedByUser, mapped.LastModifiedBy);
-            AssertOptionalOrganization(src.Organization, mapped.OrganizationContext);
-            AssertOptionalOrganizationIdentities(src.Usages.Select(x => x.Organization), mapped.UsingOrganizations);
+            //Arrange
+            var input = new SystemPermissions(A<ResourcePermissionsResult>(), EnumRange.All<SystemDeletionConflict>().RandomItems(2));
+
+            //Act
+            var dto = _sut.MapPermissions(input);
+
+            //Assert
+            Assert.Equal(input.BasePermissions.Read, dto.Read);
+            Assert.Equal(input.BasePermissions.Modify, dto.Modify);
+            Assert.Equal(input.BasePermissions.Delete, dto.Delete);
+            Assert.Equivalent(input.DeletionConflicts.Select(c => c.ToChoice()), dto.DeletionConflicts);
         }
 
-        private void AssertBaseResponseProperties(ItSystem src, IEnumerable<ExternalReferenceDataResponseDTO> expectedExternalReferences, BaseItSystemResponseDTO mapped)
+        private static void AssertBaseResponseProperties(ItSystem src, IEnumerable<ExternalReferenceDataResponseDTO> expectedExternalReferences, BaseItSystemResponseDTO mapped)
         {
             Assert.Equal(src.Uuid, mapped.Uuid);
             Assert.Equal(src.Name, mapped.Name);

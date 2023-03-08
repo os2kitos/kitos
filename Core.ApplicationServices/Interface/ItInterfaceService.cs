@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Interface;
+using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
@@ -74,12 +75,20 @@ namespace Core.ApplicationServices.Interface
             }
 
             var itInterface = getItInterfaceResult.Value;
-            if (!_authorizationContext.AllowDelete(itInterface))
+            var permissions = GetPermissions(itInterface);
+            if (permissions.Failed)
+            {
+                return permissions.Error.FailureType;
+            }
+
+            var itInterfacePermissions = permissions.Value;
+            if (!itInterfacePermissions.BasePermissions.Delete)
             {
                 return OperationFailure.Forbidden;
             }
 
-            if (itInterface.ExhibitedBy != null)
+            var conflicts = itInterfacePermissions.DeletionConflicts.ToList();
+            if (conflicts.Contains(ItInterfaceDeletionConflict.ExposedByItSystem))
             {
                 if (breakBindings)
                 {
@@ -379,9 +388,29 @@ namespace Core.ApplicationServices.Interface
             return itInterface;
         }
 
-        public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid)
+        public Result<ItInterfacePermissions, OperationError> GetPermissions(Guid uuid)
         {
-            return GetInterface(uuid).Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
+            return GetInterface(uuid).Transform(GetPermissions);
+        }
+
+        private Result<ItInterfacePermissions, OperationError> GetPermissions(Result<ItInterface, OperationError> result)
+        {
+            return ResourcePermissionsResult
+                .FromResolutionResult(result, _authorizationContext)
+                .Select(permissions => new ItInterfacePermissions(permissions, GetDeletionConflicts(result, permissions.Delete)));
+        }
+
+        private static IEnumerable<ItInterfaceDeletionConflict> GetDeletionConflicts(Result<ItInterface, OperationError> itInterface, bool allowDelete)
+        {
+            return allowDelete
+                ? itInterface.Select(GetDeletionConflicts).Match(conflicts => conflicts, _ => Array.Empty<ItInterfaceDeletionConflict>())
+                : Array.Empty<ItInterfaceDeletionConflict>();
+        }
+
+        private static IEnumerable<ItInterfaceDeletionConflict> GetDeletionConflicts(ItInterface arg)
+        {
+            if (arg.ExhibitedBy != null)
+                yield return ItInterfaceDeletionConflict.ExposedByItSystem;
         }
 
         public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
