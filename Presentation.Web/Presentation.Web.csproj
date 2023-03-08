@@ -361,6 +361,7 @@
     <Compile Include="Controllers\API\V2\External\ItInterfaces\ItInterfaceInterfaceTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItInterfaces\Mapping\IItInterfaceResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItInterfaces\Mapping\ItInterfaceResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItInterfaces\Mapping\ItInterfaceDeletionConflictMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\IItSystemResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\ItSystemResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\SystemDeletionConflictMappingExtensions.cs" />
@@ -416,6 +417,7 @@
     <Compile Include="Models\API\V2\Request\System\Shared\IItSystemWriteRequestCommonPropertiesDTO.cs" />
     <Compile Include="Models\API\V2\Response\Generic\Hierarchy\RegistrationHierarchyNodeWithActivationStatusResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Interface\ItInterfaceDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Interface\ItInterfacePermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Shared\ResourceCollectionPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\BaseSystemRelationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\IncomingSystemRelationResponseDTO.cs" />
@@ -425,7 +427,9 @@
     <Compile Include="Models\API\V2\Response\SystemUsage\JournalPeriodResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\System\ItSystemPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasDeactivatedExternal.cs" />
+    <Compile Include="Models\API\V2\SharedProperties\IHasDeletionConflicts.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasOrganizationContext.cs" />
+    <Compile Include="Models\API\V2\Types\Interface\ItInterfaceDeletionConflict.cs" />
     <Compile Include="Models\API\V2\Types\Notifications\NotificationSendType.cs" />
     <Compile Include="Models\API\V2\Types\Notifications\OwnerResourceType.cs" />
     <Compile Include="Models\API\V2\Types\Notifications\RepetitionFrequencyOptions.cs" />

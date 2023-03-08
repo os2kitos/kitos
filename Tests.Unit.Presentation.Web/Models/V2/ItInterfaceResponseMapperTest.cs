@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
+using Core.ApplicationServices.Model.Interface;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
@@ -110,6 +111,23 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(itInterface.Disabled, responseDto.Deactivated);
             AssertIdentityReference(itInterface.ExhibitedBy?.ItSystem, responseDto.ExposedBySystem);
         }
+
+        [Fact]
+        public void Can_Map_Permissions()
+        {
+            //Arrange
+            var itInterfacePermissions = A<ItInterfacePermissions>();
+
+            //Act
+            var dto = _sut.Map(itInterfacePermissions);
+
+            //Assert
+            Assert.Equal(itInterfacePermissions.BasePermissions.Delete,dto.Delete);
+            Assert.Equal(itInterfacePermissions.BasePermissions.Modify,dto.Modify);
+            Assert.Equal(itInterfacePermissions.BasePermissions.Read,dto.Read);
+            Assert.Equivalent(itInterfacePermissions.DeletionConflicts.Select(x=>x.ToChoice()),dto.DeletionConflicts);
+        }
+
 
         private static void AssertData(ItInterface expected, ItInterfaceResponseDTO actual)
         {

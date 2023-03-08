@@ -465,7 +465,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <returns></returns>
         [HttpGet]
         [Route("it-interfaces/{interfaceUuid}/permissions")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfacePermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -476,7 +476,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
             return _itInterfaceService
                 .GetPermissions(interfaceUuid)
-                .Select(_permissionResponseMapper.Map)
+                .Select(_responseMapper.Map)
                 .Match(Ok, FromOperationError);
         }
 
