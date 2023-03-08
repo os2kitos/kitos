@@ -82,7 +82,6 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             using (var response = await HttpApi.PostWithCookieAsync(url, login, input))
             {
-                var res = await response.Content.ReadAsStringAsync();
                 Assert.Equal(HttpStatusCode.Created,response.StatusCode);
                 return await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
             }

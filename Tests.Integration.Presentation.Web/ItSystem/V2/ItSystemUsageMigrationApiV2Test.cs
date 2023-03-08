@@ -1,10 +1,13 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.ApplicationServices.Shared;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using ExpectedObjects.Strategies;
 using Presentation.Web.Models.API.V1;
@@ -74,17 +77,17 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var system2Name = prefix + A<string>();
             var system3Name = prefix + A<string>();
 
-            var (itSystem, organization, cookie) = await CreatePrerequisitesWithUser(role, system1Name, AccessModifier.Public);
+            var (ownLocalSystem, organization, cookie) = await CreatePrerequisitesWithUser(role, system1Name);
             var itSystem2 = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, system2Name, AccessModifier.Public);
-            var localSystem = await CreateSystemAsync(organization.Id, system3Name);
-            var createdSystemsUuids = new[] { itSystem.Uuid, itSystem2.Uuid, localSystem.Uuid };
+            await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, system3Name);
+            var createdSystemsUuids = new[] { ownLocalSystem.Uuid, itSystem2.Uuid};
 
             //Act
             var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 10, true, prefix, cookie);
 
             //Assert
             var systemList = systems.ToList();
-            Assert.Equal(3, systemList.Count);
+            Assert.Equal(2, systemList.Count);
             Assert.True(systemList.All(x => createdSystemsUuids.Contains(x.Uuid)));
         }
 
@@ -133,6 +136,27 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var systemList = systems.ToList();
             Assert.Equal(2, systemList.Count);
             Assert.True(systemList.All(x => createdSystemsUuids.Contains(x.Uuid)));
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.User)]
+        public async Task GetUnusedItSystems_Filters_By_Name(OrganizationRole role)
+        {
+            //Arrange
+            var system1Name = A<string>();
+            var system2Name = A<string>();
+
+            var (itSystem, organization, cookie) = await CreatePrerequisitesWithUser(role, system1Name, AccessModifier.Public);
+            await CreateSystemAsync(organization.Id, system2Name);
+
+            //Act
+            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 10, false, system1Name, cookie);
+
+            //Assert
+            var dto = Assert.Single(systems);
+            Assert.Equal(dto.Uuid, itSystem.Uuid);
+            Assert.Equal(dto.Name, itSystem.Name);
         }
 
         [Fact, Description("Systems in use in our own organization should not be included")]
@@ -264,17 +288,17 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         public async Task GetMigration_When_System_Has_Relation_With_From_System_Exposing_Interface()
         {
             //Arrange
-            var (system, organization) = await CreatePrerequisites();
-            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organization.Id);
-            var newSystem = await CreateSystemAsync(organization.Id, CreateName());
-            var targetUsage = await ItSystemHelper.TakeIntoUseAsync(newSystem.Id, organization.Id);
+            var (fromSystem, organization) = await CreatePrerequisites();
+            var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
+            var toSystem = await CreateSystemAsync(organization.Id, CreateName());
+            var toSystemUsage = await ItSystemHelper.TakeIntoUseAsync(toSystem.Id, organization.Id);
 
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organization.Id, AccessModifier.Public));
-            var exhibit = await InterfaceExhibitHelper.CreateExhibit(system.Id, interfaceDto.Id);
+            var exhibit = await InterfaceExhibitHelper.CreateExhibit(fromSystem.Id, interfaceDto.Id);
 
             var relationDTO = await CreateSystemRelation(
-                targetUsage.Id,
-                usage.Id,
+                toSystemUsage.Id,
+                fromSystemUsage.Id,
                 A<string>(),
                 exhibit.ItInterfaceId,
                 null,
@@ -282,7 +306,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             );
 
             //Act
-            var result = await ItSystemUsageMigrationV2Helper.GetMigration(usage.Uuid, newSystem.Uuid);
+            var result = await ItSystemUsageMigrationV2Helper.GetMigration(fromSystemUsage.Uuid, toSystem.Uuid);
             
             //Assert
             Assert.Empty(result.AffectedDataProcessingRegistrations);
@@ -290,13 +314,263 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             var affectedRelation = Assert.Single(result.AffectedRelations);
             Assert.Equal(relationDTO.ToUsage.Name, affectedRelation.ToSystemUsage.Name);
-            Assert.Equal(relationDTO.Contract.Name, affectedRelation.Contract.Name);
             Assert.Equal(relationDTO.FromUsage.Name, affectedRelation.FromSystemUsage.Name);
             Assert.Equal(relationDTO.Description, affectedRelation.Description);
-            Assert.Equal(relationDTO.FrequencyType.Name, affectedRelation.FrequencyType.Name);
             Assert.Equal(relationDTO.Interface.Name, affectedRelation.Interface.Name);
+            Assert.Null(affectedRelation.Contract);
+            Assert.Null(affectedRelation.FrequencyType);
 
-            AssertFromToSystemInfo(usage, result, system, newSystem);
+            AssertFromToSystemInfo(fromSystemUsage, result, fromSystem, toSystem);
+        }
+
+        [Fact]
+        public async Task GetMigration_When_System_Has_Relation_With_No_RelationInterface()
+        {
+            //Arrange
+            var (fromSystem, organization) = await CreatePrerequisites();
+            var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
+            var toSystem = await CreateSystemAsync(organization.Id, CreateName());
+            var toSystemUsage = await ItSystemHelper.TakeIntoUseAsync(toSystem.Id, organization.Id);
+
+            await CreateSystemRelation(
+                toSystemUsage.Id,
+                fromSystemUsage.Id,
+                A<string>(),
+                null,
+                null,
+                null
+            );
+
+            //Act
+            var result = await ItSystemUsageMigrationV2Helper.GetMigration(fromSystemUsage.Uuid, toSystem.Uuid);
+            
+            //Assert
+            Assert.Empty(result.AffectedDataProcessingRegistrations);
+            Assert.Empty(result.AffectedContracts);
+            Assert.Empty(result.AffectedRelations);
+            
+            AssertFromToSystemInfo(fromSystemUsage, result, fromSystem, toSystem);
+        }
+
+        [Fact]
+        public async Task GetMigration_When_System_Has_Relation_With_Contract_And_No_RelationInterface()
+        {
+            //Arrange
+            var (fromSystem, organization) = await CreatePrerequisites();
+            var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
+            var toSystem = await CreateSystemAsync(organization.Id, CreateName());
+            var toSystemUsage = await ItSystemHelper.TakeIntoUseAsync(toSystem.Id, organization.Id);
+            var contract = await ItContractHelper.CreateContract(A<string>(), organization.Id);
+
+            await CreateSystemRelation(
+                toSystemUsage.Id,
+                fromSystemUsage.Id,
+                A<string>(),
+                null,
+                null,
+                contract.Id
+            );
+
+            //Act
+            var result = await ItSystemUsageMigrationV2Helper.GetMigration(fromSystemUsage.Uuid, toSystem.Uuid);
+            
+            //Assert
+            Assert.Empty(result.AffectedDataProcessingRegistrations);
+            Assert.Empty(result.AffectedContracts);
+            Assert.Empty(result.AffectedRelations);
+            
+            AssertFromToSystemInfo(fromSystemUsage, result, fromSystem, toSystem);
+        }
+
+        [Fact]
+        public async Task PostMigration_Can_Migrate_System_Usage_With_No_Associated_Entities()
+        {
+            //Arrange
+            var (fromSystem, organization) = await CreatePrerequisites();
+            var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
+            var toSystem = await CreateSystemAsync(organization.Id, CreateName());
+
+            //Act and Assert (expected no content)
+            await ItSystemUsageMigrationV2Helper.ExecuteMigration(fromSystemUsage.Uuid, toSystem.Uuid);
+        }
+
+        [Fact]
+        public async Task PostMigration_SystemUsageAssociation_In_Contract_Is_Not_Changed()
+        {
+            //Arrange
+            var (fromSystem, organization) = await CreatePrerequisites();
+            var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
+            var toSystem = await CreateSystemAsync(organization.Id, CreateName());
+            var contract = await ItContractHelper.CreateContract(A<string>(), organization.Id);
+            await ItContractHelper.AddItSystemUsage(contract.Id, fromSystemUsage.Id, organization.Id);
+
+            //Act
+            await ItSystemUsageMigrationV2Helper.ExecuteMigration(fromSystemUsage.Uuid, toSystem.Uuid);
+
+            //Assert
+            await AssertSystemUsageAssociationExistsInContract(contract, fromSystemUsage);
+        }
+
+        [Fact]
+        public async Task PostMigration_Can_Migrate_All_Usage_Data()
+        {
+            //Arrange
+            var (fromSystem, organization) = await CreatePrerequisites();
+            var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
+            var toSystem = await CreateSystemAsync(organization.Id, CreateName());
+            var toSystemUsage = await ItSystemHelper.TakeIntoUseAsync(toSystem.Id, organization.Id);
+            
+            var contract = await ItContractHelper.CreateContract(A<string>(), organization.Id);
+            await ItContractHelper.AddItSystemUsage(contract.Id, fromSystemUsage.Id, organization.Id);
+
+            var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organization.Id, AccessModifier.Public));
+            var exhibit = await InterfaceExhibitHelper.CreateExhibit(toSystem.Id, interfaceDto.Id);
+            
+            var relation = await CreateSystemRelation(
+                fromSystemUsage.Id,
+                toSystemUsage.Id,
+                A<string>(),
+                exhibit.ItInterfaceId,
+                GetValidFrequencyTypeId(),
+                contract.Id
+            );
+            
+            //Act
+            await ItSystemUsageMigrationV2Helper.ExecuteMigration(fromSystemUsage.Uuid, toSystem.Uuid);
+
+            //Assert
+            await AssertSystemUsageAssociationExistsInContract(contract, fromSystemUsage);
+            await AssertRelationExists(relation, fromSystemUsage, true, true, true);
+        }
+
+        [Fact]
+        public async Task PostMigration_To_Own_System_Does_Nothing()
+        {
+            //Arrange
+            var (fromSystem, organization) = await CreatePrerequisites();
+            var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
+            
+            var contract = await ItContractHelper.CreateContract(A<string>(), organization.Id);
+            await ItContractHelper.AddItSystemUsage(contract.Id, fromSystemUsage.Id, organization.Id);
+            
+            //Act
+            await ItSystemUsageMigrationV2Helper.ExecuteMigration(fromSystemUsage.Uuid, fromSystem.Uuid);
+
+            //Assert
+            await AssertSystemUsageAssociationExistsInContract(contract, fromSystemUsage);
+        }
+
+        [Fact]
+        public async Task PostMigration_When_System_Has_Relation_With_From_System_Exposing_Interface()
+        {
+            //Arrange
+            var (fromSystem, organization) = await CreatePrerequisites();
+            var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
+            var toSystem = await CreateSystemAsync(organization.Id, CreateName());
+            var toSystemUsage = await ItSystemHelper.TakeIntoUseAsync(toSystem.Id, organization.Id);
+            
+            var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organization.Id, AccessModifier.Public));
+            var exhibit = await InterfaceExhibitHelper.CreateExhibit(toSystem.Id, interfaceDto.Id);
+
+            var relation = await CreateSystemRelation(
+                fromSystemUsage.Id,
+                toSystemUsage.Id,
+                A<string>(),
+                exhibit.ItInterfaceId,
+                null,
+                null
+            );
+
+            //Act
+            await ItSystemUsageMigrationV2Helper.ExecuteMigration(fromSystemUsage.Uuid, toSystem.Uuid);
+
+            //Assert
+            await AssertRelationExists(relation, fromSystemUsage, true);
+        }
+
+        [Fact]
+        public async Task PostMigration_When_System_Has_Relation_With_To_System_Exposing_Interface()
+        {
+            //Arrange
+            var (fromSystem, organization) = await CreatePrerequisites();
+            var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
+            var toSystem = await CreateSystemAsync(organization.Id, CreateName());
+            var toSystemUsage = await ItSystemHelper.TakeIntoUseAsync(toSystem.Id, organization.Id);
+            
+            var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organization.Id, AccessModifier.Public));
+            var exhibit = await InterfaceExhibitHelper.CreateExhibit(toSystem.Id, interfaceDto.Id);
+
+            var migrateToItSystem = await CreateSystemAsync(organization.Id, CreateName());
+
+            var relation = await CreateSystemRelation(
+                fromSystemUsage.Id,
+                toSystemUsage.Id,
+                A<string>(),
+                exhibit.ItInterfaceId,
+                null,
+                null
+            );
+
+            //Act
+            await ItSystemUsageMigrationV2Helper.ExecuteMigration(toSystemUsage.Uuid, migrateToItSystem.Uuid);
+
+            //Assert
+            await AssertRelationExists(relation, fromSystemUsage);
+        }
+
+        [Fact]
+        public async Task PostMigration_When_System_Has_Relation_With_To_System()
+        {
+            //Arrange
+            var (fromSystem, organization) = await CreatePrerequisites();
+            var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
+            var toSystem = await CreateSystemAsync(organization.Id, CreateName());
+            var toSystemUsage = await ItSystemHelper.TakeIntoUseAsync(toSystem.Id, organization.Id);
+            
+            var migrateToItSystem = await CreateSystemAsync(organization.Id, CreateName());
+
+            var relation = await CreateSystemRelation(
+                fromSystemUsage.Id,
+                toSystemUsage.Id,
+                A<string>(),
+                null,
+                null,
+                null
+            );
+
+            //Act
+            await ItSystemUsageMigrationV2Helper.ExecuteMigration(fromSystemUsage.Uuid, migrateToItSystem.Uuid);
+
+            //Assert
+            await AssertRelationExists(relation, fromSystemUsage);
+        }
+
+        [Fact]
+        public async Task PostMigration_When_System_Has_Relation_With_Contract()
+        {
+            //Arrange
+            var (fromSystem, organization) = await CreatePrerequisites();
+            var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
+            var toSystem = await CreateSystemAsync(organization.Id, CreateName());
+            var toSystemUsage = await ItSystemHelper.TakeIntoUseAsync(toSystem.Id, organization.Id);
+            var contract = await ItContractHelper.CreateContract(A<string>(), organization.Id);
+
+            var migrateToItSystem = await CreateSystemAsync(organization.Id, CreateName());
+
+            var relation = await CreateSystemRelation(
+                fromSystemUsage.Id,
+                toSystemUsage.Id,
+                A<string>(),
+                null,
+                null,
+                contract.Id
+            );
+
+            //Act
+            await ItSystemUsageMigrationV2Helper.ExecuteMigration(fromSystemUsage.Uuid, migrateToItSystem.Uuid);
+
+            //Assert
+            await AssertRelationExists(relation, fromSystemUsage, hasContract: true);
         }
 
         private static void AssertFromToSystemInfo(
@@ -308,6 +582,55 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(usage.Uuid, result.TargetUsage.Uuid);
             Assert.Equal(oldSystem.Uuid, result.FromSystem.Uuid);
             Assert.Equal(newSystem.Uuid, result.ToSystem.Uuid);
+        }
+
+        private static async Task AssertSystemUsageAssociationExistsInContract(ItContractDTO contract, ItSystemUsageDTO usage)
+        {
+            var contractFromServer = await ItContractHelper.GetItContract(contract.Id);
+
+            Assert.Equal(1, contractFromServer.AssociatedSystemUsages.Count(x => x.Id == usage.Id));
+        }
+
+        private static async Task AssertRelationExists(SystemRelationDTO expectedRelation, ItSystemUsageDTO usage, bool hasInterface = false, bool hasFrequency = false, bool hasContract = false)
+        {
+            using var response = await SystemRelationHelper.SendGetRelationRequestAsync(usage.Id, expectedRelation.Id);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+            Assert.Equal(expectedRelation.Id, relation.Id);
+            Assert.Equal(expectedRelation.Description, relation.Description);
+            if (hasInterface)
+            {
+                AssertEqualNamedEntities(expectedRelation.Interface, relation.Interface);
+            }
+            else
+            {
+                Assert.Null(relation.Interface);
+            }
+
+            if (hasFrequency)
+            {
+                AssertEqualNamedEntities(expectedRelation.FrequencyType, relation.FrequencyType);
+            }
+            else
+            {
+                Assert.Null(relation.FrequencyType);
+            }
+
+            if (hasContract)
+            {
+                AssertEqualNamedEntities(expectedRelation.Contract, relation.Contract);
+            }
+            else
+            {
+                Assert.Null(relation.Contract);
+            }
+        }
+
+        private static void AssertEqualNamedEntities(NamedEntityDTO expected, NamedEntityDTO actual)
+        {
+            Assert.Equal(expected.Id, actual.Id);
+            Assert.Equal(expected.Name, actual.Name);
         }
 
         private async Task<(ItSystemDTO system, OrganizationDTO organization, Cookie cookie)> CreatePrerequisitesWithUser(OrganizationRole role, string systemName = null, AccessModifier accessModifier = AccessModifier.Local)
@@ -370,6 +693,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         private string CreateEmail()
         {
             return $"{A<string>()}@kitos.dk";
+        }
+
+        private static int GetValidFrequencyTypeId()
+        {
+            return new Random().Next(1, 4);
         }
     }
 }

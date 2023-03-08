@@ -46,12 +46,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping
         {
             return new ItSystemUsageRelationMigrationV2ResponseDTO
             {
-                ToSystemUsage = entity.ToSystemUsage.MapIdentityNamePairWithDeactivatedStatusDTO(),
-                FromSystemUsage = entity.FromSystemUsage.MapIdentityNamePairWithDeactivatedStatusDTO(),
+                ToSystemUsage = entity.ToSystemUsage?.MapIdentityNamePairWithDeactivatedStatusDTO(),
+                FromSystemUsage = entity.FromSystemUsage?.MapIdentityNamePairWithDeactivatedStatusDTO(),
                 Description = entity.Description,
-                Interface = entity.RelationInterface.MapIdentityNamePairDTO(),
-                FrequencyType = entity.UsageFrequency.MapIdentityNamePairDTO(),
-                Contract = entity.AssociatedContract.MapIdentityNamePairDTO()
+                Interface = entity.RelationInterface?.MapIdentityNamePairDTO(),
+                FrequencyType = entity.UsageFrequency?.MapIdentityNamePairDTO(),
+                Contract = entity.AssociatedContract?.MapIdentityNamePairDTO()
             };
         }
     }

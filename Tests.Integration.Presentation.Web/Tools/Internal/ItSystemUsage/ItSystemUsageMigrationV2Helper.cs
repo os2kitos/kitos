@@ -48,6 +48,15 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystemUsage
             return await response.ReadResponseBodyAsAsync<ItSystemUsageMigrationV2ResponseDTO>();
         }
 
+        public static async Task ExecuteMigration(Guid itSystemUsageUuid, Guid toSystemUuid, Cookie userCookie = null)
+        {
+            var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var path = BasePath + $"/{itSystemUsageUuid}/migration?toSystemUuid={toSystemUuid}";
+
+            using var response = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl(path), cookie, null);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
         public static async Task<ItSystemUsageMigrationPermissionsResponseDTO> GetPermissions(Guid itSystemUsageUuid, Cookie userCookie = null)
         {
             var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
