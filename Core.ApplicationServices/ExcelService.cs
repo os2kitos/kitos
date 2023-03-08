@@ -4,12 +4,18 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Transactions;
+using Core.Abstractions.Extensions;
+using Core.ApplicationServices.Contract.Write;
+using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Model.Contracts.Write;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.Cryptography;
+using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices
 {
@@ -21,13 +27,19 @@ namespace Core.ApplicationServices
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IExcelHandler _excelHandler;
         private readonly ICryptoService _cryptoService;
+        private readonly ITransactionManager _transactionManager;
+        private readonly IItContractWriteService _contractWriteService;
+        private readonly IOrganizationRepository _organizationRepository;
 
         public ExcelService(IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<User> userRepository,
             IGenericRepository<ItContract> itContractRepository,
             IGenericRepository<OrganizationRight> orgRightRepository,
             IExcelHandler excelHandler,
-            ICryptoService cryptoService)
+            ICryptoService cryptoService,
+            ITransactionManager transactionManager,
+            IItContractWriteService contractWriteService,
+            IOrganizationRepository organizationRepository)
         {
             _orgUnitRepository = orgUnitRepository;
             _userRepository = userRepository;
@@ -35,6 +47,9 @@ namespace Core.ApplicationServices
             _orgRightRepository = orgRightRepository;
             _excelHandler = excelHandler;
             _cryptoService = cryptoService;
+            _transactionManager = transactionManager;
+            _contractWriteService = contractWriteService;
+            _organizationRepository = organizationRepository;
         }
 
         /// <summary>
@@ -118,6 +133,19 @@ namespace Core.ApplicationServices
 
         private IEnumerable<ExcelImportError> ImportItContractsTransaction(DataTable contractTable, int organizationId)
         {
+            using var transaction = _transactionManager.Begin();
+            var organizationResult = _organizationRepository.GetById(organizationId);
+            if (organizationResult.IsNone)
+            {
+                throw new ArgumentException("Invalid organization id passed");
+            }
+
+            var organization = organizationResult.Value;
+            var names = _itContractRepository
+                .AsQueryable()
+                .ByOrganizationId(organizationId)
+                .Select(x => x.Name)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
             var errors = new List<ExcelImportError>();
 
             // select only contracts that should be inserted
@@ -127,13 +155,14 @@ namespace Core.ApplicationServices
             // if nothing to add then abort here
             if (firstRow == null)
             {
-                errors.Add(new ExcelImportError { Message = "Intet at importere!"});
+                errors.Add(new ExcelImportError { Message = "Intet at importere!" });
                 return errors;
             }
 
             var rowIndex = contractTable.Rows.IndexOf(firstRow) + 2; // adding 2 to get it to lign up with row numbers in excel
             foreach (var row in newContracts)
             {
+                var rowErrors = new List<ExcelImportError>();
                 var contractRow = new ContractRow
                 {
                     RowIndex = rowIndex,
@@ -156,7 +185,18 @@ namespace Core.ApplicationServices
                         Message = "IT Kontrakt Navn mangler",
                         SheetName = "IT Kontrakter"
                     };
-                    errors.Add(error);
+                    rowErrors.Add(error);
+                }
+                else if (!names.Add(contractRow.Name))
+                {
+                    var error = new ExcelImportError
+                    {
+                        Row = contractRow.RowIndex,
+                        Column = "B",
+                        Message = "IT Kontrakt Navn er allerede i brug",
+                        SheetName = "IT Kontrakter"
+                    };
+                    rowErrors.Add(error);
                 }
 
                 // validate Concluded is a date
@@ -175,7 +215,7 @@ namespace Core.ApplicationServices
                         Message = "Indgået er ikke en gyldig dato",
                         SheetName = "IT Kontrakter"
                     };
-                    errors.Add(error);
+                    rowErrors.Add(error);
                 }
 
                 // validate IrrevocableTo is a date
@@ -194,7 +234,7 @@ namespace Core.ApplicationServices
                         Message = "'Uopsigeligt til' er ikke en gyldig dato",
                         SheetName = "IT Kontrakter"
                     };
-                    errors.Add(error);
+                    rowErrors.Add(error);
                 }
 
                 // validate ExpirationDate is a date
@@ -213,7 +253,7 @@ namespace Core.ApplicationServices
                         Message = "Udløbsdato er ikke en gyldig dato",
                         SheetName = "IT Kontrakter"
                     };
-                    errors.Add(error);
+                    rowErrors.Add(error);
                 }
 
                 // validate Terminated is a date
@@ -232,26 +272,58 @@ namespace Core.ApplicationServices
                         Message = "'Kontrakten opsagt' er ikke en gyldig dato",
                         SheetName = "IT Kontrakter"
                     };
-                    errors.Add(error);
+                    rowErrors.Add(error);
                 }
 
-                _itContractRepository.Insert(new ItContract
+                if (!rowErrors.Any())
                 {
-                    Name = contractRow.Name,
-                    ItContractId = contractRow.ItContractId,
-                    Note = contractRow.Note,
-                    Concluded = contractRow.Concluded,
-                    IrrevocableTo = contractRow.IrrevocableTo,
-                    ExpirationDate = contractRow.ExpirationDate,
-                    Terminated = contractRow.Terminated,
-                    OrganizationId = organizationId,
-                });
+                    var creationResult = _contractWriteService.Create(organization.Uuid, new ItContractModificationParameters
+                    {
+                        Name = contractRow.Name.AsChangedValue(),
+                        General = new ItContractGeneralDataModificationParameters
+                        {
+                            ContractId = contractRow.ItContractId.AsChangedValue(),
+                            Notes = contractRow.Note.AsChangedValue(),
+                            ValidFrom = contractRow.Concluded.FromNullableValueType().AsChangedValue(),
+                            ValidTo = contractRow.ExpirationDate.FromNullableValueType().AsChangedValue()
+                        },
+                        AgreementPeriod = new ItContractAgreementPeriodModificationParameters
+                        {
+                            IrrevocableUntil = contractRow.IrrevocableTo.AsChangedValue(),
+                        },
+                        Termination = new ItContractTerminationParameters
+                        {
+                            TerminatedAt = contractRow.Terminated.FromNullableValueType().AsChangedValue()
+                        }
+
+                    });
+                    if (creationResult.Failed)
+                    {
+                        var error = new ExcelImportError
+                        {
+                            Row = contractRow.RowIndex,
+                            Column = "B",
+                            Message = $"'Intern fejl i oprettelse af kontrakt:{creationResult.Error}",
+                            SheetName = "IT Kontrakter"
+                        };
+                        rowErrors.Add(error);
+                    }
+                }
+
+                errors.AddRange(rowErrors);
 
                 rowIndex++;
             }
-            // no errors found, it's safe to save to DB
-            if (!errors.Any())
+
+            if (errors.Any())
+            {
+                transaction.Rollback();
+            }
+            else
+            {
                 _itContractRepository.Save();
+                transaction.Commit();
+            }
 
             return errors;
         }
