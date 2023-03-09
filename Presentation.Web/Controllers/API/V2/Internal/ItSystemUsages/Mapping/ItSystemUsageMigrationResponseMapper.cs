@@ -26,9 +26,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping
                 TargetUsage = entity.SystemUsage.MapIdentityNamePairWithDeactivatedStatusDTO(),
                 FromSystem = entity.FromItSystem.MapIdentityNamePairWithDeactivatedStatusDTO(),
                 ToSystem = entity.ToItSystem.MapIdentityNamePairWithDeactivatedStatusDTO(),
-                AffectedContracts = entity.AffectedContracts.Select(x => x.MapIdentityNamePairDTO()),
-                AffectedRelations = entity.AffectedSystemRelations.Select(MapRelationMigration),
-                AffectedDataProcessingRegistrations = entity.AffectedDataProcessingRegistrations.Select(x => x.MapIdentityNamePairDTO())
+                AffectedContracts = entity.AffectedContracts.Select(x => x.MapIdentityNamePairDTO()).ToList(),
+                AffectedRelations = entity.AffectedSystemRelations.Select(MapRelationMigration).ToList(),
+                AffectedDataProcessingRegistrations = entity.AffectedDataProcessingRegistrations.Select(x => x.MapIdentityNamePairDTO()).ToList()
             };
         }
 
