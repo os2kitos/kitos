@@ -29,7 +29,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IEntityIdentityResolver> _identityResolver;
         private readonly Mock<IItSystemUsageMigrationService> _systemUsageMigrationService;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
-        private readonly Mock<IItSystemUsageService> _systemUsageService;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IOrganizationService> _organizationService;
 
@@ -40,7 +39,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _identityResolver = new Mock<IEntityIdentityResolver>();
             _systemUsageMigrationService = new Mock<IItSystemUsageMigrationService>();
             _authorizationContext = new Mock<IAuthorizationContext>();
-            _systemUsageService = new Mock<IItSystemUsageService>();
             _transactionManager = new Mock<ITransactionManager>();
             _organizationService = new Mock<IOrganizationService>();
 
@@ -48,7 +46,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 _identityResolver.Object,
                 _systemUsageMigrationService.Object,
                 _authorizationContext.Object,
-                _systemUsageService.Object,
                 _transactionManager.Object,
                 _organizationService.Object);
         }
@@ -352,76 +349,14 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         public void Can_GetCommandPermissions(bool canExecute)
         {
             //Arrange
-            var usageUuid = A<Guid>();
-            var usageId = A<int>();
-
-            var usage = new ItSystemUsage();
-            ExpectResolveIdReturns<ItSystemUsage>(usageUuid, usageId);
-            ExpectGetUsageByIdReturns(usageId, usage);
-            ExpectAllowReads(usage, true);
             ExpectCanExecuteMigration(canExecute);
 
             //Act
-            var result = _sut.GetCommandPermissions(usageUuid);
+            var result = _sut.GetCommandPermissions();
 
             //Assert
-            Assert.True(result.Ok);
-            var executeCommand = Assert.Single(result.Value, x => x.Id == CommandPermissionConstraints.UsageMigration.Execute);
+            var executeCommand = Assert.Single(result, x => x.Id == CommandPermissionConstraints.UsageMigration.Execute);
             Assert.Equal(canExecute, executeCommand.CanExecute);
-        }
-
-        [Fact]
-        public void GetCommandPermissions_Returns_Forbidden_If_Not_Allowed_To_Read()
-        {
-            //Arrange
-            var usageUuid = A<Guid>();
-            var usageId = A<int>();
-
-            var usage = new ItSystemUsage();
-            ExpectResolveIdReturns<ItSystemUsage>(usageUuid, usageId);
-            ExpectGetUsageByIdReturns(usageId, usage);
-            ExpectAllowReads(usage, false);
-
-            //Act
-            var result = _sut.GetCommandPermissions(usageUuid);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-        }
-
-        [Fact]
-        public void GetCommandPermissions_Returns_NotFound_When_Usage_Is_Null()
-        {
-            //Arrange
-            var usageUuid = A<Guid>();
-            var usageId = A<int>();
-
-            ExpectResolveIdReturns<ItSystemUsage>(usageUuid, usageId);
-            ExpectGetUsageByIdReturns(usageId, null);
-
-            //Act
-            var result = _sut.GetCommandPermissions(usageUuid);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
-        }
-
-        [Fact]
-        public void GetCommandPermissions_Returns_NotFound_When_UsageId_Is_Not_Found()
-        {
-            //Arrange
-            var usageUuid = A<Guid>();
-
-            ExpectResolveIdReturns<ItSystemUsage>(usageUuid, Maybe<int>.None);
-
-            //Act
-            var result = _sut.GetCommandPermissions(usageUuid);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         private static ItSystemUsageMigration CreateItSystemUsageMigration(Guid fromUsageUuid, Guid toSystemUuid)
@@ -452,11 +387,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var transactionMock = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transactionMock.Object);
             return transactionMock;
-        }
-
-        private void ExpectGetUsageByIdReturns(int usageId, ItSystemUsage result)
-        {
-            _systemUsageService.Setup(x => x.GetById(usageId)).Returns(result);
         }
 
         private void ExpectCanExecuteMigration(bool result)

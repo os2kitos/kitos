@@ -19,21 +19,18 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly IEntityIdentityResolver _identityResolver;
         private readonly IItSystemUsageMigrationService _systemUsageMigrationService;
         private readonly IAuthorizationContext _authorizationContext;
-        private readonly IItSystemUsageService _systemUsageService;
         private readonly ITransactionManager _transactionManager;
         private readonly IOrganizationService _organizationService;
 
-        public ItSystemUsageMigrationServiceAdapter(IEntityIdentityResolver identityResolver, 
-            IItSystemUsageMigrationService systemUsageMigrationService, 
+        public ItSystemUsageMigrationServiceAdapter(IEntityIdentityResolver identityResolver,
+            IItSystemUsageMigrationService systemUsageMigrationService,
             IAuthorizationContext authorizationContext,
-            IItSystemUsageService systemUsageService,
-            ITransactionManager transactionManager, 
+            ITransactionManager transactionManager,
             IOrganizationService organizationService)
         {
             _identityResolver = identityResolver;
             _systemUsageMigrationService = systemUsageMigrationService;
             _authorizationContext = authorizationContext;
-            _systemUsageService = systemUsageService;
             _transactionManager = transactionManager;
             _organizationService = organizationService;
         }
@@ -41,13 +38,10 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         public Result<ItSystemUsageMigration, OperationError> GetMigration(Guid usageUuid, Guid toSystemUuid)
         {
             return ResolveUsageAndSystemIds(usageUuid, toSystemUuid)
-                    .Bind(result => _systemUsageMigrationService.GetSystemUsageMigration(result.usageId, result.systemId)
-                        .Bind
-                        (
-                            migration => WithReadAccess(migration.SystemUsage)
-                                .Select(_ => migration)
-                        )
-                    );
+                .Bind(result => _systemUsageMigrationService.GetSystemUsageMigration(result.usageId, result.systemId))
+                .Bind(migration => WithReadAccess(migration.SystemUsage)
+                    .Select(_ => migration)
+                );
         }
 
         public Result<ItSystemUsage, OperationError> ExecuteMigration(Guid usageUuid, Guid toSystemUuid)
@@ -56,17 +50,19 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
             return ResolveUsageAndSystemIds(usageUuid, toSystemUuid)
                 .Bind(result => _systemUsageMigrationService.ExecuteSystemUsageMigration(result.usageId, result.systemId))
-                .Bind(usage =>
-                {
-                    if (_authorizationContext.AllowModify(usage))
+                .Bind(WithModifyAccess)
+                .Match(
+                    usage =>
                     {
                         transaction.Commit();
                         return Result<ItSystemUsage, OperationError>.Success(usage);
+                    },
+                    error =>
+                    {
+                        transaction.Rollback();
+                        return error;
                     }
-
-                    transaction.Rollback();
-                    return new OperationError($"User is not allowed to read It System Usage with uuid: {usageUuid}", OperationFailure.Forbidden);
-                });
+                );
         }
 
         public Result<IEnumerable<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(Guid organizationUuid,
@@ -74,47 +70,33 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             bool getPublicFromOtherOrganizations,
             params IDomainQuery<ItSystem>[] conditions)
         {
-            //TODO: AsEnumerable?
             return _organizationService.GetOrganization(organizationUuid)
-                .Bind(organization => _systemUsageMigrationService
-                    .GetUnusedItSystemsByOrganizationQuery(organization.Id, numberOfItSystems, getPublicFromOtherOrganizations, conditions)
-                    .Select(x => x
-                        .ToList()
-                        .AsEnumerable()
-                    )
-                );
+                .Bind(organization => _systemUsageMigrationService.GetUnusedItSystemsByOrganizationQuery(organization.Id, numberOfItSystems, getPublicFromOtherOrganizations, conditions))
+                .Select<IEnumerable<ItSystem>>(x => x.ToList());
         }
 
-        public Result<IEnumerable<CommandPermissionResult>, OperationError> GetCommandPermissions(Guid usageUuid)
+        public IEnumerable<CommandPermissionResult> GetCommandPermissions()
         {
-            return ResolveUsageId(usageUuid)
-                .Bind(GetSystemUsage)
-                .Bind(WithReadAccess)
-                .Bind(_ =>
-                {
-                    var commandPermissions = new List<CommandPermissionResult>
-                    {
-                        new (CommandPermissionConstraints.UsageMigration.Execute, _systemUsageMigrationService.CanExecuteMigration())
-                    };
+            var commandPermissions = new List<CommandPermissionResult>
+            {
+                new (CommandPermissionConstraints.UsageMigration.Execute, _systemUsageMigrationService.CanExecuteMigration())
+            };
 
-                    return Result<IEnumerable<CommandPermissionResult>, OperationError>.Success(commandPermissions);
-                });
-        }
-
-        private Result<ItSystemUsage, OperationError> GetSystemUsage(int usageId)
-        {
-            var usage = _systemUsageService.GetById(usageId);
-
-            return usage != null
-                ? usage
-                : new OperationError($"ItSystemUsage with id: {usageId} was not found", OperationFailure.NotFound);
+            return commandPermissions;
         }
 
         private Result<ItSystemUsage, OperationError> WithReadAccess(ItSystemUsage usage)
         {
-            return _authorizationContext.AllowReads(usage) 
+            return _authorizationContext.AllowReads(usage)
                 ? usage
                 : new OperationError($"User is not allowed to read It System Usage with uuid: {usage.Uuid}", OperationFailure.Forbidden);
+        }
+
+        private Result<ItSystemUsage, OperationError> WithModifyAccess(ItSystemUsage usage)
+        {
+            return _authorizationContext.AllowReads(usage)
+                ? usage
+                : new OperationError($"User is not allowed to modify It System Usage with uuid: {usage.Uuid}", OperationFailure.Forbidden);
         }
 
         private Result<(int usageId, int systemId), OperationError> ResolveUsageAndSystemIds(Guid usageUuid, Guid systemUuid)

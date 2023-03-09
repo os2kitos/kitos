@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -11,6 +12,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping
 {
     public class ItSystemUsageMigrationResponseMapper : IItSystemUsageMigrationResponseMapper
     {
+        private readonly ICommandPermissionsResponseMapper _commandPermissionsResponseMapper;
+
+        public ItSystemUsageMigrationResponseMapper(ICommandPermissionsResponseMapper commandPermissionsResponseMapper)
+        {
+            _commandPermissionsResponseMapper = commandPermissionsResponseMapper;
+        }
+
         public ItSystemUsageMigrationV2ResponseDTO MapMigration(ItSystemUsageMigration entity)
         {
             return new ItSystemUsageMigrationV2ResponseDTO
@@ -27,6 +35,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping
         public IEnumerable<IdentityNamePairWithDeactivatedStatusDTO> MapUnusedSystems(IEnumerable<ItSystem> systems)
         {
             return systems.Select(x => x.MapIdentityNamePairWithDeactivatedStatusDTO()).ToList();
+        }
+
+        public ItSystemUsageMigrationPermissionsResponseDTO MapCommandPermissions(IEnumerable<CommandPermissionResult> permissionResult)
+        {
+            return new ItSystemUsageMigrationPermissionsResponseDTO(permissionResult.Select(_commandPermissionsResponseMapper.MapCommandPermission));
         }
 
         private static ItSystemUsageRelationMigrationV2ResponseDTO MapRelationMigration(SystemRelation entity)

@@ -67,20 +67,19 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         }
 
         [HttpGet]
-        [Route("{usageUuid}/migration/permissions")]
+        [Route("permissions/commands")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageMigrationPermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetPermissions([Required][NonEmptyGuid] Guid usageUuid)
+        public IHttpActionResult GetPermissions()
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            return _adapter.GetCommandPermissions(usageUuid)
-                .Select(_resourcePermissionsResponseMapper.MapCommandPermissions<ItSystemUsageMigrationPermissionsResponseDTO>)
-                .Match(Ok, FromOperationError);
+            var permissions = _adapter.GetCommandPermissions();
+            return Ok(_responseMapper.MapCommandPermissions(permissions));
         }
 
         [HttpGet]

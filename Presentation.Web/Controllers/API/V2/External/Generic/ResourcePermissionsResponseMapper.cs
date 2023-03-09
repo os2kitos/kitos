@@ -1,8 +1,5 @@
 ﻿using Core.ApplicationServices.Authorization;
 using Presentation.Web.Models.API.V2.Response.Shared;
-using Presentation.Web.Models.API.V2.SharedProperties;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Presentation.Web.Controllers.API.V2.External.Generic
 {
@@ -22,19 +19,6 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             return new ResourceCollectionPermissionsResponseDTO
             {
                 Create = permissionsResult.Create
-            };
-        }
-
-        public TResult MapCommandPermissions<TResult>(IEnumerable<CommandPermissionResult> permissionResult) where TResult : class, IHasCommandPermissionsResponseDTO, new()
-        {
-            return new TResult
-            {
-                Commands = permissionResult.Select(x =>
-                    new CommandPermissionResponseDTO
-                    {
-                        Id = x.Id,
-                        CanExecute = x.CanExecute
-                    })
             };
         }
     }

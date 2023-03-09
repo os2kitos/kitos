@@ -57,10 +57,10 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystemUsage
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
-        public static async Task<ItSystemUsageMigrationPermissionsResponseDTO> GetPermissions(Guid itSystemUsageUuid, Cookie userCookie = null)
+        public static async Task<ItSystemUsageMigrationPermissionsResponseDTO> GetPermissions(Cookie userCookie = null)
         {
             var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var path = BasePath + $"/{itSystemUsageUuid}/migration/permissions";
+            var path = BasePath + "/permissions/commands";
 
             using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl(path), cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

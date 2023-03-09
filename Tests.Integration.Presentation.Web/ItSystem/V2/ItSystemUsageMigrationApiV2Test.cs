@@ -202,11 +202,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         public async Task GetAccessibilityLevel_Returns(OrganizationRole role, bool expectedMigrationAvailability)
         {
             //Arrange
-            var (system, organization, cookie) = await CreatePrerequisitesWithUser(role);
-            var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organization.Id);
+            var (_, _, cookie) = await CreatePrerequisitesWithUser(role);
 
             //Act
-            var result = await ItSystemUsageMigrationV2Helper.GetPermissions(usage.Uuid, cookie);
+            var result = await ItSystemUsageMigrationV2Helper.GetPermissions(cookie);
 
             //Assert
             var command = Assert.Single(result.Commands, x => x.Id == CommandPermissionConstraints.UsageMigration.Execute);

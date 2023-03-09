@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Moq;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
-using Presentation.Web.Models.API.V2.SharedProperties;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -19,9 +23,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     {
         private readonly ItSystemUsageMigrationResponseMapper _sut;
 
+        private readonly Mock<ICommandPermissionsResponseMapper> _commandPermissionsResponseMapper;
+
         public ItSystemUsageMigrationResponseMapperTest()
         {
-            _sut = new ItSystemUsageMigrationResponseMapper();
+            _commandPermissionsResponseMapper = new Mock<ICommandPermissionsResponseMapper>();
+
+            _sut = new ItSystemUsageMigrationResponseMapper(_commandPermissionsResponseMapper.Object);
         }
 
         [Fact]
@@ -85,6 +93,30 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertIdentityNamePairWithDeactivatedStatus(system1, systemDto1);
             var systemDto2 = Assert.Single(unusedSystems, x => x.Uuid == system2.Uuid);
             AssertIdentityNamePairWithDeactivatedStatus(system2, systemDto2);
+        }
+
+        [Fact]
+        public void Can_MapCommandPermissions()
+        {
+            //Arrange
+            var commandPermission = new CommandPermissionResult(A<string>(), A<bool>());
+
+            var expectedDto = new CommandPermissionResponseDTO
+            {
+                Id = commandPermission.Id,
+                CanExecute = commandPermission.CanExecute
+            };
+
+            _commandPermissionsResponseMapper.Setup(x => x.MapCommandPermission(commandPermission)).Returns(expectedDto);
+
+            //Act
+            var result = _sut.MapCommandPermissions(commandPermission.WrapAsEnumerable());
+
+            //Assert
+            Assert.NotNull(result);
+            var actualDto = Assert.Single(result.Commands);
+            Assert.Equal(expectedDto.Id, actualDto.Id);
+            Assert.Equal(expectedDto.CanExecute, actualDto.CanExecute);
         }
 
         private static void AssertIdentityNamePair<TEntity>(TEntity entity, IdentityNamePairResponseDTO dto) where TEntity : class, IHasUuid, IHasName

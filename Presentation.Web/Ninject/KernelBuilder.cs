@@ -126,6 +126,7 @@ using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
 using Core.ApplicationServices.System.Write;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
 
@@ -333,6 +334,7 @@ namespace Presentation.Web.Ninject
 
             //Permissions
             kernel.Bind<IResourcePermissionsResponseMapper>().To<ResourcePermissionsResponseMapper>().InCommandScope(Mode);
+            kernel.Bind<ICommandPermissionsResponseMapper>().To<CommandPermissionsResponseMapper>().InCommandScope(Mode);
 
             //Public messages
             kernel.Bind<IPublicMessagesWriteModelMapper>().To<PublicMessagesWriteModelMapper>().InCommandScope(Mode);

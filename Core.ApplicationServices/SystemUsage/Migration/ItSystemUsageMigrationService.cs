@@ -5,7 +5,6 @@ using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Authorization;
-using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
@@ -18,7 +17,6 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.DomainModel.Events;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.SystemUsage;
 
 namespace Core.ApplicationServices.SystemUsage.Migration
 {

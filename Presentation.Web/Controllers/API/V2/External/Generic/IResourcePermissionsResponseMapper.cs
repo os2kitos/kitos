@@ -9,6 +9,5 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
     {
         ResourcePermissionsResponseDTO Map(ResourcePermissionsResult permissionsResult);
         ResourceCollectionPermissionsResponseDTO Map(ResourceCollectionPermissionsResult permissionsResult);
-        TResult MapCommandPermissions<TResult>(IEnumerable<CommandPermissionResult> permissionResult) where TResult : class, IHasCommandPermissionsResponseDTO, new();
     }
 }

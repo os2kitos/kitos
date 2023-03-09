@@ -13,7 +13,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
     {
         Result<ItSystemUsageMigration, OperationError> GetMigration(Guid usageUuid, Guid toSystemUuid);
         Result<ItSystemUsage, OperationError> ExecuteMigration(Guid usageUuid, Guid toSystemUuid);
-        Result<IEnumerable<CommandPermissionResult>, OperationError> GetCommandPermissions(Guid usageUuid);
+        IEnumerable<CommandPermissionResult> GetCommandPermissions();
         Result<IEnumerable<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(Guid organizationUuid,
             int numberOfItSystems,
             bool getPublicFromOtherOrganizations,
