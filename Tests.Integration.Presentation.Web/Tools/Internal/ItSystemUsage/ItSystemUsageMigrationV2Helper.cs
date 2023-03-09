@@ -7,7 +7,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
 using Xunit;
-using System.IO;
 
 namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystemUsage
 {

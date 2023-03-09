@@ -8,7 +8,6 @@ using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
-using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
@@ -22,15 +21,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
     {
         private readonly IItSystemUsageMigrationResponseMapper _responseMapper;
         private readonly IItSystemUsageMigrationServiceAdapter _adapter;
-        private readonly IResourcePermissionsResponseMapper _resourcePermissionsResponseMapper;
 
         public ItSystemUsageMigrationV2Controller(IItSystemUsageMigrationResponseMapper responseMapper,
-            IItSystemUsageMigrationServiceAdapter adapter,
-            IResourcePermissionsResponseMapper resourcePermissionsResponseMapper)
+            IItSystemUsageMigrationServiceAdapter adapter)
         {
             _responseMapper = responseMapper;
             _adapter = adapter;
-            _resourcePermissionsResponseMapper = resourcePermissionsResponseMapper;
         }
 
         [HttpGet]
