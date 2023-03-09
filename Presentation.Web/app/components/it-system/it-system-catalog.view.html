@@ -63,11 +63,11 @@
                 <div class="panel panel-default" ng-if="systemCatalogVm.migrationReportDTO.affectedContracts.length > 0">
                     <table class="table">
                         <tr>
-                            <th>Id</th>
+                            <th>Uuid</th>
                             <th>Navn</th>
                         </tr>
                         <tr ng-repeat="affectedContracts in systemCatalogVm.migrationReportDTO.affectedContracts">
-                            <td class="idTableDataCellFormat">{{affectedContracts.id}}</td>
+                            <td class="idTableDataCellFormat">{{affectedContracts.uuid}}</td>
                             <td>{{affectedContracts.name}}</td>
                         </tr>
                     </table>
@@ -86,14 +86,14 @@
                         </tr>
                         <tr ng-repeat="relation in systemCatalogVm.migrationReportDTO.affectedRelations">
                             <td>
-                                Navn: {{formatSystemName(relation.fromSystemUsage.name,relation.fromSystemUsage.disabled) }}
+                                Navn: {{formatSystemName(relation.fromSystemUsage.name,relation.fromSystemUsage.deactivated) }}
                                 <br />
-                                Id: {{relation.fromSystemUsage.id}}
+                                Uuid: {{relation.fromSystemUsage.uuid}}
                             </td>
                             <td>
-                                Navn: {{formatSystemName(relation.toSystemUsage.name,relation.toSystemUsage.disabled) }}
+                                Navn: {{formatSystemName(relation.toSystemUsage.name,relation.toSystemUsage.deactivated) }}
                                 <br />
-                                Id: {{ relation.toSystemUsage.id}}
+                                Uuid: {{ relation.toSystemUsage.uuid}}
                             </td>
                             <td>
                                 {{relation.description}}
@@ -101,7 +101,7 @@
                             <td>
                                 Navn: {{relation.interface.name}}
                                 <br />
-                                Id:{{relation.interface.id}}
+                                Uuid: {{relation.interface.uuid}}
                             </td>
                             <td>
                                 {{relation.frequencyType.name}}
@@ -109,7 +109,7 @@
                             <td ng-if="relation.contract">
                                 Navn: {{relation.contract.name}}
                                 <br />
-                                Id: {{relation.contract.id}}
+                                Uuid: {{relation.contract.uuid}}
                             </td>
                             <td ng-if="!relation.contract">Ingen kontrakt</td>
                         </tr>
@@ -120,11 +120,11 @@
                 <div class="panel panel-default" ng-if="systemCatalogVm.migrationReportDTO.affectedDataProcessingRegistrations.length > 0">
                     <table class="table">
                         <tr>
-                            <th>Id</th>
+                            <th>Uuid</th>
                             <th>Navn</th>
                         </tr>
                         <tr ng-repeat="dpr in systemCatalogVm.migrationReportDTO.affectedDataProcessingRegistrations">
-                            <td class="idTableDataCellFormat">{{dpr.id}}</td>
+                            <td class="idTableDataCellFormat">{{dpr.uuid}}</td>
                             <td>{{dpr.name}}</td>
                         </tr>
                     </table>
