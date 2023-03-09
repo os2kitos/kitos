@@ -36,7 +36,7 @@
         public modal: kendo.ui.Window;
         public modalMigration: kendo.ui.Window;
         public canCreate = this.userAccessRights.canCreate;
-        public canMigrate = this.userMigrationRights.canExecuteMigration;
+        public canMigrate = false;
         public migrationReportDTO: Models.ItSystemUsage.Migration.IItSystemUsageMigrationDTO;
         public allowToggleUsage = false;
         private showInactiveSystems: boolean;
@@ -77,7 +77,7 @@
             private notify,
             private user: Services.IUser,
             private userAccessRights,
-            private userMigrationRights,
+            private userMigrationRights: Models.Api.ItSystemUsage.ItSystemUsageMigrationPermissionsDto,
             private gridStateService: Services.IGridStateFactory,
             private $uibModal,
             private exportGridToExcelService,
@@ -95,6 +95,12 @@
             $scope.formatSystemName = Kitos.Helpers.SystemNameFormat.apply;
             this.showInactiveSystems = ItSystem.Settings.OverviewState.getShowInactiveSystems($window, user.id, this.pageName);
             this.updateToggleActiveSystemsMasterFilterBtnText();
+
+            const filteredCommands = this.userMigrationRights.commands.filter(x => x.id === 'system-usage-migration_execute');
+            if (filteredCommands.length > 0)
+                this.canMigrate = filteredCommands[0].canExecute;
+                
+
 
             $scope.$on("kendoWidgetCreated",
                 (event, widget) => {
@@ -1144,8 +1150,8 @@
                                 .createSystemUsageAuthorization()
                                 .getOverviewAuthorization()
                         ],
-                        userMigrationRights: ["$http", $http => $http.get("api/v1/ItSystemUsageMigration/Accessibility")
-                            .then(result => result.data.response)
+                        userMigrationRights: ["$http", $http => $http.get("api/v2/internal/it-system-usages/permissions/commands")
+                            .then(result => result.data)
                         ],
                     }
                 });

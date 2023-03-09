@@ -477,6 +477,7 @@
     <TypeScriptCompile Include="app\helpers\sub-nav-helper.ts" />
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
+    <TypeScriptCompile Include="app\models\Api\command-permission-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\admin-rights-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\personal-data-option.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
@@ -498,6 +499,7 @@
     <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-error.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-life-cycle-status.ts" />
+    <TypeScriptCompile Include="app\models\Api\it-system-usage\it-system-usage-migration-command-permissions-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
