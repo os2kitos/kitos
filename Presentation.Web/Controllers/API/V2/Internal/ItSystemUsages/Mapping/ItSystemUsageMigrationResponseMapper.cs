@@ -39,7 +39,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping
 
         public ItSystemUsageMigrationPermissionsResponseDTO MapCommandPermissions(IEnumerable<CommandPermissionResult> permissionResult)
         {
-            return new ItSystemUsageMigrationPermissionsResponseDTO(permissionResult.Select(_commandPermissionsResponseMapper.MapCommandPermission));
+            return new ItSystemUsageMigrationPermissionsResponseDTO(permissionResult.Select(_commandPermissionsResponseMapper.MapCommandPermission).ToList());
         }
 
         private static ItSystemUsageRelationMigrationV2ResponseDTO MapRelationMigration(SystemRelation entity)
