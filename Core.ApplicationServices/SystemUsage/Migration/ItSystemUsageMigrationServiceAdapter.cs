@@ -94,7 +94,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
         private Result<ItSystemUsage, OperationError> WithModifyAccess(ItSystemUsage usage)
         {
-            return _authorizationContext.AllowReads(usage)
+            return _authorizationContext.AllowModify(usage)
                 ? usage
                 : new OperationError($"User is not allowed to modify It System Usage with uuid: {usage.Uuid}", OperationFailure.Forbidden);
         }
