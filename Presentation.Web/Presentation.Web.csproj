@@ -903,7 +903,6 @@
     <Compile Include="Models\API\V1\GDPR\DataProcessingRegistrationDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\DataProcessingRegistrationOversightDateDTO.cs" />
     <Compile Include="Models\API\V1\HierachyNodeDTO.cs" />
-    <Compile Include="Models\API\V1\ItSystemUsageMigration\RelationMigrationDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemUsageOptionsDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\GDPR\GDPRExportReportColumns.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\GDPR\GDPRExportReportCsvMapper.cs" />
@@ -919,8 +918,6 @@
     <Compile Include="Infrastructure\Authorization\Controller\Crud\IControllerCrudAuthorization.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\General\ContextBasedAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\RootEntityCrudAuthorization.cs" />
-    <Compile Include="Models\API\V1\ItSystemUsageMigration\ItSystemUsageMigrationAccessDTO.cs" />
-    <Compile Include="Models\API\V1\ItSystemUsageMigration\ItSystemUsageMigrationDTO.cs" />
     <Compile Include="Models\API\V1\ItSystem\UsingOrganizationDTO.cs" />
     <Compile Include="Models\API\V1\KLEStatusDTO.cs" />
     <Compile Include="Models\API\V1\NamedEntityWithEnabledStatusDTO.cs" />
