@@ -88,11 +88,16 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(expected.ExposedBySystemUuid, actual.ExposedBySystem?.Uuid);
             Assert.Equal(expected.ItInterfaceTypeUuid, actual.ItInterfaceType?.Uuid);
             Assert.Equal(expected.Scope, actual.Scope);
-            Assert.Equivalent(expected.Data ?? new List<ItInterfaceDataRequestDTO>(), actual.Data.Select(x => new ItInterfaceDataRequestDTO()
+            Assert.Equivalent(expected.Data ?? new List<ItInterfaceDataRequestDTO>(), actual.Data.Select(ToItInterfaceDataRequestDto));
+        }
+
+        protected static ItInterfaceDataRequestDTO ToItInterfaceDataRequestDto(ItInterfaceDataResponseDTO x)
+        {
+            return new ItInterfaceDataRequestDTO()
             {
                 Description = x.Description,
                 DataTypeUuid = x.DataType?.Uuid
-            }));
+            };
         }
     }
 }

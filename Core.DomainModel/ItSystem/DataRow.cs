@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.DomainModel.Extensions;
 
 namespace Core.DomainModel.ItSystem
 {
@@ -32,5 +33,12 @@ namespace Core.DomainModel.ItSystem
         public string Data { get; set; }
 
         public Guid Uuid { get; set; }
+
+        public void ResetDataType()
+        {
+            DataType?.Track();
+            DataType = null;
+            DataTypeId = null;
+        }
     }
 }

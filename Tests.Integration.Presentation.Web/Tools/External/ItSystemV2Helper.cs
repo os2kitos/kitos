@@ -333,12 +333,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
-        public static async Task<ResourcePermissionsResponseDTO> GetPermissionsAsync(string token, Guid uuid)
+        public static async Task<ItSystemPermissionsResponseDTO> GetPermissionsAsync(string token, Guid uuid)
         {
             using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{BaseItSystemPath}/{uuid:D}/permissions"), token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<ResourcePermissionsResponseDTO>();
+            return await response.ReadResponseBodyAsAsync<ItSystemPermissionsResponseDTO>();
         }
 
         public static async Task<ResourceCollectionPermissionsResponseDTO> GetCollectionPermissionsAsync(string token, Guid organizationUuid)

@@ -210,7 +210,8 @@ namespace Core.ApplicationServices.SystemUsage
 
         public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid)
         {
-            return GetReadableItSystemUsageByUuid(uuid).Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
+            return GetReadableItSystemUsageByUuid(uuid)
+                .Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
         }
 
         public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)

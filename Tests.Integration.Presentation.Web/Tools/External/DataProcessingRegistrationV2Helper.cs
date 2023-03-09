@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Presentation.Web.Infrastructure;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -53,7 +54,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
                 queryParameters.Add(new KeyValuePair<string, string>("changedSinceGtEq", changedSinceGtEq.Value.ToString("O")));
 
             var query = string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"));
-            
+
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations?{query}"), token);
         }
 
@@ -65,9 +66,13 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetDPRAsync(string token, Guid uuid)
+        public static async Task<HttpResponseMessage> SendGetDPRAsync(string token, Guid uuid, bool withIntegerEnums = false)
         {
-            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid:D}"), token);
+            var headers = new List<KeyValuePair<string, string>>
+            {
+                new(KitosConstants.Headers.SerializeEnumAsInteger, withIntegerEnums ? bool.TrueString : bool.FalseString)
+            };
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid:D}"), token, headers);
         }
 
         public static async Task<DataProcessingRegistrationResponseDTO> PostAsync(string token, CreateDataProcessingRegistrationRequestDTO payload)

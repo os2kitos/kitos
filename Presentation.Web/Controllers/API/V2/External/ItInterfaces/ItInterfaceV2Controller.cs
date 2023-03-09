@@ -34,7 +34,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         private readonly IItInterfaceWriteModelMapper _writeModelMapper;
         private readonly IItInterfaceWriteService _writeService;
         private readonly IItInterfaceResponseMapper _responseMapper;
-		private readonly IResourcePermissionsResponseMapper _permissionResponseMapper;
+        private readonly IResourcePermissionsResponseMapper _permissionResponseMapper;
 
         public ItInterfaceV2Controller(
             IItInterfaceRightsHolderService rightsHolderService,
@@ -42,7 +42,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             IItInterfaceWriteModelMapper writeModelMapper,
             IItInterfaceWriteService writeService,
             IItInterfaceResponseMapper responseMapper,
-			IResourcePermissionsResponseMapper permissionResponseMapper)
+            IResourcePermissionsResponseMapper permissionResponseMapper)
         {
             _rightsHolderService = rightsHolderService;
             _itInterfaceService = itInterfaceService;
@@ -75,7 +75,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             return _writeService
                 .Create(request.OrganizationUuid, creationParameters)
                 .Select(ToItInterfaceResponseDTO)
-                .Match(MapItInterfaceCreatedResponse, FromOperationError);
+                .Match(ToCreatedResponse, FromOperationError);
         }
 
         /// <summary>
@@ -130,6 +130,78 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         }
 
         /// <summary>
+        /// Creates a new IT-Interface data description
+        /// </summary>
+        /// <param name="request">A collection of specific IT-Interface data description values</param>
+        /// <returns>Location header is set to uri for newly created IT-Interface data description</returns>
+        [HttpPost]
+        [Route("it-interfaces/{uuid}/data")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItInterfaceDataResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PostDataDescription([NonEmptyGuid] Guid uuid, [FromBody] ItInterfaceDataRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var parameters = _writeModelMapper.MapDataDescription(request);
+
+            return _writeService
+                .AddDataDescription(uuid, parameters)
+                .Select(_responseMapper.ToDataResponseDTO)
+                .Match(ToCreatedResponse, FromOperationError);
+        }
+
+        /// <summary>
+        /// Replace an existing IT-Interface data description
+        /// </summary>
+        /// <param name="request">A collection of specific IT-Interface data description values</param>
+        /// <returns>Updated data description</returns>
+        [HttpPut]
+        [Route("it-interfaces/{uuid}/data/{dataDescriptionUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceDataResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutDataDescription([NonEmptyGuid] Guid uuid, [NonEmptyGuid] Guid dataDescriptionUuid, [FromBody] ItInterfaceDataRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var parameters = _writeModelMapper.MapDataDescription(request);
+
+            return _writeService
+                .UpdateDataDescription(uuid, dataDescriptionUuid, parameters)
+                .Select(_responseMapper.ToDataResponseDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Delete an existing IT-Interface data description
+        /// </summary>
+        /// <returns>Updated data description</returns>
+        [HttpDelete]
+        [Route("it-interfaces/{uuid}/data/{dataDescriptionUuid}")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteDataDescription([NonEmptyGuid] Guid uuid, [NonEmptyGuid] Guid dataDescriptionUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .DeleteDataDescription(uuid, dataDescriptionUuid)
+                .Match(FromOperationError, NoContent);
+        }
+
+        /// <summary>
         /// Creates a new IT-Interface based on given input values
         /// </summary>
         /// <param name="request">A collection of specific IT-Interface values</param>
@@ -153,7 +225,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             return _rightsHolderService
                 .CreateNewItInterface(request.RightsHolderUuid, creationParameters)
                 .Select(ToRightsHolderItInterfaceResponseDTO)
-                .Match(MapItInterfaceCreatedResponse, FromOperationError);
+                .Match(ToCreatedResponse, FromOperationError);
         }
 
         /// <summary>
@@ -342,10 +414,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             if (changedSinceGtEq.HasValue)
                 refinements.Add(new QueryByChangedSinceGtEq<ItInterface>(changedSinceGtEq.Value));
 
-            if(nameEquals != null)
+            if (nameEquals != null)
                 refinements.Add(new QueryByName<ItInterface>(nameEquals));
 
-            if(usedInOrganizationUuid.HasValue)
+            if (usedInOrganizationUuid.HasValue)
                 refinements.Add(new QueryInterfaceByUsedInOrganizationWithUuid(usedInOrganizationUuid.Value));
 
             if(nameContains != null)
@@ -393,7 +465,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <returns></returns>
         [HttpGet]
         [Route("it-interfaces/{interfaceUuid}/permissions")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfacePermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -404,7 +476,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
             return _itInterfaceService
                 .GetPermissions(interfaceUuid)
-                .Select(_permissionResponseMapper.Map)
+                .Select(_responseMapper.Map)
                 .Match(Ok, FromOperationError);
         }
 
@@ -441,7 +513,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             return _responseMapper.ToItInterfaceResponseDTO(itInterface);
         }
 
-        private CreatedNegotiatedContentResult<T> MapItInterfaceCreatedResponse<T>(T dto) where T : IHasUuidExternal
+        private CreatedNegotiatedContentResult<T> ToCreatedResponse<T>(T dto) where T : IHasUuidExternal
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
@@ -145,7 +146,7 @@ namespace Core.ApplicationServices.Interface.Write
                 parameters.Scope = OptionalValueChange<AccessModifier>.None;
 
                 var result = _itInterfaceService
-                    .CreateNewItInterface(organizationId.Value, name.NewValue, interfaceId.MapOptionalChangeWithFallback(string.Empty),accessModifier: accessModifier)
+                    .CreateNewItInterface(organizationId.Value, name.NewValue, interfaceId.MapOptionalChangeWithFallback(string.Empty), accessModifier: accessModifier)
                     .Bind(itInterface => ApplyUpdates(itInterface, parameters));
 
                 if (result.Ok)
@@ -172,15 +173,20 @@ namespace Core.ApplicationServices.Interface.Write
             if (parameters == null)
                 throw new ArgumentNullException(nameof(parameters));
 
+            return Mutate(interfaceUuid, itInterface => ApplyUpdates(itInterface, parameters));
+        }
+
+        public Result<TResult, OperationError> Mutate<TResult>(Guid interfaceUuid, Func<ItInterface, Result<TResult, OperationError>> withMutation)
+        {
             using var transaction = _transactionManager.Begin();
             try
             {
-                var result = GetItInterfaceAndAuthorizeAccess(interfaceUuid)
-                    .Bind(itInterface => ApplyUpdates(itInterface, parameters));
+                var getInterfaceResult = GetItInterfaceAndAuthorizeAccess(interfaceUuid);
+                var result = getInterfaceResult.Bind(withMutation);
 
                 if (result.Ok)
                 {
-                    SaveAndNotify(result.Value, transaction);
+                    SaveAndNotify(getInterfaceResult.Value, transaction);
                 }
                 else
                 {
@@ -217,6 +223,21 @@ namespace Core.ApplicationServices.Interface.Write
                 _logger.Error(e, "Failed deleting It-Interface with uuid {uuid}", interfaceUuid);
                 return new OperationError(OperationFailure.UnknownError);
             }
+        }
+
+        public Result<DataRow, OperationError> AddDataDescription(Guid interfaceUuid, ItInterfaceDataWriteModel parameters)
+        {
+            return Mutate(interfaceUuid, itInterface => _itInterfaceService.AddInterfaceData(itInterface.Id, parameters));
+        }
+
+        public Result<DataRow, OperationError> UpdateDataDescription(Guid interfaceUuid, Guid dataDescriptionUuid, ItInterfaceDataWriteModel parameters)
+        {
+            return Mutate(interfaceUuid, itInterface => _itInterfaceService.UpdateInterfaceData(itInterface.Id, dataDescriptionUuid, parameters));
+        }
+
+        public Maybe<OperationError> DeleteDataDescription(Guid interfaceUuid, Guid dataDescriptionUuid)
+        {
+            return Mutate(interfaceUuid, itInterface => _itInterfaceService.DeleteInterfaceData(itInterface.Id, dataDescriptionUuid)).MatchFailure();
         }
 
         private Result<ItInterface, OperationError> WithWriteAccess(ItInterface itInterface)

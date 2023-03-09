@@ -1451,7 +1451,44 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var permissions = result.Value;
-            Assert.Equivalent(new ResourcePermissionsResult(read, modify, delete), permissions);
+            Assert.Equivalent(new SystemPermissions(new ResourcePermissionsResult(read, modify, delete), Array.Empty<SystemDeletionConflict>()), permissions);
+        }
+
+        [Theory]
+        [InlineData(true, true, true, true)]
+        [InlineData(false, true, true, true)]
+        [InlineData(true, false, false, false)]
+        [InlineData(true, false, false, true)]
+        [InlineData(true, false, true, false)]
+        [InlineData(true, true, false, false)]
+        public void Can_Get_Permissions_With_Deletion_Conflicts(bool allowDelete, bool withUsages, bool withChildren, bool withExposures)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var itSystem = new ItSystem { Uuid = uuid };
+            ExpectGetSystemReturns(uuid, itSystem);
+            ExpectAllowReadsReturns(itSystem, true);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectAllowDeleteReturns(itSystem, allowDelete);
+            if (withUsages) itSystem.Usages.Add(new ItSystemUsage());
+            if (withExposures) itSystem.ItInterfaceExhibits.Add(new ItInterfaceExhibit());
+            if (withChildren) itSystem.Children.Add(new ItSystem());
+
+
+            //Act
+            var result = _sut.GetPermissions(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var permissions = result.Value;
+            var expectedConflicts = new List<SystemDeletionConflict>();
+            if (allowDelete)
+            {
+                if (withUsages) expectedConflicts.Add(SystemDeletionConflict.InUse);
+                if (withChildren) expectedConflicts.Add(SystemDeletionConflict.HasChildren);
+                if (withExposures) expectedConflicts.Add(SystemDeletionConflict.HasInterfaceExhibits);
+            }
+            Assert.Equivalent(new SystemPermissions(new ResourcePermissionsResult(true, true, allowDelete), expectedConflicts), permissions);
         }
 
         [Fact]
@@ -1476,7 +1513,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var organizationUuid = A<Guid>();
-            var organization = new Organization {Id = A<int>()};
+            var organization = new Organization { Id = A<int>() };
 
             ExpectOrganizationServiceGetOrganizationReturns(organizationUuid, organization);
             ExpectAllowCreateReturns(organization.Id, create);

@@ -15,6 +15,7 @@
             $scope.url = 'api/excel?organizationId=' + user.currentOrganizationId + '&exportOrgUnits';
             $scope.title = 'organisationsenheder';
             $scope.currentOrganizationUuid = user.currentOrganizationUuid;
+            $scope.showFkOrgSection = true;
             //Import OrganizationUnits
             $scope.submit = function () {
                 var msg = notify.addInfoMessage("Læser excel ark...", false);

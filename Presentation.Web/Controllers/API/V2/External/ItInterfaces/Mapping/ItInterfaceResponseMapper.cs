@@ -3,6 +3,7 @@ using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Response.Interface;
 using System.Linq;
+using Core.ApplicationServices.Model.Interface;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
 {
@@ -16,7 +17,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
                 LastModifiedBy = itInterface.LastChangedByUser?.MapIdentityNamePairDTO(),
                 Scope = itInterface.AccessModifier.ToChoice(),
                 ItInterfaceType = itInterface.Interface?.MapIdentityNamePairDTO(),
-                Data = itInterface.DataRows.Select(ToDTO).ToList(),
+                Data = itInterface.DataRows.Select(ToDataResponseDTO).ToList(),
                 OrganizationContext = itInterface.Organization?.MapShallowOrganizationResponseDTO()
             };
             MapBaseInformation(itInterface, dto);
@@ -30,13 +31,24 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
             return dto;
         }
 
-        private static ItInterfaceDataResponseDTO ToDTO(DataRow arg)
+        public ItInterfaceDataResponseDTO ToDataResponseDTO(DataRow row)
         {
             return new ItInterfaceDataResponseDTO
             {
-                DataType = arg.DataType?.MapIdentityNamePairDTO(),
-                Uuid = arg.Uuid,
-                Description = arg.Data
+                DataType = row.DataType?.MapIdentityNamePairDTO(),
+                Uuid = row.Uuid,
+                Description = row.Data
+            };
+        }
+
+        public ItInterfacePermissionsResponseDTO Map(ItInterfacePermissions permissions)
+        {
+            return new ItInterfacePermissionsResponseDTO()
+            {
+                Delete = permissions.BasePermissions.Delete,
+                Read = permissions.BasePermissions.Read,
+                Modify = permissions.BasePermissions.Modify,
+                DeletionConflicts = permissions.DeletionConflicts.Select(x => x.ToChoice()).ToList()
             };
         }
 

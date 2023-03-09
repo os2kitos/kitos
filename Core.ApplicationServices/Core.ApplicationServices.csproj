@@ -160,6 +160,8 @@
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDate.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationRoles.cs" />
     <Compile Include="Model\Interface\ItInterfaceDataWriteModel.cs" />
+    <Compile Include="Model\Interface\ItInterfaceDeletionConflict.cs" />
+    <Compile Include="Model\Interface\ItInterfacePermissions.cs" />
     <Compile Include="Model\Interface\ItInterfaceWriteModel.cs" />
     <Compile Include="Model\Interface\ItInterfaceWriteModelParametersBase.cs" />
     <Compile Include="Model\Messages\WritePublicMessagesParams.cs" />
@@ -213,6 +215,8 @@
     <Compile Include="Model\Shared\Write\UserRolePair.cs" />
     <Compile Include="Model\System\RightsHolderSystemUpdateParameters.cs" />
     <Compile Include="Model\System\SharedSystemUpdateParameters.cs" />
+    <Compile Include="Model\System\SystemDeletionConflict.cs" />
+    <Compile Include="Model\System\SystemPermissions.cs" />
     <Compile Include="Model\System\SystemUpdateParameters.cs" />
     <Compile Include="Model\Interface\RightsHolderItInterfaceUpdateParameters.cs" />
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
