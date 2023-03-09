@@ -56,23 +56,6 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Theory]
-        [InlineData("")]
-        [InlineData(" ")]
-        [InlineData(null)]
-        public void GetUnusedItSystemsByOrganizationByName_Returns_BadInput_On_Empty_Name_Content(string nameContent)
-        {
-            //Arrange
-            var organizationId = A<int>();
-
-            //Act
-            var result = _sut.GetUnusedItSystemsByOrganizationByName(organizationId, nameContent, A<int>(), A<bool>());
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-        }
-
-        [Theory]
         [InlineData(0)]
         [InlineData(26)]
         public void GetUnusedItSystemsByOrganization_ReturnBadInput_On_NumberOfItSystems_Less_Than_1_Or_More_Than_25(int numberOfItSystems)

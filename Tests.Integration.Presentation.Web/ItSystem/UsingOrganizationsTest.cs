@@ -36,7 +36,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IReadOnlyList<UsingOrganizationDTO>>();
                 //Assert
                 var usingOrganization = Assert.Single(response);
-                Assert.Equal(newUsage.Id, usingOrganization.SystemUsageId);
+                Assert.Equal(newUsage.Uuid, usingOrganization.SystemUsageUuid);
                 Assert.Equal(TestEnvironment.DefaultOrganizationId, usingOrganization.Organization.Id);
             }
         }
@@ -58,8 +58,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IReadOnlyList<UsingOrganizationDTO>>();
                 //Assert
                 Assert.Equal(2, response.Count);
-                Assert.Contains(firstUsage.Id, response.Select(x => x.SystemUsageId));
-                Assert.Contains(secondUsage.Id, response.Select(x => x.SystemUsageId));
+                Assert.Contains(firstUsage.Uuid, response.Select(x => x.SystemUsageUuid));
+                Assert.Contains(secondUsage.Uuid, response.Select(x => x.SystemUsageUuid));
                 Assert.Contains(TestEnvironment.DefaultOrganizationId, response.Select(x => x.Organization.Id));
                 Assert.Contains(TestEnvironment.SecondOrganizationId, response.Select(x => x.Organization.Id));
             }

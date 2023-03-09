@@ -85,9 +85,9 @@
             private $window,
             private oldItSystemName,
             private oldItSystemId,
-            private oldItSystemUsageId,
+            private oldItSystemUsageUuid,
             private newItSystemObject,
-            private municipalityId,
+            private municipalityUuid,
             private municipalityName,
             public migrationConsequenceText) {
             this.allowToggleUsage = systemUsageUserAccessRights.canCreate;
@@ -135,11 +135,11 @@
                     quietMillis: 500,
                     transport: (queryParams) => {
                         var request = this.$http.get(
-                            "api/v1/ItSystemUsageMigration/UnusedItSystems?" +
-                            `organizationId=${this.municipalityId}` +
-                            `&nameContent=${queryParams.data.query}` +
+                            "api/v2/internal/it-system-usages/unused?" +
+                            `organizationUuid=${this.municipalityUuid}` +
                             "&numberOfItSystems=25" +
-                            "&getPublicFromOtherOrganizations=true");
+                            "&getPublicFromOtherOrganizations=true" +
+                            `&nameContent=${queryParams.data.query}`);
                         request.then(queryParams.success);
 
                         request.catch(() => {
@@ -153,10 +153,10 @@
                         var results = [];
 
                         //for each system usages
-                        _.each(data.data.response, (system: { id; name; }) => {
+                        _.each(data.data, (system: { uuid; name; deactivated}) => {
                             results.push({
                                 //the id of the system is the id, that is selected
-                                id: system.id,
+                                id: system.uuid,
                                 //the name of the system is the label for the select2
                                 text: system.name,
                                 //saving the system for later use
@@ -867,9 +867,9 @@
 
         private resetMigrationFlow = () => {
             this.newItSystemObject = null;
-            this.municipalityId = null;
+            this.municipalityUuid = null;
             this.municipalityName = null;
-            this.oldItSystemUsageId = null;
+            this.oldItSystemUsageUuid = null;
             this.oldItSystemName = null;
             this.oldItSystemId = null;
             this.resetItSystemSelection();
@@ -901,11 +901,11 @@
             return this.$(name) as any;
         }
 
-        public beginItSystemMigration = (municipalityId: number, municipalityName: string, usageId: number) => {
+        public beginItSystemMigration = (municipalityUuid: string, municipalityName: string, usageUuid: string) => {
             this.modal.close();
-            this.municipalityId = municipalityId;
+            this.municipalityUuid = municipalityUuid;
             this.municipalityName = municipalityName;
-            this.oldItSystemUsageId = usageId;
+            this.oldItSystemUsageUuid = usageUuid;
             this.modalMigration.setOptions({
                 close: (e) => {
                     this.closeSelectionDropdown();
@@ -920,9 +920,9 @@
             var self = this;
             this.newItSystemObject = this.getItSystemSelection();
             if (this.newItSystemObject != null) {
-                this.getMigrationReport(this.oldItSystemUsageId, this.newItSystemObject.id)
+                this.getMigrationReport(this.oldItSystemUsageUuid, this.newItSystemObject.id)
                     .then(function onSuccess(result) {
-                        self.migrationReportDTO = result.data.response;
+                        self.migrationReportDTO = result.data;
 
                         self.modalMigrationConsequence.setOptions({
                             close: (_) => true,
@@ -937,14 +937,14 @@
             }
         }
 
-        private getMigrationReport: any = (usageId, toSystemId) => {
-            var url = `api/v1/ItSystemUsageMigration?usageId=${usageId}&toSystemId=${toSystemId}`;
+        private getMigrationReport: any = (usageUuid, toSystemUuid) => {
+            var url = `api/v2/internal/it-system-usages/${usageUuid}/migration?toSystemUuid=${toSystemUuid}`;
 
             return this.$http({ method: "GET", url: url, });
         }
 
-        private executeMigration: any = (usageId, toSystemId) => {
-            var url = `api/v1/ItSystemUsageMigration?usageId=${usageId}&toSystemId=${toSystemId}`;
+        private executeMigration: any = (usageUuid, toSystemUuid) => {
+            var url = `api/v2/internal/it-system-usages/${usageUuid}/migration?toSystemUuid=${toSystemUuid}`;
 
             return this.$http({ method: "POST", url: url, });
         }
@@ -962,7 +962,7 @@
         public performMigration = () => {
             var self = this;
             if (this.oldItSystemName != null || this.newItSystemObject != null) {
-                this.executeMigration(this.oldItSystemUsageId, this.newItSystemObject.system.id)
+                this.executeMigration(this.oldItSystemUsageUuid, this.newItSystemObject.id)
                     .then(function onSuccess(result) {
                         self.modalMigrationConsequence.close();
                         self.mainGrid.dataSource.fetch();
@@ -1004,11 +1004,11 @@
                 {
                     field: "organization.name", title: "Organisation",
                     template: dataItem => {
-                        var orgId = dataItem.organization.id;
+                        var orgUuid = dataItem.organizationUuid;
                         var orgName = dataItem.organization.name;
-                        var usageId = dataItem.systemUsageId;
+                        var usageUuid = dataItem.systemUsageUuid;
                         if (this.canMigrate) {
-                            return `<p data-element-type='MigrationMoveOrgName'>${orgName}</p> <button ng-click='systemCatalogVm.beginItSystemMigration(${orgId}, "${orgName}", ${usageId})' data-element-type='migrateItSystem' class='k-button pull-right'>Flyt</button>`;
+                            return `<p data-element-type='MigrationMoveOrgName'>${orgName}</p> <button ng-click='systemCatalogVm.beginItSystemMigration("${orgUuid}", "${orgName}", "${usageUuid}")' data-element-type='migrateItSystem' class='k-button pull-right'>Flyt</button>`;
                         } else {
                             return `<p data-element-type='MigrationMoveOrgName'>${orgName}</p>`;
                         }

@@ -46,14 +46,14 @@
                         </tr>
                         <tr>
                             <td>
-                                Navn: {{formatSystemName(systemCatalogVm.migrationReportDTO.fromSystem.name,systemCatalogVm.migrationReportDTO.fromSystem.disabled) }}
+                                Navn: {{formatSystemName(systemCatalogVm.migrationReportDTO.fromSystem.name,systemCatalogVm.migrationReportDTO.fromSystem.deactivated) }}
                                 <br />
-                                Id: {{ systemCatalogVm.migrationReportDTO.fromSystem.id}}
+                                Uuid: {{ systemCatalogVm.migrationReportDTO.fromSystem.uuid}}
                             </td>
                             <td>
-                                Navn: {{formatSystemName(systemCatalogVm.migrationReportDTO.toSystem.name,systemCatalogVm.migrationReportDTO.toSystem.disabled) }}
+                                Navn: {{formatSystemName(systemCatalogVm.migrationReportDTO.toSystem.name,systemCatalogVm.migrationReportDTO.toSystem.deactivated) }}
                                 <br />
-                                Id: {{ systemCatalogVm.migrationReportDTO.toSystem.id}}
+                                Uuid: {{ systemCatalogVm.migrationReportDTO.toSystem.uuid}}
                             </td>
                         </tr>
                     </table>

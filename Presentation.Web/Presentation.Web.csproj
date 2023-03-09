@@ -913,7 +913,6 @@
     <Compile Include="Controllers\API\V1\OData\ItContractItSystemUsagesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\SensitiveDataTypesController.cs" />
     <Compile Include="Extensions\HttpMethodIntent.cs" />
-    <Compile Include="Controllers\API\V1\ItSystemUsageMigrationController.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapper.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\ChildEntityCrudAuthorization.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\General\IControllerAuthorizationStrategy.cs" />

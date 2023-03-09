@@ -1,16 +1,19 @@
-﻿using Core.ApplicationServices.Model.Shared;
+﻿using System;
+using Core.ApplicationServices.Model.Shared;
 
 namespace Core.ApplicationServices.Model.System
 {
     public class UsingOrganization
     {
-        public int ItSystemUsageId { get; }
+        public Guid ItSystemUsageUuid { get; }
         public NamedEntity Organization { get; }
+        public Guid OrganizationUuid { get; set; }
 
-        public UsingOrganization(int usageId, NamedEntity organization)
+        public UsingOrganization(Guid usageUuid, NamedEntity organization, Guid organizationUuid)
         {
-            ItSystemUsageId = usageId;
+            ItSystemUsageUuid = usageUuid;
             Organization = organization;
+            OrganizationUuid = organizationUuid;
         }
     }
 }
