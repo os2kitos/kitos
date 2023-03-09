@@ -656,7 +656,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             var organizationName = CreateName();
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
-                organizationName, "11224455", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+                organizationName, "11224455", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             return organization;
         }
 

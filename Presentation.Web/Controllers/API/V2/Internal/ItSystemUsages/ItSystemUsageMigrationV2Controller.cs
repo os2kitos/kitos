@@ -6,15 +6,13 @@ using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.SystemUsage;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
-using Presentation.Web.Models.API.V2.Response.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
@@ -24,12 +22,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
     {
         private readonly IItSystemUsageMigrationResponseMapper _responseMapper;
         private readonly IItSystemUsageMigrationServiceAdapter _adapter;
+        private readonly IResourcePermissionsResponseMapper _resourcePermissionsResponseMapper;
 
         public ItSystemUsageMigrationV2Controller(IItSystemUsageMigrationResponseMapper responseMapper,
-            IItSystemUsageMigrationServiceAdapter adapter)
+            IItSystemUsageMigrationServiceAdapter adapter,
+            IResourcePermissionsResponseMapper resourcePermissionsResponseMapper)
         {
             _responseMapper = responseMapper;
             _adapter = adapter;
+            _resourcePermissionsResponseMapper = resourcePermissionsResponseMapper;
         }
 
         [HttpGet]
@@ -78,7 +79,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
                 return BadRequest();
 
             return _adapter.GetCommandPermissions(usageUuid)
-                .Select(_responseMapper.MapCommandPermissions)
+                .Select(_resourcePermissionsResponseMapper.MapCommandPermissions<ItSystemUsageMigrationPermissionsResponseDTO>)
                 .Match(Ok, FromOperationError);
         }
 

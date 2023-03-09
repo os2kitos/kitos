@@ -5,6 +5,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.ApplicationServices.Organizations;
+using Core.ApplicationServices.Shared;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainModel;
@@ -345,16 +346,82 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(expectedResult.FailureType, result.Error.FailureType);
         }
 
-        [Fact]
-        public void Can_GetCommandPermissions()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_GetCommandPermissions(bool canExecute)
         {
             //Arrange
+            var usageUuid = A<Guid>();
+            var usageId = A<int>();
 
+            var usage = new ItSystemUsage();
+            ExpectResolveIdReturns<ItSystemUsage>(usageUuid, usageId);
+            ExpectGetUsageByIdReturns(usageId, usage);
+            ExpectAllowReads(usage, true);
+            ExpectCanExecuteMigration(canExecute);
 
             //Act
-
+            var result = _sut.GetCommandPermissions(usageUuid);
 
             //Assert
+            Assert.True(result.Ok);
+            var executeCommand = Assert.Single(result.Value, x => x.Id == CommandPermissionConstraints.UsageMigration.Execute);
+            Assert.Equal(canExecute, executeCommand.CanExecute);
+        }
+
+        [Fact]
+        public void GetCommandPermissions_Returns_Forbidden_If_Not_Allowed_To_Read()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var usageId = A<int>();
+
+            var usage = new ItSystemUsage();
+            ExpectResolveIdReturns<ItSystemUsage>(usageUuid, usageId);
+            ExpectGetUsageByIdReturns(usageId, usage);
+            ExpectAllowReads(usage, false);
+
+            //Act
+            var result = _sut.GetCommandPermissions(usageUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetCommandPermissions_Returns_NotFound_When_Usage_Is_Null()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+            var usageId = A<int>();
+
+            ExpectResolveIdReturns<ItSystemUsage>(usageUuid, usageId);
+            ExpectGetUsageByIdReturns(usageId, null);
+
+            //Act
+            var result = _sut.GetCommandPermissions(usageUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetCommandPermissions_Returns_NotFound_When_UsageId_Is_Not_Found()
+        {
+            //Arrange
+            var usageUuid = A<Guid>();
+
+            ExpectResolveIdReturns<ItSystemUsage>(usageUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.GetCommandPermissions(usageUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         private static ItSystemUsageMigration CreateItSystemUsageMigration(Guid fromUsageUuid, Guid toSystemUuid)
@@ -385,6 +452,16 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var transactionMock = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transactionMock.Object);
             return transactionMock;
+        }
+
+        private void ExpectGetUsageByIdReturns(int usageId, ItSystemUsage result)
+        {
+            _systemUsageService.Setup(x => x.GetById(usageId)).Returns(result);
+        }
+
+        private void ExpectCanExecuteMigration(bool result)
+        {
+            _systemUsageMigrationService.Setup(x => x.CanExecuteMigration()).Returns(result);
         }
 
         private void ExpectExecuteSystemUsageMigrationReturns(int usageId, int systemId, Result<ItSystemUsage, OperationError> result)

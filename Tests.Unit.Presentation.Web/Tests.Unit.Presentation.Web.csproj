@@ -301,6 +301,7 @@
     <Compile Include="Models\V2\ItInterfaceResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItInterfaceWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemResponseMapperTest.cs" />
+    <Compile Include="Models\V2\ItSystemUsageMigrationResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemWriteModelMapperTest.cs" />

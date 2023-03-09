@@ -6,10 +6,6 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage
 {
     public class ItSystemUsageMigrationPermissionsResponseDTO: IHasCommandPermissionsResponseDTO
     {
-        public IEnumerable<CommandPermissionResponseDTO> Commands { get; }
-        public ItSystemUsageMigrationPermissionsResponseDTO(IEnumerable<CommandPermissionResponseDTO> commands)
-        {
-            Commands = commands;
-        }
+        public IEnumerable<CommandPermissionResponseDTO> Commands { get; set; }
     }
 }

@@ -5,6 +5,6 @@ namespace Presentation.Web.Models.API.V2.SharedProperties
 {
     public interface IHasCommandPermissionsResponseDTO
     {
-        IEnumerable<CommandPermissionResponseDTO> Commands { get; }
+        IEnumerable<CommandPermissionResponseDTO> Commands { get; set; }
     }
 }

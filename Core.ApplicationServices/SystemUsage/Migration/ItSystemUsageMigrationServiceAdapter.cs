@@ -8,7 +8,6 @@ using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Shared;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Infrastructure.Services.DataAccess;
@@ -45,9 +44,8 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     .Bind(result => _systemUsageMigrationService.GetSystemUsageMigration(result.usageId, result.systemId)
                         .Bind
                         (
-                            migration => _authorizationContext.AllowReads(migration.SystemUsage) 
-                                ? Result<ItSystemUsageMigration, OperationError>.Success(migration) 
-                                : new OperationError($"User is not allowed to read It System Usage with uuid: {usageUuid}", OperationFailure.Forbidden)
+                            migration => WithReadAccess(migration.SystemUsage)
+                                .Select(_ => migration)
                         )
                     );
         }
@@ -90,15 +88,10 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         public Result<IEnumerable<CommandPermissionResult>, OperationError> GetCommandPermissions(Guid usageUuid)
         {
             return ResolveUsageId(usageUuid)
-                .Select(_systemUsageService.GetById)
-                .Bind(usage =>
+                .Bind(GetSystemUsage)
+                .Bind(WithReadAccess)
+                .Bind(_ =>
                 {
-                    if (usage == null)
-                    {
-                        return new OperationError($"ItSystemUsage with uuid: {usageUuid} was not found",
-                            OperationFailure.NotFound);
-                    }
-
                     var commandPermissions = new List<CommandPermissionResult>
                     {
                         new (CommandPermissionConstraints.UsageMigration.Execute, _systemUsageMigrationService.CanExecuteMigration())
@@ -106,6 +99,22 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
                     return Result<IEnumerable<CommandPermissionResult>, OperationError>.Success(commandPermissions);
                 });
+        }
+
+        private Result<ItSystemUsage, OperationError> GetSystemUsage(int usageId)
+        {
+            var usage = _systemUsageService.GetById(usageId);
+
+            return usage != null
+                ? usage
+                : new OperationError($"ItSystemUsage with id: {usageId} was not found", OperationFailure.NotFound);
+        }
+
+        private Result<ItSystemUsage, OperationError> WithReadAccess(ItSystemUsage usage)
+        {
+            return _authorizationContext.AllowReads(usage) 
+                ? usage
+                : new OperationError($"User is not allowed to read It System Usage with uuid: {usage.Uuid}", OperationFailure.Forbidden);
         }
 
         private Result<(int usageId, int systemId), OperationError> ResolveUsageAndSystemIds(Guid usageUuid, Guid systemUuid)
