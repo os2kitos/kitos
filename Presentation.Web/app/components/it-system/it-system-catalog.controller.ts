@@ -96,11 +96,9 @@
             this.showInactiveSystems = ItSystem.Settings.OverviewState.getShowInactiveSystems($window, user.id, this.pageName);
             this.updateToggleActiveSystemsMasterFilterBtnText();
 
-            const filteredCommands = this.userMigrationRights.commands.filter(x => x.id === 'system-usage-migration_execute');
-            if (filteredCommands.length > 0)
-                this.canMigrate = filteredCommands[0].canExecute;
-                
-
+            const command = _.find(this.userMigrationRights.commands, (x: Models.Api.CommandPermissionDTO) => x.id === 'system-usage-migration_execute');
+            if (command)
+                this.canMigrate = command.canExecute;
 
             $scope.$on("kendoWidgetCreated",
                 (event, widget) => {
