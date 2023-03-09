@@ -67,7 +67,7 @@
                             <th>Navn</th>
                         </tr>
                         <tr ng-repeat="affectedContracts in systemCatalogVm.migrationReportDTO.affectedContracts">
-                            <td class="idTableDataCellFormat">{{affectedContracts.uuid}}</td>
+                            <td>{{affectedContracts.uuid}}</td>
                             <td>{{affectedContracts.name}}</td>
                         </tr>
                     </table>
@@ -124,7 +124,7 @@
                             <th>Navn</th>
                         </tr>
                         <tr ng-repeat="dpr in systemCatalogVm.migrationReportDTO.affectedDataProcessingRegistrations">
-                            <td class="idTableDataCellFormat">{{dpr.uuid}}</td>
+                            <td>{{dpr.uuid}}</td>
                             <td>{{dpr.name}}</td>
                         </tr>
                     </table>
