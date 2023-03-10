@@ -1,6 +1,6 @@
 ﻿namespace Core.ApplicationServices.Shared
 {
-    public static class CommandPermissionConstraints
+    public static class CommandPermissionCommandIds
     {
         public static class UsageMigration
         {

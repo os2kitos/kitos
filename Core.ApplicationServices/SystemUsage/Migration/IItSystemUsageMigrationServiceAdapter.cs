@@ -6,6 +6,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Core.ApplicationServices.SystemUsage.Migration
 {
@@ -14,7 +15,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         Result<ItSystemUsageMigration, OperationError> GetMigration(Guid usageUuid, Guid toSystemUuid);
         Result<ItSystemUsage, OperationError> ExecuteMigration(Guid usageUuid, Guid toSystemUuid);
         IEnumerable<CommandPermissionResult> GetCommandPermissions();
-        Result<IEnumerable<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(Guid organizationUuid,
+        Result<IQueryable<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(Guid organizationUuid,
             int numberOfItSystems,
             bool getPublicFromOtherOrganizations,
             params IDomainQuery<ItSystem>[] conditions);

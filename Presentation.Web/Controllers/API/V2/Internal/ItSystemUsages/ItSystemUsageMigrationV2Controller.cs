@@ -39,7 +39,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         public IHttpActionResult Get([Required][NonEmptyGuid] Guid usageUuid, [Required][NonEmptyGuid] Guid toSystemUuid)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
             return _adapter.GetMigration(usageUuid, toSystemUuid)
                 .Select(_responseMapper.MapMigration)
@@ -48,6 +48,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
 
         [HttpPost]
         [Route("{usageUuid}/migration")]
+        [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.NoContent)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -56,14 +57,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         public IHttpActionResult ExecuteMigration([Required][NonEmptyGuid] Guid usageUuid, [Required][NonEmptyGuid] Guid toSystemUuid)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
             return _adapter.ExecuteMigration(usageUuid, toSystemUuid)
                 .Match(NoContent, FromOperationError);
         }
 
         [HttpGet]
-        [Route("permissions/commands")]
+        [Route("migration/permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageMigrationPermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -72,7 +73,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         public IHttpActionResult GetPermissions()
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
             var permissions = _adapter.GetCommandPermissions();
             return Ok(_responseMapper.MapCommandPermissions(permissions));
@@ -91,7 +92,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
             string nameContent = null)
         {
             if(!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
             var conditions = new List<IDomainQuery<ItSystem>>();
 
@@ -99,7 +100,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
                 conditions.Add(new QueryByPartOfName<ItSystem>(nameContent));
 
             return _adapter.GetUnusedItSystemsByOrganization(organizationUuid, numberOfItSystems, getPublicFromOtherOrganizations, conditions.ToArray())
-                .Select(x=> x.Select(system => system.MapIdentityNamePairWithDeactivatedStatusDTO()))
+                .Select(x=> x
+                    .ToList()
+                    .Select(system => system.MapIdentityNamePairWithDeactivatedStatusDTO())
+                    .ToList())
                 .Match(Ok, FromOperationError);
         }
     }

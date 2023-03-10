@@ -4,7 +4,7 @@
 namespace Core.DomainModel.Organization
 {
     /// <summary>
-    /// 1 - Kommune
+    /// 1 - Municipality
     /// 2 - Community of interest
     /// 3 - Company
     /// 4 - Other public authority
