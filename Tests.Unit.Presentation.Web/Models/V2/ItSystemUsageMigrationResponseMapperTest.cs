@@ -99,13 +99,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_MapCommandPermissions()
         {
             //Arrange
-            var commandPermission = new CommandPermissionResult(A<string>(), A<bool>());
+            var commandPermission = A<CommandPermissionResult>();
 
-            var expectedDto = new CommandPermissionResponseDTO
-            {
-                Id = commandPermission.Id,
-                CanExecute = commandPermission.CanExecute
-            };
+            var expectedDto = A<CommandPermissionResponseDTO>();
 
             _commandPermissionsResponseMapper.Setup(x => x.MapCommandPermission(commandPermission)).Returns(expectedDto);
 

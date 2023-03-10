@@ -2,11 +2,6 @@
 {
     public static class Constants
     {
-        public static class CommandPermissionIds
-        {
-            public const string SystemUsageMigrationExecute = "system-usage-migration_execute";
-        }
-
         public static class StatusCodeMessages
         {
             public const string ForbiddenErrorMessage = "Du har ikke rettigheder til at bruge denne funktion";
