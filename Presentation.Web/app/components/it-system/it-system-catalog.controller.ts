@@ -159,7 +159,7 @@
                         //for each system usages
                         _.each(data.data, (system: { uuid; name; deactivated}) => {
                             results.push({
-                                //the id of the system is the id, that is selected
+                                //the id is the uuid of the system, that is selected
                                 id: system.uuid,
                                 //the name of the system is the label for the select2
                                 text: system.name,
