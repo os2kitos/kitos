@@ -20,12 +20,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
     public class ItSystemUsageMigrationV2Controller : InternalApiV2Controller
     {
         private readonly IItSystemUsageMigrationResponseMapper _responseMapper;
+        private readonly IEntityWithDeactivatedStatusMapper _entityWithDeactivatedStatusMapper;
         private readonly IItSystemUsageMigrationServiceAdapter _adapter;
 
         public ItSystemUsageMigrationV2Controller(IItSystemUsageMigrationResponseMapper responseMapper,
+            IEntityWithDeactivatedStatusMapper entityWithDeactivatedStatusMapper,
             IItSystemUsageMigrationServiceAdapter adapter)
         {
             _responseMapper = responseMapper;
+            _entityWithDeactivatedStatusMapper = entityWithDeactivatedStatusMapper;
             _adapter = adapter;
         }
 
@@ -80,7 +83,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         }
 
         [HttpGet]
-        [Route("unused")]
+        [Route("migration/unused-it-systems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairWithDeactivatedStatusDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -100,10 +103,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
                 conditions.Add(new QueryByPartOfName<ItSystem>(nameContent));
 
             return _adapter.GetUnusedItSystemsByOrganization(organizationUuid, numberOfItSystems, getPublicFromOtherOrganizations, conditions.ToArray())
-                .Select(x=> x
-                    .ToList()
-                    .Select(system => system.MapIdentityNamePairWithDeactivatedStatusDTO())
-                    .ToList())
+                .Select(_entityWithDeactivatedStatusMapper.Map)
                 .Match(Ok, FromOperationError);
         }
     }

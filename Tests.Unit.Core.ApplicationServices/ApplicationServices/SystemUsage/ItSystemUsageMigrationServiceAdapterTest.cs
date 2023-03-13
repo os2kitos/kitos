@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Generic;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Shared;
@@ -23,7 +24,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 {
     public class ItSystemUsageMigrationServiceAdapterTest : WithAutoFixture
     {
-        private readonly Mock<IEntityIdentityResolver> _identityResolver;
+        private readonly Mock<IExtendedEntityIdentityResolverService> _identityResolver;
         private readonly Mock<IItSystemUsageMigrationService> _systemUsageMigrationService;
         private readonly Mock<IOrganizationService> _organizationService;
 
@@ -31,7 +32,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         public ItSystemUsageMigrationServiceAdapterTest()
         {
-            _identityResolver = new Mock<IEntityIdentityResolver>();
+            _identityResolver = new Mock<IExtendedEntityIdentityResolverService>();
             _systemUsageMigrationService = new Mock<IItSystemUsageMigrationService>();
             _organizationService = new Mock<IOrganizationService>();
 

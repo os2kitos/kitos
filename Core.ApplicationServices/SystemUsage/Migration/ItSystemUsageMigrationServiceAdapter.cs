@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Generic;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Shared;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 
 namespace Core.ApplicationServices.SystemUsage.Migration
 {
     public class ItSystemUsageMigrationServiceAdapter : IItSystemUsageMigrationServiceAdapter
     {
-        private readonly IEntityIdentityResolver _identityResolver;
+        private readonly IExtendedEntityIdentityResolverService _identityResolver;
         private readonly IItSystemUsageMigrationService _systemUsageMigrationService;
         private readonly IOrganizationService _organizationService;
 
-        public ItSystemUsageMigrationServiceAdapter(IEntityIdentityResolver identityResolver,
+        public ItSystemUsageMigrationServiceAdapter(IExtendedEntityIdentityResolverService identityResolver,
             IItSystemUsageMigrationService systemUsageMigrationService,
             IOrganizationService organizationService)
         {

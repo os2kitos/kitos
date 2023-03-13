@@ -42,18 +42,5 @@ namespace Infrastructure.Ninject.DomainServices
                 .FromNullable()
                 .Select(x => x.Id);
         }
-
-        public Result<int, OperationError> ExchangeId<TEntity>(Guid uuid) where TEntity : Entity, IHasUuid
-        {
-            return ResolveDbId<TEntity>(uuid)
-                .Match<Result<int, OperationError>>(id => id, () => new OperationError($"{typeof(TEntity).Name} with uuid: {uuid} was not found", OperationFailure.NotFound));
-        }
-
-        public Result<Guid, OperationError> ExchangeId<TEntity>(int id) where TEntity : Entity, IHasUuid
-        {
-            return ResolveUuid<TEntity>(id)
-                .Match<Result<Guid, OperationError>>(uuid => uuid, () => new OperationError($"{typeof(TEntity).Name} with id: {id} was not found", OperationFailure.NotFound));
-        }
-
     }
 }

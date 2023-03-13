@@ -12,7 +12,5 @@ namespace Core.DomainServices.Generic
     {
         Maybe<Guid> ResolveUuid<T>(int dbId) where T : class, IHasUuid, IHasId;
         Maybe<int> ResolveDbId<T>(Guid uuid) where T : class, IHasUuid, IHasId;
-        Result<int, OperationError> ExchangeId<TEntity>(Guid uuid) where TEntity : Entity, IHasUuid;
-        Result<Guid, OperationError> ExchangeId<TEntity>(int id) where TEntity : Entity, IHasUuid;
     }
 }
