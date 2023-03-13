@@ -77,35 +77,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Fact]
-        public void Can_MapUnusedSystems()
-        {
-            //Arrange
-            var system1 = CreateSystem();
-            var system2 = CreateSystem();
-
-            //Act
-            var result = _sut.MapUnusedSystems(new List<ItSystem> {system1, system2});
-
-            //Assert
-            var unusedSystems = result.ToList();
-            Assert.Equal(2, unusedSystems.Count);
-            var systemDto1 = Assert.Single(unusedSystems, x => x.Uuid == system1.Uuid);
-            AssertIdentityNamePairWithDeactivatedStatus(system1, systemDto1);
-            var systemDto2 = Assert.Single(unusedSystems, x => x.Uuid == system2.Uuid);
-            AssertIdentityNamePairWithDeactivatedStatus(system2, systemDto2);
-        }
-
-        [Fact]
         public void Can_MapCommandPermissions()
         {
             //Arrange
-            var commandPermission = new CommandPermissionResult(A<string>(), A<bool>());
+            var commandPermission = A<CommandPermissionResult>();
 
-            var expectedDto = new CommandPermissionResponseDTO
-            {
-                Id = commandPermission.Id,
-                CanExecute = commandPermission.CanExecute
-            };
+            var expectedDto = A<CommandPermissionResponseDTO>();
 
             _commandPermissionsResponseMapper.Setup(x => x.MapCommandPermission(commandPermission)).Returns(expectedDto);
 

@@ -2,11 +2,9 @@
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
-using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping
 {
@@ -30,11 +28,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping
                 AffectedRelations = entity.AffectedSystemRelations.Select(MapRelationMigration).ToList(),
                 AffectedDataProcessingRegistrations = entity.AffectedDataProcessingRegistrations.Select(x => x.MapIdentityNamePairDTO()).ToList()
             };
-        }
-
-        public IEnumerable<IdentityNamePairWithDeactivatedStatusDTO> MapUnusedSystems(IEnumerable<ItSystem> systems)
-        {
-            return systems.Select(x => x.MapIdentityNamePairWithDeactivatedStatusDTO()).ToList();
         }
 
         public ItSystemUsageMigrationPermissionsResponseDTO MapCommandPermissions(IEnumerable<CommandPermissionResult> permissionResult)

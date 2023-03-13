@@ -20,12 +20,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
     public class ItSystemUsageMigrationV2Controller : InternalApiV2Controller
     {
         private readonly IItSystemUsageMigrationResponseMapper _responseMapper;
+        private readonly IEntityWithDeactivatedStatusMapper _entityWithDeactivatedStatusMapper;
         private readonly IItSystemUsageMigrationServiceAdapter _adapter;
 
         public ItSystemUsageMigrationV2Controller(IItSystemUsageMigrationResponseMapper responseMapper,
+            IEntityWithDeactivatedStatusMapper entityWithDeactivatedStatusMapper,
             IItSystemUsageMigrationServiceAdapter adapter)
         {
             _responseMapper = responseMapper;
+            _entityWithDeactivatedStatusMapper = entityWithDeactivatedStatusMapper;
             _adapter = adapter;
         }
 
@@ -39,7 +42,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         public IHttpActionResult Get([Required][NonEmptyGuid] Guid usageUuid, [Required][NonEmptyGuid] Guid toSystemUuid)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
             return _adapter.GetMigration(usageUuid, toSystemUuid)
                 .Select(_responseMapper.MapMigration)
@@ -48,6 +51,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
 
         [HttpPost]
         [Route("{usageUuid}/migration")]
+        [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.NoContent)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -56,14 +60,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         public IHttpActionResult ExecuteMigration([Required][NonEmptyGuid] Guid usageUuid, [Required][NonEmptyGuid] Guid toSystemUuid)
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
             return _adapter.ExecuteMigration(usageUuid, toSystemUuid)
                 .Match(NoContent, FromOperationError);
         }
 
         [HttpGet]
-        [Route("permissions/commands")]
+        [Route("migration/permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageMigrationPermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -72,14 +76,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         public IHttpActionResult GetPermissions()
         {
             if (!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
             var permissions = _adapter.GetCommandPermissions();
             return Ok(_responseMapper.MapCommandPermissions(permissions));
         }
 
         [HttpGet]
-        [Route("unused")]
+        [Route("migration/unused-it-systems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairWithDeactivatedStatusDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -91,7 +95,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
             string nameContent = null)
         {
             if(!ModelState.IsValid)
-                return BadRequest();
+                return BadRequest(ModelState);
 
             var conditions = new List<IDomainQuery<ItSystem>>();
 
@@ -99,7 +103,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
                 conditions.Add(new QueryByPartOfName<ItSystem>(nameContent));
 
             return _adapter.GetUnusedItSystemsByOrganization(organizationUuid, numberOfItSystems, getPublicFromOtherOrganizations, conditions.ToArray())
-                .Select(x=> x.Select(system => system.MapIdentityNamePairWithDeactivatedStatusDTO()))
+                .Select(_entityWithDeactivatedStatusMapper.Map)
                 .Match(Ok, FromOperationError);
         }
     }

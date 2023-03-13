@@ -357,7 +357,9 @@
     <Compile Include="Controllers\API\V1\ExtendedApiController.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\CommandPermissionsResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\EntityWithDeactivatedStatusMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\ICommandPermissionsResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\IEntityWithDeactivatedStatusMapper.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\RecommendedArchiveDutyChoiceMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\ItInterfaces\ItInterfaceInterfaceDataTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItInterfaces\ItInterfaceInterfaceTypeV2Controller.cs" />

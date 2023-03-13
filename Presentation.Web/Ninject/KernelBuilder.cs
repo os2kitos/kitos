@@ -129,6 +129,7 @@ using Core.ApplicationServices.System.Write;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
+using Core.ApplicationServices.Generic;
 
 namespace Presentation.Web.Ninject
 {
@@ -266,6 +267,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ITrackingService>().To<TrackingService>().InCommandScope(Mode);
             kernel.Bind<IUIModuleCustomizationService>().To<UIModuleCustomizationService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationUnitService>().To<OrganizationUnitService>().InCommandScope(Mode);
+            kernel.Bind<IExtendedEntityIdentityResolverService>().To<ExtendedEntityIdentityResolverService>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);
@@ -308,6 +310,9 @@ namespace Presentation.Web.Ninject
 
         private void RegisterMappers(IKernel kernel)
         {
+            //Generic
+            kernel.Bind<IEntityWithDeactivatedStatusMapper>().To<EntityWithDeactivatedStatusMapper>().InCommandScope(Mode);
+
             //Systems
             kernel.Bind<IItSystemWriteModelMapper>().To<ItSystemWriteModelMapper>().InCommandScope(Mode);
             kernel.Bind<IItSystemResponseMapper>().To<ItSystemResponseMapper>().InCommandScope(Mode);

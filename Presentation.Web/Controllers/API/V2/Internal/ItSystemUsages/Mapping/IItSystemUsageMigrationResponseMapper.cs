@@ -10,7 +10,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping
     public interface IItSystemUsageMigrationResponseMapper
     {
         ItSystemUsageMigrationV2ResponseDTO MapMigration(ItSystemUsageMigration entity);
-        IEnumerable<IdentityNamePairWithDeactivatedStatusDTO> MapUnusedSystems(IEnumerable<ItSystem> systems);
 
         ItSystemUsageMigrationPermissionsResponseDTO MapCommandPermissions(IEnumerable<CommandPermissionResult> permissionResult);
     }

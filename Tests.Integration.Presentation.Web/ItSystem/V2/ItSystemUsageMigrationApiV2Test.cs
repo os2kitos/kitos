@@ -208,7 +208,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var result = await ItSystemUsageMigrationV2Helper.GetPermissions(cookie);
 
             //Assert
-            var command = Assert.Single(result.Commands, x => x.Id == CommandPermissionConstraints.UsageMigration.Execute);
+            var command = Assert.Single(result.Commands, x => x.Id == CommandPermissionCommandIds.UsageMigration.Execute);
             Assert.Equal(expectedMigrationAvailability, command.CanExecute);
         }
 

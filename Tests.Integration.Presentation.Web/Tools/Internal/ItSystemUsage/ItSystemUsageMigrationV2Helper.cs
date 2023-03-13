@@ -17,7 +17,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystemUsage
         public static async Task<IEnumerable<IdentityNamePairWithDeactivatedStatusDTO>> GetUnusedSystemsAsync(Guid organizationUuid, int numberOfItSystems, bool getPublicFromOtherOrganizations, string nameContent = null, Cookie userCookie = null)
         {
             var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var path = BasePath + "/unused";
+            var path = BasePath + "/migration/unused-it-systems";
             var queryParameters = new List<KeyValuePair<string, string>>
             {
                 new("organizationUuid", organizationUuid.ToString("D")),
@@ -59,7 +59,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystemUsage
         public static async Task<ItSystemUsageMigrationPermissionsResponseDTO> GetPermissions(Cookie userCookie = null)
         {
             var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var path = BasePath + "/permissions/commands";
+            var path = BasePath + "/migration/permissions";
 
             using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl(path), cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
