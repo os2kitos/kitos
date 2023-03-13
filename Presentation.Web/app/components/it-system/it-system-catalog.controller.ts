@@ -139,7 +139,7 @@
                     quietMillis: 500,
                     transport: (queryParams) => {
                         var request = this.$http.get(
-                            "api/v2/internal/it-system-usages/unused?" +
+                            "api/v2/internal/it-system-usages/migration/unused-it-systems?" +
                             `organizationUuid=${this.municipalityUuid}` +
                             "&numberOfItSystems=25" +
                             "&getPublicFromOtherOrganizations=true" +
@@ -1148,7 +1148,7 @@
                                 .createSystemUsageAuthorization()
                                 .getOverviewAuthorization()
                         ],
-                        userMigrationRights: ["$http", $http => $http.get("api/v2/internal/it-system-usages/permissions/commands")
+                        userMigrationRights: ["$http", $http => $http.get("api/v2/internal/it-system-usages/migration/permissions")
                             .then(result => result.data)
                         ],
                     }
