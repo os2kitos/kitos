@@ -15,11 +15,11 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 {
     public class ItSystemUsageMigrationServiceAdapter : IItSystemUsageMigrationServiceAdapter
     {
-        private readonly IExtendedEntityIdentityResolverService _identityResolver;
+        private readonly IEntityIdMapper _identityResolver;
         private readonly IItSystemUsageMigrationService _systemUsageMigrationService;
         private readonly IOrganizationService _organizationService;
 
-        public ItSystemUsageMigrationServiceAdapter(IExtendedEntityIdentityResolverService identityResolver,
+        public ItSystemUsageMigrationServiceAdapter(IEntityIdMapper identityResolver,
             IItSystemUsageMigrationService systemUsageMigrationService,
             IOrganizationService organizationService)
         {
@@ -62,8 +62,8 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
         private Result<(int usageId, int systemId), OperationError> ResolveUsageAndSystemIds(Guid usageUuid, Guid systemUuid)
         {
-            return _identityResolver.ExchangeId<ItSystemUsage>(usageUuid)
-                .Bind(usageId => _identityResolver.ExchangeId<ItSystem>(systemUuid)
+            return _identityResolver.Map<ItSystemUsage>(usageUuid)
+                .Bind(usageId => _identityResolver.Map<ItSystem>(systemUuid)
                     .Select(systemId => (usageId, systemId))
                 );
         }

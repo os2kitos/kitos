@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage.Migration;
@@ -32,6 +31,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
             _adapter = adapter;
         }
 
+        /// <summary>
+        /// Gets the migration description if a system usage is migrated to another master it-system resource
+        /// </summary>
+        /// <param name="usageUuid">uuid of system usage being migrated</param>
+        /// <param name="toSystemUuid">uuid of the master it-system to migrate to</param>
+        /// <returns>A description of the consequences of the migration</returns>
         [HttpGet]
         [Route("{usageUuid}/migration")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageMigrationV2ResponseDTO))]
@@ -49,6 +54,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
                 .Match(Ok, FromOperationError);
         }
 
+        /// <summary>
+        /// Perform a migration of the it-system-usage to from the current it-system master data to a new it-system master data
+        /// </summary>
+        /// <param name="usageUuid"></param>
+        /// <param name="toSystemUuid"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("{usageUuid}/migration")]
         [SwaggerResponseRemoveDefaults]
@@ -66,6 +77,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
                 .Match(NoContent, FromOperationError);
         }
 
+        /// <summary>
+        /// Gets the migration permissions of the authenticated user
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("migration/permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageMigrationPermissionsResponseDTO))]
@@ -82,6 +97,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
             return Ok(_responseMapper.MapCommandPermissions(permissions));
         }
 
+        /// <summary>
+        /// Search for systems which are not in use and which are valid migration targets
+        /// </summary>
+        /// <param name="organizationUuid"></param>
+        /// <param name="numberOfItSystems"></param>
+        /// <param name="getPublicFromOtherOrganizations"></param>
+        /// <param name="nameContent"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("migration/unused-it-systems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairWithDeactivatedStatusDTO>))]
@@ -89,7 +112,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetUnusedItSystemsBySearchAndOrganization([Required][NonEmptyGuid] Guid organizationUuid,
+        public IHttpActionResult GetUnusedItSystemsBySearchAndOrganization(
+            [Required][NonEmptyGuid] Guid organizationUuid,
             [Required] int numberOfItSystems,
             [Required] bool getPublicFromOtherOrganizations,
             string nameContent = null)

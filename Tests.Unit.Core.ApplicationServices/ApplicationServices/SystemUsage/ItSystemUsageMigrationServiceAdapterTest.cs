@@ -24,7 +24,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 {
     public class ItSystemUsageMigrationServiceAdapterTest : WithAutoFixture
     {
-        private readonly Mock<IExtendedEntityIdentityResolverService> _identityResolver;
+        private readonly Mock<IEntityIdMapper> _identityResolver;
         private readonly Mock<IItSystemUsageMigrationService> _systemUsageMigrationService;
         private readonly Mock<IOrganizationService> _organizationService;
 
@@ -32,7 +32,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         public ItSystemUsageMigrationServiceAdapterTest()
         {
-            _identityResolver = new Mock<IExtendedEntityIdentityResolverService>();
+            _identityResolver = new Mock<IEntityIdMapper>();
             _systemUsageMigrationService = new Mock<IItSystemUsageMigrationService>();
             _organizationService = new Mock<IOrganizationService>();
 
@@ -335,7 +335,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private void ExpectResolveIdReturns<TEntity>(Guid uuid, Result<int, OperationError> result) where TEntity : Entity, IHasId, IHasUuid
         {
-            _identityResolver.Setup(x => x.ExchangeId<TEntity>(uuid)).Returns(result);
+            _identityResolver.Setup(x => x.Map<TEntity>(uuid)).Returns(result);
         }
     }
 }
