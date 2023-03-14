@@ -51,16 +51,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var itSystem = await CreateSystemAsync(name: itSystemName, accessModifier: AccessModifier.Public);
 
             //Act
-            using (var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, itSystemName, 10, true))
-            {
-                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                var itSystems = response.ToList();
-                var dto = Assert.Single(itSystems);
-                Assert.Equal(itSystemName, dto.Name);
-                Assert.Equal(itSystem.Id, dto.Id);
-            }
+            using var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, itSystemName, 10, true);
+
+            var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+            var itSystems = response.ToList();
+            var dto = Assert.Single(itSystems);
+            Assert.Equal(itSystemName, dto.Name);
+            Assert.Equal(itSystem.Id, dto.Id);
         }
 
         [Theory]
@@ -79,15 +78,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var createdSystemsIds = new[] { itSystem1.Id, itSystem2.Id, itSystem3.Id };
 
             //Act
-            using (var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, prefix, 2, true))
-            {
-                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                var itSystems = response.ToList();
-                Assert.Equal(2, itSystems.Count);
-                Assert.True(itSystems.All(x => createdSystemsIds.Contains(x.Id)));
-            }
+            using var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, prefix, 2, true);
+
+            var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+            var itSystems = response.ToList();
+            Assert.Equal(2, itSystems.Count);
+            Assert.True(itSystems.All(x => createdSystemsIds.Contains(x.Id)));
         }
 
         [Theory]
@@ -105,20 +103,20 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await CreateSystemAsync(TestEnvironment.SecondOrganizationId, itSystemName3); //Private system in other org
 
             //Act
-            using (var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, prefix, 3, true))
-            {
-                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                var itSystemIds = response.Select(x => x.Id).ToList();
-                Assert.Equal(2, itSystemIds.Count);
-                Assert.Contains(ownLocalSystem.Id, itSystemIds);
-                Assert.Contains(sharedSystemFromOtherOrg.Id, itSystemIds);
-            }
+            using var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, prefix, 3, true);
+
+            var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+            var itSystemIds = response.Select(x => x.Id).ToList();
+            Assert.Equal(2, itSystemIds.Count);
+            Assert.Contains(ownLocalSystem.Id, itSystemIds);
+            Assert.Contains(sharedSystemFromOtherOrg.Id, itSystemIds);
         }
 
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
+        [InlineData(OrganizationRole.User)]
         public async Task GetUnusedItSystems_Can_Include_It_Systems_From_Own_Organization_Only(OrganizationRole role)
         {
             //Arrange
@@ -129,15 +127,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await CreateSystemAsync(TestEnvironment.SecondOrganizationId, itSystemName2, AccessModifier.Public); //shared system should not be returned when not asked to
 
             //Act
-            using (var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, prefix, 2, false))
-            {
-                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                var itSystemIds = response.Select(x => x.Id).ToList();
-                var id = Assert.Single(itSystemIds);
-                Assert.Equal(ownLocalSystem.Id, id);
-            }
+            using var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, prefix, 2, false);
+
+            var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+            var itSystemIds = response.Select(x => x.Id).ToList();
+            var id = Assert.Single(itSystemIds);
+            Assert.Equal(ownLocalSystem.Id, id);
         }
 
         [Theory]
@@ -146,13 +143,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task GetUnusedItSystems_Returns_Empty_List_On_Whitespace_Or_Empty(OrganizationRole role, string nameContent)
         {
             //Act
-            using (var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, nameContent, 25, true))
-            {
-                var response = await httpResponse.Content.ReadAsStringAsync();
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.Equal(TestEnvironment.EmptyListApiJson, response);
-            }
+            using var httpResponse = await GetUnusedSystemsAsync(role, TestEnvironment.DefaultOrganizationId, nameContent, 25, true);
+
+            var response = await httpResponse.Content.ReadAsStringAsync();
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+            Assert.Equal(TestEnvironment.EmptyListApiJson, response);
         }
 
         [Fact, Description("Systems in use in our own organization should not be included")]
@@ -172,15 +168,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await TakeSystemIntoUseAsync(itSystem3, organizationId: TestEnvironment.DefaultOrganizationId);
 
             //Act
-            using (var httpResponse = await GetUnusedSystemsAsync(OrganizationRole.GlobalAdmin, TestEnvironment.DefaultOrganizationId, prefix, 3, true))
-            {
-                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                var itSystems = response.ToList();
-                var dto = Assert.Single(itSystems);
-                Assert.Equal(itSystem1.Id, dto.Id);
-            }
+            using var httpResponse = await GetUnusedSystemsAsync(OrganizationRole.GlobalAdmin, TestEnvironment.DefaultOrganizationId, prefix, 3, true);
+
+            var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+            var itSystems = response.ToList();
+            var dto = Assert.Single(itSystems);
+            Assert.Equal(itSystem1.Id, dto.Id);
         }
 
         [Fact, Description("Systems in use applies to current org only, do not expect results to be omitted if it system is used in another organization.")]
@@ -201,15 +196,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var createdSystemsIds = new[] { itSystem1.Id, itSystem2.Id, itSystem3.Id };
 
             //Act
-            using (var httpResponse = await GetUnusedSystemsAsync(OrganizationRole.GlobalAdmin, TestEnvironment.DefaultOrganizationId, prefix, 3, true))
-            {
-                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                var itSystems = response.ToList();
-                Assert.Equal(3, itSystems.Count);
-                Assert.True(itSystems.All(x => createdSystemsIds.Contains(x.Id)));
-            }
+            using var httpResponse = await GetUnusedSystemsAsync(OrganizationRole.GlobalAdmin, TestEnvironment.DefaultOrganizationId, prefix, 3, true);
+
+            var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<ItSystemSimpleDTO>>();
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+            var itSystems = response.ToList();
+            Assert.Equal(3, itSystems.Count);
+            Assert.True(itSystems.All(x => createdSystemsIds.Contains(x.Id)));
         }
 
         [Theory]
@@ -223,13 +217,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var cookie = await HttpApi.GetCookieAsync(role);
 
             //Act
-            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                var result = await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageMigrationAccessDTO>();
-                Assert.Equal(expectedMigrationAvailability, result.CanExecuteMigration);
-            }
+            using var response = await HttpApi.GetWithCookieAsync(url, cookie);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var result = await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageMigrationAccessDTO>();
+            Assert.Equal(expectedMigrationAvailability, result.CanExecuteMigration);
         }
 
         [Fact]
@@ -240,15 +233,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var newSystem = _newSystem;
 
             //Act
-            using (var response = await GetMigration(usage, newSystem))
-            {
-                //Assert
-                var result = await AssertMigrationReturned(response);
-                Assert.Empty(result.AffectedRelations);
-                Assert.Empty(result.AffectedContracts);
-                Assert.Empty(result.AffectedDataProcessingRegistrations);
-                AssertFromToSystemInfo(usage, result, _oldSystemInUse, newSystem);
-            }
+            using var response = await GetMigration(usage, newSystem);
+
+            //Assert
+            var result = await AssertMigrationReturned(response);
+            Assert.Empty(result.AffectedRelations);
+            Assert.Empty(result.AffectedContracts);
+            Assert.Empty(result.AffectedDataProcessingRegistrations);
+            AssertFromToSystemInfo(usage, result, _oldSystemInUse, newSystem);
         }
 
         [Fact]
@@ -259,14 +251,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await AddItSystemUsageToContractAsync(contract, _oldSystemUsage);
 
             //Act
-            using (var response = await GetMigration(_oldSystemUsage, _newSystem))
-            {
-                //Assert
-                var result = await AssertMigrationReturned(response);
-                Assert.Empty(result.AffectedRelations);
-                var resultContract = Assert.Single(result.AffectedContracts);
-                Assert.Equal(contract.Id, resultContract.Id);
-            }
+            using var response = await GetMigration(_oldSystemUsage, _newSystem);
+
+            //Assert
+            var result = await AssertMigrationReturned(response);
+            Assert.Empty(result.AffectedRelations);
+            var resultContract = Assert.Single(result.AffectedContracts);
+            Assert.Equal(contract.Id, resultContract.Id);
         }
 
         [Fact]
@@ -277,13 +268,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dpr.Id, _oldSystemUsage.Id);
 
             //Act
-            using (var response = await GetMigration(_oldSystemUsage, _newSystem))
-            {
-                //Assert
-                var result = await AssertMigrationReturned(response);
-                var resultDpr = Assert.Single(result.AffectedDataProcessingRegistrations);
-                Assert.Equal(dpr.Id, resultDpr.Id);
-            }
+            using var response = await GetMigration(_oldSystemUsage, _newSystem);
+
+            //Assert
+            var result = await AssertMigrationReturned(response);
+            var resultDpr = Assert.Single(result.AffectedDataProcessingRegistrations);
+            Assert.Equal(dpr.Id, resultDpr.Id);
         }
 
         [Fact]
@@ -302,13 +292,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), exhibit.ItInterfaceId, null, null);
 
             //Act
-            using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
-            {
-                //Assert
-                var result = await AssertMigrationReturned(response);
-                Assert.Empty(result.AffectedContracts);
-                Assert.Empty(result.AffectedRelations);
-            }
+            using var response = await GetMigration(fromItSystemUsage, migrateToItSystem);
+
+            //Assert
+            var result = await AssertMigrationReturned(response);
+            Assert.Empty(result.AffectedContracts);
+            Assert.Empty(result.AffectedRelations);
         }
 
         [Fact]
@@ -327,18 +316,17 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var relation = await CreateSystemRelation(toItSystemUsage.Id, fromItSystemUsage.Id, A<string>(), exhibit.ItInterfaceId, null, null);
 
             //Act
-            using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
-            {
-                //Assert
-                var result = await AssertMigrationReturned(response);
-                Assert.Empty(result.AffectedContracts);
-                var dto = Assert.Single(result.AffectedRelations);
-                AssertEqualNamedEntities(relation.FromUsage, dto.FromSystemUsage);
-                AssertEqualNamedEntities(relation.ToUsage, dto.ToSystemUsage);
-                Assert.Equal(relation.Description, dto.Description);
-                AssertEqualNamedEntities(relation.Interface, dto.Interface);
-                Assert.Null(dto.Contract);
-            }
+            using var response = await GetMigration(fromItSystemUsage, migrateToItSystem);
+
+            //Assert
+            var result = await AssertMigrationReturned(response);
+            Assert.Empty(result.AffectedContracts);
+            var dto = Assert.Single(result.AffectedRelations);
+            AssertEqualNamedEntities(relation.FromUsage, dto.FromSystemUsage);
+            AssertEqualNamedEntities(relation.ToUsage, dto.ToSystemUsage);
+            Assert.Equal(relation.Description, dto.Description);
+            AssertEqualNamedEntities(relation.Interface, dto.Interface);
+            Assert.Null(dto.Contract);
         }
 
         [Fact]
@@ -355,13 +343,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, null, null);
 
             //Act
-            using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
-            {
-                //Assert
-                var result = await AssertMigrationReturned(response);
-                Assert.Empty(result.AffectedContracts);
-                Assert.Empty(result.AffectedRelations);
-            }
+            using var response = await GetMigration(fromItSystemUsage, migrateToItSystem);
+
+            //Assert
+            var result = await AssertMigrationReturned(response);
+            Assert.Empty(result.AffectedContracts);
+            Assert.Empty(result.AffectedRelations);
         }
 
         [Fact]
@@ -379,24 +366,21 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, null, contract.Id);
 
             //Act
-            using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
-            {
-                //Assert
-                var result = await AssertMigrationReturned(response);
-                Assert.Empty(result.AffectedContracts);
-                Assert.Empty(result.AffectedRelations);
-            }
+            using var response = await GetMigration(fromItSystemUsage, migrateToItSystem);
+
+            //Assert
+            var result = await AssertMigrationReturned(response);
+            Assert.Empty(result.AffectedContracts);
+            Assert.Empty(result.AffectedRelations);
         }
 
         [Fact]
         public async Task PostMigration_Can_Migrate_System_Usage_With_No_Associated_Entities()
         {
             //Act
-            using (var response = await PostMigration(_oldSystemUsage, _newSystem))
-            {
-                //Assert
-                AssertMigrationSucceeded(response);
-            }
+            using var response = await PostMigration(_oldSystemUsage, _newSystem);
+            //Assert
+            AssertMigrationSucceeded(response);
         }
 
         [Fact]
@@ -408,12 +392,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var createdContract = await GetItContractAsync(contract.Id);
 
             //Act
-            using (var response = await PostMigration(_oldSystemUsage, _newSystem))
-            {
-                //Assert
-                AssertMigrationSucceeded(response);
-                await AssertSystemUsageAssociationExistsInContract(createdContract, _oldSystemUsage);
-            }
+            using var response = await PostMigration(_oldSystemUsage, _newSystem);
+
+            //Assert
+            AssertMigrationSucceeded(response);
+            await AssertSystemUsageAssociationExistsInContract(createdContract, _oldSystemUsage);
         }
 
         [Fact]
@@ -427,7 +410,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var createdInterface = await CreateInterfaceAsync();
             var contract = await CreateContractAsync();
             await AddItSystemUsageToContractAsync(contract, fromItSystemUsage);
-            var createdContract = await GetItContractAsync(contract.Id);
 
             var usageExhibit = await CreateExhibitAsync(createdInterface, toItSystem);
             var usageRelation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), usageExhibit.ItInterfaceId, GetValidFrequencyTypeId(), contract.Id);
@@ -435,15 +417,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var migrateToItSystem = await CreateSystemAsync();
 
             //Act
-            using (var response = await PostMigration(fromItSystemUsage, migrateToItSystem))
-            {
-                //Assert
-                AssertMigrationSucceeded(response);
-                await AssertSystemUsageAssociationExistsInContract(createdContract, fromItSystemUsage);
+            using var response = await PostMigration(fromItSystemUsage, migrateToItSystem);
 
-                await AssertRelationExists(usageRelation, fromItSystemUsage, true, true, true);
+            //Assert
+            AssertMigrationSucceeded(response);
+            await AssertSystemUsageAssociationExistsInContract(contract, fromItSystemUsage);
 
-            }
+            await AssertRelationExists(usageRelation, fromItSystemUsage, true, true, true);
         }
 
         [Fact]
@@ -456,12 +436,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var createdContract = await GetItContractAsync(contract.Id);
 
             //Act
-            using (var response = await PostMigration(_oldSystemUsage, _oldSystemInUse))
-            {
-                //Assert
-                AssertMigrationSucceeded(response);
-                await AssertSystemUsageAssociationExistsInContract(createdContract, _oldSystemUsage);
-            }
+            using var response = await PostMigration(_oldSystemUsage, _oldSystemInUse);
+
+            //Assert
+            AssertMigrationSucceeded(response);
+            await AssertSystemUsageAssociationExistsInContract(createdContract, _oldSystemUsage);
         }
 
 
@@ -481,12 +460,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), exhibit.ItInterfaceId, null, null);
 
             //Act
-            using (var response = await PostMigration(fromItSystemUsage, migrateToItSystem))
-            {
-                //Assert
-                AssertMigrationSucceeded(response);
-                await AssertRelationExists(relation, fromItSystemUsage, hasInterface: true);
-            }
+            using var response = await PostMigration(fromItSystemUsage, migrateToItSystem);
+
+            //Assert
+            AssertMigrationSucceeded(response);
+            await AssertRelationExists(relation, fromItSystemUsage, hasInterface: true);
         }
 
         [Fact]
@@ -505,12 +483,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), exhibit.ItInterfaceId, null, null);
 
             //Act
-            using (var response = await PostMigration(toItSystemUsage, migrateToItSystem))
-            {
-                //Assert
-                AssertMigrationSucceeded(response);
-                await AssertRelationExists(relation, fromItSystemUsage);
-            }
+            using var response = await PostMigration(toItSystemUsage, migrateToItSystem);
+
+            //Assert
+            AssertMigrationSucceeded(response);
+            await AssertRelationExists(relation, fromItSystemUsage);
         }
 
         [Fact]
@@ -527,12 +504,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var relation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), null, null, null);
 
             //Act
-            using (var response = await PostMigration(fromItSystemUsage, migrateToItSystem))
-            {
-                //Assert
-                AssertMigrationSucceeded(response);
-                await AssertRelationExists(relation, fromItSystemUsage);
-            }
+            using var response = await PostMigration(fromItSystemUsage, migrateToItSystem);
+
+            //Assert
+            AssertMigrationSucceeded(response);
+            await AssertRelationExists(relation, fromItSystemUsage);
         }
 
         [Fact]
@@ -620,8 +596,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private static async Task AssertRelationExists(SystemRelationDTO expectedRelation, ItSystemUsageDTO usage, bool hasInterface = false, bool hasFrequency = false, bool hasContract = false)
         {
-            var response = await SystemRelationHelper.SendGetRelationRequestAsync(usage.Id, expectedRelation.Id);
+            using var response = await SystemRelationHelper.SendGetRelationRequestAsync(usage.Id, expectedRelation.Id);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var relation = await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
+
             Assert.Equal(expectedRelation.Id, relation.Id);
             Assert.Equal(expectedRelation.Description, relation.Description);
             if (hasInterface)

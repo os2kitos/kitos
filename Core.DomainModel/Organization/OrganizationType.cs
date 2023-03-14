@@ -3,6 +3,12 @@
 
 namespace Core.DomainModel.Organization
 {
+    /// <summary>
+    /// 1 - Municipality
+    /// 2 - Community of interest
+    /// 3 - Company
+    /// 4 - Other public authority
+    /// </summary>
     public enum OrganizationTypeKeys
     {
         Kommune = 1,

@@ -6,7 +6,6 @@ using System.Web.Http;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainServices.Authorization;
 using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
@@ -31,13 +30,9 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItSystemUsageMigrationDTO>))]
         public HttpResponseMessage GetMigration([FromUri] int usageId, [FromUri] int toSystemId)
         {
-            var res = _itSystemUsageMigrationService.GetSystemUsageMigration(usageId, toSystemId);
-            if (res.Ok)
-            {
-                return Ok(Map(res.Value));
-            }
-
-            return FromOperationFailure(res.Error);
+            return _itSystemUsageMigrationService.GetSystemUsageMigration(usageId, toSystemId)
+                .Select(Map)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPost]
@@ -48,13 +43,8 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage ExecuteMigration([FromUri] int usageId, [FromUri] int toSystemId)
         {
-            var result = _itSystemUsageMigrationService.ExecuteSystemUsageMigration(usageId, toSystemId);
-            if (result.Ok)
-            {
-                return NoContent();
-            }
-
-            return FromOperationFailure(result.Error);
+            return _itSystemUsageMigrationService.ExecuteSystemUsageMigration(usageId, toSystemId)
+                .Match(_ => NoContent(), FromOperationError);
         }
 
         [HttpGet]
@@ -77,28 +67,14 @@ namespace Presentation.Web.Controllers.API.V1
             [FromUri] int numberOfItSystems,
             [FromUri] bool getPublicFromOtherOrganizations)
         {
-            if (GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.Public)
-            {
-                return Forbidden();
-            }
             if (string.IsNullOrWhiteSpace(nameContent))
             {
                 return Ok(Enumerable.Empty<NamedEntityDTO>().ToList());
             }
-            if (numberOfItSystems < 1 || numberOfItSystems > 25)
-            {
-                return BadRequest($"{nameof(numberOfItSystems)} must satisfy constraint: 1 <= n <= 25");
-            }
 
-            var result = _itSystemUsageMigrationService.GetUnusedItSystemsByOrganization(organizationId, nameContent, numberOfItSystems, getPublicFromOtherOrganizations);
-
-            if (result.Ok)
-            {
-                var unusedItSystems = result.Value.Select(DTOMappingExtensions.MapToNamedEntityWithEnabledStatusDTO).ToList();
-                return Ok(unusedItSystems);
-            }
-
-            return FromOperationFailure(result.Error);
+            return _itSystemUsageMigrationService.GetUnusedItSystemsByOrganizationByName(organizationId, nameContent, numberOfItSystems, getPublicFromOtherOrganizations)
+                .Select(x => x.Select(DTOMappingExtensions.MapToNamedEntityWithEnabledStatusDTO).ToList())
+                .Match(Ok, FromOperationError);
         }
 
         private static ItSystemUsageMigrationDTO Map(ItSystemUsageMigration input)

@@ -126,7 +126,10 @@ using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
 using Core.ApplicationServices.System.Write;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
+using Core.ApplicationServices.Generic;
 
 namespace Presentation.Web.Ninject
 {
@@ -217,6 +220,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InCommandScope(Mode);
             kernel.Bind<IItSystemService>().To<ItSystemService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageMigrationServiceAdapter>().To<ItSystemUsageMigrationServiceAdapter>().InCommandScope(Mode);
             kernel.Bind<IItsystemUsageRelationsService>().To<ItsystemUsageRelationsService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageWriteService>().To<ItSystemUsageWriteService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceService>().To<ItInterfaceService>().InCommandScope(Mode);
@@ -263,6 +267,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ITrackingService>().To<TrackingService>().InCommandScope(Mode);
             kernel.Bind<IUIModuleCustomizationService>().To<UIModuleCustomizationService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationUnitService>().To<OrganizationUnitService>().InCommandScope(Mode);
+            kernel.Bind<IEntityIdMapper>().To<EntityIdMapper>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);
@@ -305,6 +310,9 @@ namespace Presentation.Web.Ninject
 
         private void RegisterMappers(IKernel kernel)
         {
+            //Generic
+            kernel.Bind<IEntityWithDeactivatedStatusMapper>().To<EntityWithDeactivatedStatusMapper>().InCommandScope(Mode);
+
             //Systems
             kernel.Bind<IItSystemWriteModelMapper>().To<ItSystemWriteModelMapper>().InCommandScope(Mode);
             kernel.Bind<IItSystemResponseMapper>().To<ItSystemResponseMapper>().InCommandScope(Mode);
@@ -312,6 +320,7 @@ namespace Presentation.Web.Ninject
             //System usage
             kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageWriteModelMapper>().To<ItSystemUsageWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageMigrationResponseMapper>().To<ItSystemUsageMigrationResponseMapper>().InCommandScope(Mode);
 
             //Data processing
             kernel.Bind<IDataProcessingRegistrationWriteModelMapper>().To<DataProcessingRegistrationWriteModelMapper>().InCommandScope(Mode);
@@ -330,6 +339,7 @@ namespace Presentation.Web.Ninject
 
             //Permissions
             kernel.Bind<IResourcePermissionsResponseMapper>().To<ResourcePermissionsResponseMapper>().InCommandScope(Mode);
+            kernel.Bind<ICommandPermissionsResponseMapper>().To<CommandPermissionsResponseMapper>().InCommandScope(Mode);
 
             //Public messages
             kernel.Bind<IPublicMessagesWriteModelMapper>().To<PublicMessagesWriteModelMapper>().InCommandScope(Mode);
