@@ -86,14 +86,14 @@
                         </tr>
                         <tr ng-repeat="relation in systemCatalogVm.migrationReportDTO.affectedRelations">
                             <td>
-                                Navn: {{formatSystemName(relation.fromSystemUsage.name,relation.fromSystemUsage.deactivated) }}
+                                Navn: {{formatSystemName(relation.fromSystem.name,relation.fromSystem.deactivated) }}
                                 <br />
-                                Uuid: {{relation.fromSystemUsage.uuid}}
+                                Uuid: {{relation.fromSystem.uuid}}
                             </td>
                             <td>
-                                Navn: {{formatSystemName(relation.toSystemUsage.name,relation.toSystemUsage.deactivated) }}
+                                Navn: {{formatSystemName(relation.toSystem.name,relation.toSystem.deactivated) }}
                                 <br />
-                                Uuid: {{ relation.toSystemUsage.uuid}}
+                                Uuid: {{ relation.toSystem.uuid}}
                             </td>
                             <td>
                                 {{relation.description}}
