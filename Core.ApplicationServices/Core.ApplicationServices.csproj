@@ -73,7 +73,7 @@
     <Compile Include="Authentication\ApplicationAuthenticationState.cs" />
     <Compile Include="Authorization\CommandPermissionResult.cs" />
     <Compile Include="Generic\ExtendedExtendedEntityIdentityResolverService.cs" />
-    <Compile Include="Generic\IExtendedEntityIdentityResolverService.cs" />
+    <Compile Include="Generic\IEntityIdMapper.cs" />
     <Compile Include="Interface\Write\IItInterfaceWriteService.cs" />
     <Compile Include="Interface\Write\ItInterfaceWriteService.cs" />
     <Compile Include="Authorization\ResourceCollectionPermissionsResult.cs" />

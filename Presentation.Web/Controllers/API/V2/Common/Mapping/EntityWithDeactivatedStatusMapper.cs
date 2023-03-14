@@ -7,9 +7,9 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 {
     public class EntityWithDeactivatedStatusMapper : IEntityWithDeactivatedStatusMapper
     {
-        public IEnumerable<IdentityNamePairWithDeactivatedStatusDTO> Map<T>(IEnumerable<T> systems) where T : IHasUuid, IHasName, IEntityWithEnabledStatus
+        public IEnumerable<IdentityNamePairWithDeactivatedStatusDTO> Map<T>(IEnumerable<T> entities) where T : IHasUuid, IHasName, IEntityWithEnabledStatus
         {
-            return systems.Select(x => x.MapIdentityNamePairWithDeactivatedStatusDTO()).ToList();
+            return entities.Select(x => x.MapIdentityNamePairWithDeactivatedStatusDTO()).ToList();
         }
     }
 }
