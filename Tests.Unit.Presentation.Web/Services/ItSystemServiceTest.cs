@@ -1651,7 +1651,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private ItSystemUsage CreateSystemUsage(Organization organization)
         {
-            return new() { Id = A<int>(), Organization = organization };
+            return new() { Id = A<int>(), Organization = organization, ItSystem = new ItSystem{Name = A<string>()}};
         }
 
         private ItInterfaceExhibit CreateInterfaceExhibit()
