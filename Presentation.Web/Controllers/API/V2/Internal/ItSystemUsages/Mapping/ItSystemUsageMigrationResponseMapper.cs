@@ -39,8 +39,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping
         {
             return new ItSystemUsageRelationMigrationV2ResponseDTO
             {
-                ToSystemUsage = entity.ToSystemUsage?.MapIdentityNamePairWithDeactivatedStatusDTO(),
-                FromSystemUsage = entity.FromSystemUsage?.MapIdentityNamePairWithDeactivatedStatusDTO(),
+                ToSystem = entity.ToSystemUsage?.ItSystem.MapIdentityNamePairWithDeactivatedStatusDTO(),
+                FromSystem = entity.FromSystemUsage?.ItSystem.MapIdentityNamePairWithDeactivatedStatusDTO(),
                 Description = entity.Description,
                 Interface = entity.RelationInterface?.MapIdentityNamePairDTO(),
                 FrequencyType = entity.UsageFrequency?.MapIdentityNamePairDTO(),

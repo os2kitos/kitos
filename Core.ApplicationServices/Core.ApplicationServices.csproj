@@ -199,6 +199,7 @@
     <Compile Include="Model\Organizations\StsOrganizationSynchronizationDetails.cs" />
     <Compile Include="Model\Organizations\AuthorizedUpdateOrganizationFromFKOrganisationCommand.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
+    <Compile Include="Model\Shared\NamedEntityWithUuid.cs" />
     <Compile Include="Model\Shared\OptionalValueChange.cs" />
     <Compile Include="Model\Shared\Write\ExternalReferenceProperties.cs" />
     <Compile Include="Model\SystemUsage\Write\NamedLink.cs" />

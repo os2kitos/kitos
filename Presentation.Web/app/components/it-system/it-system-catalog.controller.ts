@@ -1008,9 +1008,9 @@
                 {
                     field: "organization.name", title: "Organisation",
                     template: dataItem => {
-                        var orgUuid = dataItem.organizationUuid;
+                        var orgUuid = dataItem.organization.uuid;
                         var orgName = dataItem.organization.name;
-                        var usageUuid = dataItem.systemUsageUuid;
+                        var usageUuid = dataItem.systemUsage.uuid;
                         if (this.canMigrate) {
                             return `<p data-element-type='MigrationMoveOrgName'>${orgName}</p> <button ng-click='systemCatalogVm.beginItSystemMigration("${orgUuid}", "${orgName}", "${usageUuid}")' data-element-type='migrateItSystem' class='k-button pull-right'>Flyt</button>`;
                         } else {

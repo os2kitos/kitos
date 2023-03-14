@@ -29,6 +29,11 @@ namespace Presentation.Web.Controllers.API.V1.Mapping
             return new EntityWithOrganizationRelationshipDTO(source.Id, source.Name, source.Organization?.MapToShallowOrganizationDTO());
         }
 
+        public static NamedEntityWithUuidDTO MapToNamedEntityDTO(this NamedEntityWithUuid source)
+        {
+            return new NamedEntityWithUuidDTO(source.Id, source.Name, source.Uuid);
+        }
+
         public static NamedEntityDTO MapToNamedEntityDTO(this NamedEntity source)
         {
             return new NamedEntityDTO(source.Id, source.Name);

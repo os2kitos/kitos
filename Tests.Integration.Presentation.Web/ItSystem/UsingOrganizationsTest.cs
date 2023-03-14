@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.ItSystem;
 using Tests.Integration.Presentation.Web.Tools;
@@ -36,7 +35,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IReadOnlyList<UsingOrganizationDTO>>();
                 //Assert
                 var usingOrganization = Assert.Single(response);
-                Assert.Equal(newUsage.Uuid, usingOrganization.SystemUsageUuid);
+                Assert.Equal(newUsage.Uuid, usingOrganization.SystemUsage.Uuid);
                 Assert.Equal(TestEnvironment.DefaultOrganizationId, usingOrganization.Organization.Id);
             }
         }
@@ -58,8 +57,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<IReadOnlyList<UsingOrganizationDTO>>();
                 //Assert
                 Assert.Equal(2, response.Count);
-                Assert.Contains(firstUsage.Uuid, response.Select(x => x.SystemUsageUuid));
-                Assert.Contains(secondUsage.Uuid, response.Select(x => x.SystemUsageUuid));
+                Assert.Contains(firstUsage.Uuid, response.Select(x => x.SystemUsage.Uuid));
+                Assert.Contains(secondUsage.Uuid, response.Select(x => x.SystemUsage.Uuid));
                 Assert.Contains(TestEnvironment.DefaultOrganizationId, response.Select(x => x.Organization.Id));
                 Assert.Contains(TestEnvironment.SecondOrganizationId, response.Select(x => x.Organization.Id));
             }

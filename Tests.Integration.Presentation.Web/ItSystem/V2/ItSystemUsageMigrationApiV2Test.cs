@@ -307,8 +307,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Empty(result.AffectedContracts);
 
             var affectedRelation = Assert.Single(result.AffectedRelations);
-            Assert.Equal(relationDTO.ToUsage.Name, affectedRelation.ToSystemUsage.Name);
-            Assert.Equal(relationDTO.FromUsage.Name, affectedRelation.FromSystemUsage.Name);
+            Assert.Equal(relationDTO.ToUsage.Name, affectedRelation.ToSystem.Name);
+            Assert.Equal(relationDTO.FromUsage.Name, affectedRelation.FromSystem.Name);
             Assert.Equal(relationDTO.Description, affectedRelation.Description);
             Assert.Equal(relationDTO.Interface.Name, affectedRelation.Interface.Name);
             Assert.Null(affectedRelation.Contract);

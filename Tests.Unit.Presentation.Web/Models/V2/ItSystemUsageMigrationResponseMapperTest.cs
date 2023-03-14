@@ -65,8 +65,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertIdentityNamePair(affectedContract, contractDto);
 
             var relationDto = Assert.Single(result.AffectedRelations);
-            AssertIdentityNamePairWithDeactivatedStatus(affectedRelation.ToSystemUsage, relationDto.ToSystemUsage);
-            AssertIdentityNamePairWithDeactivatedStatus(affectedRelation.FromSystemUsage, relationDto.FromSystemUsage);
+            AssertIdentityNamePairWithDeactivatedStatus(affectedRelation.ToSystemUsage, relationDto.ToSystem);
+            AssertIdentityNamePairWithDeactivatedStatus(affectedRelation.FromSystemUsage, relationDto.FromSystem);
             Assert.Equal(affectedRelation.Description, relationDto.Description);
             AssertIdentityNamePair(affectedRelation.RelationInterface, relationDto.Interface);
             AssertIdentityNamePair(affectedRelation.UsageFrequency, relationDto.FrequencyType);
