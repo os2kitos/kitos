@@ -267,7 +267,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ITrackingService>().To<TrackingService>().InCommandScope(Mode);
             kernel.Bind<IUIModuleCustomizationService>().To<UIModuleCustomizationService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationUnitService>().To<OrganizationUnitService>().InCommandScope(Mode);
-            kernel.Bind<IExtendedEntityIdentityResolverService>().To<ExtendedEntityIdentityResolverService>().InCommandScope(Mode);
+            kernel.Bind<IEntityIdMapper>().To<EntityIdMapper>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);
