@@ -2,7 +2,7 @@
 {
     public class UsingOrganizationDTO
     {
-        public int SystemUsageId { get; set; }
-        public NamedEntityDTO Organization { get; set; }
+        public NamedEntityWithUuidDTO SystemUsage{ get; set; }
+        public NamedEntityWithUuidDTO Organization { get; set; }
     }
 }

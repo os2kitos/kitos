@@ -115,7 +115,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         public IHttpActionResult GetUnusedItSystemsBySearchAndOrganization(
             [Required][NonEmptyGuid] Guid organizationUuid,
             [Required] int numberOfItSystems,
-            [Required] bool getPublicFromOtherOrganizations,
             string nameContent = null)
         {
             if(!ModelState.IsValid)
@@ -126,7 +125,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
             if (nameContent != null)
                 conditions.Add(new QueryByPartOfName<ItSystem>(nameContent));
 
-            return _adapter.GetUnusedItSystemsByOrganization(organizationUuid, numberOfItSystems, getPublicFromOtherOrganizations, conditions.ToArray())
+            return _adapter.GetUnusedItSystemsByOrganization(organizationUuid, numberOfItSystems, conditions.ToArray())
                 .Select(_entityWithDeactivatedStatusMapper.Map)
                 .Match(Ok, FromOperationError);
         }

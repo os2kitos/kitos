@@ -545,8 +545,8 @@ namespace Core.ApplicationServices.System
         {
             return itSystemUsages.Select(
                 itSystemUsage => new UsingOrganization(
-                    itSystemUsage.Id,
-                    itSystemUsage.Organization.ToNamedEntity()))
+                    itSystemUsage.ToNamedEntityWithUuid(),
+                    itSystemUsage.Organization.ToNamedEntityWithUuid()))
                 .ToList()
                 .AsReadOnly();
         }

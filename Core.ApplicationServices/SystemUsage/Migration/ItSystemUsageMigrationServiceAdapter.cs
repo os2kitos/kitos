@@ -43,11 +43,10 @@ namespace Core.ApplicationServices.SystemUsage.Migration
 
         public Result<IQueryable<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(Guid organizationUuid,
             int numberOfItSystems,
-            bool getPublicFromOtherOrganizations,
             params IDomainQuery<ItSystem>[] conditions)
         {
             return _organizationService.GetOrganization(organizationUuid)
-                .Bind(organization => _systemUsageMigrationService.GetUnusedItSystemsByOrganizationQuery(organization.Id, numberOfItSystems, getPublicFromOtherOrganizations, conditions));
+                .Bind(organization => _systemUsageMigrationService.GetUnusedItSystemsByOrganizationQuery(organization.Id, numberOfItSystems, true, conditions));
         }
 
         public IEnumerable<CommandPermissionResult> GetCommandPermissions()

@@ -170,7 +170,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
             Assert.True(
                 usingOrganizations.Select(x => new
                 {
-                    usageId = x.ItSystemUsageId,
+                    usageId = x.ItSystemUsage.Uuid,
                     org = new
                     {
                         id = x.Organization.Id,
@@ -180,7 +180,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
                     .SequenceEqual(
                         dtos.Select(x => new
                         {
-                            usageId = x.SystemUsageId,
+                            usageId = x.SystemUsage.Uuid,
                             org = new
                             {
                                 id = x.Organization.Id,

@@ -12,9 +12,9 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystemUsage
 {
     public class ItSystemUsageMigrationV2Helper
     {
-        const string BasePath = "api/v2/internal/it-system-usages";
+        private const string BasePath = "api/v2/internal/it-system-usages";
 
-        public static async Task<IEnumerable<IdentityNamePairWithDeactivatedStatusDTO>> GetUnusedSystemsAsync(Guid organizationUuid, int numberOfItSystems, bool getPublicFromOtherOrganizations, string nameContent = null, Cookie userCookie = null)
+        public static async Task<IEnumerable<IdentityNamePairWithDeactivatedStatusDTO>> GetUnusedSystemsAsync(Guid organizationUuid, int numberOfItSystems, string nameContent = null, Cookie userCookie = null)
         {
             var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var path = BasePath + "/migration/unused-it-systems";
@@ -22,7 +22,6 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystemUsage
             {
                 new("organizationUuid", organizationUuid.ToString("D")),
                 new("numberOfItSystems", numberOfItSystems.ToString("D")),
-                new("getPublicFromOtherOrganizations", getPublicFromOtherOrganizations.ToString())
             };
 
             if(nameContent != null)

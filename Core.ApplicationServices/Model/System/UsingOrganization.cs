@@ -4,12 +4,12 @@ namespace Core.ApplicationServices.Model.System
 {
     public class UsingOrganization
     {
-        public int ItSystemUsageId { get; }
-        public NamedEntity Organization { get; }
+        public NamedEntityWithUuid ItSystemUsage { get; set; }
+        public NamedEntityWithUuid Organization { get; }
 
-        public UsingOrganization(int usageId, NamedEntity organization)
+        public UsingOrganization(NamedEntityWithUuid itSystemUsage, NamedEntityWithUuid organization)
         {
-            ItSystemUsageId = usageId;
+            ItSystemUsage = itSystemUsage;
             Organization = organization;
         }
     }

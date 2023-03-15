@@ -379,6 +379,7 @@
     <Compile Include="Infrastructure\Attributes\V2StyleJsonResponseSerializationAttribute.cs" />
     <Compile Include="Infrastructure\Config\V2JsonSerializationConfig.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\NotificationTypeMappingExtensions.cs" />
+    <Compile Include="Models\API\V1\NamedEntityWithUuidDTO.cs" />
     <Compile Include="Models\API\V1\UserCredentialsDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\BaseNotificationPropertiesWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\IHasBaseWriteProperties.cs" />
@@ -479,6 +480,7 @@
     <TypeScriptCompile Include="app\helpers\sub-nav-helper.ts" />
     <TypeScriptCompile Include="app\helpers\date-validation-helper.ts" />
     <TypeScriptCompile Include="app\models\advice\advice-type.ts" />
+    <TypeScriptCompile Include="app\models\Api\command-permission-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\admin-rights-dto.ts" />
     <TypeScriptCompile Include="app\models\Api\it-system-usage\personal-data-option.ts" />
     <TypeScriptCompile Include="app\models\Api\organization\check-connectoin-error.ts" />
@@ -500,6 +502,7 @@
     <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-contract\it-contract-validation-error.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-life-cycle-status.ts" />
+    <TypeScriptCompile Include="app\models\Api\it-system-usage\it-system-usage-migration-command-permissions-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-details-response-dto.ts" />
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage-validation-error.ts" />
     <TypeScriptCompile Include="app\models\Odata\generic\option-dto.ts" />
@@ -905,7 +908,6 @@
     <Compile Include="Models\API\V1\GDPR\DataProcessingRegistrationDTO.cs" />
     <Compile Include="Models\API\V1\GDPR\DataProcessingRegistrationOversightDateDTO.cs" />
     <Compile Include="Models\API\V1\HierachyNodeDTO.cs" />
-    <Compile Include="Models\API\V1\ItSystemUsageMigration\RelationMigrationDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemUsageOptionsDTO.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\GDPR\GDPRExportReportColumns.cs" />
     <Compile Include="Models\API\V1\ItSystemUsage\GDPR\GDPRExportReportCsvMapper.cs" />
@@ -915,15 +917,12 @@
     <Compile Include="Controllers\API\V1\OData\ItContractItSystemUsagesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\SensitiveDataTypesController.cs" />
     <Compile Include="Extensions\HttpMethodIntent.cs" />
-    <Compile Include="Controllers\API\V1\ItSystemUsageMigrationController.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapper.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\ChildEntityCrudAuthorization.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\General\IControllerAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\IControllerCrudAuthorization.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\General\ContextBasedAuthorizationStrategy.cs" />
     <Compile Include="Infrastructure\Authorization\Controller\Crud\RootEntityCrudAuthorization.cs" />
-    <Compile Include="Models\API\V1\ItSystemUsageMigration\ItSystemUsageMigrationAccessDTO.cs" />
-    <Compile Include="Models\API\V1\ItSystemUsageMigration\ItSystemUsageMigrationDTO.cs" />
     <Compile Include="Models\API\V1\ItSystem\UsingOrganizationDTO.cs" />
     <Compile Include="Models\API\V1\KLEStatusDTO.cs" />
     <Compile Include="Models\API\V1\NamedEntityWithEnabledStatusDTO.cs" />

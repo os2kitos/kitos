@@ -179,7 +179,6 @@
     <Compile Include="Organizations\V2\OrganizationUserApiV2Test.cs" />
     <Compile Include="ItSystem\ItSystemTests.cs" />
     <Compile Include="Interfaces\ItInterfacesTest.cs" />
-    <Compile Include="ItSystem\ItSystemUsageMigrationTests.cs" />
     <Compile Include="ItSystem\ItSystemUsageTests.cs" />
     <Compile Include="LocalAdminArea\LocalConfigTest.cs" />
     <Compile Include="Organizations\OrganizationTest.cs" />

@@ -282,7 +282,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var usage = Assert.Single(result.Value);
-            Assert.Equal(systemUsage.Id, usage.ItSystemUsageId);
+            Assert.Equal(systemUsage.Uuid, usage.ItSystemUsage.Uuid);
             Assert.Equal(organization.Id, usage.Organization.Id);
             Assert.Equal(organization.Name, usage.Organization.Name);
         }
@@ -307,8 +307,8 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             Assert.Collection(result.Value,
-                item => Assert.Equal(firstSystemUsage.Id, item.ItSystemUsageId),
-                item => Assert.Equal(secondSystemUsage.Id, item.ItSystemUsageId)
+                item => Assert.Equal(firstSystemUsage.Uuid, item.ItSystemUsage.Uuid),
+                item => Assert.Equal(secondSystemUsage.Uuid, item.ItSystemUsage.Uuid)
                 );
         }
 
@@ -1651,7 +1651,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private ItSystemUsage CreateSystemUsage(Organization organization)
         {
-            return new() { Id = A<int>(), Organization = organization };
+            return new() { Id = A<int>(), Organization = organization, ItSystem = new ItSystem{Name = A<string>()}};
         }
 
         private ItInterfaceExhibit CreateInterfaceExhibit()

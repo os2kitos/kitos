@@ -85,26 +85,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             return Result<IQueryable<ItSystem>, OperationError>.Success(finalQuery);
         }
 
-        public Result<IReadOnlyList<ItSystem>, OperationError> GetUnusedItSystemsByOrganizationByName(
-            int organizationId,
-            string nameContent,
-            int numberOfItSystems,
-            bool getPublicFromOtherOrganizations)
-        {
-            if (string.IsNullOrWhiteSpace(nameContent))
-            {
-                return new OperationError($"{nameof(nameContent)} cannot be empty or null", OperationFailure.BadInput);
-            }
-
-            var conditions = new List<IDomainQuery<ItSystem>>
-            {
-                new QueryByPartOfName<ItSystem>(nameContent)
-            };
-            
-            return GetUnusedItSystemsByOrganizationQuery(organizationId, numberOfItSystems, getPublicFromOtherOrganizations, conditions.ToArray())
-                .Select<IReadOnlyList<ItSystem>>(unusedSystems => unusedSystems.ToList().AsReadOnly());
-        }
-
         public Result<ItSystemUsageMigration, OperationError> GetSystemUsageMigration(int usageId, int toSystemId)
         {
             if (!CanExecuteMigration())

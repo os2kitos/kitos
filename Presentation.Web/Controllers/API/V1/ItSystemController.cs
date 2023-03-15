@@ -417,8 +417,8 @@ namespace Presentation.Web.Controllers.API.V1
                 .Select(
                 usingOrganization => new UsingOrganizationDTO
                 {
-                    SystemUsageId = usingOrganization.ItSystemUsageId,
-                    Organization = usingOrganization.Organization.MapToNamedEntityDTO()
+                    SystemUsage = usingOrganization.ItSystemUsage.MapToNamedEntityDTO(),
+                    Organization = usingOrganization.Organization.MapToNamedEntityDTO(),
                 })
                 .ToList();
         }
