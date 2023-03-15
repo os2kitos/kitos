@@ -15,9 +15,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         Result<ItSystemUsageMigration, OperationError> GetMigration(Guid usageUuid, Guid toSystemUuid);
         Result<ItSystemUsage, OperationError> ExecuteMigration(Guid usageUuid, Guid toSystemUuid);
         IEnumerable<CommandPermissionResult> GetCommandPermissions();
-        Result<IQueryable<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(Guid organizationUuid,
-            int numberOfItSystems,
-            bool getPublicFromOtherOrganizations,
-            params IDomainQuery<ItSystem>[] conditions);
+        Result<IQueryable<ItSystem>, OperationError> GetUnusedItSystemsByOrganization(Guid organizationUuid, int numberOfItSystems, params IDomainQuery<ItSystem>[] conditions);
     }
 }

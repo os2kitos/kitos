@@ -14,7 +14,6 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
-using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -139,7 +138,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var systemUuid = A<Guid>();
             var systemId = A<int>();
 
-            var expectedResult = new ItSystemUsage{Uuid = usageUuid};
+            var expectedResult = new ItSystemUsage { Uuid = usageUuid };
 
             ExpectResolveIdReturns<ItSystemUsage>(usageUuid, usageId);
             ExpectResolveIdReturns<ItSystem>(systemUuid, systemId);
@@ -184,7 +183,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var usageUuid = A<Guid>();
             var usageId = A<int>();
             var systemUuid = A<Guid>();
-            
+
             var expectedResult = A<OperationError>();
 
             ExpectResolveIdReturns<ItSystemUsage>(usageUuid, usageId);
@@ -227,13 +226,13 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var getPublicFromTheOrganization = A<bool>();
             var conditions = new QueryByPartOfName<ItSystem>(A<string>());
 
-            var expectedResult = new List<ItSystem> {new(), new()};
+            var expectedResult = new List<ItSystem> { new(), new() };
 
-            ExpectGetOrganizationReturns(organizationUuid, new Organization{Id = organizationId});
-            ExpectGetUnusedItSystemsByOrganizationQuery(organizationId, numberOfItSystems, getPublicFromTheOrganization, conditions, Result<IQueryable<ItSystem>, OperationError>.Success(expectedResult.AsQueryable()));
+            ExpectGetOrganizationReturns(organizationUuid, new Organization { Id = organizationId });
+            ExpectGetUnusedItSystemsByOrganizationQuery(organizationId, numberOfItSystems, conditions, Result<IQueryable<ItSystem>, OperationError>.Success(expectedResult.AsQueryable()));
 
             //Act
-            var result = _sut.GetUnusedItSystemsByOrganization(organizationUuid, numberOfItSystems, getPublicFromTheOrganization, conditions);
+            var result = _sut.GetUnusedItSystemsByOrganization(organizationUuid, numberOfItSystems, conditions);
 
             //Assert
             Assert.True(result.Ok);
@@ -247,16 +246,15 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var organizationUuid = A<Guid>();
             var organizationId = A<int>();
             var numberOfItSystems = A<int>();
-            var getPublicFromTheOrganization = A<bool>();
             var conditions = new QueryByPartOfName<ItSystem>(A<string>());
 
             var expectedResult = A<OperationError>();
 
-            ExpectGetOrganizationReturns(organizationUuid, new Organization{Id = organizationId});
-            ExpectGetUnusedItSystemsByOrganizationQuery(organizationId, numberOfItSystems, getPublicFromTheOrganization, conditions, expectedResult);
+            ExpectGetOrganizationReturns(organizationUuid, new Organization { Id = organizationId });
+            ExpectGetUnusedItSystemsByOrganizationQuery(organizationId, numberOfItSystems, conditions, expectedResult);
 
             //Act
-            var result = _sut.GetUnusedItSystemsByOrganization(organizationUuid, numberOfItSystems, getPublicFromTheOrganization, conditions);
+            var result = _sut.GetUnusedItSystemsByOrganization(organizationUuid, numberOfItSystems, conditions);
 
             //Assert
             Assert.True(result.Failed);
@@ -269,7 +267,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Arrange
             var organizationUuid = A<Guid>();
             var numberOfItSystems = A<int>();
-            var getPublicFromTheOrganization = A<bool>();
             var conditions = new QueryByPartOfName<ItSystem>(A<string>());
 
             var expectedResult = A<OperationError>();
@@ -277,7 +274,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectGetOrganizationReturns(organizationUuid, expectedResult);
 
             //Act
-            var result = _sut.GetUnusedItSystemsByOrganization(organizationUuid, numberOfItSystems, getPublicFromTheOrganization, conditions);
+            var result = _sut.GetUnusedItSystemsByOrganization(organizationUuid, numberOfItSystems, conditions);
 
             //Assert
             Assert.True(result.Failed);
@@ -302,8 +299,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private static ItSystemUsageMigration CreateItSystemUsageMigration(Guid fromUsageUuid, Guid toSystemUuid)
         {
-            return new ItSystemUsageMigration(new ItSystemUsage{Uuid = fromUsageUuid}, new ItSystem(),
-                new ItSystem{Uuid = toSystemUuid}, new List<ItContract>(), new List<SystemRelation>(),
+            return new ItSystemUsageMigration(new ItSystemUsage { Uuid = fromUsageUuid }, new ItSystem(),
+                new ItSystem { Uuid = toSystemUuid }, new List<ItContract>(), new List<SystemRelation>(),
                 new List<DataProcessingRegistration>()
             );
         }
@@ -328,9 +325,9 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _systemUsageMigrationService.Setup(x => x.GetSystemUsageMigration(usageId, systemId)).Returns(result);
         }
 
-        private void ExpectGetUnusedItSystemsByOrganizationQuery(int orgId, int numberOfItSystems, bool getPublic, IDomainQuery<ItSystem> condition, Result<IQueryable<ItSystem>, OperationError> result)
+        private void ExpectGetUnusedItSystemsByOrganizationQuery(int orgId, int numberOfItSystems, IDomainQuery<ItSystem> condition, Result<IQueryable<ItSystem>, OperationError> result)
         {
-            _systemUsageMigrationService.Setup(x => x.GetUnusedItSystemsByOrganizationQuery(orgId, numberOfItSystems, getPublic, condition)).Returns(result);
+            _systemUsageMigrationService.Setup(x => x.GetUnusedItSystemsByOrganizationQuery(orgId, numberOfItSystems, true, condition)).Returns(result);
         }
 
         private void ExpectResolveIdReturns<TEntity>(Guid uuid, Result<int, OperationError> result) where TEntity : Entity, IHasId, IHasUuid

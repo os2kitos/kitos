@@ -28,7 +28,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var (itSystem, organization) = await CreatePrerequisites(accessModifier: AccessModifier.Public);
 
             //Act
-            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 10, true, itSystem.Name,  cookie);
+            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 10, itSystem.Name, cookie);
 
             //Assert
             var system = Assert.Single(systems);
@@ -53,7 +53,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var createdSystemsUuids = new[] { itSystem.Uuid, itSystem2.Uuid, itSystem3.Uuid };
 
             //Act
-            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, expectedNumberOfSystems, true, prefix, cookie);
+            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, expectedNumberOfSystems, prefix, cookie);
 
             //Assert
             var systemList = systems.ToList();
@@ -75,57 +75,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var (ownLocalSystem, organization, cookie) = await CreatePrerequisitesWithUser(role, system1Name);
             var itSystem2 = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, system2Name, AccessModifier.Public);
             await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, system3Name);
-            var createdSystemsUuids = new[] { ownLocalSystem.Uuid, itSystem2.Uuid};
+            var createdSystemsUuids = new[] { ownLocalSystem.Uuid, itSystem2.Uuid };
 
             //Act
-            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 3, true, prefix, cookie);
-
-            //Assert
-            var systemList = systems.ToList();
-            Assert.Equal(2, systemList.Count);
-            Assert.True(systemList.All(x => createdSystemsUuids.Contains(x.Uuid)));
-        }
-
-        [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin)]
-        [InlineData(OrganizationRole.User)]
-        public async Task GetUnusedItSystems_Can_Include_It_Systems_From_Own_Organization_Only(OrganizationRole role)
-        {
-            //Arrange
-            var prefix = A<string>();
-            var system1Name = prefix + A<string>();
-            var system2Name = prefix + A<string>();
-            var system3Name = prefix + A<string>();
-
-            var (itSystem, organization, cookie) = await CreatePrerequisitesWithUser(role, system1Name, AccessModifier.Public);
-            var localSystem = await CreateSystemAsync(organization.Id, system3Name);
-            await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, system2Name, AccessModifier.Public);
-            var createdSystemsUuids = new[] { itSystem.Uuid, localSystem.Uuid };
-
-            //Act
-            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 10, false, prefix, cookie);
-
-            //Assert
-            var systemList = systems.ToList();
-            Assert.Equal(2, systemList.Count);
-            Assert.True(systemList.All(x => createdSystemsUuids.Contains(x.Uuid)));
-        }
-
-        [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin)]
-        [InlineData(OrganizationRole.User)]
-        public async Task GetUnusedItSystems_Returns_All_On_Whitespace_Or_Empty(OrganizationRole role)
-        {
-            //Arrange
-            var system1Name = A<string>();
-            var system2Name = A<string>();
-
-            var (itSystem, organization, cookie) = await CreatePrerequisitesWithUser(role, system1Name, AccessModifier.Public);
-            var localSystem = await CreateSystemAsync(organization.Id, system2Name);
-            var createdSystemsUuids = new[] { itSystem.Uuid, localSystem.Uuid };
-
-            //Act
-            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 10, false, null, cookie);
+            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 3, prefix, cookie);
 
             //Assert
             var systemList = systems.ToList();
@@ -146,7 +99,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             await CreateSystemAsync(organization.Id, system2Name);
 
             //Act
-            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 10, false, system1Name, cookie);
+            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 10, system1Name, cookie);
 
             //Assert
             var dto = Assert.Single(systems);
@@ -158,15 +111,16 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         public async Task GetUnusedItSystems_Does_Not_Include_Systems_In_Use()
         {
             //Arrange
-            var system1Name = A<string>();
-            var system2Name = A<string>();
+            var prefix = A<Guid>().ToString("N");
+            var system1Name = $"{prefix}_1";
+            var system2Name = $"{prefix}_2";
 
             var (itSystem, organization, cookie) = await CreatePrerequisitesWithUser(OrganizationRole.GlobalAdmin, system1Name, AccessModifier.Public);
             var localSystem = await CreateSystemAsync(organization.Id, system2Name);
             await ItSystemHelper.TakeIntoUseAsync(localSystem.Id, organization.Id);
 
             //Act
-            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 10, false, null, cookie);
+            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 10, prefix, cookie);
 
             //Assert
             var systemList = systems.ToList();
@@ -187,7 +141,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             await ItSystemHelper.TakeIntoUseAsync(itSystemOtherOrg.Id, organization.Id);
 
             //Act
-            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 2, true, prefix, cookie);
+            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 2, prefix, cookie);
 
             //Assert
             var systemList = systems.ToList();
@@ -222,7 +176,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             //Act
             var result = await ItSystemUsageMigrationV2Helper.GetMigration(usage.Uuid, newSystem.Uuid);
-            
+
             //Assert
             Assert.Empty(result.AffectedRelations);
             Assert.Empty(result.AffectedContracts);
@@ -243,7 +197,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             //Act
             var result = await ItSystemUsageMigrationV2Helper.GetMigration(usage.Uuid, newSystem.Uuid);
-            
+
             //Assert
             Assert.Empty(result.AffectedRelations);
             Assert.Empty(result.AffectedDataProcessingRegistrations);
@@ -267,7 +221,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             //Act
             var result = await ItSystemUsageMigrationV2Helper.GetMigration(usage.Uuid, newSystem.Uuid);
-            
+
             //Assert
             Assert.Empty(result.AffectedRelations);
             Assert.Empty(result.AffectedContracts);
@@ -301,7 +255,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             //Act
             var result = await ItSystemUsageMigrationV2Helper.GetMigration(fromSystemUsage.Uuid, toSystem.Uuid);
-            
+
             //Assert
             Assert.Empty(result.AffectedDataProcessingRegistrations);
             Assert.Empty(result.AffectedContracts);
@@ -337,12 +291,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             //Act
             var result = await ItSystemUsageMigrationV2Helper.GetMigration(fromSystemUsage.Uuid, toSystem.Uuid);
-            
+
             //Assert
             Assert.Empty(result.AffectedDataProcessingRegistrations);
             Assert.Empty(result.AffectedContracts);
             Assert.Empty(result.AffectedRelations);
-            
+
             AssertFromToSystemInfo(fromSystemUsage, result, fromSystem, toSystem);
         }
 
@@ -367,12 +321,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             //Act
             var result = await ItSystemUsageMigrationV2Helper.GetMigration(fromSystemUsage.Uuid, toSystem.Uuid);
-            
+
             //Assert
             Assert.Empty(result.AffectedDataProcessingRegistrations);
             Assert.Empty(result.AffectedContracts);
             Assert.Empty(result.AffectedRelations);
-            
+
             AssertFromToSystemInfo(fromSystemUsage, result, fromSystem, toSystem);
         }
 
@@ -413,13 +367,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
             var toSystem = await CreateSystemAsync(organization.Id, CreateName());
             var toSystemUsage = await ItSystemHelper.TakeIntoUseAsync(toSystem.Id, organization.Id);
-            
+
             var contract = await ItContractHelper.CreateContract(A<string>(), organization.Id);
             await ItContractHelper.AddItSystemUsage(contract.Id, fromSystemUsage.Id, organization.Id);
 
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organization.Id, AccessModifier.Public));
             var exhibit = await InterfaceExhibitHelper.CreateExhibit(toSystem.Id, interfaceDto.Id);
-            
+
             var relation = await CreateSystemRelation(
                 fromSystemUsage.Id,
                 toSystemUsage.Id,
@@ -428,7 +382,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 GetValidFrequencyTypeId(),
                 contract.Id
             );
-            
+
             //Act
             await ItSystemUsageMigrationV2Helper.ExecuteMigration(fromSystemUsage.Uuid, toSystem.Uuid);
 
@@ -443,10 +397,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Arrange
             var (fromSystem, organization) = await CreatePrerequisites();
             var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
-            
+
             var contract = await ItContractHelper.CreateContract(A<string>(), organization.Id);
             await ItContractHelper.AddItSystemUsage(contract.Id, fromSystemUsage.Id, organization.Id);
-            
+
             //Act
             await ItSystemUsageMigrationV2Helper.ExecuteMigration(fromSystemUsage.Uuid, fromSystem.Uuid);
 
@@ -462,7 +416,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
             var toSystem = await CreateSystemAsync(organization.Id, CreateName());
             var toSystemUsage = await ItSystemHelper.TakeIntoUseAsync(toSystem.Id, organization.Id);
-            
+
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organization.Id, AccessModifier.Public));
             var exhibit = await InterfaceExhibitHelper.CreateExhibit(toSystem.Id, interfaceDto.Id);
 
@@ -490,7 +444,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
             var toSystem = await CreateSystemAsync(organization.Id, CreateName());
             var toSystemUsage = await ItSystemHelper.TakeIntoUseAsync(toSystem.Id, organization.Id);
-            
+
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organization.Id, AccessModifier.Public));
             var exhibit = await InterfaceExhibitHelper.CreateExhibit(toSystem.Id, interfaceDto.Id);
 
@@ -520,7 +474,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var fromSystemUsage = await ItSystemHelper.TakeIntoUseAsync(fromSystem.Id, organization.Id);
             var toSystem = await CreateSystemAsync(organization.Id, CreateName());
             var toSystemUsage = await ItSystemHelper.TakeIntoUseAsync(toSystem.Id, organization.Id);
-            
+
             var migrateToItSystem = await CreateSystemAsync(organization.Id, CreateName());
 
             var relation = await CreateSystemRelation(

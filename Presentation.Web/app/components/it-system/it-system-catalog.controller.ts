@@ -142,7 +142,6 @@
                             "api/v2/internal/it-system-usages/migration/unused-it-systems?" +
                             `organizationUuid=${this.municipalityUuid}` +
                             "&numberOfItSystems=25" +
-                            "&getPublicFromOtherOrganizations=true" +
                             `&nameContent=${queryParams.data.query}`);
                         request.then(queryParams.success);
 

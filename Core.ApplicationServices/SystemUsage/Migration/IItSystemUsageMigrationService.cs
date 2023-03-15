@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.SystemUsage.Migration;
 using Core.DomainModel.ItSystem;
