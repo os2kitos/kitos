@@ -163,6 +163,20 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(newOrg.Uuid, org.Uuid);
         }
 
+        [Fact]
+        public async Task GET_Organizations_Returns_Ok_Uuid_Filtering()
+        { //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var newOrg = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+
+            //Act
+            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250, uuid: newOrg.Uuid);
+
+            //Assert
+            var org = Assert.Single(organizations);
+            Assert.Equal(newOrg.Uuid, org.Uuid);
+        }
+
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -175,7 +189,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250, nameOrCvrContent: inputIsCvr ? newOrg.Cvr : newOrg.Name);
 
             //Assert
-            var org = Assert.Single(organizations.Where(x=>x.Uuid == newOrg.Uuid));
+            var org = Assert.Single(organizations.Where(x => x.Uuid == newOrg.Uuid));
             Assert.Equal(newOrg.Uuid, org.Uuid);
         }
 
