@@ -53,6 +53,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         /// <param name="nameContent">Optional query for name content</param>
         /// <param name="cvrContent">Optional query on CVR number</param>
         /// <param name="nameOrCvrContent">Optional query which will query both name and CVR number using OR logic</param>
+        /// <param name="uuid">Optional query by organization uuid</param>
         /// <returns>A list of organizations</returns>
         [HttpGet]
         [Route("organizations")]
@@ -60,10 +61,11 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         public IHttpActionResult GetOrganizations(
-            bool onlyWhereUserHasMembership = false, 
-            string nameContent = null, 
+            bool onlyWhereUserHasMembership = false,
+            string nameContent = null,
             string cvrContent = null,
-            string nameOrCvrContent = null, 
+            string nameOrCvrContent = null,
+            [NonEmptyGuid] Guid? uuid = null,
             [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
@@ -80,6 +82,9 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
             if (!string.IsNullOrWhiteSpace(nameOrCvrContent))
                 refinements.Add(new QueryByNameOrCvrContent(nameOrCvrContent));
 
+            if (uuid.HasValue)
+                refinements.Add(new QueryByUuid<Organization>(uuid.Value));
+
             return _organizationService
                 .SearchAccessibleOrganizations(onlyWhereUserHasMembership, refinements.ToArray())
                 .OrderBy(x => x.Id)
@@ -93,10 +98,10 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         /// Returns organization identified by uuid
         /// </summary>
         /// <param name="organizationUuid">UUID of the organization</param>
-        /// <returns>A list of organizations</returns>
+        /// <returns>An organization</returns>
         [HttpGet]
         [Route("organizations/{organizationUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
