@@ -98,7 +98,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         /// Returns organization identified by uuid
         /// </summary>
         /// <param name="organizationUuid">UUID of the organization</param>
-        /// <returns>A list of organizations</returns>
+        /// <returns>An organization</returns>
         [HttpGet]
         [Route("organizations/{organizationUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
