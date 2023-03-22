@@ -17,10 +17,10 @@ namespace Presentation.Web.Swagger
                 isCollectionResult = okResponse.schema?.type?.Equals("array", StringComparison.OrdinalIgnoreCase) ?? false;
             }
 
-            var responseTypeNamePart = isCollectionResult ? "MANY" : "SINGLE";
+            var responseTypeNamePart = isCollectionResult ? "Many" : "Single";
 
             var opsId =
-                $"{apiDescription.HttpMethod.Method}_{responseTypeNamePart}_{apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName}_{apiDescription.ActionDescriptor.ActionName}";
+                $"{apiDescription.HttpMethod.Method.ToLowerInvariant()}_{responseTypeNamePart}_{apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName}_{apiDescription.ActionDescriptor.ActionName}";
 
             if (apiDescription.ActionDescriptor is ReflectedHttpActionDescriptor actionDescriptor)
             {
