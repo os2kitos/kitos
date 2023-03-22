@@ -14,12 +14,12 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// <summary>
         /// Comment attached to the recommendation
         /// </summary>
-        public string Comment { get; }
+        public string Comment { get; set; }
 
         /// <summary>
         /// Archive duty recommendation identifier
         /// </summary>
         [Required]
-        public RecommendedArchiveDutyChoice Id { get; }
+        public RecommendedArchiveDutyChoice Id { get; set; }
     }
 }

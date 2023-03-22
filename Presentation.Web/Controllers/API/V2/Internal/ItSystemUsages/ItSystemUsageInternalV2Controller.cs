@@ -92,7 +92,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
                 .Match(Ok, FromOperationError);
         }
 
-        public ItSystemUsageSearchResultResponseDTO Map(ItSystemUsage usage)
+        private static ItSystemUsageSearchResultResponseDTO Map(ItSystemUsage usage)
         {
             return usage
                 .MapIdentityNamePairDTO()

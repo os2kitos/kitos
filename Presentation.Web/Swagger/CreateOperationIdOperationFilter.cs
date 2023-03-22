@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
+using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using Swashbuckle.Swagger;
@@ -10,27 +11,41 @@ namespace Presentation.Web.Swagger
     {
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
         {
-            operation.operationId =
-                apiDescription.HttpMethod.Method + "_" +
-                apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName + "_" +
-                apiDescription.ActionDescriptor.ActionName + "_" +
-                DescribeParameters(apiDescription.ActionDescriptor.ActionBinding.ParameterBindings);
-        }
+            var isCollectionResult = false;
+            if (operation.responses.TryGetValue("200", out var okResponse))
+            {
+                isCollectionResult = okResponse.schema?.type?.Equals("array", StringComparison.OrdinalIgnoreCase) ?? false;
+            }
 
-        private static string DescribeParameters(IEnumerable<HttpParameterBinding> actionBindingParameterBindings)
-        {
-            var parameterDescriptions = actionBindingParameterBindings
-                .OrderBy(x => x.Descriptor.ParameterType.FullName)
-                .ThenBy(x => x.Descriptor.ParameterName)
-                .Select(DescribeParameter)
-                .ToList();
+            var responseTypeNamePart = isCollectionResult ? "Many" : "Single";
 
-            return parameterDescriptions.Any() ? $"_{string.Join("_", parameterDescriptions)}" : string.Empty;
-        }
+            var opsId =
+                $"{apiDescription.HttpMethod.Method.ToLowerInvariant()}_{responseTypeNamePart}_{apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName}_{apiDescription.ActionDescriptor.ActionName}";
 
-        private static string DescribeParameter(HttpParameterBinding actionBindingParameterBinding)
-        {
-            return $"{actionBindingParameterBinding.Descriptor.ParameterType.Name}-{actionBindingParameterBinding.Descriptor.ParameterName}";
+            if (apiDescription.ActionDescriptor is ReflectedHttpActionDescriptor actionDescriptor)
+            {
+                var methodInfo = actionDescriptor.MethodInfo;
+                var publicMethodsWithSameName = methodInfo
+                    .DeclaringType
+                    .GetMethods()
+                    //Only match public methods
+                    .Where(x => x.IsPublic)
+                    //Don't care about omitted methods
+                    .Where(x => x.GetCustomAttributes(false).Contains(typeof(NonActionAttribute)) == false)
+                    //Match similar names regardless of casing
+                    .Where(x => x.Name.Equals(methodInfo.Name, StringComparison.OrdinalIgnoreCase))
+                    //Order by declaring order
+                    .OrderBy(m => m.MetadataToken)
+                    .ToList();
+
+                var indexOfCurrentAction = publicMethodsWithSameName.IndexOf(methodInfo);
+                if (publicMethodsWithSameName.Count > 1 && indexOfCurrentAction != 0)
+                {
+                    opsId += "_V" + indexOfCurrentAction;
+                }
+            }
+
+            operation.operationId = opsId;
         }
     }
 }
