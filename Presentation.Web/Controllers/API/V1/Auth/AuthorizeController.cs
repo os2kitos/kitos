@@ -11,6 +11,7 @@ using System.Web.Http;
 using System.Web.Security;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Authentication.Commands;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
@@ -36,25 +37,28 @@ namespace Presentation.Web.Controllers.API.V1.Auth
         private readonly IOrganizationService _organizationService;
         private readonly IApplicationAuthenticationState _applicationAuthenticationState;
         private readonly ICommandBus _commandBus;
+        private readonly IOrganizationalUserContext _userContext;
 
         public AuthorizeController(
             IUserRepository userRepository,
             IUserService userService,
             IOrganizationService organizationService,
             IApplicationAuthenticationState applicationAuthenticationState,
-            ICommandBus commandBus)
+            ICommandBus commandBus,
+            IOrganizationalUserContext userContext)
         {
             _userRepository = userRepository;
             _userService = userService;
             _organizationService = organizationService;
             _applicationAuthenticationState = applicationAuthenticationState;
             _commandBus = commandBus;
+            _userContext = userContext;
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<UserDTO>))]
         public HttpResponseMessage GetLogin()
         {
-            var user = _userRepository.GetById(UserId);
+            var user = _userRepository.GetById(_userContext.UserId);
             Logger.Debug($"GetLogin called for {user}");
             var response = Map<User, UserDTO>(user);
             return Ok(response);
@@ -96,8 +100,8 @@ namespace Presentation.Web.Controllers.API.V1.Auth
             var orgs = _organizationService.SearchAccessibleOrganizations();
 
             //Global admin should se everything but regular users should only see organizations which they are a member of
-            if (!UserContext.IsGlobalAdmin())
-                orgs = orgs.ByIds(UserContext.OrganizationIds.ToList());
+            if (!_userContext.IsGlobalAdmin())
+                orgs = orgs.ByIds(_userContext.OrganizationIds.ToList());
             return orgs;
         }
 
@@ -105,7 +109,7 @@ namespace Presentation.Web.Controllers.API.V1.Auth
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<OrganizationAndDefaultUnitDTO>))]
         public HttpResponseMessage GetOrganization(int orgId)
         {
-            var user = _userRepository.GetById(UserId);
+            var user = _userRepository.GetById(_userContext.UserId);
             var org = GetOrganizationsWithMembershipAccess().SingleOrDefault(o => o.Id == orgId);
             if (org == null)
             {
