@@ -14,7 +14,6 @@ using Presentation.Web.Helpers;
 using Presentation.Web.Models.API.V1;
 using System.Web.Http.ModelBinding;
 using Core.Abstractions.Types;
-using Core.ApplicationServices.Authorization;
 
 namespace Presentation.Web.Controllers.API.V1
 {
@@ -26,10 +25,6 @@ namespace Presentation.Web.Controllers.API.V1
 
         [Inject]
         public IMapper Mapper { get; set; }
-
-        [Inject]
-        public IOrganizationalUserContext UserContext { get; set; }
-        protected int UserId => UserContext.UserId;
 
         protected HttpResponseMessage LogError(Exception exp, [CallerMemberName] string memberName = "")
         {
