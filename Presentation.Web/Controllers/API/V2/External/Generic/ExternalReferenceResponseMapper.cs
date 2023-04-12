@@ -7,13 +7,12 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
 {
     public class ExternalReferenceResponseMapper: IExternalReferenceResponseMapper
     {
-        public IEnumerable<ExternalReferenceDataResponseDTO> MapExternalReferences(IEnumerable<ExternalReference> externalReferences,
-            ExternalReference masterReference)
+        public IEnumerable<ExternalReferenceDataResponseDTO> MapExternalReferences(IEnumerable<ExternalReference> externalReferences)
         {
-            return externalReferences.Select(externalReference => MapExternalReferenceDto(externalReference, masterReference)).ToList();
+            return externalReferences.Select(MapExternalReference).ToList();
         }
 
-        private static ExternalReferenceDataResponseDTO MapExternalReferenceDto(ExternalReference externalReference, ExternalReference masterReference)
+        public ExternalReferenceDataResponseDTO MapExternalReference(ExternalReference externalReference)
         {
             return new ExternalReferenceDataResponseDTO
             {
@@ -21,7 +20,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
                 DocumentId = externalReference.ExternalReferenceId,
                 Title = externalReference.Title,
                 Url = externalReference.URL,
-                MasterReference = masterReference?.Id.Equals(externalReference.Id) == true
+                MasterReference = externalReference.IsMasterReference()
             };
         }
     }

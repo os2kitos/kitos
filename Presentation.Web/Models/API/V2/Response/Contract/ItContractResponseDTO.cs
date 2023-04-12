@@ -9,7 +9,7 @@ using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Presentation.Web.Models.API.V2.Response.Contract
 {
-    public class ItContractResponseDTO : IHasNameExternal, IHasUuidExternal, IHasLastModified, IHasEntityCreator
+    public class ItContractResponseDTO : IHasNameExternal, IHasUuidExternal, IHasLastModified, IHasEntityCreator, IHasOrganizationContext
     {
         /// <summary>
         /// UUID for IT-Contract

@@ -163,6 +163,20 @@ namespace Presentation.Web.Controllers.API.V1.OData
             return NotFound();
         }
 
+        [ODataRoute("GetUserByEmailAndOrganizationRelationship(email={email},organizationId={organizationId})")]
+        public IHttpActionResult GetUserByEmailAndOrganizationId(string email, int organizationId)
+        {
+            var userToReturn = this._repository.AsQueryable().FirstOrDefault(u =>
+                u.Email.ToLower() == email.ToLower() &&
+                u.OrganizationRights.Any(r => r.OrganizationId == organizationId));
+
+            if (userToReturn != null)
+            {
+                return Ok(userToReturn);
+            }
+            return NotFound();
+        }
+
         /// <summary>
         /// Always returns 405 - Unauthorized. Please use /api/User/{id} from API - UserController instead.
         /// </summary>

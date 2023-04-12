@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Qa.References;
@@ -123,6 +124,28 @@ namespace Core.DomainModel.ItSystem
             }
             Organization = newOrganization;
             OrganizationId = newOrganization.Id;
+        }
+
+        public void Activate()
+        {
+            Disabled = false;
+        }
+
+        public DataRow AddDataRow(string dataDescription, Maybe<DataType> dataType)
+        {
+            var dataRow = new DataRow
+            {
+                ItInterface = this,
+                Data = dataDescription,
+                DataType = dataType.GetValueOrDefault()
+            };
+            DataRows.Add(dataRow);
+            return dataRow;
+        }
+
+        public Maybe<DataRow> GetDataRow(Guid dataUuid)
+        {
+            return DataRows.SingleOrDefault(x => x.Uuid == dataUuid).FromNullable();
         }
     }
 }

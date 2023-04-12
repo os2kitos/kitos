@@ -2,15 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Notification;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
+using Core.ApplicationServices.System.Write;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -36,6 +40,9 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private readonly Mock<ITaskRefRepository> _taskRefRepositoryMock;
         private readonly Mock<IGlobalAdminNotificationService> _globalAdminNotificationServiceMock;
         private readonly Mock<IUserRepository> _userRepositoryMock;
+        private readonly Mock<IDatabaseControl> _dbControlMock;
+        private readonly Mock<IDomainEvents> _domainEventsMock;
+        private readonly Mock<IItSystemWriteService> _writeServiceMock;
 
         public RightsHolderSystemServiceTest()
         {
@@ -46,16 +53,21 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _taskRefRepositoryMock = new Mock<ITaskRefRepository>();
             _globalAdminNotificationServiceMock = new Mock<IGlobalAdminNotificationService>();
             _userRepositoryMock = new Mock<IUserRepository>();
+            _dbControlMock = new Mock<IDatabaseControl>();
+            _domainEventsMock = new Mock<IDomainEvents>();
+            _writeServiceMock = new Mock<IItSystemWriteService>();
             _sut = new RightsHolderSystemService(
                 _userContextMock.Object,
                 _organizationRepositoryMock.Object,
                 _itSystemServiceMock.Object,
-                _taskRefRepositoryMock.Object,
                 _globalAdminNotificationServiceMock.Object,
                 _transactionManagerMock.Object,
                 _userRepositoryMock.Object,
                 Mock.Of<IOperationClock>(x => x.Now == DateTime.Now),
-                Mock.Of<ILogger>());
+                Mock.Of<ILogger>(),
+                _dbControlMock.Object,
+                _domainEventsMock.Object,
+                _writeServiceMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -65,24 +77,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             {
                 Name = A<string>().AsChangedValue(),
                 Description = A<string>().AsChangedValue(),
-                UrlReference = A<string>().AsChangedValue(),
                 FormerName = A<string>().AsChangedValue(),
+                ExternalReferences = new UpdatedExternalReferenceProperties(A<string>(), A<string>(), A<string>(), true).WrapAsEnumerable().FromNullable(),
                 ParentSystemUuid = ((Guid?)A<Guid>()).AsChangedValue(),
                 BusinessTypeUuid = ((Guid?)A<Guid>()).AsChangedValue(),
-                TaskRefKeys = Many<string>().AsChangedValue(),
                 TaskRefUuids = Many<Guid>().AsChangedValue(),
                 RightsHolderProvidedUuid = A<Guid>()
-            });
-            fixture.Register(() => new RightsHolderSystemUpdateParameters
-            {
-                Name = A<string>().AsChangedValue(),
-                Description = A<string>().AsChangedValue(),
-                UrlReference = A<string>().AsChangedValue(),
-                FormerName = A<string>().AsChangedValue(),
-                ParentSystemUuid = ((Guid?)A<Guid>()).AsChangedValue(),
-                BusinessTypeUuid = ((Guid?)A<Guid>()).AsChangedValue(),
-                TaskRefKeys = Many<string>().AsChangedValue(),
-                TaskRefUuids = Many<Guid>().AsChangedValue()
             });
         }
 
@@ -224,7 +224,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Ok()
+        public void CreateNewSystemAsRightsHolder_Returns_Ok()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -235,12 +235,6 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var parentSystem = new ItSystem() { Id = A<int>(), OrganizationId = A<int>(), BelongsToId = A<int>() };
 
             var taskRefs = new Dictionary<string, TaskRef>();
-            foreach (var taskRefKey in inputParameters.TaskRefKeys.NewValue)
-            {
-                var taskRef = new TaskRef { Id = A<int>() };
-                _taskRefRepositoryMock.Setup(x => x.GetTaskRef(taskRefKey)).Returns(taskRef);
-                taskRefs[taskRefKey] = taskRef;
-            }
             foreach (var uuid in inputParameters.TaskRefUuids.NewValue)
             {
                 var taskRef = new TaskRef { Id = A<int>() };
@@ -248,23 +242,17 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
                 taskRefs[uuid.ToString()] = taskRef;
             }
 
-            var expectedTaskRefIds = taskRefs.Select(tr => tr.Value.Id).ToList();
-
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
             ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
             ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
+            ExpectUpdateRightsHolderReturns(itSystem, rightsHolderUuid, itSystem);
             ExpectSystemServiceGetSystemReturns(inputParameters.ParentSystemUuid.NewValue.GetValueOrDefault(), parentSystem);
             ExpectUserHasRightsHolderAccessInOrganizationReturns(parentSystem.BelongsToId.Value, true);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
-            ExpectUpdatePreviousNameReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateDescriptionReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateMainUrlReferenceReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateParentSystemReturns(itSystem.Id, parentSystem, itSystem);
-            ExpectUpdateBusinessTypeReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateTaskRefsReturns(itSystem.Id, expectedTaskRefIds, itSystem);
+            _writeServiceMock.Setup(x => x.Update(itSystem.Uuid, It.IsAny<SystemUpdateParameters>())).Returns(itSystem);
+
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Ok);
@@ -272,7 +260,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_GetRightsHolderOrganizationFails()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_GetRightsHolderOrganizationFails()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -282,7 +270,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectGetOrganizationReturns(rightsHolderUuid, Maybe<Organization>.None);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -291,7 +279,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_No_RightsHolderAccess_In_Target_Organization()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_No_RightsHolderAccess_In_Target_Organization()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -303,7 +291,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, false);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -312,7 +300,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_Create_Fails()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_Create_Fails()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -327,7 +315,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, operationError);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -336,7 +324,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_UpdateRightsHolder_Fails()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_UpdateRightsHolder_Fails()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -349,10 +337,10 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
             ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
             ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, operationError);
+            ExpectUpdateRightsHolderReturns(itSystem, rightsHolderUuid, operationError);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -361,88 +349,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_UpdatePreviousName_Fails()
-        {
-            //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<RightsHolderSystemCreationParameters>();
-            var transactionMock = ExpectTransactionBegins();
-            var orgDbId = A<int>();
-            var itSystem = new ItSystem { Id = A<int>() };
-            var operationError = A<OperationError>();
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
-            ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
-            ExpectUpdatePreviousNameReturns(itSystem.Id, inputParameters, operationError);
-
-            //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewSystem_Returns_Error_If_UpdateDescription_Fails()
-        {
-            //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<RightsHolderSystemCreationParameters>();
-            var transactionMock = ExpectTransactionBegins();
-            var orgDbId = A<int>();
-            var itSystem = new ItSystem { Id = A<int>() };
-            var operationError = A<OperationError>();
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
-            ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
-            ExpectUpdatePreviousNameReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateDescriptionReturns(itSystem.Id, inputParameters, operationError);
-
-            //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewSystem_Returns_Error_If_UpdateMainUrlReference_Fails()
-        {
-            //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<RightsHolderSystemCreationParameters>();
-            var transactionMock = ExpectTransactionBegins();
-            var orgDbId = A<int>();
-            var itSystem = new ItSystem { Id = A<int>() };
-            var operationError = A<OperationError>();
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
-            ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
-            ExpectUpdatePreviousNameReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateDescriptionReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateMainUrlReferenceReturns(itSystem.Id, inputParameters, operationError);
-
-            //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewSystem_Returns_Error_If_GetParentSystemFails()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_GetParentSystemFails()
         {
             //Arrange
             var operationFailures = Enum.GetValues(typeof(OperationFailure)).Cast<OperationFailure>().Where(x => x != OperationFailure.NotFound);
@@ -454,17 +361,14 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var itSystem = new ItSystem { Id = A<int>() };
             var operationError = A<OperationError>();
 
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
+            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId, Uuid = rightsHolderUuid });
+            ExpectUpdateRightsHolderReturns(itSystem, rightsHolderUuid, itSystem);
             ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
             ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
-            ExpectUpdatePreviousNameReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateDescriptionReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateMainUrlReferenceReturns(itSystem.Id, inputParameters, itSystem);
             ExpectSystemServiceGetSystemReturns(inputParameters.ParentSystemUuid.NewValue.GetValueOrDefault(), operationError);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -473,7 +377,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void CreateNewSystem_Returns_Error_If_UserIsNotRightsHolderOfParentSystem()
+        public void CreateNewSystemAsRightsHolder_Returns_Error_If_UserIsNotRightsHolderOfParentSystem()
         {
             //Arrange
             var rightsHolderUuid = A<Guid>();
@@ -486,219 +390,16 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
             ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
             ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
-            ExpectUpdatePreviousNameReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateDescriptionReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateMainUrlReferenceReturns(itSystem.Id, inputParameters, itSystem);
             ExpectSystemServiceGetSystemReturns(inputParameters.ParentSystemUuid.NewValue.GetValueOrDefault(), parentSystem);
+            ExpectUpdateRightsHolderReturns(itSystem, rightsHolderUuid, itSystem);
             ExpectUserHasRightsHolderAccessInOrganizationReturns(parentSystem.BelongsToId.Value, false);
 
             //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+            var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewSystem_Returns_Error_If_UpdateParentSystemFails()
-        {
-            //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<RightsHolderSystemCreationParameters>();
-            var transactionMock = ExpectTransactionBegins();
-            var orgDbId = A<int>();
-            var itSystem = new ItSystem { Id = A<int>() };
-            var parentSystem = new ItSystem() { Id = A<int>(), OrganizationId = A<int>(), BelongsToId = A<int>() };
-            var operationError = A<OperationError>();
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
-            ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
-            ExpectUpdatePreviousNameReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateDescriptionReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateMainUrlReferenceReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectSystemServiceGetSystemReturns(inputParameters.ParentSystemUuid.NewValue.GetValueOrDefault(), parentSystem);
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(parentSystem.BelongsToId.Value, true);
-            ExpectUpdateParentSystemReturns(itSystem.Id, parentSystem, operationError);
-
-            //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewSystem_Returns_Error_If_UpdateBusinessTypeFails()
-        {
-            //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<RightsHolderSystemCreationParameters>();
-            var transactionMock = ExpectTransactionBegins();
-            var orgDbId = A<int>();
-            var itSystem = new ItSystem { Id = A<int>() };
-            var parentSystem = new ItSystem() { Id = A<int>(), OrganizationId = A<int>(), BelongsToId = A<int>() };
-            var operationError = A<OperationError>();
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
-            ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
-            ExpectUpdatePreviousNameReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateDescriptionReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateMainUrlReferenceReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectSystemServiceGetSystemReturns(inputParameters.ParentSystemUuid.NewValue.GetValueOrDefault(), parentSystem);
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(parentSystem.BelongsToId.Value, true);
-            ExpectUpdateParentSystemReturns(itSystem.Id, parentSystem, itSystem);
-            ExpectUpdateBusinessTypeReturns(itSystem.Id, inputParameters, operationError);
-
-            //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewSystem_Returns_Error_If_KLE_Duplicates_By_Key()
-        {
-            //Arrange
-            var overlapKey = A<string>();
-            var uniqueKey = A<string>();
-            var rightsHolderUuid = A<Guid>();
-            var inputParameters = new RightsHolderSystemCreationParameters
-            {
-                RightsHolderProvidedUuid = Guid.NewGuid(),
-                Name = A<string>().AsChangedValue(),
-                TaskRefKeys = new[] { overlapKey, uniqueKey, overlapKey }.AsChangedValue<IEnumerable<string>>()
-            };
-            var transactionMock = ExpectTransactionBegins();
-            var orgDbId = A<int>();
-            var itSystem = new ItSystem { Id = A<int>() };
-
-            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(uniqueKey)).Returns(new TaskRef() { Id = A<int>() });
-            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(overlapKey)).Returns(new TaskRef() { Id = A<int>() });
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
-            ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
-
-            //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            Assert.Contains("Overlapping KLE. Please specify the same KLE only once. KLE resolved by key ", result.Error.Message.Value);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewSystem_Returns_Error_If_KLE_Duplicates_By_Uuid()
-        {
-            //Arrange
-            var overlapKey = A<Guid>();
-            var uniqueKey = A<Guid>();
-            var rightsHolderUuid = A<Guid>();
-            var inputParameters = new RightsHolderSystemCreationParameters
-            {
-                RightsHolderProvidedUuid = Guid.NewGuid(),
-                Name = A<string>().AsChangedValue(),
-                TaskRefUuids = new[] { overlapKey, uniqueKey, overlapKey }.AsChangedValue<IEnumerable<Guid>>()
-            };
-            var transactionMock = ExpectTransactionBegins();
-            var orgDbId = A<int>();
-            var itSystem = new ItSystem { Id = A<int>() };
-
-            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(uniqueKey)).Returns(new TaskRef() { Id = A<int>() });
-            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(overlapKey)).Returns(new TaskRef() { Id = A<int>() });
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
-            ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
-
-            //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            Assert.Contains("Overlapping KLE. Please specify the same KLE only once. KLE resolved by uuid", result.Error.Message.Value);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewSystem_Returns_Error_If_ProvidedTaskKeyIsInvalid()
-        {
-            //Arrange
-            Configure(fixture => fixture.Inject<IEnumerable<Guid>>(new Guid[0]));
-            var rightsHolderUuid = A<Guid>();
-            var inputParameters = A<RightsHolderSystemCreationParameters>();
-            var transactionMock = ExpectTransactionBegins();
-            var orgDbId = A<int>();
-            var itSystem = new ItSystem { Id = A<int>() };
-            var parentSystem = new ItSystem() { Id = A<int>(), OrganizationId = A<int>(), BelongsToId = A<int>() };
-
-            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(It.IsAny<string>())).Returns(Maybe<TaskRef>.None);
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
-            ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
-            ExpectSystemServiceGetSystemReturns(inputParameters.ParentSystemUuid.NewValue.GetValueOrDefault(), parentSystem);
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(parentSystem.BelongsToId.Value, true);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
-            ExpectUpdatePreviousNameReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateDescriptionReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateMainUrlReferenceReturns(itSystem.Id, inputParameters, itSystem);
-            ExpectUpdateParentSystemReturns(itSystem.Id, parentSystem, itSystem);
-            ExpectUpdateBusinessTypeReturns(itSystem.Id, inputParameters, itSystem);
-
-            //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            transactionMock.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void CreateNewSystem_Returns_Error_If_ProvidedTaskUuidIsInvalid()
-        {
-            //Arrange
-            var rightsHolderUuid = A<Guid>();
-            var inputParameters = new RightsHolderSystemCreationParameters
-            {
-                RightsHolderProvidedUuid = Guid.NewGuid(),
-                Name = A<string>().AsChangedValue(),
-                TaskRefUuids = Many<Guid>().AsChangedValue()
-            };
-            var transactionMock = ExpectTransactionBegins();
-            var orgDbId = A<int>();
-            var itSystem = new ItSystem { Id = A<int>() };
-
-            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(It.IsAny<Guid>())).Returns(Maybe<TaskRef>.None);
-
-            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
-            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
-            ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
-            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
-            //Act
-            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
             transactionMock.Verify(x => x.Commit(), Times.Never);
         }
 
@@ -708,38 +409,35 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var systemUuid = A<Guid>();
             var parameters = A<RightsHolderSystemUpdateParameters>();
-            var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
+            var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>(), Uuid = systemUuid };
             var parent = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
-            var taskRefs = new Dictionary<string, TaskRef>();
-            foreach (var taskRefKey in parameters.TaskRefKeys.NewValue)
-            {
-                var taskRef = new TaskRef { Id = A<int>() };
-                _taskRefRepositoryMock.Setup(x => x.GetTaskRef(taskRefKey)).Returns(taskRef);
-                taskRefs[taskRefKey] = taskRef;
-            }
-            foreach (var uuid in parameters.TaskRefUuids.NewValue)
-            {
-                var taskRef = new TaskRef { Id = A<int>() };
-                _taskRefRepositoryMock.Setup(x => x.GetTaskRef(uuid)).Returns(taskRef);
-                taskRefs[uuid.ToString()] = taskRef;
-            }
-            var expectedTaskRefIds = taskRefs.Select(tr => tr.Value.Id).ToList();
 
             var transaction = ExpectTransactionBegins();
             ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
             ExpectHasSpecificAccessReturns(itSystem, true);
-            ExpectUpdateNameReturns(itSystem.Id, parameters.Name.NewValue, itSystem);
-            ExpectUpdatePreviousNameReturns(itSystem.Id, parameters, itSystem);
-            ExpectUpdateDescriptionReturns(itSystem.Id, parameters, itSystem);
-            ExpectUpdateMainUrlReferenceReturns(itSystem.Id, parameters, itSystem);
             ExpectSystemServiceGetSystemReturns(parameters.ParentSystemUuid.NewValue.GetValueOrDefault(), parent);
             ExpectHasSpecificAccessReturns(parent, true);
-            ExpectUpdateParentSystemReturns(itSystem.Id, parent, itSystem);
-            ExpectUpdateBusinessTypeReturns(itSystem.Id, parameters, itSystem);
-            ExpectUpdateTaskRefsReturns(itSystem.Id, expectedTaskRefIds, itSystem);
+            _writeServiceMock
+                .Setup(x => x.Update(
+                    systemUuid,
+                    It.Is<SystemUpdateParameters>(p =>
+                        //The following are not exposed on the rightsholders' simplified interface
+                        p.RightsHolderUuid.IsUnchanged &&
+                        p.ArchivingRecommendation.IsUnchanged &&
+                        p.Deactivated.IsUnchanged &&
+                        p.Scope.IsUnchanged &&
+                        //The following should be passed from the input of the parameters
+                        p.ExternalReferences == parameters.ExternalReferences &&
+                        p.ParentSystemUuid == parameters.ParentSystemUuid &&
+                        p.Name == parameters.Name &&
+                        p.BusinessTypeUuid == parameters.BusinessTypeUuid &&
+                        p.Description == parameters.Description &&
+                        p.TaskRefUuids == parameters.TaskRefUuids
+                        )))
+                .Returns(itSystem);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Ok);
@@ -747,136 +445,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_KLE_Has_Duplicates()
+        public void Cannot_UpdateAsRightsHolder_If_No_RightsHolder_Access_To_Parent()
         {
             //Arrange
             var systemUuid = A<Guid>();
-            var parameters = new RightsHolderSystemUpdateParameters
-            {
-                TaskRefUuids = Many<Guid>().AsChangedValue(),
-                TaskRefKeys = Many<string>().AsChangedValue()
-            };
-            var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
-
-            var taskRefs = new Dictionary<string, TaskRef>();
-            foreach (var taskRefKey in parameters.TaskRefKeys.NewValue)
-            {
-                var taskRef = new TaskRef { Id = 1 };
-                _taskRefRepositoryMock.Setup(x => x.GetTaskRef(taskRefKey)).Returns(taskRef);
-                taskRefs[taskRefKey] = taskRef;
-            }
-            foreach (var uuid in parameters.TaskRefUuids.NewValue)
-            {
-                var taskRef = new TaskRef { Id = 1 };
-                _taskRefRepositoryMock.Setup(x => x.GetTaskRef(uuid)).Returns(taskRef);
-                taskRefs[uuid.ToString()] = taskRef;
-            }
-
-            var transaction = ExpectTransactionBegins();
-            ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
-            ExpectHasSpecificAccessReturns(itSystem, true);
-
-            //Act
-            var result = _sut.Update(systemUuid, parameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            transaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void Cannot_UpdateItSystem_If_KLE_Has_Invalid_Ids()
-        {
-            //Arrange
-            var systemUuid = A<Guid>();
-            var parameters = new RightsHolderSystemUpdateParameters
-            {
-                TaskRefKeys = Many<string>().AsChangedValue()
-            };
-            var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
-            var taskRefs = new Dictionary<string, TaskRef>();
-            foreach (var taskRefKey in parameters.TaskRefKeys.NewValue)
-            {
-                var taskRef = new TaskRef { Id = 1 };
-                _taskRefRepositoryMock.Setup(x => x.GetTaskRef(taskRefKey)).Returns(Maybe<TaskRef>.None);
-                taskRefs[taskRefKey] = taskRef;
-            }
-
-            var transaction = ExpectTransactionBegins();
-            ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
-            ExpectHasSpecificAccessReturns(itSystem, true);
-
-            //Act
-            var result = _sut.Update(systemUuid, parameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            transaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void Cannot_UpdateItSystem_If_Business_Type_Update_Fails()
-        {
-            //Arrange
-            var systemUuid = A<Guid>();
-            var parameters = new RightsHolderSystemUpdateParameters
-            {
-                BusinessTypeUuid = ((Guid?)A<Guid>()).AsChangedValue()
-            };
-            var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
-            var operationError = A<OperationError>();
-
-            var transaction = ExpectTransactionBegins();
-            ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
-            ExpectHasSpecificAccessReturns(itSystem, true);
-            ExpectUpdateBusinessTypeReturns(itSystem.Id, parameters, operationError);
-
-            //Act
-            var result = _sut.Update(systemUuid, parameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void Cannot_UpdateItSystem_If_Parent_Update_Fails()
-        {
-            //Arrange
-            var systemUuid = A<Guid>();
-            var parameters = new RightsHolderSystemUpdateParameters
-            {
-                ParentSystemUuid = ((Guid?)A<Guid>()).AsChangedValue()
-            };
-            var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
-            var parent = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
-            var operationError = A<OperationError>();
-
-            var transaction = ExpectTransactionBegins();
-            ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
-            ExpectHasSpecificAccessReturns(itSystem, true);
-            ExpectSystemServiceGetSystemReturns(parameters.ParentSystemUuid.NewValue.GetValueOrDefault(), parent);
-            ExpectHasSpecificAccessReturns(parent, true);
-            ExpectUpdateParentSystemReturns(itSystem.Id, parent, operationError);
-
-            //Act
-            var result = _sut.Update(systemUuid, parameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
-            transaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void Cannot_UpdateItSystem_If_No_RightsHolder_Access_To_Parent()
-        {
-            //Arrange
-            var systemUuid = A<Guid>();
-            var parameters = new RightsHolderSystemUpdateParameters
+            var parameters = new RightsHolderSystemUpdateParameters()
             {
                 ParentSystemUuid = ((Guid?)A<Guid>()).AsChangedValue()
             };
@@ -890,7 +463,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectHasSpecificAccessReturns(parent, false);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -899,7 +472,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_Parent_Resolution_Fails()
+        public void Cannot_UpdateAsRightsHolder_If_Parent_Resolution_Fails()
         {
             //Arrange
             var operationFailures = Enum.GetValues(typeof(OperationFailure)).Cast<OperationFailure>().Where(x => x != OperationFailure.NotFound);
@@ -918,7 +491,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectSystemServiceGetSystemReturns(parameters.ParentSystemUuid.NewValue.GetValueOrDefault(), operationError);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -927,7 +500,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_Parent_Resolution_Fails_With_NotFound()
+        public void Cannot_UpdateAsRightsHolder_If_Parent_Resolution_Fails_With_NotFound()
         {
             //Arrange
             Configure(x => x.Inject(OperationFailure.NotFound));
@@ -945,7 +518,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectSystemServiceGetSystemReturns(parameters.ParentSystemUuid.NewValue.GetValueOrDefault(), operationError);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -955,111 +528,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Cannot_UpdateItSystem_If_UpdateUrlReference_Fails()
-        {
-            //Arrange
-            var systemUuid = A<Guid>();
-            var parameters = new RightsHolderSystemUpdateParameters
-            {
-                UrlReference = A<string>().AsChangedValue()
-            };
-            var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
-            var error = A<OperationError>();
-
-            var transaction = ExpectTransactionBegins();
-            ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
-            ExpectHasSpecificAccessReturns(itSystem, true);
-            ExpectUpdateMainUrlReferenceReturns(itSystem.Id, parameters, error);
-
-            //Act
-            var result = _sut.Update(systemUuid, parameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(error, result.Error);
-            transaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void Cannot_UpdateItSystem_If_UpdateDescription_Fails()
-        {
-            //Arrange
-            var systemUuid = A<Guid>();
-            var parameters = new RightsHolderSystemUpdateParameters
-            {
-                Description = A<string>().AsChangedValue()
-            };
-            var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
-            var error = A<OperationError>();
-
-            var transaction = ExpectTransactionBegins();
-            ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
-            ExpectHasSpecificAccessReturns(itSystem, true);
-            ExpectUpdateDescriptionReturns(itSystem.Id, parameters, error);
-
-            //Act
-            var result = _sut.Update(systemUuid, parameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(error, result.Error);
-            transaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void Cannot_UpdateItSystem_If_UpdatePreviousName_Fails()
-        {
-            //Arrange
-            var systemUuid = A<Guid>();
-            var parameters = new RightsHolderSystemUpdateParameters
-            {
-                FormerName = A<string>().AsChangedValue()
-            };
-            var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
-            var error = A<OperationError>();
-
-            var transaction = ExpectTransactionBegins();
-            ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
-            ExpectHasSpecificAccessReturns(itSystem, true);
-            ExpectUpdatePreviousNameReturns(itSystem.Id, parameters, error);
-
-            //Act
-            var result = _sut.Update(systemUuid, parameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(error, result.Error);
-            transaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void Cannot_UpdateItSystem_If_UpdateName_Fails()
-        {
-            //Arrange
-            var systemUuid = A<Guid>();
-            var parameters = new RightsHolderSystemUpdateParameters
-            {
-                Name = A<string>().AsChangedValue()
-            };
-            var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
-            var error = A<OperationError>();
-
-            var transaction = ExpectTransactionBegins();
-            ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
-            ExpectHasSpecificAccessReturns(itSystem, true);
-            ExpectUpdateNameReturns(itSystem.Id, parameters.Name.NewValue, error);
-
-            //Act
-            var result = _sut.Update(systemUuid, parameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Same(error, result.Error);
-            transaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void Cannot_UpdateItSystem_If_System_Is_Deactivated()
+        public void Cannot_UpdateAsRightsHolder_If_System_Is_Deactivated()
         {
             //Arrange
             var systemUuid = A<Guid>();
@@ -1071,7 +540,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectHasSpecificAccessReturns(itSystem, true);
 
             //Act
-            var result = _sut.Update(systemUuid, parameters);
+            var result = _sut.UpdateAsRightsHolder(systemUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
@@ -1086,17 +555,17 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var systemUuid = A<Guid>();
             var reason = A<string>();
             var transaction = ExpectTransactionBegins();
-            var itSystem = new ItSystem() { Id = A<int>(), BelongsToId = A<int>() };
+            var itSystem = new ItSystem() { Id = A<int>(), BelongsToId = A<int>(), Uuid = systemUuid };
             var userId = A<int>();
 
             ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
             ExpectHasSpecificAccessReturns(itSystem, true);
-            ExpectDeactivateReturns(itSystem.Id, itSystem);
             _userContextMock.Setup(x => x.UserId).Returns(userId);
             _userRepositoryMock.Setup(x => x.GetById(userId)).Returns(new User { Email = A<string>() });
+            ExpectDeactivationUpdateReturns(systemUuid, itSystem);
 
             //Act
-            var result = _sut.Deactivate(systemUuid, reason);
+            var result = _sut.DeactivateAsRightsHolder(systemUuid, reason);
 
             //Assert
             Assert.True(result.Ok);
@@ -1111,15 +580,15 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var systemUuid = A<Guid>();
             var reason = A<string>();
             var transaction = ExpectTransactionBegins();
-            var itSystem = new ItSystem() { Id = A<int>(), BelongsToId = A<int>() };
+            var itSystem = new ItSystem() { Id = A<int>(), BelongsToId = A<int>(), Uuid = systemUuid };
             var operationError = A<OperationError>();
 
             ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
             ExpectHasSpecificAccessReturns(itSystem, true);
-            ExpectDeactivateReturns(itSystem.Id, operationError);
+            ExpectDeactivationUpdateReturns(systemUuid, operationError);
 
             //Act
-            var result = _sut.Deactivate(systemUuid, reason);
+            var result = _sut.DeactivateAsRightsHolder(systemUuid, reason);
 
             //Assert
             Assert.True(result.Failed);
@@ -1141,7 +610,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectHasSpecificAccessReturns(itSystem, false);
 
             //Act
-            var result = _sut.Deactivate(systemUuid, reason);
+            var result = _sut.DeactivateAsRightsHolder(systemUuid, reason);
 
             //Assert
             Assert.True(result.Failed);
@@ -1162,58 +631,13 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectSystemServiceGetSystemReturns(systemUuid, operationError);
 
             //Act
-            var result = _sut.Deactivate(systemUuid, reason);
+            var result = _sut.DeactivateAsRightsHolder(systemUuid, reason);
 
             //Assert
             Assert.True(result.Failed);
             Assert.Same(operationError, result.Error);
             _globalAdminNotificationServiceMock.Verify(x => x.Submit(It.IsAny<GlobalAdminNotification>()), Times.Never);
             transaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        private void ExpectDeactivateReturns(int systemId, Result<ItSystem, OperationError> result)
-        {
-            _itSystemServiceMock.Setup(x => x.Deactivate(systemId)).Returns(result);
-        }
-
-        private void ExpectUpdateNameReturns(int id, string name, Result<ItSystem, OperationError> result)
-        {
-            _itSystemServiceMock.Setup(x => x.UpdateName(id, name)).Returns(result);
-        }
-
-        private void ExpectUpdateTaskRefsReturns(int systemId, List<int> expectedTaskRefIds, Result<ItSystem, OperationError> result)
-        {
-            _itSystemServiceMock.Setup(x => x.UpdateTaskRefs(systemId, It.Is<IEnumerable<int>>(ids => ids.SequenceEqual(expectedTaskRefIds)))).Returns(result);
-        }
-
-        private void ExpectUpdateBusinessTypeReturns(int systemId, RightsHolderSystemUpdateParameters inputParameters, Result<ItSystem, OperationError> result)
-        {
-            _itSystemServiceMock.Setup(x => x.UpdateBusinessType(systemId, inputParameters.BusinessTypeUuid.NewValue)).Returns(result);
-        }
-
-        private void ExpectUpdateParentSystemReturns(int systemId, ItSystem parentSystem, Result<ItSystem, OperationError> result)
-        {
-            _itSystemServiceMock.Setup(x => x.UpdateParentSystem(systemId, parentSystem.Id)).Returns(result);
-        }
-
-        private void ExpectUpdateMainUrlReferenceReturns(int systemId, RightsHolderSystemUpdateParameters inputParameters, Result<ItSystem, OperationError> result)
-        {
-            _itSystemServiceMock.Setup(x => x.UpdateMainUrlReference(systemId, inputParameters.UrlReference.NewValue)).Returns(result);
-        }
-
-        private void ExpectUpdateDescriptionReturns(int systemId, RightsHolderSystemUpdateParameters inputParameters, Result<ItSystem, OperationError> result)
-        {
-            _itSystemServiceMock.Setup(x => x.UpdateDescription(systemId, inputParameters.Description.NewValue)).Returns(result);
-        }
-
-        private void ExpectUpdatePreviousNameReturns(int systemId, RightsHolderSystemUpdateParameters inputParameters, Result<ItSystem, OperationError> result)
-        {
-            _itSystemServiceMock.Setup(x => x.UpdatePreviousName(systemId, inputParameters.FormerName.NewValue)).Returns(result);
-        }
-
-        private void ExpectUpdateRightsHolderReturns(int systemId, Guid rightsHolderUuid, Result<ItSystem, OperationError> result)
-        {
-            _itSystemServiceMock.Setup(x => x.UpdateRightsHolder(systemId, rightsHolderUuid)).Returns(result);
         }
 
 
@@ -1255,6 +679,17 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private void ExpectUserHasRightsHolderAccessReturns(bool value)
         {
             _userContextMock.Setup(x => x.HasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess)).Returns(value);
+        }
+
+        private void ExpectUpdateRightsHolderReturns(ItSystem itSystem, Guid rightsHolderUuid, Result<ItSystem, OperationError> result)
+        {
+            _itSystemServiceMock.Setup(x => x.UpdateRightsHolder(itSystem.Id, rightsHolderUuid)).Returns(result);
+        }
+
+        private void ExpectDeactivationUpdateReturns(Guid systemUuid, Result<ItSystem, OperationError> result)
+        {
+            _writeServiceMock.Setup(x => x.Update(systemUuid,
+                It.Is<SystemUpdateParameters>(p => p.Deactivated.HasChange && p.Deactivated.NewValue))).Returns(result);
         }
     }
 }

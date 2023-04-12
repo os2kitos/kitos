@@ -2,12 +2,10 @@
 using System.Linq;
 using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
-using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
-using Presentation.Web.Models.API.V1.GDPR;
 
 namespace Presentation.Web.Controllers.API.V1.Mapping
 {
@@ -29,6 +27,11 @@ namespace Presentation.Web.Controllers.API.V1.Mapping
             where T : IHasId, IHasName, IOwnedByOrganization
         {
             return new EntityWithOrganizationRelationshipDTO(source.Id, source.Name, source.Organization?.MapToShallowOrganizationDTO());
+        }
+
+        public static NamedEntityWithUuidDTO MapToNamedEntityDTO(this NamedEntityWithUuid source)
+        {
+            return new NamedEntityWithUuidDTO(source.Id, source.Name, source.Uuid);
         }
 
         public static NamedEntityDTO MapToNamedEntityDTO(this NamedEntity source)

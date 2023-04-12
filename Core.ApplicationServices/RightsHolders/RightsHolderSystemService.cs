@@ -9,13 +9,14 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.System;
+using Core.ApplicationServices.System.Write;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.ItSystem;
 using Core.DomainServices.Repositories.Organization;
-using Core.DomainServices.Repositories.TaskRefs;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Serilog;
@@ -27,40 +28,46 @@ namespace Core.ApplicationServices.RightsHolders
         private readonly IOrganizationalUserContext _userContext;
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IItSystemService _systemService;
-        private readonly ITaskRefRepository _taskRefRepository;
         private readonly IGlobalAdminNotificationService _globalAdminNotificationService;
         private readonly ITransactionManager _transactionManager;
         private readonly IUserRepository _userRepository;
         private readonly IOperationClock _operationClock;
         private readonly ILogger _logger;
+        private readonly IDatabaseControl _databaseControl;
+        private readonly IDomainEvents _domainEvents;
+        private readonly IItSystemWriteService _writeService;
 
         public RightsHolderSystemService(
             IOrganizationalUserContext userContext,
             IOrganizationRepository organizationRepository,
             IItSystemService systemService,
-            ITaskRefRepository taskRefRepository,
             IGlobalAdminNotificationService globalAdminNotificationService,
             ITransactionManager transactionManager,
             IUserRepository userRepository,
             IOperationClock operationClock,
-            ILogger logger)
+            ILogger logger,
+            IDatabaseControl databaseControl,
+            IDomainEvents domainEvents,
+            IItSystemWriteService writeService)
             : base(userContext, organizationRepository)
         {
             _userContext = userContext;
             _organizationRepository = organizationRepository;
             _systemService = systemService;
-            _taskRefRepository = taskRefRepository;
             _globalAdminNotificationService = globalAdminNotificationService;
             _transactionManager = transactionManager;
             _userRepository = userRepository;
             _operationClock = operationClock;
             _logger = logger;
+            _databaseControl = databaseControl;
+            _domainEvents = domainEvents;
+            _writeService = writeService;
         }
 
-        public Result<ItSystem, OperationError> CreateNewSystem(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters)
+        public Result<ItSystem, OperationError> CreateNewSystemAsRightsHolder(Guid rightsHolderUuid, RightsHolderSystemCreationParameters parameters)
         {
-            if (creationParameters == null)
-                throw new ArgumentNullException(nameof(creationParameters));
+            if (parameters == null)
+                throw new ArgumentNullException(nameof(parameters));
 
             using var transaction = _transactionManager.Begin();
             try
@@ -73,25 +80,26 @@ namespace Core.ApplicationServices.RightsHolders
                 if (!_userContext.HasRole(organizationId.Value, OrganizationRole.RightsHolderAccess))
                     return new OperationError("User does not have rights holder access in the provided organization", OperationFailure.Forbidden);
 
-                var name = creationParameters.Name;
+                var name = parameters.Name;
 
                 if (name.IsUnchanged)
                     return new OperationError("Error must be defined upon creation", OperationFailure.BadInput);
 
-                creationParameters.Name = OptionalValueChange<string>.None; //name is extracted - make sure it's not re-written pointlessly
+                parameters.Name = OptionalValueChange<string>.None; //name is extracted - make sure it's not re-written pointlessly
 
                 var result = _systemService
-                    .CreateNewSystem(organizationId.Value, name.NewValue, creationParameters.RightsHolderProvidedUuid)
+                    .CreateNewSystem(organizationId.Value, name.NewValue, parameters.RightsHolderProvidedUuid)
                     .Bind(system => _systemService.UpdateRightsHolder(system.Id, rightsHolderUuid))
-                    .Bind(system => ApplyUpdates(system, creationParameters));
+                    .Bind(system => ApplyUpdates(system, parameters));
 
                 if (result.Ok)
                 {
-                    transaction.Commit();
+                    SaveAndNotify(result.Value, transaction);
                 }
                 else
                 {
-                    _logger.Error("RightsHolder {uuid} failed to create It-System {name} due to error: {errorMessage}", rightsHolderUuid, creationParameters.Name, result.Error.ToString());
+                    transaction.Rollback();
+                    _logger.Error("RightsHolder {uuid} failed to create It-System {name} due to error: {errorMessage}", rightsHolderUuid, parameters.Name, result.Error.ToString());
                 }
 
                 return result;
@@ -103,7 +111,7 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        public Result<ItSystem, OperationError> Update(Guid systemUuid, RightsHolderSystemUpdateParameters updateParameters)
+        public Result<ItSystem, OperationError> UpdateAsRightsHolder(Guid systemUuid, RightsHolderSystemUpdateParameters parameters)
         {
             using var transaction = _transactionManager.Begin();
             try
@@ -112,14 +120,15 @@ namespace Core.ApplicationServices.RightsHolders
                     .GetSystem(systemUuid)
                     .Bind(WithRightsHolderAccessTo)
                     .Bind(WithActiveEntityOnly)
-                    .Bind(system => ApplyUpdates(system, updateParameters));
+                    .Bind(system => ApplyUpdates(system, parameters));
 
                 if (result.Ok)
                 {
-                    transaction.Commit();
+                    SaveAndNotify(result.Value, transaction);
                 }
                 else
                 {
+                    transaction.Rollback();
                     _logger.Error("User {id} failed to update It-System {uuid} due to error: {errorMessage}", _userContext.UserId, systemUuid, result.Error.ToString());
                 }
 
@@ -132,7 +141,7 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        public Result<ItSystem, OperationError> Deactivate(Guid systemUuid, string reason)
+        public Result<ItSystem, OperationError> DeactivateAsRightsHolder(Guid systemUuid, string reason)
         {
             if (string.IsNullOrEmpty(reason))
                 return new OperationError("No deactivation reason provided", OperationFailure.BadInput);
@@ -144,12 +153,12 @@ namespace Core.ApplicationServices.RightsHolders
                     .GetSystem(systemUuid)
                     .Bind(WithRightsHolderAccessTo)
                     .Bind(WithActiveEntityOnly)
-                    .Bind(system => _systemService.Deactivate(system.Id));
+                    .Bind(Deactivate);
 
                 if (result.Ok)
                 {
                     _logger.Information("User {userId} deactivated system with id {systemUuid} due to reason:{reason}", _userContext.UserId, systemUuid, reason);
-                    transaction.Commit();
+                    SaveAndNotify(result.Value, transaction);
 
                     var currentUserEmail = _userRepository.GetById(_userContext.UserId).Email;
                     var deactivatedItSystem = result.Value;
@@ -169,6 +178,7 @@ namespace Core.ApplicationServices.RightsHolders
                 }
                 else
                 {
+                    transaction.Rollback();
                     _logger.Error("User {id} failed to deactivate It-System {uuid} due to error: {errorMessage}", _userContext.UserId, systemUuid, result.Error.ToString());
                 }
 
@@ -181,86 +191,9 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        private Result<ItSystem, OperationError> ApplyUpdates(ItSystem system, RightsHolderSystemUpdateParameters updates)
+        private Result<ItSystem, OperationError> Deactivate(ItSystem system)
         {
-            return system
-                .WithOptionalUpdate(updates.Name, (itSystem, newValue) => _systemService.UpdateName(itSystem.Id, newValue))
-                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.FormerName, (itSystem, newValue) => _systemService.UpdatePreviousName(itSystem.Id, newValue)))
-                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Description, (itSystem, newValue) => _systemService.UpdateDescription(itSystem.Id, newValue)))
-                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.UrlReference, UpdateMainUrlReference))
-                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ParentSystemUuid, UpdateParentSystem))
-                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.BusinessTypeUuid, (itSystem, newValue) => _systemService.UpdateBusinessType(itSystem.Id, newValue)))
-                .Bind(updatedSystem => UpdateTaskRefs(updatedSystem, updates.TaskRefKeys, updates.TaskRefUuids));
-        }
-
-        private Result<ItSystem, OperationError> UpdateTaskRefs(ItSystem system, OptionalValueChange<IEnumerable<string>> taskRefKeysChanges, OptionalValueChange<IEnumerable<Guid>> taskRefUuidsChanges)
-        {
-            if (taskRefKeysChanges.IsUnchanged && taskRefUuidsChanges.IsUnchanged)
-            {
-                //No changes requested - skip it
-                return system;
-            }
-
-            var taskRefKeys = taskRefKeysChanges.Match(keys => keys, Array.Empty<string>).ToList();
-            var taskRefUuids = taskRefUuidsChanges.Match(keys => keys, Array.Empty<Guid>).ToList();
-
-            var taskRefIds = new HashSet<int>();
-            foreach (var taskRefKey in taskRefKeys)
-            {
-                var taskRef = _taskRefRepository.GetTaskRef(taskRefKey);
-
-                if (taskRef.IsNone)
-                    return new OperationError($"Invalid KLE Number:{taskRefKey}", OperationFailure.BadInput);
-
-                if (!taskRefIds.Add(taskRef.Value.Id))
-                    return new OperationError($"Overlapping KLE. Please specify the same KLE only once. KLE resolved by key {taskRefKey}", OperationFailure.BadInput);
-            }
-            foreach (var uuid in taskRefUuids)
-            {
-                var taskRef = _taskRefRepository.GetTaskRef(uuid);
-
-                if (taskRef.IsNone)
-                    return new OperationError($"Invalid KLE UUID:{uuid}", OperationFailure.BadInput);
-
-                var taskRefValue = taskRef.Value;
-
-                if (!taskRefIds.Add(taskRefValue.Id))
-                    return new OperationError($"Overlapping KLE. Please specify the same KLE only once. KLE resolved by uuid {uuid} which matches overlap on KLE {taskRefValue.TaskKey}", OperationFailure.BadInput);
-            }
-
-            return _systemService.UpdateTaskRefs(system.Id, taskRefIds.ToList());
-        }
-
-        private Result<ItSystem, OperationError> UpdateMainUrlReference(ItSystem system, string urlReference)
-        {
-            if (string.IsNullOrWhiteSpace(urlReference))
-                return new OperationError("URL references are required for new rightsholder systems", OperationFailure.BadInput);
-
-            return _systemService.UpdateMainUrlReference(system.Id, urlReference);
-        }
-
-        private Result<ItSystem, OperationError> UpdateParentSystem(ItSystem system, Guid? parentSystemUuid)
-        {
-            var parentSystemId = default(int?);
-            if (parentSystemUuid.HasValue)
-            {
-                //Make sure that user has rightsholders access to the parent system
-                var parentSystemResult =
-                    _systemService
-                        .GetSystem(parentSystemUuid.Value)
-                        .Bind(WithRightsHolderAccessTo);
-
-                if (parentSystemResult.Failed)
-                    return parentSystemResult.Error.FailureType == OperationFailure.NotFound
-                        ? new OperationError("Parent system cannot be found", OperationFailure.BadInput)
-                        : parentSystemResult.Error;
-
-
-                parentSystemId = parentSystemResult.Value.Id;
-            }
-
-            return _systemService.UpdateParentSystem(system.Id, parentSystemId);
-
+            return _writeService.Update(system.Uuid, new SystemUpdateParameters() { Deactivated = true.AsChangedValue() });
         }
 
         public Result<IQueryable<ItSystem>, OperationError> GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(IEnumerable<IDomainQuery<ItSystem>> refinements, Guid? rightsHolderUuid = null)
@@ -307,6 +240,44 @@ namespace Core.ApplicationServices.RightsHolders
                     error => error,
                     () => _systemService.GetSystem(systemUuid).Bind(WithRightsHolderAccessTo)
                 );
+        }
+        private void SaveAndNotify(ItSystem system, IDatabaseTransaction transaction)
+        {
+            _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(system));
+            _databaseControl.SaveChanges();
+            transaction.Commit();
+        }
+
+        private Result<ItSystem, OperationError> ApplyUpdates(ItSystem system, SharedSystemUpdateParameters parameters)
+        {
+            var updateParameters = new SystemUpdateParameters
+            {
+                Name = parameters.Name,
+                ExternalReferences = parameters.ExternalReferences,
+                ParentSystemUuid = parameters.ParentSystemUuid,
+                FormerName = parameters.FormerName,
+                Description = parameters.Description,
+                BusinessTypeUuid = parameters.BusinessTypeUuid,
+                TaskRefUuids = parameters.TaskRefUuids
+            };
+
+            //Validate that rightsholder is also rights holder of the parent system
+            if (updateParameters.ParentSystemUuid.HasChange)
+            {
+                var newParent = updateParameters.ParentSystemUuid.NewValue;
+                if (newParent.HasValue)
+                {
+                    var parentSystemResult = _systemService
+                        .GetSystem(newParent.Value)
+                        .Bind(WithRightsHolderAccessTo);
+                    if (parentSystemResult.Failed)
+                        return parentSystemResult.Error.FailureType == OperationFailure.NotFound
+                            ? new OperationError("Parent system cannot be found", OperationFailure.BadInput)
+                            : parentSystemResult.Error;
+                }
+            }
+
+            return _writeService.Update(system.Uuid, updateParameters);
         }
     }
 }

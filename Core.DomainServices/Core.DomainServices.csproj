@@ -114,6 +114,8 @@
     <Compile Include="Queries\DPR\QueryByDataProcessorUuid.cs" />
     <Compile Include="Queries\DPR\QueryBySystemUsageUuid.cs" />
     <Compile Include="Queries\DPR\QueryBySystemUuid.cs" />
+    <Compile Include="Queries\Interface\QueryInterfaceByUsedInOrganizationWithUuid.cs" />
+    <Compile Include="Queries\Interface\QueryByInterfaceId.cs" />
     <Compile Include="Queries\ItSystem\QueryByBusinessType.cs" />
     <Compile Include="Queries\ItSystem\QueryByNumberOfUsages.cs" />
     <Compile Include="Queries\ItSystem\QueryByRightsHolderIdOrOwnOrganizationIds.cs" />
@@ -126,6 +128,9 @@
     <Compile Include="Queries\KLE\QueryByKeyPrefix.cs" />
     <Compile Include="Queries\KLE\QueryByParentKey.cs" />
     <Compile Include="Queries\KLE\QueryByParentUuid.cs" />
+    <Compile Include="Queries\Notifications\QueryByActiveAdvice.cs" />
+    <Compile Include="Queries\Notifications\QueryByOwnerResourceType.cs" />
+    <Compile Include="Queries\Notifications\QueryByOwnerResourceId.cs" />
     <Compile Include="Queries\Organization\QueryByNameOrCvrContent.cs" />
     <Compile Include="Queries\Organization\QueryByCvrContent.cs" />
     <Compile Include="Queries\Organization\QueryOrganizationByIdsOrSharedAccess.cs" />
@@ -142,6 +147,7 @@
     <Compile Include="Queries\SystemUsage\QueryReadModelsWhichShouldExpire.cs" />
     <Compile Include="Queries\User\QueryByCrossOrganizationPermissions.cs" />
     <Compile Include="Queries\User\QueryByRoleAssignment.cs" />
+    <Compile Include="Queries\ItSystem\QuerySystemByUsedInOrganizationUuid.cs" />
     <Compile Include="Repositories\Contract\IItContractOverviewReadModelRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractOverviewReadModelRepository.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />

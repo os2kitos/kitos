@@ -1,5 +1,5 @@
-﻿using Presentation.Web.Models.API.V2.Request.Shared;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 
 namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {
@@ -16,5 +16,9 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         ///     - Existing references will be replaced by the input data, so unless identified using uuid in the updates, the existing references will be removed.
         /// </summary>
         public IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> ExternalReferences { get; set; }
+        /// <summary>
+        /// Defines archiving related properties for this system usage
+        /// </summary>
+        public ArchivingUpdateRequestDTO Archiving { get; set; }
     }
 }

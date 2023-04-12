@@ -10,7 +10,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     [RoutePrefix("api/v1/organizations/{organizationId}/administration/users/permissions")]
     public class UserAdministrationPermissionsController : BaseApiController
     {

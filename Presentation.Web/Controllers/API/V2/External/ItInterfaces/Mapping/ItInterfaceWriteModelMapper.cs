@@ -1,11 +1,14 @@
 ﻿using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.Model.Shared;
-using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Interface;
 using System;
+using System.Linq;
+using Core.DomainModel;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.External.Generic;
+using System.Collections.Generic;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
 {
@@ -46,16 +49,70 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
             return parameters;
         }
 
-        private void Map(IRightsHolderWritableItInterfacePropertiesDTO source, RightsHolderItInterfaceUpdateParameters destination, bool enforceFallbackIfNotProvided)
+        public ItInterfaceWriteModel FromPOST(CreateItInterfaceRequestDTO request)
         {
-            bool ShouldChange(string propertyName) => ClientRequestsChangeTo(propertyName) || enforceFallbackIfNotProvided;
+            var writeModel = new ItInterfaceWriteModel();
+            Map(request, writeModel, true);
+            return writeModel;
+        }
 
-            destination.Name = ShouldChange(nameof(IRightsHolderWritableItInterfacePropertiesDTO.Name)) ? source.Name.AsChangedValue() : OptionalValueChange<string>.None;
-            destination.InterfaceId = ShouldChange(nameof(IRightsHolderWritableItInterfacePropertiesDTO.InterfaceId)) ? (source.InterfaceId ?? string.Empty).AsChangedValue() : OptionalValueChange<string>.None;
-            destination.ExposingSystemUuid = ShouldChange(nameof(IRightsHolderWritableItInterfacePropertiesDTO.ExposedBySystemUuid)) ? source.ExposedBySystemUuid.AsChangedValue() : OptionalValueChange<Guid>.None;
-            destination.Description = ShouldChange(nameof(IRightsHolderWritableItInterfacePropertiesDTO.Description)) ? source.Description.AsChangedValue() : OptionalValueChange<string>.None;
-            destination.Version = ShouldChange(nameof(IRightsHolderWritableItInterfacePropertiesDTO.Version)) ? source.Version.AsChangedValue() : OptionalValueChange<string>.None;
-            destination.UrlReference = ShouldChange(nameof(IRightsHolderWritableItInterfacePropertiesDTO.UrlReference)) ? source.UrlReference.AsChangedValue() : OptionalValueChange<string>.None;
+        public ItInterfaceWriteModel FromPATCH(UpdateItInterfaceRequestDTO request)
+        {
+            var writeModel = new ItInterfaceWriteModel();
+            Map(request, writeModel, false);
+            return writeModel;
+        }
+
+        private void Map(IItInterfaceWritablePropertiesRequestDTO source, ItInterfaceWriteModel destination, bool enforceFallbackIfNotProvided)
+        {
+            var rule = CreateChangeRule<IItInterfaceWritablePropertiesRequestDTO>(enforceFallbackIfNotProvided);
+            MapCommon(source, destination, enforceFallbackIfNotProvided);
+            destination.ExposingSystemUuid = rule.MustUpdate(x => x.ExposedBySystemUuid) ? source.ExposedBySystemUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
+            destination.Note = rule.MustUpdate(x => x.Note) ? source.Note.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.Deactivated = rule.MustUpdate(x => x.Deactivated) ? source.Deactivated.AsChangedValue() : OptionalValueChange<bool>.None;
+            destination.InterfaceTypeUuid = rule.MustUpdate(x => x.ItInterfaceTypeUuid) ? source.ItInterfaceTypeUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
+            destination.Scope = rule.MustUpdate(x => x.Scope) ? source.Scope.FromChoice().AsChangedValue() : OptionalValueChange<AccessModifier>.None;
+            destination.Data = rule.MustUpdate(x => x.Data)
+                ? (source.Data ?? Array.Empty<ItInterfaceDataRequestDTO>())
+                .Select(MapDataDescription)
+                .ToList()
+                .AsChangedValue<IReadOnlyList<ItInterfaceDataWriteModel>>()
+                : OptionalValueChange<IReadOnlyList<ItInterfaceDataWriteModel>>.None;
+        }
+
+        public ItInterfaceDataWriteModel MapDataDescription(ItInterfaceDataRequestDTO request)
+        {
+            return new ItInterfaceDataWriteModel(request.Description, request.DataTypeUuid);
+        }
+
+        private void Map(IRightsHolderWritableItInterfacePropertiesDTO source, ItInterfaceWriteModelParametersBase destination, bool enforceFallbackIfNotProvided)
+        {
+            var rule = CreateChangeRule<IRightsHolderWritableItInterfacePropertiesDTO>(enforceFallbackIfNotProvided);
+
+            destination.ExposingSystemUuid = rule.MustUpdate(x => x.ExposedBySystemUuid) ? ((Guid?)source.ExposedBySystemUuid).AsChangedValue() : OptionalValueChange<Guid?>.None;
+
+            MapCommon(source, destination, enforceFallbackIfNotProvided);
+        }
+
+        private void MapCommon(ICommonItInterfaceRequestPropertiesDTO source, ItInterfaceWriteModelParametersBase destination, bool enforceFallbackIfNotProvided)
+        {
+            var rule = CreateChangeRule<ICommonItInterfaceRequestPropertiesDTO>(enforceFallbackIfNotProvided);
+            destination.Name = rule.MustUpdate(x => x.Name) ? source.Name.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.InterfaceId = rule.MustUpdate(x => x.InterfaceId)
+                ? (source.InterfaceId ?? string.Empty).AsChangedValue()
+                : OptionalValueChange<string>.None;
+
+            destination.Description = rule.MustUpdate(x => x.Description)
+                ? source.Description.AsChangedValue()
+                : OptionalValueChange<string>.None;
+
+            destination.Version = rule.MustUpdate(x => x.Version)
+                ? source.Version.AsChangedValue()
+                : OptionalValueChange<string>.None;
+
+            destination.UrlReference = rule.MustUpdate(x => x.UrlReference)
+                ? source.UrlReference.AsChangedValue()
+                : OptionalValueChange<string>.None;
         }
     }
 }

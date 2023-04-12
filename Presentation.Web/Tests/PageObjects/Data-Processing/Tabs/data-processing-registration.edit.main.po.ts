@@ -52,6 +52,10 @@ class DataProcessingRegistrationEditMainPageObject {
         return element(by.xpath(this.getSubDpRowExpression(dpName)));
     }
 
+    getSubDataProcessorCellWithContent(dpName: string, content: string) {
+        return element(by.xpath(`${this.getSubDpRowExpression(dpName)}//*[contains(text(),"${content}")]`));
+    }
+
     getSaveSubDataProcessorButton() {
         console.log("Getting the save SubDataProcessor button");
         return element(by.id("save-sub-data-processor-btn"));
@@ -63,11 +67,11 @@ class DataProcessingRegistrationEditMainPageObject {
     }
 
     getRemoveSubDataProcessorButton(dpName: string) {
-        return element(by.xpath(`${this.getSubDpRowExpression(dpName)}/td[last()]/button`));
+        return element(by.xpath(`${this.getSubDpRowExpression(dpName)}//*/button[2]`));
     }
 
     getEditSubDataProcessorButton(dpName: string) {
-        return element(by.xpath(`${this.getSubDpRowExpression(dpName)}/td/button`));
+        return element(by.xpath(`${this.getSubDpRowExpression(dpName)}//*/button[1]`));
     }
 
     private getThirdCountryRowExpression(dpName: string) {

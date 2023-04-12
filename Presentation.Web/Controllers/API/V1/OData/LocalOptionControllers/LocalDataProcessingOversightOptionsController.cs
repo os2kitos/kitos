@@ -8,7 +8,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API.V1.OData.LocalOptionControllers
 {
-    [PublicApi]
+    [InternalApi]
     [ODataRoutePrefix("LocalDataProcessingOversightOptions")]
     public class LocalDataProcessingOversightOptionsController : LocalOptionBaseController<LocalDataProcessingOversightOption, DataProcessingRegistration, DataProcessingOversightOption>
     {

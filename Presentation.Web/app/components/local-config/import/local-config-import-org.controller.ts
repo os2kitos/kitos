@@ -11,11 +11,11 @@
 
     app.controller('local-config.import.ImportOrgCtrl', [
         '$scope', '$http', 'notify', 'user', 'featureToggleService',
-        function ($scope, $http, notify, user, featureToggleService: Kitos.Services.FeatureToggle.IFeatureToggleService) {
+        function ($scope, $http, notify, user) {
             $scope.url = 'api/excel?organizationId=' + user.currentOrganizationId + '&exportOrgUnits';
             $scope.title = 'organisationsenheder';
-            $scope.showFkOrgImport = featureToggleService.hasFeature(Kitos.Services.FeatureToggle.TemporaryFeature.FK_Organisation);
             $scope.currentOrganizationUuid = user.currentOrganizationUuid;
+            $scope.showFkOrgSection = true;
             //Import OrganizationUnits
             $scope.submit = function () {
                 var msg = notify.addInfoMessage("Læser excel ark...", false);

@@ -4,10 +4,12 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.System;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
@@ -16,7 +18,6 @@ using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainModel.References;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
@@ -48,6 +49,7 @@ namespace Core.ApplicationServices.System
         private readonly IOperationClock _operationClock;
         private readonly IItInterfaceService _interfaceService;
         private readonly IItSystemUsageService _systemUsageService;
+        private readonly IOrganizationService _organizationService;
 
         public ItSystemService(
             IItSystemRepository itSystemRepository,
@@ -62,8 +64,8 @@ namespace Core.ApplicationServices.System
             IDomainEvents domainEvents,
             IOperationClock operationClock,
             IItInterfaceService interfaceService,
-            IItSystemUsageService systemUsageService
-            )
+            IItSystemUsageService systemUsageService,
+            IOrganizationService organizationService)
         {
             _itSystemRepository = itSystemRepository;
             _authorizationContext = authorizationContext;
@@ -78,6 +80,7 @@ namespace Core.ApplicationServices.System
             _operationClock = operationClock;
             _interfaceService = interfaceService;
             _systemUsageService = systemUsageService;
+            _organizationService = organizationService;
         }
 
         public Result<ItSystem, OperationError> GetSystem(Guid uuid)
@@ -162,70 +165,71 @@ namespace Core.ApplicationServices.System
                 return SystemDeleteResult.NotFound;
             }
 
-            if (_authorizationContext.AllowDelete(system) == false)
+            var permissions = GetPermissions(system);
+            if (permissions.Failed)
             {
+                return permissions.Error.FailureType == OperationFailure.Forbidden
+                    ? SystemDeleteResult.Forbidden
+                    : SystemDeleteResult.UnknownError;
+            }
+
+            var systemPermissions = permissions.Value;
+            if (!systemPermissions.BasePermissions.Delete)
                 return SystemDeleteResult.Forbidden;
+
+            var conflicts = systemPermissions.DeletionConflicts.ToList();
+            if (conflicts.Any() && !breakBindings)
+            {
+                return conflicts.First() switch
+                {
+                    SystemDeletionConflict.InUse => SystemDeleteResult.InUse,
+                    SystemDeletionConflict.HasChildren => SystemDeleteResult.HasChildren,
+                    SystemDeletionConflict.HasInterfaceExhibits => SystemDeleteResult.HasInterfaceExhibits,
+                    _ => throw new ArgumentOutOfRangeException(nameof(conflicts), "Unknown deletion conflict")
+                };
             }
 
-            if (system.Usages.Any())
+            if (conflicts.Contains(SystemDeletionConflict.InUse))
             {
-                if (breakBindings)
+                var failedUsageDeletion = system.Usages.ToList().Select(usage => _systemUsageService.Delete(usage.Id)).FirstOrDefault(x => x.Failed);
+                if (failedUsageDeletion != null)
                 {
-                    var failedUsageDeletion = system.Usages.ToList().Select(usage => _systemUsageService.Delete(usage.Id)).FirstOrDefault(x => x.Failed);
-                    if (failedUsageDeletion != null)
-                    {
-                        _logger.Error("Failed to delete system with id {id} because deleting usages failed", id);
-                        return SystemDeleteResult.UnknownError;
-                    }
-                }
-                else
-                {
-                    return SystemDeleteResult.InUse;
-                }
-            }
-
-            if (system.Children.Any())
-            {
-                if (breakBindings)
-                {
-                    var failedChildDeletion = system
-                        .Children
-                        .ToList()
-                        .Select(child => UpdateParentSystem(child.Id))
-                        .FirstOrDefault(result => result.Failed);
-                    if (failedChildDeletion != null)
-                    {
-                        _logger.Error("Failed to delete system with id {id} because deleting children failed", id);
-                        return SystemDeleteResult.UnknownError;
-                    }
-                    system.Children.Clear();
-                }
-                else
-                {
-                    return SystemDeleteResult.HasChildren;
+                    _logger.Error("Failed to delete system with id {id} because deleting usages failed", id);
+                    return SystemDeleteResult.UnknownError;
                 }
             }
 
-            if (system.ItInterfaceExhibits.Any())
+            if (conflicts.Contains(SystemDeletionConflict.HasChildren))
             {
-                if (breakBindings)
+
+                var failedChildDeletion = system
+                    .Children
+                    .ToList()
+                    .Select(child => UpdateParentSystem(child.Id))
+                    .FirstOrDefault(result => result.Failed);
+                if (failedChildDeletion != null)
                 {
-                    var failedUpdate = system
-                        .ItInterfaceExhibits
-                        .ToList()
-                        .Select(exhibit => _interfaceService.UpdateExposingSystem(exhibit.ItInterface.Id, null))
-                        .FirstOrDefault(x => x.Failed);
-                    if (failedUpdate != null)
-                    {
-                        _logger.Error("Failed to delete system with id {id} because deleting interface exposures failed", id);
-                        return SystemDeleteResult.UnknownError;
-                    }
-                    system.ItInterfaceExhibits.Clear();
+                    _logger.Error("Failed to delete system with id {id} because deleting children failed", id);
+                    return SystemDeleteResult.UnknownError;
                 }
-                else
+                system.Children.Clear();
+
+            }
+
+            if (conflicts.Contains(SystemDeletionConflict.HasInterfaceExhibits))
+            {
+
+                var failedUpdate = system
+                    .ItInterfaceExhibits
+                    .ToList()
+                    .Select(exhibit => _interfaceService.UpdateExposingSystem(exhibit.ItInterface.Id, null))
+                    .FirstOrDefault(x => x.Failed);
+                if (failedUpdate != null)
                 {
-                    return SystemDeleteResult.HasInterfaceExhibits;
+                    _logger.Error("Failed to delete system with id {id} because deleting interface exposures failed", id);
+                    return SystemDeleteResult.UnknownError;
                 }
+                system.ItInterfaceExhibits.Clear();
             }
 
             try
@@ -320,6 +324,47 @@ namespace Core.ApplicationServices.System
             return ValidateNameChange(organizationId, systemId, newName).IsNone;
         }
 
+        public Result<SystemPermissions, OperationError> GetPermissions(Guid uuid)
+        {
+            return GetSystem(uuid).Transform(GetPermissions);
+        }
+
+        private Result<SystemPermissions, OperationError> GetPermissions(Result<ItSystem,OperationError> systemResult)
+        {
+            return systemResult
+                .Transform
+                (
+                    system => ResourcePermissionsResult
+                        .FromResolutionResult(system, _authorizationContext)
+                        .Select(permissions =>
+                            new SystemPermissions(permissions, GetDeletionConflicts(system, permissions.Delete)))
+                );
+        }
+
+        private static IEnumerable<SystemDeletionConflict> GetDeletionConflicts(Result<ItSystem, OperationError> system, bool allowDelete)
+        {
+            return allowDelete
+                ? system.Select(GetDeletionConflicts).Match(conflicts => conflicts, _ => Array.Empty<SystemDeletionConflict>())
+                : Array.Empty<SystemDeletionConflict>();
+        }
+
+        private static IEnumerable<SystemDeletionConflict> GetDeletionConflicts(ItSystem arg)
+        {
+            if (arg.Children.Any())
+                yield return SystemDeletionConflict.HasChildren;
+            if (arg.ItInterfaceExhibits.Any())
+                yield return SystemDeletionConflict.HasInterfaceExhibits;
+            if (arg.Usages.Any())
+                yield return SystemDeletionConflict.InUse;
+        }
+
+        public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid)
+                .Select(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItSystem>(organization.Id, _authorizationContext));
+        }
+
         private Maybe<OperationError> ValidateNameChange(int organizationId, int systemId, string newName)
         {
             if (!ItSystem.IsValidName(newName))
@@ -333,30 +378,6 @@ namespace Core.ApplicationServices.System
         public bool CanCreateSystemWithName(int organizationId, string name)
         {
             return ValidateNewSystemName(organizationId, name).IsNone;
-        }
-
-        public Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference)
-        {
-            return Mutate(systemId, system => system.Reference?.URL != urlReference, updateWithResult: system =>
-            {
-                if (string.IsNullOrWhiteSpace(urlReference))
-                    return new OperationError("Url must be defined", OperationFailure.BadInput);
-
-                var existingReference = system.Reference;
-                if (existingReference != null)
-                {
-                    existingReference.URL = urlReference;
-                    return system;
-                }
-
-                var addReferenceResult = _referenceService.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference);
-                if (addReferenceResult.Failed)
-                {
-                    return addReferenceResult.Error;
-                }
-
-                return system.SetMasterReference(addReferenceResult.Value).Match(_ => Result<ItSystem, OperationError>.Success(system), error => error);
-            });
         }
 
         public Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> newTaskRefState)
@@ -444,7 +465,7 @@ namespace Core.ApplicationServices.System
                     if (!_authorizationContext.AllowReads(parent))
                         return new OperationError("Access to parent system is denied", OperationFailure.Forbidden);
 
-                    system.SetUpdateParentSystem(parent);
+                    system.UpdateParentSystem(parent);
                 }
                 else
                 {
@@ -455,12 +476,34 @@ namespace Core.ApplicationServices.System
             });
         }
 
+        public Result<ItSystem, OperationError> Activate(int itSystemId)
+        {
+            return Mutate(itSystemId, system => system.Disabled, system =>
+            {
+                system.Activate();
+                _domainEvents.Raise(new EnabledStatusChanged<ItSystem>(system, true, false));
+            });
+        }
+
         public Result<ItSystem, OperationError> Deactivate(int systemId)
         {
             return Mutate(systemId, system => system.Disabled == false, system =>
             {
                 system.Deactivate();
                 _domainEvents.Raise(new EnabledStatusChanged<ItSystem>(system, false, true));
+            });
+        }
+
+        public Result<ItSystem, OperationError> UpdateAccessModifier(int itSystemId, AccessModifier accessModifier)
+        {
+            return Mutate(itSystemId, system => system.AccessModifier != accessModifier, updateWithResult: system =>
+            {
+                if (!_authorizationContext.HasPermission(new VisibilityControlPermission(system)))
+                {
+                    return new OperationError(OperationFailure.Forbidden);
+                }
+                system.AccessModifier = accessModifier;
+                return system;
             });
         }
 
@@ -502,8 +545,8 @@ namespace Core.ApplicationServices.System
         {
             return itSystemUsages.Select(
                 itSystemUsage => new UsingOrganization(
-                    itSystemUsage.Id,
-                    itSystemUsage.Organization.ToNamedEntity()))
+                    itSystemUsage.ToNamedEntityWithUuid(),
+                    itSystemUsage.Organization.ToNamedEntityWithUuid()))
                 .ToList()
                 .AsReadOnly();
         }

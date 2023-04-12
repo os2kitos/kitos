@@ -125,22 +125,25 @@
 
         public attachUser() {
             var msg = this.notify.addInfoMessage("Tilknytter bruger", false);
-            this.$http.get<Models.IODataResult<Models.IUser>>(`odata/Users?$filter=Email eq '${this.vm.email}'`).then((response) => {
-                var userResult = this._.first(response.data.value);
+            this.$http.get<Models.IUser>('odata/GetUserByEmail(email=\'' + this.vm.email + '\')').then((response) => {
+                var userResult = response.data;
+                if (!userResult) {
+                    msg.toErrorMessage(`Der opstod en fejl ifm. tilknytningen af brugeren til organisationen!`);
+                } else {
+                    var promises: ng.IHttpPromise<any>[] = [];
+                    const currentOrganizationId = this.user.currentOrganizationId;
+                    const userId = userResult.Id;
 
-                var promises: ng.IHttpPromise<any>[] = [];
-                const currentOrganizationId = this.user.currentOrganizationId;
-                const userId = userResult.Id;
+                    this.createUserRights(promises, currentOrganizationId, userId);
 
-                this.createUserRights(promises, currentOrganizationId, userId);
-
-                // when all requests are done
-                this.$q.all(promises).then(
-                    () => {
-                        msg.toSuccessMessage(`${userResult.Name} ${userResult.LastName} er tilknyttet til organisationen`);
-                        this.cancel();
-                    },
-                    (reason) => msg.toErrorMessage(`Kunne ikke tilknytte ${userResult.Name} ${userResult.LastName} til organisationen!`)); // on error: display error
+                    // when all requests are done
+                    this.$q.all(promises).then(
+                        () => {
+                            msg.toSuccessMessage(`${userResult.Name} ${userResult.LastName} er tilknyttet til organisationen`);
+                            this.cancel();
+                        },
+                        (reason) => msg.toErrorMessage(`Kunne ikke tilknytte ${userResult.Name} ${userResult.LastName} til organisationen!`)); // on error: display error
+                }
             });
         }
     }

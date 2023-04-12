@@ -6,7 +6,6 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainModel.References;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
@@ -23,7 +22,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Events;
 using Tests.Toolkit.Patterns;
@@ -47,6 +48,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IItInterfaceService> _interfaceServiceMock;
         private readonly Mock<IItSystemUsageService> _systemUsageServiceMock;
+        private readonly Mock<IOrganizationService> _organizationServiceMock;
 
         public ItSystemServiceTest()
         {
@@ -63,6 +65,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _domainEventsMock = new Mock<IDomainEvents>();
             _interfaceServiceMock = new Mock<IItInterfaceService>();
             _systemUsageServiceMock = new Mock<IItSystemUsageService>();
+            _organizationServiceMock = new Mock<IOrganizationService>();
             _sut = new ItSystemService(
                 _systemRepository.Object,
                 _authorizationContext.Object,
@@ -76,7 +79,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 _domainEventsMock.Object,
                 Mock.Of<IOperationClock>(),
                 _interfaceServiceMock.Object,
-                _systemUsageServiceMock.Object
+                _systemUsageServiceMock.Object,
+                _organizationServiceMock.Object
                 );
         }
 
@@ -278,7 +282,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var usage = Assert.Single(result.Value);
-            Assert.Equal(systemUsage.Id, usage.ItSystemUsageId);
+            Assert.Equal(systemUsage.Uuid, usage.ItSystemUsage.Uuid);
             Assert.Equal(organization.Id, usage.Organization.Id);
             Assert.Equal(organization.Name, usage.Organization.Name);
         }
@@ -303,8 +307,8 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             Assert.Collection(result.Value,
-                item => Assert.Equal(firstSystemUsage.Id, item.ItSystemUsageId),
-                item => Assert.Equal(secondSystemUsage.Id, item.ItSystemUsageId)
+                item => Assert.Equal(firstSystemUsage.Uuid, item.ItSystemUsage.Uuid),
+                item => Assert.Equal(secondSystemUsage.Uuid, item.ItSystemUsage.Uuid)
                 );
         }
 
@@ -934,102 +938,6 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void UpdateMainUrlReference_With_Existing_Updates_Existing_Reference_And_Returns_Ok()
-        {
-            //Arrange
-            var systemId = A<int>();
-            var urlReference = A<string>();
-            var itSystem = new ItSystem { Reference = new ExternalReference { URL = A<string>() } };
-            ExpectTransactionToBeSet();
-            ExpectGetSystemReturns(systemId, itSystem);
-            ExpectAllowModifyReturns(itSystem, true);
-
-            //Act
-            var result = _sut.UpdateMainUrlReference(systemId, urlReference);
-
-            //Assert
-            Assert.True(result.Ok);
-            Assert.Equal(urlReference, result.Select(x => x.Reference.URL).Value);
-        }
-
-        [Fact]
-        public void UpdateMainUrlReference_WithOut_Existing_Reference_Creates_New_And_Returns_Ok()
-        {
-            //Arrange
-            var systemId = A<int>();
-            var urlReference = A<string>();
-            var createdReference = new ExternalReference { URL = A<string>() };
-            var itSystem = new ItSystem { Id = systemId };
-            ExpectTransactionToBeSet();
-            ExpectGetSystemReturns(systemId, itSystem);
-            ExpectAllowModifyReturns(itSystem, true);
-            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference)).Returns(createdReference);
-
-            //Act
-            var result = _sut.UpdateMainUrlReference(systemId, urlReference);
-
-            //Assert
-            Assert.True(result.Ok);
-            Assert.Same(createdReference, result.Select(x => x.Reference).Value);
-            _systemRepository.Verify(x => x.Update(itSystem), Times.Once);
-            _dbTransaction.Verify(x => x.Commit(), Times.Once);
-        }
-
-        [Fact]
-        public void UpdateMainUrlReference_Fails_If_CreateReference_Fails()
-        {
-            //Arrange
-            var systemId = A<int>();
-            var urlReference = A<string>();
-            var itSystem = new ItSystem { Id = systemId };
-            ExpectTransactionToBeSet();
-            ExpectGetSystemReturns(systemId, itSystem);
-            ExpectAllowModifyReturns(itSystem, true);
-            var operationError = A<OperationError>();
-            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference)).Returns(operationError);
-
-            //Act
-            var result = _sut.UpdateMainUrlReference(systemId, urlReference);
-
-            //Assert
-            AssertUpdateFailure(result, operationError.FailureType);
-        }
-
-        [Fact]
-        public void UpdateMainUrlReference_Fails_If_Write_Access_Is_Rejected()
-        {
-            //Arrange
-            var systemId = A<int>();
-            var urlReference = A<string>();
-            var itSystem = new ItSystem { Id = systemId };
-            ExpectTransactionToBeSet();
-            ExpectGetSystemReturns(systemId, itSystem);
-            ExpectAllowModifyReturns(itSystem, false);
-
-            //Act
-            var result = _sut.UpdateMainUrlReference(systemId, urlReference);
-
-            //Assert
-            AssertUpdateFailure(result, OperationFailure.Forbidden);
-        }
-
-        [Fact]
-        public void UpdateMainUrlReference_Fails_If_System_Is_Not_Found()
-        {
-            //Arrange
-            var systemId = A<int>();
-            var urlReference = A<string>();
-            ExpectTransactionToBeSet();
-            ExpectGetSystemReturns(systemId, null);
-
-            //Act
-            var result = _sut.UpdateMainUrlReference(systemId, urlReference);
-
-            //Assert
-            AssertUpdateFailure(result, OperationFailure.NotFound);
-        }
-
-        [Fact]
         public void UpdateBusinessType_Returns_Ok()
         {
             //Arrange
@@ -1388,19 +1296,266 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
+        [Fact]
+        public void Activate_Returns_Ok()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var organization1Id = A<int>();
+            var itSystem = CreateSystem(organization1Id);
+            itSystem.Disabled = true;
+            ExpectTransactionToBeSet();
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+
+            //Act
+            var result = _sut.Activate(systemId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.False(result.Select(x => x.Disabled).Value);
+            _systemRepository.Verify(x => x.Update(It.IsAny<ItSystem>()), Times.Once);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void Cannot_Activate_If_No_Access()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var organization1Id = A<int>();
+            var itSystem = CreateSystem(organization1Id);
+            ExpectTransactionToBeSet();
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, false);
+
+            //Act
+            var result = _sut.Activate(systemId);
+
+            //Assert
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
+        }
+
+        [Fact]
+        public void Cannot_Activate_If_Not_Found()
+        {
+            //Arrange
+            var systemId = A<int>();
+            ExpectTransactionToBeSet();
+            ExpectGetSystemReturns(systemId, null);
+
+            //Act
+            var result = _sut.Activate(systemId);
+
+            //Assert
+            AssertUpdateFailure(result, OperationFailure.NotFound);
+        }
+
+        [Theory]
+        [InlineData(AccessModifier.Local, AccessModifier.Public)]
+        [InlineData(AccessModifier.Public, AccessModifier.Local)]
+        public void UpdateAccessModifier_Returns_Ok(AccessModifier from, AccessModifier to)
+        {
+            //Arrange
+            var systemId = A<int>();
+            var organization1Id = A<int>();
+            var itSystem = CreateSystem(organization1Id);
+            itSystem.AccessModifier = from;
+            itSystem.Disabled = true;
+            ExpectTransactionToBeSet();
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectHasVisibilityControlPermission(itSystem, true);
+
+            //Act
+            var result = _sut.UpdateAccessModifier(systemId, to);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(to, itSystem.AccessModifier);
+            _systemRepository.Verify(x => x.Update(It.IsAny<ItSystem>()), Times.Once);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void Cannot_UpdateAccessModifier_If_No_Permission()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var organization1Id = A<int>();
+            var itSystem = CreateSystem(organization1Id);
+            ExpectTransactionToBeSet();
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, false);
+            ExpectHasVisibilityControlPermission(itSystem, false);
+
+            //Act
+            var result = _sut.UpdateAccessModifier(systemId, AccessModifier.Local);
+
+            //Assert
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
+        }
+
+        [Fact]
+        public void Cannot_UpdateAccessModifier_If_No_Access()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var organization1Id = A<int>();
+            var itSystem = CreateSystem(organization1Id);
+            ExpectTransactionToBeSet();
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, false);
+
+            //Act
+            var result = _sut.UpdateAccessModifier(systemId, AccessModifier.Local);
+
+            //Assert
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
+        }
+
+        [Fact]
+        public void Cannot_UpdateAccessModifier_If_Not_Found()
+        {
+            //Arrange
+            var systemId = A<int>();
+            ExpectTransactionToBeSet();
+            ExpectGetSystemReturns(systemId, null);
+
+            //Act
+            var result = _sut.UpdateAccessModifier(systemId, AccessModifier.Local);
+
+            //Assert
+            AssertUpdateFailure(result, OperationFailure.NotFound);
+        }
+
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, false, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, false)]
+        [InlineData(false, false, false)]
+        public void Can_Get_Permissions(bool read, bool modify, bool delete)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var itSystem = new ItSystem { Uuid = uuid };
+            ExpectGetSystemReturns(uuid, itSystem);
+            ExpectAllowReadsReturns(itSystem, read);
+            ExpectAllowModifyReturns(itSystem, modify);
+            ExpectAllowDeleteReturns(itSystem, delete);
+
+            //Act
+            var result = _sut.GetPermissions(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var permissions = result.Value;
+            Assert.Equivalent(new SystemPermissions(new ResourcePermissionsResult(read, modify, delete), Array.Empty<SystemDeletionConflict>()), permissions);
+        }
+
+        [Theory]
+        [InlineData(true, true, true, true)]
+        [InlineData(false, true, true, true)]
+        [InlineData(true, false, false, false)]
+        [InlineData(true, false, false, true)]
+        [InlineData(true, false, true, false)]
+        [InlineData(true, true, false, false)]
+        public void Can_Get_Permissions_With_Deletion_Conflicts(bool allowDelete, bool withUsages, bool withChildren, bool withExposures)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var itSystem = new ItSystem { Uuid = uuid };
+            ExpectGetSystemReturns(uuid, itSystem);
+            ExpectAllowReadsReturns(itSystem, true);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectAllowDeleteReturns(itSystem, allowDelete);
+            if (withUsages) itSystem.Usages.Add(new ItSystemUsage());
+            if (withExposures) itSystem.ItInterfaceExhibits.Add(new ItInterfaceExhibit());
+            if (withChildren) itSystem.Children.Add(new ItSystem());
+
+
+            //Act
+            var result = _sut.GetPermissions(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var permissions = result.Value;
+            var expectedConflicts = new List<SystemDeletionConflict>();
+            if (allowDelete)
+            {
+                if (withUsages) expectedConflicts.Add(SystemDeletionConflict.InUse);
+                if (withChildren) expectedConflicts.Add(SystemDeletionConflict.HasChildren);
+                if (withExposures) expectedConflicts.Add(SystemDeletionConflict.HasInterfaceExhibits);
+            }
+            Assert.Equivalent(new SystemPermissions(new ResourcePermissionsResult(true, true, allowDelete), expectedConflicts), permissions);
+        }
+
+        [Fact]
+        public void Get_Permissions_Returns_Not_Found()
+        {
+            //Arrange
+            var wrongUuid = A<Guid>();
+            ExpectGetSystemReturns(wrongUuid, Maybe<ItSystem>.None);
+
+            //Act
+            var result = _sut.GetPermissions(wrongUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Get_CollectionPermissions(bool create)
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var organization = new Organization { Id = A<int>() };
+
+            ExpectOrganizationServiceGetOrganizationReturns(organizationUuid, organization);
+            ExpectAllowCreateReturns(organization.Id, create);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(organizationUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(create, result.Value.Create);
+        }
+
+        [Fact]
+        public void Get_CollectionPermissions_Returns_OperationError_When_GetOrganization_Fails()
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var error = A<OperationError>();
+
+            ExpectOrganizationServiceGetOrganizationReturns(organizationUuid, error);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(organizationUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(error.FailureType, result.Error.FailureType);
+        }
+
         private (ItSystem root, IReadOnlyList<ItSystem> createdItSystems) CreateHierarchy()
         {
             var root = CreateSystem();
             var child = CreateSystem();
             var grandchild = CreateSystem();
 
-            child.Children = new List<ItSystem> {grandchild};
+            child.Children = new List<ItSystem> { grandchild };
             grandchild.Parent = child;
 
-            root.Children = new List<ItSystem> {child};
+            root.Children = new List<ItSystem> { child };
             child.Parent = root;
 
-            return (root, new List<ItSystem>{root, child, grandchild});
+            return (root, new List<ItSystem> { root, child, grandchild });
         }
 
         private void UpdateName_Fails_With_BadInput(string newName)
@@ -1434,9 +1589,14 @@ namespace Tests.Unit.Presentation.Web.Services
             _businessTypeServiceMock.Setup(x => x.GetOptionByUuid(organizationId, businessTypeId)).Returns(result);
         }
 
-        private void ExpectGetOrganizationReturns(Guid id, Maybe<Organization> response)
+        private void ExpectGetOrganizationReturns(Guid uuid, Maybe<Organization> response)
         {
-            _organizationRepositoryMock.Setup(x => x.GetByUuid(id)).Returns(response);
+            _organizationRepositoryMock.Setup(x => x.GetByUuid(uuid)).Returns(response);
+        }
+
+        private void ExpectOrganizationServiceGetOrganizationReturns(Guid uuid, Result<Organization, OperationError> result, OrganizationDataReadAccessLevel? organizationDataReadAccessLevel = null)
+        {
+            _organizationServiceMock.Setup(x => x.GetOrganization(uuid, organizationDataReadAccessLevel)).Returns(result);
         }
 
         private void ExpectAllowModifyReturns(ItSystem itSystem, bool value)
@@ -1491,7 +1651,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private ItSystemUsage CreateSystemUsage(Organization organization)
         {
-            return new() { Id = A<int>(), Organization = organization };
+            return new() { Id = A<int>(), Organization = organization, ItSystem = new ItSystem{Name = A<string>()}};
         }
 
         private ItInterfaceExhibit CreateInterfaceExhibit()
@@ -1594,6 +1754,13 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             _referenceService.Setup(x => x.DeleteBySystemId(system.Id))
                 .Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
+        }
+
+        private void ExpectHasVisibilityControlPermission(ItSystem itSystem, bool value)
+        {
+            _authorizationContext
+                .Setup(x => x.HasPermission(It.Is<VisibilityControlPermission>(p => p.Target == itSystem)))
+                .Returns(value);
         }
     }
 }

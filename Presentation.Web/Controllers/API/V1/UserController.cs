@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.RightsHolder;
 using Core.ApplicationServices.Organizations;
@@ -30,17 +31,20 @@ namespace Presentation.Web.Controllers.API.V1
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
         private readonly IUserRightsService _userRightsService;
+        private readonly IOrganizationalUserContext _userContext;
 
         public UserController(
             IGenericRepository<User> repository,
             IUserService userService,
             IOrganizationService organizationService,
-            IUserRightsService userRightsService)
+            IUserRightsService userRightsService,
+            IOrganizationalUserContext userContext)
             : base(repository)
         {
             _userService = userService;
             _organizationService = organizationService;
             _userRightsService = userRightsService;
+            _userContext = userContext;
         }
 
         [NonAction]
@@ -158,7 +162,7 @@ namespace Presentation.Web.Controllers.API.V1
         {
             try
             {
-                var user = Repository.GetByKey(UserId);
+                var user = Repository.GetByKey(_userContext.UserId);
                 if (user == null)
                     return NotFound();
 

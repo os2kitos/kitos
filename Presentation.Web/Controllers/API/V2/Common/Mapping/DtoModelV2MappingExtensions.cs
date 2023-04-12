@@ -1,12 +1,10 @@
-﻿using System;
-using Core.ApplicationServices.Model.Shared.Write;
+﻿using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
-using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 {
@@ -15,6 +13,16 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         public static IdentityNamePairResponseDTO MapIdentityNamePairDTO<T>(this T source) where T : IHasUuid, IHasName
         {
             return new(source.Uuid, source.Name);
+        }
+
+        public static IdentityNamePairWithDeactivatedStatusDTO MapIdentityNamePairWithDeactivatedStatusDTO<T>(this T source) where T : IHasUuid, IHasName, IEntityWithEnabledStatus
+        {
+            return new(source.Uuid, source.Name, source.Disabled);
+        }
+
+        public static IdentityNamePairWithDeactivatedStatusDTO MapIdentityNamePairWithDeactivatedStatusDTO(this ItSystemUsage source)
+        {
+            return new(source.Uuid, source.ItSystem.Name, source.ItSystem.Disabled);
         }
 
         public static IdentityNamePairResponseDTO MapIdentityNamePairDTO(this TaskRef source)
@@ -35,24 +43,6 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         public static ShallowOrganizationResponseDTO MapShallowOrganizationResponseDTO(this Organization organization)
         {
             return new(organization.Uuid, organization.Name, organization.GetActiveCvr());
-        }
-
-        public static RecommendedArchiveDutyChoice ToDTOType(this ArchiveDutyRecommendationTypes? domainType)
-        {
-            switch (domainType)
-            {
-                case null:
-                case ArchiveDutyRecommendationTypes.Undecided:
-                    return RecommendedArchiveDutyChoice.Undecided;
-                case ArchiveDutyRecommendationTypes.B:
-                    return RecommendedArchiveDutyChoice.B;
-                case ArchiveDutyRecommendationTypes.K:
-                    return RecommendedArchiveDutyChoice.K;
-                case ArchiveDutyRecommendationTypes.NoRecommendation:
-                    return RecommendedArchiveDutyChoice.NoRecommendation;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(domainType), domainType, null);
-            }
         }
 
         public static UserRolePair ToUserRolePair(this RoleAssignmentRequestDTO src)

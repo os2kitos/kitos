@@ -14,7 +14,6 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Time;
 using Moq;
 using Presentation.Web.Controllers.API.V1;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.ItSystem;
 using Tests.Unit.Presentation.Web.Helpers;
@@ -41,7 +40,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
                 Mock.Of<IOperationClock>(x => x.Now == DateTime.Now)
                 );
 
-            SetupControllerFrorTest(_sut);
+            SetupControllerForTest(_sut);
             _sut.AuthorizationContext = _authorizationContext.Object;
         }
 
@@ -171,7 +170,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
             Assert.True(
                 usingOrganizations.Select(x => new
                 {
-                    usageId = x.ItSystemUsageId,
+                    usageId = x.ItSystemUsage.Uuid,
                     org = new
                     {
                         id = x.Organization.Id,
@@ -181,7 +180,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
                     .SequenceEqual(
                         dtos.Select(x => new
                         {
-                            usageId = x.SystemUsageId,
+                            usageId = x.SystemUsage.Uuid,
                             org = new
                             {
                                 id = x.Organization.Id,

@@ -15,7 +15,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 (LifeCycleStatusChoice.Undecided, LifeCycleStatusType.Undecided),
                 (LifeCycleStatusChoice.NotInUse, LifeCycleStatusType.NotInUse),
                 (LifeCycleStatusChoice.PhasingIn, LifeCycleStatusType.PhasingIn),
-                (LifeCycleStatusChoice.Operational, LifeCycleStatusType.Operational)
+                (LifeCycleStatusChoice.Operational, LifeCycleStatusType.Operational),
+                (LifeCycleStatusChoice.PhasingOut, LifeCycleStatusType.PhasingOut)
             );
         }
 

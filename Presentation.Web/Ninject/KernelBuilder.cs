@@ -119,11 +119,17 @@ using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using System.Linq;
 using Core.ApplicationServices.Messages;
 using Core.Abstractions.Caching;
+using Core.ApplicationServices.Interface.Write;
 using Core.ApplicationServices.Users.Handlers;
 using Core.DomainModel.Commands;
 using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
+using Core.ApplicationServices.System.Write;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
+using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
+using Core.ApplicationServices.Generic;
 
 namespace Presentation.Web.Ninject
 {
@@ -208,9 +214,13 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationRightsService>().To<OrganizationRightsService>().InCommandScope(Mode);
             kernel.Bind<IAdviceService>().To<AdviceService>().InCommandScope(Mode);
             kernel.Bind<AdviceService>().ToSelf().InCommandScope(Mode);
+            kernel.Bind<IRegistrationNotificationService>().To<RegistrationNotificationService>().InCommandScope(Mode);
+            kernel.Bind<IRegistrationNotificationUserRelationsService>().To<RegistrationNotificationUserRelationsService>().InCommandScope(Mode);
+            kernel.Bind<INotificationService>().To<NotificationService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InCommandScope(Mode);
             kernel.Bind<IItSystemService>().To<ItSystemService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageMigrationServiceAdapter>().To<ItSystemUsageMigrationServiceAdapter>().InCommandScope(Mode);
             kernel.Bind<IItsystemUsageRelationsService>().To<ItsystemUsageRelationsService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageWriteService>().To<ItSystemUsageWriteService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceService>().To<ItInterfaceService>().InCommandScope(Mode);
@@ -257,6 +267,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ITrackingService>().To<TrackingService>().InCommandScope(Mode);
             kernel.Bind<IUIModuleCustomizationService>().To<UIModuleCustomizationService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationUnitService>().To<OrganizationUnitService>().InCommandScope(Mode);
+            kernel.Bind<IEntityIdMapper>().To<EntityIdMapper>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);
@@ -282,7 +293,9 @@ namespace Presentation.Web.Ninject
             RegisterMappers(kernel);
 
             kernel.Bind<IRightsHolderSystemService>().To<RightsHolderSystemService>().InCommandScope(Mode);
+            kernel.Bind<IItSystemWriteService>().To<ItSystemWriteService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceRightsHolderService>().To<ItInterfaceRightsHolderService>().InCommandScope(Mode);
+            kernel.Bind<IItInterfaceWriteService>().To<ItInterfaceWriteService>().InCommandScope(Mode);
             kernel.Bind<IUserRightsService>().To<UserRightsService>().InCommandScope(Mode);
 
             //STS Organization
@@ -297,12 +310,17 @@ namespace Presentation.Web.Ninject
 
         private void RegisterMappers(IKernel kernel)
         {
+            //Generic
+            kernel.Bind<IEntityWithDeactivatedStatusMapper>().To<EntityWithDeactivatedStatusMapper>().InCommandScope(Mode);
+
             //Systems
             kernel.Bind<IItSystemWriteModelMapper>().To<ItSystemWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IItSystemResponseMapper>().To<ItSystemResponseMapper>().InCommandScope(Mode);
 
             //System usage
             kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageWriteModelMapper>().To<ItSystemUsageWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageMigrationResponseMapper>().To<ItSystemUsageMigrationResponseMapper>().InCommandScope(Mode);
 
             //Data processing
             kernel.Bind<IDataProcessingRegistrationWriteModelMapper>().To<DataProcessingRegistrationWriteModelMapper>().InCommandScope(Mode);
@@ -314,15 +332,21 @@ namespace Presentation.Web.Ninject
 
             //Interfaces
             kernel.Bind<IItInterfaceWriteModelMapper>().To<ItInterfaceWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IItInterfaceResponseMapper>().To<ItInterfaceResponseMapper>().InCommandScope(Mode);
 
             //External references
             kernel.Bind<IExternalReferenceResponseMapper>().To<ExternalReferenceResponseMapper>().InCommandScope(Mode);
 
             //Permissions
             kernel.Bind<IResourcePermissionsResponseMapper>().To<ResourcePermissionsResponseMapper>().InCommandScope(Mode);
+            kernel.Bind<ICommandPermissionsResponseMapper>().To<CommandPermissionsResponseMapper>().InCommandScope(Mode);
 
             //Public messages
             kernel.Bind<IPublicMessagesWriteModelMapper>().To<PublicMessagesWriteModelMapper>().InCommandScope(Mode);
+            
+            //Notifications
+            kernel.Bind<INotificationWriteModelMapper>().To<NotificationWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<INotificationResponseMapper>().To<NotificationResponseMapper>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)
@@ -409,6 +433,7 @@ namespace Presentation.Web.Ninject
             RegisterCommands<RemoveUserFromKitosCommandHandler>(kernel);
             RegisterCommands<RemoveOrganizationUnitRegistrationsCommandHandler>(kernel);
             RegisterCommands<AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler>(kernel);
+            RegisterCommands<ValidateUserCredentialsCommandHandler>(kernel);
         }
 
         private void RegisterCommands<THandler>(IKernel kernel)
@@ -423,6 +448,11 @@ namespace Presentation.Web.Ninject
 
         private void RegisterOptions(IKernel kernel)
         {
+            //IT-interface
+            RegisterOptionsService<ItInterface, InterfaceType, LocalInterfaceType>(kernel);
+            
+            RegisterOptionsService<DataRow, DataType, LocalDataType>(kernel);
+
             //Data processing registrations
             RegisterOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, LocalDataProcessingRegistrationRole>(kernel);
 

@@ -18,7 +18,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
-    [PublicApi]
+    [InternalApi]
     public class ExhibitController : GenericApiController<ItInterfaceExhibit, ItInterfaceExhibitDTO>
     {
         private readonly IGenericRepository<ItInterfaceExhibit> _repository;

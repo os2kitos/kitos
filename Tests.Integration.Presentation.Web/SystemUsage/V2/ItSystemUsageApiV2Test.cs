@@ -14,8 +14,10 @@ using Core.DomainServices.Extensions;
 using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
+using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
+using Presentation.Web.Models.API.V2.Internal.Response.Roles;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Request.Shared;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
@@ -58,6 +60,197 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertExpectedUsageShallow(system2UsageOrg1, dtos);
             AssertExpectedUsageShallow(system2UsageOrg2, dtos);
             AssertExpectedUsageShallow(system3UsageOrg2, dtos);
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal()
+        {
+            //Arrange
+            var (_, _, organization, system1) = await CreatePrerequisitesAsync();
+
+            var system2 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+
+            var system1Usage = await ItSystemHelper.TakeIntoUseAsync(system1.Id, organization.Id);
+            var system2Usage = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization.Id);
+            var system3Usage = await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization.Id);
+
+            var toBeDisabled = new[] { system1Usage, system2Usage, system3Usage }.RandomItem();
+            using var disabled = await ItSystemHelper.SendSetDisabledRequestAsync(toBeDisabled.ItSystem.Id, true);
+            toBeDisabled.ItSystem.Disabled = true; //line up expected result
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization.Uuid)).ToList();
+
+            //Assert
+            Assert.Equal(3, dtos.Count);
+            AssertExpectedUsageShallow(system1Usage, dtos);
+            AssertExpectedUsageShallow(system2Usage, dtos);
+            AssertExpectedUsageShallow(system3Usage, dtos);
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal_With_Paging()
+        {
+            //Arrange
+            var (_, _, organization1, system1) = await CreatePrerequisitesAsync();
+
+            var system2 = await CreateSystemAsync(organization1.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(organization1.Id, AccessModifier.Public);
+            var system4 = await CreateSystemAsync(organization1.Id, AccessModifier.Public);
+
+            var system1Usage = await ItSystemHelper.TakeIntoUseAsync(system1.Id, organization1.Id);
+            var system2Usage = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization1.Id);
+            var system3Usage = await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization1.Id);
+            var system4Usage = await ItSystemHelper.TakeIntoUseAsync(system4.dbId, organization1.Id);
+
+            //Act
+            var page1Dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization1.Uuid, page: 0, pageSize: 2)).ToList();
+            var page2Dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization1.Uuid, page: 1, pageSize: 2)).ToList();
+
+            //Assert
+            Assert.Equal(2, page1Dtos.Count);
+            Assert.Equal(2, page2Dtos.Count);
+            AssertExpectedUsageShallow(system1Usage, page1Dtos);
+            AssertExpectedUsageShallow(system2Usage, page1Dtos);
+            AssertExpectedUsageShallow(system3Usage, page2Dtos);
+            AssertExpectedUsageShallow(system4Usage, page2Dtos);
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal_Filtered_By_LastModified()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+
+            var system1Usage = await ItSystemHelper.TakeIntoUseAsync(system1.Id, organization.Id);
+            var system2Usage = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization.Id);
+            var system3Usage = await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization.Id);
+
+            foreach (var systemUsageDto in new[] { system2Usage, system3Usage, system1Usage })
+            {
+                using var patchResponse = await ItSystemUsageV2Helper.SendPatchGeneral(token, systemUsageDto.Uuid, new GeneralDataUpdateRequestDTO() { Notes = A<string>() });
+                Assert.Equal(HttpStatusCode.OK, patchResponse.StatusCode);
+            }
+
+            var referenceChange = await ItSystemUsageV2Helper.GetSingleAsync(token, system3Usage.Uuid);
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization.Uuid, changedSinceGtEq: referenceChange.LastModified, page: 0, pageSize: 10)).ToList();
+
+            //Assert that the correct dtos are provided in the right order
+            Assert.Equal(new[] { system3Usage.Uuid, system1Usage.Uuid }, dtos.Select(x => x.Uuid));
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal_Filtered_By_RelationToSystemUuId()
+        {
+            //Arrange - setup multiple relations across orgs
+            var (_, _, organization, system1) = await CreatePrerequisitesAsync();
+
+            var system2 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var relationTargetSystem = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+
+            var system1UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system1.Id, organization.Id);
+            var system2UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization.Id);
+            var system4UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(relationTargetSystem.dbId, organization.Id);
+
+            await CreateRelationAsync(system1UsageOrg1, system4UsageOrg1);
+            await CreateRelationAsync(system2UsageOrg1, system4UsageOrg1);
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization.Uuid, relationToSystemUuidFilter: relationTargetSystem.uuid)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            AssertExpectedUsageShallow(system1UsageOrg1, dtos);
+            AssertExpectedUsageShallow(system2UsageOrg1, dtos);
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal_Filtered_By_RelationToSystemUsageUuId()
+        {
+            //Arrange - setup multiple relations across orgs
+            var (_, _, organization, _) = await CreatePrerequisitesAsync();
+
+            var system1 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var system2 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var relationTargetSystem = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+
+            var system1UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system1.dbId, organization.Id);
+            var system2UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization.Id);
+            await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization.Id);
+            var relationTargetUsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(relationTargetSystem.dbId, organization.Id);
+
+            await CreateRelationAsync(system1UsageOrg1, relationTargetUsageOrg1);
+            await CreateRelationAsync(system2UsageOrg1, relationTargetUsageOrg1);
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization.Uuid, relationToSystemUsageUuidFilter: relationTargetUsageOrg1.Uuid)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            AssertExpectedUsageShallow(system1UsageOrg1, dtos);
+            AssertExpectedUsageShallow(system2UsageOrg1, dtos);
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal_Filtered_By_RelationContractUuId()
+        {
+            //Arrange - setup multiple relations across orgs
+            var (_, _, organization, _) = await CreatePrerequisitesAsync();
+
+            var system1 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var system2 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var relationTargetSystem = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+
+            var systemUsage1 = await ItSystemHelper.TakeIntoUseAsync(system1.dbId, organization.Id);
+            var systemUsage2 = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization.Id);
+            var systemUsage3 = await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization.Id);
+            var relationTargetUsage = await ItSystemHelper.TakeIntoUseAsync(relationTargetSystem.dbId, organization.Id);
+
+            var contract = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+
+            await CreateRelationAsync(systemUsage1, relationTargetUsage, contract);
+            await CreateRelationAsync(relationTargetUsage, systemUsage2, contract);
+            await CreateRelationAsync(systemUsage3, relationTargetUsage);
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization.Uuid, relationToContractUuidFilter: contract.Uuid)).ToList();
+
+            //Assert
+            // Get by contract returns only "From" system usages
+            Assert.Equal(2, dtos.Count);
+            AssertExpectedUsageShallow(systemUsage1, dtos);
+            AssertExpectedUsageShallow(relationTargetUsage, dtos);
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Internal_Filtered_By_SystemNameContent()
+        {
+            //Arrange
+            var content = $"CONTENT_{A<Guid>()}";
+            var (_, _, organization, _) = await CreatePrerequisitesAsync();
+
+            var system1 = await CreateSystemAsync(organization.Id, AccessModifier.Public, $"{content}ONE");
+            var system2 = await CreateSystemAsync(organization.Id, AccessModifier.Public, $"TWO{content}");
+            var system3 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+
+            var system1UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system1.dbId, organization.Id);
+            var system2UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization.Id);
+            await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization.Id);
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyInternalAsync(organization.Uuid, systemNameContentFilter: content)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            AssertExpectedUsageShallow(system1UsageOrg1, dtos);
+            AssertExpectedUsageShallow(system2UsageOrg1, dtos);
         }
 
         [Fact]
@@ -309,6 +502,29 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 Read = expectRead,
                 Modify = expectModify,
                 Delete = expectDelete
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.User, false)]
+        public async Task Can_Get_ItSystemUsage_CollectionPermissions(OrganizationRole userRole, bool expectCreate)
+        {
+            //Arrange
+            var (token, user, _, _) = await CreatePrerequisitesAsync();
+            var organization2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, userRole, organization2.Id).DisposeAsync();
+
+            //Act
+            var permissionsResponseDto = await ItSystemUsageV2Helper.GetCollectionPermissionsAsync(token, organization2.Uuid);
+
+            //Assert
+            var expected = new ResourceCollectionPermissionsResponseDTO()
+            {
+                Create = expectCreate
             };
             Assert.Equivalent(expected, permissionsResponseDto);
         }
@@ -997,7 +1213,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var archiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 0)).First();
             var archiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 0)).First();
 
-            var inputs = CreateArchivingWriteRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
+            var inputs = await CreateArchivingCreationRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
 
             var request = CreatePostRequest(organization.Uuid, system.Uuid, archiving: inputs);
 
@@ -1006,7 +1222,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Assert
             var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
-            AssertArchivingParametersSet(inputs, dto.Archiving);
+            AssertArchivingParametersSet<ArchivingCreationRequestDTO, JournalPeriodDTO>(inputs, dto.Archiving);
         }
 
         [Fact]
@@ -1026,7 +1242,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var archiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 0)).First();
             var archiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 0)).First();
 
-            var inputs = CreateArchivingWriteRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
+            var inputs = await CreateArchivingUpdateRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
 
             //Act - Add archiving data
             using var addedArchivingDataUsage = await ItSystemUsageV2Helper.SendPatchArchiving(token, newUsage.Uuid, inputs);
@@ -1034,28 +1250,61 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert 
             Assert.Equal(HttpStatusCode.OK, addedArchivingDataUsage.StatusCode);
             var addedDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
-            AssertArchivingParametersSet(inputs, addedDTO.Archiving);
+            AssertArchivingParametersSet<ArchivingUpdateRequestDTO, JournalPeriodUpdateRequestDTO>(inputs, addedDTO.Archiving);
 
             //Act - Update archiving data
             var updatedArchiveType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes, organization.Uuid, 1, 1)).First();
             var updatedArchiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 1)).First();
             var updatedArchiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 1)).First();
-            var updatedInputs = CreateArchivingWriteRequestDTO(updatedArchiveType.Uuid, updatedArchiveLocation.Uuid, updatedArchiveTestLocation.Uuid, organization2.Uuid);
+            var updatedInputs = await CreateArchivingUpdateRequestDTO(updatedArchiveType.Uuid, updatedArchiveLocation.Uuid, updatedArchiveTestLocation.Uuid, organization2.Uuid);
 
             using var updatedArchivingDataUsage = await ItSystemUsageV2Helper.SendPatchArchiving(token, newUsage.Uuid, updatedInputs);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, updatedArchivingDataUsage.StatusCode);
             var updatedDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
-            AssertArchivingParametersSet(updatedInputs, updatedDTO.Archiving);
+            AssertArchivingParametersSet<ArchivingUpdateRequestDTO, JournalPeriodUpdateRequestDTO>(updatedInputs, updatedDTO.Archiving);
 
             //Act - Remove archiving data
-            using var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPatchArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO() { JournalPeriods = new List<JournalPeriodDTO>() });
+            using var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPatchArchiving(token, newUsage.Uuid, new ArchivingUpdateRequestDTO() { JournalPeriods = new List<JournalPeriodUpdateRequestDTO>() });
 
             //Assert 
             Assert.Equal(HttpStatusCode.OK, removedArchivingDataUsage.StatusCode);
             var removedDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
             AssertArchivingParametersNotSet(removedDTO.Archiving);
+        }
+
+        [Fact]
+        public async Task Can_PATCH_With_Archiving_With_Specific_Journal_Periods()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var initialJournalPeriodInputs = await CreateArchivingUpdateRequestDTO(organization.Uuid);
+            using var firstArchiveResponse = await ItSystemUsageV2Helper.SendPatchArchiving(token, usageDTO.Uuid, initialJournalPeriodInputs);
+            Assert.Equal(HttpStatusCode.OK, firstArchiveResponse.StatusCode);
+            usageDTO = await firstArchiveResponse.ReadResponseBodyAsAsync<ItSystemUsageResponseDTO>();
+            var changedInputs = await CreateArchivingUpdateRequestDTO(organization.Uuid);
+            //Set one of the journal periods to be an update of an existing
+            var periodToChange = usageDTO.Archiving.JournalPeriods.RandomItem();
+            var inputPeriodToChange = changedInputs.JournalPeriods.RandomItem();
+            inputPeriodToChange.Uuid = periodToChange.Uuid;
+
+            var journalPeriodUuidsBefore = usageDTO.Archiving.JournalPeriods.Select(x => x.Uuid).ToList();
+
+            //Act
+            using var secondArchivingResponse = await ItSystemUsageV2Helper.SendPatchArchiving(token, usageDTO.Uuid, changedInputs);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, secondArchivingResponse.StatusCode);
+            usageDTO = await secondArchivingResponse.ReadResponseBodyAsAsync<ItSystemUsageResponseDTO>();
+            Assert.Contains(usageDTO.Archiving.JournalPeriods, x =>
+                x.Uuid == inputPeriodToChange.Uuid.GetValueOrDefault() &&
+                x.Approved == inputPeriodToChange.Approved &&
+                x.StartDate == inputPeriodToChange.StartDate &&
+                x.EndDate == inputPeriodToChange.EndDate &&
+                x.ArchiveId == inputPeriodToChange.ArchiveId);
+            Assert.Single(usageDTO.Archiving.JournalPeriods.Select(x => x.Uuid).Intersect(journalPeriodUuidsBefore));
         }
 
         [Fact]
@@ -1142,7 +1391,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             AssertGDPR(request.GDPR, createdUsage.GDPR);
 
-            AssertArchivingParametersSet(request.Archiving, createdUsage.Archiving);
+            AssertArchivingParametersSet<ArchivingCreationRequestDTO, JournalPeriodDTO>(request.Archiving, createdUsage.Archiving);
         }
 
         [Fact]
@@ -1160,7 +1409,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     referenceDataDtos: externalReferences1,
                     roles: roles1,
                     gdpr: gdpr1,
-                    archiving: archiving1);
+                    baseArchiving: archiving1);
 
             //Act - PUT on empty system usage
             var updatedUsage1 = await ItSystemUsageV2Helper.PutAsync(token, newUsage.Uuid, updateRequest1);
@@ -1179,7 +1428,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             AssertGDPR(updateRequest1.GDPR, updatedUsage1.GDPR);
 
-            AssertArchivingParametersSet(updateRequest1.Archiving, updatedUsage1.Archiving);
+            AssertArchivingParametersSet<ArchivingUpdateRequestDTO, JournalPeriodUpdateRequestDTO>(updateRequest1.Archiving, updatedUsage1.Archiving);
 
             //Act - PUT on filled system usage
             var (generalData2, orgUnit2, organizationUsageData2, addedTaskRefs2, removedTaskRefs2, kleDeviations2,
@@ -1191,7 +1440,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     referenceDataDtos: externalReferences2,
                     roles: roles2,
                     gdpr: gdpr2,
-                    archiving: archiving2);
+                    baseArchiving: archiving2);
 
             var updatedUsage2 = await ItSystemUsageV2Helper.PutAsync(token, newUsage.Uuid, updateRequest2);
 
@@ -1209,7 +1458,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             AssertGDPR(updateRequest2.GDPR, updatedUsage2.GDPR);
 
-            AssertArchivingParametersSet(updateRequest2.Archiving, updatedUsage2.Archiving);
+            AssertArchivingParametersSet<ArchivingUpdateRequestDTO, JournalPeriodUpdateRequestDTO>(updateRequest2.Archiving, updatedUsage2.Archiving);
 
             //Act - PUT empty on filled system usage
             var updateRequest3 = CreatePutRequest(
@@ -1219,7 +1468,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     referenceDataDtos: new List<UpdateExternalReferenceDataWriteRequestDTO>(),
                     roles: new List<RoleAssignmentRequestDTO>(),
                     gdpr: new GDPRWriteRequestDTO(),
-                    archiving: new ArchivingWriteRequestDTO());
+                    baseArchiving: new ArchivingUpdateRequestDTO());
 
             var updatedUsage3 = await ItSystemUsageV2Helper.PutAsync(token, newUsage.Uuid, updateRequest3);
 
@@ -1329,6 +1578,38 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, getResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_GET_Incoming_SystemUsageRelation()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+            var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
+
+            var (interfaceUuid, interfaceName) = await CreateExhibitingInterface(organization.Id, system2.Id);
+            var contract = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var relationFrequency = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageRelationFrequencies, organization.Uuid, 1, 0)).First();
+
+            var input = new SystemRelationWriteRequestDTO
+            {
+                ToSystemUsageUuid = usage2.Uuid,
+                RelationInterfaceUuid = interfaceUuid,
+                AssociatedContractUuid = contract.Uuid,
+                RelationFrequencyUuid = relationFrequency.Uuid,
+                Description = A<string>(),
+                UrlReference = A<string>()
+            };
+            await ItSystemUsageV2Helper.PostRelationAsync(token, usage1.Uuid, input);
+
+            //Act
+            var retrievedRelation = await ItSystemUsageV2Helper.GetIncomingRelationsAsync(token, usage2.Uuid);
+
+            //Assert
+            var relation = Assert.Single(retrievedRelation);
+            AssertIncomingRelation(input, usage1.Uuid, interfaceName, contract.Name, relationFrequency.Name, relation);
         }
 
         [Fact]
@@ -1777,6 +2058,183 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(HttpStatusCode.Forbidden, deleteResult.StatusCode);
         }
 
+        [Fact]
+        public async Task Can_Create_Update_And_Delete_ExternalReference()
+        {
+            //Arrange
+            var (token, _, organization, system1) = await CreatePrerequisitesAsync();
+            var usage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+
+            var request = new ExternalReferenceDataWriteRequestDTO
+            {
+                DocumentId = A<string>(),
+                MasterReference = A<bool>(),
+                Title = A<string>(),
+                Url = A<string>()
+            };
+
+            //Act
+            var createdReference = await ItSystemUsageV2Helper.AddExternalReferenceAsync(token, usage.Uuid, request);
+
+            //Assert
+            AssertExternalReference(request, createdReference);
+
+            var usageAfterCreate = await ItSystemUsageV2Helper.GetSingleAsync(token, usage.Uuid);
+
+            var checkCreatedExternalReference = Assert.Single(usageAfterCreate.ExternalReferences);
+            AssertExternalReference(request, checkCreatedExternalReference);
+
+            //Arrange - update
+            var updateRequest = new ExternalReferenceDataWriteRequestDTO
+            {
+                DocumentId = A<string>(),
+                MasterReference = request.MasterReference || A<bool>(),
+                Title = A<string>(),
+                Url = A<string>()
+            };
+
+            //Act - update
+            var updatedReference = await ItSystemUsageV2Helper.UpdateExternalReferenceAsync(token, usage.Uuid, createdReference.Uuid, updateRequest);
+
+            //Assert - update
+            AssertExternalReference(updateRequest, updatedReference);
+
+            var usageAfterUpdate = await ItSystemUsageV2Helper.GetSingleAsync(token, usage.Uuid);
+
+            var checkUpdatedExternalReference = Assert.Single(usageAfterUpdate.ExternalReferences);
+            AssertExternalReference(updateRequest, checkUpdatedExternalReference);
+
+            //Act - delete
+            await ItSystemUsageV2Helper.DeleteExternalReferenceAsync(token, usage.Uuid, createdReference.Uuid);
+
+            //Assert - delete
+            var usageAfterDelete = await ItSystemUsageV2Helper.GetSingleAsync(token, usage.Uuid);
+            Assert.Empty(usageAfterDelete.ExternalReferences);
+        }
+
+        [Fact]
+        public async Task Can_POST_And_GET_Journal_Period()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var journalPeriods = CreateNewJournalPeriods(3);
+            var newJournalPeriodInput = journalPeriods.RandomItem();
+
+            //Act
+            var postResult = await ItSystemUsageV2Helper.CreateJournalPeriodAsync(token, usageDTO.Uuid, newJournalPeriodInput);
+            var getResult = await ItSystemUsageV2Helper.GetJournalPeriodAsync(token, usageDTO.Uuid, postResult.Uuid);
+
+            //Assert
+            AssertJournalPeriod(newJournalPeriodInput, postResult);
+            Assert.Equivalent(postResult, getResult);
+
+        }
+
+        [Fact]
+        public async Task Can_PUT_Journal_Period()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var journalPeriods = CreateNewJournalPeriods(3);
+            var newJournalPeriodInputs = journalPeriods.RandomItems(2);
+            var initial = newJournalPeriodInputs.First();
+            var updated = newJournalPeriodInputs.Last();
+            var postResult = await ItSystemUsageV2Helper.CreateJournalPeriodAsync(token, usageDTO.Uuid, initial);
+
+            //Act
+            var putResult = await ItSystemUsageV2Helper.UpdateJournalPeriodAsync(token, usageDTO.Uuid, postResult.Uuid, updated);
+            var getResult = await ItSystemUsageV2Helper.GetJournalPeriodAsync(token, usageDTO.Uuid, postResult.Uuid);
+
+            //Assert
+            AssertJournalPeriod(updated, putResult);
+            Assert.Equivalent(putResult, getResult);
+        }
+
+        [Fact]
+        public async Task Can_DELETE_Journal_Period()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var journalPeriods = CreateNewJournalPeriods(3);
+            var newJournalPeriodInputs = journalPeriods.RandomItems(2);
+            var initial = newJournalPeriodInputs.First();
+            var postResult = await ItSystemUsageV2Helper.CreateJournalPeriodAsync(token, usageDTO.Uuid, initial);
+
+            //Act
+            using var deleteResult = await ItSystemUsageV2Helper.SendDeleteJournalPeriodAsync(token, usageDTO.Uuid, postResult.Uuid);
+            using var getAfterDeleteResult = await ItSystemUsageV2Helper.SendGetJournalPeriodAsync(token, usageDTO.Uuid, postResult.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NoContent, deleteResult.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, getAfterDeleteResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_GET_Roles_From_Internal_Endpoint()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+
+            var user1 = await CreateUser(organization);
+            var user2 = await CreateUser(organization);
+            var rawRoles = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole[]>(x => x.AsQueryable().AsEnumerable().RandomItems(2).ToArray());
+            var role1 = rawRoles.First();
+            var role2 = rawRoles.Last();
+            var roles = new List<RoleAssignmentRequestDTO>
+            {
+                new()
+                {
+                    RoleUuid = role1.Uuid,
+                    UserUuid = user1.Uuid
+                },
+                new()
+                {
+                    RoleUuid = role2.Uuid,
+                    UserUuid = user2.Uuid
+                }
+            };
+            var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid, roles: roles));
+
+            //Act
+            var assignedRoles = (await ItSystemUsageV2Helper.GetRoleAssignmentsInternalAsync(createdDTO.Uuid)).ToList();
+
+            //Assert
+            Assert.Equal(2, assignedRoles.Count);
+            Assert.Contains(assignedRoles, assignment => MatchExpectedAssignment(assignment, role1, user1));
+            Assert.Contains(assignedRoles, assignment => MatchExpectedAssignment(assignment, role2, user2));
+        }
+
+        private static bool MatchExpectedAssignment(ExtendedRoleAssignmentResponseDTO assignment, ItSystemRole expectedRole, User expectedUser)
+        {
+            return assignment.Role.Name == expectedRole.Name &&
+                   assignment.Role.Uuid == expectedRole.Uuid &&
+                   assignment.User.Email == expectedUser.Email &&
+                   assignment.User.Name == expectedUser.GetFullName() &&
+                   assignment.User.Uuid == expectedUser.Uuid;
+        }
+
+        private static void AssertJournalPeriod(JournalPeriodDTO newJournalPeriodInput, JournalPeriodResponseDTO result)
+        {
+            Assert.Equal(newJournalPeriodInput.Approved, result.Approved);
+            Assert.Equal(newJournalPeriodInput.StartDate, result.StartDate);
+            Assert.Equal(newJournalPeriodInput.EndDate, result.EndDate);
+            Assert.Equal(newJournalPeriodInput.ArchiveId, result.ArchiveId);
+        }
+
+        private static void AssertExternalReference(ExternalReferenceDataWriteRequestDTO expected, ExternalReferenceDataResponseDTO actual)
+        {
+            Assert.Equal(expected.DocumentId, actual.DocumentId);
+            Assert.Equal(expected.Title, actual.Title);
+            Assert.Equal(expected.Url, actual.Url);
+            Assert.Equal(expected.MasterReference, actual.MasterReference);
+        }
+
         private async Task<string> CreateUserInNewOrgAndGetToken()
         {
             var otherOrganization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
@@ -1784,9 +2242,21 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             return token;
         }
 
-        private static void AssertRelation(SystemRelationWriteRequestDTO expected, string expectedInterfaceName, string expectedContractName, string expectedFrequencyName, SystemRelationResponseDTO actual)
+        private static void AssertRelation(SystemRelationWriteRequestDTO expected, string expectedInterfaceName, string expectedContractName, string expectedFrequencyName, OutgoingSystemRelationResponseDTO actual)
         {
             Assert.Equal(expected.ToSystemUsageUuid, actual.ToSystemUsage.Uuid);
+            AssertBaseRelation(expected, expectedInterfaceName, expectedContractName, expectedFrequencyName, actual);
+        }
+
+        private static void AssertIncomingRelation(SystemRelationWriteRequestDTO expected, Guid expectedFromSystemUsageUuid, string expectedInterfaceName, string expectedContractName, string expectedFrequencyName, IncomingSystemRelationResponseDTO actual)
+        {
+            Assert.Equal(expectedFromSystemUsageUuid, actual.FromSystemUsage.Uuid);
+            AssertBaseRelation(expected, expectedInterfaceName, expectedContractName, expectedFrequencyName, actual);
+        }
+
+        private static void AssertBaseRelation(SystemRelationWriteRequestDTO expected, string expectedInterfaceName,
+            string expectedContractName, string expectedFrequencyName, BaseSystemRelationResponseDTO actual)
+        {
             Assert.Equal(expected.RelationInterfaceUuid, actual.RelationInterface.Uuid);
             Assert.Equal(expectedInterfaceName, actual.RelationInterface.Name);
             Assert.Equal(expected.AssociatedContractUuid, actual.AssociatedContract.Uuid);
@@ -1813,10 +2283,10 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             IEnumerable<UpdateExternalReferenceDataWriteRequestDTO>,
             IEnumerable<RoleAssignmentRequestDTO>,
             GDPRWriteRequestDTO,
-            ArchivingWriteRequestDTO)> CreateUpdateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system, IEnumerable<ExternalReferenceDataResponseDTO> existingExternalReferences = null)
+            ArchivingUpdateRequestDTO)> CreateUpdateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system, IEnumerable<ExternalReferenceDataResponseDTO> existingExternalReferences = null)
         {
             var fullData = await CreateFullDataRequestDTO(organization, system);
-
+            var archiving = await CreateArchivingUpdateRequestDTO(organization.Uuid);
             var mappedFullData = (
                 fullData.generalData,
                 fullData.unit1,
@@ -1827,7 +2297,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 existingExternalReferences != null ? CreateNewExternalReferenceDataWithOldUuid(existingExternalReferences) : MapExternalReferenceDtosToUpdateDtos(fullData.externalReferences),
                 fullData.roles,
                 fullData.gdpr,
-                fullData.archiving);
+                archiving);
             return mappedFullData;
         }
 
@@ -1840,7 +2310,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             IEnumerable<ExternalReferenceDataWriteRequestDTO> externalReferences,
             IEnumerable<RoleAssignmentRequestDTO> roles,
             GDPRWriteRequestDTO gdpr,
-            ArchivingWriteRequestDTO archiving)> CreateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system)
+            ArchivingCreationRequestDTO archiving)> CreateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system)
         {
             var dataClassification = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageDataClassification, organization.Uuid, 1, 0)).First();
             var generalData = CreateGeneralDataWriteRequestDTO(dataClassification.Uuid);
@@ -1868,10 +2338,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             var gdpr = await CreateGDPRInputAsync(organization);
 
-            var archiveType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes, organization.Uuid, 1, 0)).First();
-            var archiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 0)).First();
-            var archiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 0)).First();
-            var archiving = CreateArchivingWriteRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
+            var archiving = await CreateArchivingCreationRequestDTO(organization.Uuid);
 
             return (generalData, unit1, organizationUsageData, addedTaskRefs, removedTaskRefs, kleDeviations, externalReferences, roles, gdpr, archiving);
         }
@@ -2103,7 +2570,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Empty(actual.JournalPeriods);
         }
 
-        private static void AssertArchivingParametersSet(ArchivingWriteRequestDTO expected, ArchivingRegistrationsResponseDTO actual)
+        private static void AssertArchivingParametersSet<T, TJournalPeriod>(T expected, ArchivingRegistrationsResponseDTO actual)
+            where T : BaseArchivingWriteRequestDTO, IHasJournalPeriods<TJournalPeriod>
+            where TJournalPeriod : JournalPeriodDTO
         {
             Assert.Equal(expected.ArchiveDuty, actual.ArchiveDuty);
             Assert.Equal(expected.TypeUuid, actual.Type.Uuid);
@@ -2124,31 +2593,89 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(firstJournalPeriod.EndDate, journalPeriodFromServer.EndDate);
         }
 
-        private ArchivingWriteRequestDTO CreateArchivingWriteRequestDTO(Guid archiveTypeUuid, Guid archiveLocationUuid, Guid archiveTestLocationUuid, Guid organizationUuid)
+        private async Task<ArchivingCreationRequestDTO> CreateArchivingCreationRequestDTO(Guid organizationUuid)
         {
-            return new ArchivingWriteRequestDTO()
-            {
-                ArchiveDuty = A<ArchiveDutyChoice>(),
-                TypeUuid = archiveTypeUuid,
-                LocationUuid = archiveLocationUuid,
-                TestLocationUuid = archiveTestLocationUuid,
-                SupplierOrganizationUuid = organizationUuid,
-                Active = A<bool>(),
-                FrequencyInMonths = A<int>(),
-                DocumentBearing = A<bool>(),
-                Notes = A<string>(),
-                JournalPeriods = new Fixture()
-                    .Build<JournalPeriodDTO>()
-                    .Without(x => x.EndDate)
-                    .Without(x => x.StartDate)
-                    .Do(x =>
-                    {
-                        var startDate = A<DateTime>();
-                        x.StartDate = startDate;
-                        x.EndDate = startDate.AddDays(1);
-                    })
-                    .CreateMany()
-            };
+
+            var dto = new ArchivingCreationRequestDTO();
+            await AssignArchivingProperties(organizationUuid, dto);
+            dto.JournalPeriods = CreateNewJournalPeriods(3);
+            return dto;
+        }
+
+        private IEnumerable<JournalPeriodDTO> CreateNewJournalPeriods(int count)
+        {
+            return new Fixture()
+                .Build<JournalPeriodDTO>()
+                .Without(x => x.EndDate)
+                .Without(x => x.StartDate)
+                .Do(x =>
+                {
+                    var startDate = A<DateTime>();
+                    x.StartDate = startDate;
+                    x.EndDate = startDate.AddDays(1);
+                })
+                .CreateMany(count);
+        }
+
+        private async Task<ArchivingCreationRequestDTO> CreateArchivingCreationRequestDTO(Guid archiveTypeUuid, Guid archiveLocationUuid, Guid archiveTestLocationUuid, Guid organizationUuid)
+        {
+            var requestDto = await CreateArchivingCreationRequestDTO(organizationUuid);
+            UpdateArchivingChoices(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, requestDto);
+            return requestDto;
+        }
+
+        private static void UpdateArchivingChoices(Guid archiveTypeUuid, Guid archiveLocationUuid, Guid archiveTestLocationUuid, BaseArchivingWriteRequestDTO requestDto)
+        {
+            requestDto.TypeUuid = archiveTypeUuid;
+            requestDto.LocationUuid = archiveLocationUuid;
+            requestDto.TestLocationUuid = archiveTestLocationUuid;
+        }
+
+        private async Task AssignArchivingProperties(Guid organizationUuid, BaseArchivingWriteRequestDTO dto)
+        {
+            var archiveType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes, organizationUuid, 1, 0)).First();
+            var archiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organizationUuid, 1, 0)).First();
+            var archiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organizationUuid, 1, 0)).First();
+            dto.ArchiveDuty = A<ArchiveDutyChoice>();
+            dto.TypeUuid = archiveType.Uuid;
+            dto.LocationUuid = archiveLocation.Uuid;
+            dto.TestLocationUuid = archiveTestLocation.Uuid;
+            dto.SupplierOrganizationUuid = organizationUuid;
+            dto.Active = A<bool>();
+            dto.FrequencyInMonths = A<int>();
+            dto.DocumentBearing = A<bool>();
+            dto.Notes = A<string>();
+        }
+
+        private async Task<ArchivingUpdateRequestDTO> CreateArchivingUpdateRequestDTO(Guid organizationUuid)
+        {
+            var dto = new ArchivingUpdateRequestDTO();
+            await AssignArchivingProperties(organizationUuid, dto);
+            dto.JournalPeriods = CreateJournalPeriodUpdates(3);
+            return dto;
+        }
+
+        private IEnumerable<JournalPeriodUpdateRequestDTO> CreateJournalPeriodUpdates(int count)
+        {
+            return new Fixture()
+                .Build<JournalPeriodUpdateRequestDTO>()
+                .Without(x => x.Uuid)
+                .Without(x => x.EndDate)
+                .Without(x => x.StartDate)
+                .Do(x =>
+                {
+                    var startDate = A<DateTime>();
+                    x.StartDate = startDate;
+                    x.EndDate = startDate.AddDays(1);
+                })
+                .CreateMany(count).ToList();
+        }
+
+        private async Task<ArchivingUpdateRequestDTO> CreateArchivingUpdateRequestDTO(Guid archiveTypeUuid, Guid archiveLocationUuid, Guid archiveTestLocationUuid, Guid organizationUuid)
+        {
+            var dto = await CreateArchivingUpdateRequestDTO(organizationUuid);
+            UpdateArchivingChoices(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, dto);
+            return dto;
         }
 
         private IEnumerable<T> WithRandomMaster<T>(IEnumerable<T> references) where T : ExternalReferenceDataWriteRequestDTO
@@ -2303,7 +2830,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             IEnumerable<ExternalReferenceDataWriteRequestDTO> referenceDataDtos = null,
             IEnumerable<RoleAssignmentRequestDTO> roles = null,
             GDPRWriteRequestDTO gdpr = null,
-            ArchivingWriteRequestDTO archiving = null)
+            ArchivingCreationRequestDTO archiving = null)
         {
             return new CreateItSystemUsageRequestDTO
             {
@@ -2326,7 +2853,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> referenceDataDtos = null,
             IEnumerable<RoleAssignmentRequestDTO> roles = null,
             GDPRWriteRequestDTO gdpr = null,
-            ArchivingWriteRequestDTO archiving = null)
+            ArchivingUpdateRequestDTO baseArchiving = null)
         {
             var generalUpdateRequest = new GeneralDataUpdateRequestDTO()
             {
@@ -2346,7 +2873,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 ExternalReferences = referenceDataDtos?.ToList(),
                 Roles = roles?.ToList(),
                 GDPR = gdpr,
-                Archiving = archiving
+                Archiving = baseArchiving
             };
         }
 
@@ -2359,6 +2886,18 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         {
             var dto = Assert.Single(dtos, usage => usage.Uuid == expectedContent.Uuid);
             AssertExpectedUsageShallow(expectedContent, dto);
+        }
+
+        private static void AssertExpectedUsageShallow(ItSystemUsageDTO expectedContent, IEnumerable<ItSystemUsageSearchResultResponseDTO> dtos)
+        {
+            var dto = Assert.Single(dtos, usage => usage.Uuid == expectedContent.Uuid);
+            AssertExpectedUsageShallow(expectedContent, dto);
+        }
+        private static void AssertExpectedUsageShallow(ItSystemUsageDTO expectedContent, ItSystemUsageSearchResultResponseDTO dto)
+        {
+            Assert.Equal(expectedContent.ItSystem.Uuid, dto.SystemContext.Uuid);
+            Assert.Equal(expectedContent.ItSystem.Name, dto.SystemContext.Name);
+            Assert.Equal(expectedContent.ItSystem.Disabled, dto.SystemContext.Deactivated);
         }
 
         private static void AssertExpectedUsageShallow(ItSystemUsageDTO expectedContent, ItSystemUsageResponseDTO dto)

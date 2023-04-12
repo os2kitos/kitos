@@ -196,11 +196,17 @@
     <Compile Include="ApplicationServices\Handlers\AuthorizedUpdateOrganizationFromFKOrganisationCommandHandlerTest.cs" />
     <Compile Include="ApplicationServices\Handlers\RemoveUserFromKitosCommandHandler.cs" />
     <Compile Include="ApplicationServices\Handlers\SendEmailToStakeholdersOnExternalOrganizationConnectionUpdatedHandlerTest.cs" />
+    <Compile Include="ApplicationServices\Interface\ItInterfaceWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\Messages\PublicMessagesServiceTest.cs" />
+    <Compile Include="ApplicationServices\Notification\NotificationServiceTest.cs" />
+    <Compile Include="ApplicationServices\Notification\RegistrationNotificationServiceTest.cs" />
+    <Compile Include="ApplicationServices\Notification\RegistrationNotificationUserRelationsServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\OrganizationUnitServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\OrganizationTest.cs" />
     <Compile Include="ApplicationServices\Organizations\StsOrganizationSynchronizationServiceTest.cs" />
+    <Compile Include="ApplicationServices\ItSystems\ItSystemWriteServiceTest.cs" />
+    <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageMigrationServiceAdapterTest.cs" />
     <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageServiceTest.cs" />
     <Compile Include="ApplicationServices\Kendo\KendoOrganizationalConfigurationServiceTest.cs" />
     <Compile Include="ApplicationServices\KLE\GenericRepositoryTaskRefStub.cs" />
@@ -263,6 +269,7 @@
     <Compile Include="Model\ItAdvice\ItAdviceTests.cs" />
     <Compile Include="Model\ItContractTest.cs" />
     <Compile Include="Model\ItInterfaceTest.cs" />
+    <Compile Include="Model\ItSystemTest.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
     <Compile Include="Model\References\AddReferenceCommandTest.cs" />
     <Compile Include="Model\ResultTest.cs" />
@@ -298,7 +305,7 @@
       <Name>Core.DomainModel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
-      <Project>{adcacc1d-f538-464c-9102-f4c1d6fa35d3}</Project>
+      <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
       <Name>Core.DomainServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Ninject\Infrastructure.Ninject.csproj">

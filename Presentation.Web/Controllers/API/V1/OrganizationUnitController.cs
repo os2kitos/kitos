@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
@@ -20,15 +21,18 @@ namespace Presentation.Web.Controllers.API.V1
     {
         private readonly IOrgUnitService _orgUnitService;
         private readonly IOrganizationUnitService _organizationUnitService;
+        private readonly IOrganizationalUserContext _userContext;
 
         public OrganizationUnitController(
             IGenericRepository<OrganizationUnit> repository,
             IOrgUnitService orgUnitService,
-            IOrganizationUnitService organizationUnitService)
+            IOrganizationUnitService organizationUnitService,
+            IOrganizationalUserContext userContext)
             : base(repository)
         {
             _orgUnitService = orgUnitService;
             _organizationUnitService = organizationUnitService;
+            _userContext = userContext;
         }
 
         public HttpResponseMessage Post(OrgUnitDTO dto) => base.Post(dto.OrganizationId, dto);
@@ -54,7 +58,7 @@ namespace Presentation.Web.Controllers.API.V1
                 if (GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.Public)
                     return Forbidden();
 
-                var userId = UserId;
+                var userId = _userContext.UserId;
                 var orgUnits = Repository
                     .Get(x => x.Rights.Any(y => y.UserId == userId) && x.OrganizationId == organizationId)
                     .SelectMany(unit => unit.FlattenHierarchy())

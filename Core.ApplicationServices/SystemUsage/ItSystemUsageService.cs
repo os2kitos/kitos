@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -34,6 +35,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IReferenceService _referenceService;
         private readonly IGenericRepository<ArchivePeriod> _archivePeriodRepository;
         private readonly IGenericRepository<ItSystemUsagePersonalData> _personalDataRepository;
+        private readonly IOrganizationService _organizationService;
 
         public ItSystemUsageService(
             IGenericRepository<ItSystemUsage> usageRepository,
@@ -46,7 +48,8 @@ namespace Core.ApplicationServices.SystemUsage
             IOrganizationalUserContext userContext,
             IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
             IGenericRepository<ArchivePeriod> archivePeriodRepository,
-            IGenericRepository<ItSystemUsagePersonalData> personalDataRepository)
+            IGenericRepository<ItSystemUsagePersonalData> personalDataRepository, 
+            IOrganizationService organizationService)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;
@@ -59,6 +62,7 @@ namespace Core.ApplicationServices.SystemUsage
             _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _archivePeriodRepository = archivePeriodRepository;
             _personalDataRepository = personalDataRepository;
+            _organizationService = organizationService;
         }
 
         public IQueryable<ItSystemUsage> Query(params IDomainQuery<ItSystemUsage>[] conditions)
@@ -206,7 +210,15 @@ namespace Core.ApplicationServices.SystemUsage
 
         public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid)
         {
-            return GetReadableItSystemUsageByUuid(uuid).Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
+            return GetReadableItSystemUsageByUuid(uuid)
+                .Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
+        }
+
+        public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid)
+                .Select(result => ResourceCollectionPermissionsResult.FromOrganizationId<ItSystemUsage>(result.Id, _authorizationContext));
         }
 
         public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(int itSystemUsageId, SensitiveDataLevel sensitiveDataLevel)
@@ -268,6 +280,19 @@ namespace Core.ApplicationServices.SystemUsage
                             : error);
         }
 
+        public Result<ArchivePeriod, OperationError> RemoveArchivePeriod(int systemUsageId, Guid archivePeriodUuid)
+        {
+            return Modify<ArchivePeriod>(systemUsageId, systemUsage =>
+            {
+                var result = systemUsage.RemoveArchivePeriod(archivePeriodUuid);
+                if (result.Failed)
+                    return result.Error;
+
+                DeleteArchivePeriodsFromRepository(result.Value);
+                return result.Value;
+            });
+        }
+
         public Result<IEnumerable<ArchivePeriod>, OperationError> RemoveAllArchivePeriods(int systemUsageId)
         {
             return Modify(systemUsageId, usage =>
@@ -279,11 +304,7 @@ namespace Core.ApplicationServices.SystemUsage
                         periodsToRemove =>
                         {
                             var removed = periodsToRemove.ToList();
-                            foreach (var removedPeriod in removed)
-                            {
-                                _archivePeriodRepository.DeleteWithReferencePreload(removedPeriod);
-                            }
-                            _archivePeriodRepository.Save();
+                            DeleteArchivePeriodsFromRepository(removed.ToArray());
                             return removed;
                         },
                         error => error);
@@ -292,9 +313,25 @@ namespace Core.ApplicationServices.SystemUsage
             });
         }
 
+        private void DeleteArchivePeriodsFromRepository(params ArchivePeriod[] toDelete)
+        {
+            foreach (var period in toDelete)
+            {
+                _archivePeriodRepository.DeleteWithReferencePreload(period);
+            }
+
+            _archivePeriodRepository.Save();
+        }
+
         public Result<ArchivePeriod, OperationError> AddArchivePeriod(int systemUsageId, DateTime startDate, DateTime endDate, string archiveId, bool approved)
         {
             return Modify(systemUsageId, usage => usage.AddArchivePeriod(startDate, endDate, archiveId, approved));
+        }
+
+        public Result<ArchivePeriod, OperationError> UpdateArchivePeriod(int systemUsageId, Guid archivePeriodUuid, DateTime startDate, DateTime endDate,
+            string archiveId, bool approved)
+        {
+            return Modify(systemUsageId, usage => usage.UpdateArchivePeriod(archivePeriodUuid, startDate, endDate, archiveId, approved));
         }
 
         public Maybe<OperationError> TransferResponsibleUsage(int systemId, Guid targetUnitUuid)

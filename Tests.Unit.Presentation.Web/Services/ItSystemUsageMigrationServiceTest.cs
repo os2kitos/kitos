@@ -14,6 +14,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Model;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.Services.DataAccess;
@@ -55,26 +56,19 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Theory]
-        [InlineData("")]
-        [InlineData(" ")]
-        [InlineData(null)]
-        public void GetUnusedItSystemsByOrganization_Throws_On_Empty_Name_Content(string nameContent)
+        [InlineData(0)]
+        [InlineData(26)]
+        public void GetUnusedItSystemsByOrganization_ReturnBadInput_On_NumberOfItSystems_Less_Than_1_Or_More_Than_25(int numberOfItSystems)
         {
             //Arrange
             var organizationId = A<int>();
 
-            //Act + Assert
-            Assert.Throws<ArgumentException>(() => _sut.GetUnusedItSystemsByOrganization(organizationId, nameContent, 1337, A<bool>()));
-        }
+            //Act
+            var result = _sut.GetUnusedItSystemsByOrganizationQuery(organizationId, numberOfItSystems, A<bool>());
 
-        [Fact]
-        public void GetUnusedItSystemsByOrganization_Throws_On_NumberOfItSystems_Less_Than_1()
-        {
-            //Arrange
-            var organizationId = A<int>();
-
-            //Act + Assert
-            Assert.Throws<ArgumentException>(() => _sut.GetUnusedItSystemsByOrganization(organizationId, A<string>(), 0, A<bool>()));
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
         }
 
         [Fact]
@@ -83,13 +77,14 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var organizationId = A<int>();
             ExpectOrganizationalAccessLevel(organizationId, OrganizationDataReadAccessLevel.None);
+            var rand = new Random();
 
             //Act
-            var result = _sut.GetUnusedItSystemsByOrganization(organizationId, A<string>(), 1337, A<bool>());
+            var result = _sut.GetUnusedItSystemsByOrganizationQuery(organizationId, rand.Next(1, 25), A<bool>());
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Theory]
@@ -111,7 +106,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetUnusedSystemsReturns(expectedQuery, resultSet.AsQueryable());
 
             //Act
-            var result = _sut.GetUnusedItSystemsByOrganization(organizationId, prefix, amount, getPublic);
+            var result = _sut.GetUnusedItSystemsByOrganizationQuery(organizationId, amount, getPublic, new QueryByPartOfName<ItSystem>(prefix));
 
             //Assert + requested amount returned and in the right order
             Assert.True(result.Ok);
@@ -141,7 +136,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetUnusedSystemsReturns(expectedQuery, resultSet.AsQueryable());
 
             //Act
-            var result = _sut.GetUnusedItSystemsByOrganization(organizationId, prefix, 2, getPublic);
+            var result = _sut.GetUnusedItSystemsByOrganizationQuery(organizationId, 2, getPublic, new QueryByPartOfName<ItSystem>(prefix));
 
             //Assert Only the one that matches the naming criterion is returned
             Assert.True(result.Ok);
@@ -160,7 +155,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]
@@ -177,7 +172,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]
@@ -197,11 +192,11 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]
-        public void GetSystemUsageMigration_Returns_BadInput_If_SystemUsage_Does_Not_Exist()
+        public void GetSystemUsageMigration_Returns_NotFound_If_SystemUsage_Does_Not_Exist()
         {
             //Arrange
             var systemUsage = CreateSystemUsage();
@@ -214,11 +209,11 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.BadInput, result.Error);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         [Fact]
-        public void GetSystemUsageMigration_Returns_BadInput_If_System_Does_Not_Exist()
+        public void GetSystemUsageMigration_Returns_NotFound_If_System_Does_Not_Exist()
         {
             //Arrange
             var systemUsage = CreateSystemUsage();
@@ -233,7 +228,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.BadInput, result.Error);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         [Fact]
@@ -403,7 +398,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]
@@ -421,7 +416,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]
