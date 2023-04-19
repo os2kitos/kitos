@@ -125,7 +125,7 @@ namespace Presentation.Web.Controllers.API.V1
         {
             try
             {
-                return _systemService.GetHierarchy(id)
+                return _systemService.GetCompleteHierarchy(id)
                     .Select(Map)
                     .Match(Ok, FromOperationError);
             }

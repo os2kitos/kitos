@@ -18,7 +18,7 @@ namespace Core.ApplicationServices.System
         SystemDeleteResult Delete(int id, bool breakBindings = false);
         IQueryable<ItSystem> GetAvailableSystems(params IDomainQuery<ItSystem>[] conditions);
         IQueryable<ItSystem> GetAvailableSystems(int organizationId, string optionalNameSearch = null);
-        Result<IEnumerable<ItSystem>, OperationError> GetHierarchy(int systemId);
+        Result<IEnumerable<ItSystem>, OperationError> GetCompleteHierarchy(int systemId);
         Result<IReadOnlyList<UsingOrganization>, OperationFailure> GetUsingOrganizations(int systemId);
         Result<ItSystem, OperationError> UpdateName(int systemId, string newName);
         Result<ItSystem, OperationError> UpdatePreviousName(int systemId, string newPreviousName);
