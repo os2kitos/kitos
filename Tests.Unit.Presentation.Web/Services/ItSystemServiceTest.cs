@@ -1240,7 +1240,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetSystemReturns(root.Id, root);
 
             //Act
-            var result = _sut.GetHierarchy(root.Id);
+            var result = _sut.GetCompleteHierarchy(root.Id);
 
             //Assert
             Assert.True(result.Ok);
@@ -1273,7 +1273,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetSystemReturns(root.Id, root);
 
             //Act
-            var result = _sut.GetHierarchy(root.Id);
+            var result = _sut.GetCompleteHierarchy(root.Id);
 
             //Assert
             Assert.True(result.Failed);
@@ -1289,7 +1289,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetSystemReturns(root.Id, null);
 
             //Act
-            var result = _sut.GetHierarchy(root.Id);
+            var result = _sut.GetCompleteHierarchy(root.Id);
 
             //Assert
             Assert.True(result.Failed);

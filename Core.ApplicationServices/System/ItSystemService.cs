@@ -149,10 +149,10 @@ namespace Core.ApplicationServices.System
             return itSystems;
         }
 
-        public Result<IEnumerable<ItSystem>, OperationError> GetHierarchy(int systemId)
+        public Result<IEnumerable<ItSystem>, OperationError> GetCompleteHierarchy(int systemId)
         {
             return GetSystem(systemId)
-                .Select(system => system.FlattenHierarchy());
+                .Select(system => system.FlattenCompleteHierarchy());
         }
 
         public SystemDeleteResult Delete(int id, bool breakBindings = false)

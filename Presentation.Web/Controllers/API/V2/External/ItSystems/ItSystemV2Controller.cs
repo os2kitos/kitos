@@ -225,7 +225,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             return _entityIdentityResolver.ResolveDbId<ItSystem>(uuid)
                 .Match
                 (
-                    id => _itSystemService.GetHierarchy(id),
+                    id => _itSystemService.GetCompleteHierarchy(id),
                     () => new OperationError($"System with uuid: {uuid} was not found", OperationFailure.NotFound)
                 )
                 .Select(RegistrationHierarchyNodeMapper.MapHierarchyToDtosWithDisabledStatus)
