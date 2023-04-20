@@ -21,15 +21,37 @@ namespace Core.DomainModel.Extensions
         }
 
         /// <summary>
-        /// Based on the current root, returns a collection containing the current root as well as nodes in the entire subtree and the ancestry
+        /// Based on the current root, returns a collection containing the entire hierarchy to which the entity belongs
         /// </summary>
-        /// <param name="root"></param>
+        /// <param name="entity"></param>
         /// <returns></returns>
-        public static IEnumerable<TEntity> FlattenCompleteHierarchy<TEntity>(this TEntity root)
+        public static IEnumerable<TEntity> FlattenCompleteHierarchy<TEntity>(this TEntity entity)
             where TEntity : class, IHierarchy<TEntity>
 
         {
-            return root.FlattenHierarchy().Concat(root.FlattenAncestry());
+            var currentRoot = entity.LocateRoot();
+
+            //Based on the root of the hierarchy return the entire tree
+            return currentRoot.FlattenHierarchy();
+        }
+
+        /// <summary>
+        /// Locates the root of the hierarchy to which the entity belongs
+        /// </summary>
+        /// <typeparam name="TEntity"></typeparam>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public static TEntity LocateRoot<TEntity>(this TEntity entity) where TEntity : class, IHierarchy<TEntity>
+        {
+            var currentRoot = entity;
+
+            //Find the root of the hierarchy
+            while (!currentRoot.IsRoot())
+            {
+                currentRoot = currentRoot.Parent;
+            }
+
+            return currentRoot;
         }
 
         /// <summary>
