@@ -434,6 +434,7 @@ namespace Presentation.Web.Ninject
             RegisterCommands<RemoveOrganizationUnitRegistrationsCommandHandler>(kernel);
             RegisterCommands<AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler>(kernel);
             RegisterCommands<ValidateUserCredentialsCommandHandler>(kernel);
+            RegisterCommands<ReportPendingFkOrganizationChangesToStakeHoldersHandler>(kernel);
         }
 
         private void RegisterCommands<THandler>(IKernel kernel)

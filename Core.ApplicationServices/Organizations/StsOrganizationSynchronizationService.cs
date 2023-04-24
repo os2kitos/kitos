@@ -109,7 +109,7 @@ namespace Core.ApplicationServices.Organizations
                 return LoadOrganizationUnits(organization)
                     .Bind(importRoot => ConnectToExternalOrganizationHierarchy(organization, importRoot, levelsToInclude, subscribeToUpdates))
                     .Select(ToConnectionConsequences)
-                    .Select(x => x.ToLogEntries(_activeUserIdContext, _operationClock))
+                    .Select(x => x.ToLogEntries(_activeUserIdContext, _operationClock.Now))
                     .Bind(logEntries => organization.AddExternalImportLog(OrganizationUnitOrigin.STS_Organisation, logEntries))
                     .MatchFailure();
             });

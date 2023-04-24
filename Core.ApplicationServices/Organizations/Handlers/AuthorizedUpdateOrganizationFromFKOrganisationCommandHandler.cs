@@ -55,11 +55,11 @@ namespace Core.ApplicationServices.Organizations.Handlers
             using var transaction = _transactionManager.Begin();
             try
             {
+
                 //Load the external tree if not already provided
                 var organizationTree = command
                     .PreloadedExternalTree
                     .Match(tree => tree, () => _stsOrganizationUnitService.ResolveOrganizationTree(organization));
-
                 if (organizationTree.Failed)
                 {
                     var error = organizationTree.Error;
@@ -110,7 +110,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
                     organization.StsOrganizationConnection.DateOfLatestCheckBySubscription = DateTime.Now;
                 }
 
-                var logEntries = consequences.ToLogEntries(_userContext, _operationClock);
+                var logEntries = consequences.ToLogEntries(_userContext, _operationClock.Now);
 
                 //We only add a change log entry if any changes were detected
                 if (logEntries.Entries.Any())

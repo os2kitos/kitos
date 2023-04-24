@@ -116,6 +116,7 @@
     <Compile Include="Organization\OrganizationTreeUpdateConsequences.cs" />
     <Compile Include="Organization\OrganizationUnitRegistrationDetails.cs" />
     <Compile Include="Organization\OrganizationUnitOrigin.cs" />
+    <Compile Include="Organization\PendingExternalOrganizationUpdatesResolved.cs" />
     <Compile Include="Organization\Strategies\IExternalOrganizationalHierarchyUpdateStrategy.cs" />
     <Compile Include="Organization\Strategies\StsOrganizationalHierarchyUpdateStrategy.cs" />
     <Compile Include="Organization\PaymentRegistrationDetails.cs" />
