@@ -116,7 +116,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
             return organization.GetUsersWithRole(OrganizationRole.LocalAdmin, false).ToList();
         }
 
-        private static List<string> CollectChangeSummary(List<ExternalConnectionAddNewLogEntryInput> changeDetails)
+        private static IEnumerable<string> CollectChangeSummary(List<ExternalConnectionAddNewLogEntryInput> changeDetails)
         {
             var changeSummaries = new List<string>();
             foreach (var detailsByType in changeDetails.GroupBy(x => x.Type))
@@ -128,7 +128,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
                     ConnectionUpdateOrganizationUnitChangeType.Moved => "Flytninger",
                     ConnectionUpdateOrganizationUnitChangeType.Deleted => "Sletninger",
                     ConnectionUpdateOrganizationUnitChangeType.Converted => "Konverteringer",
-                    ConnectionUpdateOrganizationUnitChangeType.RootChanged => "Komplet skifte",
+                    ConnectionUpdateOrganizationUnitChangeType.RootChanged => "Organisationsrod udskiftet",
                     _ => "Ukendt"
                 };
                 changeSummaries.Add($"{category}: {detailsByType.Count()}");
