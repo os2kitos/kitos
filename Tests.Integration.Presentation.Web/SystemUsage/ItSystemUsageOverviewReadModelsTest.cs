@@ -327,8 +327,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.True(readModel.MainContractIsActive);
 
             // Associated contracts
-            var expectedContracts = new[]{contract1,contract2}.ToList();
-            Assert.Equal(expectedContracts.Count,readModel.AssociatedContracts.Count);
+            var expectedContracts = new[] { contract1, contract2 }.ToList();
+            Assert.Equal(expectedContracts.Count, readModel.AssociatedContracts.Count);
             foreach (var expectedContract in expectedContracts)
             {
                 Assert.True(readModel.AssociatedContractsNamesCsv.Contains(expectedContract.Name));
@@ -569,7 +569,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             //Assert
             var readModel = Assert.Single(readModels);
             Console.Out.WriteLine("Read model found");
-
+            Assert.Empty(readModel.AssociatedContracts);
+            Assert.Equal(string.Empty, readModel.AssociatedContractsNamesCsv);
             Assert.Null(readModel.MainContractId);
             Assert.Null(readModel.MainContractSupplierId);
             Assert.Null(readModel.MainContractSupplierName);
