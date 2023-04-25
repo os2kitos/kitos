@@ -94,7 +94,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
                                       string.Join(", ", summary) +
                                       "</p>" +
                                       $"<p><a href='{_changeLogLink}' target='_blank'>" +
-                                      "Klik her for at gennemse (klik 'Rediger') og indlæse de ventende ændringer fra FK Organisation" +
+                                      "Klik her for at gennemse (klik 'Rediger') og indlæse de ventende opdateringer fra FK Organisation" +
                                       "</a>." +
                                       "</p>" +
                                       "<p>" +
