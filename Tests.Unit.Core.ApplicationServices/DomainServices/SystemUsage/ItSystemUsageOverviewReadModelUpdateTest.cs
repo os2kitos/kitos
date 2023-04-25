@@ -61,8 +61,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 _itContractReadModelRepoMock.Object);
         }
 
-        //TODO: Extend this test
-
         private static readonly User DefaultTestUser = new()
         {
             Id = 1,
@@ -138,7 +136,13 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                     Id = A<int>()
                 }
             };
-            var contract = new ItContract
+            var contract1 = new ItContract
+            {
+                Id = A<int>(),
+                Name = A<string>(),
+                Supplier = supplier
+            };
+            var contract2 = new ItContract
             {
                 Id = A<int>(),
                 Name = A<string>(),
@@ -247,14 +251,12 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _businessTypeService.Setup(x => x.GetOption(system.OrganizationId, system.BusinessType.Id)).Returns(Maybe<(BusinessType, bool)>.Some((system.BusinessType, true)));
 
             // Add MainContract
-            var mainContract = new ItContractItSystemUsage
-            {
-                ItContractId = contract.Id,
-                ItContract = contract,
-                ItSystemUsageId = systemUsage.Id,
-                ItSystemUsage = systemUsage
-            };
+            var mainContract = AssociateContract(contract1, systemUsage);
             systemUsage.MainContract = mainContract;
+
+            //Add contracts
+            systemUsage.Contracts.Add(mainContract);
+            systemUsage.Contracts.Add(AssociateContract(contract2, systemUsage));
 
             // Add SensitiveDataLevel
             var sensitiveDataLevel = new ItSystemUsageSensitiveDataLevel
@@ -268,7 +270,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             // Add ArchivePeriod
             var archivePeriods = new List<ArchivePeriod>
             {
-                new ArchivePeriod
+                new()
                 {
                     Id = A<int>(),
                     ItSystemUsage = systemUsage,
@@ -369,10 +371,22 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.Reference.ExternalReferenceId, readModel.LocalReferenceDocumentId);
 
             //Main Contract
-            Assert.Equal(contract.Id, readModel.MainContractId);
-            Assert.Equal(contract.Supplier.Id, readModel.MainContractSupplierId);
-            Assert.Equal(contract.Supplier.Name, readModel.MainContractSupplierName);
-            Assert.Equal(contract.IsActive, readModel.MainContractIsActive);
+            Assert.Equal(contract1.Id, readModel.MainContractId);
+            Assert.Equal(contract1.Supplier.Id, readModel.MainContractSupplierId);
+            Assert.Equal(contract1.Supplier.Name, readModel.MainContractSupplierName);
+            Assert.Equal(contract1.IsActive, readModel.MainContractIsActive);
+
+            //AsociatedContracts
+            var expectedContracts = new[] { contract1, contract2 }.ToList();
+            Assert.Equal(expectedContracts.Count, readModel.AssociatedContracts.Count);
+            expectedContracts.ForEach(contract =>
+            {
+                Assert.True(readModel.AssociatedContractsNamesCsv.Contains(contract.Name));
+                Assert.Contains(readModel.AssociatedContracts, associatedContract =>
+                    associatedContract.ItContractId == contract.Id &&
+                    associatedContract.ItContractName == contract.Name &&
+                    associatedContract.ItContractUuid == contract.Uuid);
+            });
 
             //ArchivePeriods
             var rmArchivePeriod = Assert.Single(readModel.ArchivePeriods);
@@ -408,6 +422,17 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(incomingRelationItSystemUsage.Id, rmIncomingRelatedSystemUsage.ItSystemUsageId);
             Assert.Equal(incomingRelationItSystemUsage.Uuid, rmIncomingRelatedSystemUsage.ItSystemUsageUuid);
             Assert.Equal(incomingRelationItSystem.Name, rmIncomingRelatedSystemUsage.ItSystemUsageName);
+        }
+
+        private static ItContractItSystemUsage AssociateContract(ItContract contract, ItSystemUsage systemUsage)
+        {
+            return new ItContractItSystemUsage
+            {
+                ItContractId = contract.Id,
+                ItContract = contract,
+                ItSystemUsageId = systemUsage.Id,
+                ItSystemUsage = systemUsage
+            };
         }
 
         [Fact]
