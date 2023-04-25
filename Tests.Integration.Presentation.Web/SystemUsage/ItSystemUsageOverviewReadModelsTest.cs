@@ -98,7 +98,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var generalPurpose = A<string>();
             var hostedAt = A<HostedAt>();
 
-            var contractName = A<string>();
+            var contract1Name = A<string>();
+            var contract2Name = A<string>();
 
             var dataProcessingRegistrationName = A<string>();
 
@@ -167,15 +168,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), dto => dto.ItSystemUsage_Id = systemUsage.Id);
 
             //Main Contract
-            var contract = await ItContractHelper.CreateContract(contractName, organizationId);
+            var contract1 = await ItContractHelper.CreateContract(contract1Name, organizationId);
+            var contract2 = await ItContractHelper.CreateContract(contract2Name, organizationId);
             var contractUpdateBody = new
             {
                 supplierId = organizationId
             };
-            await ItContractHelper.PatchContract(contract.Id, organizationId, contractUpdateBody);
-            await ItContractHelper.AddItSystemUsage(contract.Id, systemUsage.Id, organizationId);
+            await ItContractHelper.PatchContract(contract1.Id, organizationId, contractUpdateBody);
+            await ItContractHelper.AddItSystemUsage(contract1.Id, systemUsage.Id, organizationId);
+            await ItContractHelper.AddItSystemUsage(contract2.Id, systemUsage.Id, organizationId);
 
-            await ItSystemUsageHelper.SendSetMainContractRequestAsync(systemUsage.Id, contract.Id).DisposeAsync();
+            await ItSystemUsageHelper.SendSetMainContractRequestAsync(systemUsage.Id, contract1.Id).DisposeAsync();
 
             // ArchivePeriods
             var archivePeriodStartDate = DateTime.Now.AddDays(-1);
@@ -318,10 +321,19 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(reference.ExternalReferenceId, readModel.LocalReferenceDocumentId);
 
             // Main Contract
-            Assert.Equal(contract.Id, readModel.MainContractId);
+            Assert.Equal(contract1.Id, readModel.MainContractId);
             Assert.Equal(organizationId, readModel.MainContractSupplierId);
             Assert.Equal(organizationName, readModel.MainContractSupplierName);
             Assert.True(readModel.MainContractIsActive);
+
+            // Associated contracts
+            var expectedContracts = new[]{contract1,contract2}.ToList();
+            Assert.Equal(expectedContracts.Count,readModel.AssociatedContracts.Count);
+            foreach (var expectedContract in expectedContracts)
+            {
+                Assert.True(readModel.AssociatedContractsNamesCsv.Contains(expectedContract.Name));
+                Assert.Contains(readModel.AssociatedContracts, c => c.ItContractId == expectedContract.Id);
+            }
 
             // ArchivePeriods
             Assert.Equal(archivePeriodEndDate, readModel.ActiveArchivePeriodEndDate);
