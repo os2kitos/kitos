@@ -73,7 +73,8 @@ namespace Core.BackgroundJobs.Model.Maintenance
             else
             {
                 var organization = getOrganizationResult.Value;
-                if (organization.StsOrganizationConnection?.SubscribeToUpdates != true)
+                var connection = organization.StsOrganizationConnection;
+                if (connection?.SubscribeToUpdates != true)
                 {
                     _logger.Warning("Sync job for organization with uuid {uuid} ignored since organization no longer subscribes to updates", organizationUuid);
                     return;
@@ -81,7 +82,7 @@ namespace Core.BackgroundJobs.Model.Maintenance
 
                 try
                 {
-                    var command = new ReportPendingFkOrganizationChangesToStakeHolders(organization);
+                    var command = new ReportPendingFkOrganizationChangesToStakeHolders(organization,connection);
                     var error = _commandBus.Execute<ReportPendingFkOrganizationChangesToStakeHolders, Maybe<OperationError>>(command);
                     if (error.HasValue)
                     {

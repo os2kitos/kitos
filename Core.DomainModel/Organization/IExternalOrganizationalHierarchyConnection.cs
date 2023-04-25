@@ -1,4 +1,5 @@
-﻿using Core.Abstractions.Types;
+﻿using System;
+using Core.Abstractions.Types;
 using Core.DomainModel.Constants;
 using Core.DomainModel.Organization.Strategies;
 using System.Collections.Generic;
@@ -19,5 +20,6 @@ namespace Core.DomainModel.Organization
         Maybe<OperationError> Subscribe();
         Maybe<OperationError> Unsubscribe();
         Maybe<OperationError> UpdateSynchronizationDepth(int? synchronizationDepth);
+        void UpdateDateOfLatestUpdateBySubscriptionCheck(DateTime timeStamp);
     }
 }

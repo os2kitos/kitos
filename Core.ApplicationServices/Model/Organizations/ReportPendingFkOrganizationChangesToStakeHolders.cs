@@ -8,11 +8,13 @@ namespace Core.ApplicationServices.Model.Organizations
     /// </summary>
     public class ReportPendingFkOrganizationChangesToStakeHolders : ICommand
     {
-        public ReportPendingFkOrganizationChangesToStakeHolders(Organization organization)
+        public ReportPendingFkOrganizationChangesToStakeHolders(Organization organization, IExternalOrganizationalHierarchyConnection connection)
         {
             Organization = organization;
+            Connection = connection;
         }
 
         public Organization Organization { get; }
+        public IExternalOrganizationalHierarchyConnection Connection { get; }
     }
 }

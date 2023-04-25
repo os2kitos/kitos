@@ -1,4 +1,5 @@
-﻿using Core.Abstractions.Types;
+﻿using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Commands;
@@ -44,6 +45,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
 
             //Load the external tree if not already provided
             var organization = command.Organization;
+            var connection = command.Connection;
             var organizationTree = _stsOrganizationUnitService.ResolveOrganizationTree(organization);
 
             if (organizationTree.Failed)
@@ -53,35 +55,31 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 return new OperationError($"Failed to resolve org tree:{error.Message.GetValueOrFallback("")}:{error.Detail:G}:{error.FailureType:G}", error.FailureType);
             }
 
-            var currentConnection = organization.StsOrganizationConnection;
-            if (currentConnection?.Connected == true)
+            //Compute any pending changes
+            var now = _operationClock.Now;
+            var logEntriesResult = organization
+                .ComputeExternalOrganizationHierarchyUpdateConsequences
+                (
+                    OrganizationUnitOrigin.STS_Organisation,
+                    organizationTree.Value,
+                    connection.SynchronizationDepth.FromNullableValueType()
+                )
+                .Select(consequences => consequences.ToLogEntries(Maybe<ActiveUserIdContext>.None, _operationClock.Now));
+
+            if (logEntriesResult.Failed)
             {
-                //Compute any pending changes
-                var now = _operationClock.Now;
-                var logEntriesResult = organization
-                    .ComputeExternalOrganizationHierarchyUpdateConsequences
-                    (
-                        OrganizationUnitOrigin.STS_Organisation,
-                        organizationTree.Value,
-                        currentConnection.SynchronizationDepth
-                    )
-                    .Select(consequences => consequences.ToLogEntries(Maybe<ActiveUserIdContext>.None, _operationClock.Now));
-
-                if (logEntriesResult.Failed)
-                {
-                    var error = logEntriesResult.Error;
-                    _logger.Error("Unable to compute changes org tree for organization with uuid {uuid}. Failed with: {code}:{message}", command.Organization.Uuid, error.FailureType, error.Message);
-                    return new OperationError($"Failed to compute changes to org tree:{error.Message.GetValueOrFallback("")}:{error.FailureType:G}", error.FailureType);
-                }
-
-                //Make sure date of latest check is updated and raise the change resolution event
-                var logEntries = logEntriesResult.Value;
-                currentConnection.DateOfLatestCheckBySubscription = now;
-                _domainEvents.Raise(new PendingExternalOrganizationUpdatesResolved(organization, currentConnection, logEntries));
-
-                _databaseControl.SaveChanges();
-                transaction.Commit();
+                var error = logEntriesResult.Error;
+                _logger.Error("Unable to compute changes org tree for organization with uuid {uuid}. Failed with: {code}:{message}", command.Organization.Uuid, error.FailureType, error.Message);
+                return new OperationError($"Failed to compute changes to org tree:{error.Message.GetValueOrFallback("")}:{error.FailureType:G}", error.FailureType);
             }
+
+            //Make sure date of latest check is updated and raise the change resolution event
+            var logEntries = logEntriesResult.Value;
+            connection.UpdateDateOfLatestUpdateBySubscriptionCheck(now);
+            _domainEvents.Raise(new PendingExternalOrganizationUpdatesResolved(organization, logEntries));
+
+            _databaseControl.SaveChanges();
+            transaction.Commit();
             return Maybe<OperationError>.None;
         }
     }

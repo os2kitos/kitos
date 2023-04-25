@@ -249,7 +249,7 @@ namespace Core.DomainModel.Organization
                 (error => error,
                     () =>
                     {
-                        StsOrganizationConnection ??= new StsOrganizationConnection();
+                        StsOrganizationConnection ??= StsOrganizationConnection.Create(this);
                         StsOrganizationConnection.Connect();
 
                         if (subscribeToUpdates != StsOrganizationConnection.SubscribeToUpdates)
