@@ -45,9 +45,12 @@
                                data-element-type="dataLevelTypeNoneCheckbox"
                                ng-model="vm.subscribesToUpdates"
                                ng-disabled="vm.busy || vm.loadingPreviewFailed || vm.loadingHierarchy || vm.updating || vm.consequencesAwaitingApproval">
-                        Importér automatisk (dagligt) ændringer fra FK Organisation
+                        Tjek automatisk efter ventende opdateringer*
                     </label>
                 </div>
+                <span class="help-block small">
+                    * Foretager automatisk tjek hver mandag nat og sender en email med oversigt over ventende opdateringer til brugere i kommunen med rollen "Lokal Administrator"
+                </span>
             </div>
         </div>
     </div>
