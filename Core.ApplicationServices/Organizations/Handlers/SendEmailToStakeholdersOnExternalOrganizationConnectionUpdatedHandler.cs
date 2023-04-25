@@ -119,7 +119,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
         private static IEnumerable<string> CollectChangeSummary(List<ExternalConnectionAddNewLogEntryInput> changeDetails)
         {
             var changeSummaries = new List<string>();
-            foreach (var detailsByType in changeDetails.GroupBy(x => x.Type))
+            foreach (var detailsByType in changeDetails.GroupBy(x => x.Type).OrderBy(x=>x.Key).ToList())
             {
                 var category = detailsByType.Key switch
                 {
