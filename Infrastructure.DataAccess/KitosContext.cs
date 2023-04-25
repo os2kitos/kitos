@@ -164,6 +164,7 @@ namespace Infrastructure.DataAccess
         public DbSet<StsOrganizationConsequenceLog> StsOrganizationConsequenceLogs { get; set; }
         public DbSet<SubDataProcessor> SubDataProcessors { get; set; }
         public DbSet<ItSystemUsageOverviewRelevantOrgUnitReadModel> ItSystemUsageOverviewRelevantOrgUnitReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewItContractReadModel> ItSystemUsageOverviewItContractReadModels { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -267,6 +268,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new SubDataProcessorMap());
             modelBuilder.Configurations.Add(new ExternalReferenceMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewRelevantOrgUnitReadModelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewItContractReadModelMap());
         }
     }
 }

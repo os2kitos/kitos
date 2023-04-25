@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Extensions;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Core.DomainServices.Repositories.SystemUsage
 {
@@ -69,6 +70,12 @@ namespace Core.DomainServices.Repositories.SystemUsage
             return _itSystemUsageRepository
                 .AsQueryable()
                 .Where(x => x.AssociatedDataProcessingRegistrations.Select(r => r.Id).Contains(dprId));
+        }
+
+        public IQueryable<ItSystemUsage> GetByContractId(int itContractId)
+        {
+            return _itSystemUsageRepository.AsQueryable()
+                .Where(x => x.Contracts.Any(contract => contract.ItContract.Id == itContractId));
         }
     }
 }

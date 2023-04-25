@@ -15,7 +15,6 @@ using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Options;
 using Core.DomainServices.SystemUsage;
-
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -34,7 +33,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewInterfaceReadModel>> _interfacesReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel>> _itSystemUsageReadModelRepository;
         private readonly ItSystemUsageOverviewReadModelUpdate _sut;
-        private Mock<IGenericRepository<ItSystemUsageOverviewRelevantOrgUnitReadModel>> _orgUnitRepoMock;
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewRelevantOrgUnitReadModel>> _orgUnitRepoMock;
 
         public ItSystemUsageOverviewReadModelUpdateTest()
         {
@@ -47,6 +46,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _interfacesReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewInterfaceReadModel>>();
             _itSystemUsageReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel>>();
             _orgUnitRepoMock = new Mock<IGenericRepository<ItSystemUsageOverviewRelevantOrgUnitReadModel>>();
+            _itContractReadModelRepoMock = new Mock<IGenericRepository<ItSystemUsageOverviewItContractReadModel>>();
             _sut = new ItSystemUsageOverviewReadModelUpdate(
                 _roleAssignmentRepository.Object,
                 _taskRefRepository.Object,
@@ -57,16 +57,21 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 _itSystemUsageReadModelRepository.Object,
                 Mock.Of<IGenericRepository<ItSystemUsageOverviewUsingSystemUsageReadModel>>(),
                 _businessTypeService.Object,
-                _orgUnitRepoMock.Object);
+                _orgUnitRepoMock.Object,
+                _itContractReadModelRepoMock.Object);
         }
 
-        public static User defaultTestUser = new()
+        //TODO: Extend this test
+
+        private static readonly User DefaultTestUser = new()
         {
             Id = 1,
             Name = "test",
             LastName = "tester",
             Email = $"test@tester.dk"
         };
+
+        private Mock<IGenericRepository<ItSystemUsageOverviewItContractReadModel>> _itContractReadModelRepoMock;
 
         [Fact]
         public void Apply_Generates_Correct_Read_Model()
@@ -449,8 +454,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 OrganizationId = A<int>(),
                 ItSystem = system,
-                ObjectOwner = defaultTestUser,
-                LastChangedByUser = defaultTestUser,
+                ObjectOwner = DefaultTestUser,
+                LastChangedByUser = DefaultTestUser,
                 LastChanged = A<DateTime>(),
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
             };
@@ -478,8 +483,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             {
                 Id = A<int>(),
                 ItSystem = system,
-                ObjectOwner = defaultTestUser,
-                LastChangedByUser = defaultTestUser,
+                ObjectOwner = DefaultTestUser,
+                LastChangedByUser = DefaultTestUser,
                 LastChanged = A<DateTime>(),
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
             };
@@ -534,8 +539,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 OrganizationId = A<int>(),
                 ItSystem = system,
-                ObjectOwner = defaultTestUser,
-                LastChangedByUser = defaultTestUser,
+                ObjectOwner = DefaultTestUser,
+                LastChangedByUser = DefaultTestUser,
                 LastChanged = A<DateTime>(),
                 riskAssessment = DataOptions.DONTKNOW,
                 RiskSupervisionDocumentationUrlName = A<string>(),
@@ -598,8 +603,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 OrganizationId = A<int>(),
                 ItSystem = system,
-                ObjectOwner = defaultTestUser,
-                LastChangedByUser = defaultTestUser,
+                ObjectOwner = DefaultTestUser,
+                LastChangedByUser = DefaultTestUser,
                 LastChanged = A<DateTime>(),
                 riskAssessment = DataOptions.DONTKNOW,
                 RiskSupervisionDocumentationUrlName = A<string>(),
@@ -641,8 +646,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 OrganizationId = A<int>(),
                 ItSystem = system,
-                ObjectOwner = defaultTestUser,
-                LastChangedByUser = defaultTestUser,
+                ObjectOwner = DefaultTestUser,
+                LastChangedByUser = DefaultTestUser,
                 LastChanged = A<DateTime>(),
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>(),
                 HostedAt = null
@@ -670,8 +675,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 OrganizationId = A<int>(),
                 ItSystem = system,
                 ExpirationDate = expirationDate,
-                ObjectOwner = defaultTestUser,
-                LastChangedByUser = defaultTestUser,
+                ObjectOwner = DefaultTestUser,
+                LastChangedByUser = DefaultTestUser,
                 LastChanged = A<DateTime>(),
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
             };

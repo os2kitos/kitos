@@ -16,5 +16,6 @@ namespace Core.DomainServices.Repositories.SystemUsage
         IQueryable<ItSystemUsage> GetBySystemIdInSystemRelations(int systemId);
         IQueryable<ItSystemUsage> GetBySystemIds(IEnumerable<int> systemIds);
         IQueryable<ItSystemUsage> GetByDataProcessingAgreement(int dprId);
+        IQueryable<ItSystemUsage> GetByContractId(int itContractId);
     }
 }

@@ -97,7 +97,7 @@ namespace Core.DomainServices.Repositories.SystemUsage
         {
             return _repository
                 .AsQueryable()
-                .Where(x => x.MainContractId == contractId);
+                .Where(x => x.AssociatedContracts.Any(ac=>ac.ItContractId == contractId));
         }
 
         public IQueryable<ItSystemUsageOverviewReadModel> GetByDataProcessingRegistrationId(int dataProcessingRegistrationId)
