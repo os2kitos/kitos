@@ -141,7 +141,9 @@ namespace Core.DomainServices.SystemUsage
                     ItContractName = x.Name,
                     ItContractUuid = x.Uuid
                 })
-                .MirrorTo(destination.AssociatedContracts, contract => contract.ItContractUuid);
+                .MirrorTo(destination.AssociatedContracts, contract =>
+                    //Create identity that triggers a "diff" if name changes
+                    $"{contract.ItContractUuid}{contract.ItContractName}");
             var removedContracts = contractsBefore.Except(destination.AssociatedContracts).ToList();
             if (removedContracts.Any())
             {
