@@ -1,14 +1,17 @@
-﻿using System;
+﻿using Core.DomainModel.Shared;
+using System;
 
 namespace Core.DomainModel.ItSystemUsage.Read
 {
-    public class ItSystemUsageOverviewItContractReadModel
+    public class ItSystemUsageOverviewDataProcessingRegistrationReadModel
     {
         public int Id { get; set; }
 
-        public Guid ItContractUuid { get; set; }
-        public int ItContractId { get; set; }
-        public string ItContractName { get; set; }
+        public Guid DataProcessingRegistrationUuid { get; set; }
+        public int DataProcessingRegistrationId { get; set; }
+        public string DataProcessingRegistrationName { get; set; }
+
+        public YesNoIrrelevantOption? IsAgreementConcluded { get; set; }
 
         public int ParentId { get; set; }
         public virtual ItSystemUsageOverviewReadModel Parent { get; set; }
