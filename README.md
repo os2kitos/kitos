@@ -1,5 +1,6 @@
 # OS2KITOS
 
+## Maintainer and license info
 OS2KITOS is maintained by STRONGMINDS ApS (https://www.strongminds.dk)
 for OS2 - Offentligt digitaliseringsfællesskab (https://os2.eu/).
 
@@ -13,3 +14,11 @@ http://mozilla.org/MPL/2.0/.
 
 All source code in this and the underlying directories is subject to
 the terms of the Mozilla Public License, v. 2.0. 
+
+## Solution structure
+
+### Backend and legacy UI
+This repository maintains the old (current) UI along with the backend services.
+
+### New UI
+The future UI is developed and maintained here: https://github.com/os2kitos/kitos_frontend
