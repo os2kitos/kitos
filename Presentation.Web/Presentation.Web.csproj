@@ -447,6 +447,7 @@
     <Compile Include="Models\API\V2\Types\Notifications\NotificationSendType.cs" />
     <Compile Include="Models\API\V2\Types\Notifications\OwnerResourceType.cs" />
     <Compile Include="Models\API\V2\Types\Notifications\RepetitionFrequencyOptions.cs" />
+    <Compile Include="Models\API\V2\Types\Shared\CommonOrderByProperty.cs" />
     <Compile Include="Models\API\V2\Types\System\SystemDeletionConflict.cs" />
     <Compile Include="Swagger\PurgeUnusedTypesDocumentFilter.cs" />
     <Compile Include="Swagger\RemoveUnneededMutatingCallsFilter.cs" />

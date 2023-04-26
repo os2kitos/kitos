@@ -20,6 +20,7 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.Organization;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Serilog;
 using Swashbuckle.Swagger.Annotations;
 using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
@@ -66,6 +67,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
             string cvrContent = null,
             string nameOrCvrContent = null,
             [NonEmptyGuid] Guid? uuid = null,
+            CommonOrderByProperty? orderByProperty = null,
             [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
@@ -87,7 +89,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
 
             return _organizationService
                 .SearchAccessibleOrganizations(onlyWhereUserHasMembership, refinements.ToArray())
-                .OrderBy(x => x.Id)
+                .OrderResults(orderByProperty)
                 .Page(pagination)
                 .ToList()
                 .Select(ToDTO)
