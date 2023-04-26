@@ -33,6 +33,11 @@
         OrganizationUnitId: number;
     }
 
+    export interface IItSystemUsageOverviewItContractReadModel {
+        ItContractName: string;
+        ItContractId: number;
+    }
+
     export interface IItSystemUsageOverviewReadModel {
         Id: number;
         SourceEntityId: number;
@@ -89,5 +94,6 @@
         OutgoingRelatedItSystemUsages: IItSystemUsageOverviewItSystemUsageReadModel[];
         RelevantOrganizationUnitNamesAsCsv: string;
         RelevantOrganizationUnits: IItSystemUsageOverviewRelevantOrgUnitReadModel[];
+        AssociatedContracts: IItSystemUsageOverviewItContractReadModel[];
     }
 }
