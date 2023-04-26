@@ -17,7 +17,7 @@ the terms of the Mozilla Public License, v. 2.0.
 
 ## Solution structure
 
-#### Backend and legacy UI
+### Backend and legacy UI
 This repository maintains the old (current) UI along with the backend services.
 
 ### New UI
