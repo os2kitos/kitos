@@ -5,7 +5,7 @@
     /// </summary>
     public enum CommonOrderByProperty
     {
-        Id,
+        CreationOrder,
         Name,
         LastChanged
     }

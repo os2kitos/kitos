@@ -18,6 +18,7 @@ using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Core.Abstractions.Extensions;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 {
@@ -49,6 +50,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// <param name="dataProcessingRegistrationUuid">Associated data processing registration UUID filter</param>
         /// <param name="nameContent">Name content filter</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
+        /// <param name="orderByProperty">Ordering property</param>
         /// <returns></returns>
         [HttpGet]
         [Route]
@@ -65,6 +67,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             [NonEmptyGuid] Guid? supplierUuid = null,
             string nameContent = null,
             DateTime? changedSinceGtEq = null,
+            CommonOrderByProperty? orderByProperty = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -98,7 +101,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 
             return _itContractService
                 .Query(conditions.ToArray())
-                .OrderByDefaultConventions(changedSinceGtEq.HasValue)
+                .OrderByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
                 .Page(paginationQuery)
                 .ToList()
                 .Select(_responseMapper.MapContractDTO)

@@ -7,6 +7,7 @@ using Core.DomainServices.Queries.SystemUsage;
 using Core.DomainServices.Queries;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.Common.Helpers
 {
@@ -24,6 +25,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Helpers
             Guid? systemUuid = null,
             string systemNameContent = null,
             DateTime? changedSinceGtEq = null,
+            CommonOrderByProperty? orderByProperty = null,
             BoundedPaginationQuery paginationQuery = null)
         {
             var conditions = new List<IDomainQuery<ItSystemUsage>>();
@@ -51,7 +53,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Helpers
 
             return service
                 .Query(conditions.ToArray())
-                .OrderSystemUsageByDefaultConventions(changedSinceGtEq.HasValue)
+                .OrderSystemUsageByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
                 .Page(paginationQuery).AsEnumerable();
         }
     }

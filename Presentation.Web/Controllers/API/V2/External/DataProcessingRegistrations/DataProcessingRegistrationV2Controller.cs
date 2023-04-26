@@ -17,6 +17,7 @@ using Core.ApplicationServices.GDPR.Write;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations
 {
@@ -53,6 +54,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         /// <param name="subDataProcessorUuid">UUID of a sub data processor in the registration</param>
         /// <param name="agreementConcluded">Filter based on whether or not an agreement has been concluded</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
+        /// <param name="orderByProperty">Ordering property</param>
         /// <returns></returns>
         [HttpGet]
         [Route]
@@ -68,6 +70,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             [NonEmptyGuid] Guid? subDataProcessorUuid = null,
             bool? agreementConcluded = null,
             DateTime? changedSinceGtEq = null,
+            CommonOrderByProperty? orderByProperty = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -98,7 +101,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             return _dataProcessingRegistrationService
                 .Query(conditions.ToArray())
-                .OrderByDefaultConventions(changedSinceGtEq.HasValue)
+                .OrderByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
                 .Page(paginationQuery)
                 .ToList()
                 .Select(_responseMapper.MapDataProcessingRegistrationDTO)

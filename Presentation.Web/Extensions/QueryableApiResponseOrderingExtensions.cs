@@ -9,6 +9,15 @@ namespace Presentation.Web.Extensions
 {
     public static class QueryableApiResponseOrderingExtensions
     {
+        public static IOrderedQueryable<User> OrderUserResults(this IQueryable<User> src, CommonOrderByProperty? property = null)
+        {
+            var orderByProperty = property ?? CommonOrderByProperty.CreationOrder;
+
+            return orderByProperty == CommonOrderByProperty.Name
+                ? src.OrderBy(SelectName<User>()).ThenBy(SelectUserLastName())
+                : src.OrderUnNamedResults(orderByProperty);
+        }
+
         public static IQueryable<ItSystemUsage> OrderSystemUsageByDefaultConventions(
             this IQueryable<ItSystemUsage> src,
             bool srcIsFilteredGtEqLastChanged = false,
@@ -21,9 +30,9 @@ namespace Presentation.Web.Extensions
                 : src.OrderSystemUsageResults(additionalOrdering);
         }
 
-        public static IOrderedQueryable<ItSystemUsage> OrderSystemUsageResults(this IQueryable<ItSystemUsage> src, CommonOrderByProperty? property)
+        public static IOrderedQueryable<ItSystemUsage> OrderSystemUsageResults(this IQueryable<ItSystemUsage> src, CommonOrderByProperty? property = null)
         {
-            var orderByProperty = property ?? CommonOrderByProperty.Id;
+            var orderByProperty = property ?? CommonOrderByProperty.CreationOrder;
 
             return orderByProperty == CommonOrderByProperty.Name
                 ? src.OrderBy(SelectSystemUsageName())
@@ -32,7 +41,7 @@ namespace Presentation.Web.Extensions
 
         public static IOrderedQueryable<ItSystemUsage> ThenBySystemUsageResults(this IOrderedQueryable<ItSystemUsage> src, CommonOrderByProperty? property)
         {
-            var orderByProperty = property ?? CommonOrderByProperty.Id;
+            var orderByProperty = property ?? CommonOrderByProperty.CreationOrder;
 
             return orderByProperty == CommonOrderByProperty.Name
                 ? src.ThenBy(SelectSystemUsageName())
@@ -54,7 +63,7 @@ namespace Presentation.Web.Extensions
 
         public static IOrderedQueryable<T> OrderResults<T>(this IQueryable<T> src, CommonOrderByProperty? property) where T : class, IEntity, IHasName
         {
-            var orderByProperty = property ?? CommonOrderByProperty.Id;
+            var orderByProperty = property ?? CommonOrderByProperty.CreationOrder;
             
             return orderByProperty == CommonOrderByProperty.Name
                 ? src.OrderBy(SelectName<T>())
@@ -63,9 +72,9 @@ namespace Presentation.Web.Extensions
 
         public static IOrderedQueryable<T> OrderUnNamedResults<T>(this IQueryable<T> src, CommonOrderByProperty? property) where T : class, IEntity
         {
-            return (property ?? CommonOrderByProperty.Id) switch
+            return (property ?? CommonOrderByProperty.CreationOrder) switch
             {
-                CommonOrderByProperty.Id => src.OrderBy(SelectId<T>()),
+                CommonOrderByProperty.CreationOrder => src.OrderBy(SelectId<T>()),
                 CommonOrderByProperty.LastChanged => src.OrderBy(SelectLastChanged<T>()),
                 _ => throw new ArgumentOutOfRangeException()
             };
@@ -73,7 +82,7 @@ namespace Presentation.Web.Extensions
 
         public static IOrderedQueryable<T> ThenByResults<T>(this IOrderedQueryable<T> src, CommonOrderByProperty? property) where T : class, IEntity, IHasName
         {
-            var thenByProperty = (property ?? CommonOrderByProperty.Id);
+            var thenByProperty = (property ?? CommonOrderByProperty.CreationOrder);
             
             return thenByProperty == CommonOrderByProperty.Name
                 ? src.ThenBy(SelectName<T>())
@@ -82,9 +91,9 @@ namespace Presentation.Web.Extensions
 
         public static IOrderedQueryable<T> ThenByUnNamedResults<T>(this IOrderedQueryable<T> src, CommonOrderByProperty? property) where T : class, IEntity
         {
-            return (property ?? CommonOrderByProperty.Id) switch
+            return (property ?? CommonOrderByProperty.CreationOrder) switch
             {
-                CommonOrderByProperty.Id => src.ThenBy(SelectId<T>()),
+                CommonOrderByProperty.CreationOrder => src.ThenBy(SelectId<T>()),
                 CommonOrderByProperty.LastChanged => src.ThenBy(SelectLastChanged<T>()),
                 _ => throw new ArgumentOutOfRangeException()
             };
@@ -107,6 +116,11 @@ namespace Presentation.Web.Extensions
         private static Expression<Func<ItSystemUsage, string>> SelectSystemUsageName()
         {
             return x => x.ItSystem.Name;
+        }
+
+        private static Expression<Func<User, string>> SelectUserLastName()
+        {
+            return x => x.LastName;
         }
     }
 }

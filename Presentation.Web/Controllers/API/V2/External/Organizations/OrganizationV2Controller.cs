@@ -55,6 +55,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         /// <param name="cvrContent">Optional query on CVR number</param>
         /// <param name="nameOrCvrContent">Optional query which will query both name and CVR number using OR logic</param>
         /// <param name="uuid">Optional query by organization uuid</param>
+        /// <param name="orderByProperty">Ordering property</param>
         /// <returns>A list of organizations</returns>
         [HttpGet]
         [Route("organizations")]
@@ -125,6 +126,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         /// <param name="organizationUuid">UUID of the organization</param>
         /// <param name="nameOrEmailQuery">Query by text in name or email</param>
         /// <param name="roleQuery">Query by role assignment</param>
+        /// <param name="orderByProperty">Property to order by</param>
         /// <returns>A list og users in a specific organizational context</returns>
         [HttpGet]
         [Route("organizations/{organizationUuid}/users")]
@@ -137,6 +139,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
             [NonEmptyGuid] Guid organizationUuid,
             string nameOrEmailQuery = null,
             OrganizationUserRole? roleQuery = null,
+            CommonOrderByProperty? orderByProperty = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             var queries = new List<IDomainQuery<User>>();
@@ -149,7 +152,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
 
             return _userService
                 .GetUsersInOrganization(organizationUuid, queries.ToArray())
-                .Select(x => x.OrderBy(user => user.Id))
+                .Select(x => x.OrderUserResults(orderByProperty))
                 .Select(x => x.Page(paginationQuery))
                 .Select(x => x.ToList().Select(user => (organizationUuid, user)).Select(ToUserResponseDTO))
                 .Match(Ok, FromOperationError);
@@ -183,6 +186,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         /// <param name="organizationUuid">UUID of the organization</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
         /// <param name="nameQuery">Query by text in name</param>
+        /// <param name="orderByProperty">Ordering property</param>
         /// <returns>A list og organization unit representations</returns>
         [HttpGet]
         [Route("organizations/{organizationUuid}/organization-units")]
@@ -195,6 +199,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
             [NonEmptyGuid] Guid organizationUuid,
             string nameQuery = null,
             DateTime? changedSinceGtEq = null,
+            CommonOrderByProperty? orderByProperty = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             var queries = new List<IDomainQuery<OrganizationUnit>>();
@@ -207,7 +212,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
 
             return _organizationService
                 .GetOrganizationUnits(organizationUuid, queries.ToArray())
-                .Select(units => units.OrderByDefaultConventions(changedSinceGtEq.HasValue))
+                .Select(units => units.OrderByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty))
                 .Select(units => units.Page(paginationQuery))
                 .Select(units => units.AsEnumerable().Select(ToOrganizationUnitResponseDto).ToList())
                 .Match(Ok, FromOperationError);
