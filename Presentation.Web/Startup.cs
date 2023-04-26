@@ -95,7 +95,7 @@ namespace Presentation.Web
             recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.ScheduleFkOrgUpdates,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchUpdateFkOrgSync(CancellationToken.None)),
-                cronExpression: Cron.Daily(1), // Every night at 01:00
+                cronExpression: Cron.Weekly(DayOfWeek.Monday,3), // Every monday at 3 AM
                 timeZone: TimeZoneInfo.Local);
 
             /******************

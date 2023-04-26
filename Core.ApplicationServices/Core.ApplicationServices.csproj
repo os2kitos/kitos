@@ -196,6 +196,7 @@
     <Compile Include="Model\Organizations\OrganizationUnitRegistrationChangeParameters.cs" />
     <Compile Include="Model\Organizations\OrganizationRemovalConflicts.cs" />
     <Compile Include="Model\Organizations\PaymentChangeParameters.cs" />
+    <Compile Include="Model\Organizations\ReportPendingFkOrganizationChangesToStakeHolders.cs" />
     <Compile Include="Model\Organizations\StsOrganizationSynchronizationDetails.cs" />
     <Compile Include="Model\Organizations\AuthorizedUpdateOrganizationFromFKOrganisationCommand.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
@@ -247,6 +248,7 @@
     <Compile Include="Organizations\Handlers\HandleOrganizationBeingDeleted.cs" />
     <Compile Include="Organizations\Handlers\RemoveOrganizationUnitRegistrationsCommandHandler.cs" />
     <Compile Include="Organizations\Handlers\AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler.cs" />
+    <Compile Include="Organizations\Handlers\ReportPendingFkOrganizationChangesToStakeHoldersHandler.cs" />
     <Compile Include="Organizations\Handlers\SendEmailToStakeholdersOnExternalOrganizationConnectionUpdatedHandler.cs" />
     <Compile Include="Organizations\IOrganizationUnitService.cs" />
     <Compile Include="Organizations\IStsOrganizationSynchronizationService.cs" />

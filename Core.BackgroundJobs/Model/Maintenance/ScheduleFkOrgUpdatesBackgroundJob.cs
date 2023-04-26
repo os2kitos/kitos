@@ -2,12 +2,10 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.Commands;
-using Core.DomainModel.Organization;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Time;
 using Serilog;
@@ -75,7 +73,8 @@ namespace Core.BackgroundJobs.Model.Maintenance
             else
             {
                 var organization = getOrganizationResult.Value;
-                if (organization.StsOrganizationConnection?.SubscribeToUpdates != true)
+                var connection = organization.StsOrganizationConnection;
+                if (connection?.SubscribeToUpdates != true)
                 {
                     _logger.Warning("Sync job for organization with uuid {uuid} ignored since organization no longer subscribes to updates", organizationUuid);
                     return;
@@ -83,16 +82,16 @@ namespace Core.BackgroundJobs.Model.Maintenance
 
                 try
                 {
-                    var command = new AuthorizedUpdateOrganizationFromFKOrganisationCommand(organization, organization.StsOrganizationConnection.SynchronizationDepth.FromNullableValueType(), true, Maybe<ExternalOrganizationUnit>.None);
-                    var error = _commandBus.Execute<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>(command);
+                    var command = new ReportPendingFkOrganizationChangesToStakeHolders(organization,connection);
+                    var error = _commandBus.Execute<ReportPendingFkOrganizationChangesToStakeHolders, Maybe<OperationError>>(command);
                     if (error.HasValue)
                     {
-                        _logger.Error("Error while automatically importing from FK org into org with uuid {uuid}. Error: {error}", organization, error.Select(e => e.ToString()).GetValueOrDefault());
+                        _logger.Error("Error while reporting pending changes from FK org into org with uuid {uuid}. Error: {error}", organization, error.Select(e => e.ToString()).GetValueOrDefault());
                     }
                 }
                 catch (Exception e)
                 {
-                    _logger.Error(e, "Exception during FK Org sync of organization with uuid:{uuid}", organizationUuid);
+                    _logger.Error(e, "Exception during FK Org sync reporting of organization with uuid:{uuid}", organizationUuid);
                 }
             }
         }
