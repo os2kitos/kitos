@@ -98,7 +98,12 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
         private int HandleContractUpdates(CancellationToken token, HashSet<int> alreadyScheduledIds)
         {
-            return ScheduleRootEntityChanges(token, alreadyScheduledIds, PendingReadModelUpdateSourceCategory.ItSystemUsage_Contract, update => _readModelRepository.GetByContractId(update.SourceId));
+            return ScheduleRootEntityChanges(token, alreadyScheduledIds, PendingReadModelUpdateSourceCategory.ItSystemUsage_Contract, update =>
+            {
+                var existingReadModels = _readModelRepository.GetByContractId(update.SourceId).Select(x => x.SourceEntityId).ToList();
+                var currentUsageIds = _itSystemUsageRepository.GetByContractId(update.SourceId).Select(x => x.Id).ToList();
+                return existingReadModels.Concat(currentUsageIds).Distinct().ToList().AsQueryable();
+            });
         }
 
         private int HandleDataProcessingRegistrationUpdates(CancellationToken token, HashSet<int> alreadyScheduledIds)

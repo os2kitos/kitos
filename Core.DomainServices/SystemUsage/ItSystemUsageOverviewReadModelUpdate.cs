@@ -29,6 +29,7 @@ namespace Core.DomainServices.SystemUsage
         private readonly IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> _dependsOnInterfaceReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel> _itSystemUsageUsedByRelationReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewUsingSystemUsageReadModel> _itSystemUsageUsingRelationReadModelRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewItContractReadModel> _itSystemUsageOverviewContractReadModelsRepository;
 
         public ItSystemUsageOverviewReadModelUpdate(
             IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> roleAssignmentRepository,
@@ -40,8 +41,8 @@ namespace Core.DomainServices.SystemUsage
             IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel> itSystemUsageUsedByRelationReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewUsingSystemUsageReadModel> itSystemUsageUsingRelationReadModelRepository,
             IOptionsService<ItSystem, BusinessType> businessTypeService,
-            IGenericRepository<ItSystemUsageOverviewRelevantOrgUnitReadModel> relevantOrgUnitsRepository
-            )
+            IGenericRepository<ItSystemUsageOverviewRelevantOrgUnitReadModel> relevantOrgUnitsRepository, 
+            IGenericRepository<ItSystemUsageOverviewItContractReadModel> itSystemUsageOverviewContractReadModelsRepository)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
             _taskRefRepository = taskRefRepository;
@@ -53,6 +54,7 @@ namespace Core.DomainServices.SystemUsage
             _itSystemUsageUsingRelationReadModelRepository = itSystemUsageUsingRelationReadModelRepository;
             _businessTypeService = businessTypeService;
             _relevantOrgUnitsRepository = relevantOrgUnitsRepository;
+            _itSystemUsageOverviewContractReadModelsRepository = itSystemUsageOverviewContractReadModelsRepository;
         }
 
         public void Apply(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -116,6 +118,37 @@ namespace Core.DomainServices.SystemUsage
                 csv => destination.OutgoingRelatedItSystemUsagesNamesAsCsv = csv,
                 x => x.OutgoingRelatedItSystemUsages,
                 _itSystemUsageUsingRelationReadModelRepository);
+            PatchAssociatedContracts(source, destination);
+        }
+
+        private void PatchAssociatedContracts(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.AssociatedContractsNamesCsv = source
+                .Contracts
+                .OrderBy(x => x.ItContract.Name)
+                .Select(x => x.ItContract.Name)
+                .ToList()
+                .Transform(orderedContractNames => string.Join(", ", orderedContractNames));
+
+            //Update contract collection by mirroring source into destination and deleting the orphans
+            var contractsBefore = destination.AssociatedContracts.ToList();
+            source
+                .Contracts
+                .Select(x => x.ItContract)
+                .Select(x => new ItSystemUsageOverviewItContractReadModel
+                {
+                    ItContractId = x.Id,
+                    ItContractName = x.Name,
+                    ItContractUuid = x.Uuid
+                })
+                .MirrorTo(destination.AssociatedContracts, contract =>
+                    //Create identity that triggers a "diff" if name changes
+                    $"{contract.ItContractUuid}{contract.ItContractName}");
+            var removedContracts = contractsBefore.Except(destination.AssociatedContracts).ToList();
+            if (removedContracts.Any())
+            {
+                _itSystemUsageOverviewContractReadModelsRepository.RemoveRange(removedContracts);
+            }
         }
 
         private static void PatchRelatedItSystemUsages<T>(

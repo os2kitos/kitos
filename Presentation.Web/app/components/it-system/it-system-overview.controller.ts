@@ -97,7 +97,7 @@
                 .withStorageKey(this.storageKey)
                 .withUrlFactory(options => {
                     const commonQuery =
-                        "?$expand=RoleAssignments,DataProcessingRegistrations,DependsOnInterfaces,IncomingRelatedItSystemUsages,OutgoingRelatedItSystemUsages";
+                        "?$expand=RoleAssignments,DataProcessingRegistrations,DependsOnInterfaces,IncomingRelatedItSystemUsages,OutgoingRelatedItSystemUsages,AssociatedContracts";
                     const baseUrl =
                         `/odata/Organizations(${user.currentOrganizationId})/ItSystemUsageOverviewReadModels${commonQuery}`;
                     var additionalQuery = "";
@@ -142,7 +142,9 @@
                             .replace(/(\w+\()IncomingRelatedItSystemUsagesNamesAsCsv(.*\))/,
                                 "IncomingRelatedItSystemUsages/any(c: $1c/ItSystemUsageName$2)")
                             .replace(new RegExp(`RelevantOrganizationUnitNamesAsCsv eq '(\\w+)'`, "i"),
-                                "RelevantOrganizationUnits/any(c: c/OrganizationUnitId eq $1)");
+                                "RelevantOrganizationUnits/any(c: c/OrganizationUnitId eq $1)")
+                            .replace(/(\w+\()AssociatedContractsNamesCsv(.*\))/,
+                                "AssociatedContracts/any(c: $1c/ItContractName$2)")                            ;
 
                         //Concluded has a special case for UNDECIDED | NULL which must be treated the same, so first we replace the expression to point to the collection and then we redefine it
                         const dprUndecidedQuery =
@@ -820,6 +822,20 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentOverflow()
                         .withSourceValueEchoRendering())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("AssociatedContractsNamesCsv")
+                        .withTitle("IT Kontrakter")
+                        .withId("itContracts")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withInitialVisibility(false)
+                        .withContentOverflow()
+                        .withRendering(dataItem => dataItem
+                            .AssociatedContracts
+                            .map(contract => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-contract-link`, "it-contract.edit.main", contract.ItContractId, contract.ItContractName))
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
+                        .withSourceValueEchoExcelOutput()
+                        .withInclusionCriterion(() => user.currentConfig.showItContractModule))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("RiskAssessmentDate")

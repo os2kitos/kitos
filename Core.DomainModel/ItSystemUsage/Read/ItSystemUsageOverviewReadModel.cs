@@ -20,6 +20,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
             IncomingRelatedItSystemUsages = new List<ItSystemUsageOverviewUsedBySystemUsageReadModel>();
             OutgoingRelatedItSystemUsages = new List<ItSystemUsageOverviewUsingSystemUsageReadModel>();
             RelevantOrganizationUnits = new List<ItSystemUsageOverviewRelevantOrgUnitReadModel>();
+            AssociatedContracts = new List<ItSystemUsageOverviewItContractReadModel>();
         }
 
 
@@ -118,5 +119,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public virtual ICollection<ItSystemUsageOverviewUsingSystemUsageReadModel> OutgoingRelatedItSystemUsages { get; set; }
         public string RelevantOrganizationUnitNamesAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewRelevantOrgUnitReadModel> RelevantOrganizationUnits { get; set; }
+        public string AssociatedContractsNamesCsv { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewItContractReadModel> AssociatedContracts { get; set; }
     }
 }

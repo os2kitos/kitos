@@ -70,5 +70,11 @@ namespace Core.DomainServices.Repositories.SystemUsage
                 .AsQueryable()
                 .Where(x => x.AssociatedDataProcessingRegistrations.Select(r => r.Id).Contains(dprId));
         }
+
+        public IQueryable<ItSystemUsage> GetByContractId(int itContractId)
+        {
+            return _itSystemUsageRepository.AsQueryable()
+                .Where(x => x.Contracts.Any(contract => contract.ItContract.Id == itContractId));
+        }
     }
 }

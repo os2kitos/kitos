@@ -181,6 +181,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(false);
 
             Property(x => x.SourceEntityUuid).IsRequired();
+            Property(x => x.AssociatedContractsNamesCsv).IsOptional();
         }
     }
 }
