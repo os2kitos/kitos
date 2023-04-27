@@ -22,6 +22,7 @@ using Presentation.Web.Models.API.V2.Request.Interface;
 using Presentation.Web.Models.API.V2.Response.Interface;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Response.Shared;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
@@ -263,7 +264,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
                 .GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(refinements, rightsHolderUuid)
                 .Match(
                     success => success
-                        .OrderByDefaultConventions(changedSinceGtEq.HasValue)
+                        .OrderApiResultsByDefaultConventions(changedSinceGtEq.HasValue)
                         .Page(pagination)
                         .ToList()
                         .Select(ToRightsHolderItInterfaceResponseDTO)
@@ -382,6 +383,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <param name="nameContains">Filter by contents of the name</param>
         /// <param name="interfaceId">Include only interfaces with an InterfaceId equal to the parameter</param>
         /// <param name="organizationUuid">Query it-interfaces created in a specific organization</param>
+        /// <param name="orderByProperty">Ordering property</param>
         /// <returns></returns>
         [HttpGet]
         [Route("it-interfaces")]
@@ -398,6 +400,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             string nameContains = null,
             string interfaceId = null,
             [NonEmptyGuid] Guid? organizationUuid = null,
+            CommonOrderByProperty? orderByProperty = null,
             [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
@@ -420,18 +423,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             if (usedInOrganizationUuid.HasValue)
                 refinements.Add(new QueryInterfaceByUsedInOrganizationWithUuid(usedInOrganizationUuid.Value));
 
-            if(nameContains != null)
+            if (nameContains != null)
                 refinements.Add(new QueryByPartOfName<ItInterface>(nameContains));
 
-            if(interfaceId != null)
+            if (interfaceId != null)
                 refinements.Add(new QueryByInterfaceId(interfaceId));
 
-            if(organizationUuid.HasValue)
+            if (organizationUuid.HasValue)
                 refinements.Add(new QueryByOrganizationUuid<ItInterface>(organizationUuid.Value));
 
             return _itInterfaceService
                 .GetAvailableInterfaces(refinements.ToArray())
-                .OrderByDefaultConventions(changedSinceGtEq.HasValue)
+                .OrderApiResultsByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
                 .Page(pagination)
                 .ToList()
                 .Select(ToItInterfaceResponseDTO)

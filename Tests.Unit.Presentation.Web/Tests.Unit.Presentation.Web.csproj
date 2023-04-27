@@ -281,6 +281,7 @@
     <Compile Include="Extensions\ItInterfaceExtensions.cs" />
     <Compile Include="Extensions\ItSystemExtensions.cs" />
     <Compile Include="Extensions\OrganizationOwnedObjectExtensions.cs" />
+    <Compile Include="Extensions\QueryableApiResponseOrderingExtensionsTest.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapperTest.cs" />
     <Compile Include="Helpers\DataProcessingRegistrationReadModelTestData.cs" />
     <Compile Include="Helpers\ItSystemUsageOverviewReadModelTestData.cs" />

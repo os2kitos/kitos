@@ -11,6 +11,7 @@ using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystem;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
@@ -40,6 +41,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
         /// <param name="nameEquals">Include only systems with a name equal to the parameter</param>
         /// <param name="nameContains">Include only systems with a name that contains the content in the parameter</param>
+        /// <param name="orderByProperty">Ordering property</param>
         /// <returns></returns>
         [HttpGet]
         [Route("search")]
@@ -57,13 +59,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
             DateTime? changedSinceGtEq = null,
             string nameEquals = null,
             string nameContains = null,
+            CommonOrderByProperty? orderByProperty = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _itSystemService
-                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, nameEquals: nameEquals, nameContains: nameContains, paginationQuery: paginationQuery)
+                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, nameEquals: nameEquals, nameContains: nameContains, orderByProperty: orderByProperty, paginationQuery: paginationQuery)
                 .Select(Map)
                 .Transform(Ok);
         }
