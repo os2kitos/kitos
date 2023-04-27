@@ -90,7 +90,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
 
             return _organizationService
                 .SearchAccessibleOrganizations(onlyWhereUserHasMembership, refinements.ToArray())
-                .OrderResults(orderByProperty)
+                .OrderApiResults(orderByProperty)
                 .Page(pagination)
                 .ToList()
                 .Select(ToDTO)
@@ -152,7 +152,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
 
             return _userService
                 .GetUsersInOrganization(organizationUuid, queries.ToArray())
-                .Select(x => x.OrderUserResults(orderByProperty))
+                .Select(x => x.OrderUserApiResults(orderByProperty))
                 .Select(x => x.Page(paginationQuery))
                 .Select(x => x.ToList().Select(user => (organizationUuid, user)).Select(ToUserResponseDTO))
                 .Match(Ok, FromOperationError);
@@ -212,7 +212,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
 
             return _organizationService
                 .GetOrganizationUnits(organizationUuid, queries.ToArray())
-                .Select(units => units.OrderByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty))
+                .Select(units => units.OrderApiResultsByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty))
                 .Select(units => units.Page(paginationQuery))
                 .Select(units => units.AsEnumerable().Select(ToOrganizationUnitResponseDto).ToList())
                 .Match(Ok, FromOperationError);

@@ -264,7 +264,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
                 .GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(refinements, rightsHolderUuid)
                 .Match(
                     success => success
-                        .OrderByDefaultConventions(changedSinceGtEq.HasValue)
+                        .OrderApiResultsByDefaultConventions(changedSinceGtEq.HasValue)
                         .Page(pagination)
                         .ToList()
                         .Select(ToRightsHolderItInterfaceResponseDTO)
@@ -434,7 +434,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
             return _itInterfaceService
                 .GetAvailableInterfaces(refinements.ToArray())
-                .OrderByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
+                .OrderApiResultsByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
                 .Page(pagination)
                 .ToList()
                 .Select(ToItInterfaceResponseDTO)

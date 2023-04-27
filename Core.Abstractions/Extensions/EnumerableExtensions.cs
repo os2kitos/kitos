@@ -103,10 +103,25 @@ namespace Core.Abstractions.Extensions
             {
                 if (condition(item))
                 {
-                    return item; 
+                    return item;
                 }
             }
             return Maybe<T>.None;
+        }
+
+        /// <summary>
+        /// Returns a maybe of the head and tail of the input enumerble
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="src"></param>
+        /// <returns></returns>
+        public static Maybe<(T head, IEnumerable<T> tail)> MatchHeadAndTail<T>(this IEnumerable<T> src)
+        {
+            if (src == null)
+                return Maybe<(T head, IEnumerable<T> tail)>.None;
+
+            var list = src.ToList();
+            return list.Any() ? (list.First(), list.Skip(1)) : Maybe<(T head, IEnumerable<T> tail)>.None;
         }
     }
 }

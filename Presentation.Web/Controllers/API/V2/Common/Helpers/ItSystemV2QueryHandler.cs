@@ -61,7 +61,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Helpers
                 refinements.Add(new QueryByPartOfName<ItSystem>(nameContains));
 
             return service.GetAvailableSystems(refinements.ToArray())
-                .OrderByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
+                .OrderApiResultsByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
                 .Page(paginationQuery)
                 .ToList();
         }

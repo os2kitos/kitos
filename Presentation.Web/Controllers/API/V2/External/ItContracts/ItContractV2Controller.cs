@@ -101,7 +101,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 
             return _itContractService
                 .Query(conditions.ToArray())
-                .OrderByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
+                .OrderApiResultsByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
                 .Page(paginationQuery)
                 .ToList()
                 .Select(_responseMapper.MapContractDTO)

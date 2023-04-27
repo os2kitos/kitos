@@ -268,7 +268,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             return _rightsHolderSystemService
                 .GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(refinements, rightsHolderUuid)
                 .Select(itSystems => itSystems
-                    .OrderByDefaultConventions(changedSinceGtEq.HasValue)
+                    .OrderApiResultsByDefaultConventions(changedSinceGtEq.HasValue)
                     .Page(paginationQuery)
                     .ToList()
                     .Select(_systemResponseMapper.ToRightsHolderResponseDTO)

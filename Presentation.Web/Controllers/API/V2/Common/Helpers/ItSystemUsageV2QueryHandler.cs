@@ -53,7 +53,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Helpers
 
             return service
                 .Query(conditions.ToArray())
-                .OrderSystemUsageByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
+                .OrderSystemUsageApiResultsByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
                 .Page(paginationQuery).AsEnumerable();
         }
     }
