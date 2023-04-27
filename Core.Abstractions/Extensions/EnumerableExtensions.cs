@@ -110,7 +110,7 @@ namespace Core.Abstractions.Extensions
         }
 
         /// <summary>
-        /// Returns a maybe of the head and tail of the input enumerble
+        /// Returns a maybe of the head and tail of the input enumerable
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="src"></param>
