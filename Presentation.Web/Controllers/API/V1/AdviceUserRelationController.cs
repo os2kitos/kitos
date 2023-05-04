@@ -127,7 +127,7 @@ namespace Presentation.Web.Controllers.API.V1
                 .Bind(ccs => MapRecipients(recipients, RecieverType.RECIEVER)
                     .Select(receivers => (ccs, receivers)))
                 .Bind(result => _registrationNotificationUserRelationsService.UpdateNotificationUserRelations(notificationId, result.ccs, result.receivers, relatedEntityType))
-                .Match(Ok, FromOperationError);
+                .Match(_=>Ok(), FromOperationError);
         }
 
         private static Result<RecipientModel, OperationError> MapRecipients(IEnumerable<AdviceUserRelation> recipients, RecieverType receiverType)
