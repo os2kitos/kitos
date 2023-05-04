@@ -275,7 +275,7 @@ namespace Core.ApplicationServices.Notification
             var recipientList = emailRecipients.ToList();
             return !recipientList.Any() 
                 ? new List<EmailRecipientModel>() 
-                : recipientList.Select(x => new EmailRecipientModel(x.Email));
+                : recipientList.Select(x => new EmailRecipientModel(x.Email)).ToList();
         }
 
         private Result<IEnumerable<RoleRecipientModel>, OperationError> MapRoleRecipients(IEnumerable<RoleRecipientModificationParameters> roleRecipients, RelatedEntityType relatedEntityType)
