@@ -27,6 +27,7 @@ using Presentation.Web.Controllers.API.V2.Common.Helpers;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Presentation.Web.Models.API.V2.SharedProperties;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 {
@@ -73,6 +74,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="systemUuid">Query usages of a specific system</param>
         /// <param name="systemNameContent">Query usages based on system name</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
+        /// <param name="orderByProperty">Ordering property</param>
         /// <returns></returns>
         [HttpGet]
         [Route]
@@ -87,13 +89,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             [NonEmptyGuid] Guid? systemUuid = null,
             string systemNameContent = null,
             DateTime? changedSinceGtEq = null,
+            CommonOrderByProperty? orderByProperty = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _itSystemUsageService
-                .ExecuteItSystemUsagesQuery(organizationUuid, relatedToSystemUuid, relatedToSystemUsageUuid, relatedToContractUuid, systemUuid, systemNameContent, changedSinceGtEq, paginationQuery)
+                .ExecuteItSystemUsagesQuery(organizationUuid, relatedToSystemUuid, relatedToSystemUsageUuid, relatedToContractUuid, systemUuid, systemNameContent, changedSinceGtEq, orderByProperty, paginationQuery)
                 .Select(_responseMapper.MapSystemUsageDTO)
                 .Transform(Ok);
         }

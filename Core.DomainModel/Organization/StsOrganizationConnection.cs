@@ -17,6 +17,14 @@ namespace Core.DomainModel.Organization
             StsOrganizationChangeLogs = new List<StsOrganizationChangeLog>();
         }
 
+        public static StsOrganizationConnection Create(Organization organization)
+        {
+            return new StsOrganizationConnection()
+            {
+                Organization = organization
+            };
+        }
+
         public int OrganizationId { get; set; }
         public virtual Organization Organization { get; set; }
         public bool Connected { get; set; }
@@ -83,6 +91,11 @@ namespace Core.DomainModel.Organization
 
             SynchronizationDepth = synchronizationDepth;
             return Maybe<OperationError>.None;
+        }
+
+        public void UpdateDateOfLatestUpdateBySubscriptionCheck(DateTime timeStamp)
+        {
+            DateOfLatestCheckBySubscription = timeStamp;
         }
 
         public IExternalOrganizationalHierarchyUpdateStrategy GetUpdateStrategy()

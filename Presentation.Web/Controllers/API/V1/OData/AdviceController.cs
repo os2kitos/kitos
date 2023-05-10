@@ -238,7 +238,8 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
             var emailRecipients = recipientList
                 .Where(x => x.RecpientType == RecipientType.USER && x.RecieverType == receiverType)
-                .Select(x => new EmailRecipientModel(x.Email));
+                .Select(x => new EmailRecipientModel(x.Email))
+                .ToList();
             
             return new RecipientModel(emailRecipients, roleRecipientsResult.Value);
         }

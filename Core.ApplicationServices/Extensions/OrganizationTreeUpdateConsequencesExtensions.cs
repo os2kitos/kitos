@@ -1,7 +1,7 @@
-﻿using Core.Abstractions.Types;
+﻿using System;
+using Core.Abstractions.Types;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Context;
-using Core.DomainServices.Time;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,7 +9,7 @@ namespace Core.ApplicationServices.Extensions
 {
     public static class OrganizationTreeUpdateConsequencesExtensions
     {
-        public static ExternalConnectionAddNewLogInput ToLogEntries(this OrganizationTreeUpdateConsequences consequences, Maybe<ActiveUserIdContext> activeUserIdContext, IOperationClock operationClock)
+        public static ExternalConnectionAddNewLogInput ToLogEntries(this OrganizationTreeUpdateConsequences consequences, Maybe<ActiveUserIdContext> activeUserIdContext, DateTime now)
         {
             var changeLogType = ExternalOrganizationChangeLogResponsible.Background;
             int? changeLogUserId = null;
@@ -21,9 +21,8 @@ namespace Core.ApplicationServices.Extensions
             }
 
             var changeLogEntries = consequences.ConvertConsequencesToConsequenceLogs().ToList();
-            var changeLogLogTime = operationClock.Now;
 
-            return new ExternalConnectionAddNewLogInput(changeLogUserId, changeLogType, changeLogLogTime, MapToExternalConnectionAddNewLogEntryInput(changeLogEntries));
+            return new ExternalConnectionAddNewLogInput(changeLogUserId, changeLogType, now, MapToExternalConnectionAddNewLogEntryInput(changeLogEntries));
         }
 
         private static IEnumerable<ExternalConnectionAddNewLogEntryInput> MapToExternalConnectionAddNewLogEntryInput(IEnumerable<StsOrganizationConsequenceLog> entry)

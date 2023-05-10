@@ -1,5 +1,5 @@
-﻿using System;
-using Core.DomainModel.Shared;
+﻿using Core.DomainModel.Shared;
+using System;
 
 namespace Core.DomainModel.ItSystemUsage.Read
 {

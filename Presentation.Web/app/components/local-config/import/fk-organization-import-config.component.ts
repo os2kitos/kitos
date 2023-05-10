@@ -115,11 +115,11 @@
                 if (result.subscribesToUpdates) {
                     newCommands.push({
                         id: "breakSubscription",
-                        text: "Afbryd automatisk import",
+                        text: "Afbryd automatisk tjek for opdateringer",
                         category: CommandCategory.Unsubscribe,
                         enabled: result.canUpdateConnection,
                         onClick: () => {
-                            if (confirm("Afbryd automatisk import af ændringer fra FK Organistion?")) {
+                            if (confirm("Afbryd automatisk tjek for ventende opdateringer fra FK Organistion?")) {
                                 this.busy = true;
                                 this.stsOrganizationSyncService
                                     .unsubscribeFromAutomaticUpdates(this.currentOrganizationUuid)

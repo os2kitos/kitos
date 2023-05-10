@@ -13,6 +13,7 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
@@ -44,6 +45,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         /// <param name="relatedToContractUuid">Query by contracts which are part of a system relation</param>
         /// <param name="systemNameContent">Query usages based on system name</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
+        /// <param name="orderByProperty">Ordering property</param>
         /// <returns></returns>
         ///
         [HttpGet]
@@ -58,13 +60,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
             [NonEmptyGuid] Guid? relatedToContractUuid = null,
             string systemNameContent = null,
             DateTime? changedSinceGtEq = null,
+            CommonOrderByProperty? orderByProperty = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _itSystemUsageService
-                .ExecuteItSystemUsagesQuery(organizationUuid, relatedToSystemUuid, relatedToSystemUsageUuid, relatedToContractUuid, null, systemNameContent, changedSinceGtEq, paginationQuery)
+                .ExecuteItSystemUsagesQuery(organizationUuid, relatedToSystemUuid, relatedToSystemUsageUuid, relatedToContractUuid, null, systemNameContent, changedSinceGtEq, orderByProperty, paginationQuery)
                 .Select(Map)
                 .Transform(Ok);
         }
