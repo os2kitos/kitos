@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" ID="_083d6da3-4cfb-4c63-b5ab-92f1a53db797" entityID="https://saml.adgangsstyring.stoettesystemerne.dk">
   <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
     <KeyDescriptor use="signing">
