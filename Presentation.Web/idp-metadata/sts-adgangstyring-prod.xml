@@ -1,4 +1,4 @@
-<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" ID="_083d6da3-4cfb-4c63-b5ab-92f1a53db797" entityID="https://saml.adgangsstyring.stoettesystemerne.dk">
+<EntityDescriptor ID="_083d6da3-4cfb-4c63-b5ab-92f1a53db797" entityID="https://saml.adgangsstyring.stoettesystemerne.dk" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
   <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
     <KeyDescriptor use="signing">
       <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
@@ -20,18 +20,18 @@
     <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
     <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" />
     <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" />
-    <Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="dk:gov:saml:attribute:KombitSpecVer" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Specification Version">
+    <Attribute Name="dk:gov:saml:attribute:KombitSpecVer" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Specification Version" xmlns="urn:oasis:names:tc:SAML:2.0:assertion">
       <AttributeValue>1.0</AttributeValue>
     </Attribute>
-    <Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="dk:gov:saml:attribute:AssuranceLevel" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Assurance Level">
+    <Attribute Name="dk:gov:saml:attribute:AssuranceLevel" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Assurance Level" xmlns="urn:oasis:names:tc:SAML:2.0:assertion">
       <AttributeValue>2</AttributeValue>
       <AttributeValue>3</AttributeValue>
     </Attribute>
-    <Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="dk:gov:saml:attribute:SpecVer" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Specification Version">
+    <Attribute Name="dk:gov:saml:attribute:SpecVer" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Specification Version" xmlns="urn:oasis:names:tc:SAML:2.0:assertion">
       <AttributeValue>DK-SAML-2.0</AttributeValue>
     </Attribute>
-    <Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="dk:gov:saml:attribute:CvrNumberIdentifier" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="CVR Number Identifier" />
-    <Attribute xmlns="urn:oasis:names:tc:SAML:2.0:assertion" Name="dk:gov:saml:attribute:Privileges_intermediate" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Privileges" />
+    <Attribute Name="dk:gov:saml:attribute:CvrNumberIdentifier" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="CVR Number Identifier" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/>
+    <Attribute Name="dk:gov:saml:attribute:Privileges_intermediate" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Privileges" xmlns="urn:oasis:names:tc:SAML:2.0:assertion"/>
   </IDPSSODescriptor>
   <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
     <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/services/attributeservice/saml2/soap" />
