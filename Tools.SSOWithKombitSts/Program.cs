@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text;
 using System.Xml;
+using dk.nita.saml20;
 
 namespace Tools.SSOWithKombitSts
 {

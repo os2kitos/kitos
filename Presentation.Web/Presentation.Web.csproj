@@ -69,8 +69,8 @@
     <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\packages\Castle.Core.4.4.1\lib\net45\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="dk.nita.saml20, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\dk.nita.saml20.2.0.5\lib\net472\dk.nita.saml20.dll</HintPath>
+    <Reference Include="dk.nita.saml20, Version=3.0.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\dk.nita.saml20.3.0.4\lib\net472\dk.nita.saml20.dll</HintPath>
     </Reference>
     <Reference Include="Elasticsearch.Net, Version=7.0.0.0, Culture=neutral, PublicKeyToken=96c599bbe3e70f5d, processorArchitecture=MSIL">
       <HintPath>..\packages\Elasticsearch.Net.7.8.2\lib\net461\Elasticsearch.Net.dll</HintPath>
@@ -1767,6 +1767,9 @@
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
+    <None Include="Schema\public-extensions-schema.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
       <IsTransformFile>True</IsTransformFile>
