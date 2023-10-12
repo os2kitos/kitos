@@ -301,7 +301,7 @@ namespace Presentation.Web.Ninject
             //STS Organization
             kernel.Bind<IStsOrganizationService>().To<StsOrganizationService>().InCommandScope(Mode);
             kernel.Bind<IStsOrganizationCompanyLookupService>().To<StsOrganizationCompanyLookupService>().InCommandScope(Mode);
-            kernel.Bind<IStsOrganizationUnitService>().To<StsOrganizationUnitService>().InCommandScope(Mode);
+            kernel.Bind<IStsOrganizationUnitService>().To<StsOrganizationSystemService>().InCommandScope(Mode);
             kernel.Bind<IStsOrganizationSynchronizationService>().To<StsOrganizationSynchronizationService>().InCommandScope(Mode);
 
             //Public messages

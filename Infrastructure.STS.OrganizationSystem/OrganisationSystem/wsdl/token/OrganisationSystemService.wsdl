@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="OrganisationSystemService"
+                  targetNamespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/"
+                  xmlns:tns="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/"
+                  xmlns:spf="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/"
+				  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                  xmlns:wsp="http://www.w3.org/ns/ws-policy"
+                  xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/">
+
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy" location="policies.wsdl"/>
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/"
+               location="../../sp/ServiceplatformFaultMessage_1.wsdl"/>
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/">
+      <xsd:include schemaLocation="../../OrganisationSystemServiceMsg.xsd"/>
+      <xsd:import namespace="http://kombit.dk/xml/schemas/RequestHeader/1/"
+                  schemaLocation="../../SF1500_EP_FS9/xsd/common/RequestHeader.xsd"/>
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="FremsoegobjekthierarkiRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="tns:FremsoegobjekthierarkiRequest"/>
+  </wsdl:message>
+  <wsdl:message name="FremsoegobjekthierarkiResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="tns:FremsoegobjekthierarkiResponse"/>
+  </wsdl:message>
+  <wsdl:message name="ImportRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="tns:ImportRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ImportResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="tns:ImportResponse"/>
+  </wsdl:message>
+
+  <wsdl:portType name="OrganisationSystemPortType">
+    <wsdl:operation name="fremsoegobjekthierarki">
+      <wsdl:input message="tns:FremsoegobjekthierarkiRequestMessage"/>
+      <wsdl:output message="tns:FremsoegobjekthierarkiResponseMessage"/>
+      <wsdl:fault message="spf:ServiceplatformFault" name="ServiceplatformFault"/>
+    </wsdl:operation>
+    <wsdl:operation name="import">
+      <wsdl:input message="tns:ImportRequestMessage"/>
+      <wsdl:output message="tns:ImportResponseMessage"/>
+      <wsdl:fault message="spf:ServiceplatformFault" name="ServiceplatformFault"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  
+  <wsdl:binding name="OrganisationSystemBinding" type="tns:OrganisationSystemPortType">
+    <wsp:PolicyReference URI="policies.wsdl#ServiceplatformBindingPolicy"/>
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="fremsoegobjekthierarki">
+      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/fremsoegobjekthierarki"/>
+      <wsdl:input>
+        <soap:header message="tns:FremsoegobjekthierarkiRequestMessage" part="header" use="literal"/>
+        <soap:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:FremsoegobjekthierarkiResponseMessage" part="header" use="literal"/>
+        <soap:body parts="response" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ServiceplatformFault"><soap:fault name="ServiceplatformFault" use="literal" /></wsdl:fault>
+    </wsdl:operation>
+
+    <wsdl:operation name="import">
+      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/import"/>
+      <wsdl:input>
+        <soap:header message="tns:ImportRequestMessage" part="header" use="literal"/>
+        <soap:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:header message="tns:ImportResponseMessage" part="header" use="literal"/>
+        <soap:body parts="response" use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="ServiceplatformFault"><soap:fault name="ServiceplatformFault" use="literal" /></wsdl:fault>
+    </wsdl:operation>
+
+  </wsdl:binding>
+
+  <wsdl:service name="OrganisationSystemService">
+    <wsdl:port name="OrganisationSystemPort" binding="tns:OrganisationSystemBinding">
+      <soap:address location="https://localhost:8080/service/Organisation/OrganisationSystem/5"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

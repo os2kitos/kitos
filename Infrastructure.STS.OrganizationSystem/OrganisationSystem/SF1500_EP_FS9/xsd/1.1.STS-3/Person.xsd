@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        targetNamespace="urn:oio:sts:organisation:person:1.1.3.0"
+        xmlns:oio="urn:oio:definitions:1.0.0"
+        xmlns:person="urn:oio:sts:organisation:person:1.1.3.0"
+        xmlns:orgfaelles="urn:oio:sts:organisation:1.1.3.0"
+        xmlns:sd="urn:oio:sagdok:3.0.0"
+        xmlns:part="urn:oio:sts:part:1.1.3.0"
+        oio:mapping="urn:oio:sagdok:MPD:3.0.0"
+        xmlns:sts="urn:oio:sts:1.1.3.0"
+        >
+
+    <import namespace = "urn:oio:sagdok:3.0.0" schemaLocation="../common/SagDokObjekt.xsd"/>
+    <import namespace = "urn:oio:sts:1.1.3.0" schemaLocation="GenerelleDefinitioner.xsd"/>
+    <import namespace = "urn:oio:sts:part:1.1.3.0" schemaLocation="Part.xsd"/>
+
+    <element name="NavnTekst" type="sts:ShortNavnTekst"  oio:definition="urn:oio:sagdok:shortnavn:ADD:1.0.0"/>
+
+    <element name="Person" type="person:PersonType" oio:definition="urn:oio:sagdok:person:ADD:2.0.0"/>
+    <complexType name="PersonType" oio:definition="urn:oio:sagdok:person:ADD:2.0.0">
+        <complexContent>
+            <extension base="part:PartType">
+			    <sequence>
+			        <element ref="person:Registrering" maxOccurs="unbounded" oio:content="registreringer"/>
+			    </sequence>
+		    </extension>
+	    </complexContent>
+    </complexType>
+
+    <element name="AttributListe" type="person:AttributListeType" oio:definition="urn:oio:sagdok:personattributliste:ADD:2.0.0"/>
+    <complexType name="AttributListeType" oio:definition="urn:oio:sagdok:personattributliste:ADD:2.0.0">
+        <sequence>
+            <element ref="person:Egenskab" minOccurs="0" maxOccurs="unbounded" oio:content="egenskaber"/>
+        </sequence>
+    </complexType>
+
+    <element name="TilstandListe" type="person:TilstandListeType" oio:definition="urn:oio:sagdok:persontilstandliste:ADD:2.0.0"/>
+    <complexType name="TilstandListeType" oio:definition="urn:oio:sagdok:persontilstandliste:ADD:2.0.0">
+        <sequence>
+        </sequence>
+    </complexType>
+
+    <element name="RelationListe" type="person:RelationListeType" oio:definition="urn:oio:sagdok:personrelationliste:ADD:2.0.0"/>
+    <complexType name="RelationListeType" oio:definition="urn:oio:sagdok:personrelationliste:ADD:2.0.0">
+        <sequence>
+        </sequence>
+    </complexType>
+
+    <element name="Registrering" type="person:RegistreringType" oio:definition="urn:oio:sagdok:personregistrering:ADD:2.0.0"/>
+    <complexType name="RegistreringType" oio:definition="urn:oio:sagdok:personregistrering:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:RegistreringType">
+                <sequence>
+                    <element ref="person:AttributListe" oio:content="attributter"/>
+                    <element ref="person:TilstandListe" oio:content="tilstande"/>
+                    <element ref="person:RelationListe" oio:content="relationer"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <element name="Egenskab" type="person:EgenskabType" oio:definition="urn:oio:sagdok:personegenskaber:ADD:1.0.0"/>
+    <complexType name="EgenskabType" oio:definition="urn:oio:sagdok:personegenskaber:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:Virkning" minOccurs="0" oio:content="virkning"/>
+            <element ref="sd:BrugervendtNoegleTekst" minOccurs="0" oio:content="brugervendtnoegle"/>
+            <element ref="sts:CPR-NummerTekst" minOccurs="0" oio:content="cprnr"/>
+            <element ref="person:NavnTekst" minOccurs="0" oio:content="navn"/>
+        </sequence>
+    </complexType>
+
+</schema>

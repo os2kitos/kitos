@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns:cvr="http://rep.oio.dk/cvr.dk/xml/schemas/2005/03/22/" xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://rep.oio.dk/cvr.dk/xml/schemas/2005/03/22/" elementFormDefault="qualified" version="1.1">
+	<element name="CVRnumberIdentifier" type="cvr:CVRnumberIdentifierType">
+		<annotation>
+			<documentation>Unique and generally usable identifier for all legal units included i CVR.
+			</documentation>
+		</annotation>
+	</element>
+	<simpleType name="CVRnumberIdentifierType">
+		<restriction base="string">
+			<length value="8"/>
+		</restriction>
+	</simpleType>
+</schema>

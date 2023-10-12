@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
-using System.Text;
 using Core.Abstractions.Types;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
-using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
+using Infrastructure.STS.OrganizationSystem.OrganisationSystem;
 using Infrastructure.STS.OrganizationUnit.ServiceReference;
 using OrganisationSystem;
 using Serilog;
@@ -19,19 +18,16 @@ using AktoerTypeKodeType = OrganisationSystem.AktoerTypeKodeType;
 using GyldighedStatusKodeType = Infrastructure.STS.OrganizationUnit.ServiceReference.GyldighedStatusKodeType;
 using GyldighedType = Infrastructure.STS.OrganizationUnit.ServiceReference.GyldighedType;
 using ItemChoiceType = Infrastructure.STS.OrganizationUnit.ServiceReference.ItemChoiceType;
-using LivscyklusKodeType = OrganisationSystem.LivscyklusKodeType;
 using OrganisationRelationType = Infrastructure.STS.OrganizationUnit.ServiceReference.OrganisationRelationType;
 using RegistreringType1 = Infrastructure.STS.OrganizationUnit.ServiceReference.RegistreringType1;
 using RelationListeType = Infrastructure.STS.OrganizationUnit.ServiceReference.RelationListeType;
 using SoegInputType1 = Infrastructure.STS.OrganizationUnit.ServiceReference.SoegInputType1;
-using TidspunktType = OrganisationSystem.TidspunktType;
 using TilstandListeType = Infrastructure.STS.OrganizationUnit.ServiceReference.TilstandListeType;
 using UnikIdType = Infrastructure.STS.OrganizationUnit.ServiceReference.UnikIdType;
-using VirkningType = Infrastructure.STS.OrganizationUnit.ServiceReference.VirkningType;
 
 namespace Infrastructure.STS.OrganizationSystem.DomainServices
 {
-    public class StsOrganizationSystemService : IStsOrganizationSystemService
+    public class StsOrganizationSystemService : IStsOrganizationUnitService
     {
         private readonly IStsOrganizationService _organizationService;
         private readonly ILogger _logger;
@@ -71,25 +67,13 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             do
             {
                 currentPage.Clear();
-                var searchRequest = CreateSearchOrgUnitsByOrgUuidRequest(organization.Cvr, organizationStsUuid, pageSize, totalIds.Count);
-                var searchResponse = SearchOrganizationUnits(channel, searchRequest);
 
-                var searchStatusResult = searchResponse.SoegResponse1.SoegOutput.StandardRetur;
-                var stsError = searchStatusResult.StatusKode.ParseStsErrorFromStandardResultCode();
-                if (stsError.HasValue)
-                {
-                    _logger.Error("Failed to search for org units for org with sts uuid: {stsuuid} failed with {code} {message}", organizationStsUuid, searchStatusResult.StatusKode, searchStatusResult.FejlbeskedTekst);
-                    return new DetailedOperationError<ResolveOrganizationTreeError>(OperationFailure.UnknownError, ResolveOrganizationTreeError.FailedSearchingForOrgUnits);
-
-                }
-
-                currentPage = searchResponse.SoegResponse1.SoegOutput.IdListe.ToList();
                 totalIds.AddRange(currentPage);
-
-                var listRequest = CreateOrgHierarchyRequest(organization.Cvr, currentPage.ToArray());
-                var listResponse = LoadOrganizationUnits(channel, listRequest);
-
-                var listStatusResult = listResponse.ListResponse1.ListOutput.StandardRetur;
+                
+                var listRequest = CreateOrgHierarchyRequest(organization.Cvr);
+                var listResponse = LoadOrganizationHierarchy(channel, listRequest);
+                var res = listResponse.FremsoegObjekthierarkiOutput.Organisationer;
+                /*var listStatusResult = listResponse.ListResponse1.ListOutput.StandardRetur;
                 var listStsError = listStatusResult.StatusKode.ParseStsErrorFromStandardResultCode();
                 if (listStsError.HasValue)
                 {
@@ -103,9 +87,9 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
                     .ListOutput
                     .FiltreretOejebliksbillede
                     .Select(snapshot => (new Guid(snapshot.ObjektType.UUIDIdentifikator), snapshot.Registrering.OrderByDescending(x => x.Tidspunkt).FirstOrDefault()))
-                    .Where(x => x.Item2 != null);
+                    .Where(x => x.Item2 != null);*/
 
-                totalResults.AddRange(units);
+                //totalResults.AddRange(units);
 
             } while (currentPage.Count == pageSize);
 
@@ -185,15 +169,10 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             return idToConvertedChildren[root.Item1];
 
         }
-
-        private static soegResponse SearchOrganizationUnits(OrganisationEnhedPortType channel, soegRequest searchRequest)
+        
+        private static fremsoegobjekthierarkiResponse LoadOrganizationHierarchy(OrganisationSystemPortType channel, fremsoegobjekthierarkiRequest request)
         {
-            return new RetriedIntegrationRequest<soegResponse>(() => channel.soeg(searchRequest)).Execute();
-        }
-
-        private static fremsoegobjekthierarkiResponse LoadOrganizationUnits(OrganisationSystemPortType channel, fremsoegobjekthierarkiRequest request)
-        {
-            return new RetriedIntegrationRequest<fremsoegobjekthierarkiResponse>(() => channel.fremsoegobjekthierarkiAsync(request)).Execute();
+            return new RetriedIntegrationRequest<fremsoegobjekthierarkiResponse>(() => channel.fremsoegobjekthierarkiAsync(request).Result).Execute();
         }
 
         private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType1) root, Dictionary<Guid, List<(Guid, RegistreringType1)>> unitsByParent)
@@ -235,22 +214,13 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             }
         }
 
-        public static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(string municipalityCvr, params string[] currentUnitUuids)
+        public static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(string municipalityCvr)
         {
             var listRequest = new fremsoegobjekthierarkiRequest
             {
+                FremsoegobjekthierarkiRequest1 = new FremsoegobjekthierarkiRequestType()
                 FremsoegObjekthierarkiInput = new FremsoegObjekthierarkiInputType()
                 {
-                    SoegRegistrering = new OrganisationSystem.SoegRegistreringType()
-                    {
-                        FraTidspunkt = new TidspunktType(),
-                        LivscyklusKode = LivscyklusKodeType.Opstaaet,
-                        BrugerRef = new OrganisationSystem.UnikIdType() //What is brugerRef
-                        {
-                            Item = municipalityCvr,
-                            ItemElementName = OrganisationSystem.ItemChoiceType.UUIDIdentifikator
-                        }
-                    },
                     OrganisationSoegEgenskab = new OrganisationSystem.EgenskabType()
                     {
                         
@@ -310,9 +280,9 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             };
         }
 
-        private static OrganisationEnhedPortTypeClient CreateClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
+        private static OrganisationSystemPortTypeClient CreateClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
         {
-            return new OrganisationEnhedPortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
+            return new OrganisationSystemPortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
             {
                 ClientCredentials =
                 {
