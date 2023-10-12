@@ -1,0 +1,16 @@
+{
+  "ExtendedData": {
+    "inputs": [
+      "../../wsdl_files/wsdl/OrganisationSystem.wsdl"
+    ],
+    "collectionTypes": [
+      "System.Array",
+      "System.Collections.Generic.Dictionary`2"
+    ],
+    "namespaceMappings": [
+      "*, OrganisationSystem"
+    ],
+    "targetFramework": "netstandard2.1",
+    "typeReuseMode": "All"
+  }
+}

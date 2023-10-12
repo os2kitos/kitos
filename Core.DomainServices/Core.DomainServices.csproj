@@ -97,6 +97,7 @@
     <Compile Include="Notifications\UserNotificationService.cs" />
     <Compile Include="Organizations\IStsOrganizationCompanyLookupService.cs" />
     <Compile Include="Organizations\IStsOrganizationService.cs" />
+    <Compile Include="Organizations\IStsOrganizationSystemService.cs" />
     <Compile Include="Organizations\IStsOrganizationUnitService.cs" />
     <Compile Include="Organizations\OrgUnitService.cs" />
     <Compile Include="Model\StsOrganization\ResolveOrganizationUuidError.cs" />
