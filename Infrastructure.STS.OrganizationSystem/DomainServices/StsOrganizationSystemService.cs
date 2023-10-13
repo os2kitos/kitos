@@ -62,11 +62,11 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
                 totalIds += numberOfReturnedUnits;
                 currentPageSize = numberOfReturnedUnits;
 
-                var convertedUnits = listResponseUnits
+                var unitUuidAndDataList = listResponseUnits
                     .Select(snapshot => (new Guid(snapshot.ObjektType.UUIDIdentifikator), snapshot.Registrering.OrderByDescending(x => x.Tidspunkt).FirstOrDefault()))
                     .Where(x => x.Item2 != null);
 
-                totalResults.AddRange(convertedUnits);
+                totalResults.AddRange(unitUuidAndDataList);
 
             } while (currentPageSize == pageSize);
 
