@@ -17,7 +17,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
 {
     public class AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler : ICommandHandler<AuthorizedUpdateOrganizationFromFKOrganisationCommand, Maybe<OperationError>>
     {
-        private readonly IStsOrganizationUnitService _stsOrganizationUnitService;
+        private readonly IStsOrganizationSystemService _stsOrganizationSystemService;
         private readonly IGenericRepository<OrganizationUnit> _organizationUnitRepository;
         private readonly ILogger _logger;
         private readonly IDomainEvents _domainEvents;
@@ -28,7 +28,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
         private readonly IGenericRepository<StsOrganizationChangeLog> _stsChangeLogRepository;
 
         public AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler(
-            IStsOrganizationUnitService stsOrganizationUnitService,
+            IStsOrganizationSystemService stsOrganizationSystemService,
             IGenericRepository<OrganizationUnit> organizationUnitRepository,
             ILogger logger,
             IDomainEvents domainEvents,
@@ -38,7 +38,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
             IOperationClock operationClock,
             IGenericRepository<StsOrganizationChangeLog> stsChangeLogRepository)
         {
-            _stsOrganizationUnitService = stsOrganizationUnitService;
+            _stsOrganizationSystemService = stsOrganizationSystemService;
             _organizationUnitRepository = organizationUnitRepository;
             _logger = logger;
             _domainEvents = domainEvents;
@@ -59,7 +59,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 //Load the external tree if not already provided
                 var organizationTree = command
                     .PreloadedExternalTree
-                    .Match(tree => tree, () => _stsOrganizationUnitService.ResolveOrganizationTree(organization));
+                    .Match(tree => tree, () => _stsOrganizationSystemService.ResolveOrganizationTree(organization));
                 if (organizationTree.Failed)
                 {
                     var error = organizationTree.Error;

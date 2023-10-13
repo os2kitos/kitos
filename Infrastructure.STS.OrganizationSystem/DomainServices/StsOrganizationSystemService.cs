@@ -16,7 +16,7 @@ using Serilog;
 
 namespace Infrastructure.STS.OrganizationSystem.DomainServices
 {
-    public class StsOrganizationSystemService : IStsOrganizationUnitService
+    public class StsOrganizationSystemService : IStsOrganizationSystemService
     {
         private readonly IStsOrganizationService _organizationService;
         private readonly ILogger _logger;

@@ -21,7 +21,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
     public class ReportPendingFkOrganizationChangesToStakeHoldersHandlerTest : WithAutoFixture
     {
         private readonly ReportPendingFkOrganizationChangesToStakeHoldersHandler _sut;
-        private readonly Mock<IStsOrganizationUnitService> _stsOrgUnitServiceMock;
+        private readonly Mock<IStsOrganizationSystemService> _stsOrgUnitServiceMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly DateTime _now;
         private readonly Mock<IDatabaseControl> _databaseControlMock;
@@ -29,7 +29,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
 
         public ReportPendingFkOrganizationChangesToStakeHoldersHandlerTest()
         {
-            _stsOrgUnitServiceMock = new Mock<IStsOrganizationUnitService>();
+            _stsOrgUnitServiceMock = new Mock<IStsOrganizationSystemService>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _now = DateTime.UtcNow;
             _databaseControlMock = new Mock<IDatabaseControl>();
