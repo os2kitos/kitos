@@ -33,15 +33,6 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
 
         public Result<ExternalOrganizationUnit, DetailedOperationError<ResolveOrganizationTreeError>> ResolveOrganizationTree(Organization organization)
         {
-            //Resolve the org uuid
-            var uuid = _organizationService.ResolveStsOrganizationUuid(organization);
-            if (uuid.Failed)
-            {
-                var error = uuid.Error;
-                _logger.Error("Loading sts organization uuid from org with id: {id} failed with {detailedError} {errorCode} {errorMessage}", organization.Id, error.Detail, error.FailureType, error.Message.GetValueOrFallback(""));
-                return new DetailedOperationError<ResolveOrganizationTreeError>(error.FailureType, ResolveOrganizationTreeError.FailedResolvingUuid, $"{error.Detail}:{error.Message}");
-            }
-
             //Search for org units by org uuid
             using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
 
@@ -49,7 +40,6 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             int currentPageSize;
             var totalIds = 0;
             var totalResults = new List<(Guid, RegistreringType5)>();
-            var organizationStsUuid = uuid.Value;
 
             using var client = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
             var channel = client.ChannelFactory.CreateChannel();
@@ -62,9 +52,8 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
                 var listStsError = listStatusResult.StatusKode.ParseStsErrorFromStandardResultCode();
                 if (listStsError.HasValue)
                 {
-                    _logger.Error("Failed to query org units for org {orgStsUuid} failed with {code} {message}", organizationStsUuid, listStatusResult.StatusKode, listStatusResult.FejlbeskedTekst);
+                    _logger.Error("Failed to query org units for org with cvr {orgCvr} failed with {code} {message}", organization.Cvr, listStatusResult.StatusKode, listStatusResult.FejlbeskedTekst);
                     return new DetailedOperationError<ResolveOrganizationTreeError>(OperationFailure.UnknownError, ResolveOrganizationTreeError.FailedLoadingOrgUnits);
-
                 }
 
                 var listResponseUnits = listResponse.FremsoegobjekthierarkiResponse1.FremsoegObjekthierarkiOutput.OrganisationEnheder;
@@ -220,47 +209,6 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             };
             return listRequest;
         }
-
-        /*public static soegRequest CreateSearchOrgUnitsByOrgUuidRequest(string municipalityCvr, Guid organizationUuid, int pageSize, int skip = 0)
-        {
-            return new soegRequest
-            {
-                SoegRequest1 = new SoegRequestType
-                {
-                    AuthorityContext = new AuthorityContextType
-                    {
-                        MunicipalityCVR = municipalityCvr
-                    },
-                    SoegInput = new SoegInputType1
-                    {
-                        AttributListe = new AttributListeType(), //Required by schema validation
-                        TilstandListe = new TilstandListeType()
-                        {
-                            Gyldighed = new GyldighedType[]
-                            {
-                                new()
-                                {
-                                    GyldighedStatusKode = GyldighedStatusKodeType.Aktiv
-                                }
-                            }
-                        }, //Required by schema validation
-                        RelationListe = new RelationListeType
-                        {
-                            Tilhoerer = new OrganisationRelationType
-                            {
-                                ReferenceID = new UnikIdType
-                                {
-                                    Item = organizationUuid.ToString("D"),
-                                    ItemElementName = ItemChoiceType.UUIDIdentifikator
-                                }
-                            }
-                        },
-                        MaksimalAntalKvantitet = pageSize.ToString("D"),
-                        FoersteResultatReference = skip.ToString("D")
-                    }
-                }
-            };
-        }*/
 
         private static OrganisationSystemPortTypeClient CreateClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
         {
