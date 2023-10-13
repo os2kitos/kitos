@@ -9,21 +9,10 @@ using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
+using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.OrganizationSystem.OrganisationSystem;
-using Infrastructure.STS.OrganizationUnit.ServiceReference;
-using OrganisationSystem;
 using Serilog;
-using AktoerTypeKodeType = OrganisationSystem.AktoerTypeKodeType;
-using GyldighedStatusKodeType = Infrastructure.STS.OrganizationUnit.ServiceReference.GyldighedStatusKodeType;
-using GyldighedType = Infrastructure.STS.OrganizationUnit.ServiceReference.GyldighedType;
-using ItemChoiceType = Infrastructure.STS.OrganizationUnit.ServiceReference.ItemChoiceType;
-using OrganisationRelationType = Infrastructure.STS.OrganizationUnit.ServiceReference.OrganisationRelationType;
-using RegistreringType1 = Infrastructure.STS.OrganizationUnit.ServiceReference.RegistreringType1;
-using RelationListeType = Infrastructure.STS.OrganizationUnit.ServiceReference.RelationListeType;
-using SoegInputType1 = Infrastructure.STS.OrganizationUnit.ServiceReference.SoegInputType1;
-using TilstandListeType = Infrastructure.STS.OrganizationUnit.ServiceReference.TilstandListeType;
-using UnikIdType = Infrastructure.STS.OrganizationUnit.ServiceReference.UnikIdType;
 
 namespace Infrastructure.STS.OrganizationSystem.DomainServices
 {
@@ -56,42 +45,41 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             //Search for org units by org uuid
             using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
 
-            const int pageSize = 500;
-            var totalIds = new List<string>();
-            var totalResults = new List<(Guid, RegistreringType1)>();
-            var currentPage = new List<string>();
+            const int pageSize = 1000;
+            int currentPageSize;
+            var totalIds = 0;
+            var totalResults = new List<(Guid, RegistreringType5)>();
             var organizationStsUuid = uuid.Value;
 
             using var client = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
             var channel = client.ChannelFactory.CreateChannel();
             do
             {
-                currentPage.Clear();
-
-                totalIds.AddRange(currentPage);
-                
-                var listRequest = CreateOrgHierarchyRequest(organization.Cvr);
+                var listRequest = CreateOrgHierarchyRequest(organization.Cvr, pageSize, totalIds);
                 var listResponse = LoadOrganizationHierarchy(channel, listRequest);
-                var res = listResponse.FremsoegObjekthierarkiOutput.Organisationer;
-                /*var listStatusResult = listResponse.ListResponse1.ListOutput.StandardRetur;
+
+                var listStatusResult = listResponse.FremsoegobjekthierarkiResponse1.FremsoegObjekthierarkiOutput.StandardRetur;
                 var listStsError = listStatusResult.StatusKode.ParseStsErrorFromStandardResultCode();
                 if (listStsError.HasValue)
                 {
-                    _logger.Error("Failed to list units for org units for org with sts uuid: {stsuuid} and unit uuids: {uuids} failed with {code} {message}", organizationStsUuid, string.Join(",", currentPage), listStatusResult.StatusKode, listStatusResult.FejlbeskedTekst);
+                    _logger.Error("Failed to query org units for org {orgStsUuid} failed with {code} {message}", organizationStsUuid, listStatusResult.StatusKode, listStatusResult.FejlbeskedTekst);
                     return new DetailedOperationError<ResolveOrganizationTreeError>(OperationFailure.UnknownError, ResolveOrganizationTreeError.FailedLoadingOrgUnits);
 
                 }
 
-                var units = listResponse
-                    .ListResponse1
-                    .ListOutput
-                    .FiltreretOejebliksbillede
+                var listResponseUnits = listResponse.FremsoegobjekthierarkiResponse1.FremsoegObjekthierarkiOutput.OrganisationEnheder;
+                var numberOfReturnedUnits = listResponseUnits.Length;
+
+                totalIds += numberOfReturnedUnits;
+                currentPageSize = numberOfReturnedUnits;
+
+                var convertedUnits = listResponseUnits
                     .Select(snapshot => (new Guid(snapshot.ObjektType.UUIDIdentifikator), snapshot.Registrering.OrderByDescending(x => x.Tidspunkt).FirstOrDefault()))
-                    .Where(x => x.Item2 != null);*/
+                    .Where(x => x.Item2 != null);
 
-                //totalResults.AddRange(units);
+                totalResults.AddRange(convertedUnits);
 
-            } while (currentPage.Count == pageSize);
+            } while (currentPageSize == pageSize);
 
             // Prepare conversion to import tree
             var unitsByUuid = totalResults.ToDictionary(unit => unit.Item1);
@@ -147,13 +135,12 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             while (processingStack.Any())
             {
                 var currentUnitUuid = processingStack.Pop();
-                (Guid, RegistreringType1) unit = unitsByUuid[currentUnitUuid];
+                var (unitUuid, registreringType5) = unitsByUuid[currentUnitUuid];
 
-                var egenskabType = unit.Item2.AttributListe.Egenskab.First(x => string.IsNullOrEmpty(x.EnhedNavn) == false);
-                var unitUuid = unit.Item1;
+                var egenskabType = registreringType5.AttributListe.Egenskab.First(x => string.IsNullOrEmpty(x.EnhedNavn) == false);
                 var organizationUnit = new ExternalOrganizationUnit(unitUuid, egenskabType.EnhedNavn, new Dictionary<string, string>() { { "UserFacingKey", egenskabType.BrugervendtNoegleTekst } }, parentIdToConvertedChildren.ContainsKey(unitUuid) ? parentIdToConvertedChildren[unitUuid] : new List<ExternalOrganizationUnit>(0));
                 idToConvertedChildren[organizationUnit.Uuid] = organizationUnit;
-                var parentUnit = unit.Item2.RelationListe.Overordnet;
+                var parentUnit = registreringType5.RelationListe.Overordnet;
                 if (parentUnit != null)
                 {
                     var parentId = new Guid(parentUnit.ReferenceID.Item);
@@ -175,7 +162,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             return new RetriedIntegrationRequest<fremsoegobjekthierarkiResponse>(() => channel.fremsoegobjekthierarkiAsync(request).Result).Execute();
         }
 
-        private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType1) root, Dictionary<Guid, List<(Guid, RegistreringType1)>> unitsByParent)
+        private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType5) root, Dictionary<Guid, List<(Guid, RegistreringType5)>> unitsByParent)
         {
             var processingStack = new Stack<Guid>();
             processingStack.Push(root.Item1);
@@ -193,7 +180,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             return processingStack;
         }
 
-        private static IEnumerable<Guid> GetSubTree((Guid, RegistreringType1) currentChild, Dictionary<Guid, List<(Guid, RegistreringType1)>> unitsByParent)
+        private static IEnumerable<Guid> GetSubTree((Guid, RegistreringType5) currentChild, Dictionary<Guid, List<(Guid, RegistreringType5)>> unitsByParent)
         {
             var id = currentChild.Item1;
 
@@ -214,32 +201,27 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             }
         }
 
-        public static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(string municipalityCvr)
+        public static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(string municipalityCvr, int pageSize, int skip = 0)
         {
             var listRequest = new fremsoegobjekthierarkiRequest
             {
                 FremsoegobjekthierarkiRequest1 = new FremsoegobjekthierarkiRequestType()
-                FremsoegObjekthierarkiInput = new FremsoegObjekthierarkiInputType()
-                {
-                    OrganisationSoegEgenskab = new OrganisationSystem.EgenskabType()
+                { 
+                    AuthorityContext = new AuthorityContextType()
                     {
-                        
-                        Virkning = new OrganisationSystem.VirkningType
-                        {
-                            AktoerTypeKode = AktoerTypeKodeType.Organisation,
-                            AktoerRef = new OrganisationSystem.UnikIdType
-                            {
-                                Item = municipalityCvr,
-                                ItemElementName = OrganisationSystem.ItemChoiceType.UUIDIdentifikator //should be CVR?
-                            }
-                        }
+                        MunicipalityCVR = municipalityCvr
+                    },
+                    FremsoegObjekthierarkiInput = new FremsoegObjekthierarkiInputType()
+                    {
+                        MaksimalAntalKvantitet = pageSize.ToString("D"),
+                        FoersteResultatReference = skip.ToString("D")
                     }
-                }
+                },
             };
             return listRequest;
         }
 
-        public static soegRequest CreateSearchOrgUnitsByOrgUuidRequest(string municipalityCvr, Guid organizationUuid, int pageSize, int skip = 0)
+        /*public static soegRequest CreateSearchOrgUnitsByOrgUuidRequest(string municipalityCvr, Guid organizationUuid, int pageSize, int skip = 0)
         {
             return new soegRequest
             {
@@ -278,7 +260,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
                     }
                 }
             };
-        }
+        }*/
 
         private static OrganisationSystemPortTypeClient CreateClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
         {

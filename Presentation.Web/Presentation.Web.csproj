@@ -1845,6 +1845,10 @@
       <Project>{09A799FA-3781-419B-AB54-3C76219FD2DE}</Project>
       <Name>Infrastructure.STS.Company</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.STS.OrganizationSystem\Infrastructure.STS.OrganizationSystem.csproj">
+      <Project>{A125252B-4EFF-4123-9895-54AD85AAAEAF}</Project>
+      <Name>Infrastructure.STS.OrganizationSystem</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.STS.OrganizationUnit\Infrastructure.STS.OrganizationUnit.csproj">
       <Project>{77C5BEDB-CC7F-4D6F-BF34-EC72B57C03C8}</Project>
       <Name>Infrastructure.STS.OrganizationUnit</Name>

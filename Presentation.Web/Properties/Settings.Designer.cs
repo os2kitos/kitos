@@ -97,7 +97,7 @@ namespace Presentation.Web.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("exttestprod.serviceplatformen.dk")]
+        [global::System.Configuration.DefaultSettingValueAttribute("prod.serviceplatformen.dk")]
         public string StsOrganisationEndpointHost {
             get {
                 return ((string)(this["StsOrganisationEndpointHost"]));
