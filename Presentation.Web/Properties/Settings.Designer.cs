@@ -88,7 +88,7 @@ namespace Presentation.Web.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("97131f5b34995c74222235bf384c38f80404afd1")]
+        [global::System.Configuration.DefaultSettingValueAttribute("9d4b49c46f7d118c5cf9b4192b6db65e879e0b0f")]
         public string SsoCertificateThumbprint {
             get {
                 return ((string)(this["SsoCertificateThumbprint"]));
@@ -97,7 +97,7 @@ namespace Presentation.Web.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("prod.serviceplatformen.dk")]
+        [global::System.Configuration.DefaultSettingValueAttribute("exttest.serviceplatformen.dk")]
         public string StsOrganisationEndpointHost {
             get {
                 return ((string)(this["StsOrganisationEndpointHost"]));
