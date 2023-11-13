@@ -250,7 +250,6 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUserHasRightsHolderAccessInOrganizationReturns(parentSystem.BelongsToId.Value, true);
             _writeServiceMock.Setup(x => x.Update(itSystem.Uuid, It.IsAny<SystemUpdateParameters>())).Returns(itSystem);
 
-
             //Act
             var result = _sut.CreateNewSystemAsRightsHolder(rightsHolderUuid, inputParameters);
 
@@ -430,6 +429,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
                         p.ExternalReferences == parameters.ExternalReferences &&
                         p.ParentSystemUuid == parameters.ParentSystemUuid &&
                         p.Name == parameters.Name &&
+                        p.ExternalUuid == parameters.ExternalUuid &&
                         p.BusinessTypeUuid == parameters.BusinessTypeUuid &&
                         p.Description == parameters.Description &&
                         p.TaskRefUuids == parameters.TaskRefUuids

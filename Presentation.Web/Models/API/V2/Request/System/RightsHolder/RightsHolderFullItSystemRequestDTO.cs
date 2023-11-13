@@ -18,13 +18,13 @@ namespace Presentation.Web.Models.API.V2.Request.System.RightsHolder
         [Required]
         [NonEmptyGuid]
         public Guid RightsHolderUuid { get; set; }
-
+        
         /// <summary>
-        /// UUID for IT-System
-        /// If no uuid is provided, KITOS will assign one automatically
+        /// External Uuid for IT-System
         /// </summary>
         [NonEmptyGuid]
-        public Guid? Uuid { get; set; }
+        public Guid? ExternalUuid{ get; set; }
+
         /// <summary>
         /// UUID for possible IT-System parent (if any)
         /// </summary>

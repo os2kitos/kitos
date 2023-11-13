@@ -14,6 +14,9 @@ namespace Presentation.Web.Models.API.V2.Request.System.RightsHolder
         [NonEmptyGuid]
         public Guid? ParentUuid { get; set; }
 
+        [NonEmptyGuid]
+        public Guid? ExternalUuid { get; set; }
+
         /// <summary>
         /// Name of IT-System
         /// </summary>

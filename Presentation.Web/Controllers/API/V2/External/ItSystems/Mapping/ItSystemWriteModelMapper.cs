@@ -6,6 +6,7 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.System;
 using Core.DomainModel;
+using Ninject.Activation;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
@@ -25,22 +26,22 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 
         public RightsHolderSystemCreationParameters FromRightsHolderPOST(RightsHolderFullItSystemRequestDTO request)
         {
-            var creationParameters = new RightsHolderSystemCreationParameters { RightsHolderProvidedUuid = request.Uuid };
-            MapCommonChanges(request, creationParameters, true);
+            var creationParameters = new RightsHolderSystemCreationParameters();
+            MapRightsHolderCommonChanges(request, creationParameters, true);
             return creationParameters;
         }
 
         public RightsHolderSystemUpdateParameters FromRightsHolderPUT(RightsHolderFullItSystemRequestDTO request)
         {
             var parameters = new RightsHolderSystemUpdateParameters();
-            MapCommonChanges(request, parameters, true);
+            MapRightsHolderCommonChanges(request, parameters, true);
             return parameters;
         }
 
         public RightsHolderSystemUpdateParameters FromRightsHolderPATCH(RightsHolderUpdateSystemPropertiesRequestDTO request)
         {
             var parameters = new RightsHolderSystemUpdateParameters();
-            MapCommonChanges(request, parameters, false);
+            MapRightsHolderCommonChanges(request, parameters, false);
             return parameters;
         }
 
@@ -100,6 +101,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
                 : OptionalValueChange<string>.None;
 
             return (recommendedArchiveDutyChoice, comment);
+        }
+
+        private void MapRightsHolderCommonChanges(IRightsHolderWritableSystemPropertiesRequestDTO source,
+            SharedSystemUpdateParameters destination, bool enforceResetOnMissingProperty)
+        {
+            var rule = CreateChangeRule<IRightsHolderWritableSystemPropertiesRequestDTO>(enforceResetOnMissingProperty);
+ 
+            destination.ExternalUuid = rule.MustUpdate(x => x.ExternalUuid) ? source.ExternalUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
+            MapCommonChanges(source, destination, enforceResetOnMissingProperty);
         }
 
         private void MapCommonChanges(IItSystemWriteRequestCommonPropertiesDTO source, SharedSystemUpdateParameters destination, bool enforceResetOnMissingProperty)
