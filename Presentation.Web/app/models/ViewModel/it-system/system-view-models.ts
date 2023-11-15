@@ -34,6 +34,7 @@
         readonly businessTypeName: string;
         readonly archiveDuty: IArchiveDuty;
         readonly uuid: string;
+        readonly externalUuid: string;
 
         constructor(itSystem: any) {
             this.name = Helpers.SystemNameFormat.apply(itSystem.name, itSystem.disabled);
@@ -47,6 +48,7 @@
             this.taskRefs = itSystem.taskRefs;
             this.businessTypeName = itSystem.businessTypeName;
             this.uuid = itSystem.uuid;
+            this.externalUuid = itSystem.externalUuid;
             this.disabled = itSystem.disabled;
             this.archiveDuty = this.mapArchiveDuty(itSystem);
             this.accessModifier = Mappers.AccessModifierMapper.mapAccessModifier(itSystem.accessModifier);

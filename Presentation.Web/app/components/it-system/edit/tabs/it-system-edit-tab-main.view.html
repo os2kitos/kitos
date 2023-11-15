@@ -173,6 +173,11 @@
                             <label for="system-uuid" class="control-label small">UUID</label>
                             <input id="system-uuid" type="text" value="{{system.uuid}}" class="form-control input-sm" disabled="disabled" />
                         </div>
+                        <!-- External UUID -->
+                        <div ng-if="system.externalUuid" class="form-group">
+                            <label for="system-external-uuid" class="control-label small">Externt UUID <field-help-text data-key="it-system-external-uuid"></field-help-text></label>
+                            <input id="system-external-uuid" type="text" value="{{system.externalUuid}}" class="form-control input-sm" disabled="disabled" />
+                        </div>
                     </div>
                 </div>
             </div>

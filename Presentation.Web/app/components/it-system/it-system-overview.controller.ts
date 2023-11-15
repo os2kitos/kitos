@@ -332,6 +332,15 @@
                         .withInitialVisibility(false))
                 .withColumn(builder =>
                     builder
+                        .withDataSourceName("ExternalSystemUuid")
+                        .withTitle("IT-System (Externt UUID)")
+                        .withId("externaluuid")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withSourceValueEchoRendering()
+                        .withSourceValueEchoExcelOutput()
+                        .withInitialVisibility(false))
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("ParentItSystemName")
                         .withTitle("Overordnet IT System")
                         .withStandardWidth(170)

@@ -78,7 +78,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             var outgoingRelationItSystem = new ItSystem
             {
                 Id = A<int>(),
-                Name = A<string>()
+                Name = A<string>(),
+                ExternalUuid = A<Guid>()
             };
             var outgoingRelationInterface = new ItInterface
             {
@@ -324,6 +325,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(system.Name, readModel.SystemName);
             Assert.Equal(system.Disabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
+            Assert.Equal(system.ExternalUuid, readModel.ExternalSystemUuid);
             Assert.Equal(system.BelongsTo.Id, readModel.ItSystemRightsHolderId);
             Assert.Equal(system.BelongsTo.Name, readModel.ItSystemRightsHolderName);
             Assert.Equal(system.BusinessType.Id, readModel.ItSystemBusinessTypeId);
