@@ -14,6 +14,8 @@ using Presentation.Web.Infrastructure.Model.Authentication;
 using Presentation.Web.Ninject;
 using Presentation.Web.Infrastructure.Filters;
 using Presentation.Web.Infrastructure;
+using System.Net;
+using System.Net.Security;
 
 [assembly: OwinStartup(typeof(Presentation.Web.Startup))]
 namespace Presentation.Web
@@ -46,7 +48,9 @@ namespace Presentation.Web
             app.Use<DenyModificationsThroughApiMiddleware>();
             app.Use<DenyTooLargeQueriesMiddleware>();
 
-            System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+
+            ServicePointManager.ServerCertificateValidationCallback += (_, _, _, _) => true;
         }
 
         private static void InitializeHangfire(IAppBuilder app)
