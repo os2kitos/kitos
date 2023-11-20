@@ -47,10 +47,6 @@ namespace Presentation.Web
             app.Use<DenyUsersWithoutApiAccessMiddleware>();
             app.Use<DenyModificationsThroughApiMiddleware>();
             app.Use<DenyTooLargeQueriesMiddleware>();
-
-            ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
-
-            ServicePointManager.ServerCertificateValidationCallback += (_, _, _, _) => true;
         }
 
         private static void InitializeHangfire(IAppBuilder app)
