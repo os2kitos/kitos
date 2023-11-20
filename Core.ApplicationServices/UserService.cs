@@ -47,7 +47,7 @@ namespace Core.ApplicationServices
         private readonly IOrganizationalUserContext _organizationalUserContext;
         private readonly ICommandBus _commandBus;
         private static readonly RNGCryptoServiceProvider rngCsp = new();
-        private const string KitosManualsLink = "https://os2.eu/Kitosvejledning";
+        private const string KitosManualsLink = "https://info.kitos.dk/s/qZPox9byHBRsMi2";
 
         public UserService(TimeSpan ttl,
             string baseUrl,
@@ -138,7 +138,7 @@ namespace Core.ApplicationServices
                           "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil.</p>" +
                           "<p>Linket udløber om " + _ttl.TotalDays + " dage. <a href='" + resetLink + "'>Klik her</a>, " +
                           "hvis dit link er udløbet og du vil blive ledt til 'Glemt password' proceduren.</p>" +
-                          "<p><a href='" + KitosManualsLink + "'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
+                          "<p><a href='" + KitosManualsLink + "'>Klik her for at få hjælp, vejledning og inspiration til Kitos</a></p>" +
                           "<p>Bemærk at denne mail ikke kan besvares.</p>";
 
             IssuePasswordReset(user, subject, content);
@@ -163,7 +163,7 @@ namespace Core.ApplicationServices
                               "<p><a href='" + resetLink +
                               "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
                               "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>" +
-                              "<p><a href='" + KitosManualsLink + "'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
+                              "<p><a href='" + KitosManualsLink + "'>Klik her for at få hjælp, vejledning og inspiration til Kitos</a></p>" +
                               "<p>Bemærk at denne mail ikke kan besvares.</p>";
             }
             var mailSubject = "Nulstilning af dit KITOS password" + _mailSuffix;
