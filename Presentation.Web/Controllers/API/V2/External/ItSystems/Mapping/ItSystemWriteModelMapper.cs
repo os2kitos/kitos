@@ -6,7 +6,6 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.System;
 using Core.DomainModel;
-using Ninject.Activation;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
