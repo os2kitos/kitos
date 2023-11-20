@@ -21,6 +21,7 @@ namespace Presentation.Web.Models.API.V2.Request.System.RightsHolder
         
         /// <summary>
         /// External Uuid for IT-System
+        /// Note: When setting ExternalUuid to NULL there's no way to tell if the value was removed or if it was never set.
         /// </summary>
         [NonEmptyGuid]
         public Guid? ExternalUuid{ get; set; }
