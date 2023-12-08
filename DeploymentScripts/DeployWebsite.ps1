@@ -1,6 +1,13 @@
 Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $mailSuffix, $baseUrl, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost, $robotsFileName, $smtpNetworkPort, $smtpNetworkUsername, $smtpNetworkPassword) {
 
     $msdeploy = "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe";
+
+    $kitosSingleQuotes = $kitosDbConnectionString -replace "Password=([^,]+);", "Password='$1';"
+    $convertedKitosConnectionString = $kitosSingleQuotes -replace '"', '""'
+
+    $hangfireSingleQoutes = $hangfireConnectionString -replace "Password=([^,]+);", "Password='$1';"
+    $convertedHangfireConnectionString = $hangfireSingleQoutes -replace '"', '""'
+
     $fullCommand=$(("`"{0}`" " +  
                     "-verb:sync " +
                     "-source:package=`"{1}\Presentation.Web.zip`" " +
@@ -34,7 +41,7 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
                     "-setParam:name=`"SmtpPort`",value=`"{25}`" " +
                     "-setParam:name=`"SmtpUserName`",value=`"{26}`" " +
                     "-setParam:name=`"SmtpPassword`",value=`"{27}`"") `
-    -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost, $robotsFileName, $smtpNetworkPort, $smtpNetworkUsername, $smtpNetworkPassword)
+    -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $convertedKitosConnectionString, $convertedHangfireConnectionString, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost, $robotsFileName, $smtpNetworkPort, $smtpNetworkUsername, $smtpNetworkPassword)
     
     & cmd.exe /C $fullCommand
  
