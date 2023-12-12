@@ -3,10 +3,10 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
     $msdeploy = "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe";
 
     $kitosSingleQuotes = $kitosDbConnectionString -replace "Password=([^,]+);", "Password='$1';"
-    $convertedKitosConnectionString = $kitosSingleQuotes -replace '"', '""'
+    $convertedKitosConnectionString = $$kitosDbConnectionString -replace '"', '""'
 
     $hangfireSingleQoutes = $hangfireConnectionString -replace "Password=([^,]+);", "Password='$1';"
-    $convertedHangfireConnectionString = $hangfireSingleQoutes -replace '"', '""'
+    $convertedHangfireConnectionString = $hangfireConnectionString -replace '"', '""'
 
     $fullCommand=$(("`"{0}`" " +  
                     "-verb:sync " +
