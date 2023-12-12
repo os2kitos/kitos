@@ -39,7 +39,8 @@ namespace Infrastructure.DataAccess
             var base64EncodedString = connectionString.Substring("base64:".Length);
             var base64EncodedBytes = Convert.FromBase64String(base64EncodedString);
             connectionString = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-            return connectionString;
+            System.Configuration.ConfigurationManager.ConnectionStrings["KitosContext"].ConnectionString = connectionString;
+            return "KitosContext";
         }
 
         public KitosContext(string nameOrConnectionString)

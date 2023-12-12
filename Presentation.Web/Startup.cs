@@ -24,6 +24,10 @@ namespace Presentation.Web
         {
             InitializeHangfire(app);
 
+            //Replace value in web.config with the value from the environment variable
+            
+            
+
             // Setup token authentication
             app.UseJwtBearerAuthentication(new Microsoft.Owin.Security.Jwt.JwtBearerAuthenticationOptions
             {
@@ -57,7 +61,8 @@ namespace Presentation.Web
             var base64EncodedString = connectionString.Substring("base64:".Length);
             var base64EncodedBytes = Convert.FromBase64String(base64EncodedString);
             connectionString = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
-            return connectionString;
+            System.Configuration.ConfigurationManager.ConnectionStrings["kitos_HangfireDB"].ConnectionString = connectionString;
+            return "kitos_HangfireDB";
         }
 
         private static void InitializeHangfire(IAppBuilder app)
