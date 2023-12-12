@@ -2,6 +2,12 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
 
     $msdeploy = "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe";
 
+    #Base64 encode $kitosContext variable
+    $kitosContext = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($kitosDbConnectionString))
+
+    #Base64 encode $hangfireConnectionString variable
+    $hangfireConnectionString = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($hangfireConnectionString))
+
     $fullCommand=$(("`"{0}`" " +  
                     "-verb:sync " +
                     "-source:package=`"{1}\Presentation.Web.zip`" " +
@@ -35,7 +41,7 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
                     "-setParam:name=`"SmtpPort`",value=`"{25}`" " +
                     "-setParam:name=`"SmtpUserName`",value=`"{26}`" " +
                     "-setParam:name=`"SmtpPassword`",value=`"{27}`"") `
-    -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost, $robotsFileName, $smtpNetworkPort, $smtpNetworkUsername, $smtpNetworkPassword)
+    -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $kitosContext, $hangfireConnectionString, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost, $robotsFileName, $smtpNetworkPort, $smtpNetworkUsername, $smtpNetworkPassword)
     
     & cmd.exe /C $fullCommand
  

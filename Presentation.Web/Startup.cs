@@ -47,13 +47,26 @@ namespace Presentation.Web
             app.Use<DenyTooLargeQueriesMiddleware>();
         }
 
+        //Create a method that gets kitos_HangfireDB connection string from the web.config file, checks if the variable is base64 encoded, and decodes it if it is encoded
+        private static string GetHangfireConnectionString()
+        {
+            var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["kitos_HangfireDB"].ConnectionString;
+            if (!connectionString.StartsWith("base64:")) 
+                return connectionString;
+            
+            var base64EncodedString = connectionString.Substring("base64:".Length);
+            var base64EncodedBytes = Convert.FromBase64String(base64EncodedString);
+            connectionString = System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+            return connectionString;
+        }
+
         private static void InitializeHangfire(IAppBuilder app)
         {
             // Initializing the Hangfire scheduler
             var standardKernel = new KernelBuilder().ForHangFire().Build();
 
             GlobalConfiguration.Configuration.UseNinjectActivator(standardKernel);
-            GlobalConfiguration.Configuration.UseSqlServerStorage("kitos_HangfireDB");
+            GlobalConfiguration.Configuration.UseSqlServerStorage(GetHangfireConnectionString());
             GlobalJobFilters.Filters.Add(new AdvisSendFailureFilter(standardKernel));
             GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = KitosConstants.MaxHangfireRetries });
 
