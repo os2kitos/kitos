@@ -2,11 +2,11 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
 
     $msdeploy = "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe";
 
-    #Base64 encode $kitosContext variable
-    $kitosContext = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($kitosDbConnectionString))
+    #Base64 encode $kitosContext variable, and add base64: at the beggining
+    $kitosContext = "base64:" + [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($kitosDbConnectionString))
 
-    #Base64 encode $hangfireConnectionString variable
-    $hangfireContext = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($hangfireConnectionString))
+    #Base64 encode $hangfireConnectionString variable, and add base64: at the beggining
+    $hangfireContext = "base64:" + [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($hangfireConnectionString))
 
     $fullCommand=$(("`"{0}`" " +  
                     "-verb:sync " +
