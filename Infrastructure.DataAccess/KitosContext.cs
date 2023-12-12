@@ -32,7 +32,7 @@ namespace Infrastructure.DataAccess
         //Create a method that uses ConfigurationManager to get the connection string from the web.config file, checks if the variable is base64 encoded, and decodes it if it is encoded
         private static string GetConnectionString()
         {
-            var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["KitosContext"].ConnectionString;
+            var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["KitosContext"]?.ConnectionString ?? "KitosContext";
             if (!connectionString.StartsWith("base64:")) 
                 return connectionString;
             

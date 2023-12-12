@@ -50,7 +50,7 @@ namespace Presentation.Web
         //Create a method that gets kitos_HangfireDB connection string from the web.config file, checks if the variable is base64 encoded, and decodes it if it is encoded
         private static string GetHangfireConnectionString()
         {
-            var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["kitos_HangfireDB"].ConnectionString;
+            var connectionString = System.Configuration.ConfigurationManager.ConnectionStrings["kitos_HangfireDB"]?.ConnectionString ?? "kitos_HangfireDB";
             if (!connectionString.StartsWith("base64:")) 
                 return connectionString;
             

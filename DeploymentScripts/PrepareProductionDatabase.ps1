@@ -13,7 +13,5 @@ Setup-Environment -environmentName "production"
 
 #-------------------------------------------------------------
 Write-Host "Running migrations"
-Write-Host "Migrations folder: $Env:MigrationsFolder"
-Write-Host "Connection string: $Env:KitosDbConnectionStringForTeamCity"
 #-------------------------------------------------------------
 Run-DB-Migrations -newDb $false -migrationsFolder "$Env:MigrationsFolder" -connectionString "$Env:KitosDbConnectionStringForTeamCity"
