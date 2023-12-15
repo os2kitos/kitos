@@ -25,10 +25,6 @@ namespace Presentation.Web
         {
             InitializeHangfire(app);
 
-            //Replace value in web.config with the value from the environment variable
-            
-            
-
             // Setup token authentication
             app.UseJwtBearerAuthentication(new Microsoft.Owin.Security.Jwt.JwtBearerAuthenticationOptions
             {
