@@ -64,6 +64,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
         private void MapBaseInformation<T>(ItSystem arg, T dto) where T : BaseItSystemResponseDTO
         {
             dto.Uuid = arg.Uuid;
+            dto.ExternalUuid = arg.ExternalUuid;
             dto.Name = arg.Name;
             dto.RightsHolder = arg.BelongsTo?.Transform(organization => organization.MapShallowOrganizationResponseDTO());
             dto.BusinessType = arg.BusinessType?.Transform(businessType => businessType.MapIdentityNamePairDTO());

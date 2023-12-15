@@ -44,7 +44,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.FromRightsHolderPOST(input);
 
             //Assert
-            Assert.Equal(input.Uuid, output.RightsHolderProvidedUuid);
+            Assert.Equal(input.ExternalUuid, AssertPropertyContainsDataChange(output.ExternalUuid));
             AssertUpdateData(input, output);
         }
 
@@ -58,6 +58,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.FromRightsHolderPUT(input);
 
             //Assert
+            Assert.Equal(input.ExternalUuid, AssertPropertyContainsDataChange(output.ExternalUuid));
             AssertUpdateData(input, output);
         }
 
@@ -71,6 +72,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.FromRightsHolderPATCH(input);
 
             //Assert
+            Assert.Equal(input.ExternalUuid, AssertPropertyContainsDataChange(output.ExternalUuid));
             AssertUpdateData(input, output);
         }
 
