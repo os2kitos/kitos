@@ -403,6 +403,11 @@ namespace Core.ApplicationServices.System
             });
         }
 
+        public Result<ItSystem, OperationError> UpdateExternalUuid(int systemId, Guid? newExternalUuid)
+        {
+            return Mutate(systemId, system => system.ExternalUuid != newExternalUuid, system => system.ExternalUuid = newExternalUuid);
+        }
+
         public Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? newBusinessTypeState)
         {
             if (newBusinessTypeState.HasValue)

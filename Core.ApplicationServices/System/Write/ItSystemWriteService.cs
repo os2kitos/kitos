@@ -186,6 +186,7 @@ namespace Core.ApplicationServices.System.Write
         {
             return system
                 .WithOptionalUpdate(updates.Name, (itSystem, newValue) => _systemService.UpdateName(itSystem.Id, newValue))
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ExternalUuid, (itSystem, newValue) => _systemService.UpdateExternalUuid(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.FormerName, (itSystem, newValue) => _systemService.UpdatePreviousName(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Description, (itSystem, newValue) => _systemService.UpdateDescription(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ExternalReferences, UpdateExternalReferences))

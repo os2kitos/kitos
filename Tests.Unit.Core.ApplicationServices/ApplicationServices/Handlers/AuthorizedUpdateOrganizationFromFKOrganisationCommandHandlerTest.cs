@@ -25,7 +25,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
     {
         private readonly DateTime _now = DateTime.Now;
         private AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler _sut;
-        private Mock<IStsOrganizationUnitService> _stsOrganizationUnitService;
+        private Mock<IStsOrganizationSystemService> _stsOrganizationUnitService;
         private Mock<IGenericRepository<OrganizationUnit>> _organizationUnitRepositoryMock;
         private Mock<IDomainEvents> _domainEventsMock;
         private Mock<IDatabaseControl> _databaseControlMock;
@@ -364,7 +364,7 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
 
         private void CreateSut(Maybe<ActiveUserIdContext> activeUserId)
         {
-            _stsOrganizationUnitService = new Mock<IStsOrganizationUnitService>();
+            _stsOrganizationUnitService = new Mock<IStsOrganizationSystemService>();
             _organizationUnitRepositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _databaseControlMock = new Mock<IDatabaseControl>();

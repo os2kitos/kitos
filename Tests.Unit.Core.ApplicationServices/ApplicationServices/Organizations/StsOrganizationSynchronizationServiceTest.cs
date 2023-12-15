@@ -29,7 +29,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
     {
         private readonly ITestOutputHelper _testOutputHelper;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
-        private readonly Mock<IStsOrganizationUnitService> _stsOrganizationUnitService;
+        private readonly Mock<IStsOrganizationSystemService> _stsOrganizationUnitService;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly StsOrganizationSynchronizationService _sut;
         private readonly Mock<IDatabaseControl> _dbControlMock;
@@ -44,7 +44,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         {
             _testOutputHelper = testOutputHelper;
             _authorizationContextMock = new Mock<IAuthorizationContext>();
-            _stsOrganizationUnitService = new Mock<IStsOrganizationUnitService>();
+            _stsOrganizationUnitService = new Mock<IStsOrganizationSystemService>();
             _organizationServiceMock = new Mock<IOrganizationService>();
             _dbControlMock = new Mock<IDatabaseControl>();
             _transactionManagerMock = new Mock<ITransactionManager>();

@@ -253,6 +253,7 @@ namespace Core.ApplicationServices.RightsHolders
             var updateParameters = new SystemUpdateParameters
             {
                 Name = parameters.Name,
+                ExternalUuid = parameters.ExternalUuid,
                 ExternalReferences = parameters.ExternalReferences,
                 ParentSystemUuid = parameters.ParentSystemUuid,
                 FormerName = parameters.FormerName,

@@ -61,6 +61,7 @@ namespace Core.DomainServices.SystemUsage
         {
             destination.SourceEntityId = source.Id;
             destination.SourceEntityUuid = source.Uuid;
+            destination.ExternalSystemUuid = source.ItSystem.ExternalUuid;
             destination.OrganizationId = source.OrganizationId;
             destination.SystemName = source.ItSystem.Name;
             destination.ItSystemDisabled = source.ItSystem.Disabled;
