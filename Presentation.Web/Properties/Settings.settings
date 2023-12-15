@@ -24,7 +24,7 @@
       <Value Profile="(Default)">true</Value>
     </Setting>
     <Setting Name="SsoCertificateThumbprint" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">9d4b49c46f7d118c5cf9b4192b6db65e879e0b0f</Value>
+      <Value Profile="(Default)">5a96f4868fb67ef4829a91588a0cf0de4d2290ea</Value>
     </Setting>
     <Setting Name="StsOrganisationEndpointHost" Type="System.String" Scope="Application">
       <Value Profile="(Default)">exttest.serviceplatformen.dk</Value>

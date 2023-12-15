@@ -88,7 +88,7 @@ namespace Presentation.Web.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("9d4b49c46f7d118c5cf9b4192b6db65e879e0b0f")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5a96f4868fb67ef4829a91588a0cf0de4d2290ea")]
         public string SsoCertificateThumbprint {
             get {
                 return ((string)(this["SsoCertificateThumbprint"]));
