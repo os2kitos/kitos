@@ -14,6 +14,8 @@ using Presentation.Web.Infrastructure.Model.Authentication;
 using Presentation.Web.Ninject;
 using Presentation.Web.Infrastructure.Filters;
 using Presentation.Web.Infrastructure;
+using System.Net;
+using System.Net.Security;
 
 [assembly: OwinStartup(typeof(Presentation.Web.Startup))]
 namespace Presentation.Web

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:bruger="urn:oio:sts:organisation:bruger:1.1.3.0" xmlns:sd="urn:oio:sagdok:3.0.0" xmlns:orgfaelles="urn:oio:sts:organisation:1.1.3.0" xmlns:oio="urn:oio:definitions:1.0.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:oio:sts:organisation:bruger:1.1.3.0" oio:mapping="urn:oio:sagdok:MPD:3.0.0" xmlns="http://www.w3.org/2001/XMLSchema">
+  <import schemaLocation="OrganisationFaelles.xsd" namespace="urn:oio:sts:organisation:1.1.3.0" />
+  <import schemaLocation="../common/SagDokObjekt.xsd" namespace="urn:oio:sagdok:3.0.0" />
+  <element oio:definition="urn:oio:sagdok:bruger:ADD:2.0.0" name="Bruger" type="bruger:BrugerType" />
+  <complexType oio:definition="urn:oio:sagdok:bruger:ADD:2.0.0" name="BrugerType">
+    <complexContent mixed="false">
+      <extension base="orgfaelles:AktoerType">
+        <sequence>
+          <element oio:content="registreringer" maxOccurs="unbounded" ref="bruger:Registrering" />
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <element oio:definition="urn:oio:sagdok:brugerattributliste:ADD:2.0.0" name="AttributListe" type="bruger:AttributListeType" />
+  <complexType oio:definition="urn:oio:sagdok:brugerattributliste:ADD:2.0.0" name="AttributListeType">
+    <sequence>
+      <element oio:content="egenskaber" minOccurs="0" maxOccurs="unbounded" ref="bruger:Egenskab" />
+      <element oio:content="lokaludvidelse" minOccurs="0" ref="sd:LokalUdvidelse" />
+    </sequence>
+  </complexType>
+  <element oio:definition="urn:oio:sagdok:brugertilstandliste:ADD:2.0.0" name="TilstandListe" type="bruger:TilstandListeType" />
+  <complexType oio:definition="urn:oio:sagdok:brugertilstandliste:ADD:2.0.0" name="TilstandListeType">
+    <sequence>
+      <element oio:content="gyldighed" minOccurs="0" maxOccurs="unbounded" ref="orgfaelles:Gyldighed" />
+      <element oio:content="lokaludvidelse" minOccurs="0" ref="sd:LokalUdvidelse" />
+    </sequence>
+  </complexType>
+  <element oio:definition="urn:oio:sagdok:brugerrelationliste:ADD:2.0.0" name="RelationListe" type="bruger:RelationListeType" />
+  <complexType oio:definition="urn:oio:sagdok:brugerrelationliste:ADD:2.0.0" name="RelationListeType">
+    <sequence>
+      <element oio:content="adresser" minOccurs="0" maxOccurs="unbounded" ref="sd:Adresser" />
+      <element oio:content="brugertyper" minOccurs="0" maxOccurs="unbounded" ref="sd:BrugerTyper" />
+      <element oio:content="opgaver" minOccurs="0" maxOccurs="unbounded" ref="sd:Opgaver" />
+      <element oio:content="tilhoerer" minOccurs="0" ref="sd:Tilhoerer" />
+      <element oio:content="tilknyttedeenheder" minOccurs="0" maxOccurs="unbounded" ref="sd:TilknyttedeEnheder" />
+      <element oio:content="tilknyttedefunktioner" minOccurs="0" maxOccurs="unbounded" ref="sd:TilknyttedeFunktioner" />
+      <element oio:content="tilknyttedeinteressefaellesskaber" minOccurs="0" maxOccurs="unbounded" ref="sd:TilknyttedeInteressefaellesskaber" />
+      <element oio:content="tilknyttedeorganisationer" minOccurs="0" maxOccurs="unbounded" ref="sd:TilknyttedeOrganisationer" />
+      <element oio:content="tilknyttedepersoner" minOccurs="0" maxOccurs="unbounded" ref="sd:TilknyttedePersoner" />
+      <element oio:content="tilknyttedeitsystemer" minOccurs="0" maxOccurs="unbounded" ref="sd:TilknyttedeItSystemer" />
+      <element oio:content="lokaludvidelse" minOccurs="0" ref="sd:LokalUdvidelse" />
+    </sequence>
+  </complexType>
+  <element oio:definition="urn:oio:sagdok:brugerregistrering:ADD:2.0.0" name="Registrering" type="bruger:RegistreringType" />
+  <complexType oio:definition="urn:oio:sagdok:brugerregistrering:ADD:2.0.0" name="RegistreringType">
+    <complexContent mixed="false">
+      <extension base="sd:RegistreringType">
+        <sequence>
+          <element oio:content="attributter" ref="bruger:AttributListe" />
+          <element oio:content="tilstande" ref="bruger:TilstandListe" />
+          <element oio:content="relationer" ref="bruger:RelationListe" />
+        </sequence>
+      </extension>
+    </complexContent>
+  </complexType>
+  <element oio:definition="urn:oio:sagdok:brugeregenskaber:ADD:1.0.0" name="Egenskab" type="bruger:EgenskabType" />
+  <complexType oio:definition="urn:oio:sagdok:brugeregenskaber:ADD:1.0.0" name="EgenskabType">
+    <sequence>
+      <element oio:content="virkning" minOccurs="0" ref="sd:Virkning" />
+      <element oio:content="brugervendtnoegle" minOccurs="0" ref="sd:BrugervendtNoegleTekst" />
+      <element oio:content="brugernavn" minOccurs="0" ref="sd:BrugerNavn" />
+      <element oio:content="brugertype" minOccurs="0" ref="sd:BrugerTypeTekst" />
+    </sequence>
+  </complexType>
+</schema>
