@@ -16,7 +16,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
     public class ReportPendingFkOrganizationChangesToStakeHoldersHandler : ICommandHandler<ReportPendingFkOrganizationChangesToStakeHolders, Maybe<OperationError>>
 
     {
-        private readonly IStsOrganizationUnitService _stsOrganizationUnitService;
+        private readonly IStsOrganizationSystemService _stsOrganizationSystemService;
         private readonly ILogger _logger;
         private readonly ITransactionManager _transactionManager;
         private readonly IOperationClock _operationClock;
@@ -24,14 +24,14 @@ namespace Core.ApplicationServices.Organizations.Handlers
         private readonly IDomainEvents _domainEvents;
 
         public ReportPendingFkOrganizationChangesToStakeHoldersHandler(
-            IStsOrganizationUnitService stsOrganizationUnitService,
+            IStsOrganizationSystemService stsOrganizationSystemService,
             ILogger logger,
             ITransactionManager transactionManager,
             IOperationClock operationClock,
             IDatabaseControl databaseControl,
             IDomainEvents domainEvents)
         {
-            _stsOrganizationUnitService = stsOrganizationUnitService;
+            _stsOrganizationSystemService = stsOrganizationSystemService;
             _logger = logger;
             _transactionManager = transactionManager;
             _operationClock = operationClock;
@@ -46,7 +46,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
             //Load the external tree if not already provided
             var organization = command.Organization;
             var connection = command.Connection;
-            var organizationTree = _stsOrganizationUnitService.ResolveOrganizationTree(organization);
+            var organizationTree = _stsOrganizationSystemService.ResolveOrganizationTree(organization);
 
             if (organizationTree.Failed)
             {

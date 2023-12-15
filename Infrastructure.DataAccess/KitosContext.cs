@@ -22,13 +22,14 @@ using Core.DomainModel.SSO;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Tracking;
 using Core.DomainModel.UIConfiguration;
+using Infrastructure.DataAccess.Tools;
 
 namespace Infrastructure.DataAccess
 {
     public class KitosContext : DbContext
     {
-        public KitosContext() : this("KitosContext") { }
-
+        public KitosContext() : this(ConnectionStringTools.GetConnectionString("KitosContext")) { }
+        
         public KitosContext(string nameOrConnectionString)
             : base(nameOrConnectionString)
         {

@@ -23,7 +23,7 @@ namespace Core.ApplicationServices.Organizations
 {
     public class StsOrganizationSynchronizationService : IStsOrganizationSynchronizationService
     {
-        private readonly IStsOrganizationUnitService _stsOrganizationUnitService;
+        private readonly IStsOrganizationSystemService _stsOrganizationSystemService;
         private readonly IOrganizationService _organizationService;
         private readonly ILogger _logger;
         private readonly IStsOrganizationService _stsOrganizationService;
@@ -38,7 +38,7 @@ namespace Core.ApplicationServices.Organizations
 
         public StsOrganizationSynchronizationService(
             IAuthorizationContext authorizationContext,
-            IStsOrganizationUnitService stsOrganizationUnitService,
+            IStsOrganizationSystemService stsOrganizationSystemService,
             IOrganizationService organizationService,
             ILogger logger,
             IStsOrganizationService stsOrganizationService,
@@ -50,7 +50,7 @@ namespace Core.ApplicationServices.Organizations
             IOperationClock operationClock,
             ICommandBus commandBus)
         {
-            _stsOrganizationUnitService = stsOrganizationUnitService;
+            _stsOrganizationSystemService = stsOrganizationSystemService;
             _organizationService = organizationService;
             _logger = logger;
             _stsOrganizationService = stsOrganizationService;
@@ -188,7 +188,7 @@ namespace Core.ApplicationServices.Organizations
 
         private Result<ExternalOrganizationUnit, OperationError> LoadOrganizationUnits(Organization organization)
         {
-            return _stsOrganizationUnitService.ResolveOrganizationTree(organization).Match<Result<ExternalOrganizationUnit, OperationError>>(root => root, detailedOperationError => new OperationError($"Failed to load organization tree:{detailedOperationError.Detail:G}:{detailedOperationError.FailureType:G}:{detailedOperationError.Message}", detailedOperationError.FailureType));
+            return _stsOrganizationSystemService.ResolveOrganizationTree(organization).Match<Result<ExternalOrganizationUnit, OperationError>>(root => root, detailedOperationError => new OperationError($"Failed to load organization tree:{detailedOperationError.Detail:G}:{detailedOperationError.FailureType:G}:{detailedOperationError.Message}", detailedOperationError.FailureType));
         }
 
         private Result<Organization, OperationError> GetOrganizationWithImportPermission(Guid organizationId)

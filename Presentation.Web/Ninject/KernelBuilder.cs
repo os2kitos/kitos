@@ -113,7 +113,6 @@ using Core.DomainServices.Repositories.UICustomization;
 using Core.DomainServices.Tracking;
 using Infrastructure.STS.Company.DomainServices;
 using Infrastructure.STS.Organization.DomainServices;
-using Infrastructure.STS.OrganizationUnit.DomainServices;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using System.Linq;
@@ -130,6 +129,7 @@ using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
 using Core.ApplicationServices.Generic;
+using Infrastructure.STS.OrganizationSystem.DomainServices;
 
 namespace Presentation.Web.Ninject
 {
@@ -301,7 +301,7 @@ namespace Presentation.Web.Ninject
             //STS Organization
             kernel.Bind<IStsOrganizationService>().To<StsOrganizationService>().InCommandScope(Mode);
             kernel.Bind<IStsOrganizationCompanyLookupService>().To<StsOrganizationCompanyLookupService>().InCommandScope(Mode);
-            kernel.Bind<IStsOrganizationUnitService>().To<StsOrganizationUnitService>().InCommandScope(Mode);
+            kernel.Bind<IStsOrganizationSystemService>().To<StsOrganizationSystemService>().InCommandScope(Mode);
             kernel.Bind<IStsOrganizationSynchronizationService>().To<StsOrganizationSynchronizationService>().InCommandScope(Mode);
 
             //Public messages
