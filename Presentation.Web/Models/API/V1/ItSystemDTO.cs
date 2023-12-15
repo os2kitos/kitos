@@ -12,6 +12,7 @@ namespace Presentation.Web.Models.API.V1
         }
 
         public int Id { get; set; }
+        public Guid? ExternalUuid { get; set; }
         public Guid Uuid { get; set; }
         public int? ParentId { get; set; }
         public string ParentName { get; set; }

@@ -16,6 +16,12 @@ namespace Presentation.Web.Models.API.V2.Response.System
         [Required]
         public Guid Uuid { get; set; }
 
+
+        /// <summary>
+        /// External Uuid for IT-System
+        /// </summary>
+        public Guid? ExternalUuid { get; set; }
+
         /// <summary>
         /// UUID for possible IT-System parent (if any)
         /// </summary>

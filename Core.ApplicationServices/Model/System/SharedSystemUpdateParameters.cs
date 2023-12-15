@@ -9,6 +9,7 @@ namespace Core.ApplicationServices.Model.System
     public abstract class SharedSystemUpdateParameters
     {
         public OptionalValueChange<string> Name { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<Guid?> ExternalUuid { get; set; } = OptionalValueChange<Guid?>.None;
         public OptionalValueChange<Guid?> ParentSystemUuid { get; set; } = OptionalValueChange<Guid?>.None;
         public OptionalValueChange<string> FormerName { get; set; } = OptionalValueChange<string>.None;
         public OptionalValueChange<string> Description { get; set; } = OptionalValueChange<string>.None;

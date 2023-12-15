@@ -462,6 +462,23 @@
                         }
                     },
                     {
+                        field: "ExternalUuid",
+                        title: "IT-System (Eksternt UUID)",
+                        width: 150,
+                        persistId: "externaluuid",
+                        attributes: { "class": "might-overflow" },
+                        excelTemplate: dataItem => dataItem.ExternalUuid != null ? dataItem.ExternalUuid : "",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
                         field: "AccessModifier",
                         title: "Synlighed",
                         width: 120,
