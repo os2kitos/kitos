@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.System;
@@ -82,7 +83,8 @@ namespace Presentation.Web.Controllers.API.V1
         {
             try
             {
-                var systemQuery = _systemService.GetAvailableSystems(organizationId, q);
+                var decodedQuery = HttpUtility.UrlDecode(q);
+                var systemQuery = _systemService.GetAvailableSystems(organizationId, decodedQuery);
 
                 var query = Page(systemQuery, paging)
                     .AsEnumerable()
@@ -102,15 +104,15 @@ namespace Presentation.Web.Controllers.API.V1
         {
             try
             {
+                var decodedQuery = HttpUtility.UrlDecode(q);
                 var systems = _systemService
-                    .GetAvailableSystems(orgId, q)
+                    .GetAvailableSystems(orgId, decodedQuery)
                     .ExceptEntitiesWithIds(excludeId)
-                    .OrderBy(_ => _.Name)
+                    .OrderBy(system => system.Name)
                     .Take(take)
                     .AsEnumerable()
                     .Select(system => system.MapToNamedEntityWithEnabledStatusDTO())
                     .ToList();
-
 
                 return Ok(systems);
             }
