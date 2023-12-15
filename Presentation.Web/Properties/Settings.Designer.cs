@@ -12,7 +12,7 @@ namespace Presentation.Web.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.4.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -88,7 +88,7 @@ namespace Presentation.Web.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("9d4b49c46f7d118c5cf9b4192b6db65e879e0b0f")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5a96f4868fb67ef4829a91588a0cf0de4d2290ea")]
         public string SsoCertificateThumbprint {
             get {
                 return ((string)(this["SsoCertificateThumbprint"]));
