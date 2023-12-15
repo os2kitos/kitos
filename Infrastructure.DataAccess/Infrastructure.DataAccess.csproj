@@ -49,6 +49,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
@@ -1061,6 +1062,7 @@
     <Compile Include="Services\PocoTypeFromProxyResolver.cs" />
     <Compile Include="Services\WithinAmbienTransaction.cs" />
     <Compile Include="Services\TransactionManager.cs" />
+    <Compile Include="Tools\ConnectionStringTools.cs" />
     <Compile Include="Tools\SqlMigrationScriptRepository.cs" />
     <Compile Include="TypeConfigurationExtensions.cs" />
     <Compile Include="TypeMapping.cs" />
