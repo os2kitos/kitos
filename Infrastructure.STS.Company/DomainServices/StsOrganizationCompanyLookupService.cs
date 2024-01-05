@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
 using Core.Abstractions.Types;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Organizations;
@@ -43,14 +44,14 @@ namespace Infrastructure.STS.Company.DomainServices
             {
                 var response = GetSearchResponse(channel, request);
 
-                var statusResult = response.SoegResponse1.SoegOutput.StandardRetur;
+                var statusResult = response.SoegOutput.StandardRetur;
                 var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
                 if (stsError.HasValue)
                 {
                     return new DetailedOperationError<StsError>(OperationFailure.UnknownError, stsError.Value, $"Error resolving the organization company from STS:{statusResult.StatusKode}:{statusResult.FejlbeskedTekst}");
                 }
 
-                var ids = response.SoegResponse1.SoegOutput.IdListe;
+                var ids = response.SoegOutput.IdListe;
                 if (ids.Length != 1)
                 {
                     return new DetailedOperationError<StsError>(OperationFailure.UnknownError, StsError.Unknown, $"Error resolving the organization company from STS. Expected a single UUID but got:{string.Join(",", ids)}");
@@ -58,9 +59,9 @@ namespace Infrastructure.STS.Company.DomainServices
 
                 return new Guid(ids.Single());
             }
-            catch (FaultException<ServiceplatformFaultType> spFault)
+            catch (FaultException<MessageFault> spFault)
             {
-                var knownStsError = spFault.Detail.ErrorList.Select(error => error.ErrorCode.ParseStsFromErrorCode()).FirstOrDefault(x => x.HasValue);
+                var knownStsError = spFault.Detail.Reason.ToString().ParseStsFromErrorCode();
                 var stsError = knownStsError.GetValueOrFallback(StsError.Unknown);
                 var operationFailure =
                     stsError is StsError.MissingServiceAgreement or StsError.ExistingServiceAgreementIssue
@@ -86,24 +87,17 @@ namespace Infrastructure.STS.Company.DomainServices
         {
             return new soegRequest
             {
-                SoegRequest1 = new SoegRequestType
+                SoegInput = new SoegInputType1
                 {
-                    AuthorityContext = new AuthorityContextType
+                    RelationListe = new RelationListeType(),
+                    FoersteResultatReference = "0",
+                    MaksimalAntalKvantitet = "2",
+                    SoegRegistrering = new SoegRegistreringType(),
+                    TilstandListe = new TilstandListeType(),
+                    AttributListe = new[]{new EgenskabType
                     {
-                        MunicipalityCVR = organization.Cvr
-                    },
-                    SoegInput = new SoegInputType1
-                    {
-                        RelationListe = new RelationListeType(),
-                        FoersteResultatReference = "0",
-                        MaksimalAntalKvantitet = "2",
-                        SoegRegistrering = new SoegRegistreringType(),
-                        TilstandListe = new TilstandListeType(),
-                        AttributListe = new[]{new EgenskabType
-                        {
-                            CVRNummerTekst = organization.Cvr
-                        }}
-                    }
+                        CVRNummerTekst = organization.Cvr
+                    }}
                 }
             };
         }

@@ -7,19 +7,12 @@ namespace Core.DomainServices.SSO
 {
     internal static class StsBrugerHelpers
     {
-        public static laesRequest CreateStsBrugerLaesRequest(string municipalityCvr, Guid uuid)
+        public static laesRequest CreateStsBrugerLaesRequest(Guid uuid)
         {
             var laesInputType = new LaesInputType {UUIDIdentifikator = uuid.ToString()};
             var laesRequest = new laesRequest
             {
-                LaesRequest1 = new LaesRequestType
-                {
-                    LaesInput = laesInputType,
-                    AuthorityContext = new AuthorityContextType
-                    {
-                        MunicipalityCVR = municipalityCvr 
-                    }
-                }
+                LaesInput = laesInputType,
             };
             return laesRequest;
         }

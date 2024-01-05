@@ -39,16 +39,16 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             const int pageSize = 1000;
             int currentPageSize;
             var totalIds = 0;
-            var totalResults = new List<(Guid, RegistreringType5)>();
+            var totalResults = new List<(Guid, RegistreringType9)>();
 
             using var client = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
             var channel = client.ChannelFactory.CreateChannel();
             do
             {
-                var listRequest = CreateOrgHierarchyRequest(organization.Cvr, pageSize, totalIds);
+                var listRequest = CreateOrgHierarchyRequest(pageSize, totalIds);
                 var listResponse = LoadOrganizationHierarchy(channel, listRequest);
 
-                var listStatusResult = listResponse.FremsoegobjekthierarkiResponse1.FremsoegObjekthierarkiOutput.StandardRetur;
+                var listStatusResult = listResponse.FremsoegObjekthierarkiOutput.StandardRetur;
                 var listStsError = listStatusResult.StatusKode.ParseStsErrorFromStandardResultCode();
                 if (listStsError.HasValue)
                 {
@@ -56,7 +56,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
                     return new DetailedOperationError<ResolveOrganizationTreeError>(OperationFailure.UnknownError, ResolveOrganizationTreeError.FailedLoadingOrgUnits);
                 }
 
-                var listResponseUnits = listResponse.FremsoegobjekthierarkiResponse1.FremsoegObjekthierarkiOutput.OrganisationEnheder;
+                var listResponseUnits = listResponse.FremsoegObjekthierarkiOutput.OrganisationEnheder;
                 var numberOfReturnedUnits = listResponseUnits.Length;
 
                 totalIds += numberOfReturnedUnits;
@@ -151,7 +151,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             return new RetriedIntegrationRequest<fremsoegobjekthierarkiResponse>(() => channel.fremsoegobjekthierarkiAsync(request).Result).Execute();
         }
 
-        private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType5) root, Dictionary<Guid, List<(Guid, RegistreringType5)>> unitsByParent)
+        private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType9) root, Dictionary<Guid, List<(Guid, RegistreringType9)>> unitsByParent)
         {
             var processingStack = new Stack<Guid>();
             processingStack.Push(root.Item1);
@@ -169,7 +169,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             return processingStack;
         }
 
-        private static IEnumerable<Guid> GetSubTree((Guid, RegistreringType5) currentChild, Dictionary<Guid, List<(Guid, RegistreringType5)>> unitsByParent)
+        private static IEnumerable<Guid> GetSubTree((Guid, RegistreringType9) currentChild, Dictionary<Guid, List<(Guid, RegistreringType9)>> unitsByParent)
         {
             var id = currentChild.Item1;
 
@@ -190,22 +190,15 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             }
         }
 
-        public static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(string municipalityCvr, int pageSize, int skip = 0)
+        public static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(int pageSize, int skip = 0)
         {
             var listRequest = new fremsoegobjekthierarkiRequest
             {
-                FremsoegobjekthierarkiRequest1 = new FremsoegobjekthierarkiRequestType()
-                { 
-                    AuthorityContext = new AuthorityContextType()
-                    {
-                        MunicipalityCVR = municipalityCvr
-                    },
-                    FremsoegObjekthierarkiInput = new FremsoegObjekthierarkiInputType()
-                    {
-                        MaksimalAntalKvantitet = pageSize.ToString("D"),
-                        FoersteResultatReference = skip.ToString("D")
-                    }
-                },
+                FremsoegObjekthierarkiInput = new FremsoegObjekthierarkiInputType()
+                {
+                    MaksimalAntalKvantitet = pageSize.ToString("D"),
+                    FoersteResultatReference = skip.ToString("D")
+                }
             };
             return listRequest;
         }

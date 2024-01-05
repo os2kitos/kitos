@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="f97502eb-4083-4c7e-ba62-ce1d43b6c102" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="f97502eb-4083-4c7e-ba62-ce1d43b6c102" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -19,22 +19,19 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="C:\work\saw\kitos\Infrastructure.STS.Organization\ServiceContract\wsdl\context\OrganisationService.wsdl" Protocol="file" SourceId="1" />
+    <MetadataSource Address="C:\Temp\v6_0_0_0\wsdl\Organisation.wsdl" Protocol="file" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="ServiceplatformFaultMessage.wsdl" MetadataType="Wsdl" ID="24987820-139c-48d3-bfcd-9e91d1946626" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.Organization/ServiceContract/sp/ServiceplatformFaultMessage_1.wsdl" />
-    <MetadataFile FileName="OrganisationOperationer.xsd" MetadataType="Schema" ID="e985253b-bbb4-47b8-a0e8-793c11b77074" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.Organization/ServiceContract/SF1500_EP_FS8/xsd/1.1.STS-3/OrganisationOperationer.xsd" />
-    <MetadataFile FileName="OrganisationService.wsdl" MetadataType="Wsdl" ID="85dd9682-cc49-4ad7-bc5a-cbc312dff843" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.Organization/ServiceContract/wsdl/context/OrganisationService.wsdl" />
-    <MetadataFile FileName="ServiceplatformFault_1.xsd" MetadataType="Schema" ID="d444020e-ac48-472e-a867-b405bb6fad53" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.Organization/ServiceContract/sp/ServiceplatformFault_1.xsd" />
-    <MetadataFile FileName="OrganisationFaelles.xsd" MetadataType="Schema" ID="bde8dae7-1eb1-4735-8c13-3b408f76fe3b" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.Organization/ServiceContract/SF1500_EP_FS8/xsd/1.1.STS-3/OrganisationFaelles.xsd" />
-    <MetadataFile FileName="Part.xsd" MetadataType="Schema" ID="24c58b65-9562-47b3-bb38-7455cac63721" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.Organization/ServiceContract/SF1500_EP_FS8/xsd/1.1.STS-3/Part.xsd" />
-    <MetadataFile FileName="policies.wsdl" MetadataType="Wsdl" ID="86cfb460-5a1a-404c-9f28-f94e98c5a432" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.Organization/ServiceContract/wsdl/context/policies.wsdl" />
-    <MetadataFile FileName="CallContext_1.xsd" MetadataType="Schema" ID="92de806d-ab67-46ac-8931-57fb4f6730bd" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.Organization/ServiceContract/sp/CallContext_1.xsd" />
-    <MetadataFile FileName="OrganisationServiceMsg.xsd" MetadataType="Schema" ID="0de27c9f-1cb2-495f-871b-938ae7bbb374" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.Organization/ServiceContract/OrganisationServiceMsg.xsd" />
-    <MetadataFile FileName="Organisation.xsd" MetadataType="Schema" ID="3e4f9750-e704-46f1-ac51-a17582b44246" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.Organization/ServiceContract/SF1500_EP_FS8/xsd/1.1.STS-3/Organisation.xsd" />
-    <MetadataFile FileName="RequestHeader.xsd" MetadataType="Schema" ID="7c476225-8fe8-428a-8fa9-65ed969a3acd" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.Organization/ServiceContract/SF1500_EP_FS8/xsd/common/RequestHeader.xsd" />
-    <MetadataFile FileName="AuthorityContext_1.xsd" MetadataType="Schema" ID="2163e8fb-4437-4efe-a8d1-b53dd34c8319" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.Organization/ServiceContract/sp/AuthorityContext_1.xsd" />
-    <MetadataFile FileName="SagDokObjekt.xsd" MetadataType="Schema" ID="a96b300a-7944-4150-ac22-1273749a7439" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.Organization/ServiceContract/SF1500_EP_FS8/xsd/common/SagDokObjekt.xsd" />
+    <MetadataFile FileName="OrganisationService1.wsdl" MetadataType="Wsdl" ID="50894ebb-8f4d-4c5b-95c3-126a771b24e9" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/Organisation.wsdl" />
+    <MetadataFile FileName="OrganisationBesked.xsd" MetadataType="Schema" ID="3e8dabc8-3500-4497-ad43-f021dcf5980d" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/OrganisationBesked.xsd" />
+    <MetadataFile FileName="RequestHeader1.xsd" MetadataType="Schema" ID="c173629b-4d13-4011-ae68-e61280bacb8a" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/RequestHeader.xsd" />
+    <MetadataFile FileName="OIOIDWS.wsdl" MetadataType="Wsdl" ID="f23abe25-621e-4001-9538-b486f9d29f4f" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/policies/OIOIDWS.wsdl" />
+    <MetadataFile FileName="Part1.xsd" MetadataType="Schema" ID="222d745d-779d-46a8-ad85-1aa760ad76f1" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Part.xsd" />
+    <MetadataFile FileName="Organisation1.xsd" MetadataType="Schema" ID="c9e2b85c-f9ac-47ff-9d18-c7a23196b095" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Organisation.xsd" />
+    <MetadataFile FileName="SagDokObjekt1.xsd" MetadataType="Schema" ID="dd20520b-1d60-4bf8-aaab-7bdd829c36ab" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/SagDokObjekt.xsd" />
+    <MetadataFile FileName="GenerelleDefinitioner.xsd" MetadataType="Schema" ID="2f681359-4420-4948-b58f-1b6a4084fea7" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/GenerelleDefinitioner.xsd" />
+    <MetadataFile FileName="OrganisationOperationer1.xsd" MetadataType="Schema" ID="962adc77-9df7-4797-859b-66fdfe924a2d" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/OrganisationOperationer.xsd" />
+    <MetadataFile FileName="OrganisationFaelles1.xsd" MetadataType="Schema" ID="6f4fc156-7873-4196-bcd3-8ed23d27b1bf" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/OrganisationFaelles.xsd" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

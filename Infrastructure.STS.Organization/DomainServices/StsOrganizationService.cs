@@ -79,7 +79,7 @@ namespace Infrastructure.STS.Organization.DomainServices
             var searchRequest = CreateSearchForOrganizationRequest(organization, companyUuid.Value);
             var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
             var response = GetSearchResponse(channel, searchRequest);
-            var statusResult = response.SoegResponse1.SoegOutput.StandardRetur;
+            var statusResult = response.SoegOutput.StandardRetur;
             var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
             if (stsError.HasValue)
             {
@@ -87,7 +87,7 @@ namespace Infrastructure.STS.Organization.DomainServices
                 return new DetailedOperationError<ResolveOrganizationUuidError>(OperationFailure.UnknownError, ResolveOrganizationUuidError.FailedToSearchForOrganizationByCompanyUuid);
             }
 
-            var ids = response.SoegResponse1.SoegOutput.IdListe;
+            var ids = response.SoegOutput.IdListe;
             if (ids.Length != 1)
             {
                 _logger.Error("Failed to search for organization ({id}) by company uuid {uuid}. Expected 1 result but got {resultsCsv}", organization.Id, companyUuid.Value, string.Join(",", ids));
@@ -125,11 +125,11 @@ namespace Infrastructure.STS.Organization.DomainServices
             using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
             using var organizationPortTypeClient = CreateOrganizationPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
 
-            var readRequest = CreateGetOrganizationByUuidRequest(organization, uuid);
+            var readRequest = CreateGetOrganizationByUuidRequest(uuid);
             var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
 
             var response = GetReadResponse(channel, readRequest);
-            var statusResult = response.LaesResponse1.LaesOutput.StandardRetur;
+            var statusResult = response.LaesOutput.StandardRetur;
             var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
             if (stsError.HasValue)
             {
@@ -137,7 +137,7 @@ namespace Infrastructure.STS.Organization.DomainServices
                 return new OperationError("Failed to resolve organization by uuid", OperationFailure.UnknownError);
             }
 
-            var orgResult = response.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering.FirstOrDefault();
+            var orgResult = response.LaesOutput.FiltreretOejebliksbillede.Registrering.FirstOrDefault();
             if (orgResult == null)
             {
                 _logger.Error("Success reading organization ({id}) by uuid {uuid}. But no data was returned", organization.Id, uuid);
@@ -154,20 +154,13 @@ namespace Infrastructure.STS.Organization.DomainServices
             return rootIdAsUuid;
         }
 
-        private static laesRequest CreateGetOrganizationByUuidRequest(Core.DomainModel.Organization.Organization organization, Guid uuid)
+        private static laesRequest CreateGetOrganizationByUuidRequest(Guid uuid)
         {
             return new laesRequest()
             {
-                LaesRequest1 = new LaesRequestType()
+                LaesInput = new LaesInputType()
                 {
-                    AuthorityContext = new AuthorityContextType()
-                    {
-                        MunicipalityCVR = organization.Cvr
-                    },
-                    LaesInput = new LaesInputType()
-                    {
-                        UUIDIdentifikator = uuid.ToString("D")
-                    }
+                    UUIDIdentifikator = uuid.ToString("D")
                 }
             };
         }
@@ -220,26 +213,19 @@ namespace Infrastructure.STS.Organization.DomainServices
         {
             return new soegRequest
             {
-                SoegRequest1 = new SoegRequestType
+                SoegInput = new SoegInputType1
                 {
-                    AuthorityContext = new AuthorityContextType
+                    MaksimalAntalKvantitet = "2", //We expect only one match so get 2 as max to see if something is off
+                    AttributListe = new AttributListeType(), //Required by the schema even if it is not used
+                    TilstandListe = new TilstandListeType(), //Required by the schema even if it is not used
+                    RelationListe = new RelationListeType
                     {
-                        MunicipalityCVR = organization.Cvr
-                    },
-                    SoegInput = new SoegInputType1
-                    {
-                        MaksimalAntalKvantitet = "2", //We expect only one match so get 2 as max to see if something is off
-                        AttributListe = new AttributListeType(), //Required by the schema even if it is not used
-                        TilstandListe = new TilstandListeType(), //Required by the schema even if it is not used
-                        RelationListe = new RelationListeType
+                        Virksomhed = new VirksomhedRelationType
                         {
-                            Virksomhed = new VirksomhedRelationType
+                            ReferenceID = new UnikIdType
                             {
-                                ReferenceID = new UnikIdType
-                                {
-                                    ItemElementName = ItemChoiceType.UUIDIdentifikator,
-                                    Item = companyUuid.ToString("D")
-                                }
+                                ItemElementName = ItemChoiceType.UUIDIdentifikator,
+                                Item = companyUuid.ToString("D")
                             }
                         }
                     }

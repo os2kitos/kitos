@@ -11,26 +11,65 @@
 namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     
     
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="http://stoettesystemerne.dk/organisation/6/", ConfigurationName="OrganisationSystem.OrganisationSystemPortType")]
+    public interface OrganisationSystemPortType {
+        
+        // CODEGEN: Generating message contract since the operation fremsoegobjekthierarki is neither RPC nor document wrapped.
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/organisationssystem/fremsoegobjekthierarki", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(SoegInputType))]
+        Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiResponse fremsoegobjekthierarki(Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/organisationssystem/fremsoegobjekthierarki", ReplyAction="*")]
+        System.Threading.Tasks.Task<Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiResponse> fremsoegobjekthierarkiAsync(Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiRequest request);
+        
+        // CODEGEN: Generating message contract since the operation import is neither RPC nor document wrapped.
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/organisationssystem/import", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(SoegInputType))]
+        Infrastructure.STS.OrganizationSystem.OrganisationSystem.importResponse import(Infrastructure.STS.OrganizationSystem.OrganisationSystem.importRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/organisationssystem/import", ReplyAction="*")]
+        System.Threading.Tasks.Task<Infrastructure.STS.OrganizationSystem.OrganisationSystem.importResponse> importAsync(Infrastructure.STS.OrganizationSystem.OrganisationSystem.importRequest request);
+        
+        // CODEGEN: Generating message contract since the operation anonymiser is neither RPC nor document wrapped.
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/organisationssystem/anonymiser", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(SoegInputType))]
+        Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserResponse anonymiser(Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/organisationssystem/anonymiser", ReplyAction="*")]
+        System.Threading.Tasks.Task<Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserResponse> anonymiserAsync(Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserRequest request);
+    }
+    
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-    public partial class ServiceplatformFaultType : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+    public partial class RequestHeaderType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private ErrorType[] errorListField;
+        private string transactionUUIDField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("Error", IsNullable=false)]
-        public ErrorType[] ErrorList {
+        public string TransactionUUID {
             get {
-                return this.errorListField;
+                return this.transactionUUIDField;
             }
             set {
-                this.errorListField = value;
-                this.RaisePropertyChanged("ErrorList");
+                this.transactionUUIDField = value;
+                this.RaisePropertyChanged("TransactionUUID");
             }
         }
         
@@ -49,34 +88,37 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-    public partial class ErrorType : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisationsystem/6/")]
+    public partial class AnonymiserInputType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private string errorCodeField;
+        private string itemField;
         
-        private string errorTextField;
+        private ItemChoiceType1 itemElementNameField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public string ErrorCode {
+        [System.Xml.Serialization.XmlElementAttribute("PersonCPR", typeof(string), Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute("PersonUUID", typeof(string), Order=0)]
+        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemElementName")]
+        public string Item {
             get {
-                return this.errorCodeField;
+                return this.itemField;
             }
             set {
-                this.errorCodeField = value;
-                this.RaisePropertyChanged("ErrorCode");
+                this.itemField = value;
+                this.RaisePropertyChanged("Item");
             }
         }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public string ErrorText {
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public ItemChoiceType1 ItemElementName {
             get {
-                return this.errorTextField;
+                return this.itemElementNameField;
             }
             set {
-                this.errorTextField = value;
-                this.RaisePropertyChanged("ErrorText");
+                this.itemElementNameField = value;
+                this.RaisePropertyChanged("ItemElementName");
             }
         }
         
@@ -93,74 +135,122 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
     [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="urn:oio:sts:organisation:person:1.1.3.0")]
-    public partial class FiltreretOejebliksbilledeType9 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private SagDokObjektType objektTypeField;
-        
-        private RegistreringType6[] registreringField;
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisationsystem/6/", IncludeInSchema=false)]
+    public enum ItemChoiceType1 {
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public SagDokObjektType ObjektType {
-            get {
-                return this.objektTypeField;
-            }
-            set {
-                this.objektTypeField = value;
-                this.RaisePropertyChanged("ObjektType");
-            }
-        }
+        PersonCPR,
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
-        public RegistreringType6[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
+        PersonUUID,
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PartType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AktoerType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(InteressefaellesskabType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationFunktionType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ItSystemType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationEnhedType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PersonType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(VirksomhedType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(MyndighedType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AdresseType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesFiltreretOutputType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class SagDokObjektType : object, System.ComponentModel.INotifyPropertyChanged {
+    public partial class MultipleOutputType : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private StandardReturType[] itemsField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("StandardRetur", typeof(StandardReturType), Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute("UnikRetur", typeof(UnikReturType), Order=0)]
+        public StandardReturType[] Items {
+            get {
+                return this.itemsField;
+            }
+            set {
+                this.itemsField = value;
+                this.RaisePropertyChanged("Items");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(UnikReturType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class StandardReturType : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private string statusKodeField;
+        
+        private string fejlbeskedTekstField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(DataType="integer", Order=0)]
+        public string StatusKode {
+            get {
+                return this.statusKodeField;
+            }
+            set {
+                this.statusKodeField = value;
+                this.RaisePropertyChanged("StatusKode");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public string FejlbeskedTekst {
+            get {
+                return this.fejlbeskedTekstField;
+            }
+            set {
+                this.fejlbeskedTekstField = value;
+                this.RaisePropertyChanged("FejlbeskedTekst");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class UnikReturType : StandardReturType {
+        
+        private string typeField;
         
         private string uUIDIdentifikatorField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string Type {
+            get {
+                return this.typeField;
+            }
+            set {
+                this.typeField = value;
+                this.RaisePropertyChanged("Type");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
         public string UUIDIdentifikator {
             get {
                 return this.uUIDIdentifikatorField;
@@ -170,6 +260,44 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
                 this.RaisePropertyChanged("UUIDIdentifikator");
             }
         }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisationsystem/6/")]
+    public partial class ImporterOrganisationSystemInputType : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private OrganisationType organisationField;
+        
+        private OrganisationEnhedType[] organisationEnhederInputField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisation/6/", Order=0)]
+        public OrganisationType Organisation {
+            get {
+                return this.organisationField;
+            }
+            set {
+                this.organisationField = value;
+                this.RaisePropertyChanged("Organisation");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayAttribute(Order=1)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("OrganisationEnhed", Namespace="http://stoettesystemerne.dk/organisation/organisationenhed/6/", IsNullable=false)]
+        public OrganisationEnhedType[] OrganisationEnhederInput {
+            get {
+                return this.organisationEnhederInputField;
+            }
+            set {
+                this.organisationEnhederInputField = value;
+                this.RaisePropertyChanged("OrganisationEnhederInput");
+            }
+        }
         
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
@@ -182,52 +310,18 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AktoerType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(InteressefaellesskabType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationFunktionType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ItSystemType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationEnhedType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PersonType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(VirksomhedType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(MyndighedType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:part:1.1.3.0")]
-    public partial class PartType : SagDokObjektType {
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(InteressefaellesskabType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationFunktionType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ItSystemType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationEnhedType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerType))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:1.1.3.0")]
-    public partial class AktoerType : PartType {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:interessefaellesskab:1.1.3.0")]
-    public partial class InteressefaellesskabType : AktoerType {
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisation/6/")]
+    public partial class OrganisationType : AktoerType {
         
-        private RegistreringType10[] registreringField;
+        private RegistreringType2[] registreringField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
-        public RegistreringType10[] Registrering {
+        public RegistreringType2[] Registrering {
             get {
                 return this.registreringField;
             }
@@ -243,8 +337,8 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="urn:oio:sts:organisation:interessefaellesskab:1.1.3.0")]
-    public partial class RegistreringType10 : RegistreringType {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="http://stoettesystemerne.dk/organisation/organisation/6/")]
+    public partial class RegistreringType2 : RegistreringType {
         
         private AttributListeType2 attributListeField;
         
@@ -294,16 +388,16 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="AttributListeType", Namespace="urn:oio:sts:organisation:interessefaellesskab:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="AttributListeType", Namespace="http://stoettesystemerne.dk/organisation/organisation/6/")]
     public partial class AttributListeType2 : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private EgenskabType2[] egenskabField;
+        private EgenskabType[] egenskabField;
         
         private LokalUdvidelseType lokalUdvidelseField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("Egenskab", Order=0)]
-        public EgenskabType2[] Egenskab {
+        public EgenskabType[] Egenskab {
             get {
                 return this.egenskabField;
             }
@@ -340,16 +434,14 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="urn:oio:sts:organisation:interessefaellesskab:1.1.3.0")]
-    public partial class EgenskabType2 : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisation/6/")]
+    public partial class EgenskabType : object, System.ComponentModel.INotifyPropertyChanged {
         
         private VirkningType virkningField;
         
         private string brugervendtNoegleTekstField;
         
-        private string interessefaellesskabNavnField;
-        
-        private string interessefaellesskabTypeTekstField;
+        private string organisationNavnField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=0)]
@@ -377,25 +469,13 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=2)]
-        public string InteressefaellesskabNavn {
+        public string OrganisationNavn {
             get {
-                return this.interessefaellesskabNavnField;
+                return this.organisationNavnField;
             }
             set {
-                this.interessefaellesskabNavnField = value;
-                this.RaisePropertyChanged("InteressefaellesskabNavn");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=3)]
-        public string InteressefaellesskabTypeTekst {
-            get {
-                return this.interessefaellesskabTypeTekstField;
-            }
-            set {
-                this.interessefaellesskabTypeTekstField = value;
-                this.RaisePropertyChanged("InteressefaellesskabTypeTekst");
+                this.organisationNavnField = value;
+                this.RaisePropertyChanged("OrganisationNavn");
             }
         }
         
@@ -545,6 +625,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     }
     
     /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(UuidLabelInputType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -609,6 +690,29 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
     [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class UuidLabelInputType : UnikIdType {
+        
+        private string labelField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string Label {
+            get {
+                return this.labelField;
+            }
+            set {
+                this.labelField = value;
+                this.RaisePropertyChanged("Label");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
     public enum AktoerTypeKodeType {
         
@@ -668,7 +772,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="urn:oio:sts:organisation:interessefaellesskab:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="http://stoettesystemerne.dk/organisation/organisation/6/")]
     public partial class TilstandListeType2 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private GyldighedType[] gyldighedField;
@@ -676,7 +780,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         private LokalUdvidelseType lokalUdvidelseField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="urn:oio:sts:organisation:1.1.3.0", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="http://stoettesystemerne.dk/organisation/6/", Order=0)]
         public GyldighedType[] Gyldighed {
             get {
                 return this.gyldighedField;
@@ -714,7 +818,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/6/")]
     public partial class GyldighedType : object, System.ComponentModel.INotifyPropertyChanged {
         
         private VirkningType virkningField;
@@ -758,7 +862,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/6/")]
     public enum GyldighedStatusKodeType {
         
         /// <remarks/>
@@ -773,20 +877,30 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="urn:oio:sts:organisation:interessefaellesskab:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="http://stoettesystemerne.dk/organisation/organisation/6/")]
     public partial class RelationListeType2 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private AdresseFlerRelationType[] adresserField;
         
+        private PersonFlerRelationType[] ansatteField;
+        
         private KlasseRelationType brancheField;
         
-        private KlasseRelationType interessefaellesskabstypeField;
+        private KlasseRelationType organisationstypeField;
         
-        private KlasseFlerRelationType[] opgaverField;
+        private MyndighedRelationType myndighedField;
+        
+        private KlasseRelationType myndighedstypeField;
+        
+        private KlasseFlerRelationType[] tilknyttedeOpgaverField;
         
         private OrganisationEnhedRelationType overordnetField;
         
-        private OrganisationRelationType tilhoererField;
+        private VirksomhedRelationType produktionsenhedField;
+        
+        private VirksomhedRelationType skatteenhedField;
+        
+        private OrganisationFlerRelationType tilhoererField;
         
         private BrugerFlerRelationType[] tilknyttedeBrugereField;
         
@@ -801,6 +915,10 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         private PersonFlerRelationType[] tilknyttedePersonerField;
         
         private ItSystemFlerRelationType[] tilknyttedeItSystemerField;
+        
+        private VirksomhedRelationType virksomhedField;
+        
+        private KlasseRelationType virksomhedstypeField;
         
         private LokalUdvidelseType lokalUdvidelseField;
         
@@ -817,7 +935,19 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        [System.Xml.Serialization.XmlElementAttribute("Ansatte", Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        public PersonFlerRelationType[] Ansatte {
+            get {
+                return this.ansatteField;
+            }
+            set {
+                this.ansatteField = value;
+                this.RaisePropertyChanged("Ansatte");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=2)]
         public KlasseRelationType Branche {
             get {
                 return this.brancheField;
@@ -829,31 +959,55 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=2)]
-        public KlasseRelationType Interessefaellesskabstype {
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=3)]
+        public KlasseRelationType Organisationstype {
             get {
-                return this.interessefaellesskabstypeField;
+                return this.organisationstypeField;
             }
             set {
-                this.interessefaellesskabstypeField = value;
-                this.RaisePropertyChanged("Interessefaellesskabstype");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Opgaver", Namespace="urn:oio:sagdok:3.0.0", Order=3)]
-        public KlasseFlerRelationType[] Opgaver {
-            get {
-                return this.opgaverField;
-            }
-            set {
-                this.opgaverField = value;
-                this.RaisePropertyChanged("Opgaver");
+                this.organisationstypeField = value;
+                this.RaisePropertyChanged("Organisationstype");
             }
         }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=4)]
+        public MyndighedRelationType Myndighed {
+            get {
+                return this.myndighedField;
+            }
+            set {
+                this.myndighedField = value;
+                this.RaisePropertyChanged("Myndighed");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=5)]
+        public KlasseRelationType Myndighedstype {
+            get {
+                return this.myndighedstypeField;
+            }
+            set {
+                this.myndighedstypeField = value;
+                this.RaisePropertyChanged("Myndighedstype");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOpgaver", Namespace="urn:oio:sagdok:3.0.0", Order=6)]
+        public KlasseFlerRelationType[] TilknyttedeOpgaver {
+            get {
+                return this.tilknyttedeOpgaverField;
+            }
+            set {
+                this.tilknyttedeOpgaverField = value;
+                this.RaisePropertyChanged("TilknyttedeOpgaver");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=7)]
         public OrganisationEnhedRelationType Overordnet {
             get {
                 return this.overordnetField;
@@ -865,8 +1019,32 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=5)]
-        public OrganisationRelationType Tilhoerer {
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=8)]
+        public VirksomhedRelationType Produktionsenhed {
+            get {
+                return this.produktionsenhedField;
+            }
+            set {
+                this.produktionsenhedField = value;
+                this.RaisePropertyChanged("Produktionsenhed");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=9)]
+        public VirksomhedRelationType Skatteenhed {
+            get {
+                return this.skatteenhedField;
+            }
+            set {
+                this.skatteenhedField = value;
+                this.RaisePropertyChanged("Skatteenhed");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=10)]
+        public OrganisationFlerRelationType Tilhoerer {
             get {
                 return this.tilhoererField;
             }
@@ -877,7 +1055,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeBrugere", Namespace="urn:oio:sagdok:3.0.0", Order=6)]
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeBrugere", Namespace="urn:oio:sagdok:3.0.0", Order=11)]
         public BrugerFlerRelationType[] TilknyttedeBrugere {
             get {
                 return this.tilknyttedeBrugereField;
@@ -889,7 +1067,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeEnheder", Namespace="urn:oio:sagdok:3.0.0", Order=7)]
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeEnheder", Namespace="urn:oio:sagdok:3.0.0", Order=12)]
         public OrganisationEnhedFlerRelationType[] TilknyttedeEnheder {
             get {
                 return this.tilknyttedeEnhederField;
@@ -901,7 +1079,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeFunktioner", Namespace="urn:oio:sagdok:3.0.0", Order=8)]
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeFunktioner", Namespace="urn:oio:sagdok:3.0.0", Order=13)]
         public OrganisationFunktionFlerRelationType[] TilknyttedeFunktioner {
             get {
                 return this.tilknyttedeFunktionerField;
@@ -913,7 +1091,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeInteressefaellesskaber", Namespace="urn:oio:sagdok:3.0.0", Order=9)]
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeInteressefaellesskaber", Namespace="urn:oio:sagdok:3.0.0", Order=14)]
         public InteressefaellesskabFlerRelationType[] TilknyttedeInteressefaellesskaber {
             get {
                 return this.tilknyttedeInteressefaellesskaberField;
@@ -925,7 +1103,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOrganisationer", Namespace="urn:oio:sagdok:3.0.0", Order=10)]
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOrganisationer", Namespace="urn:oio:sagdok:3.0.0", Order=15)]
         public OrganisationFlerRelationType[] TilknyttedeOrganisationer {
             get {
                 return this.tilknyttedeOrganisationerField;
@@ -937,7 +1115,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedePersoner", Namespace="urn:oio:sagdok:3.0.0", Order=11)]
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedePersoner", Namespace="urn:oio:sagdok:3.0.0", Order=16)]
         public PersonFlerRelationType[] TilknyttedePersoner {
             get {
                 return this.tilknyttedePersonerField;
@@ -949,7 +1127,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeItSystemer", Namespace="urn:oio:sagdok:3.0.0", Order=12)]
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeItSystemer", Namespace="urn:oio:sagdok:3.0.0", Order=17)]
         public ItSystemFlerRelationType[] TilknyttedeItSystemer {
             get {
                 return this.tilknyttedeItSystemerField;
@@ -961,7 +1139,31 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=13)]
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=18)]
+        public VirksomhedRelationType Virksomhed {
+            get {
+                return this.virksomhedField;
+            }
+            set {
+                this.virksomhedField = value;
+                this.RaisePropertyChanged("Virksomhed");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=19)]
+        public KlasseRelationType Virksomhedstype {
+            get {
+                return this.virksomhedstypeField;
+            }
+            set {
+                this.virksomhedstypeField = value;
+                this.RaisePropertyChanged("Virksomhedstype");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=20)]
         public LokalUdvidelseType LokalUdvidelse {
             get {
                 return this.lokalUdvidelseField;
@@ -988,17 +1190,28 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class AdresseFlerRelationType : FlerRelationType {
+    public partial class AdresseFlerRelationType : DynamicFlerRelationType {
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AdresseFlerRelationType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OpgaverFlerRelationType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class DynamicFlerRelationType : FlerRelationType {
         
-        private UnikIdType rolleField;
+        private UuidLabelInputType rolleField;
         
-        private UnikIdType typeField;
+        private UuidLabelInputType typeField;
         
         private string indeksField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public UnikIdType Rolle {
+        public UuidLabelInputType Rolle {
             get {
                 return this.rolleField;
             }
@@ -1010,7 +1223,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public UnikIdType Type {
+        public UuidLabelInputType Type {
             get {
                 return this.typeField;
             }
@@ -1034,6 +1247,9 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     }
     
     /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(DynamicFlerRelationType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AdresseFlerRelationType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OpgaverFlerRelationType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ArkivFlerRelationType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(DokumentFlerRelationType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(PartFlerRelationType))]
@@ -1047,7 +1263,6 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerFlerRelationType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(KlasseFlerRelationType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(PersonFlerRelationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AdresseFlerRelationType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -1216,6 +1431,15 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class OpgaverFlerRelationType : DynamicFlerRelationType {
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
     public partial class KlasseRelationType : RelationType {
     }
     
@@ -1328,34 +1552,6 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
     public partial class AktoerRelationType : RelationType {
-        
-        private AktoerTypeKodeType aktoerTypeKodeField;
-        
-        private bool aktoerTypeKodeFieldSpecified;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public AktoerTypeKodeType AktoerTypeKode {
-            get {
-                return this.aktoerTypeKodeField;
-            }
-            set {
-                this.aktoerTypeKodeField = value;
-                this.RaisePropertyChanged("AktoerTypeKode");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool AktoerTypeKodeSpecified {
-            get {
-                return this.aktoerTypeKodeFieldSpecified;
-            }
-            set {
-                this.aktoerTypeKodeFieldSpecified = value;
-                this.RaisePropertyChanged("AktoerTypeKodeSpecified");
-            }
-        }
     }
     
     /// <remarks/>
@@ -1530,18 +1726,19 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="urn:oio:sts:organisation:organisation:1.1.3.0")]
-    public partial class RegistreringType9 : RegistreringType {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="http://stoettesystemerne.dk/organisation/adresse/6/")]
+    public partial class RegistreringType10 : RegistreringType {
         
-        private AttributListeType7 attributListeField;
+        private EgenskabType7[] attributListeField;
         
-        private TilstandListeType7 tilstandListeField;
+        private TilstandListeType3 tilstandListeField;
         
-        private RelationListeType7 relationListeField;
+        private RelationListeType3 relationListeField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public AttributListeType7 AttributListe {
+        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("Egenskab", IsNullable=false)]
+        public EgenskabType7[] AttributListe {
             get {
                 return this.attributListeField;
             }
@@ -1553,7 +1750,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public TilstandListeType7 TilstandListe {
+        public TilstandListeType3 TilstandListe {
             get {
                 return this.tilstandListeField;
             }
@@ -1565,7 +1762,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public RelationListeType7 RelationListe {
+        public RelationListeType3 RelationListe {
             get {
                 return this.relationListeField;
             }
@@ -1581,575 +1778,14 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="AttributListeType", Namespace="urn:oio:sts:organisation:organisation:1.1.3.0")]
-    public partial class AttributListeType7 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private EgenskabType6[] egenskabField;
-        
-        private LokalUdvidelseType lokalUdvidelseField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Egenskab", Order=0)]
-        public EgenskabType6[] Egenskab {
-            get {
-                return this.egenskabField;
-            }
-            set {
-                this.egenskabField = value;
-                this.RaisePropertyChanged("Egenskab");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
-        public LokalUdvidelseType LokalUdvidelse {
-            get {
-                return this.lokalUdvidelseField;
-            }
-            set {
-                this.lokalUdvidelseField = value;
-                this.RaisePropertyChanged("LokalUdvidelse");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="urn:oio:sts:organisation:organisation:1.1.3.0")]
-    public partial class EgenskabType6 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private VirkningType virkningField;
-        
-        private string brugervendtNoegleTekstField;
-        
-        private string organisationNavnField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=0)]
-        public VirkningType Virkning {
-            get {
-                return this.virkningField;
-            }
-            set {
-                this.virkningField = value;
-                this.RaisePropertyChanged("Virkning");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
-        public string BrugervendtNoegleTekst {
-            get {
-                return this.brugervendtNoegleTekstField;
-            }
-            set {
-                this.brugervendtNoegleTekstField = value;
-                this.RaisePropertyChanged("BrugervendtNoegleTekst");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=2)]
-        public string OrganisationNavn {
-            get {
-                return this.organisationNavnField;
-            }
-            set {
-                this.organisationNavnField = value;
-                this.RaisePropertyChanged("OrganisationNavn");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="urn:oio:sts:organisation:organisation:1.1.3.0")]
-    public partial class TilstandListeType7 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private GyldighedType[] gyldighedField;
-        
-        private LokalUdvidelseType lokalUdvidelseField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="urn:oio:sts:organisation:1.1.3.0", Order=0)]
-        public GyldighedType[] Gyldighed {
-            get {
-                return this.gyldighedField;
-            }
-            set {
-                this.gyldighedField = value;
-                this.RaisePropertyChanged("Gyldighed");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
-        public LokalUdvidelseType LokalUdvidelse {
-            get {
-                return this.lokalUdvidelseField;
-            }
-            set {
-                this.lokalUdvidelseField = value;
-                this.RaisePropertyChanged("LokalUdvidelse");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="urn:oio:sts:organisation:organisation:1.1.3.0")]
-    public partial class RelationListeType7 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private AdresseFlerRelationType[] adresserField;
-        
-        private PersonFlerRelationType[] ansatteField;
-        
-        private KlasseRelationType brancheField;
-        
-        private KlasseRelationType organisationstypeField;
-        
-        private MyndighedRelationType myndighedField;
-        
-        private KlasseRelationType myndighedstypeField;
-        
-        private KlasseFlerRelationType[] opgaverField;
-        
-        private OrganisationEnhedRelationType overordnetField;
-        
-        private VirksomhedRelationType produktionsenhedField;
-        
-        private VirksomhedRelationType skatteenhedField;
-        
-        private OrganisationRelationType tilhoererField;
-        
-        private BrugerFlerRelationType[] tilknyttedeBrugereField;
-        
-        private OrganisationEnhedFlerRelationType[] tilknyttedeEnhederField;
-        
-        private OrganisationFunktionFlerRelationType[] tilknyttedeFunktionerField;
-        
-        private InteressefaellesskabFlerRelationType[] tilknyttedeInteressefaellesskaberField;
-        
-        private OrganisationFlerRelationType[] tilknyttedeOrganisationerField;
-        
-        private PersonFlerRelationType[] tilknyttedePersonerField;
-        
-        private ItSystemFlerRelationType[] tilknyttedeItSystemerField;
-        
-        private VirksomhedRelationType virksomhedField;
-        
-        private KlasseRelationType virksomhedstypeField;
-        
-        private LokalUdvidelseType lokalUdvidelseField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Adresser", Namespace="urn:oio:sagdok:3.0.0", Order=0)]
-        public AdresseFlerRelationType[] Adresser {
-            get {
-                return this.adresserField;
-            }
-            set {
-                this.adresserField = value;
-                this.RaisePropertyChanged("Adresser");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Ansatte", Namespace="urn:oio:sagdok:3.0.0", Order=1)]
-        public PersonFlerRelationType[] Ansatte {
-            get {
-                return this.ansatteField;
-            }
-            set {
-                this.ansatteField = value;
-                this.RaisePropertyChanged("Ansatte");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=2)]
-        public KlasseRelationType Branche {
-            get {
-                return this.brancheField;
-            }
-            set {
-                this.brancheField = value;
-                this.RaisePropertyChanged("Branche");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=3)]
-        public KlasseRelationType Organisationstype {
-            get {
-                return this.organisationstypeField;
-            }
-            set {
-                this.organisationstypeField = value;
-                this.RaisePropertyChanged("Organisationstype");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=4)]
-        public MyndighedRelationType Myndighed {
-            get {
-                return this.myndighedField;
-            }
-            set {
-                this.myndighedField = value;
-                this.RaisePropertyChanged("Myndighed");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=5)]
-        public KlasseRelationType Myndighedstype {
-            get {
-                return this.myndighedstypeField;
-            }
-            set {
-                this.myndighedstypeField = value;
-                this.RaisePropertyChanged("Myndighedstype");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Opgaver", Namespace="urn:oio:sagdok:3.0.0", Order=6)]
-        public KlasseFlerRelationType[] Opgaver {
-            get {
-                return this.opgaverField;
-            }
-            set {
-                this.opgaverField = value;
-                this.RaisePropertyChanged("Opgaver");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=7)]
-        public OrganisationEnhedRelationType Overordnet {
-            get {
-                return this.overordnetField;
-            }
-            set {
-                this.overordnetField = value;
-                this.RaisePropertyChanged("Overordnet");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=8)]
-        public VirksomhedRelationType Produktionsenhed {
-            get {
-                return this.produktionsenhedField;
-            }
-            set {
-                this.produktionsenhedField = value;
-                this.RaisePropertyChanged("Produktionsenhed");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=9)]
-        public VirksomhedRelationType Skatteenhed {
-            get {
-                return this.skatteenhedField;
-            }
-            set {
-                this.skatteenhedField = value;
-                this.RaisePropertyChanged("Skatteenhed");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=10)]
-        public OrganisationRelationType Tilhoerer {
-            get {
-                return this.tilhoererField;
-            }
-            set {
-                this.tilhoererField = value;
-                this.RaisePropertyChanged("Tilhoerer");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeBrugere", Namespace="urn:oio:sagdok:3.0.0", Order=11)]
-        public BrugerFlerRelationType[] TilknyttedeBrugere {
-            get {
-                return this.tilknyttedeBrugereField;
-            }
-            set {
-                this.tilknyttedeBrugereField = value;
-                this.RaisePropertyChanged("TilknyttedeBrugere");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeEnheder", Namespace="urn:oio:sagdok:3.0.0", Order=12)]
-        public OrganisationEnhedFlerRelationType[] TilknyttedeEnheder {
-            get {
-                return this.tilknyttedeEnhederField;
-            }
-            set {
-                this.tilknyttedeEnhederField = value;
-                this.RaisePropertyChanged("TilknyttedeEnheder");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeFunktioner", Namespace="urn:oio:sagdok:3.0.0", Order=13)]
-        public OrganisationFunktionFlerRelationType[] TilknyttedeFunktioner {
-            get {
-                return this.tilknyttedeFunktionerField;
-            }
-            set {
-                this.tilknyttedeFunktionerField = value;
-                this.RaisePropertyChanged("TilknyttedeFunktioner");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeInteressefaellesskaber", Namespace="urn:oio:sagdok:3.0.0", Order=14)]
-        public InteressefaellesskabFlerRelationType[] TilknyttedeInteressefaellesskaber {
-            get {
-                return this.tilknyttedeInteressefaellesskaberField;
-            }
-            set {
-                this.tilknyttedeInteressefaellesskaberField = value;
-                this.RaisePropertyChanged("TilknyttedeInteressefaellesskaber");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOrganisationer", Namespace="urn:oio:sagdok:3.0.0", Order=15)]
-        public OrganisationFlerRelationType[] TilknyttedeOrganisationer {
-            get {
-                return this.tilknyttedeOrganisationerField;
-            }
-            set {
-                this.tilknyttedeOrganisationerField = value;
-                this.RaisePropertyChanged("TilknyttedeOrganisationer");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedePersoner", Namespace="urn:oio:sagdok:3.0.0", Order=16)]
-        public PersonFlerRelationType[] TilknyttedePersoner {
-            get {
-                return this.tilknyttedePersonerField;
-            }
-            set {
-                this.tilknyttedePersonerField = value;
-                this.RaisePropertyChanged("TilknyttedePersoner");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeItSystemer", Namespace="urn:oio:sagdok:3.0.0", Order=17)]
-        public ItSystemFlerRelationType[] TilknyttedeItSystemer {
-            get {
-                return this.tilknyttedeItSystemerField;
-            }
-            set {
-                this.tilknyttedeItSystemerField = value;
-                this.RaisePropertyChanged("TilknyttedeItSystemer");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=18)]
-        public VirksomhedRelationType Virksomhed {
-            get {
-                return this.virksomhedField;
-            }
-            set {
-                this.virksomhedField = value;
-                this.RaisePropertyChanged("Virksomhed");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=19)]
-        public KlasseRelationType Virksomhedstype {
-            get {
-                return this.virksomhedstypeField;
-            }
-            set {
-                this.virksomhedstypeField = value;
-                this.RaisePropertyChanged("Virksomhedstype");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=20)]
-        public LokalUdvidelseType LokalUdvidelse {
-            get {
-                return this.lokalUdvidelseField;
-            }
-            set {
-                this.lokalUdvidelseField = value;
-                this.RaisePropertyChanged("LokalUdvidelse");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="urn:oio:sts:organisation:organisationfunktion:1.1.3.0")]
-    public partial class RegistreringType8 : RegistreringType {
-        
-        private AttributListeType8 attributListeField;
-        
-        private TilstandListeType8 tilstandListeField;
-        
-        private RelationListeType8 relationListeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public AttributListeType8 AttributListe {
-            get {
-                return this.attributListeField;
-            }
-            set {
-                this.attributListeField = value;
-                this.RaisePropertyChanged("AttributListe");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public TilstandListeType8 TilstandListe {
-            get {
-                return this.tilstandListeField;
-            }
-            set {
-                this.tilstandListeField = value;
-                this.RaisePropertyChanged("TilstandListe");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public RelationListeType8 RelationListe {
-            get {
-                return this.relationListeField;
-            }
-            set {
-                this.relationListeField = value;
-                this.RaisePropertyChanged("RelationListe");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="AttributListeType", Namespace="urn:oio:sts:organisation:organisationfunktion:1.1.3.0")]
-    public partial class AttributListeType8 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private EgenskabType7[] egenskabField;
-        
-        private LokalUdvidelseType lokalUdvidelseField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Egenskab", Order=0)]
-        public EgenskabType7[] Egenskab {
-            get {
-                return this.egenskabField;
-            }
-            set {
-                this.egenskabField = value;
-                this.RaisePropertyChanged("Egenskab");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
-        public LokalUdvidelseType LokalUdvidelse {
-            get {
-                return this.lokalUdvidelseField;
-            }
-            set {
-                this.lokalUdvidelseField = value;
-                this.RaisePropertyChanged("LokalUdvidelse");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="urn:oio:sts:organisation:organisationfunktion:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="http://stoettesystemerne.dk/organisation/adresse/6/")]
     public partial class EgenskabType7 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private VirkningType virkningField;
         
         private string brugervendtNoegleTekstField;
         
-        private string funktionNavnField;
+        private string adresseTekstField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=0)]
@@ -2176,14 +1812,14 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=2)]
-        public string FunktionNavn {
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:6", Order=2)]
+        public string AdresseTekst {
             get {
-                return this.funktionNavnField;
+                return this.adresseTekstField;
             }
             set {
-                this.funktionNavnField = value;
-                this.RaisePropertyChanged("FunktionNavn");
+                this.adresseTekstField = value;
+                this.RaisePropertyChanged("AdresseTekst");
             }
         }
         
@@ -2202,36 +1838,8 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="urn:oio:sts:organisation:organisationfunktion:1.1.3.0")]
-    public partial class TilstandListeType8 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private GyldighedType[] gyldighedField;
-        
-        private LokalUdvidelseType lokalUdvidelseField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="urn:oio:sts:organisation:1.1.3.0", Order=0)]
-        public GyldighedType[] Gyldighed {
-            get {
-                return this.gyldighedField;
-            }
-            set {
-                this.gyldighedField = value;
-                this.RaisePropertyChanged("Gyldighed");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
-        public LokalUdvidelseType LokalUdvidelse {
-            get {
-                return this.lokalUdvidelseField;
-            }
-            set {
-                this.lokalUdvidelseField = value;
-                this.RaisePropertyChanged("LokalUdvidelse");
-            }
-        }
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="http://stoettesystemerne.dk/organisation/adresse/6/")]
+    public partial class TilstandListeType3 : object, System.ComponentModel.INotifyPropertyChanged {
         
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
@@ -2248,148 +1856,8 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="urn:oio:sts:organisation:organisationfunktion:1.1.3.0")]
-    public partial class RelationListeType8 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private AdresseFlerRelationType[] adresserField;
-        
-        private KlasseRelationType funktionstypeField;
-        
-        private KlasseFlerRelationType[] opgaverField;
-        
-        private BrugerFlerRelationType[] tilknyttedeBrugereField;
-        
-        private OrganisationEnhedFlerRelationType[] tilknyttedeEnhederField;
-        
-        private InteressefaellesskabFlerRelationType[] tilknyttedeInteressefaellesskaberField;
-        
-        private OrganisationFlerRelationType[] tilknyttedeOrganisationerField;
-        
-        private PersonFlerRelationType[] tilknyttedePersonerField;
-        
-        private ItSystemFlerRelationType[] tilknyttedeItSystemerField;
-        
-        private LokalUdvidelseType lokalUdvidelseField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Adresser", Namespace="urn:oio:sagdok:3.0.0", Order=0)]
-        public AdresseFlerRelationType[] Adresser {
-            get {
-                return this.adresserField;
-            }
-            set {
-                this.adresserField = value;
-                this.RaisePropertyChanged("Adresser");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
-        public KlasseRelationType Funktionstype {
-            get {
-                return this.funktionstypeField;
-            }
-            set {
-                this.funktionstypeField = value;
-                this.RaisePropertyChanged("Funktionstype");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Opgaver", Namespace="urn:oio:sagdok:3.0.0", Order=2)]
-        public KlasseFlerRelationType[] Opgaver {
-            get {
-                return this.opgaverField;
-            }
-            set {
-                this.opgaverField = value;
-                this.RaisePropertyChanged("Opgaver");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeBrugere", Namespace="urn:oio:sagdok:3.0.0", Order=3)]
-        public BrugerFlerRelationType[] TilknyttedeBrugere {
-            get {
-                return this.tilknyttedeBrugereField;
-            }
-            set {
-                this.tilknyttedeBrugereField = value;
-                this.RaisePropertyChanged("TilknyttedeBrugere");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeEnheder", Namespace="urn:oio:sagdok:3.0.0", Order=4)]
-        public OrganisationEnhedFlerRelationType[] TilknyttedeEnheder {
-            get {
-                return this.tilknyttedeEnhederField;
-            }
-            set {
-                this.tilknyttedeEnhederField = value;
-                this.RaisePropertyChanged("TilknyttedeEnheder");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeInteressefaellesskaber", Namespace="urn:oio:sagdok:3.0.0", Order=5)]
-        public InteressefaellesskabFlerRelationType[] TilknyttedeInteressefaellesskaber {
-            get {
-                return this.tilknyttedeInteressefaellesskaberField;
-            }
-            set {
-                this.tilknyttedeInteressefaellesskaberField = value;
-                this.RaisePropertyChanged("TilknyttedeInteressefaellesskaber");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOrganisationer", Namespace="urn:oio:sagdok:3.0.0", Order=6)]
-        public OrganisationFlerRelationType[] TilknyttedeOrganisationer {
-            get {
-                return this.tilknyttedeOrganisationerField;
-            }
-            set {
-                this.tilknyttedeOrganisationerField = value;
-                this.RaisePropertyChanged("TilknyttedeOrganisationer");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedePersoner", Namespace="urn:oio:sagdok:3.0.0", Order=7)]
-        public PersonFlerRelationType[] TilknyttedePersoner {
-            get {
-                return this.tilknyttedePersonerField;
-            }
-            set {
-                this.tilknyttedePersonerField = value;
-                this.RaisePropertyChanged("TilknyttedePersoner");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeItSystemer", Namespace="urn:oio:sagdok:3.0.0", Order=8)]
-        public ItSystemFlerRelationType[] TilknyttedeItSystemer {
-            get {
-                return this.tilknyttedeItSystemerField;
-            }
-            set {
-                this.tilknyttedeItSystemerField = value;
-                this.RaisePropertyChanged("TilknyttedeItSystemer");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=9)]
-        public LokalUdvidelseType LokalUdvidelse {
-            get {
-                return this.lokalUdvidelseField;
-            }
-            set {
-                this.lokalUdvidelseField = value;
-                this.RaisePropertyChanged("LokalUdvidelse");
-            }
-        }
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="http://stoettesystemerne.dk/organisation/adresse/6/")]
+    public partial class RelationListeType3 : object, System.ComponentModel.INotifyPropertyChanged {
         
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
@@ -2406,587 +1874,8 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="urn:oio:sts:organisation:itsystem:1.1.3.0")]
-    public partial class RegistreringType7 : RegistreringType {
-        
-        private AttributListeType6 attributListeField;
-        
-        private TilstandListeType6 tilstandListeField;
-        
-        private RelationListeType6 relationListeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public AttributListeType6 AttributListe {
-            get {
-                return this.attributListeField;
-            }
-            set {
-                this.attributListeField = value;
-                this.RaisePropertyChanged("AttributListe");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public TilstandListeType6 TilstandListe {
-            get {
-                return this.tilstandListeField;
-            }
-            set {
-                this.tilstandListeField = value;
-                this.RaisePropertyChanged("TilstandListe");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public RelationListeType6 RelationListe {
-            get {
-                return this.relationListeField;
-            }
-            set {
-                this.relationListeField = value;
-                this.RaisePropertyChanged("RelationListe");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="AttributListeType", Namespace="urn:oio:sts:organisation:itsystem:1.1.3.0")]
-    public partial class AttributListeType6 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private EgenskabType8[] egenskabField;
-        
-        private LokalUdvidelseType lokalUdvidelseField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Egenskab", Order=0)]
-        public EgenskabType8[] Egenskab {
-            get {
-                return this.egenskabField;
-            }
-            set {
-                this.egenskabField = value;
-                this.RaisePropertyChanged("Egenskab");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
-        public LokalUdvidelseType LokalUdvidelse {
-            get {
-                return this.lokalUdvidelseField;
-            }
-            set {
-                this.lokalUdvidelseField = value;
-                this.RaisePropertyChanged("LokalUdvidelse");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="urn:oio:sts:organisation:itsystem:1.1.3.0")]
-    public partial class EgenskabType8 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private VirkningType virkningField;
-        
-        private string brugervendtNoegleTekstField;
-        
-        private string itSystemNavnField;
-        
-        private string itSystemTypeTekstField;
-        
-        private string[] konfigurationReferenceField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=0)]
-        public VirkningType Virkning {
-            get {
-                return this.virkningField;
-            }
-            set {
-                this.virkningField = value;
-                this.RaisePropertyChanged("Virkning");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
-        public string BrugervendtNoegleTekst {
-            get {
-                return this.brugervendtNoegleTekstField;
-            }
-            set {
-                this.brugervendtNoegleTekstField = value;
-                this.RaisePropertyChanged("BrugervendtNoegleTekst");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=2)]
-        public string ItSystemNavn {
-            get {
-                return this.itSystemNavnField;
-            }
-            set {
-                this.itSystemNavnField = value;
-                this.RaisePropertyChanged("ItSystemNavn");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=3)]
-        public string ItSystemTypeTekst {
-            get {
-                return this.itSystemTypeTekstField;
-            }
-            set {
-                this.itSystemTypeTekstField = value;
-                this.RaisePropertyChanged("ItSystemTypeTekst");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("KonfigurationReference", Namespace="urn:oio:sagdok:3.0.0", Order=4)]
-        public string[] KonfigurationReference {
-            get {
-                return this.konfigurationReferenceField;
-            }
-            set {
-                this.konfigurationReferenceField = value;
-                this.RaisePropertyChanged("KonfigurationReference");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="urn:oio:sts:organisation:itsystem:1.1.3.0")]
-    public partial class TilstandListeType6 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private GyldighedType[] gyldighedField;
-        
-        private LokalUdvidelseType lokalUdvidelseField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="urn:oio:sts:organisation:1.1.3.0", Order=0)]
-        public GyldighedType[] Gyldighed {
-            get {
-                return this.gyldighedField;
-            }
-            set {
-                this.gyldighedField = value;
-                this.RaisePropertyChanged("Gyldighed");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
-        public LokalUdvidelseType LokalUdvidelse {
-            get {
-                return this.lokalUdvidelseField;
-            }
-            set {
-                this.lokalUdvidelseField = value;
-                this.RaisePropertyChanged("LokalUdvidelse");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="urn:oio:sts:organisation:itsystem:1.1.3.0")]
-    public partial class RelationListeType6 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private AdresseFlerRelationType[] adresserField;
-        
-        private KlasseFlerRelationType[] opgaverField;
-        
-        private KlasseFlerRelationType[] systemTyperField;
-        
-        private OrganisationRelationType tilhoererField;
-        
-        private BrugerFlerRelationType[] tilknyttedeBrugereField;
-        
-        private OrganisationEnhedFlerRelationType[] tilknyttedeEnhederField;
-        
-        private OrganisationFunktionFlerRelationType[] tilknyttedeFunktionerField;
-        
-        private InteressefaellesskabFlerRelationType[] tilknyttedeInteressefaellesskaberField;
-        
-        private OrganisationFlerRelationType[] tilknyttedeOrganisationerField;
-        
-        private PersonFlerRelationType[] tilknyttedePersonerField;
-        
-        private ItSystemFlerRelationType[] tilknyttedeItSystemerField;
-        
-        private LokalUdvidelseType lokalUdvidelseField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Adresser", Namespace="urn:oio:sagdok:3.0.0", Order=0)]
-        public AdresseFlerRelationType[] Adresser {
-            get {
-                return this.adresserField;
-            }
-            set {
-                this.adresserField = value;
-                this.RaisePropertyChanged("Adresser");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Opgaver", Namespace="urn:oio:sagdok:3.0.0", Order=1)]
-        public KlasseFlerRelationType[] Opgaver {
-            get {
-                return this.opgaverField;
-            }
-            set {
-                this.opgaverField = value;
-                this.RaisePropertyChanged("Opgaver");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SystemTyper", Namespace="urn:oio:sagdok:3.0.0", Order=2)]
-        public KlasseFlerRelationType[] SystemTyper {
-            get {
-                return this.systemTyperField;
-            }
-            set {
-                this.systemTyperField = value;
-                this.RaisePropertyChanged("SystemTyper");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=3)]
-        public OrganisationRelationType Tilhoerer {
-            get {
-                return this.tilhoererField;
-            }
-            set {
-                this.tilhoererField = value;
-                this.RaisePropertyChanged("Tilhoerer");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeBrugere", Namespace="urn:oio:sagdok:3.0.0", Order=4)]
-        public BrugerFlerRelationType[] TilknyttedeBrugere {
-            get {
-                return this.tilknyttedeBrugereField;
-            }
-            set {
-                this.tilknyttedeBrugereField = value;
-                this.RaisePropertyChanged("TilknyttedeBrugere");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeEnheder", Namespace="urn:oio:sagdok:3.0.0", Order=5)]
-        public OrganisationEnhedFlerRelationType[] TilknyttedeEnheder {
-            get {
-                return this.tilknyttedeEnhederField;
-            }
-            set {
-                this.tilknyttedeEnhederField = value;
-                this.RaisePropertyChanged("TilknyttedeEnheder");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeFunktioner", Namespace="urn:oio:sagdok:3.0.0", Order=6)]
-        public OrganisationFunktionFlerRelationType[] TilknyttedeFunktioner {
-            get {
-                return this.tilknyttedeFunktionerField;
-            }
-            set {
-                this.tilknyttedeFunktionerField = value;
-                this.RaisePropertyChanged("TilknyttedeFunktioner");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeInteressefaellesskaber", Namespace="urn:oio:sagdok:3.0.0", Order=7)]
-        public InteressefaellesskabFlerRelationType[] TilknyttedeInteressefaellesskaber {
-            get {
-                return this.tilknyttedeInteressefaellesskaberField;
-            }
-            set {
-                this.tilknyttedeInteressefaellesskaberField = value;
-                this.RaisePropertyChanged("TilknyttedeInteressefaellesskaber");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOrganisationer", Namespace="urn:oio:sagdok:3.0.0", Order=8)]
-        public OrganisationFlerRelationType[] TilknyttedeOrganisationer {
-            get {
-                return this.tilknyttedeOrganisationerField;
-            }
-            set {
-                this.tilknyttedeOrganisationerField = value;
-                this.RaisePropertyChanged("TilknyttedeOrganisationer");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedePersoner", Namespace="urn:oio:sagdok:3.0.0", Order=9)]
-        public PersonFlerRelationType[] TilknyttedePersoner {
-            get {
-                return this.tilknyttedePersonerField;
-            }
-            set {
-                this.tilknyttedePersonerField = value;
-                this.RaisePropertyChanged("TilknyttedePersoner");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeItSystemer", Namespace="urn:oio:sagdok:3.0.0", Order=10)]
-        public ItSystemFlerRelationType[] TilknyttedeItSystemer {
-            get {
-                return this.tilknyttedeItSystemerField;
-            }
-            set {
-                this.tilknyttedeItSystemerField = value;
-                this.RaisePropertyChanged("TilknyttedeItSystemer");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=11)]
-        public LokalUdvidelseType LokalUdvidelse {
-            get {
-                return this.lokalUdvidelseField;
-            }
-            set {
-                this.lokalUdvidelseField = value;
-                this.RaisePropertyChanged("LokalUdvidelse");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="urn:oio:sts:organisation:person:1.1.3.0")]
-    public partial class RegistreringType6 : RegistreringType {
-        
-        private EgenskabType9[] attributListeField;
-        
-        private TilstandListeType9 tilstandListeField;
-        
-        private RelationListeType9 relationListeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("Egenskab", IsNullable=false)]
-        public EgenskabType9[] AttributListe {
-            get {
-                return this.attributListeField;
-            }
-            set {
-                this.attributListeField = value;
-                this.RaisePropertyChanged("AttributListe");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public TilstandListeType9 TilstandListe {
-            get {
-                return this.tilstandListeField;
-            }
-            set {
-                this.tilstandListeField = value;
-                this.RaisePropertyChanged("TilstandListe");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public RelationListeType9 RelationListe {
-            get {
-                return this.relationListeField;
-            }
-            set {
-                this.relationListeField = value;
-                this.RaisePropertyChanged("RelationListe");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="urn:oio:sts:organisation:person:1.1.3.0")]
-    public partial class EgenskabType9 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private VirkningType virkningField;
-        
-        private string brugervendtNoegleTekstField;
-        
-        private string cPRNummerTekstField;
-        
-        private string navnTekstField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=0)]
-        public VirkningType Virkning {
-            get {
-                return this.virkningField;
-            }
-            set {
-                this.virkningField = value;
-                this.RaisePropertyChanged("Virkning");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
-        public string BrugervendtNoegleTekst {
-            get {
-                return this.brugervendtNoegleTekstField;
-            }
-            set {
-                this.brugervendtNoegleTekstField = value;
-                this.RaisePropertyChanged("BrugervendtNoegleTekst");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("CPR-NummerTekst", Namespace="urn:oio:sts:1.1.3.0", Order=2)]
-        public string CPRNummerTekst {
-            get {
-                return this.cPRNummerTekstField;
-            }
-            set {
-                this.cPRNummerTekstField = value;
-                this.RaisePropertyChanged("CPRNummerTekst");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
-        public string NavnTekst {
-            get {
-                return this.navnTekstField;
-            }
-            set {
-                this.navnTekstField = value;
-                this.RaisePropertyChanged("NavnTekst");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="urn:oio:sts:organisation:person:1.1.3.0")]
-    public partial class TilstandListeType9 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="urn:oio:sts:organisation:person:1.1.3.0")]
-    public partial class RelationListeType9 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="urn:oio:sts:organisation:organisationenhed:1.1.3.0")]
-    public partial class RegistreringType5 : RegistreringType {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="http://stoettesystemerne.dk/organisation/organisationenhed/6/")]
+    public partial class RegistreringType9 : RegistreringType {
         
         private AttributListeType5 attributListeField;
         
@@ -3036,16 +1925,16 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="AttributListeType", Namespace="urn:oio:sts:organisation:organisationenhed:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="AttributListeType", Namespace="http://stoettesystemerne.dk/organisation/organisationenhed/6/")]
     public partial class AttributListeType5 : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private EgenskabType5[] egenskabField;
+        private EgenskabType1[] egenskabField;
         
         private LokalUdvidelseType lokalUdvidelseField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("Egenskab", Order=0)]
-        public EgenskabType5[] Egenskab {
+        public EgenskabType1[] Egenskab {
             get {
                 return this.egenskabField;
             }
@@ -3082,8 +1971,8 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="urn:oio:sts:organisation:organisationenhed:1.1.3.0")]
-    public partial class EgenskabType5 : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="http://stoettesystemerne.dk/organisation/organisationenhed/6/")]
+    public partial class EgenskabType1 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private VirkningType virkningField;
         
@@ -3142,7 +2031,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="urn:oio:sts:organisation:organisationenhed:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="http://stoettesystemerne.dk/organisation/organisationenhed/6/")]
     public partial class TilstandListeType5 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private GyldighedType[] gyldighedField;
@@ -3150,7 +2039,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         private LokalUdvidelseType lokalUdvidelseField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="urn:oio:sts:organisation:1.1.3.0", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="http://stoettesystemerne.dk/organisation/6/", Order=0)]
         public GyldighedType[] Gyldighed {
             get {
                 return this.gyldighedField;
@@ -3188,7 +2077,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="urn:oio:sts:organisation:organisationenhed:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="http://stoettesystemerne.dk/organisation/organisationenhed/6/")]
     public partial class RelationListeType5 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private AdresseFlerRelationType[] adresserField;
@@ -3199,7 +2088,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         private KlasseRelationType enhedstypeField;
         
-        private KlasseFlerRelationType[] opgaverField;
+        private OpgaverFlerRelationType[] opgaverField;
         
         private OrganisationEnhedRelationType overordnetField;
         
@@ -3207,7 +2096,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         private VirksomhedRelationType skatteenhedField;
         
-        private OrganisationRelationType tilhoererField;
+        private OrganisationFlerRelationType tilhoererField;
         
         private BrugerFlerRelationType[] tilknyttedeBrugereField;
         
@@ -3275,7 +2164,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("Opgaver", Namespace="urn:oio:sagdok:3.0.0", Order=4)]
-        public KlasseFlerRelationType[] Opgaver {
+        public OpgaverFlerRelationType[] Opgaver {
             get {
                 return this.opgaverField;
             }
@@ -3323,7 +2212,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=8)]
-        public OrganisationRelationType Tilhoerer {
+        public OrganisationFlerRelationType Tilhoerer {
             get {
                 return this.tilhoererField;
             }
@@ -3444,19 +2333,18 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="urn:oio:sts:organisation:adresse:1.1.3.0")]
-    public partial class RegistreringType4 : RegistreringType {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="http://stoettesystemerne.dk/organisation/itsystem/6/")]
+    public partial class RegistreringType8 : RegistreringType {
         
-        private EgenskabType1[] attributListeField;
+        private AttributListeType6 attributListeField;
         
-        private TilstandListeType1 tilstandListeField;
+        private TilstandListeType6 tilstandListeField;
         
-        private RelationListeType1 relationListeField;
+        private RelationListeType6 relationListeField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("Egenskab", IsNullable=false)]
-        public EgenskabType1[] AttributListe {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public AttributListeType6 AttributListe {
             get {
                 return this.attributListeField;
             }
@@ -3468,7 +2356,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public TilstandListeType1 TilstandListe {
+        public TilstandListeType6 TilstandListe {
             get {
                 return this.tilstandListeField;
             }
@@ -3480,7 +2368,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public RelationListeType1 RelationListe {
+        public RelationListeType6 RelationListe {
             get {
                 return this.relationListeField;
             }
@@ -3496,14 +2384,64 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="urn:oio:sts:organisation:adresse:1.1.3.0")]
-    public partial class EgenskabType1 : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="AttributListeType", Namespace="http://stoettesystemerne.dk/organisation/itsystem/6/")]
+    public partial class AttributListeType6 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private EgenskabType5[] egenskabField;
+        
+        private LokalUdvidelseType lokalUdvidelseField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Egenskab", Order=0)]
+        public EgenskabType5[] Egenskab {
+            get {
+                return this.egenskabField;
+            }
+            set {
+                this.egenskabField = value;
+                this.RaisePropertyChanged("Egenskab");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        public LokalUdvidelseType LokalUdvidelse {
+            get {
+                return this.lokalUdvidelseField;
+            }
+            set {
+                this.lokalUdvidelseField = value;
+                this.RaisePropertyChanged("LokalUdvidelse");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="http://stoettesystemerne.dk/organisation/itsystem/6/")]
+    public partial class EgenskabType5 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private VirkningType virkningField;
         
         private string brugervendtNoegleTekstField;
         
-        private string adresseTekstField;
+        private string itSystemNavnField;
+        
+        private string itSystemTypeTekstField;
+        
+        private string[] konfigurationReferenceField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=0)]
@@ -3530,14 +2468,38 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:1.1.3.0", Order=2)]
-        public string AdresseTekst {
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=2)]
+        public string ItSystemNavn {
             get {
-                return this.adresseTekstField;
+                return this.itSystemNavnField;
             }
             set {
-                this.adresseTekstField = value;
-                this.RaisePropertyChanged("AdresseTekst");
+                this.itSystemNavnField = value;
+                this.RaisePropertyChanged("ItSystemNavn");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=3)]
+        public string ItSystemTypeTekst {
+            get {
+                return this.itSystemTypeTekstField;
+            }
+            set {
+                this.itSystemTypeTekstField = value;
+                this.RaisePropertyChanged("ItSystemTypeTekst");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("KonfigurationReference", Namespace="urn:oio:sagdok:3.0.0", Order=4)]
+        public string[] KonfigurationReference {
+            get {
+                return this.konfigurationReferenceField;
+            }
+            set {
+                this.konfigurationReferenceField = value;
+                this.RaisePropertyChanged("KonfigurationReference");
             }
         }
         
@@ -3556,8 +2518,36 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="urn:oio:sts:organisation:adresse:1.1.3.0")]
-    public partial class TilstandListeType1 : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="http://stoettesystemerne.dk/organisation/itsystem/6/")]
+    public partial class TilstandListeType6 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private GyldighedType[] gyldighedField;
+        
+        private LokalUdvidelseType lokalUdvidelseField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="http://stoettesystemerne.dk/organisation/6/", Order=0)]
+        public GyldighedType[] Gyldighed {
+            get {
+                return this.gyldighedField;
+            }
+            set {
+                this.gyldighedField = value;
+                this.RaisePropertyChanged("Gyldighed");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        public LokalUdvidelseType LokalUdvidelse {
+            get {
+                return this.lokalUdvidelseField;
+            }
+            set {
+                this.lokalUdvidelseField = value;
+                this.RaisePropertyChanged("LokalUdvidelse");
+            }
+        }
         
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
@@ -3574,8 +2564,176 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="urn:oio:sts:organisation:adresse:1.1.3.0")]
-    public partial class RelationListeType1 : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="http://stoettesystemerne.dk/organisation/itsystem/6/")]
+    public partial class RelationListeType6 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private AdresseFlerRelationType[] adresserField;
+        
+        private KlasseFlerRelationType[] tilknyttedeOpgaverField;
+        
+        private KlasseFlerRelationType[] systemTyperField;
+        
+        private OrganisationFlerRelationType[] tilhoererField;
+        
+        private BrugerFlerRelationType[] tilknyttedeBrugereField;
+        
+        private OrganisationEnhedFlerRelationType[] tilknyttedeEnhederField;
+        
+        private OrganisationFunktionFlerRelationType[] tilknyttedeFunktionerField;
+        
+        private InteressefaellesskabFlerRelationType[] tilknyttedeInteressefaellesskaberField;
+        
+        private OrganisationFlerRelationType[] tilknyttedeOrganisationerField;
+        
+        private PersonFlerRelationType[] tilknyttedePersonerField;
+        
+        private ItSystemFlerRelationType[] tilknyttedeItSystemerField;
+        
+        private LokalUdvidelseType lokalUdvidelseField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Adresser", Namespace="urn:oio:sagdok:3.0.0", Order=0)]
+        public AdresseFlerRelationType[] Adresser {
+            get {
+                return this.adresserField;
+            }
+            set {
+                this.adresserField = value;
+                this.RaisePropertyChanged("Adresser");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOpgaver", Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        public KlasseFlerRelationType[] TilknyttedeOpgaver {
+            get {
+                return this.tilknyttedeOpgaverField;
+            }
+            set {
+                this.tilknyttedeOpgaverField = value;
+                this.RaisePropertyChanged("TilknyttedeOpgaver");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("SystemTyper", Namespace="urn:oio:sagdok:3.0.0", Order=2)]
+        public KlasseFlerRelationType[] SystemTyper {
+            get {
+                return this.systemTyperField;
+            }
+            set {
+                this.systemTyperField = value;
+                this.RaisePropertyChanged("SystemTyper");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Tilhoerer", Namespace="urn:oio:sagdok:3.0.0", Order=3)]
+        public OrganisationFlerRelationType[] Tilhoerer {
+            get {
+                return this.tilhoererField;
+            }
+            set {
+                this.tilhoererField = value;
+                this.RaisePropertyChanged("Tilhoerer");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeBrugere", Namespace="urn:oio:sagdok:3.0.0", Order=4)]
+        public BrugerFlerRelationType[] TilknyttedeBrugere {
+            get {
+                return this.tilknyttedeBrugereField;
+            }
+            set {
+                this.tilknyttedeBrugereField = value;
+                this.RaisePropertyChanged("TilknyttedeBrugere");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeEnheder", Namespace="urn:oio:sagdok:3.0.0", Order=5)]
+        public OrganisationEnhedFlerRelationType[] TilknyttedeEnheder {
+            get {
+                return this.tilknyttedeEnhederField;
+            }
+            set {
+                this.tilknyttedeEnhederField = value;
+                this.RaisePropertyChanged("TilknyttedeEnheder");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeFunktioner", Namespace="urn:oio:sagdok:3.0.0", Order=6)]
+        public OrganisationFunktionFlerRelationType[] TilknyttedeFunktioner {
+            get {
+                return this.tilknyttedeFunktionerField;
+            }
+            set {
+                this.tilknyttedeFunktionerField = value;
+                this.RaisePropertyChanged("TilknyttedeFunktioner");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeInteressefaellesskaber", Namespace="urn:oio:sagdok:3.0.0", Order=7)]
+        public InteressefaellesskabFlerRelationType[] TilknyttedeInteressefaellesskaber {
+            get {
+                return this.tilknyttedeInteressefaellesskaberField;
+            }
+            set {
+                this.tilknyttedeInteressefaellesskaberField = value;
+                this.RaisePropertyChanged("TilknyttedeInteressefaellesskaber");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOrganisationer", Namespace="urn:oio:sagdok:3.0.0", Order=8)]
+        public OrganisationFlerRelationType[] TilknyttedeOrganisationer {
+            get {
+                return this.tilknyttedeOrganisationerField;
+            }
+            set {
+                this.tilknyttedeOrganisationerField = value;
+                this.RaisePropertyChanged("TilknyttedeOrganisationer");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedePersoner", Namespace="urn:oio:sagdok:3.0.0", Order=9)]
+        public PersonFlerRelationType[] TilknyttedePersoner {
+            get {
+                return this.tilknyttedePersonerField;
+            }
+            set {
+                this.tilknyttedePersonerField = value;
+                this.RaisePropertyChanged("TilknyttedePersoner");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeItSystemer", Namespace="urn:oio:sagdok:3.0.0", Order=10)]
+        public ItSystemFlerRelationType[] TilknyttedeItSystemer {
+            get {
+                return this.tilknyttedeItSystemerField;
+            }
+            set {
+                this.tilknyttedeItSystemerField = value;
+                this.RaisePropertyChanged("TilknyttedeItSystemer");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=11)]
+        public LokalUdvidelseType LokalUdvidelse {
+            get {
+                return this.lokalUdvidelseField;
+            }
+            set {
+                this.lokalUdvidelseField = value;
+                this.RaisePropertyChanged("LokalUdvidelse");
+            }
+        }
         
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
@@ -3592,19 +2750,19 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="urn:oio:sts:organisation:virksomhed:1.1.3.0")]
-    public partial class RegistreringType3 : RegistreringType {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="http://stoettesystemerne.dk/organisation/myndighed/6/")]
+    public partial class RegistreringType7 : RegistreringType {
         
-        private EgenskabType[] attributListeField;
+        private EgenskabType8[] attributListeField;
         
-        private TilstandListeType tilstandListeField;
+        private TilstandListeType7 tilstandListeField;
         
-        private RelationListeType relationListeField;
+        private RelationListeType7 relationListeField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
         [System.Xml.Serialization.XmlArrayItemAttribute("Egenskab", IsNullable=false)]
-        public EgenskabType[] AttributListe {
+        public EgenskabType8[] AttributListe {
             get {
                 return this.attributListeField;
             }
@@ -3616,7 +2774,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public TilstandListeType TilstandListe {
+        public TilstandListeType7 TilstandListe {
             get {
                 return this.tilstandListeField;
             }
@@ -3628,7 +2786,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public RelationListeType RelationListe {
+        public RelationListeType7 RelationListe {
             get {
                 return this.relationListeField;
             }
@@ -3644,8 +2802,184 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:virksomhed:1.1.3.0")]
-    public partial class EgenskabType : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="http://stoettesystemerne.dk/organisation/myndighed/6/")]
+    public partial class EgenskabType8 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private VirkningType virkningField;
+        
+        private string brugervendtNoegleTekstField;
+        
+        private string cVRNummerTekstField;
+        
+        private string navnTekstField;
+        
+        private string myndighedsKodeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=0)]
+        public VirkningType Virkning {
+            get {
+                return this.virkningField;
+            }
+            set {
+                this.virkningField = value;
+                this.RaisePropertyChanged("Virkning");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        public string BrugervendtNoegleTekst {
+            get {
+                return this.brugervendtNoegleTekstField;
+            }
+            set {
+                this.brugervendtNoegleTekstField = value;
+                this.RaisePropertyChanged("BrugervendtNoegleTekst");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("CVR-NummerTekst", Namespace="urn:oio:sts:6", Order=2)]
+        public string CVRNummerTekst {
+            get {
+                return this.cVRNummerTekstField;
+            }
+            set {
+                this.cVRNummerTekstField = value;
+                this.RaisePropertyChanged("CVRNummerTekst");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:6", Order=3)]
+        public string NavnTekst {
+            get {
+                return this.navnTekstField;
+            }
+            set {
+                this.navnTekstField = value;
+                this.RaisePropertyChanged("NavnTekst");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:6", Order=4)]
+        public string MyndighedsKode {
+            get {
+                return this.myndighedsKodeField;
+            }
+            set {
+                this.myndighedsKodeField = value;
+                this.RaisePropertyChanged("MyndighedsKode");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="http://stoettesystemerne.dk/organisation/myndighed/6/")]
+    public partial class TilstandListeType7 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="http://stoettesystemerne.dk/organisation/myndighed/6/")]
+    public partial class RelationListeType7 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="http://stoettesystemerne.dk/organisation/virksomhed/6/")]
+    public partial class RegistreringType6 : RegistreringType {
+        
+        private EgenskabType9[] attributListeField;
+        
+        private TilstandListeType8 tilstandListeField;
+        
+        private RelationListeType8 relationListeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("Egenskab", IsNullable=false)]
+        public EgenskabType9[] AttributListe {
+            get {
+                return this.attributListeField;
+            }
+            set {
+                this.attributListeField = value;
+                this.RaisePropertyChanged("AttributListe");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public TilstandListeType8 TilstandListe {
+            get {
+                return this.tilstandListeField;
+            }
+            set {
+                this.tilstandListeField = value;
+                this.RaisePropertyChanged("TilstandListe");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public RelationListeType8 RelationListe {
+            get {
+                return this.relationListeField;
+            }
+            set {
+                this.relationListeField = value;
+                this.RaisePropertyChanged("RelationListe");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="http://stoettesystemerne.dk/organisation/virksomhed/6/")]
+    public partial class EgenskabType9 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private VirkningType virkningField;
         
@@ -3684,7 +3018,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("CVR-NummerTekst", Namespace="urn:oio:sts:1.1.3.0", Order=2)]
+        [System.Xml.Serialization.XmlElementAttribute("CVR-NummerTekst", Namespace="urn:oio:sts:6", Order=2)]
         public string CVRNummerTekst {
             get {
                 return this.cVRNummerTekstField;
@@ -3696,7 +3030,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("SE-NummerTekst", Namespace="urn:oio:sts:1.1.3.0", Order=3)]
+        [System.Xml.Serialization.XmlElementAttribute("SE-NummerTekst", Namespace="urn:oio:sts:6", Order=3)]
         public string SENummerTekst {
             get {
                 return this.sENummerTekstField;
@@ -3708,7 +3042,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("P-NummerTekst", Namespace="urn:oio:sts:1.1.3.0", Order=4)]
+        [System.Xml.Serialization.XmlElementAttribute("P-NummerTekst", Namespace="urn:oio:sts:6", Order=4)]
         public string PNummerTekst {
             get {
                 return this.pNummerTekstField;
@@ -3720,7 +3054,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:1.1.3.0", Order=5)]
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:6", Order=5)]
         public string NavnTekst {
             get {
                 return this.navnTekstField;
@@ -3746,8 +3080,8 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:virksomhed:1.1.3.0")]
-    public partial class TilstandListeType : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="http://stoettesystemerne.dk/organisation/virksomhed/6/")]
+    public partial class TilstandListeType8 : object, System.ComponentModel.INotifyPropertyChanged {
         
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
@@ -3764,8 +3098,8 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:virksomhed:1.1.3.0")]
-    public partial class RelationListeType : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="http://stoettesystemerne.dk/organisation/virksomhed/6/")]
+    public partial class RelationListeType8 : object, System.ComponentModel.INotifyPropertyChanged {
         
         public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
@@ -3782,18 +3116,18 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class RegistreringType2 : RegistreringType {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/")]
+    public partial class RegistreringType5 : RegistreringType {
         
-        private AttributListeType4 attributListeField;
+        private AttributListeType9 attributListeField;
         
-        private TilstandListeType4 tilstandListeField;
+        private TilstandListeType9 tilstandListeField;
         
-        private RelationListeType4 relationListeField;
+        private RelationListeType9 relationListeField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public AttributListeType4 AttributListe {
+        public AttributListeType9 AttributListe {
             get {
                 return this.attributListeField;
             }
@@ -3805,7 +3139,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public TilstandListeType4 TilstandListe {
+        public TilstandListeType9 TilstandListe {
             get {
                 return this.tilstandListeField;
             }
@@ -3817,7 +3151,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public RelationListeType4 RelationListe {
+        public RelationListeType9 RelationListe {
             get {
                 return this.relationListeField;
             }
@@ -3833,8 +3167,8 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="AttributListeType", Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class AttributListeType4 : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="AttributListeType", Namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/")]
+    public partial class AttributListeType9 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private EgenskabType4[] egenskabField;
         
@@ -3879,8 +3213,439 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/")]
     public partial class EgenskabType4 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private VirkningType virkningField;
+        
+        private string brugervendtNoegleTekstField;
+        
+        private string interessefaellesskabNavnField;
+        
+        private string interessefaellesskabTypeTekstField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=0)]
+        public VirkningType Virkning {
+            get {
+                return this.virkningField;
+            }
+            set {
+                this.virkningField = value;
+                this.RaisePropertyChanged("Virkning");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        public string BrugervendtNoegleTekst {
+            get {
+                return this.brugervendtNoegleTekstField;
+            }
+            set {
+                this.brugervendtNoegleTekstField = value;
+                this.RaisePropertyChanged("BrugervendtNoegleTekst");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=2)]
+        public string InteressefaellesskabNavn {
+            get {
+                return this.interessefaellesskabNavnField;
+            }
+            set {
+                this.interessefaellesskabNavnField = value;
+                this.RaisePropertyChanged("InteressefaellesskabNavn");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=3)]
+        public string InteressefaellesskabTypeTekst {
+            get {
+                return this.interessefaellesskabTypeTekstField;
+            }
+            set {
+                this.interessefaellesskabTypeTekstField = value;
+                this.RaisePropertyChanged("InteressefaellesskabTypeTekst");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/")]
+    public partial class TilstandListeType9 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private GyldighedType[] gyldighedField;
+        
+        private LokalUdvidelseType lokalUdvidelseField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="http://stoettesystemerne.dk/organisation/6/", Order=0)]
+        public GyldighedType[] Gyldighed {
+            get {
+                return this.gyldighedField;
+            }
+            set {
+                this.gyldighedField = value;
+                this.RaisePropertyChanged("Gyldighed");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        public LokalUdvidelseType LokalUdvidelse {
+            get {
+                return this.lokalUdvidelseField;
+            }
+            set {
+                this.lokalUdvidelseField = value;
+                this.RaisePropertyChanged("LokalUdvidelse");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/")]
+    public partial class RelationListeType9 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private AdresseFlerRelationType[] adresserField;
+        
+        private KlasseRelationType brancheField;
+        
+        private KlasseRelationType interessefaellesskabstypeField;
+        
+        private KlasseFlerRelationType[] tilknyttedeOpgaverField;
+        
+        private OrganisationEnhedRelationType overordnetField;
+        
+        private OrganisationFlerRelationType tilhoererField;
+        
+        private BrugerFlerRelationType[] tilknyttedeBrugereField;
+        
+        private OrganisationEnhedFlerRelationType[] tilknyttedeEnhederField;
+        
+        private OrganisationFunktionFlerRelationType[] tilknyttedeFunktionerField;
+        
+        private InteressefaellesskabFlerRelationType[] tilknyttedeInteressefaellesskaberField;
+        
+        private OrganisationFlerRelationType[] tilknyttedeOrganisationerField;
+        
+        private PersonFlerRelationType[] tilknyttedePersonerField;
+        
+        private ItSystemFlerRelationType[] tilknyttedeItSystemerField;
+        
+        private LokalUdvidelseType lokalUdvidelseField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Adresser", Namespace="urn:oio:sagdok:3.0.0", Order=0)]
+        public AdresseFlerRelationType[] Adresser {
+            get {
+                return this.adresserField;
+            }
+            set {
+                this.adresserField = value;
+                this.RaisePropertyChanged("Adresser");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        public KlasseRelationType Branche {
+            get {
+                return this.brancheField;
+            }
+            set {
+                this.brancheField = value;
+                this.RaisePropertyChanged("Branche");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=2)]
+        public KlasseRelationType Interessefaellesskabstype {
+            get {
+                return this.interessefaellesskabstypeField;
+            }
+            set {
+                this.interessefaellesskabstypeField = value;
+                this.RaisePropertyChanged("Interessefaellesskabstype");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOpgaver", Namespace="urn:oio:sagdok:3.0.0", Order=3)]
+        public KlasseFlerRelationType[] TilknyttedeOpgaver {
+            get {
+                return this.tilknyttedeOpgaverField;
+            }
+            set {
+                this.tilknyttedeOpgaverField = value;
+                this.RaisePropertyChanged("TilknyttedeOpgaver");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=4)]
+        public OrganisationEnhedRelationType Overordnet {
+            get {
+                return this.overordnetField;
+            }
+            set {
+                this.overordnetField = value;
+                this.RaisePropertyChanged("Overordnet");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=5)]
+        public OrganisationFlerRelationType Tilhoerer {
+            get {
+                return this.tilhoererField;
+            }
+            set {
+                this.tilhoererField = value;
+                this.RaisePropertyChanged("Tilhoerer");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeBrugere", Namespace="urn:oio:sagdok:3.0.0", Order=6)]
+        public BrugerFlerRelationType[] TilknyttedeBrugere {
+            get {
+                return this.tilknyttedeBrugereField;
+            }
+            set {
+                this.tilknyttedeBrugereField = value;
+                this.RaisePropertyChanged("TilknyttedeBrugere");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeEnheder", Namespace="urn:oio:sagdok:3.0.0", Order=7)]
+        public OrganisationEnhedFlerRelationType[] TilknyttedeEnheder {
+            get {
+                return this.tilknyttedeEnhederField;
+            }
+            set {
+                this.tilknyttedeEnhederField = value;
+                this.RaisePropertyChanged("TilknyttedeEnheder");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeFunktioner", Namespace="urn:oio:sagdok:3.0.0", Order=8)]
+        public OrganisationFunktionFlerRelationType[] TilknyttedeFunktioner {
+            get {
+                return this.tilknyttedeFunktionerField;
+            }
+            set {
+                this.tilknyttedeFunktionerField = value;
+                this.RaisePropertyChanged("TilknyttedeFunktioner");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeInteressefaellesskaber", Namespace="urn:oio:sagdok:3.0.0", Order=9)]
+        public InteressefaellesskabFlerRelationType[] TilknyttedeInteressefaellesskaber {
+            get {
+                return this.tilknyttedeInteressefaellesskaberField;
+            }
+            set {
+                this.tilknyttedeInteressefaellesskaberField = value;
+                this.RaisePropertyChanged("TilknyttedeInteressefaellesskaber");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOrganisationer", Namespace="urn:oio:sagdok:3.0.0", Order=10)]
+        public OrganisationFlerRelationType[] TilknyttedeOrganisationer {
+            get {
+                return this.tilknyttedeOrganisationerField;
+            }
+            set {
+                this.tilknyttedeOrganisationerField = value;
+                this.RaisePropertyChanged("TilknyttedeOrganisationer");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedePersoner", Namespace="urn:oio:sagdok:3.0.0", Order=11)]
+        public PersonFlerRelationType[] TilknyttedePersoner {
+            get {
+                return this.tilknyttedePersonerField;
+            }
+            set {
+                this.tilknyttedePersonerField = value;
+                this.RaisePropertyChanged("TilknyttedePersoner");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeItSystemer", Namespace="urn:oio:sagdok:3.0.0", Order=12)]
+        public ItSystemFlerRelationType[] TilknyttedeItSystemer {
+            get {
+                return this.tilknyttedeItSystemerField;
+            }
+            set {
+                this.tilknyttedeItSystemerField = value;
+                this.RaisePropertyChanged("TilknyttedeItSystemer");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=13)]
+        public LokalUdvidelseType LokalUdvidelse {
+            get {
+                return this.lokalUdvidelseField;
+            }
+            set {
+                this.lokalUdvidelseField = value;
+                this.RaisePropertyChanged("LokalUdvidelse");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class RegistreringType4 : RegistreringType {
+        
+        private AttributListeType attributListeField;
+        
+        private TilstandListeType tilstandListeField;
+        
+        private RelationListeType relationListeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public AttributListeType AttributListe {
+            get {
+                return this.attributListeField;
+            }
+            set {
+                this.attributListeField = value;
+                this.RaisePropertyChanged("AttributListe");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public TilstandListeType TilstandListe {
+            get {
+                return this.tilstandListeField;
+            }
+            set {
+                this.tilstandListeField = value;
+                this.RaisePropertyChanged("TilstandListe");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public RelationListeType RelationListe {
+            get {
+                return this.relationListeField;
+            }
+            set {
+                this.relationListeField = value;
+                this.RaisePropertyChanged("RelationListe");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class AttributListeType : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private EgenskabType3[] egenskabField;
+        
+        private LokalUdvidelseType lokalUdvidelseField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Egenskab", Order=0)]
+        public EgenskabType3[] Egenskab {
+            get {
+                return this.egenskabField;
+            }
+            set {
+                this.egenskabField = value;
+                this.RaisePropertyChanged("Egenskab");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        public LokalUdvidelseType LokalUdvidelse {
+            get {
+                return this.lokalUdvidelseField;
+            }
+            set {
+                this.lokalUdvidelseField = value;
+                this.RaisePropertyChanged("LokalUdvidelse");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class EgenskabType3 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private VirkningType virkningField;
         
@@ -3953,15 +3718,15 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class TilstandListeType4 : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class TilstandListeType : object, System.ComponentModel.INotifyPropertyChanged {
         
         private GyldighedType[] gyldighedField;
         
         private LokalUdvidelseType lokalUdvidelseField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="urn:oio:sts:organisation:1.1.3.0", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="http://stoettesystemerne.dk/organisation/6/", Order=0)]
         public GyldighedType[] Gyldighed {
             get {
                 return this.gyldighedField;
@@ -3999,16 +3764,16 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class RelationListeType4 : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class RelationListeType : object, System.ComponentModel.INotifyPropertyChanged {
         
         private AdresseFlerRelationType[] adresserField;
         
         private KlasseFlerRelationType[] brugerTyperField;
         
-        private KlasseFlerRelationType[] opgaverField;
+        private KlasseFlerRelationType[] tilknyttedeOpgaverField;
         
-        private OrganisationRelationType tilhoererField;
+        private OrganisationFlerRelationType tilhoererField;
         
         private OrganisationEnhedFlerRelationType[] tilknyttedeEnhederField;
         
@@ -4049,20 +3814,20 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Opgaver", Namespace="urn:oio:sagdok:3.0.0", Order=2)]
-        public KlasseFlerRelationType[] Opgaver {
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOpgaver", Namespace="urn:oio:sagdok:3.0.0", Order=2)]
+        public KlasseFlerRelationType[] TilknyttedeOpgaver {
             get {
-                return this.opgaverField;
+                return this.tilknyttedeOpgaverField;
             }
             set {
-                this.opgaverField = value;
-                this.RaisePropertyChanged("Opgaver");
+                this.tilknyttedeOpgaverField = value;
+                this.RaisePropertyChanged("TilknyttedeOpgaver");
             }
         }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=3)]
-        public OrganisationRelationType Tilhoerer {
+        public OrganisationFlerRelationType Tilhoerer {
             get {
                 return this.tilhoererField;
             }
@@ -4171,19 +3936,18 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="urn:oio:sts:organisation:myndighed:1.1.3.0")]
-    public partial class RegistreringType1 : RegistreringType {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/")]
+    public partial class RegistreringType3 : RegistreringType {
         
-        private EgenskabType3[] attributListeField;
+        private AttributListeType4 attributListeField;
         
-        private TilstandListeType3 tilstandListeField;
+        private TilstandListeType4 tilstandListeField;
         
-        private RelationListeType3 relationListeField;
+        private RelationListeType4 relationListeField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("Egenskab", IsNullable=false)]
-        public EgenskabType3[] AttributListe {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public AttributListeType4 AttributListe {
             get {
                 return this.attributListeField;
             }
@@ -4195,7 +3959,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public TilstandListeType3 TilstandListe {
+        public TilstandListeType4 TilstandListe {
             get {
                 return this.tilstandListeField;
             }
@@ -4207,7 +3971,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public RelationListeType3 RelationListe {
+        public RelationListeType4 RelationListe {
             get {
                 return this.relationListeField;
             }
@@ -4223,18 +3987,60 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="urn:oio:sts:organisation:myndighed:1.1.3.0")]
-    public partial class EgenskabType3 : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="AttributListeType", Namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/")]
+    public partial class AttributListeType4 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private EgenskabType2[] egenskabField;
+        
+        private LokalUdvidelseType lokalUdvidelseField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Egenskab", Order=0)]
+        public EgenskabType2[] Egenskab {
+            get {
+                return this.egenskabField;
+            }
+            set {
+                this.egenskabField = value;
+                this.RaisePropertyChanged("Egenskab");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        public LokalUdvidelseType LokalUdvidelse {
+            get {
+                return this.lokalUdvidelseField;
+            }
+            set {
+                this.lokalUdvidelseField = value;
+                this.RaisePropertyChanged("LokalUdvidelse");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/")]
+    public partial class EgenskabType2 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private VirkningType virkningField;
         
         private string brugervendtNoegleTekstField;
         
-        private string cVRNummerTekstField;
-        
-        private string navnTekstField;
-        
-        private string myndighedsKodeField;
+        private string funktionNavnField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=0)]
@@ -4261,19 +4067,337 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("CVR-NummerTekst", Namespace="urn:oio:sts:1.1.3.0", Order=2)]
-        public string CVRNummerTekst {
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=2)]
+        public string FunktionNavn {
             get {
-                return this.cVRNummerTekstField;
+                return this.funktionNavnField;
             }
             set {
-                this.cVRNummerTekstField = value;
-                this.RaisePropertyChanged("CVRNummerTekst");
+                this.funktionNavnField = value;
+                this.RaisePropertyChanged("FunktionNavn");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/")]
+    public partial class TilstandListeType4 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private GyldighedType[] gyldighedField;
+        
+        private LokalUdvidelseType lokalUdvidelseField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="http://stoettesystemerne.dk/organisation/6/", Order=0)]
+        public GyldighedType[] Gyldighed {
+            get {
+                return this.gyldighedField;
+            }
+            set {
+                this.gyldighedField = value;
+                this.RaisePropertyChanged("Gyldighed");
             }
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:1.1.3.0", Order=3)]
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        public LokalUdvidelseType LokalUdvidelse {
+            get {
+                return this.lokalUdvidelseField;
+            }
+            set {
+                this.lokalUdvidelseField = value;
+                this.RaisePropertyChanged("LokalUdvidelse");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/")]
+    public partial class RelationListeType4 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private AdresseFlerRelationType[] adresserField;
+        
+        private KlasseRelationType funktionstypeField;
+        
+        private KlasseFlerRelationType[] tilknyttedeOpgaverField;
+        
+        private BrugerFlerRelationType[] tilknyttedeBrugereField;
+        
+        private OrganisationEnhedFlerRelationType[] tilknyttedeEnhederField;
+        
+        private InteressefaellesskabFlerRelationType[] tilknyttedeInteressefaellesskaberField;
+        
+        private OrganisationFlerRelationType[] tilknyttedeOrganisationerField;
+        
+        private PersonFlerRelationType[] tilknyttedePersonerField;
+        
+        private ItSystemFlerRelationType[] tilknyttedeItSystemerField;
+        
+        private LokalUdvidelseType lokalUdvidelseField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Adresser", Namespace="urn:oio:sagdok:3.0.0", Order=0)]
+        public AdresseFlerRelationType[] Adresser {
+            get {
+                return this.adresserField;
+            }
+            set {
+                this.adresserField = value;
+                this.RaisePropertyChanged("Adresser");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        public KlasseRelationType Funktionstype {
+            get {
+                return this.funktionstypeField;
+            }
+            set {
+                this.funktionstypeField = value;
+                this.RaisePropertyChanged("Funktionstype");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOpgaver", Namespace="urn:oio:sagdok:3.0.0", Order=2)]
+        public KlasseFlerRelationType[] TilknyttedeOpgaver {
+            get {
+                return this.tilknyttedeOpgaverField;
+            }
+            set {
+                this.tilknyttedeOpgaverField = value;
+                this.RaisePropertyChanged("TilknyttedeOpgaver");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeBrugere", Namespace="urn:oio:sagdok:3.0.0", Order=3)]
+        public BrugerFlerRelationType[] TilknyttedeBrugere {
+            get {
+                return this.tilknyttedeBrugereField;
+            }
+            set {
+                this.tilknyttedeBrugereField = value;
+                this.RaisePropertyChanged("TilknyttedeBrugere");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeEnheder", Namespace="urn:oio:sagdok:3.0.0", Order=4)]
+        public OrganisationEnhedFlerRelationType[] TilknyttedeEnheder {
+            get {
+                return this.tilknyttedeEnhederField;
+            }
+            set {
+                this.tilknyttedeEnhederField = value;
+                this.RaisePropertyChanged("TilknyttedeEnheder");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeInteressefaellesskaber", Namespace="urn:oio:sagdok:3.0.0", Order=5)]
+        public InteressefaellesskabFlerRelationType[] TilknyttedeInteressefaellesskaber {
+            get {
+                return this.tilknyttedeInteressefaellesskaberField;
+            }
+            set {
+                this.tilknyttedeInteressefaellesskaberField = value;
+                this.RaisePropertyChanged("TilknyttedeInteressefaellesskaber");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOrganisationer", Namespace="urn:oio:sagdok:3.0.0", Order=6)]
+        public OrganisationFlerRelationType[] TilknyttedeOrganisationer {
+            get {
+                return this.tilknyttedeOrganisationerField;
+            }
+            set {
+                this.tilknyttedeOrganisationerField = value;
+                this.RaisePropertyChanged("TilknyttedeOrganisationer");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedePersoner", Namespace="urn:oio:sagdok:3.0.0", Order=7)]
+        public PersonFlerRelationType[] TilknyttedePersoner {
+            get {
+                return this.tilknyttedePersonerField;
+            }
+            set {
+                this.tilknyttedePersonerField = value;
+                this.RaisePropertyChanged("TilknyttedePersoner");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeItSystemer", Namespace="urn:oio:sagdok:3.0.0", Order=8)]
+        public ItSystemFlerRelationType[] TilknyttedeItSystemer {
+            get {
+                return this.tilknyttedeItSystemerField;
+            }
+            set {
+                this.tilknyttedeItSystemerField = value;
+                this.RaisePropertyChanged("TilknyttedeItSystemer");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=9)]
+        public LokalUdvidelseType LokalUdvidelse {
+            get {
+                return this.lokalUdvidelseField;
+            }
+            set {
+                this.lokalUdvidelseField = value;
+                this.RaisePropertyChanged("LokalUdvidelse");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="http://stoettesystemerne.dk/organisation/person/6/")]
+    public partial class RegistreringType1 : RegistreringType {
+        
+        private EgenskabType6[] attributListeField;
+        
+        private TilstandListeType1 tilstandListeField;
+        
+        private RelationListeType1 relationListeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("Egenskab", IsNullable=false)]
+        public EgenskabType6[] AttributListe {
+            get {
+                return this.attributListeField;
+            }
+            set {
+                this.attributListeField = value;
+                this.RaisePropertyChanged("AttributListe");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public TilstandListeType1 TilstandListe {
+            get {
+                return this.tilstandListeField;
+            }
+            set {
+                this.tilstandListeField = value;
+                this.RaisePropertyChanged("TilstandListe");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public RelationListeType1 RelationListe {
+            get {
+                return this.relationListeField;
+            }
+            set {
+                this.relationListeField = value;
+                this.RaisePropertyChanged("RelationListe");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="EgenskabType", Namespace="http://stoettesystemerne.dk/organisation/person/6/")]
+    public partial class EgenskabType6 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private VirkningType virkningField;
+        
+        private string brugervendtNoegleTekstField;
+        
+        private string cPRNummerTekstField;
+        
+        private string navnTekstField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=0)]
+        public VirkningType Virkning {
+            get {
+                return this.virkningField;
+            }
+            set {
+                this.virkningField = value;
+                this.RaisePropertyChanged("Virkning");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=1)]
+        public string BrugervendtNoegleTekst {
+            get {
+                return this.brugervendtNoegleTekstField;
+            }
+            set {
+                this.brugervendtNoegleTekstField = value;
+                this.RaisePropertyChanged("BrugervendtNoegleTekst");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("CPR-NummerTekst", Namespace="urn:oio:sts:6", Order=2)]
+        public string CPRNummerTekst {
+            get {
+                return this.cPRNummerTekstField;
+            }
+            set {
+                this.cPRNummerTekstField = value;
+                this.RaisePropertyChanged("CPRNummerTekst");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
         public string NavnTekst {
             get {
                 return this.navnTekstField;
@@ -4284,15 +4408,118 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
             }
         }
         
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="http://stoettesystemerne.dk/organisation/person/6/")]
+    public partial class TilstandListeType1 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="http://stoettesystemerne.dk/organisation/person/6/")]
+    public partial class RelationListeType1 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationEnhedType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ItSystemType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(InteressefaellesskabType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationFunktionType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/6/")]
+    public partial class AktoerType : PartType {
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AktoerType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationEnhedType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ItSystemType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(InteressefaellesskabType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationFunktionType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(MyndighedType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(VirksomhedType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PersonType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:part:6")]
+    public partial class PartType : SagDokObjektType {
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AdresseType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PartType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AktoerType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationEnhedType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ItSystemType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(InteressefaellesskabType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationFunktionType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(MyndighedType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(VirksomhedType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PersonType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesFiltreretOutputType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class SagDokObjektType : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private string uUIDIdentifikatorField;
+        
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:1.1.3.0", Order=4)]
-        public string MyndighedsKode {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string UUIDIdentifikator {
             get {
-                return this.myndighedsKodeField;
+                return this.uUIDIdentifikatorField;
             }
             set {
-                this.myndighedsKodeField = value;
-                this.RaisePropertyChanged("MyndighedsKode");
+                this.uUIDIdentifikatorField = value;
+                this.RaisePropertyChanged("UUIDIdentifikator");
             }
         }
         
@@ -4311,234 +4538,14 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="TilstandListeType", Namespace="urn:oio:sts:organisation:myndighed:1.1.3.0")]
-    public partial class TilstandListeType3 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RelationListeType", Namespace="urn:oio:sts:organisation:myndighed:1.1.3.0")]
-    public partial class RelationListeType3 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:organisation:1.1.3.0")]
-    public partial class OrganisationType : AktoerType {
-        
-        private RegistreringType9[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
-        public RegistreringType9[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:organisationfunktion:1.1.3.0")]
-    public partial class OrganisationFunktionType : AktoerType {
-        
-        private RegistreringType8[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
-        public RegistreringType8[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:itsystem:1.1.3.0")]
-    public partial class ItSystemType : AktoerType {
-        
-        private RegistreringType7[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
-        public RegistreringType7[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:organisationenhed:1.1.3.0")]
-    public partial class OrganisationEnhedType : AktoerType {
-        
-        private RegistreringType5[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
-        public RegistreringType5[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class BrugerType : AktoerType {
-        
-        private RegistreringType2[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
-        public RegistreringType2[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:person:1.1.3.0")]
-    public partial class PersonType : PartType {
-        
-        private RegistreringType6[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
-        public RegistreringType6[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:virksomhed:1.1.3.0")]
-    public partial class VirksomhedType : PartType {
-        
-        private RegistreringType3[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
-        public RegistreringType3[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:myndighed:1.1.3.0")]
-    public partial class MyndighedType : PartType {
-        
-        private RegistreringType1[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
-        public RegistreringType1[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:adresse:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/adresse/6/")]
     public partial class AdresseType : SagDokObjektType {
         
-        private RegistreringType4[] registreringField;
+        private RegistreringType10[] registreringField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
-        public RegistreringType4[] Registrering {
+        public RegistreringType10[] Registrering {
             get {
                 return this.registreringField;
             }
@@ -4563,7 +4570,237 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="urn:oio:sts:organisation:itsystem:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/myndighed/6/")]
+    public partial class MyndighedType : PartType {
+        
+        private RegistreringType7[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
+        public RegistreringType7[] Registrering {
+            get {
+                return this.registreringField;
+            }
+            set {
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/virksomhed/6/")]
+    public partial class VirksomhedType : PartType {
+        
+        private RegistreringType6[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
+        public RegistreringType6[] Registrering {
+            get {
+                return this.registreringField;
+            }
+            set {
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/person/6/")]
+    public partial class PersonType : PartType {
+        
+        private RegistreringType1[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
+        public RegistreringType1[] Registrering {
+            get {
+                return this.registreringField;
+            }
+            set {
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisationenhed/6/")]
+    public partial class OrganisationEnhedType : AktoerType {
+        
+        private RegistreringType9[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
+        public RegistreringType9[] Registrering {
+            get {
+                return this.registreringField;
+            }
+            set {
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/itsystem/6/")]
+    public partial class ItSystemType : AktoerType {
+        
+        private RegistreringType8[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
+        public RegistreringType8[] Registrering {
+            get {
+                return this.registreringField;
+            }
+            set {
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/")]
+    public partial class InteressefaellesskabType : AktoerType {
+        
+        private RegistreringType5[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
+        public RegistreringType5[] Registrering {
+            get {
+                return this.registreringField;
+            }
+            set {
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class BrugerType : AktoerType {
+        
+        private RegistreringType4[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
+        public RegistreringType4[] Registrering {
+            get {
+                return this.registreringField;
+            }
+            set {
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/")]
+    public partial class OrganisationFunktionType : AktoerType {
+        
+        private RegistreringType3[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
+        public RegistreringType3[] Registrering {
+            get {
+                return this.registreringField;
+            }
+            set {
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="http://stoettesystemerne.dk/organisation/virksomhed/6/")]
+    public partial class FiltreretOejebliksbilledeType9 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private SagDokObjektType objektTypeField;
+        
+        private RegistreringType6[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public SagDokObjektType ObjektType {
+            get {
+                return this.objektTypeField;
+            }
+            set {
+                this.objektTypeField = value;
+                this.RaisePropertyChanged("ObjektType");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
+        public RegistreringType6[] Registrering {
+            get {
+                return this.registreringField;
+            }
+            set {
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="http://stoettesystemerne.dk/organisation/myndighed/6/")]
     public partial class FiltreretOejebliksbilledeType8 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private SagDokObjektType objektTypeField;
@@ -4609,238 +4846,8 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="urn:oio:sts:organisation:organisationfunktion:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="http://stoettesystemerne.dk/organisation/adresse/6/")]
     public partial class FiltreretOejebliksbilledeType7 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private SagDokObjektType objektTypeField;
-        
-        private RegistreringType8[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public SagDokObjektType ObjektType {
-            get {
-                return this.objektTypeField;
-            }
-            set {
-                this.objektTypeField = value;
-                this.RaisePropertyChanged("ObjektType");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
-        public RegistreringType8[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="urn:oio:sts:organisation:organisation:1.1.3.0")]
-    public partial class FiltreretOejebliksbilledeType6 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private SagDokObjektType objektTypeField;
-        
-        private RegistreringType9[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public SagDokObjektType ObjektType {
-            get {
-                return this.objektTypeField;
-            }
-            set {
-                this.objektTypeField = value;
-                this.RaisePropertyChanged("ObjektType");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
-        public RegistreringType9[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="urn:oio:sts:organisation:organisationenhed:1.1.3.0")]
-    public partial class FiltreretOejebliksbilledeType5 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private SagDokObjektType objektTypeField;
-        
-        private RegistreringType5[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public SagDokObjektType ObjektType {
-            get {
-                return this.objektTypeField;
-            }
-            set {
-                this.objektTypeField = value;
-                this.RaisePropertyChanged("ObjektType");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
-        public RegistreringType5[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class FiltreretOejebliksbilledeType4 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private SagDokObjektType objektTypeField;
-        
-        private RegistreringType2[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public SagDokObjektType ObjektType {
-            get {
-                return this.objektTypeField;
-            }
-            set {
-                this.objektTypeField = value;
-                this.RaisePropertyChanged("ObjektType");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
-        public RegistreringType2[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="urn:oio:sts:organisation:myndighed:1.1.3.0")]
-    public partial class FiltreretOejebliksbilledeType3 : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private SagDokObjektType objektTypeField;
-        
-        private RegistreringType1[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public SagDokObjektType ObjektType {
-            get {
-                return this.objektTypeField;
-            }
-            set {
-                this.objektTypeField = value;
-                this.RaisePropertyChanged("ObjektType");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
-        public RegistreringType1[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="urn:oio:sts:organisation:interessefaellesskab:1.1.3.0")]
-    public partial class FiltreretOejebliksbilledeType2 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private SagDokObjektType objektTypeField;
         
@@ -4885,8 +4892,146 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="urn:oio:sts:organisation:adresse:1.1.3.0")]
-    public partial class FiltreretOejebliksbilledeType1 : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="http://stoettesystemerne.dk/organisation/person/6/")]
+    public partial class FiltreretOejebliksbilledeType6 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private SagDokObjektType objektTypeField;
+        
+        private RegistreringType1[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public SagDokObjektType ObjektType {
+            get {
+                return this.objektTypeField;
+            }
+            set {
+                this.objektTypeField = value;
+                this.RaisePropertyChanged("ObjektType");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
+        public RegistreringType1[] Registrering {
+            get {
+                return this.registreringField;
+            }
+            set {
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="http://stoettesystemerne.dk/organisation/itsystem/6/")]
+    public partial class FiltreretOejebliksbilledeType5 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private SagDokObjektType objektTypeField;
+        
+        private RegistreringType8[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public SagDokObjektType ObjektType {
+            get {
+                return this.objektTypeField;
+            }
+            set {
+                this.objektTypeField = value;
+                this.RaisePropertyChanged("ObjektType");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
+        public RegistreringType8[] Registrering {
+            get {
+                return this.registreringField;
+            }
+            set {
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/")]
+    public partial class FiltreretOejebliksbilledeType4 : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private SagDokObjektType objektTypeField;
+        
+        private RegistreringType5[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public SagDokObjektType ObjektType {
+            get {
+                return this.objektTypeField;
+            }
+            set {
+                this.objektTypeField = value;
+                this.RaisePropertyChanged("ObjektType");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
+        public RegistreringType5[] Registrering {
+            get {
+                return this.registreringField;
+            }
+            set {
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class FiltreretOejebliksbilledeType3 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private SagDokObjektType objektTypeField;
         
@@ -4931,8 +5076,8 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:virksomhed:1.1.3.0")]
-    public partial class FiltreretOejebliksbilledeType : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/")]
+    public partial class FiltreretOejebliksbilledeType2 : object, System.ComponentModel.INotifyPropertyChanged {
         
         private SagDokObjektType objektTypeField;
         
@@ -4973,39 +5118,38 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(UnikReturType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class StandardReturType : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="FiltreretOejebliksbilledeType", Namespace="http://stoettesystemerne.dk/organisation/organisationenhed/6/")]
+    public partial class FiltreretOejebliksbilledeType1 : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private string statusKodeField;
+        private SagDokObjektType objektTypeField;
         
-        private string fejlbeskedTekstField;
+        private RegistreringType9[] registreringField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType="integer", Order=0)]
-        public string StatusKode {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public SagDokObjektType ObjektType {
             get {
-                return this.statusKodeField;
+                return this.objektTypeField;
             }
             set {
-                this.statusKodeField = value;
-                this.RaisePropertyChanged("StatusKode");
+                this.objektTypeField = value;
+                this.RaisePropertyChanged("ObjektType");
             }
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public string FejlbeskedTekst {
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
+        public RegistreringType9[] Registrering {
             get {
-                return this.fejlbeskedTekstField;
+                return this.registreringField;
             }
             set {
-                this.fejlbeskedTekstField = value;
-                this.RaisePropertyChanged("FejlbeskedTekst");
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
             }
         }
         
@@ -5024,53 +5168,62 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class UnikReturType : StandardReturType {
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisation/6/")]
+    public partial class FiltreretOejebliksbilledeType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private string typeField;
+        private SagDokObjektType objektTypeField;
         
-        private string uUIDIdentifikatorField;
+        private RegistreringType2[] registreringField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public string Type {
+        public SagDokObjektType ObjektType {
             get {
-                return this.typeField;
+                return this.objektTypeField;
             }
             set {
-                this.typeField = value;
-                this.RaisePropertyChanged("Type");
+                this.objektTypeField = value;
+                this.RaisePropertyChanged("ObjektType");
             }
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public string UUIDIdentifikator {
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
+        public RegistreringType2[] Registrering {
             get {
-                return this.uUIDIdentifikatorField;
+                return this.registreringField;
             }
             set {
-                this.uUIDIdentifikatorField = value;
-                this.RaisePropertyChanged("UUIDIdentifikator");
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
             }
         }
     }
     
     /// <remarks/>
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesOutputType9))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ListOutputType1))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesOutputType8))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesOutputType7))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesOutputType6))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FremsoegObjekthierarkiOutputType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OpretOutputType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesOutputType5))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesOutputType4))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ListOutputType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesOutputType3))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesOutputType2))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ListOutputType1))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesOutputType1))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ListOutputType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesOutputType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OpretOutputType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FremsoegObjekthierarkiOutputType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -5107,8 +5260,54 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="urn:oio:sts:organisation:person:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/")]
     public partial class LaesOutputType9 : BasicOutputType {
+        
+        private FiltreretOejebliksbilledeType4 filtreretOejebliksbilledeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public FiltreretOejebliksbilledeType4 FiltreretOejebliksbillede {
+            get {
+                return this.filtreretOejebliksbilledeField;
+            }
+            set {
+                this.filtreretOejebliksbilledeField = value;
+                this.RaisePropertyChanged("FiltreretOejebliksbillede");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="ListOutputType", Namespace="http://stoettesystemerne.dk/organisation/virksomhed/6/")]
+    public partial class ListOutputType1 : BasicOutputType {
+        
+        private FiltreretOejebliksbilledeType9[] filtreretOejebliksbilledeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("FiltreretOejebliksbillede", Order=0)]
+        public FiltreretOejebliksbilledeType9[] FiltreretOejebliksbillede {
+            get {
+                return this.filtreretOejebliksbilledeField;
+            }
+            set {
+                this.filtreretOejebliksbilledeField = value;
+                this.RaisePropertyChanged("FiltreretOejebliksbillede");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="http://stoettesystemerne.dk/organisation/virksomhed/6/")]
+    public partial class LaesOutputType8 : BasicOutputType {
         
         private FiltreretOejebliksbilledeType9 filtreretOejebliksbilledeField;
         
@@ -5130,54 +5329,8 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="urn:oio:sts:organisation:organisationfunktion:1.1.3.0")]
-    public partial class LaesOutputType8 : BasicOutputType {
-        
-        private FiltreretOejebliksbilledeType7 filtreretOejebliksbilledeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public FiltreretOejebliksbilledeType7 FiltreretOejebliksbillede {
-            get {
-                return this.filtreretOejebliksbilledeField;
-            }
-            set {
-                this.filtreretOejebliksbilledeField = value;
-                this.RaisePropertyChanged("FiltreretOejebliksbillede");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="urn:oio:sts:organisation:organisation:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="http://stoettesystemerne.dk/organisation/myndighed/6/")]
     public partial class LaesOutputType7 : BasicOutputType {
-        
-        private FiltreretOejebliksbilledeType6 filtreretOejebliksbilledeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public FiltreretOejebliksbilledeType6 FiltreretOejebliksbillede {
-            get {
-                return this.filtreretOejebliksbilledeField;
-            }
-            set {
-                this.filtreretOejebliksbilledeField = value;
-                this.RaisePropertyChanged("FiltreretOejebliksbillede");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="urn:oio:sts:organisation:itsystem:1.1.3.0")]
-    public partial class LaesOutputType6 : BasicOutputType {
         
         private FiltreretOejebliksbilledeType8 filtreretOejebliksbilledeField;
         
@@ -5199,96 +5352,181 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:organisationsystem:1.1.3.0")]
-    public partial class FremsoegObjekthierarkiOutputType : BasicOutputType {
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="http://stoettesystemerne.dk/organisation/itsystem/6/")]
+    public partial class LaesOutputType6 : BasicOutputType {
         
-        private FiltreretOejebliksbilledeType6[] organisationerField;
-        
-        private FiltreretOejebliksbilledeType5[] organisationEnhederField;
-        
-        private FiltreretOejebliksbilledeType7[] organisationFunktionerField;
-        
-        private FiltreretOejebliksbilledeType4[] brugereField;
-        
-        private FiltreretOejebliksbilledeType2[] interessefaellesskaberField;
-        
-        private FiltreretOejebliksbilledeType8[] itSystemerField;
+        private FiltreretOejebliksbilledeType5 filtreretOejebliksbilledeField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("FiltreretOejebliksbillede", IsNullable=false)]
-        public FiltreretOejebliksbilledeType6[] Organisationer {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public FiltreretOejebliksbilledeType5 FiltreretOejebliksbillede {
             get {
-                return this.organisationerField;
+                return this.filtreretOejebliksbilledeField;
             }
             set {
-                this.organisationerField = value;
-                this.RaisePropertyChanged("Organisationer");
+                this.filtreretOejebliksbilledeField = value;
+                this.RaisePropertyChanged("FiltreretOejebliksbillede");
             }
         }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="http://stoettesystemerne.dk/organisation/organisationenhed/6/")]
+    public partial class LaesOutputType5 : BasicOutputType {
+        
+        private FiltreretOejebliksbilledeType1 filtreretOejebliksbilledeField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=1)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("FiltreretOejebliksbillede", IsNullable=false)]
-        public FiltreretOejebliksbilledeType5[] OrganisationEnheder {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public FiltreretOejebliksbilledeType1 FiltreretOejebliksbillede {
             get {
-                return this.organisationEnhederField;
+                return this.filtreretOejebliksbilledeField;
             }
             set {
-                this.organisationEnhederField = value;
-                this.RaisePropertyChanged("OrganisationEnheder");
+                this.filtreretOejebliksbilledeField = value;
+                this.RaisePropertyChanged("FiltreretOejebliksbillede");
             }
         }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/")]
+    public partial class LaesOutputType4 : BasicOutputType {
+        
+        private FiltreretOejebliksbilledeType2 filtreretOejebliksbilledeField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=2)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("FiltreretOejebliksbillede", IsNullable=false)]
-        public FiltreretOejebliksbilledeType7[] OrganisationFunktioner {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public FiltreretOejebliksbilledeType2 FiltreretOejebliksbillede {
             get {
-                return this.organisationFunktionerField;
+                return this.filtreretOejebliksbilledeField;
             }
             set {
-                this.organisationFunktionerField = value;
-                this.RaisePropertyChanged("OrganisationFunktioner");
+                this.filtreretOejebliksbilledeField = value;
+                this.RaisePropertyChanged("FiltreretOejebliksbillede");
             }
         }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/adresse/6/")]
+    public partial class ListOutputType : BasicOutputType {
+        
+        private FiltreretOejebliksbilledeType7[] filtreretOejebliksbilledeField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=3)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("FiltreretOejebliksbillede", IsNullable=false)]
-        public FiltreretOejebliksbilledeType4[] Brugere {
+        [System.Xml.Serialization.XmlElementAttribute("FiltreretOejebliksbillede", Order=0)]
+        public FiltreretOejebliksbilledeType7[] FiltreretOejebliksbillede {
             get {
-                return this.brugereField;
+                return this.filtreretOejebliksbilledeField;
             }
             set {
-                this.brugereField = value;
-                this.RaisePropertyChanged("Brugere");
+                this.filtreretOejebliksbilledeField = value;
+                this.RaisePropertyChanged("FiltreretOejebliksbillede");
             }
         }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="http://stoettesystemerne.dk/organisation/adresse/6/")]
+    public partial class LaesOutputType3 : BasicOutputType {
+        
+        private FiltreretOejebliksbilledeType7 filtreretOejebliksbilledeField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=4)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("FiltreretOejebliksbillede", IsNullable=false)]
-        public FiltreretOejebliksbilledeType2[] Interessefaellesskaber {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public FiltreretOejebliksbilledeType7 FiltreretOejebliksbillede {
             get {
-                return this.interessefaellesskaberField;
+                return this.filtreretOejebliksbilledeField;
             }
             set {
-                this.interessefaellesskaberField = value;
-                this.RaisePropertyChanged("Interessefaellesskaber");
+                this.filtreretOejebliksbilledeField = value;
+                this.RaisePropertyChanged("FiltreretOejebliksbillede");
             }
         }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="http://stoettesystemerne.dk/organisation/organisation/6/")]
+    public partial class LaesOutputType2 : BasicOutputType {
+        
+        private FiltreretOejebliksbilledeType filtreretOejebliksbilledeField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=5)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("FiltreretOejebliksbillede", IsNullable=false)]
-        public FiltreretOejebliksbilledeType8[] ItSystemer {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public FiltreretOejebliksbilledeType FiltreretOejebliksbillede {
             get {
-                return this.itSystemerField;
+                return this.filtreretOejebliksbilledeField;
             }
             set {
-                this.itSystemerField = value;
-                this.RaisePropertyChanged("ItSystemer");
+                this.filtreretOejebliksbilledeField = value;
+                this.RaisePropertyChanged("FiltreretOejebliksbillede");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="http://stoettesystemerne.dk/organisation/person/6/")]
+    public partial class LaesOutputType1 : BasicOutputType {
+        
+        private FiltreretOejebliksbilledeType6 filtreretOejebliksbilledeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public FiltreretOejebliksbilledeType6 FiltreretOejebliksbillede {
+            get {
+                return this.filtreretOejebliksbilledeField;
+            }
+            set {
+                this.filtreretOejebliksbilledeField = value;
+                this.RaisePropertyChanged("FiltreretOejebliksbillede");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class LaesOutputType : BasicOutputType {
+        
+        private FiltreretOejebliksbilledeType3 filtreretOejebliksbilledeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public FiltreretOejebliksbilledeType3 FiltreretOejebliksbillede {
+            get {
+                return this.filtreretOejebliksbilledeField;
+            }
+            set {
+                this.filtreretOejebliksbilledeField = value;
+                this.RaisePropertyChanged("FiltreretOejebliksbillede");
             }
         }
     }
@@ -5321,213 +5559,96 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="urn:oio:sts:organisation:organisationenhed:1.1.3.0")]
-    public partial class LaesOutputType5 : BasicOutputType {
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisationsystem/6/")]
+    public partial class FremsoegObjekthierarkiOutputType : BasicOutputType {
         
-        private FiltreretOejebliksbilledeType5 filtreretOejebliksbilledeField;
+        private FiltreretOejebliksbilledeType[] organisationerField;
         
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public FiltreretOejebliksbilledeType5 FiltreretOejebliksbillede {
-            get {
-                return this.filtreretOejebliksbilledeField;
-            }
-            set {
-                this.filtreretOejebliksbilledeField = value;
-                this.RaisePropertyChanged("FiltreretOejebliksbillede");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class LaesOutputType4 : BasicOutputType {
+        private FiltreretOejebliksbilledeType1[] organisationEnhederField;
         
-        private FiltreretOejebliksbilledeType4 filtreretOejebliksbilledeField;
+        private FiltreretOejebliksbilledeType2[] organisationFunktionerField;
+        
+        private FiltreretOejebliksbilledeType3[] brugereField;
+        
+        private FiltreretOejebliksbilledeType4[] interessefaellesskaberField;
+        
+        private FiltreretOejebliksbilledeType5[] itSystemerField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public FiltreretOejebliksbilledeType4 FiltreretOejebliksbillede {
+        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("FiltreretOejebliksbillede", IsNullable=false)]
+        public FiltreretOejebliksbilledeType[] Organisationer {
             get {
-                return this.filtreretOejebliksbilledeField;
+                return this.organisationerField;
             }
             set {
-                this.filtreretOejebliksbilledeField = value;
-                this.RaisePropertyChanged("FiltreretOejebliksbillede");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="urn:oio:sts:organisation:myndighed:1.1.3.0")]
-    public partial class LaesOutputType3 : BasicOutputType {
-        
-        private FiltreretOejebliksbilledeType3 filtreretOejebliksbilledeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public FiltreretOejebliksbilledeType3 FiltreretOejebliksbillede {
-            get {
-                return this.filtreretOejebliksbilledeField;
-            }
-            set {
-                this.filtreretOejebliksbilledeField = value;
-                this.RaisePropertyChanged("FiltreretOejebliksbillede");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="urn:oio:sts:organisation:interessefaellesskab:1.1.3.0")]
-    public partial class LaesOutputType2 : BasicOutputType {
-        
-        private FiltreretOejebliksbilledeType2 filtreretOejebliksbilledeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public FiltreretOejebliksbilledeType2 FiltreretOejebliksbillede {
-            get {
-                return this.filtreretOejebliksbilledeField;
-            }
-            set {
-                this.filtreretOejebliksbilledeField = value;
-                this.RaisePropertyChanged("FiltreretOejebliksbillede");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="ListOutputType", Namespace="urn:oio:sts:organisation:adresse:1.1.3.0")]
-    public partial class ListOutputType1 : BasicOutputType {
-        
-        private FiltreretOejebliksbilledeType1[] filtreretOejebliksbilledeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("FiltreretOejebliksbillede", Order=0)]
-        public FiltreretOejebliksbilledeType1[] FiltreretOejebliksbillede {
-            get {
-                return this.filtreretOejebliksbilledeField;
-            }
-            set {
-                this.filtreretOejebliksbilledeField = value;
-                this.RaisePropertyChanged("FiltreretOejebliksbillede");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="LaesOutputType", Namespace="urn:oio:sts:organisation:adresse:1.1.3.0")]
-    public partial class LaesOutputType1 : BasicOutputType {
-        
-        private FiltreretOejebliksbilledeType1 filtreretOejebliksbilledeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public FiltreretOejebliksbilledeType1 FiltreretOejebliksbillede {
-            get {
-                return this.filtreretOejebliksbilledeField;
-            }
-            set {
-                this.filtreretOejebliksbilledeField = value;
-                this.RaisePropertyChanged("FiltreretOejebliksbillede");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:virksomhed:1.1.3.0")]
-    public partial class ListOutputType : BasicOutputType {
-        
-        private FiltreretOejebliksbilledeType[] filtreretOejebliksbilledeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("FiltreretOejebliksbillede", Order=0)]
-        public FiltreretOejebliksbilledeType[] FiltreretOejebliksbillede {
-            get {
-                return this.filtreretOejebliksbilledeField;
-            }
-            set {
-                this.filtreretOejebliksbilledeField = value;
-                this.RaisePropertyChanged("FiltreretOejebliksbillede");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:virksomhed:1.1.3.0")]
-    public partial class LaesOutputType : BasicOutputType {
-        
-        private FiltreretOejebliksbilledeType filtreretOejebliksbilledeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public FiltreretOejebliksbilledeType FiltreretOejebliksbillede {
-            get {
-                return this.filtreretOejebliksbilledeField;
-            }
-            set {
-                this.filtreretOejebliksbilledeField = value;
-                this.RaisePropertyChanged("FiltreretOejebliksbillede");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/")]
-    public partial class FremsoegobjekthierarkiResponseType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private FremsoegObjekthierarkiOutputType fremsoegObjekthierarkiOutputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:organisationsystem:1.1.3.0", Order=0)]
-        public FremsoegObjekthierarkiOutputType FremsoegObjekthierarkiOutput {
-            get {
-                return this.fremsoegObjekthierarkiOutputField;
-            }
-            set {
-                this.fremsoegObjekthierarkiOutputField = value;
-                this.RaisePropertyChanged("FremsoegObjekthierarkiOutput");
+                this.organisationerField = value;
+                this.RaisePropertyChanged("Organisationer");
             }
         }
         
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayAttribute(Order=1)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("FiltreretOejebliksbillede", IsNullable=false)]
+        public FiltreretOejebliksbilledeType1[] OrganisationEnheder {
+            get {
+                return this.organisationEnhederField;
+            }
+            set {
+                this.organisationEnhederField = value;
+                this.RaisePropertyChanged("OrganisationEnheder");
+            }
+        }
         
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayAttribute(Order=2)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("FiltreretOejebliksbillede", IsNullable=false)]
+        public FiltreretOejebliksbilledeType2[] OrganisationFunktioner {
+            get {
+                return this.organisationFunktionerField;
+            }
+            set {
+                this.organisationFunktionerField = value;
+                this.RaisePropertyChanged("OrganisationFunktioner");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayAttribute(Order=3)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("FiltreretOejebliksbillede", IsNullable=false)]
+        public FiltreretOejebliksbilledeType3[] Brugere {
+            get {
+                return this.brugereField;
+            }
+            set {
+                this.brugereField = value;
+                this.RaisePropertyChanged("Brugere");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayAttribute(Order=4)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("FiltreretOejebliksbillede", IsNullable=false)]
+        public FiltreretOejebliksbilledeType4[] Interessefaellesskaber {
+            get {
+                return this.interessefaellesskaberField;
+            }
+            set {
+                this.interessefaellesskaberField = value;
+                this.RaisePropertyChanged("Interessefaellesskaber");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlArrayAttribute(Order=5)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("FiltreretOejebliksbillede", IsNullable=false)]
+        public FiltreretOejebliksbilledeType5[] ItSystemer {
+            get {
+                return this.itSystemerField;
+            }
+            set {
+                this.itSystemerField = value;
+                this.RaisePropertyChanged("ItSystemer");
             }
         }
     }
@@ -5727,13 +5848,13 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoegInputType9))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoegInputType8))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoegInputType7))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FremsoegObjekthierarkiInputType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoegInputType6))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoegInputType5))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoegInputType4))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoegInputType3))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoegInputType2))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoegInputType1))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FremsoegObjekthierarkiInputType))]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
@@ -5812,19 +5933,18 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="urn:oio:sts:organisation:person:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/")]
     public partial class SoegInputType10 : SoegInputType {
         
-        private EgenskabType9[] attributListeField;
+        private AttributListeType9 attributListeField;
         
         private TilstandListeType9 tilstandListeField;
         
         private RelationListeType9 relationListeField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("Egenskab", IsNullable=false)]
-        public EgenskabType9[] AttributListe {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public AttributListeType9 AttributListe {
             get {
                 return this.attributListeField;
             }
@@ -5864,18 +5984,19 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="urn:oio:sts:organisation:organisationfunktion:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="http://stoettesystemerne.dk/organisation/virksomhed/6/")]
     public partial class SoegInputType9 : SoegInputType {
         
-        private AttributListeType8 attributListeField;
+        private EgenskabType9[] attributListeField;
         
         private TilstandListeType8 tilstandListeField;
         
         private RelationListeType8 relationListeField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public AttributListeType8 AttributListe {
+        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("Egenskab", IsNullable=false)]
+        public EgenskabType9[] AttributListe {
             get {
                 return this.attributListeField;
             }
@@ -5915,18 +6036,19 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="urn:oio:sts:organisation:organisation:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="http://stoettesystemerne.dk/organisation/myndighed/6/")]
     public partial class SoegInputType8 : SoegInputType {
         
-        private AttributListeType7 attributListeField;
+        private EgenskabType8[] attributListeField;
         
         private TilstandListeType7 tilstandListeField;
         
         private RelationListeType7 relationListeField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public AttributListeType7 AttributListe {
+        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("Egenskab", IsNullable=false)]
+        public EgenskabType8[] AttributListe {
             get {
                 return this.attributListeField;
             }
@@ -5966,7 +6088,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="urn:oio:sts:organisation:itsystem:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="http://stoettesystemerne.dk/organisation/itsystem/6/")]
     public partial class SoegInputType7 : SoegInputType {
         
         private AttributListeType6 attributListeField;
@@ -6017,100 +6139,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:organisationsystem:1.1.3.0")]
-    public partial class FremsoegObjekthierarkiInputType : SoegInputType {
-        
-        private EgenskabType6 organisationSoegEgenskabField;
-        
-        private EgenskabType5 organisationEnhedSoegEgenskabField;
-        
-        private EgenskabType7 organisationFunktionSoegEgenskabField;
-        
-        private EgenskabType4 brugerSoegEgenskabField;
-        
-        private EgenskabType2 interessefaellesskabSoegEgenskabField;
-        
-        private EgenskabType8 itSystemSoegEgenskabField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public EgenskabType6 OrganisationSoegEgenskab {
-            get {
-                return this.organisationSoegEgenskabField;
-            }
-            set {
-                this.organisationSoegEgenskabField = value;
-                this.RaisePropertyChanged("OrganisationSoegEgenskab");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public EgenskabType5 OrganisationEnhedSoegEgenskab {
-            get {
-                return this.organisationEnhedSoegEgenskabField;
-            }
-            set {
-                this.organisationEnhedSoegEgenskabField = value;
-                this.RaisePropertyChanged("OrganisationEnhedSoegEgenskab");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public EgenskabType7 OrganisationFunktionSoegEgenskab {
-            get {
-                return this.organisationFunktionSoegEgenskabField;
-            }
-            set {
-                this.organisationFunktionSoegEgenskabField = value;
-                this.RaisePropertyChanged("OrganisationFunktionSoegEgenskab");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
-        public EgenskabType4 BrugerSoegEgenskab {
-            get {
-                return this.brugerSoegEgenskabField;
-            }
-            set {
-                this.brugerSoegEgenskabField = value;
-                this.RaisePropertyChanged("BrugerSoegEgenskab");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=4)]
-        public EgenskabType2 InteressefaellesskabSoegEgenskab {
-            get {
-                return this.interessefaellesskabSoegEgenskabField;
-            }
-            set {
-                this.interessefaellesskabSoegEgenskabField = value;
-                this.RaisePropertyChanged("InteressefaellesskabSoegEgenskab");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=5)]
-        public EgenskabType8 ItSystemSoegEgenskab {
-            get {
-                return this.itSystemSoegEgenskabField;
-            }
-            set {
-                this.itSystemSoegEgenskabField = value;
-                this.RaisePropertyChanged("ItSystemSoegEgenskab");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="urn:oio:sts:organisation:organisationenhed:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="http://stoettesystemerne.dk/organisation/organisationenhed/6/")]
     public partial class SoegInputType6 : SoegInputType {
         
         private AttributListeType5 attributListeField;
@@ -6161,7 +6190,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/")]
     public partial class SoegInputType5 : SoegInputType {
         
         private AttributListeType4 attributListeField;
@@ -6212,10 +6241,10 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="urn:oio:sts:organisation:myndighed:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="http://stoettesystemerne.dk/organisation/adresse/6/")]
     public partial class SoegInputType4 : SoegInputType {
         
-        private EgenskabType3[] attributListeField;
+        private EgenskabType7[] attributListeField;
         
         private TilstandListeType3 tilstandListeField;
         
@@ -6224,7 +6253,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         /// <remarks/>
         [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
         [System.Xml.Serialization.XmlArrayItemAttribute("Egenskab", IsNullable=false)]
-        public EgenskabType3[] AttributListe {
+        public EgenskabType7[] AttributListe {
             get {
                 return this.attributListeField;
             }
@@ -6264,7 +6293,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="urn:oio:sts:organisation:interessefaellesskab:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="http://stoettesystemerne.dk/organisation/organisation/6/")]
     public partial class SoegInputType3 : SoegInputType {
         
         private AttributListeType2 attributListeField;
@@ -6315,10 +6344,10 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="urn:oio:sts:organisation:adresse:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="http://stoettesystemerne.dk/organisation/person/6/")]
     public partial class SoegInputType2 : SoegInputType {
         
-        private EgenskabType1[] attributListeField;
+        private EgenskabType6[] attributListeField;
         
         private TilstandListeType1 tilstandListeField;
         
@@ -6327,7 +6356,7 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         /// <remarks/>
         [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
         [System.Xml.Serialization.XmlArrayItemAttribute("Egenskab", IsNullable=false)]
-        public EgenskabType1[] AttributListe {
+        public EgenskabType6[] AttributListe {
             get {
                 return this.attributListeField;
             }
@@ -6367,19 +6396,18 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="urn:oio:sts:organisation:virksomhed:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
     public partial class SoegInputType1 : SoegInputType {
         
-        private EgenskabType[] attributListeField;
+        private AttributListeType attributListeField;
         
         private TilstandListeType tilstandListeField;
         
         private RelationListeType relationListeField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("Egenskab", IsNullable=false)]
-        public EgenskabType[] AttributListe {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public AttributListeType AttributListe {
             get {
                 return this.attributListeField;
             }
@@ -6419,215 +6447,90 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/")]
-    public partial class AuthorityContextType : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisationsystem/6/")]
+    public partial class FremsoegObjekthierarkiInputType : SoegInputType {
         
-        private string municipalityCVRField;
+        private EgenskabType organisationSoegEgenskabField;
         
-        /// <remarks/>
-        public string MunicipalityCVR {
-            get {
-                return this.municipalityCVRField;
-            }
-            set {
-                this.municipalityCVRField = value;
-                this.RaisePropertyChanged("MunicipalityCVR");
-            }
-        }
+        private EgenskabType1 organisationEnhedSoegEgenskabField;
         
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        private EgenskabType2 organisationFunktionSoegEgenskabField;
         
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/CallContext/1/")]
-    public partial class CallContextType : object, System.ComponentModel.INotifyPropertyChanged {
+        private EgenskabType3 brugerSoegEgenskabField;
         
-        private string onBehalfOfUserField;
+        private EgenskabType4 interessefaellesskabSoegEgenskabField;
         
-        private string callersServiceCallIdentifierField;
-        
-        private string accountingInfoField;
+        private EgenskabType5 itSystemSoegEgenskabField;
         
         /// <remarks/>
-        public string OnBehalfOfUser {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public EgenskabType OrganisationSoegEgenskab {
             get {
-                return this.onBehalfOfUserField;
+                return this.organisationSoegEgenskabField;
             }
             set {
-                this.onBehalfOfUserField = value;
-                this.RaisePropertyChanged("OnBehalfOfUser");
+                this.organisationSoegEgenskabField = value;
+                this.RaisePropertyChanged("OrganisationSoegEgenskab");
             }
         }
         
         /// <remarks/>
-        public string CallersServiceCallIdentifier {
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public EgenskabType1 OrganisationEnhedSoegEgenskab {
             get {
-                return this.callersServiceCallIdentifierField;
+                return this.organisationEnhedSoegEgenskabField;
             }
             set {
-                this.callersServiceCallIdentifierField = value;
-                this.RaisePropertyChanged("CallersServiceCallIdentifier");
+                this.organisationEnhedSoegEgenskabField = value;
+                this.RaisePropertyChanged("OrganisationEnhedSoegEgenskab");
             }
         }
         
         /// <remarks/>
-        public string AccountingInfo {
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public EgenskabType2 OrganisationFunktionSoegEgenskab {
             get {
-                return this.accountingInfoField;
+                return this.organisationFunktionSoegEgenskabField;
             }
             set {
-                this.accountingInfoField = value;
-                this.RaisePropertyChanged("AccountingInfo");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/")]
-    public partial class FremsoegobjekthierarkiRequestType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private CallContextType callContextField;
-        
-        private AuthorityContextType authorityContextField;
-        
-        private FremsoegObjekthierarkiInputType fremsoegObjekthierarkiInputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/CallContext/1/", Order=0)]
-        public CallContextType CallContext {
-            get {
-                return this.callContextField;
-            }
-            set {
-                this.callContextField = value;
-                this.RaisePropertyChanged("CallContext");
+                this.organisationFunktionSoegEgenskabField = value;
+                this.RaisePropertyChanged("OrganisationFunktionSoegEgenskab");
             }
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/", Order=1)]
-        public AuthorityContextType AuthorityContext {
+        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
+        public EgenskabType3 BrugerSoegEgenskab {
             get {
-                return this.authorityContextField;
+                return this.brugerSoegEgenskabField;
             }
             set {
-                this.authorityContextField = value;
-                this.RaisePropertyChanged("AuthorityContext");
+                this.brugerSoegEgenskabField = value;
+                this.RaisePropertyChanged("BrugerSoegEgenskab");
             }
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:organisationsystem:1.1.3.0", Order=2)]
-        public FremsoegObjekthierarkiInputType FremsoegObjekthierarkiInput {
+        [System.Xml.Serialization.XmlElementAttribute(Order=4)]
+        public EgenskabType4 InteressefaellesskabSoegEgenskab {
             get {
-                return this.fremsoegObjekthierarkiInputField;
+                return this.interessefaellesskabSoegEgenskabField;
             }
             set {
-                this.fremsoegObjekthierarkiInputField = value;
-                this.RaisePropertyChanged("FremsoegObjekthierarkiInput");
+                this.interessefaellesskabSoegEgenskabField = value;
+                this.RaisePropertyChanged("InteressefaellesskabSoegEgenskab");
             }
         }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/", ConfigurationName="OrganisationSystem.OrganisationSystemPortType")]
-    public interface OrganisationSystemPortType {
-        
-        // CODEGEN: Generating message contract since the operation fremsoegobjekthierarki is neither RPC nor document wrapped.
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/fre" +
-            "msoegobjekthierarki", ReplyAction="*")]
-        [System.ServiceModel.FaultContractAttribute(typeof(Infrastructure.STS.OrganizationSystem.OrganisationSystem.ServiceplatformFaultType), Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/fre" +
-            "msoegobjekthierarki", Name="ServiceplatformFault", Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(BasicOutputType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(SoegInputType))]
-        Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiResponse fremsoegobjekthierarki(Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/fre" +
-            "msoegobjekthierarki", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiResponse> fremsoegobjekthierarkiAsync(Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiRequest request);
-        
-        // CODEGEN: Generating message contract since the operation import is neither RPC nor document wrapped.
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/imp" +
-            "ort", ReplyAction="*")]
-        [System.ServiceModel.FaultContractAttribute(typeof(Infrastructure.STS.OrganizationSystem.OrganisationSystem.ServiceplatformFaultType), Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/imp" +
-            "ort", Name="ServiceplatformFault", Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(BasicOutputType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(SoegInputType))]
-        Infrastructure.STS.OrganizationSystem.OrganisationSystem.importResponse import(Infrastructure.STS.OrganizationSystem.OrganisationSystem.importRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/imp" +
-            "ort", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.STS.OrganizationSystem.OrganisationSystem.importResponse> importAsync(Infrastructure.STS.OrganizationSystem.OrganisationSystem.importRequest request);
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-    public partial class RequestHeaderType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private string transactionUUIDField;
         
         /// <remarks/>
-        public string TransactionUUID {
+        [System.Xml.Serialization.XmlElementAttribute(Order=5)]
+        public EgenskabType5 ItSystemSoegEgenskab {
             get {
-                return this.transactionUUIDField;
+                return this.itSystemSoegEgenskabField;
             }
             set {
-                this.transactionUUIDField = value;
-                this.RaisePropertyChanged("TransactionUUID");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+                this.itSystemSoegEgenskabField = value;
+                this.RaisePropertyChanged("ItSystemSoegEgenskab");
             }
         }
     }
@@ -6641,15 +6544,15 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
         public Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader;
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="FremsoegobjekthierarkiRequest", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/", Order=0)]
-        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegobjekthierarkiRequestType FremsoegobjekthierarkiRequest1;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisationsystem/6/", Order=0)]
+        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegObjekthierarkiInputType FremsoegObjekthierarkiInput;
         
         public fremsoegobjekthierarkiRequest() {
         }
         
-        public fremsoegobjekthierarkiRequest(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegobjekthierarkiRequestType FremsoegobjekthierarkiRequest1) {
+        public fremsoegobjekthierarkiRequest(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegObjekthierarkiInputType FremsoegObjekthierarkiInput) {
             this.RequestHeader = RequestHeader;
-            this.FremsoegobjekthierarkiRequest1 = FremsoegobjekthierarkiRequest1;
+            this.FremsoegObjekthierarkiInput = FremsoegObjekthierarkiInput;
         }
     }
     
@@ -6662,187 +6565,15 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
         public Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader;
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="FremsoegobjekthierarkiResponse", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/", Order=0)]
-        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegobjekthierarkiResponseType FremsoegobjekthierarkiResponse1;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisationsystem/6/", Order=0)]
+        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegObjekthierarkiOutputType FremsoegObjekthierarkiOutput;
         
         public fremsoegobjekthierarkiResponse() {
         }
         
-        public fremsoegobjekthierarkiResponse(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegobjekthierarkiResponseType FremsoegobjekthierarkiResponse1) {
+        public fremsoegobjekthierarkiResponse(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegObjekthierarkiOutputType FremsoegObjekthierarkiOutput) {
             this.RequestHeader = RequestHeader;
-            this.FremsoegobjekthierarkiResponse1 = FremsoegobjekthierarkiResponse1;
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/")]
-    public partial class ImportRequestType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private CallContextType callContextField;
-        
-        private AuthorityContextType authorityContextField;
-        
-        private ImporterOrganisationSystemInputType importerOrganisationSystemInputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/CallContext/1/", Order=0)]
-        public CallContextType CallContext {
-            get {
-                return this.callContextField;
-            }
-            set {
-                this.callContextField = value;
-                this.RaisePropertyChanged("CallContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/", Order=1)]
-        public AuthorityContextType AuthorityContext {
-            get {
-                return this.authorityContextField;
-            }
-            set {
-                this.authorityContextField = value;
-                this.RaisePropertyChanged("AuthorityContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:organisationsystem:1.1.3.0", Order=2)]
-        public ImporterOrganisationSystemInputType ImporterOrganisationSystemInput {
-            get {
-                return this.importerOrganisationSystemInputField;
-            }
-            set {
-                this.importerOrganisationSystemInputField = value;
-                this.RaisePropertyChanged("ImporterOrganisationSystemInput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:organisationsystem:1.1.3.0")]
-    public partial class ImporterOrganisationSystemInputType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private OrganisationType organisationField;
-        
-        private OrganisationEnhedType[] organisationEnhederInputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:organisation:1.1.3.0", Order=0)]
-        public OrganisationType Organisation {
-            get {
-                return this.organisationField;
-            }
-            set {
-                this.organisationField = value;
-                this.RaisePropertyChanged("Organisation");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=1)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("OrganisationEnhed", Namespace="urn:oio:sts:organisation:organisationenhed:1.1.3.0", IsNullable=false)]
-        public OrganisationEnhedType[] OrganisationEnhederInput {
-            get {
-                return this.organisationEnhederInputField;
-            }
-            set {
-                this.organisationEnhederInputField = value;
-                this.RaisePropertyChanged("OrganisationEnhederInput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/")]
-    public partial class ImportResponseType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private MultipleOutputType importerOrganisationSystemOutputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:organisationsystem:1.1.3.0", Order=0)]
-        public MultipleOutputType ImporterOrganisationSystemOutput {
-            get {
-                return this.importerOrganisationSystemOutputField;
-            }
-            set {
-                this.importerOrganisationSystemOutputField = value;
-                this.RaisePropertyChanged("ImporterOrganisationSystemOutput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9037.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class MultipleOutputType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private StandardReturType[] itemsField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("StandardRetur", typeof(StandardReturType), Order=0)]
-        [System.Xml.Serialization.XmlElementAttribute("UnikRetur", typeof(UnikReturType), Order=0)]
-        public StandardReturType[] Items {
-            get {
-                return this.itemsField;
-            }
-            set {
-                this.itemsField = value;
-                this.RaisePropertyChanged("Items");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
+            this.FremsoegObjekthierarkiOutput = FremsoegObjekthierarkiOutput;
         }
     }
     
@@ -6855,15 +6586,15 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
         public Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader;
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="ImportRequest", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/", Order=0)]
-        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.ImportRequestType ImportRequest1;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisationsystem/6/", Order=0)]
+        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.ImporterOrganisationSystemInputType ImporterOrganisationSystemInput;
         
         public importRequest() {
         }
         
-        public importRequest(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.ImportRequestType ImportRequest1) {
+        public importRequest(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.ImporterOrganisationSystemInputType ImporterOrganisationSystemInput) {
             this.RequestHeader = RequestHeader;
-            this.ImportRequest1 = ImportRequest1;
+            this.ImporterOrganisationSystemInput = ImporterOrganisationSystemInput;
         }
     }
     
@@ -6876,15 +6607,57 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
         [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
         public Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader;
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="ImportResponse", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/OrganisationSystem/5/", Order=0)]
-        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.ImportResponseType ImportResponse1;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisationsystem/6/", Order=0)]
+        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.MultipleOutputType ImporterOrganisationSystemOutput;
         
         public importResponse() {
         }
         
-        public importResponse(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.ImportResponseType ImportResponse1) {
+        public importResponse(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.MultipleOutputType ImporterOrganisationSystemOutput) {
             this.RequestHeader = RequestHeader;
-            this.ImportResponse1 = ImportResponse1;
+            this.ImporterOrganisationSystemOutput = ImporterOrganisationSystemOutput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class anonymiserRequest {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisationsystem/6/", Order=0)]
+        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.AnonymiserInputType AnonymiserInput;
+        
+        public anonymiserRequest() {
+        }
+        
+        public anonymiserRequest(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.AnonymiserInputType AnonymiserInput) {
+            this.RequestHeader = RequestHeader;
+            this.AnonymiserInput = AnonymiserInput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class anonymiserResponse {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/organisationsystem/6/", Order=0)]
+        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.BasicOutputType AnonymiserOutput;
+        
+        public anonymiserResponse() {
+        }
+        
+        public anonymiserResponse(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.BasicOutputType AnonymiserOutput) {
+            this.RequestHeader = RequestHeader;
+            this.AnonymiserOutput = AnonymiserOutput;
         }
     }
     
@@ -6920,13 +6693,13 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
             return base.Channel.fremsoegobjekthierarki(request);
         }
         
-        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegobjekthierarkiResponseType fremsoegobjekthierarki(ref Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegobjekthierarkiRequestType FremsoegobjekthierarkiRequest1) {
+        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegObjekthierarkiOutputType fremsoegobjekthierarki(ref Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegObjekthierarkiInputType FremsoegObjekthierarkiInput) {
             Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiRequest inValue = new Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.FremsoegobjekthierarkiRequest1 = FremsoegobjekthierarkiRequest1;
+            inValue.FremsoegObjekthierarkiInput = FremsoegObjekthierarkiInput;
             Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiResponse retVal = ((Infrastructure.STS.OrganizationSystem.OrganisationSystem.OrganisationSystemPortType)(this)).fremsoegobjekthierarki(inValue);
             RequestHeader = retVal.RequestHeader;
-            return retVal.FremsoegobjekthierarkiResponse1;
+            return retVal.FremsoegObjekthierarkiOutput;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -6934,10 +6707,10 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
             return base.Channel.fremsoegobjekthierarkiAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiResponse> fremsoegobjekthierarkiAsync(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegobjekthierarkiRequestType FremsoegobjekthierarkiRequest1) {
+        public System.Threading.Tasks.Task<Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiResponse> fremsoegobjekthierarkiAsync(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegObjekthierarkiInputType FremsoegObjekthierarkiInput) {
             Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiRequest inValue = new Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.FremsoegobjekthierarkiRequest1 = FremsoegobjekthierarkiRequest1;
+            inValue.FremsoegObjekthierarkiInput = FremsoegObjekthierarkiInput;
             return ((Infrastructure.STS.OrganizationSystem.OrganisationSystem.OrganisationSystemPortType)(this)).fremsoegobjekthierarkiAsync(inValue);
         }
         
@@ -6946,13 +6719,13 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
             return base.Channel.import(request);
         }
         
-        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.ImportResponseType import(ref Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.ImportRequestType ImportRequest1) {
+        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.MultipleOutputType import(ref Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.ImporterOrganisationSystemInputType ImporterOrganisationSystemInput) {
             Infrastructure.STS.OrganizationSystem.OrganisationSystem.importRequest inValue = new Infrastructure.STS.OrganizationSystem.OrganisationSystem.importRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.ImportRequest1 = ImportRequest1;
+            inValue.ImporterOrganisationSystemInput = ImporterOrganisationSystemInput;
             Infrastructure.STS.OrganizationSystem.OrganisationSystem.importResponse retVal = ((Infrastructure.STS.OrganizationSystem.OrganisationSystem.OrganisationSystemPortType)(this)).import(inValue);
             RequestHeader = retVal.RequestHeader;
-            return retVal.ImportResponse1;
+            return retVal.ImporterOrganisationSystemOutput;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -6960,11 +6733,37 @@ namespace Infrastructure.STS.OrganizationSystem.OrganisationSystem {
             return base.Channel.importAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.STS.OrganizationSystem.OrganisationSystem.importResponse> importAsync(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.ImportRequestType ImportRequest1) {
+        public System.Threading.Tasks.Task<Infrastructure.STS.OrganizationSystem.OrganisationSystem.importResponse> importAsync(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.ImporterOrganisationSystemInputType ImporterOrganisationSystemInput) {
             Infrastructure.STS.OrganizationSystem.OrganisationSystem.importRequest inValue = new Infrastructure.STS.OrganizationSystem.OrganisationSystem.importRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.ImportRequest1 = ImportRequest1;
+            inValue.ImporterOrganisationSystemInput = ImporterOrganisationSystemInput;
             return ((Infrastructure.STS.OrganizationSystem.OrganisationSystem.OrganisationSystemPortType)(this)).importAsync(inValue);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserResponse Infrastructure.STS.OrganizationSystem.OrganisationSystem.OrganisationSystemPortType.anonymiser(Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserRequest request) {
+            return base.Channel.anonymiser(request);
+        }
+        
+        public Infrastructure.STS.OrganizationSystem.OrganisationSystem.BasicOutputType anonymiser(ref Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.AnonymiserInputType AnonymiserInput) {
+            Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserRequest inValue = new Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserRequest();
+            inValue.RequestHeader = RequestHeader;
+            inValue.AnonymiserInput = AnonymiserInput;
+            Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserResponse retVal = ((Infrastructure.STS.OrganizationSystem.OrganisationSystem.OrganisationSystemPortType)(this)).anonymiser(inValue);
+            RequestHeader = retVal.RequestHeader;
+            return retVal.AnonymiserOutput;
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.Threading.Tasks.Task<Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserResponse> Infrastructure.STS.OrganizationSystem.OrganisationSystem.OrganisationSystemPortType.anonymiserAsync(Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserRequest request) {
+            return base.Channel.anonymiserAsync(request);
+        }
+        
+        public System.Threading.Tasks.Task<Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserResponse> anonymiserAsync(Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType RequestHeader, Infrastructure.STS.OrganizationSystem.OrganisationSystem.AnonymiserInputType AnonymiserInput) {
+            Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserRequest inValue = new Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserRequest();
+            inValue.RequestHeader = RequestHeader;
+            inValue.AnonymiserInput = AnonymiserInput;
+            return ((Infrastructure.STS.OrganizationSystem.OrganisationSystem.OrganisationSystemPortType)(this)).anonymiserAsync(inValue);
         }
     }
 }

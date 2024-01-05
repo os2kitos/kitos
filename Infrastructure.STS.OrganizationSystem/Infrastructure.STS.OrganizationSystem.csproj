@@ -61,112 +61,135 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Connected Services\OrganisationSystem\Adresse.xsd">
+    <None Include="Connected Services\OrganisationSystem\Adresse1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\AdresseOperationer.xsd">
+    <None Include="Connected Services\OrganisationSystem\AdresseBesked.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\AuthorityContext_1.xsd">
+    <None Include="Connected Services\OrganisationSystem\AdresseOperationer1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\Bruger.xsd">
+    <None Include="Connected Services\OrganisationSystem\Bruger1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\BrugerOperationer.xsd">
+    <None Include="Connected Services\OrganisationSystem\BrugerBesked.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\CallContext_1.xsd">
+    <None Include="Connected Services\OrganisationSystem\BrugerOperationer1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\GenerelleDefinitioner.xsd">
+    <None Include="Connected Services\OrganisationSystem\GenerelleDefinitioner1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiResponse.datasource">
+    <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.anonymiserResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegobjekthierarkiResponseType.datasource">
+    <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.BasicOutputType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegObjekthierarkiOutputType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.importResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.ImportResponseType.datasource">
+    <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.MultipleOutputType.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Connected Services\OrganisationSystem\Interessefaellesskab.xsd">
+    <None Include="Connected Services\OrganisationSystem\Interessefaellesskab1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\InteressefaellesskabOperationer.xsd">
+    <None Include="Connected Services\OrganisationSystem\InteressefaellesskabBesked.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\ItSystem.xsd">
+    <None Include="Connected Services\OrganisationSystem\InteressefaellesskabOperationer1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\ItSystemOperationer.xsd">
+    <None Include="Connected Services\OrganisationSystem\ItSystem1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\Myndighed.xsd">
+    <None Include="Connected Services\OrganisationSystem\ItSystemBesked.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\MyndighedOperationer.xsd">
+    <None Include="Connected Services\OrganisationSystem\ItSystemOperationer1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\Organisation.xsd">
+    <None Include="Connected Services\OrganisationSystem\Myndighed1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationEnhed.xsd">
+    <None Include="Connected Services\OrganisationSystem\MyndighedBesked.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationEnhedOperationer.xsd">
+    <None Include="Connected Services\OrganisationSystem\MyndighedOperationer1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationFaelles.xsd">
+    <None Include="Connected Services\OrganisationSystem\OIOIDWS.wsdl" />
+    <None Include="Connected Services\OrganisationSystem\Organisation1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationFunktion.xsd">
+    <None Include="Connected Services\OrganisationSystem\OrganisationBesked.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationFunktionOperationer.xsd">
+    <None Include="Connected Services\OrganisationSystem\OrganisationEnhed1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationOperationer.xsd">
+    <None Include="Connected Services\OrganisationSystem\OrganisationEnhedBesked.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationSystemOperationer.xsd">
+    <None Include="Connected Services\OrganisationSystem\OrganisationEnhedOperationer1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationSystemService.wsdl" />
-    <None Include="Connected Services\OrganisationSystem\OrganisationSystemServiceMsg.xsd">
+    <None Include="Connected Services\OrganisationSystem\OrganisationFaelles1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\Part.xsd">
+    <None Include="Connected Services\OrganisationSystem\OrganisationFunktion1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\Person.xsd">
+    <None Include="Connected Services\OrganisationSystem\OrganisationFunktionBesked.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\PersonOperationer.xsd">
+    <None Include="Connected Services\OrganisationSystem\OrganisationFunktionOperationer1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\policies.wsdl" />
-    <None Include="Connected Services\OrganisationSystem\RequestHeader.xsd">
+    <None Include="Connected Services\OrganisationSystem\OrganisationOperationer1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\SagDokObjekt.xsd">
+    <None Include="Connected Services\OrganisationSystem\OrganisationSystemOperationer1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\ServiceplatformFaultMessage.wsdl" />
-    <None Include="Connected Services\OrganisationSystem\ServiceplatformFault_1.xsd">
+    <None Include="Connected Services\OrganisationSystem\OrganisationSystemService1.wsdl" />
+    <None Include="Connected Services\OrganisationSystem\Part1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\Virksomhed.xsd">
+    <None Include="Connected Services\OrganisationSystem\Person1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\OrganisationSystem\VirksomhedOperationer.xsd">
+    <None Include="Connected Services\OrganisationSystem\PersonBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\OrganisationSystem\PersonOperationer1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\OrganisationSystem\RequestHeader1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\OrganisationSystem\SagDokObjekt1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\OrganisationSystem\Virksomhed1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\OrganisationSystem\VirksomhedBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\OrganisationSystem\VirksomhedOperationer1.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
