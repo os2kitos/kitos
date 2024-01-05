@@ -779,7 +779,10 @@
                             .map(registration => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "data-processing.edit-registration.main", registration.DataProcessingRegistrationId, registration.DataProcessingRegistrationName))
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
                         .withSourceValueEchoExcelOutput()
-                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
+                        .withInclusionCriterion(() =>
+                        (user.currentConfig.showDataProcessing && uiState.isBluePrintNodeAvailable(uiBluePrint.children.dataProcessing)
+                            || uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)
+                        )))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("OutgoingRelatedItSystemUsagesNamesAsCsv")
