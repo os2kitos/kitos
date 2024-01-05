@@ -34,7 +34,7 @@ namespace Infrastructure.STS.Organization.DomainServices
             _stsOrganizationIdentityRepository = stsOrganizationIdentityRepository;
             _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
-            _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/Organisation/5";
+            _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/Organisation/6";
         }
 
         public Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Core.DomainModel.Organization.Organization organization)
