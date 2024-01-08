@@ -28,7 +28,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             _organizationService = organizationService;
             _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
-            _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/OrganisationSystem/5";
+            _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/OrganisationSystem/6";
         }
 
         public Result<ExternalOrganizationUnit, DetailedOperationError<ResolveOrganizationTreeError>> ResolveOrganizationTree(Organization organization)
