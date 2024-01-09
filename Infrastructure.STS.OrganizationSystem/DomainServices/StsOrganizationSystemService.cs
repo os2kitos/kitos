@@ -28,7 +28,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             _organizationService = organizationService;
             _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
-            _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/OrganisationSystem/6";
+            _serviceRoot = $"https://organisation.{configuration.EndpointHost}/organisation/organisationsystem/6";
         }
 
         public Result<ExternalOrganizationUnit, DetailedOperationError<ResolveOrganizationTreeError>> ResolveOrganizationTree(Organization organization)
@@ -45,7 +45,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             var channel = client.ChannelFactory.CreateChannel();
             do
             {
-                var listRequest = CreateOrgHierarchyRequest(pageSize, totalIds);
+                var listRequest = CreateOrgHierarchyRequest(organization.Name, pageSize, totalIds);
                 var listResponse = LoadOrganizationHierarchy(channel, listRequest);
 
                 var listStatusResult = listResponse.FremsoegObjekthierarkiOutput.StandardRetur;
@@ -190,14 +190,22 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             }
         }
 
-        public static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(int pageSize, int skip = 0)
+        public static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(string name, int pageSize, int skip = 0)
         {
             var listRequest = new fremsoegobjekthierarkiRequest
             {
+                RequestHeader = new RequestHeaderType
+                {
+                    TransactionUUID = Guid.NewGuid().ToString(),
+                },
                 FremsoegObjekthierarkiInput = new FremsoegObjekthierarkiInputType()
                 {
                     MaksimalAntalKvantitet = pageSize.ToString("D"),
-                    FoersteResultatReference = skip.ToString("D")
+                    FoersteResultatReference = skip.ToString("D"),
+                    OrganisationSoegEgenskab = new EgenskabType
+                    {
+                        OrganisationNavn = name
+                    }
                 }
             };
             return listRequest;
