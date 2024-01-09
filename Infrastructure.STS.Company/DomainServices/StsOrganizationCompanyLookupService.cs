@@ -25,7 +25,7 @@ namespace Infrastructure.STS.Company.DomainServices
         {
             _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
-            _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/Virksomhed/5";
+            _serviceRoot = $"https://organisation.{configuration.EndpointHost}/service/Organisation/Virksomhed/6";
         }
 
         public Result<Guid, DetailedOperationError<StsError>> ResolveStsOrganizationCompanyUuid(Organization organization)
