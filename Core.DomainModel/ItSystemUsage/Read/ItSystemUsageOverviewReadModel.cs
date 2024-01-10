@@ -122,6 +122,6 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public virtual ICollection<ItSystemUsageOverviewRelevantOrgUnitReadModel> RelevantOrganizationUnits { get; set; }
         public string AssociatedContractsNamesCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewItContractReadModel> AssociatedContracts { get; set; }
-        public string FormerSystemName { get; set; }
+        public string PreviousName { get; set; }
     }
 }
