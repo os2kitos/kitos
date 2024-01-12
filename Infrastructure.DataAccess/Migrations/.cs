@@ -7,12 +7,12 @@
     {
         public override void Up()
         {
-            AddColumn("dbo.ItSystemUsageOverviewReadModels", "PreviousName", c => c.String());
+            AddColumn("dbo.ItSystemUsageOverviewReadModels", "SystemPreviousName", c => c.String());
         }
         
         public override void Down()
         {
-            DropColumn("dbo.ItSystemUsageOverviewReadModels", "PreviousName");
+            DropColumn("dbo.ItSystemUsageOverviewReadModels", "SystemPreviousName");
         }
     }
 }

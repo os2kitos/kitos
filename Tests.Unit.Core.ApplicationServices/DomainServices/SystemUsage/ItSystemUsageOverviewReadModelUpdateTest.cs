@@ -316,7 +316,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.HostedAt, readModel.HostedAt);
             Assert.Equal(systemUsage.riskAssesmentDate, readModel.RiskAssessmentDate);
             Assert.Equal(systemUsage.PlannedRiskAssessmentDate, readModel.PlannedRiskAssessmentDate);
-            Assert.Equal(systemUsage.ItSystem.PreviousName, readModel.PreviousName);
+            Assert.Equal(systemUsage.ItSystem.PreviousName, readModel.SystemPreviousName);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
