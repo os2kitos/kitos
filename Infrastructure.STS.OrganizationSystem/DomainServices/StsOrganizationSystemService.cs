@@ -45,7 +45,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             var channel = client.ChannelFactory.CreateChannel();
             do
             {
-                var listRequest = CreateOrgHierarchyRequest(organization.Name, pageSize, totalIds);
+                var listRequest = CreateOrgHierarchyRequest(organization.Uuid.ToString(), pageSize, totalIds);
                 var listResponse = LoadOrganizationHierarchy(channel, listRequest);
 
                 var listStatusResult = listResponse.FremsoegObjekthierarkiOutput.StandardRetur;
@@ -190,7 +190,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             }
         }
 
-        public static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(string name, int pageSize, int skip = 0)
+        public static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(string uuid, int pageSize, int skip = 0)
         {
             var listRequest = new fremsoegobjekthierarkiRequest
             {
@@ -202,10 +202,14 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
                 {
                     MaksimalAntalKvantitet = pageSize.ToString("D"),
                     FoersteResultatReference = skip.ToString("D"),
-                    OrganisationSoegEgenskab = new EgenskabType
+                    SoegRegistrering = new SoegRegistreringType
                     {
-                        OrganisationNavn = name
+                        BrugerRef = new UnikIdType
+                        {
+                            Item = uuid
+                        }
                     }
+
                 }
             };
             return listRequest;
