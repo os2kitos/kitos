@@ -1019,7 +1019,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             {
                 OrganizationUuid = organization.Uuid,
                 Name = systemName,
-                FormerName = systemPreviousName
+                PreviousName = systemPreviousName
             });
             return system;
         }
