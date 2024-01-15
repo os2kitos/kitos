@@ -86,6 +86,7 @@ namespace Core.DomainServices.SystemUsage
             destination.LinkToDirectoryUrl = source.LinkToDirectoryUrl;
             destination.HostedAt = source.HostedAt.GetValueOrDefault(HostedAt.UNDECIDED);
             destination.LifeCycleStatus = source.LifeCycleStatus;
+            destination.SystemPreviousName = source.ItSystem.PreviousName;
 
             PatchParentSystemName(source, destination);
             PatchRoleAssignments(source, destination);
