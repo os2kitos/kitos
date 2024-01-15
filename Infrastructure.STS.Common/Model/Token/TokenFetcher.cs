@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IdentityModel.Protocols.WSTrust;
 using System.IdentityModel.Tokens;
-using System.Linq;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Cryptography;
 using System.ServiceModel.Security;
 using System.ServiceModel;
 using System.Text;
-using System.Threading.Tasks;
+using Infrastructure.STS.Common.Factories;
 
 namespace Infrastructure.STS.Common.Model.Token
 {
@@ -31,15 +29,13 @@ namespace Infrastructure.STS.Common.Model.Token
         /// Creates a token for use on Serviceplatformen
         /// </summary>
         /// <param name="entityId">The namespace to get a token for</param>
+        /// <param name="certificateThumbprint"></param>
         /// <returns>A new token</returns>
-        public static SecurityToken IssueToken(string entityId)
+        public static SecurityToken IssueToken(string entityId, string certificateThumbprint)
         {
             SecurityToken token = null;
 
-            var certificate = CertificateLoader.LoadCertificate(
-                 ConfigVariables.ClientCertificateStoreName,
-                 ConfigVariables.ClientCertificateStoreLocation,
-                 ConfigVariables.ClientCertificateThumbprint);
+            var certificate = X509CertificateClientCertificateFactory.GetClientCertificate(certificateThumbprint);
 
             var absoluteUri = new Uri(entityId).AbsoluteUri;
             var cacheKey = new Guid(MD5.Create().ComputeHash(Encoding.Default.GetBytes(absoluteUri + "_" + ConfigVariables.MYNDIGHEDS_CVR))).ToString();
