@@ -355,7 +355,9 @@ namespace Presentation.Web.Ninject
             kernel.Bind<StsOrganisationIntegrationConfiguration>().ToMethod(_ =>
                 new StsOrganisationIntegrationConfiguration(
                     Settings.Default.SsoCertificateThumbprint,
-                    Settings.Default.StsOrganisationEndpointHost))
+                    Settings.Default.StsOrganisationEndpointHost,
+                    Settings.Default.StsIssuer,
+                    Settings.Default.StsCertificateEndpoint))
                 .InSingletonScope();
 
             kernel.Bind<ISsoStateFactory>().To<SsoStateFactory>().InCommandScope(Mode);

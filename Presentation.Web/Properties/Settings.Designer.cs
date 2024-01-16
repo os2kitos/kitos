@@ -112,5 +112,23 @@ namespace Presentation.Web.Properties {
                 return ((string)(this["SsoServiceProviderId"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://adgangsstyring.eksterntest-stoettesystemerne.dk/")]
+        public string StsIssuer {
+            get {
+                return ((string)(this["StsIssuer"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("runtime/services/kombittrust/14/certificatemixed")]
+        public string StsCertificateEndpoint {
+            get {
+                return ((string)(this["StsCertificateEndpoint"]));
+            }
+        }
     }
 }

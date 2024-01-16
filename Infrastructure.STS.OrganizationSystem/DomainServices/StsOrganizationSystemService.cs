@@ -11,6 +11,7 @@ using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
+using Infrastructure.STS.Common.Model.Token;
 using Infrastructure.STS.OrganizationSystem.OrganisationSystem;
 using Serilog;
 
@@ -21,13 +22,19 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
         private readonly IStsOrganizationService _organizationService;
         private readonly ILogger _logger;
         private readonly string _certificateThumbprint;
+        private readonly string _endpoint;
+        private readonly string _issuer;
         private readonly string _serviceRoot;
+
+        private const string EntityId = "http://stoettesystemerne.dk/service/organisation/3";
 
         public StsOrganizationSystemService(IStsOrganizationService organizationService, StsOrganisationIntegrationConfiguration configuration, ILogger logger)
         {
             _organizationService = organizationService;
             _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
+            _endpoint = configuration.CertificateEndpoint;
+            _issuer = configuration.Issuer;
             _serviceRoot = $"https://organisation.{configuration.EndpointHost}/organisation/organisationsystem/6";
         }
 
@@ -42,7 +49,8 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             var totalResults = new List<(Guid, RegistreringType9)>();
 
             using var client = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
-            var channel = client.ChannelFactory.CreateChannel();
+            var token = TokenFetcher.IssueToken(EntityId, organization.Cvr, _certificateThumbprint, _endpoint, _issuer);
+            var channel = client.ChannelFactory.CreateChannelWithIssuedToken(token);
             do
             {
                 var listRequest = CreateOrgHierarchyRequest(organization.Uuid.ToString(), pageSize, totalIds);
@@ -202,14 +210,14 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
                 {
                     MaksimalAntalKvantitet = pageSize.ToString("D"),
                     FoersteResultatReference = skip.ToString("D"),
-                    SoegRegistrering = new SoegRegistreringType
-                    {
-                        BrugerRef = new UnikIdType
-                        {
-                            Item = uuid
-                        }
-                    }
-
+                    /*BrugerSoegEgenskab = new EgenskabType3(),
+                    InteressefaellesskabSoegEgenskab = new EgenskabType4(),
+                    ItSystemSoegEgenskab = new EgenskabType5(),
+                    OrganisationEnhedSoegEgenskab = new EgenskabType1(),
+                    OrganisationFunktionSoegEgenskab = new EgenskabType2(),
+                    OrganisationSoegEgenskab = new EgenskabType(),
+                    SoegRegistrering = new SoegRegistreringType(),
+                    SoegVirkning = new SoegVirkningType()*/
                 }
             };
             return listRequest;

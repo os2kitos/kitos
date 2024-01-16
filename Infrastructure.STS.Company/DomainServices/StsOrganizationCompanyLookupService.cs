@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
@@ -10,6 +11,7 @@ using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
+using Infrastructure.STS.Common.Model.Token;
 using Infrastructure.STS.Company.ServiceReference;
 using Serilog;
 
@@ -19,12 +21,18 @@ namespace Infrastructure.STS.Company.DomainServices
     {
         private readonly ILogger _logger;
         private readonly string _certificateThumbprint;
+        private readonly string _endpoint;
+        private readonly string _issuer;
         private readonly string _serviceRoot;
+
+        private const string EntityId = "http://stoettesystemerne.dk/service/organisation/3";
 
         public StsOrganizationCompanyLookupService(StsOrganisationIntegrationConfiguration configuration, ILogger logger)
         {
             _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
+            _endpoint = configuration.CertificateEndpoint;
+            _issuer = configuration.Issuer;
             _serviceRoot = $"https://organisation.{configuration.EndpointHost}/organisation/virksomhed/6";
         }
 
@@ -37,7 +45,13 @@ namespace Infrastructure.STS.Company.DomainServices
             using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
             using var organizationPortTypeClient = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
 
-            var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
+            var identity = EndpointIdentity.CreateDnsIdentity("ORG_EXTTEST_Organisation_1");
+            var endpointAddress = new EndpointAddress(organizationPortTypeClient.Endpoint.ListenUri, identity);
+            organizationPortTypeClient.Endpoint.Address = endpointAddress;
+            organizationPortTypeClient.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
+
+            var token = TokenFetcher.IssueToken(EntityId, organization.Cvr, _certificateThumbprint, _endpoint, _issuer);
+            var channel = organizationPortTypeClient.ChannelFactory.CreateChannelWithIssuedToken(token);
             var request = CreateSearchByCvrRequest(organization);
 
             try
@@ -85,21 +99,20 @@ namespace Infrastructure.STS.Company.DomainServices
 
         private static soegRequest CreateSearchByCvrRequest(Organization organization)
         {
-            return new soegRequest
-            {
-                SoegInput = new SoegInputType1
+            return new soegRequest(new RequestHeaderType
                 {
-                    RelationListe = new RelationListeType(),
-                    FoersteResultatReference = "0",
-                    MaksimalAntalKvantitet = "2",
-                    SoegRegistrering = new SoegRegistreringType(),
-                    TilstandListe = new TilstandListeType(),
+                    TransactionUUID = Guid.NewGuid().ToString()
+                }, new SoegInputType1()
+                {
+                    /*FoersteResultatReference = "0",
+                    MaksimalAntalKvantitet = "2",*/
                     AttributListe = new[]{new EgenskabType
                     {
                         CVRNummerTekst = organization.Cvr
-                    }}
-                }
-            };
+                    }},
+                    TilstandListe = new TilstandListeType(),
+                    RelationListe = new RelationListeType(),
+                });
         }
 
         private static VirksomhedPortTypeClient CreateClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
