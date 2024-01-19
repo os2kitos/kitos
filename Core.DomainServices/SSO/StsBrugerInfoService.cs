@@ -24,9 +24,9 @@ namespace Core.DomainServices.SSO
         {
             _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
-            _urlServicePlatformBrugerService = $"https://{configuration.EndpointHost}/service/Organisation/Bruger/6";
-            _urlServicePlatformAdresseService = $"https://{configuration.EndpointHost}/service/Organisation/Adresse/6";
-            _urlServicePlatformPersonService = $"https://{configuration.EndpointHost}/service/Organisation/Person/6";
+            _urlServicePlatformBrugerService = $"https://{configuration.EndpointHost}/Organisation/Bruger/6";
+            _urlServicePlatformAdresseService = $"https://{configuration.EndpointHost}/Organisation/Adresse/6";
+            _urlServicePlatformPersonService = $"https://{configuration.EndpointHost}/Organisation/Person/6";
         }
 
         public Maybe<StsBrugerInfo> GetStsBrugerInfo(Guid uuid, string cvrNumber)

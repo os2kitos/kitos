@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
 
 namespace Infrastructure.STS.Common.Factories
 {
@@ -7,7 +8,7 @@ namespace Infrastructure.STS.Common.Factories
     {
         public static BasicHttpBinding CreateHttpBinding()
         {
-            return new BasicHttpBinding
+            var binding = new BasicHttpBinding
             {
                 Security =
                 {
@@ -18,8 +19,9 @@ namespace Infrastructure.STS.Common.Factories
                 OpenTimeout = new TimeSpan(0, 3, 0),
                 CloseTimeout = new TimeSpan(0, 3, 0),
                 ReceiveTimeout = new TimeSpan(0, 3, 0),
-                SendTimeout = new TimeSpan(0, 3, 0)
+                SendTimeout = new TimeSpan(0, 3, 0),
             };
+            return binding;
         }
     }
 }

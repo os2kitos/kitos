@@ -20,7 +20,7 @@ namespace Infrastructure.STS.Common.Model.Token
             return token.ValidTo > DateTime.Now.AddMinutes(5);
         }
 
-        public static SecurityToken IssueToken(string entityId, string cvr, string thumbprint, string endpoint, string issuer)
+        public static SecurityToken IssueToken(string entityId, string cvr, string thumbprint, string issuer)
         {
             SecurityToken token = null;
 
@@ -42,44 +42,40 @@ namespace Infrastructure.STS.Common.Model.Token
             if (inCache && !needNewToken)
                 return token;
 
-            token = SendSecurityTokenRequest(absoluteUri, certificate, cvr, endpoint, issuer);
+            token = SendSecurityTokenRequest(absoluteUri, certificate, cvr, issuer);
             CacheHelper.SaveToCache(cacheKey, token, token.ValidTo);
 
             return token;
         }
 
-        private static SecurityToken SendSecurityTokenRequest(string appliesTo, X509Certificate2 clientCertificate, string cvr, string endpoint, string issuer)
+        private static SecurityToken SendSecurityTokenRequest(string appliesTo, X509Certificate2 clientCertificate, string cvr, string issuer)
         {
-            var rst = new RequestSecurityToken
-            {
+            var rst = new RequestSecurityToken {
                 AppliesTo = new EndpointReference(appliesTo),
                 RequestType = RequestTypes.Issue,
                 TokenType = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0",
                 KeyType = KeyTypes.Asymmetric,
                 Issuer = new EndpointReference(issuer),
                 UseKey = new UseKey(new X509SecurityToken(clientCertificate)),
-                Claims =
-                {
-                    Dialect = "http://docs.oasis-open.org/wsfed/authorization/200706/authclaims"
-                }
             };
 
+            rst.Claims.Dialect = "http://docs.oasis-open.org/wsfed/authorization/200706/authclaims";
             rst.Claims.Add(new RequestClaim("dk:gov:saml:attribute:CvrNumberIdentifier", false, cvr));
 
-            var fullEndpoint = issuer + endpoint;
-            var client = GenerateStsCertificateClientChannel(clientCertificate, fullEndpoint);
+            var client = GenerateStsCertificateClientChannel(clientCertificate);
             return client.Issue(rst);
         }
 
-        private static IWSTrustChannelContract GenerateStsCertificateClientChannel(X509Certificate2 clientCertificate, string endpoint)
+        private static IWSTrustChannelContract GenerateStsCertificateClientChannel(X509Certificate2 clientCertificate)
         {
+            const string endpoint = "https://adgangsstyring.eksterntest-stoettesystemerne.dk/runtime/services/kombittrust/14/certificatemixed";
             var stsAddress = new EndpointAddress(new Uri(endpoint), EndpointIdentity.CreateDnsIdentity("ADG_EXTTEST_Adgangsstyring_1"));
             var binding = new MutualCertificateWithMessageSecurityBinding(null);
             var factory = new WSTrustChannelFactory(binding, stsAddress);
 
             factory.TrustVersion = TrustVersion.WSTrust13;
             factory.Credentials.ClientCertificate.Certificate = clientCertificate;
-            var certificate = X509CertificateClientCertificateFactory.GetClientCertificate("0aa7a193f18d095f7e2ce09d892178c9682b7924");
+            var certificate = X509CertificateClientCertificateFactory.GetClientCertificate("0aa7a193f18d095f7e2ce09d892178c9682b7924"); // NB: STS Adgangsstyring certificate thumbprint
             factory.Credentials.ServiceCertificate.ScopedCertificates.Add(stsAddress.Uri, certificate);
             factory.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.None;
             // Disable revocation checking (do not use in production)

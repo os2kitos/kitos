@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="66ddcdf4-e3fe-4dc1-acab-344fd2de52e4" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="7a2df0a6-16cb-43a1-96ff-a2664ced9c27" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -22,16 +22,16 @@
     <MetadataSource Address="C:\Temp\v6_0_0_0\wsdl\Person.wsdl" Protocol="file" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="Person1.xsd" MetadataType="Schema" ID="09aa7710-b7a0-4d7a-96ce-b15e0e751c1f" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Person.xsd" />
-    <MetadataFile FileName="RequestHeader1.xsd" MetadataType="Schema" ID="d8bd1f96-3ddf-4d4a-b64e-41f777e3bcbd" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/RequestHeader.xsd" />
-    <MetadataFile FileName="OIOIDWS.wsdl" MetadataType="Wsdl" ID="0a6dce2b-2236-4fa2-a6b1-23febcde70ac" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/policies/OIOIDWS.wsdl" />
-    <MetadataFile FileName="Part1.xsd" MetadataType="Schema" ID="125bf0fa-cd0d-481a-95f2-473af4ea9fe2" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Part.xsd" />
-    <MetadataFile FileName="GenerelleDefinitioner1.xsd" MetadataType="Schema" ID="a30349b1-aa38-4641-9083-68f2abac32a0" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/GenerelleDefinitioner.xsd" />
-    <MetadataFile FileName="PersonOperationer1.xsd" MetadataType="Schema" ID="5c7cb3c7-8286-459c-8961-67636cdeada5" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/PersonOperationer.xsd" />
-    <MetadataFile FileName="SagDokObjekt1.xsd" MetadataType="Schema" ID="76761262-04dc-4336-ac2b-6f302d8eb9c7" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/SagDokObjekt.xsd" />
-    <MetadataFile FileName="PersonBesked.xsd" MetadataType="Schema" ID="d23a41b1-84a9-4b11-b5d4-fac00ca80d12" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/PersonBesked.xsd" />
-    <MetadataFile FileName="PersonService1.wsdl" MetadataType="Wsdl" ID="5c1269b6-83f6-4c42-9f0c-656e88974186" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/Person.wsdl" />
-    <MetadataFile FileName="OrganisationFaelles.xsd" MetadataType="Schema" ID="d385ddf6-4a10-4566-a6e9-7252a4e6cf49" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/OrganisationFaelles.xsd" />
+    <MetadataFile FileName="Person.xsd" MetadataType="Schema" ID="a7da1828-504b-484a-b65b-17c927a902d2" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Person.xsd" />
+    <MetadataFile FileName="RequestHeader.xsd" MetadataType="Schema" ID="1071baca-399f-4043-a1b4-0f8bf524a9ea" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/RequestHeader.xsd" />
+    <MetadataFile FileName="OIOIDWS.wsdl" MetadataType="Wsdl" ID="d00ef229-968a-43ac-b06e-d0b2d5ee8e6a" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/policies/OIOIDWS.wsdl" />
+    <MetadataFile FileName="Part.xsd" MetadataType="Schema" ID="1fc01555-9e70-420f-8f46-a4cfe44328bf" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Part.xsd" />
+    <MetadataFile FileName="GenerelleDefinitioner.xsd" MetadataType="Schema" ID="02c744a2-64d1-409d-84b1-5a1a9568776f" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/GenerelleDefinitioner.xsd" />
+    <MetadataFile FileName="PersonOperationer.xsd" MetadataType="Schema" ID="5e5a23a8-7fc9-4b78-9b55-30d023cf323a" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/PersonOperationer.xsd" />
+    <MetadataFile FileName="SagDokObjekt.xsd" MetadataType="Schema" ID="8f370d79-ad81-445c-9d12-023dbccd79ba" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/SagDokObjekt.xsd" />
+    <MetadataFile FileName="PersonBesked.xsd" MetadataType="Schema" ID="41cd63cb-c793-41b1-abff-14c5ee143d8b" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/PersonBesked.xsd" />
+    <MetadataFile FileName="PersonService.wsdl" MetadataType="Wsdl" ID="ed3bad5b-3eb4-4fcc-a751-544017735d8f" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/Person.wsdl" />
+    <MetadataFile FileName="OrganisationFaelles.xsd" MetadataType="Schema" ID="9c455767-3475-4ce9-8399-2c556b14f731" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/OrganisationFaelles.xsd" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />

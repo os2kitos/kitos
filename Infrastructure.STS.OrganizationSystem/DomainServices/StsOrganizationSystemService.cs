@@ -49,7 +49,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             var totalResults = new List<(Guid, RegistreringType9)>();
 
             using var client = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
-            var token = TokenFetcher.IssueToken(EntityId, organization.Cvr, _certificateThumbprint, _endpoint, _issuer);
+            var token = TokenFetcher.IssueToken(EntityId, organization.Cvr, _certificateThumbprint, _issuer);
             var channel = client.ChannelFactory.CreateChannelWithIssuedToken(token);
             do
             {
@@ -198,7 +198,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             }
         }
 
-        public static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(string uuid, int pageSize, int skip = 0)
+        private static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(string uuid, int pageSize, int skip = 0)
         {
             var listRequest = new fremsoegobjekthierarkiRequest
             {

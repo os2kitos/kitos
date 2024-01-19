@@ -72,21 +72,25 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Connected Services\STSVirksomhed\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="Connected Services\STSAdresse\Adresse1.xsd">
+    <None Include="Connected Services\STSAdresse\Adresse.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Connected Services\STSAdresse\AdresseBesked.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSAdresse\AdresseOperationer1.xsd">
+    <None Include="Connected Services\STSAdresse\AdresseOperationer.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSAdresse\AdresseService1.wsdl" />
-    <None Include="Connected Services\STSAdresse\GenerelleDefinitioner1.xsd">
+    <None Include="Connected Services\STSAdresse\AdresseService.wsdl" />
+    <None Include="Connected Services\STSAdresse\GenerelleDefinitioner.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Connected Services\STSAdresse\Infrastructure.Soap.STSAdresse.BasicOutputType.datasource">
@@ -138,22 +142,22 @@
     <None Include="Connected Services\STSAdresse\Part.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSAdresse\RequestHeader1.xsd">
+    <None Include="Connected Services\STSAdresse\RequestHeader.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSAdresse\SagDokObjekt1.xsd">
+    <None Include="Connected Services\STSAdresse\SagDokObjekt.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSBruger\Bruger1.xsd">
+    <None Include="Connected Services\STSBruger\Bruger.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Connected Services\STSBruger\BrugerBesked.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSBruger\BrugerOperationer1.xsd">
+    <None Include="Connected Services\STSBruger\BrugerOperationer.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSBruger\BrugerService1.wsdl" />
+    <None Include="Connected Services\STSBruger\BrugerService.wsdl" />
     <None Include="Connected Services\STSBruger\GenerelleDefinitioner.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -200,19 +204,19 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\STSBruger\OIOIDWS.wsdl" />
-    <None Include="Connected Services\STSBruger\OrganisationFaelles1.xsd">
+    <None Include="Connected Services\STSBruger\OrganisationFaelles.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSBruger\Part1.xsd">
+    <None Include="Connected Services\STSBruger\Part.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSBruger\RequestHeader1.xsd">
+    <None Include="Connected Services\STSBruger\RequestHeader.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSBruger\SagDokObjekt1.xsd">
+    <None Include="Connected Services\STSBruger\SagDokObjekt.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSPerson\GenerelleDefinitioner1.xsd">
+    <None Include="Connected Services\STSPerson\GenerelleDefinitioner.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Connected Services\STSPerson\Infrastructure.Soap.STSPerson.BasicOutputType.datasource">
@@ -261,22 +265,93 @@
     <None Include="Connected Services\STSPerson\OrganisationFaelles.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSPerson\Part1.xsd">
+    <None Include="Connected Services\STSPerson\Part.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSPerson\Person.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Connected Services\STSPerson\PersonBesked.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSPerson\PersonOperationer1.xsd">
+    <None Include="Connected Services\STSPerson\PersonOperationer.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSPerson\PersonService1.wsdl" />
-    <None Include="Connected Services\STSPerson\RequestHeader1.xsd">
+    <None Include="Connected Services\STSPerson\PersonService.wsdl" />
+    <None Include="Connected Services\STSPerson\RequestHeader.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\STSPerson\SagDokObjekt1.xsd">
+    <None Include="Connected Services\STSPerson\SagDokObjekt.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Connected Services\STSVirksomhed\GenerelleDefinitioner.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.BasicOutputType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.importerResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.LaesOutputType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.laesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.ListOutputType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.listResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.OpretOutputType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.opretResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.passiverResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.RequestHeaderType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.retResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.sletResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.SoegOutputType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Infrastructure.Soap.STSVirksomhed.soegResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\OIOIDWS.wsdl" />
+    <None Include="Connected Services\STSVirksomhed\OrganisationFaelles.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Part.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\RequestHeader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\SagDokObjekt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\Virksomhed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\VirksomhedBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\VirksomhedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\STSVirksomhed\VirksomhedService.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
@@ -285,6 +360,19 @@
     <WCFMetadataStorage Include="Connected Services\STSAdresse\" />
     <WCFMetadataStorage Include="Connected Services\STSBruger\" />
     <WCFMetadataStorage Include="Connected Services\STSPerson\" />
+    <WCFMetadataStorage Include="Connected Services\STSVirksomhed\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\STSVirksomhed\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\STSVirksomhed\configuration.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Connected Services\STSVirksomhed\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Connected Services\STSAdresse\configuration91.svcinfo" />
@@ -317,9 +405,6 @@
     <None Include="Connected Services\STSPerson\configuration.svcinfo" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Connected Services\STSPerson\Person1.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="Connected Services\STSPerson\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>

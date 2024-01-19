@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
-using Core.Abstractions.Types;
+﻿using Core.Abstractions.Types;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.SSO;
@@ -14,6 +8,12 @@ using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.Common.Model.Token;
 using Infrastructure.STS.Company.ServiceReference;
 using Serilog;
+using System;
+using System.Linq;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.ServiceModel;
+using System.ServiceModel.Channels;
 
 namespace Infrastructure.STS.Company.DomainServices
 {
@@ -21,9 +21,7 @@ namespace Infrastructure.STS.Company.DomainServices
     {
         private readonly ILogger _logger;
         private readonly string _certificateThumbprint;
-        private readonly string _endpoint;
         private readonly string _issuer;
-        private readonly string _serviceRoot;
 
         private const string EntityId = "http://stoettesystemerne.dk/service/organisation/3";
 
@@ -31,9 +29,7 @@ namespace Infrastructure.STS.Company.DomainServices
         {
             _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
-            _endpoint = configuration.CertificateEndpoint;
             _issuer = configuration.Issuer;
-            _serviceRoot = $"https://organisation.{configuration.EndpointHost}/organisation/virksomhed/6";
         }
 
         public Result<Guid, DetailedOperationError<StsError>> ResolveStsOrganizationCompanyUuid(Organization organization)
@@ -42,22 +38,20 @@ namespace Infrastructure.STS.Company.DomainServices
             {
                 throw new ArgumentNullException(nameof(organization));
             }
-            using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
-            using var organizationPortTypeClient = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
 
+            var token = TokenFetcher.IssueToken(EntityId, organization.Cvr, _certificateThumbprint, _issuer);
+            var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
+
+            using var virksomhedPortTypeClient = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), "https://organisation.eksterntest-stoettesystemerne.dk/organisation/virksomhed/6", clientCertificate);
             var identity = EndpointIdentity.CreateDnsIdentity("ORG_EXTTEST_Organisation_1");
-            var endpointAddress = new EndpointAddress(organizationPortTypeClient.Endpoint.ListenUri, identity);
-            organizationPortTypeClient.Endpoint.Address = endpointAddress;
-            organizationPortTypeClient.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
-
-            var token = TokenFetcher.IssueToken(EntityId, organization.Cvr, _certificateThumbprint, _endpoint, _issuer);
-            var channel = organizationPortTypeClient.ChannelFactory.CreateChannelWithIssuedToken(token);
+            var endpointAddress = new EndpointAddress(virksomhedPortTypeClient.Endpoint.ListenUri, identity);
+            virksomhedPortTypeClient.Endpoint.Address = endpointAddress;
+            virksomhedPortTypeClient.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
+            var channel = virksomhedPortTypeClient.ChannelFactory.CreateChannelWithIssuedToken(token);
             var request = CreateSearchByCvrRequest(organization);
-
             try
             {
                 var response = GetSearchResponse(channel, request);
-
                 var statusResult = response.SoegOutput.StandardRetur;
                 var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
                 if (stsError.HasValue)
@@ -92,27 +86,28 @@ namespace Infrastructure.STS.Company.DomainServices
             }
         }
 
-        private static soegResponse GetSearchResponse(VirksomhedPortType channel, soegRequest request)
-        {
-            return new RetriedIntegrationRequest<soegResponse>(() => channel.soeg(request)).Execute();
-        }
-
         private static soegRequest CreateSearchByCvrRequest(Organization organization)
         {
-            return new soegRequest(new RequestHeaderType
+            return new soegRequest(
+                new RequestHeaderType
                 {
                     TransactionUUID = Guid.NewGuid().ToString()
-                }, new SoegInputType1()
+                },
+                new SoegInputType1()
                 {
-                    /*FoersteResultatReference = "0",
-                    MaksimalAntalKvantitet = "2",*/
-                    AttributListe = new[]{new EgenskabType
-                    {
-                        CVRNummerTekst = organization.Cvr
-                    }},
+                    AttributListe = new[]{
+                            new EgenskabType
+                            {
+                                CVRNummerTekst = organization.Cvr
+                            }},
                     TilstandListe = new TilstandListeType(),
                     RelationListe = new RelationListeType(),
                 });
+        }
+
+        private static soegResponse GetSearchResponse(VirksomhedPortType channel, soegRequest request)
+        {
+            return new RetriedIntegrationRequest<soegResponse>(() => channel.soeg(request)).Execute();
         }
 
         private static VirksomhedPortTypeClient CreateClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
@@ -120,12 +115,12 @@ namespace Infrastructure.STS.Company.DomainServices
             return new VirksomhedPortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
             {
                 ClientCredentials =
-                {
-                    ClientCertificate =
                     {
-                        Certificate = certificate
+                        ClientCertificate =
+                        {
+                            Certificate = certificate
+                        }
                     }
-                }
             };
         }
     }

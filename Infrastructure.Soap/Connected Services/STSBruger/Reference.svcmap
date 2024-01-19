@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="718f7d80-a98f-4b4c-8d47-24d7078c1992" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="db0f86c1-9021-473f-a060-02be8670f976" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -22,16 +22,16 @@
     <MetadataSource Address="C:\Temp\v6_0_0_0\wsdl\Bruger.wsdl" Protocol="file" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="BrugerBesked.xsd" MetadataType="Schema" ID="e39b9718-fff1-45e5-a213-01542704e8bb" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/BrugerBesked.xsd" />
-    <MetadataFile FileName="OIOIDWS.wsdl" MetadataType="Wsdl" ID="85448d34-14ef-4a7c-9f25-2fb1ea802ed5" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/policies/OIOIDWS.wsdl" />
-    <MetadataFile FileName="BrugerService1.wsdl" MetadataType="Wsdl" ID="4cf1b3b4-9daf-4357-8e8b-03c1f6c9e691" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/Bruger.wsdl" />
-    <MetadataFile FileName="Part1.xsd" MetadataType="Schema" ID="818cc351-acbd-4a13-8726-9e9f085be354" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Part.xsd" />
-    <MetadataFile FileName="GenerelleDefinitioner.xsd" MetadataType="Schema" ID="6305f457-70bf-45e8-be4b-03f58e2820ae" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/GenerelleDefinitioner.xsd" />
-    <MetadataFile FileName="RequestHeader1.xsd" MetadataType="Schema" ID="36841805-7a02-44f0-b4af-840c5887d548" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/RequestHeader.xsd" />
-    <MetadataFile FileName="SagDokObjekt1.xsd" MetadataType="Schema" ID="358e0be3-17de-45c4-89f4-b525109aba00" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/SagDokObjekt.xsd" />
-    <MetadataFile FileName="Bruger1.xsd" MetadataType="Schema" ID="0119ccba-a7cb-4301-a69d-d9e3107cd71a" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Bruger.xsd" />
-    <MetadataFile FileName="OrganisationFaelles1.xsd" MetadataType="Schema" ID="c2b481f4-7ca5-4496-a4bc-39f09c965ef6" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/OrganisationFaelles.xsd" />
-    <MetadataFile FileName="BrugerOperationer1.xsd" MetadataType="Schema" ID="b036ca65-4a79-40cc-8ace-94f890107e28" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/BrugerOperationer.xsd" />
+    <MetadataFile FileName="BrugerBesked.xsd" MetadataType="Schema" ID="e43660c3-b418-4ade-a1b4-548548f9b695" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/BrugerBesked.xsd" />
+    <MetadataFile FileName="OIOIDWS.wsdl" MetadataType="Wsdl" ID="f476277d-b1d2-443c-810c-832e9a7446d2" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/policies/OIOIDWS.wsdl" />
+    <MetadataFile FileName="BrugerService.wsdl" MetadataType="Wsdl" ID="4c2717bc-e003-4cbf-be62-6bfbb7de1365" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/Bruger.wsdl" />
+    <MetadataFile FileName="Part.xsd" MetadataType="Schema" ID="1cabe773-b6fd-437e-97fc-af0a061a5d6f" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Part.xsd" />
+    <MetadataFile FileName="GenerelleDefinitioner.xsd" MetadataType="Schema" ID="56b3a5fc-1db9-4ae6-ba9c-5e6a7a63098c" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/GenerelleDefinitioner.xsd" />
+    <MetadataFile FileName="RequestHeader.xsd" MetadataType="Schema" ID="c9097cca-af32-4cbf-b310-6dfb60417c63" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/RequestHeader.xsd" />
+    <MetadataFile FileName="SagDokObjekt.xsd" MetadataType="Schema" ID="a6399cc3-0c40-4b4f-8fbd-483945f2302c" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/SagDokObjekt.xsd" />
+    <MetadataFile FileName="Bruger.xsd" MetadataType="Schema" ID="80d18076-b4d4-448a-aa74-34ce1b5d8abb" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Bruger.xsd" />
+    <MetadataFile FileName="OrganisationFaelles.xsd" MetadataType="Schema" ID="56b682b6-372c-43d8-be1e-726c1f9a6a50" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/OrganisationFaelles.xsd" />
+    <MetadataFile FileName="BrugerOperationer.xsd" MetadataType="Schema" ID="31022e78-56e6-4a45-9869-d4f35bd2e0d4" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/BrugerOperationer.xsd" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
