@@ -11,7 +11,7 @@ using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
-using Infrastructure.STS.Organization.ServiceReference;
+using Kombit.InfrastructureSamples.OrganisationService;
 using Serilog;
 
 namespace Infrastructure.STS.Organization.DomainServices

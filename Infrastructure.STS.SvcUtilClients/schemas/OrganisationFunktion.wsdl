@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+        name="OrganisationFunktionService"
+        targetNamespace="http://stoettesystemerne.dk/organisation/6/"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:tns="http://stoettesystemerne.dk/organisation/6/"
+        xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy"
+        xmlns:org="http://stoettesystemerne.dk/organisation/organisationfunktion/6/"
+        xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/">
+
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy"
+               location="policies/OIOIDWS.wsdl"/>
+          
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+		<xsd:import namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationFunktionOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationFunktionBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationFunktion.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationFaelles.xsd"/>
+        <xsd:import namespace="urn:oio:sts:part:6" schemaLocation="../xsd/6.0.STS-0/Part.xsd"/>
+        <xsd:import namespace="urn:oio:sts:6" schemaLocation="../xsd/6.0.STS-0/GenerelleDefinitioner.xsd"/>
+        <xsd:import namespace="urn:oio:sagdok:3.0.0" schemaLocation="../xsd/common/SagDokObjekt.xsd"/>
+        <xsd:import namespace="http://kombit.dk/xml/schemas/RequestHeader/1/" schemaLocation="../xsd/common/RequestHeader.xsd" />
+      </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="OrganisationFunktionOpretResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="org:OpretOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionImporterRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="org:ImportInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionListeResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="org:ListOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionLaesRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="org:LaesInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionRetRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="org:RetInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionSletResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="org:SletOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionSoegResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="org:SoegOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionPassiverRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="org:PassiverInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionImporterResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="org:ImportOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionListeRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="org:ListInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionSletRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="org:SletInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionOpretRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="org:OpretInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionPassiverResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="org:PassiverOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionRetResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="org:RetOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionLaesResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="org:LaesOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="OrganisationFunktionSoegRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="org:SoegInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="OrganisationFunktionPortType">
+    <wsdl:operation name="opret">
+      <wsdl:input message="tns:OrganisationFunktionOpretRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:OrganisationFunktionOpretResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <wsdl:input message="tns:OrganisationFunktionImporterRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:OrganisationFunktionImporterResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <wsdl:input message="tns:OrganisationFunktionPassiverRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:OrganisationFunktionPassiverResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <wsdl:input message="tns:OrganisationFunktionLaesRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:OrganisationFunktionLaesResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <wsdl:input message="tns:OrganisationFunktionRetRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:OrganisationFunktionRetResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <wsdl:input message="tns:OrganisationFunktionSletRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:OrganisationFunktionSletResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <wsdl:input message="tns:OrganisationFunktionSoegRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:OrganisationFunktionSoegResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <wsdl:input message="tns:OrganisationFunktionListeRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:OrganisationFunktionListeResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="OrganisationFunktion" type="tns:OrganisationFunktionPortType">
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsp:PolicyReference URI="#ServiceplatformBindingPolicy"/>
+    <wsdl:operation name="opret">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/organisationfunktion/opret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:OrganisationFunktionOpretRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:OrganisationFunktionOpretResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/organisationfunktion/importer" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:OrganisationFunktionImporterRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:OrganisationFunktionImporterResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/organisationfunktion/passiver" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:OrganisationFunktionPassiverRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:OrganisationFunktionPassiverResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/organisationfunktion/laes" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:OrganisationFunktionLaesRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:OrganisationFunktionLaesResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/organisationfunktion/ret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:OrganisationFunktionRetRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:OrganisationFunktionRetResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/organisationfunktion/slet" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:OrganisationFunktionSletRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:OrganisationFunktionSletResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/organisationfunktion/soeg" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:OrganisationFunktionSoegRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:OrganisationFunktionSoegResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/organisationfunktion/list" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:OrganisationFunktionListeRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:OrganisationFunktionListeResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="OrganisationFunktionService">
+    <wsdl:port name="OrganisationFunktion" binding="tns:OrganisationFunktion">
+      <soap12:address location="http://kombit.dk/sts/organisation/organisationfunktion"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

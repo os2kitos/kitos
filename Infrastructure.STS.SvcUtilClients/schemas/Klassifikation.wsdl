@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions name="KlassifikationService_6"
+	targetNamespace="http://stoettesystemerne.dk/klassifikation"
+	xmlns="http://www.w3.org/2001/XMLSchema"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:tns="http://stoettesystemerne.dk/klassifikation"
+    xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+    xmlns:wsp="http://www.w3.org/ns/ws-policy"
+	xmlns:type="http://stoettesystemerne.dk/klassifikation/klassifikation/6/"
+    xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/">
+
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy"
+               location="policies/OIOIDWS.wsdl"/>
+
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+		<xsd:import namespace="http://stoettesystemerne.dk/klassifikation/klassifikation/6/" schemaLocation="../xsd/6.0.STS-0/KlassifikationOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/klassifikation/6/" schemaLocation="../xsd/6.0.STS-0/Klassifikation.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/klassifikation/6/" schemaLocation="../xsd/6.0.STS-0/KlassifikationBesked.xsd"/>
+        <xsd:import namespace="urn:oio:sts:6" schemaLocation="../xsd/6.0.STS-0/GenerelleDefinitioner.xsd"/>
+        <xsd:import namespace="urn:oio:sagdok:3.0.0" schemaLocation="../xsd/common/SagDokObjekt.xsd"/>
+        <xsd:import namespace="http://kombit.dk/xml/schemas/RequestHeader/1/" schemaLocation="../xsd/common/RequestHeader.xsd" />
+      </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="KlassifikationOpretRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:OpretInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationOpretResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:OpretOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationLaesResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:LaesOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationSletResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:SletOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationLaesRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:LaesInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationSoegRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:SoegInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationSletRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:SletInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationImporterRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:ImportInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationPassiverResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:PassiverOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationListeResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:ListOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationRetResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:RetOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationListeRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:ListInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationRetRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:RetInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationSoegResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:SoegOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationImporterResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:ImportOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassifikationPassiverRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:PassiverInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="KlassifikationPortType">
+    <wsdl:operation name="opret">
+      <wsdl:input message="tns:KlassifikationOpretRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlassifikationOpretResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <wsdl:input message="tns:KlassifikationImporterRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlassifikationImporterResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <wsdl:input message="tns:KlassifikationPassiverRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlassifikationPassiverResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <wsdl:input message="tns:KlassifikationLaesRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlassifikationLaesResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <wsdl:input message="tns:KlassifikationRetRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlassifikationRetResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <wsdl:input message="tns:KlassifikationSletRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlassifikationSletResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <wsdl:input message="tns:KlassifikationSoegRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlassifikationSoegResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <wsdl:input message="tns:KlassifikationListeRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlassifikationListeResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Klassifikation" type="tns:KlassifikationPortType">
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsp:PolicyReference URI="#ServiceplatformBindingPolicy"/>
+    <wsdl:operation name="opret">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klassifikation/opret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlassifikationOpretRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlassifikationOpretResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klassifikation/importer" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlassifikationImporterRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlassifikationImporterResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klassifikation/passiver" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlassifikationPassiverRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlassifikationPassiverResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klassifikation/laes" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlassifikationLaesRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlassifikationLaesResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klassifikation/ret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlassifikationRetRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlassifikationRetResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klassifikation/slet" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlassifikationSletRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlassifikationSletResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klassifikation/soeg" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlassifikationSoegRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlassifikationSoegResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klassifikation/list" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlassifikationListeRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlassifikationListeResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="KlassifikationService_6">
+    <wsdl:port name="Klassifikation" binding="tns:Klassifikation">
+      <soap12:address location="http://kombit.dk/sts/klassifikation/klassifikation"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

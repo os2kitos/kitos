@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions 
+    name="KlassifikationSystemService_6"
+    targetNamespace="http://stoettesystemerne.dk/klassifikation"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:tns="http://stoettesystemerne.dk/klassifikation"
+    xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+    xmlns:wsp="http://www.w3.org/ns/ws-policy"
+    xmlns:sts="http://stoettesystemerne.dk/klassifikation/klassifikationsystem/6/"
+    xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/">
+
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy"
+               location="policies/OIOIDWS.wsdl"/>
+
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	    <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/klassifikationsystem/6/" schemaLocation="../xsd/6.0.STS-0/KlassifikationSystemOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/facet/6/" schemaLocation="../xsd/6.0.STS-0/FacetOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/facet/6/" schemaLocation="../xsd/6.0.STS-0/Facet.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/facet/6/" schemaLocation="../xsd/6.0.STS-0/FacetBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/klasse/6/" schemaLocation="../xsd/6.0.STS-0/KlasseOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/klasse/6/" schemaLocation="../xsd/6.0.STS-0/Klasse.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/klasse/6/" schemaLocation="../xsd/6.0.STS-0/KlasseBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/klassifikation/6/" schemaLocation="../xsd/6.0.STS-0/KlassifikationOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/klassifikation/6/" schemaLocation="../xsd/6.0.STS-0/Klassifikation.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/klassifikation/6/" schemaLocation="../xsd/6.0.STS-0/KlassifikationBesked.xsd"/>
+        <xsd:import namespace="urn:oio:sts:6" schemaLocation="../xsd/6.0.STS-0/GenerelleDefinitioner.xsd"/>
+        <xsd:import namespace="urn:oio:sagdok:3.0.0" schemaLocation="../xsd/common/SagDokObjekt.xsd"/>
+        <xsd:import namespace="http://kombit.dk/xml/schemas/RequestHeader/1/" schemaLocation="../xsd/common/RequestHeader.xsd" />
+      </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="FremsoegObjekthierarkiRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="sts:FremsoegObjekthierarkiInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FremsoegObjekthierarkiResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="sts:FremsoegObjekthierarkiOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ImporterKlassifikationSystemRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="sts:ImporterKlassifikationSystemInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ImporterKlassifikationSystemResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="sts:ImporterKlassifikationSystemOutput">
+    </wsdl:part>
+  </wsdl:message>
+  
+  <wsdl:portType name="KlassifikationSystemPortType">
+    <wsdl:operation name="fremsoegobjekthierarki">
+      <wsdl:input message="tns:FremsoegObjekthierarkiRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:FremsoegObjekthierarkiResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="import">
+      <wsdl:input message="tns:ImporterKlassifikationSystemRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:ImporterKlassifikationSystemResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  
+  <wsdl:binding name="KlassifikationSystem" type="tns:KlassifikationSystemPortType">
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsp:PolicyReference URI="#ServiceplatformBindingPolicy"/>
+    <wsdl:operation name="fremsoegobjekthierarki">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klassifikationsystem/fremsoegobjekthierarki" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:FremsoegObjekthierarkiRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:FremsoegObjekthierarkiResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="import">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klassifikationsystem/import" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:ImporterKlassifikationSystemRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:ImporterKlassifikationSystemResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="KlassifikationSystemService_6">
+    <wsdl:port name="KlassifikationSystem" binding="tns:KlassifikationSystem">
+      <soap12:address location="http://kombit.dk/sts/klassifikation/klassifikationsystem"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

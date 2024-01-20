@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+        name="MyndighedService"
+        targetNamespace="http://stoettesystemerne.dk/organisation/6/"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:tns="http://stoettesystemerne.dk/organisation/6/"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy"
+        xmlns:type="http://stoettesystemerne.dk/organisation/myndighed/6/"
+        xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/">
+
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy"
+               location="policies/OIOIDWS.wsdl"/>
+          
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+		<xsd:import namespace="http://stoettesystemerne.dk/organisation/myndighed/6/" schemaLocation="../xsd/6.0.STS-0/MyndighedOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/myndighed/6/" schemaLocation="../xsd/6.0.STS-0/Myndighed.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/myndighed/6/" schemaLocation="../xsd/6.0.STS-0/MyndighedBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationFaelles.xsd"/>
+        <xsd:import namespace="urn:oio:sts:part:6" schemaLocation="../xsd/6.0.STS-0/Part.xsd"/>
+        <xsd:import namespace="urn:oio:sts:6" schemaLocation="../xsd/6.0.STS-0/GenerelleDefinitioner.xsd"/>
+        <xsd:import namespace="urn:oio:sagdok:3.0.0" schemaLocation="../xsd/common/SagDokObjekt.xsd"/>
+        <xsd:import namespace="http://kombit.dk/xml/schemas/RequestHeader/1/" schemaLocation="../xsd/common/RequestHeader.xsd" />
+      </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="MyndighedImporterRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:ImportInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedOpretResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:OpretOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedLaesRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:LaesInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedListeResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:ListOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedPassiverRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:PassiverInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedSletRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:SletInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedLaesResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:LaesOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedRetResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:RetOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedRetRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:RetInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedImporterResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:ImportOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedSoegResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:SoegOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedOpretRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:OpretInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedSletResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:SletOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedPassiverResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:PassiverOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedSoegRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:SoegInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="MyndighedListeRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:ListInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="MyndighedPortType">
+    <wsdl:operation name="opret">
+      <wsdl:input message="tns:MyndighedOpretRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:MyndighedOpretResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <wsdl:input message="tns:MyndighedImporterRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:MyndighedImporterResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <wsdl:input message="tns:MyndighedPassiverRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:MyndighedPassiverResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <wsdl:input message="tns:MyndighedLaesRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:MyndighedLaesResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <wsdl:input message="tns:MyndighedRetRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:MyndighedRetResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <wsdl:input message="tns:MyndighedSletRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:MyndighedSletResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <wsdl:input message="tns:MyndighedSoegRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:MyndighedSoegResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <wsdl:input message="tns:MyndighedListeRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:MyndighedListeResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Myndighed" type="tns:MyndighedPortType">
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsp:PolicyReference URI="#ServiceplatformBindingPolicy"/>
+    <wsdl:operation name="opret">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/myndighed/opret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:MyndighedOpretRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:MyndighedOpretResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/myndighed/importer" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:MyndighedImporterRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:MyndighedImporterResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/myndighed/passiver" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:MyndighedPassiverRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:MyndighedPassiverResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/myndighed/laes" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:MyndighedLaesRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:MyndighedLaesResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/myndighed/ret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:MyndighedRetRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:MyndighedRetResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/myndighed/slet" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:MyndighedSletRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:MyndighedSletResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/myndighed/soeg" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:MyndighedSoegRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:MyndighedSoegResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/myndighed/list" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:MyndighedListeRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:MyndighedListeResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="MyndighedService">
+    <wsdl:port name="Myndighed" binding="tns:Myndighed">
+      <soap12:address location="http://kombit.dk/sts/organisation/myndighed"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

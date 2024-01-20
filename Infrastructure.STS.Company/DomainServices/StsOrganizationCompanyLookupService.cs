@@ -6,7 +6,6 @@ using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.Common.Model.Token;
-using Infrastructure.STS.Company.ServiceReference;
 using Serilog;
 using System;
 using System.Linq;
@@ -14,6 +13,7 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using Kombit.InfrastructureSamples.VirksomhedService;
 
 namespace Infrastructure.STS.Company.DomainServices
 {

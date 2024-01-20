@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+        name="FacetService_6"
+        targetNamespace="http://stoettesystemerne.dk/klassifikation"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:tns="http://stoettesystemerne.dk/klassifikation"
+        xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy"
+        xmlns:type="http://stoettesystemerne.dk/klassifikation/facet/6/"
+        xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/">
+
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy"
+               location="policies/OIOIDWS.wsdl"/>
+          
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+		<xsd:import namespace="http://stoettesystemerne.dk/klassifikation/facet/6/" schemaLocation="../xsd/6.0.STS-0/FacetOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/facet/6/" schemaLocation="../xsd/6.0.STS-0/Facet.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/facet/6/" schemaLocation="../xsd/6.0.STS-0/FacetBesked.xsd"/>
+        <xsd:import namespace="urn:oio:sts:6" schemaLocation="../xsd/6.0.STS-0/GenerelleDefinitioner.xsd"/>
+        <xsd:import namespace="urn:oio:sagdok:3.0.0" schemaLocation="../xsd/common/SagDokObjekt.xsd"/>
+        <xsd:import namespace="http://kombit.dk/xml/schemas/RequestHeader/1/" schemaLocation="../xsd/common/RequestHeader.xsd" />
+      </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="FacetOpretResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:OpretOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetLaesResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:LaesOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetSletResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:SletOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetLaesRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:LaesInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetOpretRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:OpretInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetSoegRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:SoegInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetSletRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:SletInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetImporterRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:ImportInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetPassiverResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:PassiverOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetListeResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:ListOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetRetResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:RetOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetListeRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:ListInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetRetRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:RetInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetSoegResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:SoegOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetImporterResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:ImportOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FacetPassiverRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:PassiverInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="FacetPortType">
+    <wsdl:operation name="opret">
+      <wsdl:input message="tns:FacetOpretRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:FacetOpretResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <wsdl:input message="tns:FacetImporterRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:FacetImporterResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <wsdl:input message="tns:FacetPassiverRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:FacetPassiverResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <wsdl:input message="tns:FacetLaesRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:FacetLaesResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <wsdl:input message="tns:FacetRetRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:FacetRetResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <wsdl:input message="tns:FacetSletRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:FacetSletResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <wsdl:input message="tns:FacetSoegRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:FacetSoegResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <wsdl:input message="tns:FacetListeRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:FacetListeResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Facet" type="tns:FacetPortType">
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsp:PolicyReference URI="#ServiceplatformBindingPolicy"/>
+    <wsdl:operation name="opret">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/facet/opret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:FacetOpretRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:FacetOpretResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/facet/importer" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:FacetImporterRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:FacetImporterResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/facet/passiver" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:FacetPassiverRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:FacetPassiverResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/facet/laes" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:FacetLaesRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:FacetLaesResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/facet/ret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:FacetRetRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:FacetRetResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/facet/slet" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:FacetSletRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:FacetSletResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/facet/soeg" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:FacetSoegRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:FacetSoegResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/facet/list" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:FacetListeRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:FacetListeResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="FacetService_6">
+    <wsdl:port name="Facet" binding="tns:Facet">
+      <soap12:address location="http://kombit.dk/sts/klassifikation/facet"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

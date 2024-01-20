@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions 
+  name="KlasseService_6"
+  targetNamespace="http://stoettesystemerne.dk/klassifikation"
+  xmlns="http://www.w3.org/2001/XMLSchema" 
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+  xmlns:tns="http://stoettesystemerne.dk/klassifikation"
+  xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+  xmlns:wsp="http://www.w3.org/ns/ws-policy"
+  xmlns:type="http://stoettesystemerne.dk/klassifikation/klasse/6/"
+  xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/">
+
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy"
+               location="policies/OIOIDWS.wsdl"/>
+
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+		<xsd:import namespace="http://stoettesystemerne.dk/klassifikation/klasse/6/" schemaLocation="../xsd/6.0.STS-0/KlasseOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/klasse/6/" schemaLocation="../xsd/6.0.STS-0/Klasse.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/klassifikation/klasse/6/" schemaLocation="../xsd/6.0.STS-0/KlasseBesked.xsd"/>
+        <xsd:import namespace="urn:oio:sts:6" schemaLocation="../xsd/6.0.STS-0/GenerelleDefinitioner.xsd"/>
+        <xsd:import namespace="urn:oio:sagdok:3.0.0" schemaLocation="../xsd/common/SagDokObjekt.xsd"/>
+        <xsd:import namespace="http://kombit.dk/xml/schemas/RequestHeader/1/" schemaLocation="../xsd/common/RequestHeader.xsd" />
+      </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="KlasseOpretResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:OpretOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlasseLaesResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:LaesOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlasseSletResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:SletOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlasseLaesRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:LaesInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlasseOpretRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:OpretInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlasseSoegRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:SoegInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlasseSletRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:SletInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlasseImporterRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:ImportInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassePassiverResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:PassiverOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlasseListeResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:ListOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlasseRetResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:RetOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlasseListeRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:ListInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlasseRetRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:RetInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlasseSoegResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:SoegOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlasseImporterResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:ImportOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="KlassePassiverRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:PassiverInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="KlassePortType">
+    <wsdl:operation name="opret">
+      <wsdl:input message="tns:KlasseOpretRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlasseOpretResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <wsdl:input message="tns:KlasseImporterRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlasseImporterResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <wsdl:input message="tns:KlassePassiverRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlassePassiverResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <wsdl:input message="tns:KlasseLaesRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlasseLaesResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <wsdl:input message="tns:KlasseRetRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlasseRetResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <wsdl:input message="tns:KlasseSletRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlasseSletResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <wsdl:input message="tns:KlasseSoegRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlasseSoegResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <wsdl:input message="tns:KlasseListeRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:KlasseListeResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Klasse" type="tns:KlassePortType">
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsp:PolicyReference URI="#ServiceplatformBindingPolicy"/>
+    <wsdl:operation name="opret">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klasse/opret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlasseOpretRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlasseOpretResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klasse/importer" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlasseImporterRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlasseImporterResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klasse/passiver" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlassePassiverRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlassePassiverResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klasse/laes" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlasseLaesRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlasseLaesResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klasse/ret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlasseRetRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlasseRetResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klasse/slet" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlasseSletRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlasseSletResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klasse/soeg" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlasseSoegRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlasseSoegResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <soap12:operation soapAction="http://kombit.dk/sts/klassifikation/klasse/list" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:KlasseListeRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:KlasseListeResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="KlasseService_6">
+    <wsdl:port name="Klasse" binding="tns:Klasse">
+      <soap12:address location="http://kombit.dk/sts/klassifikation/klasse"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

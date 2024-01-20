@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions 
+    name="OrganisationSystemService"
+    targetNamespace="http://stoettesystemerne.dk/organisation/6/"
+    xmlns="http://www.w3.org/2001/XMLSchema"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:tns="http://stoettesystemerne.dk/organisation/6/"
+    xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+    xmlns:wsp="http://www.w3.org/ns/ws-policy"
+    xmlns:sts="http://stoettesystemerne.dk/organisation/organisationsystem/6/"
+    xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/">
+
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy"
+               location="policies/OIOIDWS.wsdl"/>
+  
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	    <xsd:import namespace="http://stoettesystemerne.dk/organisation/organisationsystem/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationSystemOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/organisation/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/organisation/6/" schemaLocation="../xsd/6.0.STS-0/Organisation.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/organisation/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/organisationenhed/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationEnhedOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/organisationenhed/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationEnhed.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/organisationenhed/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationEnhedBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationFunktionOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationFunktion.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/organisationfunktion/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationFunktionBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/adresse/6/" schemaLocation="../xsd/6.0.STS-0/AdresseOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/adresse/6/" schemaLocation="../xsd/6.0.STS-0/Adresse.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/adresse/6/" schemaLocation="../xsd/6.0.STS-0/AdresseBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/person/6/" schemaLocation="../xsd/6.0.STS-0/PersonOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/person/6/" schemaLocation="../xsd/6.0.STS-0/Person.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/person/6/" schemaLocation="../xsd/6.0.STS-0/PersonBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/bruger/6/" schemaLocation="../xsd/6.0.STS-0/BrugerOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/bruger/6/" schemaLocation="../xsd/6.0.STS-0/Bruger.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/bruger/6/" schemaLocation="../xsd/6.0.STS-0/BrugerBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/" schemaLocation="../xsd/6.0.STS-0/InteressefaellesskabOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/" schemaLocation="../xsd/6.0.STS-0/Interessefaellesskab.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/" schemaLocation="../xsd/6.0.STS-0/InteressefaellesskabBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/itsystem/6/" schemaLocation="../xsd/6.0.STS-0/ItSystemOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/itsystem/6/" schemaLocation="../xsd/6.0.STS-0/ItSystem.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/itsystem/6/" schemaLocation="../xsd/6.0.STS-0/ItSystemBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/myndighed/6/" schemaLocation="../xsd/6.0.STS-0/MyndighedOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/myndighed/6/" schemaLocation="../xsd/6.0.STS-0/Myndighed.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/myndighed/6/" schemaLocation="../xsd/6.0.STS-0/MyndighedBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/virksomhed/6/" schemaLocation="../xsd/6.0.STS-0/VirksomhedOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/virksomhed/6/" schemaLocation="../xsd/6.0.STS-0/Virksomhed.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/virksomhed/6/" schemaLocation="../xsd/6.0.STS-0/VirksomhedBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationFaelles.xsd"/>
+        <xsd:import namespace="urn:oio:sts:part:6" schemaLocation="../xsd/6.0.STS-0/Part.xsd"/>
+        <xsd:import namespace="urn:oio:sts:6" schemaLocation="../xsd/6.0.STS-0/GenerelleDefinitioner.xsd"/>
+        <xsd:import namespace="urn:oio:sagdok:3.0.0" schemaLocation="../xsd/common/SagDokObjekt.xsd"/>
+        <xsd:import namespace="http://kombit.dk/xml/schemas/RequestHeader/1/" schemaLocation="../xsd/common/RequestHeader.xsd" />
+      </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="FremsoegObjekthierarkiRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="sts:FremsoegObjekthierarkiInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="FremsoegObjekthierarkiResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="sts:FremsoegObjekthierarkiOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ImporterOrganisationSystemRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="sts:ImporterOrganisationSystemInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ImporterOrganisationSystemResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="sts:ImporterOrganisationSystemOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="AnonymiserRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="sts:AnonymiserInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="AnonymiserResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="sts:AnonymiserOutput">
+    </wsdl:part>
+  </wsdl:message>
+ 
+  <wsdl:portType name="OrganisationSystemPortType">
+    <wsdl:operation name="fremsoegobjekthierarki">
+      <wsdl:input message="tns:FremsoegObjekthierarkiRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:FremsoegObjekthierarkiResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="import">
+      <wsdl:input message="tns:ImporterOrganisationSystemRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:ImporterOrganisationSystemResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="anonymiser">
+      <wsdl:input message="tns:AnonymiserRequestMessage">
+      </wsdl:input>
+      <wsdl:output message="tns:AnonymiserResponseMessage">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  
+  <wsdl:binding name="OrganisationSystem" type="tns:OrganisationSystemPortType">
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+      <wsp:PolicyReference URI="#ServiceplatformBindingPolicy"/>
+    <wsdl:operation name="fremsoegobjekthierarki">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/organisationssystem/fremsoegobjekthierarki" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:FremsoegObjekthierarkiRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:FremsoegObjekthierarkiResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="import">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/organisationssystem/import" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:ImporterOrganisationSystemRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:ImporterOrganisationSystemResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="anonymiser">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/organisationssystem/anonymiser" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:AnonymiserRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:AnonymiserResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="OrganisationSystemService">
+    <wsdl:port name="OrganisationSystem" binding="tns:OrganisationSystem">
+      <soap12:address location="http://kombit.dk/sts/organisation/organisationssystem"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+        name="InteressefaellesskabService"
+        targetNamespace="http://stoettesystemerne.dk/organisation/6/"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:tns="http://stoettesystemerne.dk/organisation/6/"
+        xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy"
+        xmlns:type="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/"
+        xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/">
+
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy"
+               location="policies/OIOIDWS.wsdl"/>
+          
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+		<xsd:import namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/" schemaLocation="../xsd/6.0.STS-0/InteressefaellesskabOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/" schemaLocation="../xsd/6.0.STS-0/Interessefaellesskab.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/interessefaellesskab/6/" schemaLocation="../xsd/6.0.STS-0/InteressefaellesskabBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationFaelles.xsd"/>
+        <xsd:import namespace="urn:oio:sts:part:6" schemaLocation="../xsd/6.0.STS-0/Part.xsd"/>
+        <xsd:import namespace="urn:oio:sts:6" schemaLocation="../xsd/6.0.STS-0/GenerelleDefinitioner.xsd"/>
+        <xsd:import namespace="urn:oio:sagdok:3.0.0" schemaLocation="../xsd/common/SagDokObjekt.xsd"/>
+        <xsd:import namespace="http://kombit.dk/xml/schemas/RequestHeader/1/" schemaLocation="../xsd/common/RequestHeader.xsd" />
+      </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="InteressefaellesskabLaesRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:LaesInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabSletRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:SletInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabLaesResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:LaesOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabListeResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:ListOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabSoegResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:SoegOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabPassiverResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:PassiverOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabSletResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:SletOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabOpretRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:OpretInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabPassiverRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:PassiverInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabRetRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:RetInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabImporterResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:ImportOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabRetResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:RetOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabOpretResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:OpretOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabListeRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:ListInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabImporterRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:ImportInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InteressefaellesskabSoegRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:SoegInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="InteressefaellesskabPortType">
+    <wsdl:operation name="opret">
+      <wsdl:input message="tns:InteressefaellesskabOpretRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:InteressefaellesskabOpretResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <wsdl:input message="tns:InteressefaellesskabImporterRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:InteressefaellesskabImporterResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <wsdl:input message="tns:InteressefaellesskabPassiverRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:InteressefaellesskabPassiverResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <wsdl:input message="tns:InteressefaellesskabLaesRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:InteressefaellesskabLaesResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <wsdl:input message="tns:InteressefaellesskabRetRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:InteressefaellesskabRetResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <wsdl:input message="tns:InteressefaellesskabSletRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:InteressefaellesskabSletResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <wsdl:input message="tns:InteressefaellesskabSoegRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:InteressefaellesskabSoegResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <wsdl:input message="tns:InteressefaellesskabListeRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:InteressefaellesskabListeResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Interessefaellesskab" type="tns:InteressefaellesskabPortType">
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsp:PolicyReference URI="#ServiceplatformBindingPolicy"/>
+    <wsdl:operation name="opret">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/interessefaellesskab/opret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:InteressefaellesskabOpretRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:InteressefaellesskabOpretResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/interessefaellesskab/importer" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:InteressefaellesskabImporterRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:InteressefaellesskabImporterResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/interessefaellesskab/passiver" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:InteressefaellesskabPassiverRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:InteressefaellesskabPassiverResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/interessefaellesskab/laes" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:InteressefaellesskabLaesRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:InteressefaellesskabLaesResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/interessefaellesskab/ret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:InteressefaellesskabRetRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:InteressefaellesskabRetResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/interessefaellesskab/slet" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:InteressefaellesskabSletRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:InteressefaellesskabSletResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/interessefaellesskab/soeg" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:InteressefaellesskabSoegRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:InteressefaellesskabSoegResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/interessefaellesskab/list" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:InteressefaellesskabListeRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:InteressefaellesskabListeResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="InteressefaellesskabService">
+    <wsdl:port name="Interessefaellesskab" binding="tns:Interessefaellesskab">
+      <soap12:address location="http://kombit.dk/organisation/interessefaellesskab"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
