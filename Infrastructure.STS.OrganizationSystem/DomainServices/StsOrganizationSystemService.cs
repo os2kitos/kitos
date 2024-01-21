@@ -48,7 +48,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             const int pageSize = 1000;
             int currentPageSize;
             var totalIds = 0;
-            var totalResults = new List<(Guid, RegistreringType9)>();
+            var totalResults = new List<(Guid, RegistreringType5)>();
 
             using var client = CreateClient(HttpBindingFactory.CreateSoapBinding(), _serviceRoot, clientCertificate);
             //var token = TokenFetcher.IssueToken(EntityId, organization.Cvr, _certificateThumbprint, _issuer);
@@ -162,7 +162,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             return new RetriedIntegrationRequest<fremsoegobjekthierarkiResponse>(() => channel.fremsoegobjekthierarkiAsync(request).Result).Execute();
         }
 
-        private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType9) root, Dictionary<Guid, List<(Guid, RegistreringType9)>> unitsByParent)
+        private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType5) root, Dictionary<Guid, List<(Guid, RegistreringType5)>> unitsByParent)
         {
             var processingStack = new Stack<Guid>();
             processingStack.Push(root.Item1);
@@ -180,7 +180,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             return processingStack;
         }
 
-        private static IEnumerable<Guid> GetSubTree((Guid, RegistreringType9) currentChild, Dictionary<Guid, List<(Guid, RegistreringType9)>> unitsByParent)
+        private static IEnumerable<Guid> GetSubTree((Guid, RegistreringType5) currentChild, Dictionary<Guid, List<(Guid, RegistreringType5)>> unitsByParent)
         {
             var id = currentChild.Item1;
 

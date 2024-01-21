@@ -1,8 +1,6 @@
 ﻿using Core.Abstractions.Types;
-using Core.DomainModel.Organization;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.SSO;
-using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.Common.Model.Token;
@@ -15,7 +13,6 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using Digst.OioIdws.Soap.Bindings;
 using Kombit.InfrastructureSamples.VirksomhedService;
-using System.IdentityModel.Metadata;
 using Kombit.InfrastructureSamples;
 using System.IdentityModel.Tokens;
 using Kombit.InfrastructureSamples.Token;
@@ -26,18 +23,10 @@ namespace Infrastructure.STS.Company.DomainServices
     public class StsOrganizationCompanyLookupService : IStsOrganizationCompanyLookupService
     {
         private readonly ILogger _logger;
-        private readonly string _certificateThumbprint;
-        private readonly string _issuer;
-        private SecurityToken _token;
-        private VirksomhedPortType _port;
-
-        private const string EntityId = "http://stoettesystemerne.dk/service/organisation/3";
 
         public StsOrganizationCompanyLookupService(StsOrganisationIntegrationConfiguration configuration, ILogger logger)
         {
             _logger = logger;
-            _certificateThumbprint = configuration.CertificateThumbprint;
-            _issuer = configuration.Issuer;
         }
 
         public Result<Guid, DetailedOperationError<StsError>> ResolveStsOrganizationCompanyUuid(Organization organization)
@@ -47,15 +36,6 @@ namespace Infrastructure.STS.Company.DomainServices
                 throw new ArgumentNullException(nameof(organization));
             }
 
-            //var token = TokenFetcher.IssueToken(EntityId, organization.Cvr, _certificateThumbprint, _issuer);
-            //var client = new VirksomhedPortTypeClient(); //CreateClient(HttpBindingFactory.CreateSoapBinding(), "https://organisation.eksterntest-stoettesystemerne.dk/organisation/virksomhed/6", clientCertificate);
-            //var identity = EndpointIdentity.CreateDnsIdentity("ORG_EXTTEST_Organisation_1");
-            //var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
-            //client.Endpoint.Address = endpointAddress;
-            //var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
-            //client.ClientCredentials.ClientCertificate.Certificate = clientCertificate;
-            //client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
-            //var channel = client.ChannelFactory.CreateChannelWithIssuedToken(token);
             try
             {
                 var response = GetSearchResponse(CreatePort(organization.Cvr), CreateSearchByCvrRequest(organization));
