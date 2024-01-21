@@ -9,15 +9,12 @@ using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.SSO;
-using Digst.OioIdws.Soap.Bindings;
-using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.Common.Model.Token;
 using Kombit.InfrastructureSamples;
 using Kombit.InfrastructureSamples.OrganisationService;
 using Kombit.InfrastructureSamples.Token;
-using Kombit.InfrastructureSamples.VirksomhedService;
 using Serilog;
 using ItemChoiceType = Kombit.InfrastructureSamples.OrganisationService.ItemChoiceType;
 using LaesInputType = Kombit.InfrastructureSamples.OrganisationService.LaesInputType;
@@ -37,8 +34,6 @@ namespace Infrastructure.STS.Organization.DomainServices
         private readonly IStsOrganizationCompanyLookupService _companyLookupService;
         private readonly IStsOrganizationIdentityRepository _stsOrganizationIdentityRepository;
         private readonly ILogger _logger;
-        private readonly string _certificateThumbprint;
-        private readonly string _serviceRoot;
 
         public StsOrganizationService(
             StsOrganisationIntegrationConfiguration configuration,
@@ -49,8 +44,6 @@ namespace Infrastructure.STS.Organization.DomainServices
             _companyLookupService = companyLookupService;
             _stsOrganizationIdentityRepository = stsOrganizationIdentityRepository;
             _logger = logger;
-            _certificateThumbprint = configuration.CertificateThumbprint;
-            _serviceRoot = $"https://organisation.{configuration.EndpointHost}/service/Organisation/Virksomhed/6";
         }
 
         public Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Core.DomainModel.Organization.Organization organization)
@@ -129,8 +122,8 @@ namespace Infrastructure.STS.Organization.DomainServices
             var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
             client.Endpoint.Address = endpointAddress;
             var certificate = CertificateLoader.LoadCertificate(
-                ConfigVariables.ClientCertificateStoreName,
-                ConfigVariables.ClientCertificateStoreLocation,
+                StoreName.My,
+                StoreLocation.LocalMachine,
                 ConfigVariables.ClientCertificateThumbprint
             );
             client.ClientCredentials.ClientCertificate.Certificate = certificate;

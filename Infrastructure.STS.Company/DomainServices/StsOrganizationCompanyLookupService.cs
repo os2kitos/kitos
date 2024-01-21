@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using Core.Abstractions.Types;
@@ -82,8 +83,8 @@ public class StsOrganizationCompanyLookupService : IStsOrganizationCompanyLookup
         var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
         client.Endpoint.Address = endpointAddress;
         var certificate = CertificateLoader.LoadCertificate(
-            ConfigVariables.ClientCertificateStoreName,
-            ConfigVariables.ClientCertificateStoreLocation,
+            StoreName.My,
+            StoreLocation.LocalMachine,
             ConfigVariables.ClientCertificateThumbprint
         );
         client.ClientCredentials.ClientCertificate.Certificate = certificate;

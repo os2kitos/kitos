@@ -35,8 +35,8 @@ public static class TokenFetcher
         SecurityToken token = null;
 
         var certificate = CertificateLoader.LoadCertificate(
-            ConfigVariables.ClientCertificateStoreName,
-            ConfigVariables.ClientCertificateStoreLocation,
+            StoreName.My,
+            StoreLocation.LocalMachine,
             ConfigVariables.ClientCertificateThumbprint);
 
         var absoluteUri = new Uri(entityId).AbsoluteUri;
@@ -57,7 +57,7 @@ public static class TokenFetcher
 
         if (inCache == false || needNewToken)
         {
-            token = SendSecurityTokenRequest(absoluteUri, certificate, ConfigVariables.MYNDIGHEDS_CVR);
+            token = SendSecurityTokenRequest(absoluteUri, certificate, cvr);
             CacheHelper.SaveTocache(cacheKey, token, token.ValidTo);
         }
 
@@ -95,8 +95,8 @@ public static class TokenFetcher
         factory.TrustVersion = TrustVersion.WSTrust13;
         factory.Credentials.ClientCertificate.Certificate = clientCertificate;
         var certificate = CertificateLoader.LoadCertificate(
-            ConfigVariables.StsCertificateStoreName,
-            ConfigVariables.StsCertificateStoreLocation,
+            StoreName.My,
+            StoreLocation.LocalMachine,
             ConfigVariables.StsCertificateThumbprint);
         factory.Credentials.ServiceCertificate.ScopedCertificates.Add(stsAddress.Uri, certificate);
         factory.Credentials.ServiceCertificate.Authentication.CertificateValidationMode =

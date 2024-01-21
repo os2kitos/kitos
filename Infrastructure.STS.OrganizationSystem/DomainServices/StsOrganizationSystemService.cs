@@ -166,8 +166,8 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
             client.Endpoint.Address = endpointAddress;
             var certificate = CertificateLoader.LoadCertificate(
-                ConfigVariables.ClientCertificateStoreName,
-                ConfigVariables.ClientCertificateStoreLocation,
+                StoreName.My,
+                StoreLocation.LocalMachine,
                 ConfigVariables.ClientCertificateThumbprint
             );
             client.ClientCredentials.ClientCertificate.Certificate = certificate;
