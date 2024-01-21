@@ -66,7 +66,7 @@ namespace Core.DomainServices.SSO
         {
             using (var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint))
             {
-                using var client = StsBrugerHelpers.CreateBrugerPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(),
+                using var client = StsBrugerHelpers.CreateBrugerPortTypeClient(HttpBindingFactory.CreateSoapBinding(),
                     _urlServicePlatformBrugerService, clientCertificate);
                 var laesRequest = StsBrugerHelpers.CreateStsBrugerLaesRequest(uuid);
                 var brugerPortType = client.ChannelFactory.CreateChannel();
@@ -166,7 +166,7 @@ namespace Core.DomainServices.SSO
         {
             using (var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint))
             {
-                using var client = StsAdresseHelpers.CreateAdressePortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(),
+                using var client = StsAdresseHelpers.CreateAdressePortTypeClient(HttpBindingFactory.CreateBasicHttpBinding(),
                     _urlServicePlatformAdresseService, clientCertificate);
                 var laesRequest = StsAdresseHelpers.CreateStsAdresseLaesRequest(emailAdresseUuid);
                 var adressePortType = client.ChannelFactory.CreateChannel();
@@ -222,7 +222,7 @@ namespace Core.DomainServices.SSO
         {
             using (var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint))
             {
-                using var client = StsPersonHelpers.CreatePersonPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(),
+                using var client = StsPersonHelpers.CreatePersonPortTypeClient(HttpBindingFactory.CreateBasicHttpBinding(),
                     _urlServicePlatformPersonService, clientCertificate);
                 var laesRequest = StsPersonHelpers.CreateStsPersonLaesRequest(personUuid);
                 var virksomhedPortType = client.ChannelFactory.CreateChannel();

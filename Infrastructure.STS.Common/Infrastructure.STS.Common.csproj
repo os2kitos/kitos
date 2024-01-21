@@ -48,10 +48,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants\ConfigVariables.cs" />
     <Compile Include="Constants\LibBas.cs" />
     <Compile Include="Constants\OioWsTrust.cs" />
     <Compile Include="Constants\WsAdressing.cs" />
-    <Compile Include="Factories\BasicHttpBindingFactory.cs" />
     <Compile Include="Factories\X509CertificateClientCertificateFactory.cs" />
     <Compile Include="Model\Client\RetriedIntegrationRequest.cs" />
     <Compile Include="Model\StsError.cs" />

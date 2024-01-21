@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Runtime.Caching;
 
-namespace Kombit.InfrastructureSamples.Token
+namespace Infrastructure.STS.Common.Model.Token
 {
     public static class CacheHelper
     {
-        public static void SaveTocache(string cacheKey, object savedItem, DateTime absoluteExpiration)
+        public static void SaveToCache(string cacheKey, object savedItem, DateTime absoluteExpiration)
         {
             MemoryCache.Default.Add(cacheKey, savedItem, absoluteExpiration);
         }

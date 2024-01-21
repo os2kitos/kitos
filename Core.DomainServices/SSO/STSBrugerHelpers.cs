@@ -1,6 +1,7 @@
 using System;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
+using Digst.OioIdws.Soap.Bindings;
 using Infrastructure.Soap.STSBruger;
 
 namespace Core.DomainServices.SSO
@@ -17,7 +18,7 @@ namespace Core.DomainServices.SSO
             return laesRequest;
         }
 
-        public static BrugerPortTypeClient CreateBrugerPortTypeClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
+        public static BrugerPortTypeClient CreateBrugerPortTypeClient(SoapBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
         {
             var client = new BrugerPortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
             {

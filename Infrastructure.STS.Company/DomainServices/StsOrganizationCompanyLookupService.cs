@@ -13,7 +13,13 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
+using Digst.OioIdws.Soap.Bindings;
 using Kombit.InfrastructureSamples.VirksomhedService;
+using System.IdentityModel.Metadata;
+using Kombit.InfrastructureSamples;
+using System.IdentityModel.Tokens;
+using Kombit.InfrastructureSamples.Token;
+using Organization = Core.DomainModel.Organization.Organization;
 
 namespace Infrastructure.STS.Company.DomainServices
 {
@@ -22,6 +28,8 @@ namespace Infrastructure.STS.Company.DomainServices
         private readonly ILogger _logger;
         private readonly string _certificateThumbprint;
         private readonly string _issuer;
+        private SecurityToken _token;
+        private VirksomhedPortType _port;
 
         private const string EntityId = "http://stoettesystemerne.dk/service/organisation/3";
 
@@ -39,19 +47,18 @@ namespace Infrastructure.STS.Company.DomainServices
                 throw new ArgumentNullException(nameof(organization));
             }
 
-            var token = TokenFetcher.IssueToken(EntityId, organization.Cvr, _certificateThumbprint, _issuer);
-            var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
-
-            using var virksomhedPortTypeClient = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), "https://organisation.eksterntest-stoettesystemerne.dk/organisation/virksomhed/6", clientCertificate);
-            var identity = EndpointIdentity.CreateDnsIdentity("ORG_EXTTEST_Organisation_1");
-            var endpointAddress = new EndpointAddress(virksomhedPortTypeClient.Endpoint.ListenUri, identity);
-            virksomhedPortTypeClient.Endpoint.Address = endpointAddress;
-            virksomhedPortTypeClient.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
-            var channel = virksomhedPortTypeClient.ChannelFactory.CreateChannelWithIssuedToken(token);
-            var request = CreateSearchByCvrRequest(organization);
+            //var token = TokenFetcher.IssueToken(EntityId, organization.Cvr, _certificateThumbprint, _issuer);
+            //var client = new VirksomhedPortTypeClient(); //CreateClient(HttpBindingFactory.CreateSoapBinding(), "https://organisation.eksterntest-stoettesystemerne.dk/organisation/virksomhed/6", clientCertificate);
+            //var identity = EndpointIdentity.CreateDnsIdentity("ORG_EXTTEST_Organisation_1");
+            //var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
+            //client.Endpoint.Address = endpointAddress;
+            //var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
+            //client.ClientCredentials.ClientCertificate.Certificate = clientCertificate;
+            //client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
+            //var channel = client.ChannelFactory.CreateChannelWithIssuedToken(token);
             try
             {
-                var response = GetSearchResponse(channel, request);
+                var response = GetSearchResponse(CreatePort(organization.Cvr), CreateSearchByCvrRequest(organization));
                 var statusResult = response.SoegOutput.StandardRetur;
                 var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
                 if (stsError.HasValue)
@@ -86,6 +93,28 @@ namespace Infrastructure.STS.Company.DomainServices
             }
         }
 
+        private VirksomhedPortType CreatePort(string cvr)
+        {
+            //var token = TokenFetcher.IssueToken(EntityId, cvr, _certificateThumbprint, _issuer);
+            var token = TokenFetcher.IssueToken(ConfigVariables.OrgService6EntityId);
+            VirksomhedPortTypeClient client = new VirksomhedPortTypeClient();
+
+            EndpointIdentity identity = EndpointIdentity.CreateDnsIdentity(ConfigVariables.ServiceCertificateAlias_ORG);
+            EndpointAddress endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
+            client.Endpoint.Address = endpointAddress;
+            var certificate = CertificateLoader.LoadCertificate(
+                ConfigVariables.ClientCertificateStoreName,
+                ConfigVariables.ClientCertificateStoreLocation,
+                ConfigVariables.ClientCertificateThumbprint
+            );
+            client.ClientCredentials.ClientCertificate.Certificate = certificate;
+
+            // This sets the MINIMUM level. Since the request header should not be signed, we set it to none.
+            client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
+
+            return client.ChannelFactory.CreateChannelWithIssuedToken(token);
+        }
+
         private static soegRequest CreateSearchByCvrRequest(Organization organization)
         {
             return new soegRequest(
@@ -110,17 +139,14 @@ namespace Infrastructure.STS.Company.DomainServices
             return new RetriedIntegrationRequest<soegResponse>(() => channel.soeg(request)).Execute();
         }
 
-        private static VirksomhedPortTypeClient CreateClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
+        private static VirksomhedPortTypeClient CreateClient(SoapBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
         {
             return new VirksomhedPortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
             {
                 ClientCredentials =
-                    {
-                        ClientCertificate =
-                        {
-                            Certificate = certificate
-                        }
-                    }
+                {
+                    ClientCertificate = { Certificate = certificate }
+                }
             };
         }
     }

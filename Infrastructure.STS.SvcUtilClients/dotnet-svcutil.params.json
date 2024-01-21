@@ -3,12 +3,12 @@
   "version": "2.1.0",
   "options": {
     "inputs": [
-      "schemas/Virksomhed.wsdl"
+      "schemas/OrganisationSystem.wsdl"
     ],
     "namespaceMappings": [
-      "*, Kombit.InfrastructureSamples.VirksomhedService"
+      "*, Kombit.InfrastructureSamples.OrganisationSystemService"
     ],
-    "outputFile": "VirksomhedService.cs",
+    "outputFile": "OrganisationSystemService.cs",
     "references": [
       "Microsoft.IdentityModel.Logging, {Microsoft.IdentityModel.Logging, 6.8.0}",
       "Microsoft.IdentityModel.Protocols.WsTrust, {Microsoft.IdentityModel.Protocols.WsTrust, 6.8.0}",

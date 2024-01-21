@@ -8,11 +8,13 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.SSO;
+using Digst.OioIdws.Soap.Bindings;
 using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.Common.Model.Token;
-using Infrastructure.STS.OrganizationSystem.OrganisationSystem;
+using Kombit.InfrastructureSamples.OrganisationSystemService;
+using Kombit.InfrastructureSamples.Token;
 using Serilog;
 
 namespace Infrastructure.STS.OrganizationSystem.DomainServices
@@ -48,8 +50,9 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             var totalIds = 0;
             var totalResults = new List<(Guid, RegistreringType9)>();
 
-            using var client = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
-            var token = TokenFetcher.IssueToken(EntityId, organization.Cvr, _certificateThumbprint, _issuer);
+            using var client = CreateClient(HttpBindingFactory.CreateSoapBinding(), _serviceRoot, clientCertificate);
+            //var token = TokenFetcher.IssueToken(EntityId, organization.Cvr, _certificateThumbprint, _issuer);
+            var token = TokenFetcher.IssueToken(EntityId);
             var channel = client.ChannelFactory.CreateChannelWithIssuedToken(token);
             do
             {
@@ -223,7 +226,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             return listRequest;
         }
 
-        private static OrganisationSystemPortTypeClient CreateClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
+        private static OrganisationSystemPortTypeClient CreateClient(SoapBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
         {
             return new OrganisationSystemPortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
             {

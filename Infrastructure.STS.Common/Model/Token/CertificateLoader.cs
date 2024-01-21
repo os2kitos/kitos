@@ -5,8 +5,7 @@ namespace Infrastructure.STS.Common.Model.Token
 {
     public static class CertificateLoader
     {
-        public static X509Certificate2 LoadCertificate(StoreName storeName, StoreLocation storeLocation,
-            string thumbprint)
+        public static X509Certificate2 LoadCertificate(StoreName storeName, StoreLocation storeLocation, string thumbprint)
         {
             var store = new X509Store(storeName, storeLocation);
             store.Open(OpenFlags.ReadOnly);

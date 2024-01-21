@@ -8,6 +8,7 @@ using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.SSO;
+using Digst.OioIdws.Soap.Bindings;
 using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
@@ -74,7 +75,7 @@ namespace Infrastructure.STS.Organization.DomainServices
 
             //Search for the organization based on the resolved company (all organizations are tied to a company)
             using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
-            using var organizationPortTypeClient = CreateOrganizationPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
+            using var organizationPortTypeClient = CreateOrganizationPortTypeClient(HttpBindingFactory.CreateSoapBinding(), _serviceRoot, clientCertificate);
 
             var searchRequest = CreateSearchForOrganizationRequest(organization, companyUuid.Value);
             var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
@@ -123,7 +124,7 @@ namespace Infrastructure.STS.Organization.DomainServices
 
             var uuid = organizationUuidResult.Value;
             using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
-            using var organizationPortTypeClient = CreateOrganizationPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
+            using var organizationPortTypeClient = CreateOrganizationPortTypeClient(HttpBindingFactory.CreateSoapBinding(), _serviceRoot, clientCertificate);
 
             var readRequest = CreateGetOrganizationByUuidRequest(uuid);
             var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
@@ -233,7 +234,7 @@ namespace Infrastructure.STS.Organization.DomainServices
             };
         }
 
-        private static OrganisationPortTypeClient CreateOrganizationPortTypeClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
+        private static OrganisationPortTypeClient CreateOrganizationPortTypeClient(SoapBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
         {
             return new OrganisationPortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
             {

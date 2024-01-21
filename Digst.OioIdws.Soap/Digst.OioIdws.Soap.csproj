@@ -51,6 +51,7 @@
     <Compile Include="Behaviors\SoapClientBehaviorExtensionElement.cs" />
     <Compile Include="Behaviors\SoapServiceBehavior.cs" />
     <Compile Include="Behaviors\SoapServiceBehaviorExtensionElement.cs" />
+    <Compile Include="Bindings\HttpBindingFactory.cs" />
     <Compile Include="Bindings\SoapBinding.cs" />
     <Compile Include="Bindings\SoapBindingCollectionElement.cs" />
     <Compile Include="Bindings\SoapBindingElement.cs" />
