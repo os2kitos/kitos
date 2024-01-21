@@ -9,15 +9,11 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.SSO;
-using Digst.OioIdws.Soap.Bindings;
-using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.Common.Model.Token;
-using Kombit.InfrastructureSamples;
 using Kombit.InfrastructureSamples.OrganisationSystemService;
 using Kombit.InfrastructureSamples.Token;
-using Kombit.InfrastructureSamples.VirksomhedService;
 using Serilog;
 using RequestHeaderType = Kombit.InfrastructureSamples.OrganisationSystemService.RequestHeaderType;
 
@@ -26,22 +22,16 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
     public class StsOrganizationSystemService : IStsOrganizationSystemService
     {
         private readonly IStsOrganizationService _organizationService;
+        private readonly StsOrganisationIntegrationConfiguration _configuration;
+        private readonly TokenFetcher _tokenFetcher;
         private readonly ILogger _logger;
-        private readonly string _certificateThumbprint;
-        private readonly string _endpoint;
-        private readonly string _issuer;
-        private readonly string _serviceRoot;
 
-        private const string EntityId = "http://stoettesystemerne.dk/service/organisation/3";
-
-        public StsOrganizationSystemService(IStsOrganizationService organizationService, StsOrganisationIntegrationConfiguration configuration, ILogger logger)
+        public StsOrganizationSystemService(IStsOrganizationService organizationService, StsOrganisationIntegrationConfiguration configuration, TokenFetcher tokenFetcher, ILogger logger)
         {
             _organizationService = organizationService;
+            _configuration = configuration;
+            _tokenFetcher = tokenFetcher;
             _logger = logger;
-            _certificateThumbprint = configuration.CertificateThumbprint;
-            _endpoint = configuration.CertificateEndpoint;
-            _issuer = configuration.Issuer;
-            _serviceRoot = $"https://organisation.{configuration.EndpointHost}/organisation/organisationsystem/6";
         }
 
         public Result<ExternalOrganizationUnit, DetailedOperationError<ResolveOrganizationTreeError>> ResolveOrganizationTree(Organization organization)
@@ -59,7 +49,6 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             {
                 var listRequest = CreateOrgHierarchyRequest(organization.Uuid.ToString(), pageSize, totalIds);
                 var listResponse = LoadOrganizationHierarchy(port, listRequest);
-
                 var listStatusResult = listResponse.FremsoegObjekthierarkiOutput.StandardRetur;
                 var listStsError = listStatusResult.StatusKode.ParseStsErrorFromStandardResultCode();
                 if (listStsError.HasValue)
@@ -157,18 +146,18 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             return idToConvertedChildren[root.Item1];
         }
 
-        private static OrganisationSystemPortType CreatePort(string cvr)
+        private OrganisationSystemPortType CreatePort(string cvr)
         {
-            var token = TokenFetcher.IssueToken(ConfigVariables.OrgService6EntityId, cvr);
+            var token = _tokenFetcher.IssueToken(_configuration.OrgService6EntityId, cvr);
             var client = new OrganisationSystemPortTypeClient();
 
-            var identity = EndpointIdentity.CreateDnsIdentity(ConfigVariables.ServiceCertificateAlias_ORG);
+            var identity = EndpointIdentity.CreateDnsIdentity(_configuration.ServiceCertificateAliasOrg);
             var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
             client.Endpoint.Address = endpointAddress;
             var certificate = CertificateLoader.LoadCertificate(
                 StoreName.My,
                 StoreLocation.LocalMachine,
-                ConfigVariables.ClientCertificateThumbprint
+                _configuration.ClientCertificateThumbprint
             );
             client.ClientCredentials.ClientCertificate.Certificate = certificate;
             client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;

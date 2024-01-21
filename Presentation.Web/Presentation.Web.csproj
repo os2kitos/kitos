@@ -1849,6 +1849,10 @@
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.STS.Common\Infrastructure.STS.Common.csproj">
+      <Project>{423D7522-4882-4438-94F4-7B3F5778C83F}</Project>
+      <Name>Infrastructure.STS.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.STS.Company\Infrastructure.STS.Company.csproj">
       <Project>{09A799FA-3781-419B-AB54-3C76219FD2DE}</Project>
       <Name>Infrastructure.STS.Company</Name>

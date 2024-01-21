@@ -23,7 +23,7 @@ namespace Core.DomainServices.SSO
         public StsBrugerInfoService(StsOrganisationIntegrationConfiguration configuration, ILogger logger)
         {
             _logger = logger;
-            _certificateThumbprint = configuration.CertificateThumbprint;
+            _certificateThumbprint = configuration.ClientCertificateThumbprint;
             _urlServicePlatformBrugerService = $"https://{configuration.EndpointHost}/Organisation/Bruger/6";
             _urlServicePlatformAdresseService = $"https://{configuration.EndpointHost}/Organisation/Adresse/6";
             _urlServicePlatformPersonService = $"https://{configuration.EndpointHost}/Organisation/Person/6";

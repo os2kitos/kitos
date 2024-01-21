@@ -10,7 +10,6 @@ using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.Common.Model.Token;
-using Kombit.InfrastructureSamples;
 using Kombit.InfrastructureSamples.Token;
 using Kombit.InfrastructureSamples.VirksomhedService;
 using Serilog;
@@ -22,11 +21,13 @@ public class StsOrganizationCompanyLookupService : IStsOrganizationCompanyLookup
 {
     private readonly StsOrganisationIntegrationConfiguration _configuration;
     private readonly ILogger _logger;
+    private readonly TokenFetcher _tokenFetcher;
 
-    public StsOrganizationCompanyLookupService(StsOrganisationIntegrationConfiguration configuration, ILogger logger)
+    public StsOrganizationCompanyLookupService(StsOrganisationIntegrationConfiguration configuration, ILogger logger, TokenFetcher tokenFetcher)
     {
         _configuration = configuration;
         _logger = logger;
+        _tokenFetcher = tokenFetcher;
     }
 
     public Result<Guid, DetailedOperationError<StsError>> ResolveStsOrganizationCompanyUuid(Organization organization)
@@ -74,18 +75,18 @@ public class StsOrganizationCompanyLookupService : IStsOrganizationCompanyLookup
         }
     }
 
-    private static VirksomhedPortType CreatePort(string cvr)
+    private VirksomhedPortType CreatePort(string cvr)
     {
-        var token = TokenFetcher.IssueToken(ConfigVariables.OrgService6EntityId, cvr);
+        var token = _tokenFetcher.IssueToken(_configuration.OrgService6EntityId, cvr);
         var client = new VirksomhedPortTypeClient();
 
-        var identity = EndpointIdentity.CreateDnsIdentity(ConfigVariables.ServiceCertificateAlias_ORG);
+        var identity = EndpointIdentity.CreateDnsIdentity(_configuration.ServiceCertificateAliasOrg);
         var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
         client.Endpoint.Address = endpointAddress;
         var certificate = CertificateLoader.LoadCertificate(
             StoreName.My,
             StoreLocation.LocalMachine,
-            ConfigVariables.ClientCertificateThumbprint
+            _configuration.ClientCertificateThumbprint
         );
         client.ClientCredentials.ClientCertificate.Certificate = certificate;
         client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;

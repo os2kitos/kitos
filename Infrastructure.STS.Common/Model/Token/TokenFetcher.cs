@@ -12,14 +12,29 @@ using Infrastructure.STS.Common.Model.Token;
 
 namespace Kombit.InfrastructureSamples.Token;
 
-public static class TokenFetcher
+public class TokenFetcher
 {
+    private readonly string _clientCertificateThumbprint;
+    private readonly string _stsIssuer;
+    private readonly string _stsEndpoint;
+    private readonly string _stsCertificateAlias;
+    private readonly string _stsCertificateThumbprint;
+
+    public TokenFetcher(string clientCertificateThumbprint, string stsIssuer, string stsEndpoint, string stsCertificateAlias, string stsCertificateThumbprint)
+    {
+        _clientCertificateThumbprint = clientCertificateThumbprint;
+        _stsIssuer = stsIssuer;
+        _stsEndpoint = stsEndpoint;
+        _stsCertificateAlias = stsCertificateAlias;
+        _stsCertificateThumbprint = stsCertificateThumbprint;
+    }
+
     /// <summary>
     ///     Checks if a token is valid. 5 minutes added to be sure it is valid (can be changed)
     /// </summary>
     /// <param name="token">The token to check</param>
     /// <returns>True of token is expired, false otherwise</returns>
-    public static bool IsTokenExpired(SecurityToken token)
+    public bool IsTokenExpired(SecurityToken token)
     {
         Debug.WriteLine("TokenId:" + token.Id);
         return token.ValidTo > DateTime.Now.AddMinutes(5);
@@ -30,14 +45,14 @@ public static class TokenFetcher
     /// </summary>
     /// <param name="entityId">The namespace to get a token for</param>
     /// <returns>A new token</returns>
-    public static SecurityToken IssueToken(string entityId, string cvr)
+    public SecurityToken IssueToken(string entityId, string cvr)
     {
         SecurityToken token = null;
 
         var certificate = CertificateLoader.LoadCertificate(
             StoreName.My,
             StoreLocation.LocalMachine,
-            ConfigVariables.ClientCertificateThumbprint);
+            _clientCertificateThumbprint);
 
         var absoluteUri = new Uri(entityId).AbsoluteUri;
         var cacheKey =
@@ -64,7 +79,7 @@ public static class TokenFetcher
         return token;
     }
 
-    private static SecurityToken SendSecurityTokenRequest(string appliesTo, X509Certificate2 clientCertificate,
+    private SecurityToken SendSecurityTokenRequest(string appliesTo, X509Certificate2 clientCertificate,
         string cvr)
     {
         var rst = new RequestSecurityToken
@@ -73,7 +88,7 @@ public static class TokenFetcher
             RequestType = RequestTypes.Issue,
             TokenType = "http://docs.oasis-open.org/wss/oasis-wss-saml-token-profile-1.1#SAMLV2.0",
             KeyType = KeyTypes.Asymmetric,
-            Issuer = new EndpointReference(ConfigVariables.StsIssuer),
+            Issuer = new EndpointReference(_stsIssuer),
             UseKey = new UseKey(new X509SecurityToken(clientCertificate))
         };
 
@@ -85,10 +100,9 @@ public static class TokenFetcher
         return client.Issue(rst);
     }
 
-    private static IWSTrustChannelContract GenerateStsCertificateClientChannel(X509Certificate2 clientCertificate)
+    private IWSTrustChannelContract GenerateStsCertificateClientChannel(X509Certificate2 clientCertificate)
     {
-        var stsAddress = new EndpointAddress(new Uri(ConfigVariables.StsEndpoint),
-            EndpointIdentity.CreateDnsIdentity(ConfigVariables.StsCertificateAlias));
+        var stsAddress = new EndpointAddress(new Uri(_stsEndpoint), EndpointIdentity.CreateDnsIdentity(_stsCertificateAlias));
         var binding = new MutualCertificateWithMessageSecurityBinding(null);
         var factory = new WSTrustChannelFactory(binding, stsAddress);
 
@@ -97,7 +111,7 @@ public static class TokenFetcher
         var certificate = CertificateLoader.LoadCertificate(
             StoreName.My,
             StoreLocation.LocalMachine,
-            ConfigVariables.StsCertificateThumbprint);
+            _stsCertificateThumbprint);
         factory.Credentials.ServiceCertificate.ScopedCertificates.Add(stsAddress.Uri, certificate);
         factory.Credentials.ServiceCertificate.Authentication.CertificateValidationMode =
             X509CertificateValidationMode.None;
@@ -105,7 +119,6 @@ public static class TokenFetcher
         // Should be uncommented if you intent to call DemoService locally.
         // factory.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
         factory.Endpoint.Contract.ProtectionLevel = ProtectionLevel.Sign;
-
 
         return factory.CreateChannel();
     }

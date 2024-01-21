@@ -97,15 +97,6 @@ namespace Presentation.Web.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("organisation.eksterntest-stoettesystemerne.dk")]
-        public string StsOrganisationEndpointHost {
-            get {
-                return ((string)(this["StsOrganisationEndpointHost"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("https://kitos-local.strongminds.dk")]
         public string SsoServiceProviderId {
             get {
@@ -124,10 +115,56 @@ namespace Presentation.Web.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("runtime/services/kombittrust/14/certificatemixed")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://adgangsstyring.eksterntest-stoettesystemerne.dk/runtime/services/kombittr" +
+            "ust/14/certificatemixed")]
         public string StsCertificateEndpoint {
             get {
                 return ((string)(this["StsCertificateEndpoint"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("eksterntest-stoettesystemerne.dk")]
+        public string StsOrganisationEndpointHost {
+            get {
+                return ((string)(this["StsOrganisationEndpointHost"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ORG_EXTTEST_Organisation_1")]
+        public string ServiceCertificateAliasOrg {
+            get {
+                return ((string)(this["ServiceCertificateAliasOrg"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ADG_EXTTEST_Adgangsstyring_1")]
+        public string StsCertificateAlias {
+            get {
+                return ((string)(this["StsCertificateAlias"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0aa7a193f18d095f7e2ce09d892178c9682b7924")]
+        public string StsCertificateThumbprint {
+            get {
+                return ((string)(this["StsCertificateThumbprint"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://stoettesystemerne.dk/service/organisation/3")]
+        public string OrgService6EntityId {
+            get {
+                return ((string)(this["OrgService6EntityId"]));
             }
         }
     }

@@ -31,18 +31,23 @@ namespace Infrastructure.STS.Organization.DomainServices
 {
     public class StsOrganizationService : IStsOrganizationService
     {
+        private readonly StsOrganisationIntegrationConfiguration _configuration;
         private readonly IStsOrganizationCompanyLookupService _companyLookupService;
         private readonly IStsOrganizationIdentityRepository _stsOrganizationIdentityRepository;
+        private readonly TokenFetcher _tokenFetcher;
         private readonly ILogger _logger;
 
         public StsOrganizationService(
             StsOrganisationIntegrationConfiguration configuration,
             IStsOrganizationCompanyLookupService companyLookupService,
             IStsOrganizationIdentityRepository stsOrganizationIdentityRepository,
+            TokenFetcher tokenFetcher,
             ILogger logger)
         {
+            _configuration = configuration;
             _companyLookupService = companyLookupService;
             _stsOrganizationIdentityRepository = stsOrganizationIdentityRepository;
+            _tokenFetcher = tokenFetcher;
             _logger = logger;
         }
 
@@ -113,18 +118,18 @@ namespace Infrastructure.STS.Organization.DomainServices
             return uuid;
         }
 
-        private static OrganisationPortType CreatePort(string cvr)
+        private OrganisationPortType CreatePort(string cvr)
         {
-            var token = TokenFetcher.IssueToken(ConfigVariables.OrgService6EntityId, cvr);
+            var token = _tokenFetcher.IssueToken(_configuration.OrgService6EntityId, cvr);
             var client = new OrganisationPortTypeClient();
 
-            var identity = EndpointIdentity.CreateDnsIdentity(ConfigVariables.ServiceCertificateAlias_ORG);
+            var identity = EndpointIdentity.CreateDnsIdentity(_configuration.ServiceCertificateAliasOrg);
             var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
             client.Endpoint.Address = endpointAddress;
             var certificate = CertificateLoader.LoadCertificate(
                 StoreName.My,
                 StoreLocation.LocalMachine,
-                ConfigVariables.ClientCertificateThumbprint
+                _configuration.ClientCertificateThumbprint
             );
             client.ClientCredentials.ClientCertificate.Certificate = certificate;
             client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
