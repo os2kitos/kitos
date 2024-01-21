@@ -5,7 +5,6 @@ namespace Kombit.InfrastructureSamples
 {
     public static class ConfigVariables
     {
-
         #region Variables which MUST BE MODIFIED before running the code examples
 
         // Your Client Certificate (funktionscertifikat) 
@@ -21,9 +20,6 @@ namespace Kombit.InfrastructureSamples
         public const string MYNDIGHEDS_CVR = "58271713"; // Change to your authority CVR
         public const string MYNDIGHEDS_NAVN = "Ballerup Kommune"; // Change to your authority name        
 
-        // UUID used for the test case
-        public const string UUID = "11111111-2222-3333-4444-555555555555";  // Generate your own UUID and insert it here 
-
         #endregion
 
         #region Variables for certificates and endpoints - CAN be modified 
@@ -34,9 +30,6 @@ namespace Kombit.InfrastructureSamples
 
         // The alias for the certificate to validate responses from Organisation. The thumbprint and location is set in app.config.
         public const string ServiceCertificateAlias_ORG = "ORG_EXTTEST_Organisation_1";
-
-        // The alias for the certificate to validate responses from Klassifikation. The thumbprint and location is set in app.config.
-        public const string ServiceCertificateAlias_KLA = "KLA_EXTTEST_Klassifikation_1";
 
         // The alias and thumbprint for the certificate to trust the STS.
         // Change only needed if you don't use the external test server for tokens.
@@ -56,9 +49,6 @@ namespace Kombit.InfrastructureSamples
         // Entity IDs for the Serviceplatform service to fetch token for and call.
         // This ID can be found in the service contract package from the Serviceplatform as 'service.entityID' inside /sp/service.properties.
         public const string SagDokServiceEntityId = "http://entityid.kombit.dk/service/sdi/sagdokumentindeks/6";
-
-        // Entity ID for Klassifikation 6
-        public const string KlaServiceEntityId = "http://entityid.kombit.dk/service/klassifikation/7";
 
         // Entity ID for Organisation 6
         public const string OrgService6EntityId = "http://stoettesystemerne.dk/service/organisation/3";

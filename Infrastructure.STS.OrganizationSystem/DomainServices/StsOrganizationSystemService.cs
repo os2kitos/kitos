@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Core.Abstractions.Types;
@@ -13,9 +14,12 @@ using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.Common.Model.Token;
+using Kombit.InfrastructureSamples;
 using Kombit.InfrastructureSamples.OrganisationSystemService;
 using Kombit.InfrastructureSamples.Token;
+using Kombit.InfrastructureSamples.VirksomhedService;
 using Serilog;
+using RequestHeaderType = Kombit.InfrastructureSamples.OrganisationSystemService.RequestHeaderType;
 
 namespace Infrastructure.STS.OrganizationSystem.DomainServices
 {
@@ -42,22 +46,19 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
 
         public Result<ExternalOrganizationUnit, DetailedOperationError<ResolveOrganizationTreeError>> ResolveOrganizationTree(Organization organization)
         {
-            //Search for org units by org uuid
-            using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
+            if (organization == null) throw new ArgumentNullException(nameof(organization));
 
+            //Search for org units by org uuid
             const int pageSize = 1000;
             int currentPageSize;
             var totalIds = 0;
             var totalResults = new List<(Guid, RegistreringType5)>();
 
-            using var client = CreateClient(HttpBindingFactory.CreateSoapBinding(), _serviceRoot, clientCertificate);
-            //var token = TokenFetcher.IssueToken(EntityId, organization.Cvr, _certificateThumbprint, _issuer);
-            var token = TokenFetcher.IssueToken(EntityId);
-            var channel = client.ChannelFactory.CreateChannelWithIssuedToken(token);
+            var port = CreatePort(organization.Cvr);
             do
             {
                 var listRequest = CreateOrgHierarchyRequest(organization.Uuid.ToString(), pageSize, totalIds);
-                var listResponse = LoadOrganizationHierarchy(channel, listRequest);
+                var listResponse = LoadOrganizationHierarchy(port, listRequest);
 
                 var listStatusResult = listResponse.FremsoegObjekthierarkiOutput.StandardRetur;
                 var listStsError = listStatusResult.StatusKode.ParseStsErrorFromStandardResultCode();
@@ -154,12 +155,30 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             }
 
             return idToConvertedChildren[root.Item1];
-
         }
-        
-        private static fremsoegobjekthierarkiResponse LoadOrganizationHierarchy(OrganisationSystemPortType channel, fremsoegobjekthierarkiRequest request)
+
+        private static OrganisationSystemPortType CreatePort(string cvr)
         {
-            return new RetriedIntegrationRequest<fremsoegobjekthierarkiResponse>(() => channel.fremsoegobjekthierarkiAsync(request).Result).Execute();
+            var token = TokenFetcher.IssueToken(ConfigVariables.OrgService6EntityId, cvr);
+            var client = new OrganisationSystemPortTypeClient();
+
+            var identity = EndpointIdentity.CreateDnsIdentity(ConfigVariables.ServiceCertificateAlias_ORG);
+            var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
+            client.Endpoint.Address = endpointAddress;
+            var certificate = CertificateLoader.LoadCertificate(
+                ConfigVariables.ClientCertificateStoreName,
+                ConfigVariables.ClientCertificateStoreLocation,
+                ConfigVariables.ClientCertificateThumbprint
+            );
+            client.ClientCredentials.ClientCertificate.Certificate = certificate;
+            client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
+
+            return client.ChannelFactory.CreateChannelWithIssuedToken(token);
+        }
+
+        private static fremsoegobjekthierarkiResponse LoadOrganizationHierarchy(OrganisationSystemPortType port, fremsoegobjekthierarkiRequest request)
+        {
+            return new RetriedIntegrationRequest<fremsoegobjekthierarkiResponse>(() => port.fremsoegobjekthierarkiAsync(request).Result).Execute();
         }
 
         private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType5) root, Dictionary<Guid, List<(Guid, RegistreringType5)>> unitsByParent)
@@ -224,20 +243,6 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
                 }
             };
             return listRequest;
-        }
-
-        private static OrganisationSystemPortTypeClient CreateClient(SoapBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
-        {
-            return new OrganisationSystemPortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
-            {
-                ClientCredentials =
-                {
-                    ClientCertificate =
-                    {
-                        Certificate = certificate
-                    }
-                }
-            };
         }
     }
 }
