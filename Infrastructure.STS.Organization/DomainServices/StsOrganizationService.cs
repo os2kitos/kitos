@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Core.Abstractions.Types;
@@ -12,8 +13,22 @@ using Digst.OioIdws.Soap.Bindings;
 using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
+using Infrastructure.STS.Common.Model.Token;
+using Kombit.InfrastructureSamples;
 using Kombit.InfrastructureSamples.OrganisationService;
+using Kombit.InfrastructureSamples.Token;
+using Kombit.InfrastructureSamples.VirksomhedService;
 using Serilog;
+using ItemChoiceType = Kombit.InfrastructureSamples.OrganisationService.ItemChoiceType;
+using LaesInputType = Kombit.InfrastructureSamples.OrganisationService.LaesInputType;
+using laesRequest = Kombit.InfrastructureSamples.OrganisationService.laesRequest;
+using laesResponse = Kombit.InfrastructureSamples.OrganisationService.laesResponse;
+using RelationListeType = Kombit.InfrastructureSamples.OrganisationService.RelationListeType;
+using SoegInputType1 = Kombit.InfrastructureSamples.OrganisationService.SoegInputType1;
+using soegRequest = Kombit.InfrastructureSamples.OrganisationService.soegRequest;
+using soegResponse = Kombit.InfrastructureSamples.OrganisationService.soegResponse;
+using TilstandListeType = Kombit.InfrastructureSamples.OrganisationService.TilstandListeType;
+using UnikIdType = Kombit.InfrastructureSamples.OrganisationService.UnikIdType;
 
 namespace Infrastructure.STS.Organization.DomainServices
 {
@@ -74,14 +89,12 @@ namespace Infrastructure.STS.Organization.DomainServices
                 return companyUuid.Error;
 
             //Search for the organization based on the resolved company (all organizations are tied to a company)
-            using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
-            using var organizationPortTypeClient = CreateOrganizationPortTypeClient(HttpBindingFactory.CreateSoapBinding(), _serviceRoot, clientCertificate);
-
+            var port = CreatePort(organization.Cvr);
             var searchRequest = CreateSearchForOrganizationRequest(organization, companyUuid.Value);
-            var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
-            var response = GetSearchResponse(channel, searchRequest);
+            var response = GetSearchResponse(port, searchRequest);
             var statusResult = response.SoegOutput.StandardRetur;
             var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
+            
             if (stsError.HasValue)
             {
                 _logger.Error("Failed to search for organization ({id}) by company uuid {uuid}. Failed with {stsError} {code} and {message}", organization.Id, companyUuid.Value, stsError.Value, statusResult.StatusKode, statusResult.FejlbeskedTekst);
@@ -107,6 +120,25 @@ namespace Infrastructure.STS.Organization.DomainServices
             return uuid;
         }
 
+        private static OrganisationPortType CreatePort(string cvr)
+        {
+            var token = TokenFetcher.IssueToken(ConfigVariables.OrgService6EntityId, cvr);
+            var client = new OrganisationPortTypeClient();
+
+            var identity = EndpointIdentity.CreateDnsIdentity(ConfigVariables.ServiceCertificateAlias_ORG);
+            var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
+            client.Endpoint.Address = endpointAddress;
+            var certificate = CertificateLoader.LoadCertificate(
+                ConfigVariables.ClientCertificateStoreName,
+                ConfigVariables.ClientCertificateStoreLocation,
+                ConfigVariables.ClientCertificateThumbprint
+            );
+            client.ClientCredentials.ClientCertificate.Certificate = certificate;
+            client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
+
+            return client.ChannelFactory.CreateChannelWithIssuedToken(token);
+        }
+
         public Result<Guid, OperationError> ResolveOrganizationHierarchyRootUuid(Core.DomainModel.Organization.Organization organization)
         {
             if (organization == null)
@@ -118,18 +150,14 @@ namespace Infrastructure.STS.Organization.DomainServices
             if (organizationUuidResult.Failed)
             {
                 var error = organizationUuidResult.Error;
-                _logger.Error("Failed to resilve uuid while looking up hierarchy root for org {ordId}. Failed with error: {code}:{message}", organization.Id, error.Detail, error.Message.GetValueOrFallback(""));
+                _logger.Error("Failed to resolve uuid while looking up hierarchy root for org {ordId}. Failed with error: {code}:{message}", organization.Id, error.Detail, error.Message.GetValueOrFallback(""));
                 return error;
             }
 
             var uuid = organizationUuidResult.Value;
-            using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
-            using var organizationPortTypeClient = CreateOrganizationPortTypeClient(HttpBindingFactory.CreateSoapBinding(), _serviceRoot, clientCertificate);
-
+            var port = CreatePort(organization.Cvr);
             var readRequest = CreateGetOrganizationByUuidRequest(uuid);
-            var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
-
-            var response = GetReadResponse(channel, readRequest);
+            var response = GetReadResponse(port, readRequest);
             var statusResult = response.LaesOutput.StandardRetur;
             var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
             if (stsError.HasValue)
@@ -229,20 +257,6 @@ namespace Infrastructure.STS.Organization.DomainServices
                                 Item = companyUuid.ToString("D")
                             }
                         }
-                    }
-                }
-            };
-        }
-
-        private static OrganisationPortTypeClient CreateOrganizationPortTypeClient(SoapBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
-        {
-            return new OrganisationPortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
-            {
-                ClientCredentials =
-                {
-                    ClientCertificate =
-                    {
-                        Certificate = certificate
                     }
                 }
             };
