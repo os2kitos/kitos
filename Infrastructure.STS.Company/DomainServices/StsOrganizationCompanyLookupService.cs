@@ -23,7 +23,8 @@ public class StsOrganizationCompanyLookupService : IStsOrganizationCompanyLookup
     private readonly ILogger _logger;
     private readonly TokenFetcher _tokenFetcher;
 
-    public StsOrganizationCompanyLookupService(StsOrganisationIntegrationConfiguration configuration, ILogger logger, TokenFetcher tokenFetcher)
+    public StsOrganizationCompanyLookupService(StsOrganisationIntegrationConfiguration configuration,
+        TokenFetcher tokenFetcher, ILogger logger)
     {
         _configuration = configuration;
         _logger = logger;

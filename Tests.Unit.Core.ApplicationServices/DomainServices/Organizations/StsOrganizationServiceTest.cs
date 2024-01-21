@@ -26,7 +26,7 @@ namespace Tests.Unit.Core.DomainServices.Organizations
         {
             base.OnFixtureCreated(fixture);
             _companyLookupServiceMock = new Mock<IStsOrganizationCompanyLookupService>();
-            _sut = new StsOrganizationService(A<StsOrganisationIntegrationConfiguration>(), _companyLookupServiceMock.Object, new Mock<IStsOrganizationIdentityRepository>().Object, new Mock<ITokenFetcher>().Object, Mock.Of<ILogger>());
+            _sut = new StsOrganizationService(A<StsOrganisationIntegrationConfiguration>(), _companyLookupServiceMock.Object, new Mock<IStsOrganizationIdentityRepository>().Object, new Mock<TokenFetcher>().Object, Mock.Of<ILogger>());
         }
 
         [Theory]
