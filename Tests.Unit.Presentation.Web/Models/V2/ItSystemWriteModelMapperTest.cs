@@ -97,7 +97,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var definedProperties = GetAllInputPropertyNames<RightsHolderUpdateSystemPropertiesRequestDTO>();
             if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
-            if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.FormerName));
+            if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.PreviousName));
             if (noExternalReferences) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ExternalReferences));
             if (noParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
@@ -134,7 +134,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var definedProperties = GetAllInputPropertyNames<RightsHolderUpdateSystemPropertiesRequestDTO>();
             if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
-            if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.FormerName));
+            if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.PreviousName));
             if (noExternalReferences) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ExternalReferences));
             if (npParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
@@ -171,7 +171,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var definedProperties = GetAllInputPropertyNames<RightsHolderUpdateSystemPropertiesRequestDTO>();
             if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
-            if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.FormerName));
+            if (noFormerName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.PreviousName));
             if (noExternalReferences) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ExternalReferences));
             if (npParent) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
@@ -245,7 +245,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var definedProperties = GetAllInputPropertyNames<UpdateItSystemRequestDTO>();
             if (noName) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Description));
-            if (noFormerName) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.FormerName));
+            if (noFormerName) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.PreviousName));
             if (noExternalReferences) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.ExternalReferences));
             if (noParent) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.BusinessTypeUuid));
@@ -294,7 +294,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var definedProperties = GetAllInputPropertyNames<UpdateItSystemRequestDTO>();
             if (noName) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Description));
-            if (noFormerName) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.FormerName));
+            if (noFormerName) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.PreviousName));
             if (noExternalReferences) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.ExternalReferences));
             if (noParent) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.BusinessTypeUuid));
@@ -338,7 +338,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         private static void AssertUpdateData(IItSystemWriteRequestCommonPropertiesDTO input, SharedSystemUpdateParameters output)
         {
             Assert.Equal(input.Name, AssertPropertyContainsDataChange(output.Name));
-            Assert.Equal(input.FormerName, AssertPropertyContainsDataChange(output.FormerName));
+            Assert.Equal(input.PreviousName, AssertPropertyContainsDataChange(output.FormerName));
             Assert.Equal(input.Description, AssertPropertyContainsDataChange(output.Description));
             Assert.Equal(input.BusinessTypeUuid, AssertPropertyContainsDataChange(output.BusinessTypeUuid));
             Assert.Equal(input.KLEUuids, AssertPropertyContainsDataChange(output.TaskRefUuids));
