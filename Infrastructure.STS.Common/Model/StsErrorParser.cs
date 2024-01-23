@@ -29,6 +29,10 @@ namespace Infrastructure.STS.Common.Model
                 {
                     return StsError.MissingServiceAgreement;
                 }
+                if (errorCode.IndexOf("Usercontext doesn't exist", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return StsError.ReceivedUserContextDoesNotExistOnSystem;
+                }
                 if (errorCode.Contains("ServiceAgreement"))
                 {
                     //Covers a lot of different erros related to the service agreement: https://www.serviceplatformen.dk/administration/errorcodes-doc/errorcodes/4afb35be-7b7a-45b3-ab01-bd5017a8b182_errorcodes.html

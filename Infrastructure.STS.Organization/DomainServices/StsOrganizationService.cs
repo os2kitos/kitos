@@ -61,6 +61,7 @@ namespace Infrastructure.STS.Organization.DomainServices
                         ResolveOrganizationUuidError.InvalidCvrOnOrganization => CheckConnectionError.InvalidCvrOnOrganization,
                         ResolveOrganizationUuidError.MissingServiceAgreement => CheckConnectionError.MissingServiceAgreement,
                         ResolveOrganizationUuidError.ExistingServiceAgreementIssue => CheckConnectionError.ExistingServiceAgreementIssue,
+                        ResolveOrganizationUuidError.UserContextDoesNotExistOnSystem => CheckConnectionError.UserContextDoesNotExistOnSystem,
                         _ => CheckConnectionError.Unknown
                     };
                     return new DetailedOperationError<CheckConnectionError>(error.FailureType, connectionError, error.Message.GetValueOrFallback(string.Empty));
@@ -227,6 +228,7 @@ namespace Infrastructure.STS.Organization.DomainServices
                 {
                     StsError.MissingServiceAgreement => companyUuid.Error.FailureType,
                     StsError.ExistingServiceAgreementIssue => companyUuid.Error.FailureType,
+                    StsError.ReceivedUserContextDoesNotExistOnSystem => companyUuid.Error.FailureType,
                     _ => OperationFailure.UnknownError
                 };
 

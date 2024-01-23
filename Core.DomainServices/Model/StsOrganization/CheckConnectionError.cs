@@ -2,9 +2,10 @@
 {
     public enum CheckConnectionError
     {
-        InvalidCvrOnOrganization = 0,
-        MissingServiceAgreement = 1,
-        ExistingServiceAgreementIssue = 2,
-        Unknown = 3
+        InvalidCvrOnOrganization,
+        MissingServiceAgreement,
+        ExistingServiceAgreementIssue,
+        UserContextDoesNotExistOnSystem,
+        Unknown,
     }
 }
