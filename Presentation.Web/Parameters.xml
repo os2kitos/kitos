@@ -105,4 +105,28 @@
     <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationEndpointHost']/value/text()"/>
   </parameter>
 
+  <parameter name="StsIssuer" defaultvalue="__STS_ISSUER">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsIssuer']/value/text()"/>
+  </parameter>
+
+  <parameter name="StsCertificateEndpoint" defaultvalue="__STS_CERT_ENDPOINT">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsCertificateEndpoint']/value/text()"/>
+  </parameter>
+
+  <parameter name="ServiceCertificateAliasOrg" defaultvalue="__SERVICE_CERT_ALIAS_ORG">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='ServiceCertificateAliasOrg']/value/text()"/>
+  </parameter>
+
+  <parameter name="StsCertificateAlias" defaultvalue="__STS_CERT_ALIAS">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsCertificateAlias']/value/text()"/>
+  </parameter>
+
+  <parameter name="StsCertificateThumbprint" defaultvalue="__STS_CERT_THUMBPRINT">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsCertificateThumbprint']/value/text()"/>
+  </parameter>
+
+  <parameter name="OrgService6EntityId" defaultvalue="__ORG_SERVICE_6_ENTITY_ID">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='OrgService6EntityId']/value/text()"/>
+  </parameter>
+
 </parameters>
