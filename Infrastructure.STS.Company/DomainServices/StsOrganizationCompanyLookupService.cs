@@ -56,7 +56,7 @@ public class StsOrganizationCompanyLookupService : IStsOrganizationCompanyLookup
             var knownStsError = spFault.Detail.Reason.ToString().ParseStsFromErrorCode();
             var stsError = knownStsError.GetValueOrFallback(StsError.Unknown);
             var operationFailure =
-                stsError is StsError.MissingServiceAgreement or StsError.ExistingServiceAgreementIssue or StsError.ReceivedUserContextDoesNotExistOnSystem
+                stsError is StsError.MissingServiceAgreement or StsError.ExistingServiceAgreementIssue
                     ? OperationFailure.Forbidden
                     : OperationFailure.UnknownError;
 
@@ -64,20 +64,22 @@ public class StsOrganizationCompanyLookupService : IStsOrganizationCompanyLookup
                 "Service platform exception while finding company uuid from cvr {cvr} for organization with id {organizationId}",
                 organization.Cvr, organization.Id);
             return new DetailedOperationError<StsError>(operationFailure, stsError,
-                $"STS Organisation exception while searching for uuid by cvr:{organization.Cvr} for organization with id:{organization.Id}");
+                $"STS Organisation threw and exception while searching for uuid by cvr:{organization.Cvr} for organization with id:{organization.Id}");
         }
         catch (FaultException e)
         {
-            _logger.Error(e, 
-                "Exception while finding company uuid from cvr {cvr} for organization with id {organizationId}",
-                organization.Cvr, organization.Id);
             if (e.Code.Name.Equals("5015"))
             {
+                _logger.Error(e, "The received user context does not exist while finding company uuid from cvr {cvr} with id {organizationId}",
+                    organization.Cvr, organization.Id);
                 return new DetailedOperationError<StsError>(OperationFailure.Forbidden, StsError.ReceivedUserContextDoesNotExistOnSystem,
                     e.Message + $" ({organization.Cvr} for organization with id:{organization.Id})");
             }
+            _logger.Error(e,
+                "Unknown exception while finding company uuid from cvr {cvr} for organization with id {organizationId}",
+                organization.Cvr, organization.Id);
             return new DetailedOperationError<StsError>(OperationFailure.UnknownError, StsError.Unknown,
-                $"STS Organisation unknown exception while searching for uuid by cvr:{organization.Cvr} for organization with id:{organization.Id}");
+                $"STS Organisation threw and unknown exception while searching for uuid by cvr:{organization.Cvr} for organization with id:{organization.Id}");
         }
     }
 

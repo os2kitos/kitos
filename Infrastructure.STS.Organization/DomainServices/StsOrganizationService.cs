@@ -221,6 +221,7 @@ namespace Infrastructure.STS.Organization.DomainServices
                 {
                     StsError.MissingServiceAgreement => ResolveOrganizationUuidError.MissingServiceAgreement,
                     StsError.ExistingServiceAgreementIssue => ResolveOrganizationUuidError.ExistingServiceAgreementIssue,
+                    StsError.ReceivedUserContextDoesNotExistOnSystem => ResolveOrganizationUuidError.UserContextDoesNotExistOnSystem,
                     _ => ResolveOrganizationUuidError.FailedToLookupOrganizationCompany
                 };
 
@@ -228,7 +229,6 @@ namespace Infrastructure.STS.Organization.DomainServices
                 {
                     StsError.MissingServiceAgreement => companyUuid.Error.FailureType,
                     StsError.ExistingServiceAgreementIssue => companyUuid.Error.FailureType,
-                    StsError.ReceivedUserContextDoesNotExistOnSystem => companyUuid.Error.FailureType,
                     _ => OperationFailure.UnknownError
                 };
 

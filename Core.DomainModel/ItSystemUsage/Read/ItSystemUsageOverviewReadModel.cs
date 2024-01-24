@@ -56,6 +56,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public Guid? ExternalSystemUuid { get; set; }
         public ItSystemUsage SourceEntity { get; set; }
         public string SystemName { get; set; }
+        public string SystemPreviousName { get; set; }
         public bool ItSystemDisabled { get; set; }
         public bool ActiveAccordingToValidityPeriod { get; set; }
         public bool ActiveAccordingToLifeCycle { get; set; }
