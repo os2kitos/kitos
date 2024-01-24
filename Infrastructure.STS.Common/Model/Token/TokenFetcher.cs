@@ -64,8 +64,6 @@ public class TokenFetcher
         if (inCache)
         {
             token = CacheHelper.GetFromCache<GenericXmlSecurityToken>(cacheKey);
-
-            // TODO: Currently this doesn't handle the timezone difference, so there is a one hour gap. 
             if (token.ValidTo.CompareTo(DateTime.Now) < 0)
                 needNewToken = true;
         }
