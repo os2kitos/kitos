@@ -29,6 +29,12 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     $Env:SsoServiceProviderId = $parameters["SsoServiceProviderId"]
     $Env:SsoCertificateThumbPrint = $parameters["SsoCertificateThumbPrint"]
     $Env:StsOrganisationEndpointHost = $parameters["StsOrganisationEndpointHost"]
+    $Env:StsIssuer = $parameters["StsIssuer"]
+    $Env:StsCertificateEndpoint = $parameters["StsCertificateEndpoint"]
+    $Env:ServiceCertificateAliasOrg = $parameters["ServiceCertificateAliasOrg"]
+    $Env:StsCertificateAlias = $parameters["StsCertificateAlias"]
+    $Env:StsCertificateThumbprint = $parameters["StsCertificateThumbprint"]
+    $Env:OrgService6EntityId = $parameters["OrgService6EntityId"]
     
     if($loadTcHangfireConnectionString -eq $true) {
         $Env:HangfireDbConnectionStringForTeamCity = $parameters["HangfireDbConnectionStringForTeamCity"]

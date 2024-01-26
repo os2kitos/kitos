@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        targetNamespace="http://stoettesystemerne.dk/klassifikation/klassifikation/6/"
+        xmlns:oio="urn:oio:definitions:1.0.0"
+        xmlns:klasfik="http://stoettesystemerne.dk/klassifikation/klassifikation/6/"
+        xmlns:sd="urn:oio:sagdok:3.0.0"
+        oio:mapping="urn:oio:sagdok:MPD:3.0.0">
+
+    <import namespace = "urn:oio:sagdok:3.0.0" schemaLocation="../common/SagDokObjekt.xsd"/>
+    <include schemaLocation="Klassifikation.xsd"/>
+    
+    <element name="ImportInput" type="klasfik:ImportInputType" oio:definition="urn:oio:sagdok:klassifikationimportinput:ADD:2.0.0"/>
+    <element name="ImportOutput" type="sd:BasicOutputType" oio:definition="urn:oio:sagdok:klassifikationimportoutput:ASDD:2.0.0"/>
+    
+    <element name="OpretInput" type="klasfik:OpretInputType" oio:definition="urn:oio:sagdok:klassifikationopretinput:ADD:2.0.0"/>
+    <element name="OpretOutput" type="sd:OpretOutputType" oio:definition="urn:oio:sagdok:klassifikationopretoutput:ADD:2.0.0"/>
+
+    <element name="RetInput" type="klasfik:RetInputType" oio:definition="urn:oio:sagdok:klassifikationretinput:ADD:2.0.0"/>
+    <element name="RetOutput" type="sd:BasicOutputType" oio:definition="urn:oio:sagdok:klassifikationretoutput:ASDD:1.0.0"/>
+    
+    <element name="PassiverInput" type="sd:UuidNoteInputType" oio:definition="urn:oio:sagdok:klassifikationpassiverinput:ASDD:1.0.0"/>    
+    <element name="PassiverOutput" type="sd:BasicOutputType" oio:definition="urn:oio:sagdok:klassifikationpassiveroutput:ASDD:1.0.0"/>
+    
+    <element name="SletInput" type="sd:UuidNoteInputType" oio:definition="urn:oio:sagdok:klassifikationsletinput:ASDD:1.0.0"/>
+    <element name="SletOutput" type="sd:BasicOutputType" oio:definition="urn:oio:sagdok:klassifikationsletoutput:ASDD:1.0.0"/>
+    
+    <element name="LaesInput" type="sd:LaesInputType" oio:definition="urn:oio:sagdok:klassifikationlaesinput:ASDD:1.0.0"/>
+    <element name="LaesOutput" type="klasfik:LaesOutputType" oio:definition="urn:oio:sagdok:klassifikationlaesoutput:ADD:2.0.0"/>
+
+    <element name="ListInput" type="sd:ListInputType" oio:definition="urn:oio:sagdok:klassifikationlistinput:ASDD:1.0.0"/>
+    <element name="ListOutput" type="klasfik:ListOutputType" oio:definition="urn:oio:sagdok:klassifikationlistoutput:ADD:2.0.0"/>
+
+    <element name="SoegInput" type="klasfik:SoegInputType" oio:definition="urn:oio:sagdok:klassifikationsoeginput:ADD:2.0.0"/>
+    <element name="SoegOutput" type="sd:SoegOutputType" oio:definition="urn:oio:sagdok:klassifikationsoegoutput:ASDD:1.0.0"/>
+    
+    <complexType name="ImportInputType" oio:definition="urn:oio:sagdok:klassifikationimportinput:ADD:2.0.0">
+        <sequence>
+            <element ref="klasfik:Klassifikation" oio:content="klassifikation"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="OpretInputType" oio:definition="urn:oio:sagdok:klassifikationopretinput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:OpretInputType">
+                <sequence>
+                    <element ref="klasfik:AttributListe" oio:content="attributter"/>
+                    <element ref="klasfik:TilstandListe" oio:content="tilstande"/>
+                    <element ref="klasfik:RelationListe" oio:content="relationer"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="RetInputType" oio:definition="urn:oio:sagdok:klassifikationretinput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:RetInputType">
+                <sequence>
+                    <element ref="klasfik:AttributListe" minOccurs="0" oio:content="attributter"/>
+                    <element ref="klasfik:TilstandListe" minOccurs="0" oio:content="tilstande"/>
+                    <element ref="klasfik:RelationListe" minOccurs="0" oio:content="relationer"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="LaesOutputType" oio:definition="urn:oio:sagdok:klassifikationlaesoutput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:BasicOutputType">
+                <sequence>
+		            <element name="FiltreretOejebliksbillede" type="klasfik:FiltreretOejebliksbilledeType" minOccurs="0" oio:content="filtreretoejebliksbillede"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="ListOutputType" oio:definition="urn:oio:sagdok:klassifikationlistoutput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:ListOutputType">
+                <sequence>
+		            <element name="FiltreretOejebliksbillede" type="klasfik:FiltreretOejebliksbilledeType" minOccurs="0" maxOccurs="unbounded" oio:content="filtreretoejebliksbillede"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="FiltreretOejebliksbilledeType" oio:definition="urn:oio:sagdok:klassifikationfiltreretoejebliksbillede:ADD:1.0.0">
+		<sequence>
+			<element name="ObjektType" type="sd:SagDokObjektType" oio:content="objekt"/>
+			<element name="Registrering" type="klasfik:RegistreringType" minOccurs="0" maxOccurs="unbounded" oio:content="registrering"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="SoegInputType" oio:definition="urn:oio:sagdok:klassifikationsoeginput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:SoegInputType">
+                <sequence>
+                <sequence>
+		            <element ref="klasfik:AttributListe" oio:content="soegattributter"/>
+		            <element ref="klasfik:TilstandListe" oio:content="soegtilstande"/>
+		            <element ref="klasfik:RelationListe" oio:content="soegrelationer"/>
+                </sequence>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+</schema>

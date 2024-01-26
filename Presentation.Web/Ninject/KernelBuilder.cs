@@ -130,6 +130,7 @@ using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
 using Core.ApplicationServices.Generic;
 using Infrastructure.STS.OrganizationSystem.DomainServices;
+using Kombit.InfrastructureSamples.Token;
 
 namespace Presentation.Web.Ninject
 {
@@ -299,6 +300,15 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IUserRightsService>().To<UserRightsService>().InCommandScope(Mode);
 
             //STS Organization
+            kernel.Bind<TokenFetcher>().ToMethod(_ =>
+                    new TokenFetcher(
+                        Settings.Default.SsoCertificateThumbprint,
+                        Settings.Default.StsIssuer,
+                        Settings.Default.StsCertificateEndpoint,
+                        Settings.Default.StsCertificateAlias,
+                        Settings.Default.StsCertificateThumbprint
+                    ))
+                .InSingletonScope();
             kernel.Bind<IStsOrganizationService>().To<StsOrganizationService>().InCommandScope(Mode);
             kernel.Bind<IStsOrganizationCompanyLookupService>().To<StsOrganizationCompanyLookupService>().InCommandScope(Mode);
             kernel.Bind<IStsOrganizationSystemService>().To<StsOrganizationSystemService>().InCommandScope(Mode);
@@ -355,7 +365,14 @@ namespace Presentation.Web.Ninject
             kernel.Bind<StsOrganisationIntegrationConfiguration>().ToMethod(_ =>
                 new StsOrganisationIntegrationConfiguration(
                     Settings.Default.SsoCertificateThumbprint,
-                    Settings.Default.StsOrganisationEndpointHost))
+                    Settings.Default.StsOrganisationEndpointHost,
+                    Settings.Default.StsIssuer,
+                    Settings.Default.StsCertificateEndpoint,
+                    Settings.Default.ServiceCertificateAliasOrg,
+                    Settings.Default.StsCertificateAlias,
+                    Settings.Default.StsCertificateThumbprint,
+                    Settings.Default.OrgService6EntityId
+                    ))
                 .InSingletonScope();
 
             kernel.Bind<ISsoStateFactory>().To<SsoStateFactory>().InCommandScope(Mode);

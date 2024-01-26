@@ -1,238 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
-<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:spf="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/" xmlns:tns="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="BrugerService" targetNamespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy" location="policies.wsdl" />
-  <wsdl:import namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/" location="../../sp/ServiceplatformFaultMessage_1.wsdl" />
+<wsdl:definitions xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://stoettesystemerne.dk/organisation/6/" xmlns:type="http://stoettesystemerne.dk/organisation/bruger/6/" xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/" name="BrugerService" targetNamespace="http://stoettesystemerne.dk/organisation/6/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy" location="policies/OIOIDWS.wsdl" />
   <wsdl:types>
-    <xsd:schema targetNamespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/">
-      <xsd:include schemaLocation="../../BrugerServiceMsg.xsd" />
-      <xsd:import schemaLocation="../../SF1500_EP_FS2/xsd/common/RequestHeader.xsd" namespace="http://kombit.dk/xml/schemas/RequestHeader/1/" />
+    <xsd:schema>
+      <xsd:import schemaLocation="../xsd/6.0.STS-0/BrugerOperationer.xsd" namespace="http://stoettesystemerne.dk/organisation/bruger/6/" />
+      <xsd:import schemaLocation="../xsd/6.0.STS-0/Bruger.xsd" namespace="http://stoettesystemerne.dk/organisation/bruger/6/" />
+      <xsd:import schemaLocation="../xsd/6.0.STS-0/BrugerBesked.xsd" namespace="http://stoettesystemerne.dk/organisation/bruger/6/" />
+      <xsd:import schemaLocation="../xsd/6.0.STS-0/OrganisationFaelles.xsd" namespace="http://stoettesystemerne.dk/organisation/6/" />
+      <xsd:import schemaLocation="../xsd/6.0.STS-0/Part.xsd" namespace="urn:oio:sts:part:6" />
+      <xsd:import schemaLocation="../xsd/6.0.STS-0/GenerelleDefinitioner.xsd" namespace="urn:oio:sts:6" />
+      <xsd:import schemaLocation="../xsd/common/SagDokObjekt.xsd" namespace="urn:oio:sagdok:3.0.0" />
+      <xsd:import schemaLocation="../xsd/common/RequestHeader.xsd" namespace="http://kombit.dk/xml/schemas/RequestHeader/1/" />
     </xsd:schema>
   </wsdl:types>
-  <wsdl:message name="ImporterRequestMessage">
+  <wsdl:message name="BrugerImporterRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:ImporterRequest" />
+    <wsdl:part name="request" element="type:ImportInput" />
   </wsdl:message>
-  <wsdl:message name="ImporterResponseMessage">
+  <wsdl:message name="BrugerOpretResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:ImporterResponse" />
+    <wsdl:part name="response" element="type:OpretOutput" />
   </wsdl:message>
-  <wsdl:message name="ListRequestMessage">
+  <wsdl:message name="BrugerLaesRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:ListRequest" />
+    <wsdl:part name="request" element="type:LaesInput" />
   </wsdl:message>
-  <wsdl:message name="ListResponseMessage">
+  <wsdl:message name="BrugerListeResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:ListResponse" />
+    <wsdl:part name="response" element="type:ListOutput" />
   </wsdl:message>
-  <wsdl:message name="LaesRequestMessage">
+  <wsdl:message name="BrugerPassiverRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:LaesRequest" />
+    <wsdl:part name="request" element="type:PassiverInput" />
   </wsdl:message>
-  <wsdl:message name="LaesResponseMessage">
+  <wsdl:message name="BrugerSletRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:LaesResponse" />
+    <wsdl:part name="request" element="type:SletInput" />
   </wsdl:message>
-  <wsdl:message name="OpretRequestMessage">
+  <wsdl:message name="BrugerLaesResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:OpretRequest" />
+    <wsdl:part name="response" element="type:LaesOutput" />
   </wsdl:message>
-  <wsdl:message name="OpretResponseMessage">
+  <wsdl:message name="BrugerRetResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:OpretResponse" />
+    <wsdl:part name="response" element="type:RetOutput" />
   </wsdl:message>
-  <wsdl:message name="PassiverRequestMessage">
+  <wsdl:message name="BrugerRetRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:PassiverRequest" />
+    <wsdl:part name="request" element="type:RetInput" />
   </wsdl:message>
-  <wsdl:message name="PassiverResponseMessage">
+  <wsdl:message name="BrugerImporterResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:PassiverResponse" />
+    <wsdl:part name="response" element="type:ImportOutput" />
   </wsdl:message>
-  <wsdl:message name="RetRequestMessage">
+  <wsdl:message name="BrugerSoegResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:RetRequest" />
+    <wsdl:part name="response" element="type:SoegOutput" />
   </wsdl:message>
-  <wsdl:message name="RetResponseMessage">
+  <wsdl:message name="BrugerOpretRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:RetResponse" />
+    <wsdl:part name="request" element="type:OpretInput" />
   </wsdl:message>
-  <wsdl:message name="SletRequestMessage">
+  <wsdl:message name="BrugerSletResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:SletRequest" />
+    <wsdl:part name="response" element="type:SletOutput" />
   </wsdl:message>
-  <wsdl:message name="SletResponseMessage">
+  <wsdl:message name="BrugerPassiverResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:SletResponse" />
+    <wsdl:part name="response" element="type:PassiverOutput" />
   </wsdl:message>
-  <wsdl:message name="SoegResponseMessage">
+  <wsdl:message name="BrugerSoegRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:SoegResponse" />
+    <wsdl:part name="request" element="type:SoegInput" />
   </wsdl:message>
-  <wsdl:message name="SoegRequestMessage">
+  <wsdl:message name="BrugerListeRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:SoegRequest" />
+    <wsdl:part name="request" element="type:ListInput" />
   </wsdl:message>
   <wsdl:portType name="BrugerPortType">
     <wsdl:operation name="opret">
-      <wsdl:input message="tns:OpretRequestMessage" />
-      <wsdl:output message="tns:OpretResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:BrugerOpretRequestMessage" />
+      <wsdl:output message="tns:BrugerOpretResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="importer">
-      <wsdl:input message="tns:ImporterRequestMessage" />
-      <wsdl:output message="tns:ImporterResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:BrugerImporterRequestMessage" />
+      <wsdl:output message="tns:BrugerImporterResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="passiver">
-      <wsdl:input message="tns:PassiverRequestMessage" />
-      <wsdl:output message="tns:PassiverResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:BrugerPassiverRequestMessage" />
+      <wsdl:output message="tns:BrugerPassiverResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="laes">
-      <wsdl:input message="tns:LaesRequestMessage" />
-      <wsdl:output message="tns:LaesResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:BrugerLaesRequestMessage" />
+      <wsdl:output message="tns:BrugerLaesResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="ret">
-      <wsdl:input message="tns:RetRequestMessage" />
-      <wsdl:output message="tns:RetResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:BrugerRetRequestMessage" />
+      <wsdl:output message="tns:BrugerRetResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="slet">
-      <wsdl:input message="tns:SletRequestMessage" />
-      <wsdl:output message="tns:SletResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:BrugerSletRequestMessage" />
+      <wsdl:output message="tns:BrugerSletResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="soeg">
-      <wsdl:input message="tns:SoegRequestMessage" />
-      <wsdl:output message="tns:SoegResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:BrugerSoegRequestMessage" />
+      <wsdl:output message="tns:BrugerSoegResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="list">
-      <wsdl:input message="tns:ListRequestMessage" />
-      <wsdl:output message="tns:ListResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:BrugerListeRequestMessage" />
+      <wsdl:output message="tns:BrugerListeResponseMessage" />
     </wsdl:operation>
   </wsdl:portType>
-  <wsdl:binding name="BrugerBinding" type="tns:BrugerPortType">
-    <wsp:PolicyReference URI="policies.wsdl#ServiceplatformBindingPolicy" />
-    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+  <wsdl:binding name="Bruger" type="tns:BrugerPortType">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsp:PolicyReference URI="#ServiceplatformBindingPolicy" />
     <wsdl:operation name="opret">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/opret" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/bruger/opret" />
       <wsdl:input>
-        <soap:header message="tns:OpretRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:BrugerOpretRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:OpretResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:BrugerOpretResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="importer">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/importer" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/bruger/importer" />
       <wsdl:input>
-        <soap:header message="tns:ImporterRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:BrugerImporterRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:ImporterResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:BrugerImporterResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="passiver">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/passiver" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/bruger/passiver" />
       <wsdl:input>
-        <soap:header message="tns:PassiverRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:BrugerPassiverRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:PassiverResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:BrugerPassiverResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="laes">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/laes" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/bruger/laes" />
       <wsdl:input>
-        <soap:header message="tns:LaesRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:BrugerLaesRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:LaesResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:BrugerLaesResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="ret">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/ret" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/bruger/ret" />
       <wsdl:input>
-        <soap:header message="tns:RetRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:BrugerRetRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:RetResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:BrugerRetResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="slet">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/slet" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/bruger/slet" />
       <wsdl:input>
-        <soap:header message="tns:SletRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:BrugerSletRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:SletResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:BrugerSletResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="soeg">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/soeg" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/bruger/soeg" />
       <wsdl:input>
-        <soap:header message="tns:SoegRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:BrugerSoegRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:SoegResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:BrugerSoegResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="list">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/list" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/bruger/list" />
       <wsdl:input>
-        <soap:header message="tns:ListRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:BrugerListeRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:ListResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:BrugerListeResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="BrugerService">
-    <wsdl:port name="BrugerPort" binding="tns:BrugerBinding">
-      <soap:address location="https://localhost:8080/service/Organisation/Bruger/5" />
+    <wsdl:port name="Bruger" binding="tns:Bruger">
+      <soap12:address location="http://kombit.dk/sts/organisation/bruger" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

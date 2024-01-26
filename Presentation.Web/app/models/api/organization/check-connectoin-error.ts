@@ -3,6 +3,7 @@
         InvalidCvrOnOrganization = 0,
         MissingServiceAgreement = 1,
         ExistingServiceAgreementIssue = 2,
-        Unknown = 3
+        Unknown = 3,
+        UserContextDoesNotExistOnSystem = 4
     }
 }

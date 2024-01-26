@@ -124,11 +124,12 @@
   <xs:element oio:definition="urn:oio:sagdok:interessefaellesskabstype:relation:ASDD:2.0.0" name="Interessefaellesskabstype" type="sd:KlasseRelationType" />
   <xs:element oio:definition="urn:oio:sagdok:myndighed:relation:ASDD:1.0.0" name="Myndighed" type="sd:MyndighedRelationType" />
   <xs:element oio:definition="urn:oio:sagdok:myndighedstype:relation:ASDD:1.0.0" name="Myndighedstype" type="sd:KlasseRelationType" />
-  <xs:element oio:definition="urn:oio:sagdok:opgaver:relation:ASDD:2.0.0" name="Opgaver" type="sd:KlasseFlerRelationType" />
+  <xs:element oio:definition="urn:oio:sagdok:opgaver:relation:ASDD:2.0.0" name="TilknyttedeOpgaver" type="sd:KlasseFlerRelationType" />
+  <xs:element oio:definition="urn:oio:sagdok:opgaver:relation:ASDD:2.0.0" name="Opgaver" type="sd:OpgaverFlerRelationType" />
   <xs:element oio:definition="urn:oio:sagdok:overordnet:relation:ASDD:2.0.0" name="Overordnet" type="sd:OrganisationEnhedRelationType" />
   <xs:element oio:definition="urn:oio:sagdok:produktionsenhed:relation:ASDD:2.0.0" name="Produktionsenhed" type="sd:VirksomhedRelationType" />
   <xs:element oio:definition="urn:oio:sagdok:skatteenhed:relation:ASDD:2.0.0" name="Skatteenhed" type="sd:VirksomhedRelationType" />
-  <xs:element oio:definition="urn:oio:sagdok:tilhoerer:relation:ASDD:2.0.0" name="Tilhoerer" type="sd:OrganisationRelationType" />
+  <xs:element oio:definition="urn:oio:sagdok:tilhoerer:relation:ASDD:2.0.0" name="Tilhoerer" type="sd:OrganisationFlerRelationType" />
   <xs:element oio:definition="urn:oio:sagdok:tilknyttedebrugere:relation:ASDD:2.0.0" name="TilknyttedeBrugere" type="sd:BrugerFlerRelationType" />
   <xs:element oio:definition="urn:oio:sagdok:tilknyttedeenheder:relation:ASDD:2.0.0" name="TilknyttedeEnheder" type="sd:OrganisationEnhedFlerRelationType" />
   <xs:element oio:definition="urn:oio:sagdok:tilknyttedefunktioner:relation:ASDD:2.0.0" name="TilknyttedeFunktioner" type="sd:OrganisationFunktionFlerRelationType" />
@@ -306,17 +307,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element oio:definition="urn:oio:sagdok:adresseflerrelation:ADD:1.0.0" name="AdresseFlerRelation" type="sd:AdresseFlerRelationType" />
-  <xs:complexType oio:definition="urn:oio:sagdok:adresseflerrelation:ADD:1.0.0" name="AdresseFlerRelationType">
-    <xs:complexContent mixed="false">
-      <xs:extension base="sd:FlerRelationType">
-        <xs:sequence>
-          <xs:element oio:content="rolle" minOccurs="0" name="Rolle" type="sd:UnikIdType" />
-          <xs:element oio:content="type" minOccurs="0" name="Type" type="sd:UnikIdType" />
-          <xs:element oio:content="indeks" minOccurs="0" name="Indeks" type="xs:string" />
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
   <xs:element oio:definition="urn:oio:sagdok:personflerrelation:ADD:1.0.0" name="PersonFlerRelation" type="sd:PersonFlerRelationType" />
   <xs:complexType oio:definition="urn:oio:sagdok:personflerrelation:ADD:1.0.0" name="PersonFlerRelationType">
     <xs:complexContent mixed="false">
@@ -491,7 +481,7 @@
   <xs:element oio:definition="urn:oio:sagdok:beskrivelse:BDD:1.0.0" name="BeskrivelseTekst">
     <xs:simpleType>
       <xs:restriction base="xs:string">
-        <xs:maxLength value="4096" />
+        <xs:maxLength value="10000" />
       </xs:restriction>
     </xs:simpleType>
   </xs:element>
@@ -502,7 +492,7 @@
   <xs:element oio:definition="urn:oio:sagdok:titel:BDD:1.0.0" name="TitelTekst">
     <xs:simpleType>
       <xs:restriction base="xs:string">
-        <xs:maxLength value="100" />
+        <xs:maxLength value="300" />
       </xs:restriction>
     </xs:simpleType>
   </xs:element>
@@ -521,11 +511,7 @@
   <xs:element oio:definition="urn:oio:sagdok:aktoerrelation:ADD:1.0.0" name="AktoerRelation" type="sd:AktoerRelationType" />
   <xs:complexType oio:definition="urn:oio:sagdok:aktoerrelation:ADD:1.0.0" name="AktoerRelationType">
     <xs:complexContent mixed="false">
-      <xs:extension base="sd:RelationType">
-        <xs:sequence>
-          <xs:element oio:content="aktoertype" minOccurs="0" ref="sd:AktoerTypeKode" />
-        </xs:sequence>
-      </xs:extension>
+      <xs:extension base="sd:RelationType" />
     </xs:complexContent>
   </xs:complexType>
   <xs:element oio:definition="urn:oio:sagdok:arkivrelation:ADD:1.0.0" name="ArkivRelation" type="sd:ArkivRelationType" />
@@ -798,6 +784,36 @@
           <xs:element oio:content="uuid" ref="sd:UUIDIdentifikator" />
         </xs:sequence>
       </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="DynamicFlerRelationType">
+    <xs:complexContent mixed="false">
+      <xs:extension base="sd:FlerRelationType">
+        <xs:sequence>
+          <xs:element oio:content="rolle" minOccurs="1" name="Rolle" type="sd:UuidLabelInputType" />
+          <xs:element oio:content="type" minOccurs="1" name="Type" type="sd:UuidLabelInputType" />
+          <xs:element oio:content="indeks" minOccurs="1" name="Indeks" type="xs:string" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType oio:definition="urn:oio:sagdok:unikidwithlabel:ADD:1.0.0" name="UuidLabelInputType">
+    <xs:complexContent mixed="false">
+      <xs:extension base="sd:UnikIdType">
+        <xs:sequence>
+          <xs:element oio:content="label" minOccurs="0" name="Label" type="xs:string" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType oio:definition="urn:oio:sagdok:opgaverflerrelation:ADD:1.0.0" name="OpgaverFlerRelationType">
+    <xs:complexContent mixed="false">
+      <xs:extension base="sd:DynamicFlerRelationType" />
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType oio:definition="urn:oio:sagdok:adresseflerrelation:ADD:1.0.0" name="AdresseFlerRelationType">
+    <xs:complexContent mixed="false">
+      <xs:extension base="sd:DynamicFlerRelationType" />
     </xs:complexContent>
   </xs:complexType>
 </xs:schema>
