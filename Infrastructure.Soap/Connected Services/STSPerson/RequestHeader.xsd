@@ -12,7 +12,7 @@
   </xsd:simpleType>
   <xsd:simpleType name="UUIDType">
     <xsd:restriction base="xsd:string">
-      <xsd:pattern value="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}" />
+      <xsd:minLength value="1" />
     </xsd:restriction>
   </xsd:simpleType>
 </xsd:schema>

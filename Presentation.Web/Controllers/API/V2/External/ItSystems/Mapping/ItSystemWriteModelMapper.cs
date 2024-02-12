@@ -117,7 +117,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 
             destination.Name = rule.MustUpdate(x => x.Name) ? source.Name.AsChangedValue() : OptionalValueChange<string>.None;
             destination.ParentSystemUuid = rule.MustUpdate(x => x.ParentUuid) ? source.ParentUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
-            destination.FormerName = rule.MustUpdate(x => x.FormerName) ? source.FormerName.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.FormerName = rule.MustUpdate(x => x.PreviousName) ? source.PreviousName.AsChangedValue() : OptionalValueChange<string>.None;
             destination.Description = rule.MustUpdate(x => x.Description) ? source.Description.AsChangedValue() : OptionalValueChange<string>.None;
             destination.BusinessTypeUuid = rule.MustUpdate(x => x.BusinessTypeUuid) ? source.BusinessTypeUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
             destination.TaskRefUuids = rule.MustUpdate(x => x.KLEUuids) ? (source.KLEUuids ?? new List<Guid>()).AsChangedValue() : OptionalValueChange<IEnumerable<Guid>>.None;

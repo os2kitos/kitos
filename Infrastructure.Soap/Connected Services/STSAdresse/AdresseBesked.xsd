@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema xmlns:sd="urn:oio:sagdok:3.0.0" xmlns:adresse="http://stoettesystemerne.dk/organisation/adresse/6/" xmlns:oio="urn:oio:definitions:1.0.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://stoettesystemerne.dk/organisation/adresse/6/" oio:mapping="urn:oio:sagdok:MPD:3.0.0" xmlns="http://www.w3.org/2001/XMLSchema">
+  <import schemaLocation="../common/SagDokObjekt.xsd" namespace="urn:oio:sagdok:3.0.0" />
+  <import schemaLocation="GenerelleDefinitioner.xsd" namespace="urn:oio:sts:6" />
+  <include schemaLocation="Adresse.xsd" />
+  <element oio:definition="urn:oio:sts:adresseregistreringbesked:ADD:1.0.0" name="RegistreringBesked" type="adresse:RegistreringBeskedType" />
+  <complexType oio:definition="urn:oio:sts:adresseregistreringbesked:ADD:1.0.0" name="RegistreringBeskedType">
+    <sequence>
+      <element oio:definition="urn:oio:sagdok:referenceid:ASDD:1.0.0" name="ObjektID" type="sd:UnikIdType" />
+      <element oio:content="registrering" minOccurs="1" ref="adresse:Registrering" />
+    </sequence>
+  </complexType>
+</schema>

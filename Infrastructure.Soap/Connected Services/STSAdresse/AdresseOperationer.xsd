@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<schema xmlns:adresse="urn:oio:sts:organisation:adresse:1.1.3.0" xmlns:sd="urn:oio:sagdok:3.0.0" xmlns:sts="urn:oio:sts:1.1.3.0" xmlns:oio="urn:oio:definitions:1.0.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:oio:sts:organisation:adresse:1.1.3.0" oio:mapping="urn:oio:sagdok:MPD:3.0.0" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema xmlns:sts="urn:oio:sts:6" xmlns:sd="urn:oio:sagdok:3.0.0" xmlns:adresse="http://stoettesystemerne.dk/organisation/adresse/6/" xmlns:oio="urn:oio:definitions:1.0.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://stoettesystemerne.dk/organisation/adresse/6/" oio:mapping="urn:oio:sagdok:MPD:3.0.0" xmlns="http://www.w3.org/2001/XMLSchema">
   <import schemaLocation="../common/SagDokObjekt.xsd" namespace="urn:oio:sagdok:3.0.0" />
-  <import schemaLocation="GenerelleDefinitioner.xsd" namespace="urn:oio:sts:1.1.3.0" />
+  <import schemaLocation="GenerelleDefinitioner.xsd" namespace="urn:oio:sts:6" />
   <include schemaLocation="Adresse.xsd" />
   <element oio:definition="urn:oio:sts:adresseimportinput:ADD:2.0.0" name="ImportInput" type="adresse:ImportInputType" />
   <element oio:definition="urn:oio:sts:adresseimportoutput:ASDD:2.0.0" name="ImportOutput" type="sd:BasicOutputType" />

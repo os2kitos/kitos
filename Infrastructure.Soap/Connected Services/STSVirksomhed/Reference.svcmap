@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="fe51a6c8-6106-4f11-8d46-e611f7e11204" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="C:\Temp\v6_0_0_0\wsdl\Virksomhed.wsdl" Protocol="file" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="RequestHeader.xsd" MetadataType="Schema" ID="d9288798-0717-4890-9e95-44402a926121" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/RequestHeader.xsd" />
+    <MetadataFile FileName="OIOIDWS.wsdl" MetadataType="Wsdl" ID="11272696-1084-43e6-9038-f34ed44d7f81" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/policies/OIOIDWS.wsdl" />
+    <MetadataFile FileName="Part.xsd" MetadataType="Schema" ID="37ab1efe-d6c5-46ab-ad18-8b6cbbd70530" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Part.xsd" />
+    <MetadataFile FileName="GenerelleDefinitioner.xsd" MetadataType="Schema" ID="300fea9a-fbfb-477c-b800-4758bf010b4f" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/GenerelleDefinitioner.xsd" />
+    <MetadataFile FileName="Virksomhed.xsd" MetadataType="Schema" ID="aa16b794-b353-48f7-a7e7-5de2284b90a7" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Virksomhed.xsd" />
+    <MetadataFile FileName="SagDokObjekt.xsd" MetadataType="Schema" ID="0ed9dc15-382b-4a21-ba77-21d6757b10e4" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/SagDokObjekt.xsd" />
+    <MetadataFile FileName="VirksomhedBesked.xsd" MetadataType="Schema" ID="91e0df35-0b82-47a4-a820-477ce9206ff4" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/VirksomhedBesked.xsd" />
+    <MetadataFile FileName="OrganisationFaelles.xsd" MetadataType="Schema" ID="6d895fdc-43d4-4a32-b629-c68b66db3cea" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/OrganisationFaelles.xsd" />
+    <MetadataFile FileName="VirksomhedService.wsdl" MetadataType="Wsdl" ID="7eaf5c28-0d9f-4bd5-b57a-27c423803165" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/Virksomhed.wsdl" />
+    <MetadataFile FileName="VirksomhedOperationer.xsd" MetadataType="Schema" ID="e6e93d9c-3457-439e-848d-81572370fbcf" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/VirksomhedOperationer.xsd" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

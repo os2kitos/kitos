@@ -380,6 +380,14 @@
                         .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
                     builder
+                        .withDataSourceName("SystemPreviousName")
+                        .withTitle("Tidligere systemnavn")
+                        .withId("previousname")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withContentOverflow()
+                        .withSourceValueEchoRendering())
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("ResponsibleOrganizationUnitId") //Using org unit id for better search performance and org unit name is used during sorting (in the parameter mapper)
                         .withTitle("Ansv. organisationsenhed")
                         .withId("orgunit")

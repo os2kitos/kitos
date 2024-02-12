@@ -274,13 +274,17 @@
       <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
       <Name>Core.DomainModel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Digst.OioIdws.Soap\Digst.OioIdws.Soap.csproj">
+      <Project>{2BF23085-9552-4354-B070-7F1715ED5976}</Project>
+      <Name>Digst.OioIdws.Soap</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Soap\Infrastructure.Soap.csproj">
+    <ProjectReference Include="..\Infrastructure.Soap\Infrastructure.STS.SSO.csproj">
       <Project>{a05389ea-25f4-45b5-8534-0775d9671456}</Project>
-      <Name>Infrastructure.Soap</Name>
+      <Name>Infrastructure.STS.SSO</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.STS.Common\Infrastructure.STS.Common.csproj">
       <Project>{423D7522-4882-4438-94F4-7B3F5778C83F}</Project>

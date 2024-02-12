@@ -23,10 +23,10 @@ namespace Core.DomainServices.SSO
         public StsBrugerInfoService(StsOrganisationIntegrationConfiguration configuration, ILogger logger)
         {
             _logger = logger;
-            _certificateThumbprint = configuration.CertificateThumbprint;
-            _urlServicePlatformBrugerService = $"https://{configuration.EndpointHost}/service/Organisation/Bruger/5";
-            _urlServicePlatformAdresseService = $"https://{configuration.EndpointHost}/service/Organisation/Adresse/5";
-            _urlServicePlatformPersonService = $"https://{configuration.EndpointHost}/service/Organisation/Person/5";
+            _certificateThumbprint = configuration.ClientCertificateThumbprint;
+            _urlServicePlatformBrugerService = $"https://{configuration.EndpointHost}/Organisation/Bruger/6";
+            _urlServicePlatformAdresseService = $"https://{configuration.EndpointHost}/Organisation/Adresse/6";
+            _urlServicePlatformPersonService = $"https://{configuration.EndpointHost}/Organisation/Person/6";
         }
 
         public Maybe<StsBrugerInfo> GetStsBrugerInfo(Guid uuid, string cvrNumber)
@@ -66,16 +66,16 @@ namespace Core.DomainServices.SSO
         {
             using (var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint))
             {
-                using var client = StsBrugerHelpers.CreateBrugerPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(),
+                using var client = StsBrugerHelpers.CreateBrugerPortTypeClient(HttpBindingFactory.CreateSoapBinding(),
                     _urlServicePlatformBrugerService, clientCertificate);
-                var laesRequest = StsBrugerHelpers.CreateStsBrugerLaesRequest(cvrNumber, uuid);
+                var laesRequest = StsBrugerHelpers.CreateStsBrugerLaesRequest(uuid);
                 var brugerPortType = client.ChannelFactory.CreateChannel();
                 var laesResponseResult = brugerPortType.laes(laesRequest);
 
                 if (laesResponseResult == null)
                     return $"Failed to fetch data from STS Bruger from uuid {uuid}";
 
-                var stdOutput = laesResponseResult.LaesResponse1?.LaesOutput?.StandardRetur;
+                var stdOutput = laesResponseResult.LaesOutput?.StandardRetur;
                 var returnCode = stdOutput?.StatusKode ?? "unknown";
                 var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
                 var stsError = stdOutput?.StatusKode.ParseStsErrorFromStandardResultCode() ?? Maybe<StsError>.None;
@@ -84,8 +84,7 @@ namespace Core.DomainServices.SSO
 
                 var registrations =
                     laesResponseResult
-                        .LaesResponse1
-                        ?.LaesOutput
+                        .LaesOutput
                         ?.FiltreretOejebliksbillede
                         ?.Registrering
                         ?.ToList() ?? new List<RegistreringType1>();
@@ -167,16 +166,16 @@ namespace Core.DomainServices.SSO
         {
             using (var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint))
             {
-                using var client = StsAdresseHelpers.CreateAdressePortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(),
+                using var client = StsAdresseHelpers.CreateAdressePortTypeClient(HttpBindingFactory.CreateBasicHttpBinding(),
                     _urlServicePlatformAdresseService, clientCertificate);
-                var laesRequest = StsAdresseHelpers.CreateStsAdresseLaesRequest(cvrNumber, emailAdresseUuid);
+                var laesRequest = StsAdresseHelpers.CreateStsAdresseLaesRequest(emailAdresseUuid);
                 var adressePortType = client.ChannelFactory.CreateChannel();
                 var laesResponse = adressePortType.laes(laesRequest);
 
                 if (laesResponse == null)
                     return $"Failed to read STS Adresse from emailAdresseUUID {emailAdresseUuid}";
 
-                var stdOutput = laesResponse.LaesResponse1?.LaesOutput?.StandardRetur;
+                var stdOutput = laesResponse.LaesOutput?.StandardRetur;
                 var returnCode = stdOutput?.StatusKode ?? "unknown";
                 var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
                 var stsError = stdOutput?.StatusKode.ParseStsErrorFromStandardResultCode() ?? Maybe<StsError>.None;
@@ -185,8 +184,7 @@ namespace Core.DomainServices.SSO
 
                 var registreringType1s =
                     laesResponse
-                        .LaesResponse1
-                        ?.LaesOutput
+                        .LaesOutput
                         ?.FiltreretOejebliksbillede
                         ?.Registrering ?? new Infrastructure.Soap.STSAdresse.RegistreringType1[0];
 
@@ -224,16 +222,16 @@ namespace Core.DomainServices.SSO
         {
             using (var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint))
             {
-                using var client = StsPersonHelpers.CreatePersonPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(),
+                using var client = StsPersonHelpers.CreatePersonPortTypeClient(HttpBindingFactory.CreateBasicHttpBinding(),
                     _urlServicePlatformPersonService, clientCertificate);
-                var laesRequest = StsPersonHelpers.CreateStsPersonLaesRequest(cvrNumber, personUuid);
+                var laesRequest = StsPersonHelpers.CreateStsPersonLaesRequest(personUuid);
                 var virksomhedPortType = client.ChannelFactory.CreateChannel();
                 var laesResponse = virksomhedPortType.laes(laesRequest);
 
                 if (laesResponse == null)
                     return $"Failed to read from STS Person with personUUID:{personUuid}";
 
-                var stdOutput = laesResponse.LaesResponse1?.LaesOutput?.StandardRetur;
+                var stdOutput = laesResponse.LaesOutput?.StandardRetur;
                 var returnCode = stdOutput?.StatusKode ?? "unknown";
                 var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
 
@@ -243,8 +241,7 @@ namespace Core.DomainServices.SSO
 
                 var registreringType1s =
                     laesResponse
-                        .LaesResponse1
-                        ?.LaesOutput
+                        .LaesOutput
                         ?.FiltreretOejebliksbillede
                         ?.Registrering ?? new Infrastructure.Soap.STSPerson.RegistreringType1[0];
 

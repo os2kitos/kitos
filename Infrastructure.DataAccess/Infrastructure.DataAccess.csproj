@@ -1030,6 +1030,10 @@
     <Compile Include="Migrations\202311131152402_AddExternalUuidToItSystem.designer.cs">
       <DependentUpon>202311131152402_AddExternalUuidToItSystem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202401120652462_AddedPreviousNameToSystemUsageReadModel.cs" />
+    <Compile Include="Migrations\202401120652462_AddedPreviousNameToSystemUsageReadModel.designer.cs">
+      <DependentUpon>202401120652462_AddedPreviousNameToSystemUsageReadModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
@@ -1039,6 +1043,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202311131152402_AddExternalUuidToItSystem.resx">
       <DependentUpon>202311131152402_AddExternalUuidToItSystem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202401120652462_AddedPreviousNameToSystemUsageReadModel.resx">
+      <DependentUpon>202401120652462_AddedPreviousNameToSystemUsageReadModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_DataRow.sql" />
     <EmbeddedResource Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.resx">

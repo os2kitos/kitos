@@ -217,6 +217,7 @@
                     case Models.Api.Organization.CheckConnectionError.InvalidCvrOnOrganization:
                         this.accessError = "Der enten mangler eller er registreret et ugyldigt CVR nummer på din kommune i KITOS.";
                         break;
+                    case Models.Api.Organization.CheckConnectionError.UserContextDoesNotExistOnSystem:
                     case Models.Api.Organization.CheckConnectionError.MissingServiceAgreement:
                         this.accessError = "Din organisation mangler en gyldig serviceaftale der giver KITOS adgang til data fra din kommune i FK Organisation. Kontakt venligst den KITOS ansvarlige i din kommune for hjælp.";
                         break;

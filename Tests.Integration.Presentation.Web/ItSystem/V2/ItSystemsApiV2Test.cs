@@ -488,7 +488,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             AssertOrganization(organizationDto, createdSystem.OrganizationContext);
             Assert.Equal(fullRequest.Name, createdSystem.Name);
             AssertOrganization(rightsHolder, createdSystem.RightsHolder);
-            Assert.Equal(fullRequest.FormerName, createdSystem.FormerName);
+            Assert.Equal(fullRequest.PreviousName, createdSystem.FormerName);
             Assert.Equal(fullRequest.Description, createdSystem.Description);
             Assert.Equal(fullRequest.Deactivated, createdSystem.Deactivated);
             Assert.Equivalent(businessType, createdSystem.BusinessType);
@@ -549,7 +549,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             var changes = new Dictionary<string, object>();
             if (updateName) changes.Add(nameof(UpdateItSystemRequestDTO.Name), CreateName());
-            if (updateFormerName) changes.Add(nameof(UpdateItSystemRequestDTO.FormerName), A<string>());
+            if (updateFormerName) changes.Add(nameof(UpdateItSystemRequestDTO.PreviousName), A<string>());
             if (updateDescription) changes.Add(nameof(UpdateItSystemRequestDTO.Description), A<string>());
             if (updateBusinessType) changes.Add(nameof(UpdateItSystemRequestDTO.BusinessTypeUuid), (await GetRandomBusinessType(organizationDto)).Uuid);
             if (updateParent) changes.Add(nameof(UpdateItSystemRequestDTO.ParentUuid), (await CreateSystemAsync(organizationDto.Id, AccessModifier.Public)).uuid);
@@ -568,7 +568,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(createdSystem.Created, updatedSystem.Created); //No changes expected
             Assert.Equal(updateRightsHolder ? changes[nameof(UpdateItSystemRequestDTO.RightsHolderUuid)] : createdSystem.RightsHolder.Uuid, updatedSystem.RightsHolder.Uuid);
             Assert.Equal(updateName ? changes[nameof(UpdateItSystemRequestDTO.Name)] : createdSystem.Name, updatedSystem.Name);
-            Assert.Equal(updateFormerName ? changes[nameof(UpdateItSystemRequestDTO.FormerName)] : createdSystem.FormerName, updatedSystem.FormerName);
+            Assert.Equal(updateFormerName ? changes[nameof(UpdateItSystemRequestDTO.PreviousName)] : createdSystem.FormerName, updatedSystem.FormerName);
             Assert.Equal(updateDescription ? changes[nameof(UpdateItSystemRequestDTO.Description)] : createdSystem.Description, updatedSystem.Description);
             Assert.Equal(updateBusinessType ? changes[nameof(UpdateItSystemRequestDTO.BusinessTypeUuid)] : createdSystem.BusinessType?.Uuid, updatedSystem.BusinessType?.Uuid);
             Assert.Equal(updateParent ? changes[nameof(UpdateItSystemRequestDTO.ParentUuid)] : createdSystem.ParentSystem?.Uuid, updatedSystem.ParentSystem?.Uuid);
@@ -860,7 +860,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 OrganizationUuid = organizationDto.Uuid,
                 Name = name,
                 ParentUuid = parent.Uuid,
-                FormerName = A<string>(),
+                PreviousName = A<string>(),
                 Description = A<string>(),
                 ExternalReferences = references,
                 BusinessTypeUuid = businessType.Uuid,

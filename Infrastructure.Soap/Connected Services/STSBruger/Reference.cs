@@ -11,26 +11,141 @@
 namespace Infrastructure.Soap.STSBruger {
     
     
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ServiceModel.ServiceContractAttribute(Namespace="http://stoettesystemerne.dk/organisation/6/", ConfigurationName="STSBruger.BrugerPortType")]
+    public interface BrugerPortType {
+        
+        // CODEGEN: Generating message contract since the operation opret is neither RPC nor document wrapped.
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/opret", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ListOutputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(SoegInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RetInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
+        Infrastructure.Soap.STSBruger.opretResponse opret(Infrastructure.Soap.STSBruger.opretRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/opret", ReplyAction="*")]
+        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.opretResponse> opretAsync(Infrastructure.Soap.STSBruger.opretRequest request);
+        
+        // CODEGEN: Generating message contract since the operation importer is neither RPC nor document wrapped.
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/importer", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ListOutputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(SoegInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RetInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
+        Infrastructure.Soap.STSBruger.importerResponse importer(Infrastructure.Soap.STSBruger.importerRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/importer", ReplyAction="*")]
+        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.importerResponse> importerAsync(Infrastructure.Soap.STSBruger.importerRequest request);
+        
+        // CODEGEN: Generating message contract since the operation passiver is neither RPC nor document wrapped.
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/passiver", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ListOutputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(SoegInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RetInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
+        Infrastructure.Soap.STSBruger.passiverResponse passiver(Infrastructure.Soap.STSBruger.passiverRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/passiver", ReplyAction="*")]
+        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.passiverResponse> passiverAsync(Infrastructure.Soap.STSBruger.passiverRequest request);
+        
+        // CODEGEN: Generating message contract since the operation laes is neither RPC nor document wrapped.
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/laes", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ListOutputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(SoegInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RetInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
+        Infrastructure.Soap.STSBruger.laesResponse laes(Infrastructure.Soap.STSBruger.laesRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/laes", ReplyAction="*")]
+        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.laesResponse> laesAsync(Infrastructure.Soap.STSBruger.laesRequest request);
+        
+        // CODEGEN: Generating message contract since the operation ret is neither RPC nor document wrapped.
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/ret", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ListOutputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(SoegInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RetInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
+        Infrastructure.Soap.STSBruger.retResponse ret(Infrastructure.Soap.STSBruger.retRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/ret", ReplyAction="*")]
+        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.retResponse> retAsync(Infrastructure.Soap.STSBruger.retRequest request);
+        
+        // CODEGEN: Generating message contract since the operation slet is neither RPC nor document wrapped.
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/slet", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ListOutputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(SoegInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RetInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
+        Infrastructure.Soap.STSBruger.sletResponse slet(Infrastructure.Soap.STSBruger.sletRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/slet", ReplyAction="*")]
+        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.sletResponse> sletAsync(Infrastructure.Soap.STSBruger.sletRequest request);
+        
+        // CODEGEN: Generating message contract since the operation soeg is neither RPC nor document wrapped.
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/soeg", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ListOutputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(SoegInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RetInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
+        Infrastructure.Soap.STSBruger.soegResponse soeg(Infrastructure.Soap.STSBruger.soegRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/soeg", ReplyAction="*")]
+        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.soegResponse> soegAsync(Infrastructure.Soap.STSBruger.soegRequest request);
+        
+        // CODEGEN: Generating message contract since the operation list is neither RPC nor document wrapped.
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/list", ReplyAction="*")]
+        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(ListOutputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(SoegInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RetInputType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
+        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
+        Infrastructure.Soap.STSBruger.listResponse list(Infrastructure.Soap.STSBruger.listRequest request);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://kombit.dk/sts/organisation/bruger/list", ReplyAction="*")]
+        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.listResponse> listAsync(Infrastructure.Soap.STSBruger.listRequest request);
+    }
+    
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-    public partial class ServiceplatformFaultType : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+    public partial class RequestHeaderType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private ErrorType[] errorListField;
+        private string transactionUUIDField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=0)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("Error", IsNullable=false)]
-        public ErrorType[] ErrorList {
+        public string TransactionUUID {
             get {
-                return this.errorListField;
+                return this.transactionUUIDField;
             }
             set {
-                this.errorListField = value;
-                this.RaisePropertyChanged("ErrorList");
+                this.transactionUUIDField = value;
+                this.RaisePropertyChanged("TransactionUUID");
             }
         }
         
@@ -45,38 +160,25 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ListOutputType1))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-    public partial class ErrorType : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class ListOutputType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private string errorCodeField;
-        
-        private string errorTextField;
+        private StandardReturType standardReturField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public string ErrorCode {
+        public StandardReturType StandardRetur {
             get {
-                return this.errorCodeField;
+                return this.standardReturField;
             }
             set {
-                this.errorCodeField = value;
-                this.RaisePropertyChanged("ErrorCode");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public string ErrorText {
-            get {
-                return this.errorTextField;
-            }
-            set {
-                this.errorTextField = value;
-                this.RaisePropertyChanged("ErrorText");
+                this.standardReturField = value;
+                this.RaisePropertyChanged("StandardRetur");
             }
         }
         
@@ -91,95 +193,145 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(RegistreringType1))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(UnikReturType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class RegistreringType : object, System.ComponentModel.INotifyPropertyChanged {
+    public partial class StandardReturType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private string noteTekstField;
+        private string statusKodeField;
         
-        private System.DateTime tidspunktField;
+        private string fejlbeskedTekstField;
         
-        private bool tidspunktFieldSpecified;
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(DataType="integer", Order=0)]
+        public string StatusKode {
+            get {
+                return this.statusKodeField;
+            }
+            set {
+                this.statusKodeField = value;
+                this.RaisePropertyChanged("StatusKode");
+            }
+        }
         
-        private LivscyklusKodeType livscyklusKodeField;
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public string FejlbeskedTekst {
+            get {
+                return this.fejlbeskedTekstField;
+            }
+            set {
+                this.fejlbeskedTekstField = value;
+                this.RaisePropertyChanged("FejlbeskedTekst");
+            }
+        }
         
-        private bool livscyklusKodeFieldSpecified;
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
         
-        private UnikIdType brugerRefField;
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class UnikReturType : StandardReturType {
+        
+        private string typeField;
+        
+        private string uUIDIdentifikatorField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public string NoteTekst {
+        public string Type {
             get {
-                return this.noteTekstField;
+                return this.typeField;
             }
             set {
-                this.noteTekstField = value;
-                this.RaisePropertyChanged("NoteTekst");
+                this.typeField = value;
+                this.RaisePropertyChanged("Type");
             }
         }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public System.DateTime Tidspunkt {
+        public string UUIDIdentifikator {
             get {
-                return this.tidspunktField;
+                return this.uUIDIdentifikatorField;
             }
             set {
-                this.tidspunktField = value;
-                this.RaisePropertyChanged("Tidspunkt");
+                this.uUIDIdentifikatorField = value;
+                this.RaisePropertyChanged("UUIDIdentifikator");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="ListOutputType", Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class ListOutputType1 : ListOutputType {
+        
+        private FiltreretOejebliksbilledeType[] filtreretOejebliksbilledeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("FiltreretOejebliksbillede", Order=0)]
+        public FiltreretOejebliksbilledeType[] FiltreretOejebliksbillede {
+            get {
+                return this.filtreretOejebliksbilledeField;
+            }
+            set {
+                this.filtreretOejebliksbilledeField = value;
+                this.RaisePropertyChanged("FiltreretOejebliksbillede");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class FiltreretOejebliksbilledeType : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private SagDokObjektType objektTypeField;
+        
+        private RegistreringType1[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public SagDokObjektType ObjektType {
+            get {
+                return this.objektTypeField;
+            }
+            set {
+                this.objektTypeField = value;
+                this.RaisePropertyChanged("ObjektType");
             }
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool TidspunktSpecified {
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
+        public RegistreringType1[] Registrering {
             get {
-                return this.tidspunktFieldSpecified;
+                return this.registreringField;
             }
             set {
-                this.tidspunktFieldSpecified = value;
-                this.RaisePropertyChanged("TidspunktSpecified");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public LivscyklusKodeType LivscyklusKode {
-            get {
-                return this.livscyklusKodeField;
-            }
-            set {
-                this.livscyklusKodeField = value;
-                this.RaisePropertyChanged("LivscyklusKode");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool LivscyklusKodeSpecified {
-            get {
-                return this.livscyklusKodeFieldSpecified;
-            }
-            set {
-                this.livscyklusKodeFieldSpecified = value;
-                this.RaisePropertyChanged("LivscyklusKodeSpecified");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
-        public UnikIdType BrugerRef {
-            get {
-                return this.brugerRefField;
-            }
-            set {
-                this.brugerRefField = value;
-                this.RaisePropertyChanged("BrugerRef");
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
             }
         }
         
@@ -194,60 +346,28 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public enum LivscyklusKodeType {
-        
-        /// <remarks/>
-        Opstaaet,
-        
-        /// <remarks/>
-        Importeret,
-        
-        /// <remarks/>
-        Passiveret,
-        
-        /// <remarks/>
-        Slettet,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PartType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AktoerType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesFiltreretOutputType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class UnikIdType : object, System.ComponentModel.INotifyPropertyChanged {
+    public partial class SagDokObjektType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private string itemField;
-        
-        private ItemChoiceType itemElementNameField;
+        private string uUIDIdentifikatorField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("URNIdentifikator", typeof(string), Order=0)]
-        [System.Xml.Serialization.XmlElementAttribute("UUIDIdentifikator", typeof(string), Order=0)]
-        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemElementName")]
-        public string Item {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string UUIDIdentifikator {
             get {
-                return this.itemField;
+                return this.uUIDIdentifikatorField;
             }
             set {
-                this.itemField = value;
-                this.RaisePropertyChanged("Item");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public ItemChoiceType ItemElementName {
-            get {
-                return this.itemElementNameField;
-            }
-            set {
-                this.itemElementNameField = value;
-                this.RaisePropertyChanged("ItemElementName");
+                this.uUIDIdentifikatorField = value;
+                this.RaisePropertyChanged("UUIDIdentifikator");
             }
         }
         
@@ -262,24 +382,55 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0", IncludeInSchema=false)]
-    public enum ItemChoiceType {
-        
-        /// <remarks/>
-        URNIdentifikator,
-        
-        /// <remarks/>
-        UUIDIdentifikator,
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AktoerType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:part:6")]
+    public partial class PartType : SagDokObjektType {
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/6/")]
+    public partial class AktoerType : PartType {
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class BrugerType : AktoerType {
+        
+        private RegistreringType1[] registreringField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
+        public RegistreringType1[] Registrering {
+            get {
+                return this.registreringField;
+            }
+            set {
+                this.registreringField = value;
+                this.RaisePropertyChanged("Registrering");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RegistreringType", Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
     public partial class RegistreringType1 : RegistreringType {
         
         private AttributListeType attributListeField;
@@ -326,11 +477,11 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
     public partial class AttributListeType : object, System.ComponentModel.INotifyPropertyChanged {
         
         private EgenskabType[] egenskabField;
@@ -372,11 +523,11 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
     public partial class EgenskabType : object, System.ComponentModel.INotifyPropertyChanged {
         
         private VirkningType virkningField;
@@ -446,7 +597,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -548,7 +699,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -581,7 +732,93 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(UuidLabelInputType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class UnikIdType : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private string itemField;
+        
+        private ItemChoiceType itemElementNameField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("URNIdentifikator", typeof(string), Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute("UUIDIdentifikator", typeof(string), Order=0)]
+        [System.Xml.Serialization.XmlChoiceIdentifierAttribute("ItemElementName")]
+        public string Item {
+            get {
+                return this.itemField;
+            }
+            set {
+                this.itemField = value;
+                this.RaisePropertyChanged("Item");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public ItemChoiceType ItemElementName {
+            get {
+                return this.itemElementNameField;
+            }
+            set {
+                this.itemElementNameField = value;
+                this.RaisePropertyChanged("ItemElementName");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0", IncludeInSchema=false)]
+    public enum ItemChoiceType {
+        
+        /// <remarks/>
+        URNIdentifikator,
+        
+        /// <remarks/>
+        UUIDIdentifikator,
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class UuidLabelInputType : UnikIdType {
+        
+        private string labelField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string Label {
+            get {
+                return this.labelField;
+            }
+            set {
+                this.labelField = value;
+                this.RaisePropertyChanged("Label");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
     public enum AktoerTypeKodeType {
@@ -606,7 +843,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -638,11 +875,11 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
     public partial class TilstandListeType : object, System.ComponentModel.INotifyPropertyChanged {
         
         private GyldighedType[] gyldighedField;
@@ -650,7 +887,7 @@ namespace Infrastructure.Soap.STSBruger {
         private LokalUdvidelseType lokalUdvidelseField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="urn:oio:sts:organisation:1.1.3.0", Order=0)]
+        [System.Xml.Serialization.XmlElementAttribute("Gyldighed", Namespace="http://stoettesystemerne.dk/organisation/6/", Order=0)]
         public GyldighedType[] Gyldighed {
             get {
                 return this.gyldighedField;
@@ -684,11 +921,11 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/6/")]
     public partial class GyldighedType : object, System.ComponentModel.INotifyPropertyChanged {
         
         private VirkningType virkningField;
@@ -730,9 +967,9 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/6/")]
     public enum GyldighedStatusKodeType {
         
         /// <remarks/>
@@ -743,20 +980,20 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
     public partial class RelationListeType : object, System.ComponentModel.INotifyPropertyChanged {
         
         private AdresseFlerRelationType[] adresserField;
         
         private KlasseFlerRelationType[] brugerTyperField;
         
-        private KlasseFlerRelationType[] opgaverField;
+        private KlasseFlerRelationType[] tilknyttedeOpgaverField;
         
-        private OrganisationRelationType tilhoererField;
+        private OrganisationFlerRelationType tilhoererField;
         
         private OrganisationEnhedFlerRelationType[] tilknyttedeEnhederField;
         
@@ -797,20 +1034,20 @@ namespace Infrastructure.Soap.STSBruger {
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Opgaver", Namespace="urn:oio:sagdok:3.0.0", Order=2)]
-        public KlasseFlerRelationType[] Opgaver {
+        [System.Xml.Serialization.XmlElementAttribute("TilknyttedeOpgaver", Namespace="urn:oio:sagdok:3.0.0", Order=2)]
+        public KlasseFlerRelationType[] TilknyttedeOpgaver {
             get {
-                return this.opgaverField;
+                return this.tilknyttedeOpgaverField;
             }
             set {
-                this.opgaverField = value;
-                this.RaisePropertyChanged("Opgaver");
+                this.tilknyttedeOpgaverField = value;
+                this.RaisePropertyChanged("TilknyttedeOpgaver");
             }
         }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sagdok:3.0.0", Order=3)]
-        public OrganisationRelationType Tilhoerer {
+        public OrganisationFlerRelationType Tilhoerer {
             get {
                 return this.tilhoererField;
             }
@@ -915,22 +1152,33 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class AdresseFlerRelationType : FlerRelationType {
+    public partial class AdresseFlerRelationType : DynamicFlerRelationType {
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AdresseFlerRelationType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OpgaverFlerRelationType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class DynamicFlerRelationType : FlerRelationType {
         
-        private UnikIdType rolleField;
+        private UuidLabelInputType rolleField;
         
-        private UnikIdType typeField;
+        private UuidLabelInputType typeField;
         
         private string indeksField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public UnikIdType Rolle {
+        public UuidLabelInputType Rolle {
             get {
                 return this.rolleField;
             }
@@ -942,7 +1190,7 @@ namespace Infrastructure.Soap.STSBruger {
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public UnikIdType Type {
+        public UuidLabelInputType Type {
             get {
                 return this.typeField;
             }
@@ -966,6 +1214,9 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(DynamicFlerRelationType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AdresseFlerRelationType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OpgaverFlerRelationType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(ArkivFlerRelationType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(DokumentFlerRelationType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(PartFlerRelationType))]
@@ -979,8 +1230,7 @@ namespace Infrastructure.Soap.STSBruger {
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerFlerRelationType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(KlasseFlerRelationType))]
     [System.Xml.Serialization.XmlIncludeAttribute(typeof(PersonFlerRelationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AdresseFlerRelationType))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1026,7 +1276,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1035,7 +1285,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1044,7 +1294,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1053,7 +1303,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1062,7 +1312,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1071,7 +1321,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1080,7 +1330,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1089,7 +1339,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1098,7 +1348,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1107,7 +1357,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1116,7 +1366,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1125,7 +1375,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1134,7 +1384,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1143,212 +1393,104 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class OrganisationRelationType : RelationType {
+    public partial class OpgaverFlerRelationType : DynamicFlerRelationType {
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(KlassifikationRelationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(FacetRelationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(DokumentRelationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SagRelationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ArkivRelationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AktoerRelationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationRelationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(VirksomhedRelationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OrganisationEnhedRelationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(MyndighedRelationType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(KlasseRelationType))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(RegistreringType1))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class RelationType : object, System.ComponentModel.INotifyPropertyChanged {
+    public partial class RegistreringType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private VirkningType virkningField;
+        private string noteTekstField;
         
-        private UnikIdType referenceIDField;
+        private System.DateTime tidspunktField;
+        
+        private bool tidspunktFieldSpecified;
+        
+        private LivscyklusKodeType livscyklusKodeField;
+        
+        private bool livscyklusKodeFieldSpecified;
+        
+        private UnikIdType brugerRefField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public VirkningType Virkning {
+        public string NoteTekst {
             get {
-                return this.virkningField;
+                return this.noteTekstField;
             }
             set {
-                this.virkningField = value;
-                this.RaisePropertyChanged("Virkning");
+                this.noteTekstField = value;
+                this.RaisePropertyChanged("NoteTekst");
             }
         }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public UnikIdType ReferenceID {
+        public System.DateTime Tidspunkt {
             get {
-                return this.referenceIDField;
+                return this.tidspunktField;
             }
             set {
-                this.referenceIDField = value;
-                this.RaisePropertyChanged("ReferenceID");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class KlassifikationRelationType : RelationType {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class FacetRelationType : RelationType {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class DokumentRelationType : RelationType {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class SagRelationType : RelationType {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class ArkivRelationType : RelationType {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class AktoerRelationType : RelationType {
-        
-        private AktoerTypeKodeType aktoerTypeKodeField;
-        
-        private bool aktoerTypeKodeFieldSpecified;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public AktoerTypeKodeType AktoerTypeKode {
-            get {
-                return this.aktoerTypeKodeField;
-            }
-            set {
-                this.aktoerTypeKodeField = value;
-                this.RaisePropertyChanged("AktoerTypeKode");
+                this.tidspunktField = value;
+                this.RaisePropertyChanged("Tidspunkt");
             }
         }
         
         /// <remarks/>
         [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool AktoerTypeKodeSpecified {
+        public bool TidspunktSpecified {
             get {
-                return this.aktoerTypeKodeFieldSpecified;
+                return this.tidspunktFieldSpecified;
             }
             set {
-                this.aktoerTypeKodeFieldSpecified = value;
-                this.RaisePropertyChanged("AktoerTypeKodeSpecified");
+                this.tidspunktFieldSpecified = value;
+                this.RaisePropertyChanged("TidspunktSpecified");
             }
         }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class VirksomhedRelationType : RelationType {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class OrganisationEnhedRelationType : RelationType {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class MyndighedRelationType : RelationType {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class KlasseRelationType : RelationType {
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(PartType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AktoerType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesFiltreretOutputType))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class SagDokObjektType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private string uUIDIdentifikatorField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public string UUIDIdentifikator {
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public LivscyklusKodeType LivscyklusKode {
             get {
-                return this.uUIDIdentifikatorField;
+                return this.livscyklusKodeField;
             }
             set {
-                this.uUIDIdentifikatorField = value;
-                this.RaisePropertyChanged("UUIDIdentifikator");
+                this.livscyklusKodeField = value;
+                this.RaisePropertyChanged("LivscyklusKode");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool LivscyklusKodeSpecified {
+            get {
+                return this.livscyklusKodeFieldSpecified;
+            }
+            set {
+                this.livscyklusKodeFieldSpecified = value;
+                this.RaisePropertyChanged("LivscyklusKodeSpecified");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
+        public UnikIdType BrugerRef {
+            get {
+                return this.brugerRefField;
+            }
+            set {
+                this.brugerRefField = value;
+                this.RaisePropertyChanged("BrugerRef");
             }
         }
         
@@ -1363,51 +1505,26 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(AktoerType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerType))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:part:1.1.3.0")]
-    public partial class PartType : SagDokObjektType {
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(BrugerType))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:1.1.3.0")]
-    public partial class AktoerType : PartType {
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class BrugerType : AktoerType {
-        
-        private RegistreringType1[] registreringField;
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public enum LivscyklusKodeType {
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=0)]
-        public RegistreringType1[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
+        Opstaaet,
+        
+        /// <remarks/>
+        Importeret,
+        
+        /// <remarks/>
+        Passiveret,
+        
+        /// <remarks/>
+        Slettet,
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -1416,1084 +1533,14 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class FiltreretOejebliksbilledeType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private SagDokObjektType objektTypeField;
-        
-        private RegistreringType1[] registreringField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public SagDokObjektType ObjektType {
-            get {
-                return this.objektTypeField;
-            }
-            set {
-                this.objektTypeField = value;
-                this.RaisePropertyChanged("ObjektType");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("Registrering", Order=1)]
-        public RegistreringType1[] Registrering {
-            get {
-                return this.registreringField;
-            }
-            set {
-                this.registreringField = value;
-                this.RaisePropertyChanged("Registrering");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(UnikReturType))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class StandardReturType : object, System.ComponentModel.INotifyPropertyChanged {
+    public partial class ListInputType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private string statusKodeField;
-        
-        private string fejlbeskedTekstField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType="integer", Order=0)]
-        public string StatusKode {
-            get {
-                return this.statusKodeField;
-            }
-            set {
-                this.statusKodeField = value;
-                this.RaisePropertyChanged("StatusKode");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public string FejlbeskedTekst {
-            get {
-                return this.fejlbeskedTekstField;
-            }
-            set {
-                this.fejlbeskedTekstField = value;
-                this.RaisePropertyChanged("FejlbeskedTekst");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class UnikReturType : StandardReturType {
-        
-        private string typeField;
-        
-        private string uUIDIdentifikatorField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public string Type {
-            get {
-                return this.typeField;
-            }
-            set {
-                this.typeField = value;
-                this.RaisePropertyChanged("Type");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public string UUIDIdentifikator {
-            get {
-                return this.uUIDIdentifikatorField;
-            }
-            set {
-                this.uUIDIdentifikatorField = value;
-                this.RaisePropertyChanged("UUIDIdentifikator");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesOutputType))]
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OpretOutputType))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class BasicOutputType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private StandardReturType standardReturField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public StandardReturType StandardRetur {
-            get {
-                return this.standardReturField;
-            }
-            set {
-                this.standardReturField = value;
-                this.RaisePropertyChanged("StandardRetur");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class LaesOutputType : BasicOutputType {
-        
-        private FiltreretOejebliksbilledeType filtreretOejebliksbilledeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public FiltreretOejebliksbilledeType FiltreretOejebliksbillede {
-            get {
-                return this.filtreretOejebliksbilledeField;
-            }
-            set {
-                this.filtreretOejebliksbilledeField = value;
-                this.RaisePropertyChanged("FiltreretOejebliksbillede");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class OpretOutputType : BasicOutputType {
-        
-        private string uUIDIdentifikatorField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public string UUIDIdentifikator {
-            get {
-                return this.uUIDIdentifikatorField;
-            }
-            set {
-                this.uUIDIdentifikatorField = value;
-                this.RaisePropertyChanged("UUIDIdentifikator");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class OpretResponseType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private OpretOutputType opretOutputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=0)]
-        public OpretOutputType OpretOutput {
-            get {
-                return this.opretOutputField;
-            }
-            set {
-                this.opretOutputField = value;
-                this.RaisePropertyChanged("OpretOutput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OpretInputType1))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class OpretInputType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private string noteTekstField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public string NoteTekst {
-            get {
-                return this.noteTekstField;
-            }
-            set {
-                this.noteTekstField = value;
-                this.RaisePropertyChanged("NoteTekst");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="OpretInputType", Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class OpretInputType1 : OpretInputType {
-        
-        private AttributListeType attributListeField;
-        
-        private TilstandListeType tilstandListeField;
-        
-        private RelationListeType relationListeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public AttributListeType AttributListe {
-            get {
-                return this.attributListeField;
-            }
-            set {
-                this.attributListeField = value;
-                this.RaisePropertyChanged("AttributListe");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public TilstandListeType TilstandListe {
-            get {
-                return this.tilstandListeField;
-            }
-            set {
-                this.tilstandListeField = value;
-                this.RaisePropertyChanged("TilstandListe");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public RelationListeType RelationListe {
-            get {
-                return this.relationListeField;
-            }
-            set {
-                this.relationListeField = value;
-                this.RaisePropertyChanged("RelationListe");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/")]
-    public partial class AuthorityContextType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private string municipalityCVRField;
-        
-        /// <remarks/>
-        public string MunicipalityCVR {
-            get {
-                return this.municipalityCVRField;
-            }
-            set {
-                this.municipalityCVRField = value;
-                this.RaisePropertyChanged("MunicipalityCVR");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/CallContext/1/")]
-    public partial class CallContextType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private string onBehalfOfUserField;
-        
-        private string callersServiceCallIdentifierField;
-        
-        private string accountingInfoField;
-        
-        /// <remarks/>
-        public string OnBehalfOfUser {
-            get {
-                return this.onBehalfOfUserField;
-            }
-            set {
-                this.onBehalfOfUserField = value;
-                this.RaisePropertyChanged("OnBehalfOfUser");
-            }
-        }
-        
-        /// <remarks/>
-        public string CallersServiceCallIdentifier {
-            get {
-                return this.callersServiceCallIdentifierField;
-            }
-            set {
-                this.callersServiceCallIdentifierField = value;
-                this.RaisePropertyChanged("CallersServiceCallIdentifier");
-            }
-        }
-        
-        /// <remarks/>
-        public string AccountingInfo {
-            get {
-                return this.accountingInfoField;
-            }
-            set {
-                this.accountingInfoField = value;
-                this.RaisePropertyChanged("AccountingInfo");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class OpretRequestType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private CallContextType callContextField;
-        
-        private AuthorityContextType authorityContextField;
-        
-        private OpretInputType1 opretInputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/CallContext/1/", Order=0)]
-        public CallContextType CallContext {
-            get {
-                return this.callContextField;
-            }
-            set {
-                this.callContextField = value;
-                this.RaisePropertyChanged("CallContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/", Order=1)]
-        public AuthorityContextType AuthorityContext {
-            get {
-                return this.authorityContextField;
-            }
-            set {
-                this.authorityContextField = value;
-                this.RaisePropertyChanged("AuthorityContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=2)]
-        public OpretInputType1 OpretInput {
-            get {
-                return this.opretInputField;
-            }
-            set {
-                this.opretInputField = value;
-                this.RaisePropertyChanged("OpretInput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", ConfigurationName="STSBruger.BrugerPortType")]
-    public interface BrugerPortType {
-        
-        // CODEGEN: Generating message contract since the operation opret is neither RPC nor document wrapped.
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/opret", ReplyAction="*")]
-        [System.ServiceModel.FaultContractAttribute(typeof(Infrastructure.Soap.STSBruger.ServiceplatformFaultType), Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/opret", Name="ServiceplatformFault", Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(BasicOutputType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
-        Infrastructure.Soap.STSBruger.opretResponse opret(Infrastructure.Soap.STSBruger.opretRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/opret", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.opretResponse> opretAsync(Infrastructure.Soap.STSBruger.opretRequest request);
-        
-        // CODEGEN: Generating message contract since the operation importer is neither RPC nor document wrapped.
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/importer", ReplyAction="*")]
-        [System.ServiceModel.FaultContractAttribute(typeof(Infrastructure.Soap.STSBruger.ServiceplatformFaultType), Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/importer", Name="ServiceplatformFault", Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(BasicOutputType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
-        Infrastructure.Soap.STSBruger.importerResponse importer(Infrastructure.Soap.STSBruger.importerRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/importer", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.importerResponse> importerAsync(Infrastructure.Soap.STSBruger.importerRequest request);
-        
-        // CODEGEN: Generating message contract since the operation passiver is neither RPC nor document wrapped.
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/passiver", ReplyAction="*")]
-        [System.ServiceModel.FaultContractAttribute(typeof(Infrastructure.Soap.STSBruger.ServiceplatformFaultType), Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/passiver", Name="ServiceplatformFault", Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(BasicOutputType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
-        Infrastructure.Soap.STSBruger.passiverResponse passiver(Infrastructure.Soap.STSBruger.passiverRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/passiver", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.passiverResponse> passiverAsync(Infrastructure.Soap.STSBruger.passiverRequest request);
-        
-        // CODEGEN: Generating message contract since the operation laes is neither RPC nor document wrapped.
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/laes", ReplyAction="*")]
-        [System.ServiceModel.FaultContractAttribute(typeof(Infrastructure.Soap.STSBruger.ServiceplatformFaultType), Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/laes", Name="ServiceplatformFault", Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(BasicOutputType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
-        Infrastructure.Soap.STSBruger.laesResponse laes(Infrastructure.Soap.STSBruger.laesRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/laes", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.laesResponse> laesAsync(Infrastructure.Soap.STSBruger.laesRequest request);
-        
-        // CODEGEN: Generating message contract since the operation ret is neither RPC nor document wrapped.
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/ret", ReplyAction="*")]
-        [System.ServiceModel.FaultContractAttribute(typeof(Infrastructure.Soap.STSBruger.ServiceplatformFaultType), Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/ret", Name="ServiceplatformFault", Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(BasicOutputType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
-        Infrastructure.Soap.STSBruger.retResponse ret(Infrastructure.Soap.STSBruger.retRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/ret", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.retResponse> retAsync(Infrastructure.Soap.STSBruger.retRequest request);
-        
-        // CODEGEN: Generating message contract since the operation slet is neither RPC nor document wrapped.
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/slet", ReplyAction="*")]
-        [System.ServiceModel.FaultContractAttribute(typeof(Infrastructure.Soap.STSBruger.ServiceplatformFaultType), Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/slet", Name="ServiceplatformFault", Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(BasicOutputType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
-        Infrastructure.Soap.STSBruger.sletResponse slet(Infrastructure.Soap.STSBruger.sletRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/slet", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.sletResponse> sletAsync(Infrastructure.Soap.STSBruger.sletRequest request);
-        
-        // CODEGEN: Generating message contract since the operation soeg is neither RPC nor document wrapped.
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/soeg", ReplyAction="*")]
-        [System.ServiceModel.FaultContractAttribute(typeof(Infrastructure.Soap.STSBruger.ServiceplatformFaultType), Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/soeg", Name="ServiceplatformFault", Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(BasicOutputType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
-        Infrastructure.Soap.STSBruger.soegResponse soeg(Infrastructure.Soap.STSBruger.soegRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/soeg", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.soegResponse> soegAsync(Infrastructure.Soap.STSBruger.soegRequest request);
-        
-        // CODEGEN: Generating message contract since the operation list is neither RPC nor document wrapped.
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/list", ReplyAction="*")]
-        [System.ServiceModel.FaultContractAttribute(typeof(Infrastructure.Soap.STSBruger.ServiceplatformFaultType), Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/list", Name="ServiceplatformFault", Namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/")]
-        [System.ServiceModel.XmlSerializerFormatAttribute(SupportFaults=true)]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RegistreringType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(BasicOutputType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(RelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(FlerRelationType))]
-        [System.ServiceModel.ServiceKnownTypeAttribute(typeof(OpretInputType))]
-        Infrastructure.Soap.STSBruger.listResponse list(Infrastructure.Soap.STSBruger.listRequest request);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/list", ReplyAction="*")]
-        System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.listResponse> listAsync(Infrastructure.Soap.STSBruger.listRequest request);
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-    public partial class RequestHeaderType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private string transactionUUIDField;
-        
-        /// <remarks/>
-        public string TransactionUUID {
-            get {
-                return this.transactionUUIDField;
-            }
-            set {
-                this.transactionUUIDField = value;
-                this.RaisePropertyChanged("TransactionUUID");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class opretRequest {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="OpretRequest", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.OpretRequestType OpretRequest1;
-        
-        public opretRequest() {
-        }
-        
-        public opretRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.OpretRequestType OpretRequest1) {
-            this.RequestHeader = RequestHeader;
-            this.OpretRequest1 = OpretRequest1;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class opretResponse {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="OpretResponse", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.OpretResponseType OpretResponse1;
-        
-        public opretResponse() {
-        }
-        
-        public opretResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.OpretResponseType OpretResponse1) {
-            this.RequestHeader = RequestHeader;
-            this.OpretResponse1 = OpretResponse1;
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class ImporterRequestType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private CallContextType callContextField;
-        
-        private AuthorityContextType authorityContextField;
-        
-        private ImportInputType importInputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/CallContext/1/", Order=0)]
-        public CallContextType CallContext {
-            get {
-                return this.callContextField;
-            }
-            set {
-                this.callContextField = value;
-                this.RaisePropertyChanged("CallContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/", Order=1)]
-        public AuthorityContextType AuthorityContext {
-            get {
-                return this.authorityContextField;
-            }
-            set {
-                this.authorityContextField = value;
-                this.RaisePropertyChanged("AuthorityContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=2)]
-        public ImportInputType ImportInput {
-            get {
-                return this.importInputField;
-            }
-            set {
-                this.importInputField = value;
-                this.RaisePropertyChanged("ImportInput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class ImportInputType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private BrugerType brugerField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public BrugerType Bruger {
-            get {
-                return this.brugerField;
-            }
-            set {
-                this.brugerField = value;
-                this.RaisePropertyChanged("Bruger");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class ImporterResponseType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private BasicOutputType importOutputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=0)]
-        public BasicOutputType ImportOutput {
-            get {
-                return this.importOutputField;
-            }
-            set {
-                this.importOutputField = value;
-                this.RaisePropertyChanged("ImportOutput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class importerRequest {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="ImporterRequest", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.ImporterRequestType ImporterRequest1;
-        
-        public importerRequest() {
-        }
-        
-        public importerRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ImporterRequestType ImporterRequest1) {
-            this.RequestHeader = RequestHeader;
-            this.ImporterRequest1 = ImporterRequest1;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class importerResponse {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="ImporterResponse", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.ImporterResponseType ImporterResponse1;
-        
-        public importerResponse() {
-        }
-        
-        public importerResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ImporterResponseType ImporterResponse1) {
-            this.RequestHeader = RequestHeader;
-            this.ImporterResponse1 = ImporterResponse1;
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class PassiverRequestType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private CallContextType callContextField;
-        
-        private AuthorityContextType authorityContextField;
-        
-        private UuidNoteInputType passiverInputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/CallContext/1/", Order=0)]
-        public CallContextType CallContext {
-            get {
-                return this.callContextField;
-            }
-            set {
-                this.callContextField = value;
-                this.RaisePropertyChanged("CallContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/", Order=1)]
-        public AuthorityContextType AuthorityContext {
-            get {
-                return this.authorityContextField;
-            }
-            set {
-                this.authorityContextField = value;
-                this.RaisePropertyChanged("AuthorityContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=2)]
-        public UuidNoteInputType PassiverInput {
-            get {
-                return this.passiverInputField;
-            }
-            set {
-                this.passiverInputField = value;
-                this.RaisePropertyChanged("PassiverInput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class UuidNoteInputType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private string uUIDIdentifikatorField;
-        
-        private string noteTekstField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public string UUIDIdentifikator {
-            get {
-                return this.uUIDIdentifikatorField;
-            }
-            set {
-                this.uUIDIdentifikatorField = value;
-                this.RaisePropertyChanged("UUIDIdentifikator");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public string NoteTekst {
-            get {
-                return this.noteTekstField;
-            }
-            set {
-                this.noteTekstField = value;
-                this.RaisePropertyChanged("NoteTekst");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class PassiverResponseType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private BasicOutputType passiverOutputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=0)]
-        public BasicOutputType PassiverOutput {
-            get {
-                return this.passiverOutputField;
-            }
-            set {
-                this.passiverOutputField = value;
-                this.RaisePropertyChanged("PassiverOutput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class passiverRequest {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="PassiverRequest", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.PassiverRequestType PassiverRequest1;
-        
-        public passiverRequest() {
-        }
-        
-        public passiverRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.PassiverRequestType PassiverRequest1) {
-            this.RequestHeader = RequestHeader;
-            this.PassiverRequest1 = PassiverRequest1;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class passiverResponse {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="PassiverResponse", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.PassiverResponseType PassiverResponse1;
-        
-        public passiverResponse() {
-        }
-        
-        public passiverResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.PassiverResponseType PassiverResponse1) {
-            this.RequestHeader = RequestHeader;
-            this.PassiverResponse1 = PassiverResponse1;
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class LaesRequestType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private CallContextType callContextField;
-        
-        private AuthorityContextType authorityContextField;
-        
-        private LaesInputType laesInputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/CallContext/1/", Order=0)]
-        public CallContextType CallContext {
-            get {
-                return this.callContextField;
-            }
-            set {
-                this.callContextField = value;
-                this.RaisePropertyChanged("CallContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/", Order=1)]
-        public AuthorityContextType AuthorityContext {
-            get {
-                return this.authorityContextField;
-            }
-            set {
-                this.authorityContextField = value;
-                this.RaisePropertyChanged("AuthorityContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=2)]
-        public LaesInputType LaesInput {
-            get {
-                return this.laesInputField;
-            }
-            set {
-                this.laesInputField = value;
-                this.RaisePropertyChanged("LaesInput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class LaesInputType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private string uUIDIdentifikatorField;
+        private string[] uUIDIdentifikatorField;
         
         private TidspunktType virkningFraFilterField;
         
@@ -2504,8 +1551,8 @@ namespace Infrastructure.Soap.STSBruger {
         private TidspunktType registreringTilFilterField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public string UUIDIdentifikator {
+        [System.Xml.Serialization.XmlElementAttribute("UUIDIdentifikator", Order=0)]
+        public string[] UUIDIdentifikator {
             get {
                 return this.uUIDIdentifikatorField;
             }
@@ -2574,618 +1621,39 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class LaesResponseType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private LaesOutputType laesOutputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=0)]
-        public LaesOutputType LaesOutput {
-            get {
-                return this.laesOutputField;
-            }
-            set {
-                this.laesOutputField = value;
-                this.RaisePropertyChanged("LaesOutput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class laesRequest {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="LaesRequest", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.LaesRequestType LaesRequest1;
-        
-        public laesRequest() {
-        }
-        
-        public laesRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.LaesRequestType LaesRequest1) {
-            this.RequestHeader = RequestHeader;
-            this.LaesRequest1 = LaesRequest1;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class laesResponse {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="LaesResponse", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.LaesResponseType LaesResponse1;
-        
-        public laesResponse() {
-        }
-        
-        public laesResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.LaesResponseType LaesResponse1) {
-            this.RequestHeader = RequestHeader;
-            this.LaesResponse1 = LaesResponse1;
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class RetRequestType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private CallContextType callContextField;
-        
-        private AuthorityContextType authorityContextField;
-        
-        private RetInputType1 retInputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/CallContext/1/", Order=0)]
-        public CallContextType CallContext {
-            get {
-                return this.callContextField;
-            }
-            set {
-                this.callContextField = value;
-                this.RaisePropertyChanged("CallContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/", Order=1)]
-        public AuthorityContextType AuthorityContext {
-            get {
-                return this.authorityContextField;
-            }
-            set {
-                this.authorityContextField = value;
-                this.RaisePropertyChanged("AuthorityContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=2)]
-        public RetInputType1 RetInput {
-            get {
-                return this.retInputField;
-            }
-            set {
-                this.retInputField = value;
-                this.RaisePropertyChanged("RetInput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RetInputType", Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class RetInputType1 : RetInputType {
-        
-        private AttributListeType attributListeField;
-        
-        private TilstandListeType tilstandListeField;
-        
-        private RelationListeType relationListeField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public AttributListeType AttributListe {
-            get {
-                return this.attributListeField;
-            }
-            set {
-                this.attributListeField = value;
-                this.RaisePropertyChanged("AttributListe");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public TilstandListeType TilstandListe {
-            get {
-                return this.tilstandListeField;
-            }
-            set {
-                this.tilstandListeField = value;
-                this.RaisePropertyChanged("TilstandListe");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public RelationListeType RelationListe {
-            get {
-                return this.relationListeField;
-            }
-            set {
-                this.relationListeField = value;
-                this.RaisePropertyChanged("RelationListe");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(RetInputType1))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class RetInputType : object, System.ComponentModel.INotifyPropertyChanged {
+    public partial class SoegOutputType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private string uUIDIdentifikatorField;
+        private StandardReturType standardReturField;
         
-        private string noteTekstField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public string UUIDIdentifikator {
-            get {
-                return this.uUIDIdentifikatorField;
-            }
-            set {
-                this.uUIDIdentifikatorField = value;
-                this.RaisePropertyChanged("UUIDIdentifikator");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public string NoteTekst {
-            get {
-                return this.noteTekstField;
-            }
-            set {
-                this.noteTekstField = value;
-                this.RaisePropertyChanged("NoteTekst");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class RetResponseType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private BasicOutputType retOutputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=0)]
-        public BasicOutputType RetOutput {
-            get {
-                return this.retOutputField;
-            }
-            set {
-                this.retOutputField = value;
-                this.RaisePropertyChanged("RetOutput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class retRequest {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="RetRequest", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.RetRequestType RetRequest1;
-        
-        public retRequest() {
-        }
-        
-        public retRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.RetRequestType RetRequest1) {
-            this.RequestHeader = RequestHeader;
-            this.RetRequest1 = RetRequest1;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class retResponse {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="RetResponse", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.RetResponseType RetResponse1;
-        
-        public retResponse() {
-        }
-        
-        public retResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.RetResponseType RetResponse1) {
-            this.RequestHeader = RequestHeader;
-            this.RetResponse1 = RetResponse1;
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class SletRequestType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private CallContextType callContextField;
-        
-        private AuthorityContextType authorityContextField;
-        
-        private UuidNoteInputType sletInputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/CallContext/1/", Order=0)]
-        public CallContextType CallContext {
-            get {
-                return this.callContextField;
-            }
-            set {
-                this.callContextField = value;
-                this.RaisePropertyChanged("CallContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/", Order=1)]
-        public AuthorityContextType AuthorityContext {
-            get {
-                return this.authorityContextField;
-            }
-            set {
-                this.authorityContextField = value;
-                this.RaisePropertyChanged("AuthorityContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=2)]
-        public UuidNoteInputType SletInput {
-            get {
-                return this.sletInputField;
-            }
-            set {
-                this.sletInputField = value;
-                this.RaisePropertyChanged("SletInput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class SletResponseType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private BasicOutputType sletOutputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=0)]
-        public BasicOutputType SletOutput {
-            get {
-                return this.sletOutputField;
-            }
-            set {
-                this.sletOutputField = value;
-                this.RaisePropertyChanged("SletOutput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class sletRequest {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="SletRequest", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.SletRequestType SletRequest1;
-        
-        public sletRequest() {
-        }
-        
-        public sletRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.SletRequestType SletRequest1) {
-            this.RequestHeader = RequestHeader;
-            this.SletRequest1 = SletRequest1;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class sletResponse {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="SletResponse", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.SletResponseType SletResponse1;
-        
-        public sletResponse() {
-        }
-        
-        public sletResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.SletResponseType SletResponse1) {
-            this.RequestHeader = RequestHeader;
-            this.SletResponse1 = SletResponse1;
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class SoegRequestType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private CallContextType callContextField;
-        
-        private AuthorityContextType authorityContextField;
-        
-        private SoegInputType1 soegInputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/CallContext/1/", Order=0)]
-        public CallContextType CallContext {
-            get {
-                return this.callContextField;
-            }
-            set {
-                this.callContextField = value;
-                this.RaisePropertyChanged("CallContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/", Order=1)]
-        public AuthorityContextType AuthorityContext {
-            get {
-                return this.authorityContextField;
-            }
-            set {
-                this.authorityContextField = value;
-                this.RaisePropertyChanged("AuthorityContext");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=2)]
-        public SoegInputType1 SoegInput {
-            get {
-                return this.soegInputField;
-            }
-            set {
-                this.soegInputField = value;
-                this.RaisePropertyChanged("SoegInput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class SoegInputType1 : SoegInputType {
-        
-        private AttributListeType attributListeField;
-        
-        private TilstandListeType tilstandListeField;
-        
-        private RelationListeType relationListeField;
+        private string[] idListeField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public AttributListeType AttributListe {
+        public StandardReturType StandardRetur {
             get {
-                return this.attributListeField;
+                return this.standardReturField;
             }
             set {
-                this.attributListeField = value;
-                this.RaisePropertyChanged("AttributListe");
+                this.standardReturField = value;
+                this.RaisePropertyChanged("StandardRetur");
             }
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public TilstandListeType TilstandListe {
+        [System.Xml.Serialization.XmlArrayAttribute(Order=1)]
+        [System.Xml.Serialization.XmlArrayItemAttribute("UUIDIdentifikator", IsNullable=false)]
+        public string[] IdListe {
             get {
-                return this.tilstandListeField;
+                return this.idListeField;
             }
             set {
-                this.tilstandListeField = value;
-                this.RaisePropertyChanged("TilstandListe");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public RelationListeType RelationListe {
-            get {
-                return this.relationListeField;
-            }
-            set {
-                this.relationListeField = value;
-                this.RaisePropertyChanged("RelationListe");
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoegInputType1))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class SoegInputType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private string foersteResultatReferenceField;
-        
-        private string maksimalAntalKvantitetField;
-        
-        private SoegRegistreringType soegRegistreringField;
-        
-        private SoegVirkningType soegVirkningField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType="integer", Order=0)]
-        public string FoersteResultatReference {
-            get {
-                return this.foersteResultatReferenceField;
-            }
-            set {
-                this.foersteResultatReferenceField = value;
-                this.RaisePropertyChanged("FoersteResultatReference");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(DataType="integer", Order=1)]
-        public string MaksimalAntalKvantitet {
-            get {
-                return this.maksimalAntalKvantitetField;
-            }
-            set {
-                this.maksimalAntalKvantitetField = value;
-                this.RaisePropertyChanged("MaksimalAntalKvantitet");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public SoegRegistreringType SoegRegistrering {
-            get {
-                return this.soegRegistreringField;
-            }
-            set {
-                this.soegRegistreringField = value;
-                this.RaisePropertyChanged("SoegRegistrering");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
-        public SoegVirkningType SoegVirkning {
-            get {
-                return this.soegVirkningField;
-            }
-            set {
-                this.soegVirkningField = value;
-                this.RaisePropertyChanged("SoegVirkning");
+                this.idListeField = value;
+                this.RaisePropertyChanged("IdListe");
             }
         }
         
@@ -3200,95 +1668,7 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class SoegRegistreringType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private TidspunktType fraTidspunktField;
-        
-        private TidspunktType tilTidspunktField;
-        
-        private LivscyklusKodeType livscyklusKodeField;
-        
-        private bool livscyklusKodeFieldSpecified;
-        
-        private UnikIdType brugerRefField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public TidspunktType FraTidspunkt {
-            get {
-                return this.fraTidspunktField;
-            }
-            set {
-                this.fraTidspunktField = value;
-                this.RaisePropertyChanged("FraTidspunkt");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
-        public TidspunktType TilTidspunkt {
-            get {
-                return this.tilTidspunktField;
-            }
-            set {
-                this.tilTidspunktField = value;
-                this.RaisePropertyChanged("TilTidspunkt");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
-        public LivscyklusKodeType LivscyklusKode {
-            get {
-                return this.livscyklusKodeField;
-            }
-            set {
-                this.livscyklusKodeField = value;
-                this.RaisePropertyChanged("LivscyklusKode");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlIgnoreAttribute()]
-        public bool LivscyklusKodeSpecified {
-            get {
-                return this.livscyklusKodeFieldSpecified;
-            }
-            set {
-                this.livscyklusKodeFieldSpecified = value;
-                this.RaisePropertyChanged("LivscyklusKodeSpecified");
-            }
-        }
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
-        public UnikIdType BrugerRef {
-            get {
-                return this.brugerRefField;
-            }
-            set {
-                this.brugerRefField = value;
-                this.RaisePropertyChanged("BrugerRef");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -3390,173 +1770,80 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class SoegResponseType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private SoegOutputType soegOutputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=0)]
-        public SoegOutputType SoegOutput {
-            get {
-                return this.soegOutputField;
-            }
-            set {
-                this.soegOutputField = value;
-                this.RaisePropertyChanged("SoegOutput");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class SoegOutputType : object, System.ComponentModel.INotifyPropertyChanged {
+    public partial class SoegRegistreringType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private StandardReturType standardReturField;
+        private TidspunktType fraTidspunktField;
         
-        private string[] idListeField;
+        private TidspunktType tilTidspunktField;
+        
+        private LivscyklusKodeType livscyklusKodeField;
+        
+        private bool livscyklusKodeFieldSpecified;
+        
+        private UnikIdType brugerRefField;
         
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Order=0)]
-        public StandardReturType StandardRetur {
+        public TidspunktType FraTidspunkt {
             get {
-                return this.standardReturField;
+                return this.fraTidspunktField;
             }
             set {
-                this.standardReturField = value;
-                this.RaisePropertyChanged("StandardRetur");
+                this.fraTidspunktField = value;
+                this.RaisePropertyChanged("FraTidspunkt");
             }
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlArrayAttribute(Order=1)]
-        [System.Xml.Serialization.XmlArrayItemAttribute("UUIDIdentifikator", IsNullable=false)]
-        public string[] IdListe {
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public TidspunktType TilTidspunkt {
             get {
-                return this.idListeField;
+                return this.tilTidspunktField;
             }
             set {
-                this.idListeField = value;
-                this.RaisePropertyChanged("IdListe");
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class soegRequest {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="SoegRequest", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.SoegRequestType SoegRequest1;
-        
-        public soegRequest() {
-        }
-        
-        public soegRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.SoegRequestType SoegRequest1) {
-            this.RequestHeader = RequestHeader;
-            this.SoegRequest1 = SoegRequest1;
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
-    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
-    public partial class soegResponse {
-        
-        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
-        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
-        
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="SoegResponse", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.SoegResponseType SoegResponse1;
-        
-        public soegResponse() {
-        }
-        
-        public soegResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.SoegResponseType SoegResponse1) {
-            this.RequestHeader = RequestHeader;
-            this.SoegResponse1 = SoegResponse1;
-        }
-    }
-    
-    /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
-    [System.SerializableAttribute()]
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class ListRequestType : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private CallContextType callContextField;
-        
-        private AuthorityContextType authorityContextField;
-        
-        private ListInputType listInputField;
-        
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/CallContext/1/", Order=0)]
-        public CallContextType CallContext {
-            get {
-                return this.callContextField;
-            }
-            set {
-                this.callContextField = value;
-                this.RaisePropertyChanged("CallContext");
+                this.tilTidspunktField = value;
+                this.RaisePropertyChanged("TilTidspunkt");
             }
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="http://serviceplatformen.dk/xml/schemas/AuthorityContext/1/", Order=1)]
-        public AuthorityContextType AuthorityContext {
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public LivscyklusKodeType LivscyklusKode {
             get {
-                return this.authorityContextField;
+                return this.livscyklusKodeField;
             }
             set {
-                this.authorityContextField = value;
-                this.RaisePropertyChanged("AuthorityContext");
+                this.livscyklusKodeField = value;
+                this.RaisePropertyChanged("LivscyklusKode");
             }
         }
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=2)]
-        public ListInputType ListInput {
+        [System.Xml.Serialization.XmlIgnoreAttribute()]
+        public bool LivscyklusKodeSpecified {
             get {
-                return this.listInputField;
+                return this.livscyklusKodeFieldSpecified;
             }
             set {
-                this.listInputField = value;
-                this.RaisePropertyChanged("ListInput");
+                this.livscyklusKodeFieldSpecified = value;
+                this.RaisePropertyChanged("LivscyklusKodeSpecified");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
+        public UnikIdType BrugerRef {
+            get {
+                return this.brugerRefField;
+            }
+            set {
+                this.brugerRefField = value;
+                this.RaisePropertyChanged("BrugerRef");
             }
         }
         
@@ -3571,14 +1858,238 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(SoegInputType1))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class ListInputType : object, System.ComponentModel.INotifyPropertyChanged {
+    public partial class SoegInputType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private string[] uUIDIdentifikatorField;
+        private string foersteResultatReferenceField;
+        
+        private string maksimalAntalKvantitetField;
+        
+        private SoegRegistreringType soegRegistreringField;
+        
+        private SoegVirkningType soegVirkningField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(DataType="integer", Order=0)]
+        public string FoersteResultatReference {
+            get {
+                return this.foersteResultatReferenceField;
+            }
+            set {
+                this.foersteResultatReferenceField = value;
+                this.RaisePropertyChanged("FoersteResultatReference");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(DataType="integer", Order=1)]
+        public string MaksimalAntalKvantitet {
+            get {
+                return this.maksimalAntalKvantitetField;
+            }
+            set {
+                this.maksimalAntalKvantitetField = value;
+                this.RaisePropertyChanged("MaksimalAntalKvantitet");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public SoegRegistreringType SoegRegistrering {
+            get {
+                return this.soegRegistreringField;
+            }
+            set {
+                this.soegRegistreringField = value;
+                this.RaisePropertyChanged("SoegRegistrering");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=3)]
+        public SoegVirkningType SoegVirkning {
+            get {
+                return this.soegVirkningField;
+            }
+            set {
+                this.soegVirkningField = value;
+                this.RaisePropertyChanged("SoegVirkning");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="SoegInputType", Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class SoegInputType1 : SoegInputType {
+        
+        private AttributListeType attributListeField;
+        
+        private TilstandListeType tilstandListeField;
+        
+        private RelationListeType relationListeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public AttributListeType AttributListe {
+            get {
+                return this.attributListeField;
+            }
+            set {
+                this.attributListeField = value;
+                this.RaisePropertyChanged("AttributListe");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public TilstandListeType TilstandListe {
+            get {
+                return this.tilstandListeField;
+            }
+            set {
+                this.tilstandListeField = value;
+                this.RaisePropertyChanged("TilstandListe");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public RelationListeType RelationListe {
+            get {
+                return this.relationListeField;
+            }
+            set {
+                this.relationListeField = value;
+                this.RaisePropertyChanged("RelationListe");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(RetInputType1))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class RetInputType : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private string uUIDIdentifikatorField;
+        
+        private string noteTekstField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string UUIDIdentifikator {
+            get {
+                return this.uUIDIdentifikatorField;
+            }
+            set {
+                this.uUIDIdentifikatorField = value;
+                this.RaisePropertyChanged("UUIDIdentifikator");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public string NoteTekst {
+            get {
+                return this.noteTekstField;
+            }
+            set {
+                this.noteTekstField = value;
+                this.RaisePropertyChanged("NoteTekst");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="RetInputType", Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class RetInputType1 : RetInputType {
+        
+        private AttributListeType attributListeField;
+        
+        private TilstandListeType tilstandListeField;
+        
+        private RelationListeType relationListeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public AttributListeType AttributListe {
+            get {
+                return this.attributListeField;
+            }
+            set {
+                this.attributListeField = value;
+                this.RaisePropertyChanged("AttributListe");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public TilstandListeType TilstandListe {
+            get {
+                return this.tilstandListeField;
+            }
+            set {
+                this.tilstandListeField = value;
+                this.RaisePropertyChanged("TilstandListe");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public RelationListeType RelationListe {
+            get {
+                return this.relationListeField;
+            }
+            set {
+                this.relationListeField = value;
+                this.RaisePropertyChanged("RelationListe");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class LaesInputType : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private string uUIDIdentifikatorField;
         
         private TidspunktType virkningFraFilterField;
         
@@ -3589,8 +2100,8 @@ namespace Infrastructure.Soap.STSBruger {
         private TidspunktType registreringTilFilterField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("UUIDIdentifikator", Order=0)]
-        public string[] UUIDIdentifikator {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string UUIDIdentifikator {
             get {
                 return this.uUIDIdentifikatorField;
             }
@@ -3659,24 +2170,38 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/")]
-    public partial class ListResponseType : object, System.ComponentModel.INotifyPropertyChanged {
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class UuidNoteInputType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private ListOutputType1 listOutputField;
+        private string uUIDIdentifikatorField;
+        
+        private string noteTekstField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace="urn:oio:sts:organisation:bruger:1.1.3.0", Order=0)]
-        public ListOutputType1 ListOutput {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string UUIDIdentifikator {
             get {
-                return this.listOutputField;
+                return this.uUIDIdentifikatorField;
             }
             set {
-                this.listOutputField = value;
-                this.RaisePropertyChanged("ListOutput");
+                this.uUIDIdentifikatorField = value;
+                this.RaisePropertyChanged("UUIDIdentifikator");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public string NoteTekst {
+            get {
+                return this.noteTekstField;
+            }
+            set {
+                this.noteTekstField = value;
+                this.RaisePropertyChanged("NoteTekst");
             }
         }
         
@@ -3691,36 +2216,46 @@ namespace Infrastructure.Soap.STSBruger {
     }
     
     /// <remarks/>
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(TypeName="ListOutputType", Namespace="urn:oio:sts:organisation:bruger:1.1.3.0")]
-    public partial class ListOutputType1 : ListOutputType {
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class ImportInputType : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private FiltreretOejebliksbilledeType[] filtreretOejebliksbilledeField;
+        private BrugerType brugerField;
         
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute("FiltreretOejebliksbillede", Order=0)]
-        public FiltreretOejebliksbilledeType[] FiltreretOejebliksbillede {
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public BrugerType Bruger {
             get {
-                return this.filtreretOejebliksbilledeField;
+                return this.brugerField;
             }
             set {
-                this.filtreretOejebliksbilledeField = value;
-                this.RaisePropertyChanged("FiltreretOejebliksbillede");
+                this.brugerField = value;
+                this.RaisePropertyChanged("Bruger");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
             }
         }
     }
     
     /// <remarks/>
-    [System.Xml.Serialization.XmlIncludeAttribute(typeof(ListOutputType1))]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.4084.0")]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OpretOutputType))]
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(LaesOutputType))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
-    public partial class ListOutputType : object, System.ComponentModel.INotifyPropertyChanged {
+    public partial class BasicOutputType : object, System.ComponentModel.INotifyPropertyChanged {
         
         private StandardReturType standardReturField;
         
@@ -3746,6 +2281,430 @@ namespace Infrastructure.Soap.STSBruger {
         }
     }
     
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class OpretOutputType : BasicOutputType {
+        
+        private string uUIDIdentifikatorField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string UUIDIdentifikator {
+            get {
+                return this.uUIDIdentifikatorField;
+            }
+            set {
+                this.uUIDIdentifikatorField = value;
+                this.RaisePropertyChanged("UUIDIdentifikator");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class LaesOutputType : BasicOutputType {
+        
+        private FiltreretOejebliksbilledeType filtreretOejebliksbilledeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public FiltreretOejebliksbilledeType FiltreretOejebliksbillede {
+            get {
+                return this.filtreretOejebliksbilledeField;
+            }
+            set {
+                this.filtreretOejebliksbilledeField = value;
+                this.RaisePropertyChanged("FiltreretOejebliksbillede");
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.Xml.Serialization.XmlIncludeAttribute(typeof(OpretInputType1))]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="urn:oio:sagdok:3.0.0")]
+    public partial class OpretInputType : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private string noteTekstField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public string NoteTekst {
+            get {
+                return this.noteTekstField;
+            }
+            set {
+                this.noteTekstField = value;
+                this.RaisePropertyChanged("NoteTekst");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Xml", "4.8.9032.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(TypeName="OpretInputType", Namespace="http://stoettesystemerne.dk/organisation/bruger/6/")]
+    public partial class OpretInputType1 : OpretInputType {
+        
+        private AttributListeType attributListeField;
+        
+        private TilstandListeType tilstandListeField;
+        
+        private RelationListeType relationListeField;
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=0)]
+        public AttributListeType AttributListe {
+            get {
+                return this.attributListeField;
+            }
+            set {
+                this.attributListeField = value;
+                this.RaisePropertyChanged("AttributListe");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=1)]
+        public TilstandListeType TilstandListe {
+            get {
+                return this.tilstandListeField;
+            }
+            set {
+                this.tilstandListeField = value;
+                this.RaisePropertyChanged("TilstandListe");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Order=2)]
+        public RelationListeType RelationListe {
+            get {
+                return this.relationListeField;
+            }
+            set {
+                this.relationListeField = value;
+                this.RaisePropertyChanged("RelationListe");
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class opretRequest {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.OpretInputType1 OpretInput;
+        
+        public opretRequest() {
+        }
+        
+        public opretRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.OpretInputType1 OpretInput) {
+            this.RequestHeader = RequestHeader;
+            this.OpretInput = OpretInput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class opretResponse {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.OpretOutputType OpretOutput;
+        
+        public opretResponse() {
+        }
+        
+        public opretResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.OpretOutputType OpretOutput) {
+            this.RequestHeader = RequestHeader;
+            this.OpretOutput = OpretOutput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class importerRequest {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.ImportInputType ImportInput;
+        
+        public importerRequest() {
+        }
+        
+        public importerRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ImportInputType ImportInput) {
+            this.RequestHeader = RequestHeader;
+            this.ImportInput = ImportInput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class importerResponse {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.BasicOutputType ImportOutput;
+        
+        public importerResponse() {
+        }
+        
+        public importerResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.BasicOutputType ImportOutput) {
+            this.RequestHeader = RequestHeader;
+            this.ImportOutput = ImportOutput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class passiverRequest {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.UuidNoteInputType PassiverInput;
+        
+        public passiverRequest() {
+        }
+        
+        public passiverRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.UuidNoteInputType PassiverInput) {
+            this.RequestHeader = RequestHeader;
+            this.PassiverInput = PassiverInput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class passiverResponse {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.BasicOutputType PassiverOutput;
+        
+        public passiverResponse() {
+        }
+        
+        public passiverResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.BasicOutputType PassiverOutput) {
+            this.RequestHeader = RequestHeader;
+            this.PassiverOutput = PassiverOutput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class laesRequest {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.LaesInputType LaesInput;
+        
+        public laesRequest() {
+        }
+        
+        public laesRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.LaesInputType LaesInput) {
+            this.RequestHeader = RequestHeader;
+            this.LaesInput = LaesInput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class laesResponse {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.LaesOutputType LaesOutput;
+        
+        public laesResponse() {
+        }
+        
+        public laesResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.LaesOutputType LaesOutput) {
+            this.RequestHeader = RequestHeader;
+            this.LaesOutput = LaesOutput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class retRequest {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.RetInputType1 RetInput;
+        
+        public retRequest() {
+        }
+        
+        public retRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.RetInputType1 RetInput) {
+            this.RequestHeader = RequestHeader;
+            this.RetInput = RetInput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class retResponse {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.BasicOutputType RetOutput;
+        
+        public retResponse() {
+        }
+        
+        public retResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.BasicOutputType RetOutput) {
+            this.RequestHeader = RequestHeader;
+            this.RetOutput = RetOutput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class sletRequest {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.UuidNoteInputType SletInput;
+        
+        public sletRequest() {
+        }
+        
+        public sletRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.UuidNoteInputType SletInput) {
+            this.RequestHeader = RequestHeader;
+            this.SletInput = SletInput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class sletResponse {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.BasicOutputType SletOutput;
+        
+        public sletResponse() {
+        }
+        
+        public sletResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.BasicOutputType SletOutput) {
+            this.RequestHeader = RequestHeader;
+            this.SletOutput = SletOutput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class soegRequest {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.SoegInputType1 SoegInput;
+        
+        public soegRequest() {
+        }
+        
+        public soegRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.SoegInputType1 SoegInput) {
+            this.RequestHeader = RequestHeader;
+            this.SoegInput = SoegInput;
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [System.ServiceModel.MessageContractAttribute(IsWrapped=false)]
+    public partial class soegResponse {
+        
+        [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
+        public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
+        
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.SoegOutputType SoegOutput;
+        
+        public soegResponse() {
+        }
+        
+        public soegResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.SoegOutputType SoegOutput) {
+            this.RequestHeader = RequestHeader;
+            this.SoegOutput = SoegOutput;
+        }
+    }
+    
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -3755,15 +2714,15 @@ namespace Infrastructure.Soap.STSBruger {
         [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
         public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="ListRequest", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.ListRequestType ListRequest1;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.ListInputType ListInput;
         
         public listRequest() {
         }
         
-        public listRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ListRequestType ListRequest1) {
+        public listRequest(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ListInputType ListInput) {
             this.RequestHeader = RequestHeader;
-            this.ListRequest1 = ListRequest1;
+            this.ListInput = ListInput;
         }
     }
     
@@ -3776,15 +2735,15 @@ namespace Infrastructure.Soap.STSBruger {
         [System.ServiceModel.MessageHeaderAttribute(Namespace="http://kombit.dk/xml/schemas/RequestHeader/1/")]
         public Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader;
         
-        [System.ServiceModel.MessageBodyMemberAttribute(Name="ListResponse", Namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Bruger/5/", Order=0)]
-        public Infrastructure.Soap.STSBruger.ListResponseType ListResponse1;
+        [System.ServiceModel.MessageBodyMemberAttribute(Namespace="http://stoettesystemerne.dk/organisation/bruger/6/", Order=0)]
+        public Infrastructure.Soap.STSBruger.ListOutputType1 ListOutput;
         
         public listResponse() {
         }
         
-        public listResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ListResponseType ListResponse1) {
+        public listResponse(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ListOutputType1 ListOutput) {
             this.RequestHeader = RequestHeader;
-            this.ListResponse1 = ListResponse1;
+            this.ListOutput = ListOutput;
         }
     }
     
@@ -3820,13 +2779,13 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.opret(request);
         }
         
-        public Infrastructure.Soap.STSBruger.OpretResponseType opret(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.OpretRequestType OpretRequest1) {
+        public Infrastructure.Soap.STSBruger.OpretOutputType opret(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.OpretInputType1 OpretInput) {
             Infrastructure.Soap.STSBruger.opretRequest inValue = new Infrastructure.Soap.STSBruger.opretRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.OpretRequest1 = OpretRequest1;
+            inValue.OpretInput = OpretInput;
             Infrastructure.Soap.STSBruger.opretResponse retVal = ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).opret(inValue);
             RequestHeader = retVal.RequestHeader;
-            return retVal.OpretResponse1;
+            return retVal.OpretOutput;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -3834,10 +2793,10 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.opretAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.opretResponse> opretAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.OpretRequestType OpretRequest1) {
+        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.opretResponse> opretAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.OpretInputType1 OpretInput) {
             Infrastructure.Soap.STSBruger.opretRequest inValue = new Infrastructure.Soap.STSBruger.opretRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.OpretRequest1 = OpretRequest1;
+            inValue.OpretInput = OpretInput;
             return ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).opretAsync(inValue);
         }
         
@@ -3846,13 +2805,13 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.importer(request);
         }
         
-        public Infrastructure.Soap.STSBruger.ImporterResponseType importer(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ImporterRequestType ImporterRequest1) {
+        public Infrastructure.Soap.STSBruger.BasicOutputType importer(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ImportInputType ImportInput) {
             Infrastructure.Soap.STSBruger.importerRequest inValue = new Infrastructure.Soap.STSBruger.importerRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.ImporterRequest1 = ImporterRequest1;
+            inValue.ImportInput = ImportInput;
             Infrastructure.Soap.STSBruger.importerResponse retVal = ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).importer(inValue);
             RequestHeader = retVal.RequestHeader;
-            return retVal.ImporterResponse1;
+            return retVal.ImportOutput;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -3860,10 +2819,10 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.importerAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.importerResponse> importerAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ImporterRequestType ImporterRequest1) {
+        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.importerResponse> importerAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ImportInputType ImportInput) {
             Infrastructure.Soap.STSBruger.importerRequest inValue = new Infrastructure.Soap.STSBruger.importerRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.ImporterRequest1 = ImporterRequest1;
+            inValue.ImportInput = ImportInput;
             return ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).importerAsync(inValue);
         }
         
@@ -3872,13 +2831,13 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.passiver(request);
         }
         
-        public Infrastructure.Soap.STSBruger.PassiverResponseType passiver(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.PassiverRequestType PassiverRequest1) {
+        public Infrastructure.Soap.STSBruger.BasicOutputType passiver(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.UuidNoteInputType PassiverInput) {
             Infrastructure.Soap.STSBruger.passiverRequest inValue = new Infrastructure.Soap.STSBruger.passiverRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.PassiverRequest1 = PassiverRequest1;
+            inValue.PassiverInput = PassiverInput;
             Infrastructure.Soap.STSBruger.passiverResponse retVal = ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).passiver(inValue);
             RequestHeader = retVal.RequestHeader;
-            return retVal.PassiverResponse1;
+            return retVal.PassiverOutput;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -3886,10 +2845,10 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.passiverAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.passiverResponse> passiverAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.PassiverRequestType PassiverRequest1) {
+        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.passiverResponse> passiverAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.UuidNoteInputType PassiverInput) {
             Infrastructure.Soap.STSBruger.passiverRequest inValue = new Infrastructure.Soap.STSBruger.passiverRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.PassiverRequest1 = PassiverRequest1;
+            inValue.PassiverInput = PassiverInput;
             return ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).passiverAsync(inValue);
         }
         
@@ -3898,13 +2857,13 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.laes(request);
         }
         
-        public Infrastructure.Soap.STSBruger.LaesResponseType laes(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.LaesRequestType LaesRequest1) {
+        public Infrastructure.Soap.STSBruger.LaesOutputType laes(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.LaesInputType LaesInput) {
             Infrastructure.Soap.STSBruger.laesRequest inValue = new Infrastructure.Soap.STSBruger.laesRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.LaesRequest1 = LaesRequest1;
+            inValue.LaesInput = LaesInput;
             Infrastructure.Soap.STSBruger.laesResponse retVal = ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).laes(inValue);
             RequestHeader = retVal.RequestHeader;
-            return retVal.LaesResponse1;
+            return retVal.LaesOutput;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -3912,10 +2871,10 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.laesAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.laesResponse> laesAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.LaesRequestType LaesRequest1) {
+        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.laesResponse> laesAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.LaesInputType LaesInput) {
             Infrastructure.Soap.STSBruger.laesRequest inValue = new Infrastructure.Soap.STSBruger.laesRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.LaesRequest1 = LaesRequest1;
+            inValue.LaesInput = LaesInput;
             return ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).laesAsync(inValue);
         }
         
@@ -3924,13 +2883,13 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.ret(request);
         }
         
-        public Infrastructure.Soap.STSBruger.RetResponseType ret(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.RetRequestType RetRequest1) {
+        public Infrastructure.Soap.STSBruger.BasicOutputType ret(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.RetInputType1 RetInput) {
             Infrastructure.Soap.STSBruger.retRequest inValue = new Infrastructure.Soap.STSBruger.retRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.RetRequest1 = RetRequest1;
+            inValue.RetInput = RetInput;
             Infrastructure.Soap.STSBruger.retResponse retVal = ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).ret(inValue);
             RequestHeader = retVal.RequestHeader;
-            return retVal.RetResponse1;
+            return retVal.RetOutput;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -3938,10 +2897,10 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.retAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.retResponse> retAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.RetRequestType RetRequest1) {
+        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.retResponse> retAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.RetInputType1 RetInput) {
             Infrastructure.Soap.STSBruger.retRequest inValue = new Infrastructure.Soap.STSBruger.retRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.RetRequest1 = RetRequest1;
+            inValue.RetInput = RetInput;
             return ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).retAsync(inValue);
         }
         
@@ -3950,13 +2909,13 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.slet(request);
         }
         
-        public Infrastructure.Soap.STSBruger.SletResponseType slet(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.SletRequestType SletRequest1) {
+        public Infrastructure.Soap.STSBruger.BasicOutputType slet(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.UuidNoteInputType SletInput) {
             Infrastructure.Soap.STSBruger.sletRequest inValue = new Infrastructure.Soap.STSBruger.sletRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.SletRequest1 = SletRequest1;
+            inValue.SletInput = SletInput;
             Infrastructure.Soap.STSBruger.sletResponse retVal = ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).slet(inValue);
             RequestHeader = retVal.RequestHeader;
-            return retVal.SletResponse1;
+            return retVal.SletOutput;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -3964,10 +2923,10 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.sletAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.sletResponse> sletAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.SletRequestType SletRequest1) {
+        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.sletResponse> sletAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.UuidNoteInputType SletInput) {
             Infrastructure.Soap.STSBruger.sletRequest inValue = new Infrastructure.Soap.STSBruger.sletRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.SletRequest1 = SletRequest1;
+            inValue.SletInput = SletInput;
             return ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).sletAsync(inValue);
         }
         
@@ -3976,13 +2935,13 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.soeg(request);
         }
         
-        public Infrastructure.Soap.STSBruger.SoegResponseType soeg(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.SoegRequestType SoegRequest1) {
+        public Infrastructure.Soap.STSBruger.SoegOutputType soeg(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.SoegInputType1 SoegInput) {
             Infrastructure.Soap.STSBruger.soegRequest inValue = new Infrastructure.Soap.STSBruger.soegRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.SoegRequest1 = SoegRequest1;
+            inValue.SoegInput = SoegInput;
             Infrastructure.Soap.STSBruger.soegResponse retVal = ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).soeg(inValue);
             RequestHeader = retVal.RequestHeader;
-            return retVal.SoegResponse1;
+            return retVal.SoegOutput;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -3990,10 +2949,10 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.soegAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.soegResponse> soegAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.SoegRequestType SoegRequest1) {
+        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.soegResponse> soegAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.SoegInputType1 SoegInput) {
             Infrastructure.Soap.STSBruger.soegRequest inValue = new Infrastructure.Soap.STSBruger.soegRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.SoegRequest1 = SoegRequest1;
+            inValue.SoegInput = SoegInput;
             return ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).soegAsync(inValue);
         }
         
@@ -4002,13 +2961,13 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.list(request);
         }
         
-        public Infrastructure.Soap.STSBruger.ListResponseType list(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ListRequestType ListRequest1) {
+        public Infrastructure.Soap.STSBruger.ListOutputType1 list(ref Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ListInputType ListInput) {
             Infrastructure.Soap.STSBruger.listRequest inValue = new Infrastructure.Soap.STSBruger.listRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.ListRequest1 = ListRequest1;
+            inValue.ListInput = ListInput;
             Infrastructure.Soap.STSBruger.listResponse retVal = ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).list(inValue);
             RequestHeader = retVal.RequestHeader;
-            return retVal.ListResponse1;
+            return retVal.ListOutput;
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -4016,10 +2975,10 @@ namespace Infrastructure.Soap.STSBruger {
             return base.Channel.listAsync(request);
         }
         
-        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.listResponse> listAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ListRequestType ListRequest1) {
+        public System.Threading.Tasks.Task<Infrastructure.Soap.STSBruger.listResponse> listAsync(Infrastructure.Soap.STSBruger.RequestHeaderType RequestHeader, Infrastructure.Soap.STSBruger.ListInputType ListInput) {
             Infrastructure.Soap.STSBruger.listRequest inValue = new Infrastructure.Soap.STSBruger.listRequest();
             inValue.RequestHeader = RequestHeader;
-            inValue.ListRequest1 = ListRequest1;
+            inValue.ListInput = ListInput;
             return ((Infrastructure.Soap.STSBruger.BrugerPortType)(this)).listAsync(inValue);
         }
     }

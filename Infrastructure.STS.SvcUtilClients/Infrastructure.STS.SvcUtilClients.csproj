@@ -1,0 +1,260 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2DC50C99-0A51-4FAC-B53B-54401B72D699}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Infrastructure.STS.SvcUtilClients</RootNamespace>
+    <AssemblyName>Infrastructure.STS.SvcUtilClients</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="OrganisationSystemService.cs" />
+    <Compile Include="VirksomhedService.cs" />
+    <Compile Include="OrganisationService.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Xml.Serialization" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <PackageReference Include="System.ServiceModel.Duplex" Version="4.10.*" />
+    <PackageReference Include="System.ServiceModel.Http" Version="4.10.*" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.10.*" />
+    <PackageReference Include="System.ServiceModel.Security" Version="4.10.*" />
+    <PackageReference Include="System.ServiceModel.Federation" Version="4.10.*" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="OrganisationSystem\OrganisationSystemOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\run.bat" />
+    <None Include="OrganisationSystem\wsdl\Adresse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\AdresseBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\AdresseOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\Bruger.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\BrugerBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\BrugerOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\Facet.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\FacetBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\FacetOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\GenerelleDefinitioner.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\Interessefaellesskab.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\InteressefaellesskabBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\InteressefaellesskabOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\ItSystem.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\ItSystemBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\ItSystemOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\Klasse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\KlasseBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\KlasseOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\Klassifikation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\KlassifikationBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\KlassifikationOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\KlassifikationSystemOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\Myndighed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\MyndighedBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\MyndighedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\OIOIDWS.wsdl" />
+    <None Include="OrganisationSystem\wsdl\Organisation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\OrganisationAdministrationOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\OrganisationBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\OrganisationEnhed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\OrganisationEnhedBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\OrganisationEnhedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\OrganisationFaelles.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\OrganisationFunktion.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\OrganisationFunktionBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\OrganisationFunktionOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\OrganisationOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\OrganisationSystem.wsdl" />
+    <None Include="OrganisationSystem\wsdl\OrganisationSystemOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\Part.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\Person.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\PersonBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\PersonOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\RequestHeader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\SagDokObjekt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\Virksomhed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\VirksomhedBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="OrganisationSystem\wsdl\VirksomhedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\OrganisationServiceMsg.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\run.bat" />
+    <None Include="Organisation\wsdl\GenerelleDefinitioner.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\wsdl\OIOIDWS.wsdl" />
+    <None Include="Organisation\wsdl\Organisation.wsdl" />
+    <None Include="Organisation\wsdl\Organisation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\wsdl\OrganisationBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\wsdl\OrganisationFaelles.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\wsdl\OrganisationOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\wsdl\Part.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\wsdl\RequestHeader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Organisation\wsdl\SagDokObjekt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="runall.bat" />
+    <None Include="Virksomhed\run.bat" />
+    <None Include="Virksomhed\VirksomhedServiceMsg.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\wsdl\GenerelleDefinitioner.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\wsdl\OIOIDWS.wsdl" />
+    <None Include="Virksomhed\wsdl\Part.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\wsdl\RequestHeader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\wsdl\SagDokObjekt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\wsdl\Virksomhed.wsdl" />
+    <None Include="Virksomhed\wsdl\Virksomhed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\wsdl\VirksomhedBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Virksomhed\wsdl\VirksomhedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+</Project>

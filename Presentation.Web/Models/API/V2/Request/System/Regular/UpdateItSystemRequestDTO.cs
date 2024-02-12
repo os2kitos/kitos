@@ -30,7 +30,7 @@ namespace Presentation.Web.Models.API.V2.Request.System.Regular
         /// <summary>
         /// Former name of IT-System (if any)
         /// </summary>
-        public string FormerName { get; set; }
+        public string PreviousName { get; set; }
 
         /// <summary>
         /// Description

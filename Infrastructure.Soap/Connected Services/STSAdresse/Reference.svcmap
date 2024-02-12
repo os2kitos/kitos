@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="9a44dec2-629a-4d2e-aac9-1b170cf2c16c" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+<ReferenceGroup xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ID="f1a2e688-920c-41ac-8875-768eca965b11" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
   <ClientOptions>
     <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
     <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
@@ -19,21 +19,19 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="C:\Projects\kitos\Infrastructure.Soap\Adresse\wsdl\context\AdresseService.wsdl" Protocol="file" SourceId="1" />
+    <MetadataSource Address="C:\Temp\v6_0_0_0\wsdl\Adresse.wsdl" Protocol="file" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="ServiceplatformFault_1.xsd" MetadataType="Schema" ID="c3c167f2-61ab-4b7e-aaee-f33102747d63" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Adresse/sp/ServiceplatformFault_1.xsd" />
-    <MetadataFile FileName="GenerelleDefinitioner.xsd" MetadataType="Schema" ID="1f0e75f9-3733-4557-b7bb-e1a824167aaa" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Adresse/SF1500_EP_FS1/xsd/1.1.STS-3/GenerelleDefinitioner.xsd" />
-    <MetadataFile FileName="policies.wsdl" MetadataType="Wsdl" ID="30a69032-2776-4596-ba3f-8bc6e5b4d241" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Adresse/wsdl/context/policies.wsdl" />
-    <MetadataFile FileName="AdresseOperationer.xsd" MetadataType="Schema" ID="1b69b484-b11e-46f7-9866-561cde2262b6" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Adresse/SF1500_EP_FS1/xsd/1.1.STS-3/AdresseOperationer.xsd" />
-    <MetadataFile FileName="ServiceplatformFaultMessage.wsdl" MetadataType="Wsdl" ID="05e58ec9-5ecb-463a-9027-1193e1009a75" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Adresse/sp/ServiceplatformFaultMessage_1.wsdl" />
-    <MetadataFile FileName="AdresseService.wsdl" MetadataType="Wsdl" ID="f363b0ff-f6dc-4287-a98d-c15984c23637" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Adresse/wsdl/context/AdresseService.wsdl" />
-    <MetadataFile FileName="RequestHeader.xsd" MetadataType="Schema" ID="25ea976b-27ea-46bd-8e45-fe87c7cf117f" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Adresse/SF1500_EP_FS1/xsd/common/RequestHeader.xsd" />
-    <MetadataFile FileName="AdresseServiceMsg.xsd" MetadataType="Schema" ID="512219bb-d5d7-411c-8748-dbfc106b9db5" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Adresse/AdresseServiceMsg.xsd" />
-    <MetadataFile FileName="Adresse.xsd" MetadataType="Schema" ID="6f49cfcc-773c-40f0-a9fb-fd3a899a45b5" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Adresse/SF1500_EP_FS1/xsd/1.1.STS-3/Adresse.xsd" />
-    <MetadataFile FileName="CallContext_1.xsd" MetadataType="Schema" ID="2346cf5a-35e4-449a-b477-d861c1604b8a" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Adresse/sp/CallContext_1.xsd" />
-    <MetadataFile FileName="AuthorityContext_1.xsd" MetadataType="Schema" ID="9826ae0b-d391-4261-906f-f78c639241c4" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Adresse/sp/AuthorityContext_1.xsd" />
-    <MetadataFile FileName="SagDokObjekt.xsd" MetadataType="Schema" ID="e1b12009-f62b-4b82-b948-540d09fff017" SourceId="1" SourceUrl="file:///C:/Projects/kitos/Infrastructure.Soap/Adresse/SF1500_EP_FS1/xsd/common/SagDokObjekt.xsd" />
+    <MetadataFile FileName="RequestHeader.xsd" MetadataType="Schema" ID="8e91c554-483c-415c-aa40-5655a48cdcb7" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/RequestHeader.xsd" />
+    <MetadataFile FileName="AdresseOperationer.xsd" MetadataType="Schema" ID="2c8b68b3-88a4-4bf5-af1b-7d52b75942f3" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/AdresseOperationer.xsd" />
+    <MetadataFile FileName="Part.xsd" MetadataType="Schema" ID="711cc68e-1041-4838-94d4-7e2fba539258" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Part.xsd" />
+    <MetadataFile FileName="GenerelleDefinitioner.xsd" MetadataType="Schema" ID="6bb12236-5680-499b-8970-3d05c4fbb064" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/GenerelleDefinitioner.xsd" />
+    <MetadataFile FileName="OIOIDWS.wsdl" MetadataType="Wsdl" ID="48261a1c-9c5a-4307-8a94-e7c496e17e8a" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/policies/OIOIDWS.wsdl" />
+    <MetadataFile FileName="SagDokObjekt.xsd" MetadataType="Schema" ID="eb958f98-d35e-4c37-a273-4cfb324bf0d3" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/common/SagDokObjekt.xsd" />
+    <MetadataFile FileName="OrganisationFaelles.xsd" MetadataType="Schema" ID="17e03556-8f90-4847-ab8c-b4ed73209189" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/OrganisationFaelles.xsd" />
+    <MetadataFile FileName="AdresseService.wsdl" MetadataType="Wsdl" ID="7eeecd80-a1fe-4a78-8157-d3f44d5dcacd" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/wsdl/Adresse.wsdl" />
+    <MetadataFile FileName="Adresse.xsd" MetadataType="Schema" ID="26107803-ee96-4d10-83ba-90319969eab6" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/Adresse.xsd" />
+    <MetadataFile FileName="AdresseBesked.xsd" MetadataType="Schema" ID="187cbe01-9a5c-4014-b79f-5833ba1b9771" SourceId="1" SourceUrl="file:///C:/Temp/v6_0_0_0/xsd/6.0.STS-0/AdresseBesked.xsd" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
