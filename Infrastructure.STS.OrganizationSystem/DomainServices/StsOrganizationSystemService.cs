@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Core.Abstractions.Types;
@@ -8,47 +9,47 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.SSO;
-using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
-using Infrastructure.STS.OrganizationSystem.OrganisationSystem;
+using Infrastructure.STS.Common.Model.Token;
+using Kombit.InfrastructureSamples.OrganisationSystemService;
+using Kombit.InfrastructureSamples.Token;
 using Serilog;
+using RequestHeaderType = Kombit.InfrastructureSamples.OrganisationSystemService.RequestHeaderType;
 
 namespace Infrastructure.STS.OrganizationSystem.DomainServices
 {
     public class StsOrganizationSystemService : IStsOrganizationSystemService
     {
         private readonly IStsOrganizationService _organizationService;
+        private readonly StsOrganisationIntegrationConfiguration _configuration;
+        private readonly TokenFetcher _tokenFetcher;
         private readonly ILogger _logger;
-        private readonly string _certificateThumbprint;
-        private readonly string _serviceRoot;
 
-        public StsOrganizationSystemService(IStsOrganizationService organizationService, StsOrganisationIntegrationConfiguration configuration, ILogger logger)
+        public StsOrganizationSystemService(IStsOrganizationService organizationService, StsOrganisationIntegrationConfiguration configuration, TokenFetcher tokenFetcher, ILogger logger)
         {
             _organizationService = organizationService;
+            _configuration = configuration;
+            _tokenFetcher = tokenFetcher;
             _logger = logger;
-            _certificateThumbprint = configuration.CertificateThumbprint;
-            _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/OrganisationSystem/5";
         }
 
         public Result<ExternalOrganizationUnit, DetailedOperationError<ResolveOrganizationTreeError>> ResolveOrganizationTree(Organization organization)
         {
-            //Search for org units by org uuid
-            using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
+            if (organization == null) throw new ArgumentNullException(nameof(organization));
 
+            //Search for org units by org uuid
             const int pageSize = 1000;
             int currentPageSize;
             var totalIds = 0;
             var totalResults = new List<(Guid, RegistreringType5)>();
 
-            using var client = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
-            var channel = client.ChannelFactory.CreateChannel();
+            var port = CreatePort(organization.Cvr);
             do
             {
-                var listRequest = CreateOrgHierarchyRequest(organization.Cvr, pageSize, totalIds);
-                var listResponse = LoadOrganizationHierarchy(channel, listRequest);
-
-                var listStatusResult = listResponse.FremsoegobjekthierarkiResponse1.FremsoegObjekthierarkiOutput.StandardRetur;
+                var listRequest = CreateOrgHierarchyRequest(organization.Uuid.ToString(), pageSize, totalIds);
+                var listResponse = LoadOrganizationHierarchy(port, listRequest);
+                var listStatusResult = listResponse.FremsoegObjekthierarkiOutput.StandardRetur;
                 var listStsError = listStatusResult.StatusKode.ParseStsErrorFromStandardResultCode();
                 if (listStsError.HasValue)
                 {
@@ -56,7 +57,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
                     return new DetailedOperationError<ResolveOrganizationTreeError>(OperationFailure.UnknownError, ResolveOrganizationTreeError.FailedLoadingOrgUnits);
                 }
 
-                var listResponseUnits = listResponse.FremsoegobjekthierarkiResponse1.FremsoegObjekthierarkiOutput.OrganisationEnheder;
+                var listResponseUnits = listResponse.FremsoegObjekthierarkiOutput.OrganisationEnheder;
                 var numberOfReturnedUnits = listResponseUnits.Length;
 
                 totalIds += numberOfReturnedUnits;
@@ -143,12 +144,30 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             }
 
             return idToConvertedChildren[root.Item1];
-
         }
-        
-        private static fremsoegobjekthierarkiResponse LoadOrganizationHierarchy(OrganisationSystemPortType channel, fremsoegobjekthierarkiRequest request)
+
+        private OrganisationSystemPortType CreatePort(string cvr)
         {
-            return new RetriedIntegrationRequest<fremsoegobjekthierarkiResponse>(() => channel.fremsoegobjekthierarkiAsync(request).Result).Execute();
+            var token = _tokenFetcher.IssueToken(_configuration.OrgService6EntityId, cvr);
+            var client = new OrganisationSystemPortTypeClient();
+
+            var identity = EndpointIdentity.CreateDnsIdentity(_configuration.ServiceCertificateAliasOrg);
+            var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
+            client.Endpoint.Address = endpointAddress;
+            var certificate = CertificateLoader.LoadCertificate(
+                StoreName.My,
+                StoreLocation.LocalMachine,
+                _configuration.ClientCertificateThumbprint
+            );
+            client.ClientCredentials.ClientCertificate.Certificate = certificate;
+            client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
+
+            return client.ChannelFactory.CreateChannelWithIssuedToken(token);
+        }
+
+        private static fremsoegobjekthierarkiResponse LoadOrganizationHierarchy(OrganisationSystemPortType port, fremsoegobjekthierarkiRequest request)
+        {
+            return new RetriedIntegrationRequest<fremsoegobjekthierarkiResponse>(() => port.fremsoegobjekthierarkiAsync(request).Result).Execute();
         }
 
         private static Stack<Guid> CreateOrgUnitConversionStack((Guid, RegistreringType5) root, Dictionary<Guid, List<(Guid, RegistreringType5)>> unitsByParent)
@@ -190,38 +209,29 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             }
         }
 
-        public static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(string municipalityCvr, int pageSize, int skip = 0)
+        private static fremsoegobjekthierarkiRequest CreateOrgHierarchyRequest(string uuid, int pageSize, int skip = 0)
         {
             var listRequest = new fremsoegobjekthierarkiRequest
             {
-                FremsoegobjekthierarkiRequest1 = new FremsoegobjekthierarkiRequestType()
-                { 
-                    AuthorityContext = new AuthorityContextType()
-                    {
-                        MunicipalityCVR = municipalityCvr
-                    },
-                    FremsoegObjekthierarkiInput = new FremsoegObjekthierarkiInputType()
-                    {
-                        MaksimalAntalKvantitet = pageSize.ToString("D"),
-                        FoersteResultatReference = skip.ToString("D")
-                    }
-                },
-            };
-            return listRequest;
-        }
-
-        private static OrganisationSystemPortTypeClient CreateClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
-        {
-            return new OrganisationSystemPortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
-            {
-                ClientCredentials =
+                RequestHeader = new RequestHeaderType
                 {
-                    ClientCertificate =
-                    {
-                        Certificate = certificate
-                    }
+                    TransactionUUID = Guid.NewGuid().ToString(),
+                },
+                FremsoegObjekthierarkiInput = new FremsoegObjekthierarkiInputType()
+                {
+                    MaksimalAntalKvantitet = pageSize.ToString("D"),
+                    FoersteResultatReference = skip.ToString("D"),
+                    /*BrugerSoegEgenskab = new EgenskabType3(),
+                    InteressefaellesskabSoegEgenskab = new EgenskabType4(),
+                    ItSystemSoegEgenskab = new EgenskabType5(),
+                    OrganisationEnhedSoegEgenskab = new EgenskabType1(),
+                    OrganisationFunktionSoegEgenskab = new EgenskabType2(),
+                    OrganisationSoegEgenskab = new EgenskabType(),
+                    SoegRegistrering = new SoegRegistreringType(),
+                    SoegVirkning = new SoegVirkningType()*/
                 }
             };
+            return listRequest;
         }
     }
 }

@@ -8,6 +8,7 @@
         DuplicateOrganizationResults,
         FailedToSaveUuidOnKitosOrganization,
         MissingServiceAgreement,
-        ExistingServiceAgreementIssue
+        ExistingServiceAgreementIssue,
+        UserContextDoesNotExistOnSystem
     }
 }

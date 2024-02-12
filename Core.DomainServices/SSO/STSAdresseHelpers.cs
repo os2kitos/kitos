@@ -6,19 +6,12 @@ namespace Core.DomainServices.SSO
 {
     internal static class StsAdresseHelpers
     {
-        public static laesRequest CreateStsAdresseLaesRequest(string municipalityCvr, string uuid)
+        public static laesRequest CreateStsAdresseLaesRequest(string uuid)
         {
             var laesInputType = new LaesInputType {UUIDIdentifikator = uuid};
             var laesRequest = new laesRequest
             {
-                LaesRequest1 = new LaesRequestType
-                {
-                    LaesInput = laesInputType,
-                    AuthorityContext = new AuthorityContextType()
-                    {
-                        MunicipalityCVR = municipalityCvr 
-                    }
-                }
+                LaesInput = laesInputType,
             };
             return laesRequest;
         }

@@ -12,7 +12,10 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
+using Presentation.Web.Models.API.V2.Request.System.Regular;
+using Presentation.Web.Models.API.V2.Response.System;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
@@ -23,6 +26,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
     [Collection(nameof(SequentialTestGroup))]
     public class ItSystemUsageOverviewReadModelsTest : WithAutoFixture
     {
+        private const string TestCvr = "11224455";
+
         [Fact]
         public async Task Can_Query_And_Page_ReadModels_Using_Db_Id()
         {
@@ -78,6 +83,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var organizationName = TestEnvironment.DefaultOrganizationName;
 
             var systemName = A<string>();
+            var systemPreviousName = A<string>();
             var systemDisabled = A<bool>();
 
             var systemParentName = A<string>();
@@ -103,9 +109,10 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             var dataProcessingRegistrationName = A<string>();
 
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var system = await PrepareItSystem(systemName, systemPreviousName, organizationId, organizationName, AccessModifier.Public);
             var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
-            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+            var systemId = DatabaseAccess.GetEntityId<Core.DomainModel.ItSystem.ItSystem>(system.Uuid);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(systemId, organizationId);
 
             // Role assignment
             var businessRoleDtos = await ItSystemUsageHelper.GetAvailableRolesAsync(organizationId);
@@ -116,17 +123,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(HttpStatusCode.Created, assignRoleResponse.StatusCode);
 
             // System changes
-            await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled).WithExpectedResponseCode(HttpStatusCode.NoContent).DisposeAsync();
-            await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organizationId, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync(); // Using default organization as BelongsTo
+            await ItSystemHelper.SendSetDisabledRequestAsync(systemId, systemDisabled).WithExpectedResponseCode(HttpStatusCode.NoContent).DisposeAsync();
+            await ItSystemHelper.SendSetParentSystemRequestAsync(systemId, systemParent.Id, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemHelper.SendSetBelongsToRequestAsync(systemId, organizationId, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync(); // Using default organization as BelongsTo
 
             var availableBusinessTypeOptions = (await ItSystemHelper.GetBusinessTypeOptionsAsync(organizationId)).ToList();
             var businessType = availableBusinessTypeOptions[Math.Abs(A<int>()) % availableBusinessTypeOptions.Count];
-            await ItSystemHelper.SendSetBusinessTypeRequestAsync(system.Id, businessType.Id, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemHelper.SendSetBusinessTypeRequestAsync(systemId, businessType.Id, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
-            var taskRefs = (await ItSystemHelper.GetAvailableTaskRefsRequestAsync(system.Id)).ToList();
+            var taskRefs = (await ItSystemHelper.GetAvailableTaskRefsRequestAsync(systemId)).ToList();
             var taskRef = taskRefs[Math.Abs(A<int>()) % taskRefs.Count];
-            await ItSystemHelper.SendAddTaskRefRequestAsync(system.Id, taskRef.TaskRef.Id, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemHelper.SendAddTaskRefRequestAsync(systemId, taskRef.TaskRef.Id, organizationId).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             // Parent system 
             await ItSystemHelper.SendSetDisabledRequestAsync(systemParent.Id, systemParentDisabled).WithExpectedResponseCode(HttpStatusCode.NoContent).DisposeAsync();
@@ -279,6 +286,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             // From System
             Assert.Equal(systemName, readModel.SystemName);
+            Assert.Equal(systemPreviousName, readModel.SystemPreviousName);
             Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
             Assert.Equal(businessType.Id, readModel.ItSystemBusinessTypeId);
@@ -1000,6 +1008,20 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
         private static bool MatchExpectedOrgUnit(ItSystemUsageOverviewRelevantOrgUnitReadModel x, OrgUnitDTO organizationUnit1)
         {
             return x.OrganizationUnitId == organizationUnit1.Id && x.OrganizationUnitUuid == organizationUnit1.Uuid && x.OrganizationUnitName == organizationUnit1.Name;
+        }
+
+        private static async Task<ItSystemResponseDTO> PrepareItSystem(string systemName, string systemPreviousName, int organizationId, string organizationName, AccessModifier accessModifier)
+        {
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, organizationName,
+                TestCvr, OrganizationTypeKeys.Virksomhed, accessModifier);
+            var token = (await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin)).Token;
+            var system = await ItSystemV2Helper.CreateSystemAsync(token, new CreateItSystemRequestDTO
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = systemName,
+                PreviousName = systemPreviousName
+            });
+            return system;
         }
     }
 }

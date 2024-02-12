@@ -1,238 +1,211 @@
 <?xml version="1.0" encoding="utf-8"?>
-<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:spf="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/" xmlns:tns="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Adresse/5/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="AdresseService" targetNamespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Adresse/5/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy" location="policies.wsdl" />
-  <wsdl:import namespace="http://serviceplatformen.dk/xml/schemas/ServiceplatformFault/1/" location="../../sp/ServiceplatformFaultMessage_1.wsdl" />
+<wsdl:definitions xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsp="http://www.w3.org/ns/ws-policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://stoettesystemerne.dk/organisation/6/" xmlns:type="http://stoettesystemerne.dk/organisation/adresse/6/" xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/" name="AdresseService" targetNamespace="http://stoettesystemerne.dk/organisation/6/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy" location="policies/OIOIDWS.wsdl" />
   <wsdl:types>
-    <xsd:schema targetNamespace="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Adresse/5/">
-      <xsd:include schemaLocation="../../AdresseServiceMsg.xsd" />
-      <xsd:import schemaLocation="../../SF1500_EP_FS1/xsd/common/RequestHeader.xsd" namespace="http://kombit.dk/xml/schemas/RequestHeader/1/" />
+    <xsd:schema>
+      <xsd:import schemaLocation="../xsd/6.0.STS-0/AdresseOperationer.xsd" namespace="http://stoettesystemerne.dk/organisation/adresse/6/" />
+      <xsd:import schemaLocation="../xsd/6.0.STS-0/Adresse.xsd" namespace="http://stoettesystemerne.dk/organisation/adresse/6/" />
+      <xsd:import schemaLocation="../xsd/6.0.STS-0/AdresseBesked.xsd" namespace="http://stoettesystemerne.dk/organisation/adresse/6/" />
+      <xsd:import schemaLocation="../xsd/6.0.STS-0/OrganisationFaelles.xsd" namespace="http://stoettesystemerne.dk/organisation/6/" />
+      <xsd:import schemaLocation="../xsd/6.0.STS-0/Part.xsd" namespace="urn:oio:sts:part:6" />
+      <xsd:import schemaLocation="../xsd/6.0.STS-0/GenerelleDefinitioner.xsd" namespace="urn:oio:sts:6" />
+      <xsd:import schemaLocation="../xsd/common/SagDokObjekt.xsd" namespace="urn:oio:sagdok:3.0.0" />
+      <xsd:import schemaLocation="../xsd/common/RequestHeader.xsd" namespace="http://kombit.dk/xml/schemas/RequestHeader/1/" />
     </xsd:schema>
   </wsdl:types>
-  <wsdl:message name="ImporterRequestMessage">
+  <wsdl:message name="AdresseImporterRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:ImporterRequest" />
+    <wsdl:part name="request" element="type:ImportInput" />
   </wsdl:message>
-  <wsdl:message name="ImporterResponseMessage">
+  <wsdl:message name="AdresseOpretResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:ImporterResponse" />
+    <wsdl:part name="response" element="type:OpretOutput" />
   </wsdl:message>
-  <wsdl:message name="ListRequestMessage">
+  <wsdl:message name="AdresseLaesRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:ListRequest" />
+    <wsdl:part name="request" element="type:LaesInput" />
   </wsdl:message>
-  <wsdl:message name="ListResponseMessage">
+  <wsdl:message name="AdresseListeResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:ListResponse" />
+    <wsdl:part name="response" element="type:ListOutput" />
   </wsdl:message>
-  <wsdl:message name="LaesRequestMessage">
+  <wsdl:message name="AdressePassiverRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:LaesRequest" />
+    <wsdl:part name="request" element="type:PassiverInput" />
   </wsdl:message>
-  <wsdl:message name="LaesResponseMessage">
+  <wsdl:message name="AdresseSletRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:LaesResponse" />
+    <wsdl:part name="request" element="type:SletInput" />
   </wsdl:message>
-  <wsdl:message name="OpretRequestMessage">
+  <wsdl:message name="AdresseLaesResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:OpretRequest" />
+    <wsdl:part name="response" element="type:LaesOutput" />
   </wsdl:message>
-  <wsdl:message name="OpretResponseMessage">
+  <wsdl:message name="AdresseRetResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:OpretResponse" />
+    <wsdl:part name="response" element="type:RetOutput" />
   </wsdl:message>
-  <wsdl:message name="PassiverRequestMessage">
+  <wsdl:message name="AdresseRetRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:PassiverRequest" />
+    <wsdl:part name="request" element="type:RetInput" />
   </wsdl:message>
-  <wsdl:message name="PassiverResponseMessage">
+  <wsdl:message name="AdresseImporterResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:PassiverResponse" />
+    <wsdl:part name="response" element="type:ImportOutput" />
   </wsdl:message>
-  <wsdl:message name="RetRequestMessage">
+  <wsdl:message name="AdresseSoegResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:RetRequest" />
+    <wsdl:part name="response" element="type:SoegOutput" />
   </wsdl:message>
-  <wsdl:message name="RetResponseMessage">
+  <wsdl:message name="AdresseOpretRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:RetResponse" />
+    <wsdl:part name="request" element="type:OpretInput" />
   </wsdl:message>
-  <wsdl:message name="SletRequestMessage">
+  <wsdl:message name="AdresseSletResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:SletRequest" />
+    <wsdl:part name="response" element="type:SletOutput" />
   </wsdl:message>
-  <wsdl:message name="SletResponseMessage">
+  <wsdl:message name="AdressePassiverResponseMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:SletResponse" />
+    <wsdl:part name="response" element="type:PassiverOutput" />
   </wsdl:message>
-  <wsdl:message name="SoegRequestMessage">
+  <wsdl:message name="AdresseSoegRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="request" element="tns:SoegRequest" />
+    <wsdl:part name="request" element="type:SoegInput" />
   </wsdl:message>
-  <wsdl:message name="SoegResponseMessage">
+  <wsdl:message name="AdresseListeRequestMessage">
     <wsdl:part name="header" element="header:RequestHeader" />
-    <wsdl:part name="response" element="tns:SoegResponse" />
+    <wsdl:part name="request" element="type:ListInput" />
   </wsdl:message>
   <wsdl:portType name="AdressePortType">
     <wsdl:operation name="opret">
-      <wsdl:input message="tns:OpretRequestMessage" />
-      <wsdl:output message="tns:OpretResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:AdresseOpretRequestMessage" />
+      <wsdl:output message="tns:AdresseOpretResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="importer">
-      <wsdl:input message="tns:ImporterRequestMessage" />
-      <wsdl:output message="tns:ImporterResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:AdresseImporterRequestMessage" />
+      <wsdl:output message="tns:AdresseImporterResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="passiver">
-      <wsdl:input message="tns:PassiverRequestMessage" />
-      <wsdl:output message="tns:PassiverResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:AdressePassiverRequestMessage" />
+      <wsdl:output message="tns:AdressePassiverResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="laes">
-      <wsdl:input message="tns:LaesRequestMessage" />
-      <wsdl:output message="tns:LaesResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:AdresseLaesRequestMessage" />
+      <wsdl:output message="tns:AdresseLaesResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="ret">
-      <wsdl:input message="tns:RetRequestMessage" />
-      <wsdl:output message="tns:RetResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:AdresseRetRequestMessage" />
+      <wsdl:output message="tns:AdresseRetResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="slet">
-      <wsdl:input message="tns:SletRequestMessage" />
-      <wsdl:output message="tns:SletResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:AdresseSletRequestMessage" />
+      <wsdl:output message="tns:AdresseSletResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="soeg">
-      <wsdl:input message="tns:SoegRequestMessage" />
-      <wsdl:output message="tns:SoegResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:AdresseSoegRequestMessage" />
+      <wsdl:output message="tns:AdresseSoegResponseMessage" />
     </wsdl:operation>
     <wsdl:operation name="list">
-      <wsdl:input message="tns:ListRequestMessage" />
-      <wsdl:output message="tns:ListResponseMessage" />
-      <wsdl:fault name="ServiceplatformFault" message="spf:ServiceplatformFault" />
+      <wsdl:input message="tns:AdresseListeRequestMessage" />
+      <wsdl:output message="tns:AdresseListeResponseMessage" />
     </wsdl:operation>
   </wsdl:portType>
-  <wsdl:binding name="AdresseBinding" type="tns:AdressePortType">
-    <wsp:PolicyReference URI="policies.wsdl#ServiceplatformBindingPolicy" />
-    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+  <wsdl:binding name="Adresse" type="tns:AdressePortType">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsp:PolicyReference URI="#ServiceplatformBindingPolicy" />
     <wsdl:operation name="opret">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Adresse/5/opret" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/adresse/opret" />
       <wsdl:input>
-        <soap:header message="tns:OpretRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:AdresseOpretRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:OpretResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:AdresseOpretResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="importer">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Adresse/5/importer" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/adresse/importer" />
       <wsdl:input>
-        <soap:header message="tns:ImporterRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:AdresseImporterRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:ImporterResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:AdresseImporterResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="passiver">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Adresse/5/passiver" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/adresse/passiver" />
       <wsdl:input>
-        <soap:header message="tns:PassiverRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:AdressePassiverRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:PassiverResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:AdressePassiverResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="laes">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Adresse/5/laes" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/adresse/laes" />
       <wsdl:input>
-        <soap:header message="tns:LaesRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:AdresseLaesRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:LaesResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:AdresseLaesResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="ret">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Adresse/5/ret" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/adresse/ret" />
       <wsdl:input>
-        <soap:header message="tns:RetRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:AdresseRetRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:RetResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:AdresseRetResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="slet">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Adresse/5/slet" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/adresse/slet" />
       <wsdl:input>
-        <soap:header message="tns:SletRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:AdresseSletRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:SletResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:AdresseSletResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="soeg">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Adresse/5/soeg" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/adresse/soeg" />
       <wsdl:input>
-        <soap:header message="tns:SoegRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:AdresseSoegRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:SoegResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:AdresseSoegResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="list">
-      <soap:operation soapAction="http://serviceplatformen.dk/xml/wsdl/soap11/Organisation/Adresse/5/list" />
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/adresse/list" />
       <wsdl:input>
-        <soap:header message="tns:ListRequestMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="request" />
+        <soap12:header message="tns:AdresseListeRequestMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="request" />
       </wsdl:input>
       <wsdl:output>
-        <soap:header message="tns:ListResponseMessage" part="header" use="literal" />
-        <soap:body use="literal" parts="response" />
+        <soap12:header message="tns:AdresseListeResponseMessage" part="header" use="literal" />
+        <soap12:body use="literal" parts="response" />
       </wsdl:output>
-      <wsdl:fault name="ServiceplatformFault">
-        <soap:fault use="literal" name="ServiceplatformFault" namespace="" />
-      </wsdl:fault>
     </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="AdresseService">
-    <wsdl:port name="AdressePort" binding="tns:AdresseBinding">
-      <soap:address location="https://localhost:8080/service/Organisation/Adresse/5" />
+    <wsdl:port name="Adresse" binding="tns:Adresse">
+      <soap12:address location="http://kombit.dk/sts/organisation/adresse" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

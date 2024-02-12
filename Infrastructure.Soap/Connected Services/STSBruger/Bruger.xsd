@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<schema xmlns:bruger="urn:oio:sts:organisation:bruger:1.1.3.0" xmlns:sd="urn:oio:sagdok:3.0.0" xmlns:orgfaelles="urn:oio:sts:organisation:1.1.3.0" xmlns:oio="urn:oio:definitions:1.0.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="urn:oio:sts:organisation:bruger:1.1.3.0" oio:mapping="urn:oio:sagdok:MPD:3.0.0" xmlns="http://www.w3.org/2001/XMLSchema">
-  <import schemaLocation="OrganisationFaelles.xsd" namespace="urn:oio:sts:organisation:1.1.3.0" />
+<schema xmlns:bruger="http://stoettesystemerne.dk/organisation/bruger/6/" xmlns:sd="urn:oio:sagdok:3.0.0" xmlns:orgfaelles="http://stoettesystemerne.dk/organisation/6/" xmlns:oio="urn:oio:definitions:1.0.0" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://stoettesystemerne.dk/organisation/bruger/6/" oio:mapping="urn:oio:sagdok:MPD:3.0.0" xmlns="http://www.w3.org/2001/XMLSchema">
+  <import schemaLocation="OrganisationFaelles.xsd" namespace="http://stoettesystemerne.dk/organisation/6/" />
   <import schemaLocation="../common/SagDokObjekt.xsd" namespace="urn:oio:sagdok:3.0.0" />
   <element oio:definition="urn:oio:sagdok:bruger:ADD:2.0.0" name="Bruger" type="bruger:BrugerType" />
   <complexType oio:definition="urn:oio:sagdok:bruger:ADD:2.0.0" name="BrugerType">
@@ -31,8 +31,8 @@
     <sequence>
       <element oio:content="adresser" minOccurs="0" maxOccurs="unbounded" ref="sd:Adresser" />
       <element oio:content="brugertyper" minOccurs="0" maxOccurs="unbounded" ref="sd:BrugerTyper" />
-      <element oio:content="opgaver" minOccurs="0" maxOccurs="unbounded" ref="sd:Opgaver" />
-      <element oio:content="tilhoerer" minOccurs="0" ref="sd:Tilhoerer" />
+      <element oio:content="opgaver" minOccurs="0" maxOccurs="unbounded" ref="sd:TilknyttedeOpgaver" />
+      <element oio:content="tilhoerer" minOccurs="0" maxOccurs="1" ref="sd:Tilhoerer" />
       <element oio:content="tilknyttedeenheder" minOccurs="0" maxOccurs="unbounded" ref="sd:TilknyttedeEnheder" />
       <element oio:content="tilknyttedefunktioner" minOccurs="0" maxOccurs="unbounded" ref="sd:TilknyttedeFunktioner" />
       <element oio:content="tilknyttedeinteressefaellesskaber" minOccurs="0" maxOccurs="unbounded" ref="sd:TilknyttedeInteressefaellesskaber" />

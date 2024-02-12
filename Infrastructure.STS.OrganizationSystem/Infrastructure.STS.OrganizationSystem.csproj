@@ -38,6 +38,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IdentityModel" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
@@ -48,11 +49,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Connected Services\OrganisationSystem\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </Compile>
     <Compile Include="DomainServices\StsOrganizationSystemService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -60,131 +56,7 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="Connected Services\OrganisationSystem\Adresse.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\AdresseOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\AuthorityContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\Bruger.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\BrugerOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\CallContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\GenerelleDefinitioner.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.fremsoegobjekthierarkiResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.FremsoegobjekthierarkiResponseType.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.importResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.ImportResponseType.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\Infrastructure.STS.OrganizationSystem.OrganisationSystem.RequestHeaderType.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\Interessefaellesskab.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\InteressefaellesskabOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\ItSystem.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\ItSystemOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\Myndighed.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\MyndighedOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\Organisation.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationEnhed.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationEnhedOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationFaelles.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationFunktion.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationFunktionOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationSystemOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\OrganisationSystemService.wsdl" />
-    <None Include="Connected Services\OrganisationSystem\OrganisationSystemServiceMsg.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\Part.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\Person.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\PersonOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\policies.wsdl" />
-    <None Include="Connected Services\OrganisationSystem\RequestHeader.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\SagDokObjekt.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\ServiceplatformFaultMessage.wsdl" />
-    <None Include="Connected Services\OrganisationSystem\ServiceplatformFault_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\Virksomhed.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Connected Services\OrganisationSystem\VirksomhedOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Connected Services\OrganisationSystem\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Connected Services\OrganisationSystem\configuration91.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Connected Services\OrganisationSystem\configuration.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Connected Services\OrganisationSystem\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
@@ -199,9 +71,17 @@
       <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
       <Name>Core.DomainServices</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Digst.OioIdws.Soap\Digst.OioIdws.Soap.csproj">
+      <Project>{2BF23085-9552-4354-B070-7F1715ED5976}</Project>
+      <Name>Digst.OioIdws.Soap</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.STS.Common\Infrastructure.STS.Common.csproj">
       <Project>{423D7522-4882-4438-94F4-7B3F5778C83F}</Project>
       <Name>Infrastructure.STS.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.STS.SvcUtilClients\Infrastructure.STS.SvcUtilClients.csproj">
+      <Project>{2DC50C99-0A51-4FAC-B53B-54401B72D699}</Project>
+      <Name>Infrastructure.STS.SvcUtilClients</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
