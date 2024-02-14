@@ -46,6 +46,10 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
                     "-setParam:name=`"ServiceCertificateAliasOrg`",value=`"{30}`" " +
                     "-setParam:name=`"StsCertificateAlias`",value=`"{31}`" " +
                     "-setParam:name=`"StsCertificateThumbprint`",value=`"{32}`" " +
+                    "-setParam:name=`"VirksomhedPort`",address=`"testAddress`" " +
+                    "-setParam:name=`"OrganisationPort`",address=`"testAddress2`" " +
+                    "-setParam:name=`"OrganisationSystemPort`",address=`"testAddress`" " +
+                    "-setParam:name=`"StsOrganisationCertificate`",findValue=`"certificate`" " +
                     "-setParam:name=`"OrgService6EntityId`",value=`"{33}`" ") `
     -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $kitosContext, $hangfireContext, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost, $robotsFileName, $smtpNetworkPort, $smtpNetworkUsername, $smtpNetworkPassword, $stsIssuer, $stsCertificateEndpoint, $serviceCertificateAliasOrg, $stsCertificateAlias, $stsCertificateThumbprint, $orgService6EntityId)
     
