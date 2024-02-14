@@ -50,7 +50,7 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
                     "-setParam:name=`"StsVirksomhedPort`",value=`"{34}`" " +
                     "-setParam:name=`"StsOrganisationPort`",value=`"{35}`" " +
                     "-setParam:name=`"StsOrganisationSystemPort`",value=`"{36}`" " +
-                    "-setParam:name=`"StsOrganisationCertificate`",value=`"{37}`" ") `
+                    "-setParam:name=`"StsOrganisationCertificateThumbprint`",value=`"{37}`" ") `
     -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $kitosContext, $hangfireContext, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost, $robotsFileName, $smtpNetworkPort, $smtpNetworkUsername, $smtpNetworkPassword, $stsIssuer, $stsCertificateEndpoint, $serviceCertificateAliasOrg, $stsCertificateAlias, $stsCertificateThumbprint, $orgService6EntityId, $stsVirksomhedPort, $stsOrganisationPort, $stsOrganisationSystemPort, $stsOrganisationCertificateThumbprint)
     
     & cmd.exe /C $fullCommand
