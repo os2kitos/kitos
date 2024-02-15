@@ -103,7 +103,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
         /// <param name="organizationUuid"></param>
         /// <param name="systemUuid"></param>
         /// <returns></returns>
-        [HttpDelete]
+        /*[HttpDelete]
         [Route("{organizationUuid}/{systemUsageUuid}")]
         [SwaggerResponse(HttpStatusCode.NoContent)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -118,7 +118,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
             return _writeService
                 .DeleteByItSystemAndOrganizationUuids(systemUuid, organizationUuid)
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
-        }
+        }*/
 
         private static ItSystemUsageSearchResultResponseDTO Map(ItSystemUsage usage)
         {
