@@ -11,6 +11,7 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Notifications;
@@ -313,7 +314,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
             {
                 OwnerResourceType.DataProcessingRegistration => _entityIdentityResolver.ResolveDbId<DataProcessingRegistration>(roleUuid),
                 OwnerResourceType.ItContract => _entityIdentityResolver.ResolveDbId<ItContract>(roleUuid),
-                OwnerResourceType.ItSystemUsage => _entityIdentityResolver.ResolveDbId<ItSystem>(roleUuid),
+                OwnerResourceType.ItSystemUsage => _entityIdentityResolver.ResolveDbId<ItSystemUsage>(roleUuid),
                 _ => throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null)
             };
         }
