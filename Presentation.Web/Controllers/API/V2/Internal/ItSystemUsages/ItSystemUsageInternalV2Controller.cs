@@ -97,16 +97,16 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
                 .Select(rights => rights.Select(right => right.MapExtendedRoleAssignmentResponse()))
                 .Match(Ok, FromOperationError);
         }
+
         /// <summary>
         /// Deletes a system usage by organizationUuid and systemUuid.
         /// </summary>
         /// <param name="organizationUuid"></param>
         /// <param name="systemUuid"></param>
         /// <returns></returns>
-        /*[HttpDelete]
-        [Route("{organizationUuid}/{systemUsageUuid}")]
+        [HttpDelete]
+        [Route("system/{systemUuid}/organization/{organizationUuid}")]
         [SwaggerResponse(HttpStatusCode.NoContent)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -118,7 +118,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
             return _writeService
                 .DeleteByItSystemAndOrganizationUuids(systemUuid, organizationUuid)
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
-        }*/
+        }
 
         private static ItSystemUsageSearchResultResponseDTO Map(ItSystemUsage usage)
         {
