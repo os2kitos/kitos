@@ -739,6 +739,17 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Match(_ => Maybe<OperationError>.None, error => new OperationError($"Failed to delete it system usage with Uuid: {itSystemUsageUuid}, Error message: {error.Message.GetValueOrEmptyString()}", error.FailureType));
         }
 
+        public Maybe<OperationError> DeleteByItSystemAndOrganizationUuids(Guid itSystemUuid, Guid organizationUuid)
+        {
+            return _systemService.GetSystem(itSystemUuid)
+                .Bind(system => _organizationService.GetOrganization(organizationUuid).Select(organization => (system, organization)))
+                .Match(result =>
+                {
+                    var usage = _systemUsageService.GetByOrganizationAndSystemId(result.organization.Id, result.system.Id);
+                    return _systemUsageService.Delete(usage.Id).MatchFailure();
+                }, error => error);
+        }
+
         public Result<SystemRelation, OperationError> CreateSystemRelation(Guid fromSystemUsageUuid, SystemRelationParameters parameters)
         {
             return _systemUsageService.GetReadableItSystemUsageByUuid(fromSystemUsageUuid)
