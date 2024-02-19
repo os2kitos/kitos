@@ -12,7 +12,7 @@ namespace Presentation.Web.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.8.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.7.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -165,6 +165,44 @@ namespace Presentation.Web.Properties {
         public string OrgService6EntityId {
             get {
                 return ((string)(this["OrgService6EntityId"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://organisation.eksterntest-stoettesystemerne.dk/organisation/virksomhed/6")]
+        public string StsVirksomhedPort {
+            get {
+                return ((string)(this["StsVirksomhedPort"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://organisation.eksterntest-stoettesystemerne.dk/organisation/organisation/6" +
+            "")]
+        public string StsOrganisationPort {
+            get {
+                return ((string)(this["StsOrganisationPort"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://organisation.eksterntest-stoettesystemerne.dk/organisation/organisationsy" +
+            "stem/6")]
+        public string StsOrganisationSystemPort {
+            get {
+                return ((string)(this["StsOrganisationSystemPort"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2c34be56b35d993160df525c36146336ea2b2801")]
+        public string StsOrganisationCertificateThumbprint {
+            get {
+                return ((string)(this["StsOrganisationCertificateThumbprint"]));
             }
         }
     }
