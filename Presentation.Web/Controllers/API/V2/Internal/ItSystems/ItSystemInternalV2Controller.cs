@@ -60,13 +60,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
             string nameEquals = null,
             string nameContains = null,
             CommonOrderByProperty? orderByProperty = null,
-            [FromUri] BoundedPaginationQuery paginationQuery = null)
+            [FromUri] BoundedPaginationQuery paginationQuery = null,
+            [NonEmptyGuid] Guid? excludeUuid = null,
+            [NonEmptyGuid] Guid? excludeChildrenOfUuid = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _itSystemService
-                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, nameEquals: nameEquals, nameContains: nameContains, orderByProperty: orderByProperty, paginationQuery: paginationQuery)
+                .ExecuteItSystemsQuery(rightsHolderUuid, businessTypeUuid, kleNumber, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq, nameEquals: nameEquals, nameContains: nameContains, orderByProperty: orderByProperty, paginationQuery: paginationQuery, excludeUuid: excludeUuid, excludeChildrenOfUuid: excludeChildrenOfUuid)
                 .Select(Map)
                 .Transform(Ok);
         }
