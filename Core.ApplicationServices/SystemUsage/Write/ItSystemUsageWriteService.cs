@@ -735,8 +735,18 @@ namespace Core.ApplicationServices.SystemUsage.Write
         public Maybe<OperationError> Delete(Guid itSystemUsageUuid)
         {
             return _systemUsageService.GetReadableItSystemUsageByUuid(itSystemUsageUuid)
-                .Bind(usage => _systemUsageService.Delete(usage.Id))
-                .Match(_ => Maybe<OperationError>.None, error => new OperationError($"Failed to delete it system usage with Uuid: {itSystemUsageUuid}, Error message: {error.Message.GetValueOrEmptyString()}", error.FailureType));
+                .Match(DeleteUsage, error => error);
+        }
+
+        public Maybe<OperationError> DeleteByItSystemAndOrganizationUuids(Guid itSystemUuid, Guid organizationUuid)
+        {
+            return _systemService.GetSystem(itSystemUuid)
+                .Bind(system => _organizationService.GetOrganization(organizationUuid).Select(organization => (system, organization)))
+                .Match(result =>
+                {
+                    var usage = _systemUsageService.GetByOrganizationAndSystemId(result.organization.Id, result.system.Id);
+                    return DeleteUsage(usage);
+                }, error => error);
         }
 
         public Result<SystemRelation, OperationError> CreateSystemRelation(Guid fromSystemUsageUuid, SystemRelationParameters parameters)
@@ -822,6 +832,12 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .GetReadableItSystemUsageByUuid(systemUsageUuid)
                 .Bind(WithWriteAccess)
                 .Bind(usage => _systemUsageService.RemoveArchivePeriod(usage.Id, periodUuid));
+        }
+
+        private Maybe<OperationError> DeleteUsage(ItSystemUsage usage)
+        {
+            return _systemUsageService.Delete(usage.Id)
+                .Match(_ => Maybe<OperationError>.None, error => new OperationError($"Failed to delete it system usage with Uuid: {usage.Uuid}, Error message: {error.Message.GetValueOrEmptyString()}", error.FailureType));
         }
 
         private Result<int, OperationError> ResolveRequiredId<T>(Guid requiredId) where T : class, IHasUuid, IHasId

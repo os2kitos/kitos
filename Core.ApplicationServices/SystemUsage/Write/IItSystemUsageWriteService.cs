@@ -24,5 +24,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
         Result<ExternalReference, OperationError> AddExternalReference(Guid usageUuid, ExternalReferenceProperties externalReferenceProperties);
         Result<ExternalReference, OperationError> UpdateExternalReference(Guid usageUuid, Guid externalReferenceUuid, ExternalReferenceProperties externalReferenceProperties);
         Result<ExternalReference, OperationError> DeleteExternalReference(Guid usageUuid, Guid externalReferenceUuid);
+        Maybe<OperationError> DeleteByItSystemAndOrganizationUuids(Guid itSystemUuid, Guid organizationUuid);
     }
 }

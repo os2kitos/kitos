@@ -5,6 +5,7 @@ using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.SystemUsage;
+using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Controllers.API.V2.Common.Helpers;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
@@ -25,10 +26,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
     public class ItSystemUsageInternalV2Controller : InternalApiV2Controller
     {
         private readonly IItSystemUsageService _itSystemUsageService;
+        private readonly IItSystemUsageWriteService _writeService;
 
-        public ItSystemUsageInternalV2Controller(IItSystemUsageService itSystemUsageService)
+        public ItSystemUsageInternalV2Controller(IItSystemUsageService itSystemUsageService, IItSystemUsageWriteService writeService)
         {
             _itSystemUsageService = itSystemUsageService;
+            _writeService = writeService;
         }
 
         /// <summary>
@@ -93,6 +96,28 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
                 .Select(x => x.Rights.ToList())
                 .Select(rights => rights.Select(right => right.MapExtendedRoleAssignmentResponse()))
                 .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Deletes a system usage by organizationUuid and systemUuid.
+        /// </summary>
+        /// <param name="organizationUuid"></param>
+        /// <param name="systemUuid"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("system/{systemUuid}/organization/{organizationUuid}")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteItSystemUsageByOrganizationUuidAndSystemUuid([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid systemUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .DeleteByItSystemAndOrganizationUuids(systemUuid, organizationUuid)
+                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
         private static ItSystemUsageSearchResultResponseDTO Map(ItSystemUsage usage)
