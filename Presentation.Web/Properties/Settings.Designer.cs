@@ -88,7 +88,7 @@ namespace Presentation.Web.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("933fbc2bad227d58a7f0c5ec1d7205638e10a1a3")]
+        [global::System.Configuration.DefaultSettingValueAttribute("5a96f4868fb67ef4829a91588a0cf0de4d2290ea")]
         public string SsoCertificateThumbprint {
             get {
                 return ((string)(this["SsoCertificateThumbprint"]));
@@ -97,7 +97,7 @@ namespace Presentation.Web.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://kitos-internal.strongminds.dk")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://kitos-local.strongminds.dk")]
         public string SsoServiceProviderId {
             get {
                 return ((string)(this["SsoServiceProviderId"]));
