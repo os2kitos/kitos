@@ -128,5 +128,25 @@
   <parameter name="OrgService6EntityId" defaultvalue="__ORG_SERVICE_6_ENTITY_ID">
     <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='OrgService6EntityId']/value/text()"/>
   </parameter>
+  
+  <parameter name="StsVirksomhedPort" defaultvalue="__STS_VIRKSOMHED_PORT">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='VirksomhedPort']/@address"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsVirksomhedPort']/value/text()"/>
+  </parameter>
+  
+  <parameter name="StsOrganisationPort" defaultvalue="__STS_ORGANISATION_PORT">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='OrganisationPort']/@address"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationPort']/value/text()"/>
+  </parameter>
+  
+  <parameter name="StsOrganisationSystemPort" defaultvalue="__STS_ORGANISATION_SYSTEM_PORT">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='OrganisationSystemPort']/@address"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationSystemPort']/value/text()"/>
+  </parameter>
+  
+  <parameter name="StsOrganisationCertificateThumbprint" defaultvalue="__STS_ORGANISATION_CERTIFICATE_THUMBPRINT">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/behaviors/endpointBehaviors/behavior/clientCredentials/serviceCertificate/defaultCertificate/@findValue"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationCertificateThumbprint']/value/text()"/>
+  </parameter>
 
 </parameters>

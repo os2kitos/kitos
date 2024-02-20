@@ -35,6 +35,10 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     $Env:StsCertificateAlias = $parameters["StsCertificateAlias"]
     $Env:StsCertificateThumbprint = $parameters["StsCertificateThumbprint"]
     $Env:OrgService6EntityId = $parameters["OrgService6EntityId"]
+    $Env:StsVirksomhedPort = $parameters["StsVirksomhedPort"]
+    $Env:StsOrganisationPort = $parameters["StsOrganisationPort"]
+    $Env:StsOrganisationSystemPort = $parameters["StsOrganisationSystemPort"]
+    $Env:StsOrganisationCertificateThumbprint = $parameters["StsOrganisationCertificateThumbprint"]
     
     if($loadTcHangfireConnectionString -eq $true) {
         $Env:HangfireDbConnectionStringForTeamCity = $parameters["HangfireDbConnectionStringForTeamCity"]
