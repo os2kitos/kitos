@@ -37,7 +37,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         /// <param name="kleNumber">KLE number filter ("NN.NN.NN" format)</param>
         /// <param name="kleUuid">KLE UUID number filter</param>
         /// <param name="numberOfUsers">Greater than or equal to number of users filter</param>
-        /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
+        /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-systems</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
         /// <param name="nameEquals">Include only systems with a name equal to the parameter</param>
         /// <param name="nameContains">Include only systems with a name that contains the content in the parameter</param>

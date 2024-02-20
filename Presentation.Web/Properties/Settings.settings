@@ -24,10 +24,10 @@
       <Value Profile="(Default)">true</Value>
     </Setting>
     <Setting Name="SsoCertificateThumbprint" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">5a96f4868fb67ef4829a91588a0cf0de4d2290ea</Value>
+      <Value Profile="(Default)">933fbc2bad227d58a7f0c5ec1d7205638e10a1a3</Value>
     </Setting>
     <Setting Name="SsoServiceProviderId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">https://kitos-local.strongminds.dk</Value>
+      <Value Profile="(Default)">https://kitos-internal.strongminds.dk</Value>
     </Setting>
     <Setting Name="StsIssuer" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://adgangsstyring.eksterntest-stoettesystemerne.dk/</Value>
