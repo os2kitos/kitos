@@ -1661,7 +1661,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var systemUsageUuid = A<Guid>();
             var systemUsageId = A<int>();
             var systemToBeDeleted = new ItSystemUsage() { Id = systemUsageId };
-            _itSystemUsageServiceMock.Setup(x => x.GetReadableItSystemUsageByUuid(systemUsageUuid)).Returns(systemToBeDeleted);
+
+            ExpectGetReadableItSystemUsageByUuidReturns(systemUsageUuid, systemToBeDeleted);
             _itSystemUsageServiceMock.Setup(x => x.Delete(systemUsageId)).Returns(systemToBeDeleted);
 
             //Act
@@ -1676,7 +1677,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var systemUsageUuid = A<Guid>();
-            _itSystemUsageServiceMock.Setup(x => x.GetReadableItSystemUsageByUuid(systemUsageUuid)).Returns(new OperationError(OperationFailure.NotFound));
+            ExpectGetReadableItSystemUsageByUuidReturns(systemUsageUuid, new OperationError(OperationFailure.NotFound));
 
             //Act
             var deleteResult = _sut.Delete(systemUsageUuid);
@@ -1694,7 +1695,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var systemUsageId = A<int>();
             var systemToBeDeleted = new ItSystemUsage() { Id = systemUsageId };
             var error = new OperationError(A<OperationFailure>());
-            _itSystemUsageServiceMock.Setup(x => x.GetReadableItSystemUsageByUuid(systemUsageUuid)).Returns(systemToBeDeleted);
+            ExpectGetReadableItSystemUsageByUuidReturns(systemUsageUuid, systemToBeDeleted);
             _itSystemUsageServiceMock.Setup(x => x.Delete(systemUsageId)).Returns(error);
 
             //Act
@@ -1706,10 +1707,93 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Fact]
+        public void Cannot_DeleteBySystemAndOrgUuids_SystemUsage_If_GetSystem_Fails()
+        {
+            //Arrange
+            var systemUuid = A<Guid>();
+            var organizationUuid = A<Guid>();
+            var error = A<OperationError>();
+
+            ExpectGetSystemReturns(systemUuid, error);
+            //Act
+            var resultError = _sut.DeleteByItSystemAndOrganizationUuids(systemUuid, organizationUuid);
+
+            //Assert
+            Assert.True(resultError.HasValue);
+            Assert.Equal(error.FailureType, resultError.Value.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_DeleteBySystemAndOrgUuids_SystemUsage_If_GetOrganization_Fails()
+        {
+            //Arrange
+            var systemUuid = A<Guid>();
+            var organizationUuid = A<Guid>();
+            var error = A<OperationError>();
+
+            ExpectGetSystemReturns(systemUuid, new ItSystem{Uuid = systemUuid, Id = A<int>()});
+            ExpectGetOrganizationReturns(organizationUuid, error);
+            //Act
+            var resultError = _sut.DeleteByItSystemAndOrganizationUuids(systemUuid, organizationUuid);
+
+            //Assert
+            Assert.True(resultError.HasValue);
+            Assert.Equal(error.FailureType, resultError.Value.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_DeleteBySystemAndOrgUuids_SystemUsage_If_Delete_Fails()
+        {
+            //Arrange
+            var systemUuid = A<Guid>();
+            var organizationUuid = A<Guid>();
+            var usageUuid = A<Guid>();
+            var system = new ItSystem { Uuid = systemUuid, Id = A<int>() };
+            var organization = new Organization { Uuid = organizationUuid, Id = A<int>() };
+            var usage = new ItSystemUsage { Uuid = usageUuid, Id= A<int>() };
+            var error = A<OperationError>();
+
+            ExpectGetSystemReturns(systemUuid, system);
+            ExpectGetOrganizationReturns(organizationUuid, organization);
+            _itSystemUsageServiceMock.Setup(x => x.GetByOrganizationAndSystemId(organization.Id, system.Id)).Returns(usage);
+            _itSystemUsageServiceMock.Setup(x => x.Delete(usage.Id)).Returns(error);
+
+            //Act
+            var resultError = _sut.DeleteByItSystemAndOrganizationUuids(systemUuid, organizationUuid);
+
+            //Assert
+            Assert.True(resultError.HasValue);
+            Assert.Equal(error.FailureType, resultError.Value.FailureType);
+        }
+
+        [Fact]
+        public void Can_DeleteBySystemAndOrgUuids_SystemUsage()
+        {
+            //Arrange
+            var systemUuid = A<Guid>();
+            var organizationUuid = A<Guid>();
+            var usageUuid = A<Guid>();
+            var system = new ItSystem { Uuid = systemUuid, Id = A<int>() };
+            var organization = new Organization { Uuid = organizationUuid, Id = A<int>() };
+            var usage = new ItSystemUsage { Uuid = usageUuid, Id= A<int>() };
+
+            ExpectGetSystemReturns(systemUuid, system);
+            ExpectGetOrganizationReturns(organizationUuid, organization);
+            _itSystemUsageServiceMock.Setup(x => x.GetByOrganizationAndSystemId(organization.Id, system.Id)).Returns(usage);
+            _itSystemUsageServiceMock.Setup(x => x.Delete(usage.Id)).Returns(usage);
+
+            //Act
+            var resultError = _sut.DeleteByItSystemAndOrganizationUuids(systemUuid, organizationUuid);
+
+            //Assert
+            Assert.True(resultError.IsNone);
+        }
+        
+        [Fact]
         public void Can_Update_All_On_Empty_ItSystemUsage()
         {
             //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var (_, _, transactionMock, _, _, itSystemUsage) = CreateBasicTestVariables();
 
             var updateParameters = CreateSystemUsageUpdateParametersWithSimpleParametersAdded();
 
@@ -1729,7 +1813,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         public void Can_Update_With_Specific_Journal_Period_Update()
         {
             //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var (_, _, transactionMock, _, _, itSystemUsage) = CreateBasicTestVariables();
 
             ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
             ExpectAllowModifyReturns(itSystemUsage, true);
@@ -3247,6 +3331,12 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private void ExpectGetOrganizationReturns(Guid organizationUuid, Result<Organization, OperationError> organizationResult)
         {
             _organizationServiceMock.Setup(x => x.GetOrganization(organizationUuid, null)).Returns(organizationResult);
+        }
+
+        private void ExpectGetReadableItSystemUsageByUuidReturns(Guid usageUuid,
+            Result<ItSystemUsage, OperationError> result)
+        {
+            _itSystemUsageServiceMock.Setup(x => x.GetReadableItSystemUsageByUuid(usageUuid)).Returns(result);
         }
 
         private Mock<IDatabaseTransaction> ExpectTransaction()

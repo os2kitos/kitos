@@ -50,5 +50,17 @@
     <Setting Name="OrgService6EntityId" Type="System.String" Scope="Application">
       <Value Profile="(Default)">http://stoettesystemerne.dk/service/organisation/3</Value>
     </Setting>
+    <Setting Name="StsVirksomhedPort" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://organisation.eksterntest-stoettesystemerne.dk/organisation/virksomhed/6</Value>
+    </Setting>
+    <Setting Name="StsOrganisationPort" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://organisation.eksterntest-stoettesystemerne.dk/organisation/organisation/6</Value>
+    </Setting>
+    <Setting Name="StsOrganisationSystemPort" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://organisation.eksterntest-stoettesystemerne.dk/organisation/organisationsystem/6</Value>
+    </Setting>
+    <Setting Name="StsOrganisationCertificateThumbprint" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">2c34be56b35d993160df525c36146336ea2b2801</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
