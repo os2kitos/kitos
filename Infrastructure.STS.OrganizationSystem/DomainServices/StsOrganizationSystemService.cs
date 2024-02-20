@@ -176,6 +176,8 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             processingStack.Push(root.Item1);
 
             //Flatten the tree and have the leafs at the top of the stack
+            if (!unitsByParent.Any()) return processingStack;
+
             var currentChildren = unitsByParent[processingStack.Peek()];
             foreach (var currentChild in currentChildren)
             {
