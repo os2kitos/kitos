@@ -18,13 +18,14 @@ namespace Presentation.Web.Models.API.V2.Request.System.RightsHolder
         [Required]
         [NonEmptyGuid]
         public Guid RightsHolderUuid { get; set; }
-
+        
         /// <summary>
-        /// UUID for IT-System
-        /// If no uuid is provided, KITOS will assign one automatically
+        /// External Uuid for IT-System
+        /// Note: When setting ExternalUuid to NULL there's no way to tell if the value was removed or if it was never set.
         /// </summary>
         [NonEmptyGuid]
-        public Guid? Uuid { get; set; }
+        public Guid? ExternalUuid{ get; set; }
+
         /// <summary>
         /// UUID for possible IT-System parent (if any)
         /// </summary>
@@ -41,7 +42,7 @@ namespace Presentation.Web.Models.API.V2.Request.System.RightsHolder
         /// <summary>
         /// Former name of IT-System (if any)
         /// </summary>
-        public string FormerName { get; set; }
+        public string PreviousName { get; set; }
 
         /// <summary>
         /// Description

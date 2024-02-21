@@ -15,6 +15,12 @@ namespace Presentation.Web.Models.API.V2.Request.System.RightsHolder
         public Guid? ParentUuid { get; set; }
 
         /// <summary>
+        /// External Uuid for IT-System
+        /// </summary>
+        [NonEmptyGuid]
+        public Guid? ExternalUuid { get; set; }
+
+        /// <summary>
         /// Name of IT-System
         /// </summary>
         [MaxLength(Core.DomainModel.ItSystem.ItSystem.MaxNameLength)]
@@ -23,7 +29,7 @@ namespace Presentation.Web.Models.API.V2.Request.System.RightsHolder
         /// <summary>
         /// Former name of IT-System (if any)
         /// </summary>
-        public string FormerName { get; set; }
+        public string PreviousName { get; set; }
 
         /// <summary>
         /// Description

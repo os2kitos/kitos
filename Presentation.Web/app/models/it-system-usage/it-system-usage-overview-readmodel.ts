@@ -42,6 +42,7 @@
         Id: number;
         SourceEntityId: number;
         SystemName: string;
+        ExternalSystemUuid: string;
         ItSystemDisabled: boolean;
         ActiveAccordingToValidityPeriod: boolean;
         ActiveAccordingToLifeCycle: boolean;

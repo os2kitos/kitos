@@ -6,6 +6,7 @@
         BadInput,
         MissingServiceAgreement,
         ExistingServiceAgreementIssue,
+        ReceivedUserContextDoesNotExistOnSystem,
         Unknown
     }
 }

@@ -37,6 +37,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -46,12 +48,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Factories\BasicHttpBindingFactory.cs" />
+    <Compile Include="Constants\LibBas.cs" />
+    <Compile Include="Constants\OioWsTrust.cs" />
+    <Compile Include="Constants\WsAdressing.cs" />
     <Compile Include="Factories\X509CertificateClientCertificateFactory.cs" />
     <Compile Include="Model\Client\RetriedIntegrationRequest.cs" />
     <Compile Include="Model\StsError.cs" />
     <Compile Include="Model\StsErrorParser.cs" />
+    <Compile Include="Model\Token\CacheHelper.cs" />
+    <Compile Include="Model\Token\CertificateLoader.cs" />
+    <Compile Include="Model\Token\MutualCertificateWithMessageSecurityBinding.cs" />
+    <Compile Include="Model\Token\TokenFetcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SoapFaults.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">

@@ -13,7 +13,7 @@ namespace Core.DomainModel.ItSystem
     /// <summary>
     /// Represents an it system.
     /// </summary>
-    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences, IEntityWithEnabledStatus, IHasRightsHolder
+    public class ItSystem : ItSystemBase, IHierarchy<ItSystem>, IEntityWithExternalReferences, IEntityWithEnabledStatus, IHasRightsHolder
     {
         public const int MaxNameLength = 100;
 
@@ -27,6 +27,8 @@ namespace Core.DomainModel.ItSystem
         }
 
         public int? BelongsToId { get; set; }
+
+        public Guid? ExternalUuid { get; set; }
 
         /// <summary>
         /// Gets or sets the organization the system belongs to.

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Core.Abstractions.Types;
@@ -8,33 +9,46 @@ using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.SSO;
-using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
-using Infrastructure.STS.Organization.ServiceReference;
+using Infrastructure.STS.Common.Model.Token;
+using Kombit.InfrastructureSamples;
+using Kombit.InfrastructureSamples.OrganisationService;
+using Kombit.InfrastructureSamples.Token;
 using Serilog;
+using ItemChoiceType = Kombit.InfrastructureSamples.OrganisationService.ItemChoiceType;
+using LaesInputType = Kombit.InfrastructureSamples.OrganisationService.LaesInputType;
+using laesRequest = Kombit.InfrastructureSamples.OrganisationService.laesRequest;
+using laesResponse = Kombit.InfrastructureSamples.OrganisationService.laesResponse;
+using RelationListeType = Kombit.InfrastructureSamples.OrganisationService.RelationListeType;
+using SoegInputType1 = Kombit.InfrastructureSamples.OrganisationService.SoegInputType1;
+using soegRequest = Kombit.InfrastructureSamples.OrganisationService.soegRequest;
+using soegResponse = Kombit.InfrastructureSamples.OrganisationService.soegResponse;
+using TilstandListeType = Kombit.InfrastructureSamples.OrganisationService.TilstandListeType;
+using UnikIdType = Kombit.InfrastructureSamples.OrganisationService.UnikIdType;
 
 namespace Infrastructure.STS.Organization.DomainServices
 {
     public class StsOrganizationService : IStsOrganizationService
     {
+        private readonly StsOrganisationIntegrationConfiguration _configuration;
         private readonly IStsOrganizationCompanyLookupService _companyLookupService;
         private readonly IStsOrganizationIdentityRepository _stsOrganizationIdentityRepository;
+        private readonly TokenFetcher _tokenFetcher;
         private readonly ILogger _logger;
-        private readonly string _certificateThumbprint;
-        private readonly string _serviceRoot;
 
         public StsOrganizationService(
             StsOrganisationIntegrationConfiguration configuration,
             IStsOrganizationCompanyLookupService companyLookupService,
             IStsOrganizationIdentityRepository stsOrganizationIdentityRepository,
+            TokenFetcher tokenFetcher,
             ILogger logger)
         {
+            _configuration = configuration;
             _companyLookupService = companyLookupService;
             _stsOrganizationIdentityRepository = stsOrganizationIdentityRepository;
+            _tokenFetcher = tokenFetcher;
             _logger = logger;
-            _certificateThumbprint = configuration.CertificateThumbprint;
-            _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/Organisation/5";
         }
 
         public Maybe<DetailedOperationError<CheckConnectionError>> ValidateConnection(Core.DomainModel.Organization.Organization organization)
@@ -47,6 +61,7 @@ namespace Infrastructure.STS.Organization.DomainServices
                         ResolveOrganizationUuidError.InvalidCvrOnOrganization => CheckConnectionError.InvalidCvrOnOrganization,
                         ResolveOrganizationUuidError.MissingServiceAgreement => CheckConnectionError.MissingServiceAgreement,
                         ResolveOrganizationUuidError.ExistingServiceAgreementIssue => CheckConnectionError.ExistingServiceAgreementIssue,
+                        ResolveOrganizationUuidError.UserContextDoesNotExistOnSystem => CheckConnectionError.UserContextDoesNotExistOnSystem,
                         _ => CheckConnectionError.Unknown
                     };
                     return new DetailedOperationError<CheckConnectionError>(error.FailureType, connectionError, error.Message.GetValueOrFallback(string.Empty));
@@ -73,21 +88,19 @@ namespace Infrastructure.STS.Organization.DomainServices
                 return companyUuid.Error;
 
             //Search for the organization based on the resolved company (all organizations are tied to a company)
-            using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
-            using var organizationPortTypeClient = CreateOrganizationPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
-
+            var port = CreatePort(organization.Cvr);
             var searchRequest = CreateSearchForOrganizationRequest(organization, companyUuid.Value);
-            var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
-            var response = GetSearchResponse(channel, searchRequest);
-            var statusResult = response.SoegResponse1.SoegOutput.StandardRetur;
+            var response = GetSearchResponse(port, searchRequest);
+            var statusResult = response.SoegOutput.StandardRetur;
             var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
+            
             if (stsError.HasValue)
             {
                 _logger.Error("Failed to search for organization ({id}) by company uuid {uuid}. Failed with {stsError} {code} and {message}", organization.Id, companyUuid.Value, stsError.Value, statusResult.StatusKode, statusResult.FejlbeskedTekst);
                 return new DetailedOperationError<ResolveOrganizationUuidError>(OperationFailure.UnknownError, ResolveOrganizationUuidError.FailedToSearchForOrganizationByCompanyUuid);
             }
 
-            var ids = response.SoegResponse1.SoegOutput.IdListe;
+            var ids = response.SoegOutput.IdListe;
             if (ids.Length != 1)
             {
                 _logger.Error("Failed to search for organization ({id}) by company uuid {uuid}. Expected 1 result but got {resultsCsv}", organization.Id, companyUuid.Value, string.Join(",", ids));
@@ -106,6 +119,25 @@ namespace Infrastructure.STS.Organization.DomainServices
             return uuid;
         }
 
+        private OrganisationPortType CreatePort(string cvr)
+        {
+            var token = _tokenFetcher.IssueToken(_configuration.OrgService6EntityId, cvr);
+            var client = new OrganisationPortTypeClient();
+
+            var identity = EndpointIdentity.CreateDnsIdentity(_configuration.ServiceCertificateAliasOrg);
+            var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
+            client.Endpoint.Address = endpointAddress;
+            var certificate = CertificateLoader.LoadCertificate(
+                StoreName.My,
+                StoreLocation.LocalMachine,
+                _configuration.ClientCertificateThumbprint
+            );
+            client.ClientCredentials.ClientCertificate.Certificate = certificate;
+            client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
+
+            return client.ChannelFactory.CreateChannelWithIssuedToken(token);
+        }
+
         public Result<Guid, OperationError> ResolveOrganizationHierarchyRootUuid(Core.DomainModel.Organization.Organization organization)
         {
             if (organization == null)
@@ -117,19 +149,15 @@ namespace Infrastructure.STS.Organization.DomainServices
             if (organizationUuidResult.Failed)
             {
                 var error = organizationUuidResult.Error;
-                _logger.Error("Failed to resilve uuid while looking up hierarchy root for org {ordId}. Failed with error: {code}:{message}", organization.Id, error.Detail, error.Message.GetValueOrFallback(""));
+                _logger.Error("Failed to resolve uuid while looking up hierarchy root for org {ordId}. Failed with error: {code}:{message}", organization.Id, error.Detail, error.Message.GetValueOrFallback(""));
                 return error;
             }
 
             var uuid = organizationUuidResult.Value;
-            using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
-            using var organizationPortTypeClient = CreateOrganizationPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
-
-            var readRequest = CreateGetOrganizationByUuidRequest(organization, uuid);
-            var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
-
-            var response = GetReadResponse(channel, readRequest);
-            var statusResult = response.LaesResponse1.LaesOutput.StandardRetur;
+            var port = CreatePort(organization.Cvr);
+            var readRequest = CreateGetOrganizationByUuidRequest(uuid);
+            var response = GetReadResponse(port, readRequest);
+            var statusResult = response.LaesOutput.StandardRetur;
             var stsError = statusResult.StatusKode.ParseStsErrorFromStandardResultCode();
             if (stsError.HasValue)
             {
@@ -137,7 +165,7 @@ namespace Infrastructure.STS.Organization.DomainServices
                 return new OperationError("Failed to resolve organization by uuid", OperationFailure.UnknownError);
             }
 
-            var orgResult = response.LaesResponse1.LaesOutput.FiltreretOejebliksbillede.Registrering.FirstOrDefault();
+            var orgResult = response.LaesOutput.FiltreretOejebliksbillede.Registrering.FirstOrDefault();
             if (orgResult == null)
             {
                 _logger.Error("Success reading organization ({id}) by uuid {uuid}. But no data was returned", organization.Id, uuid);
@@ -154,20 +182,13 @@ namespace Infrastructure.STS.Organization.DomainServices
             return rootIdAsUuid;
         }
 
-        private static laesRequest CreateGetOrganizationByUuidRequest(Core.DomainModel.Organization.Organization organization, Guid uuid)
+        private static laesRequest CreateGetOrganizationByUuidRequest(Guid uuid)
         {
             return new laesRequest()
             {
-                LaesRequest1 = new LaesRequestType()
+                LaesInput = new LaesInputType()
                 {
-                    AuthorityContext = new AuthorityContextType()
-                    {
-                        MunicipalityCVR = organization.Cvr
-                    },
-                    LaesInput = new LaesInputType()
-                    {
-                        UUIDIdentifikator = uuid.ToString("D")
-                    }
+                    UUIDIdentifikator = uuid.ToString("D")
                 }
             };
         }
@@ -200,6 +221,7 @@ namespace Infrastructure.STS.Organization.DomainServices
                 {
                     StsError.MissingServiceAgreement => ResolveOrganizationUuidError.MissingServiceAgreement,
                     StsError.ExistingServiceAgreementIssue => ResolveOrganizationUuidError.ExistingServiceAgreementIssue,
+                    StsError.ReceivedUserContextDoesNotExistOnSystem => ResolveOrganizationUuidError.UserContextDoesNotExistOnSystem,
                     _ => ResolveOrganizationUuidError.FailedToLookupOrganizationCompany
                 };
 
@@ -220,42 +242,21 @@ namespace Infrastructure.STS.Organization.DomainServices
         {
             return new soegRequest
             {
-                SoegRequest1 = new SoegRequestType
+                SoegInput = new SoegInputType1
                 {
-                    AuthorityContext = new AuthorityContextType
+                    MaksimalAntalKvantitet = "2", //We expect only one match so get 2 as max to see if something is off
+                    AttributListe = new AttributListeType(), //Required by the schema even if it is not used
+                    TilstandListe = new TilstandListeType(), //Required by the schema even if it is not used
+                    RelationListe = new RelationListeType
                     {
-                        MunicipalityCVR = organization.Cvr
-                    },
-                    SoegInput = new SoegInputType1
-                    {
-                        MaksimalAntalKvantitet = "2", //We expect only one match so get 2 as max to see if something is off
-                        AttributListe = new AttributListeType(), //Required by the schema even if it is not used
-                        TilstandListe = new TilstandListeType(), //Required by the schema even if it is not used
-                        RelationListe = new RelationListeType
+                        Virksomhed = new VirksomhedRelationType
                         {
-                            Virksomhed = new VirksomhedRelationType
+                            ReferenceID = new UnikIdType
                             {
-                                ReferenceID = new UnikIdType
-                                {
-                                    ItemElementName = ItemChoiceType.UUIDIdentifikator,
-                                    Item = companyUuid.ToString("D")
-                                }
+                                ItemElementName = ItemChoiceType.UUIDIdentifikator,
+                                Item = companyUuid.ToString("D")
                             }
                         }
-                    }
-                }
-            };
-        }
-
-        private static OrganisationPortTypeClient CreateOrganizationPortTypeClient(BasicHttpBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
-        {
-            return new OrganisationPortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
-            {
-                ClientCredentials =
-                {
-                    ClientCertificate =
-                    {
-                        Certificate = certificate
                     }
                 }
             };

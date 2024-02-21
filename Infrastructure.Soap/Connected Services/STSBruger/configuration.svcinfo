@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<configurationSnapshot xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="urn:schemas-microsoft-com:xml-wcfconfigurationsnapshot">
+<configurationSnapshot xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:schemas-microsoft-com:xml-wcfconfigurationsnapshot">
   <behaviors />
   <bindings>
-    <binding digest="System.ServiceModel.Configuration.BasicHttpBindingElement, System.ServiceModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089:&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;Data name=&quot;BrugerBinding&quot;&gt;&lt;security mode=&quot;Transport&quot; /&gt;&lt;/Data&gt;" bindingType="basicHttpBinding" name="BrugerBinding" />
+    <binding digest="System.ServiceModel.Configuration.CustomBindingElement, System.ServiceModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089:&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;Data name=&quot;Bruger&quot;&gt;&lt;httpTransport /&gt;&lt;textMessageEncoding messageVersion=&quot;Soap12&quot; /&gt;&lt;/Data&gt;" bindingType="customBinding" name="Bruger" />
   </bindings>
   <endpoints>
-    <endpoint normalizedDigest="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;Data address=&quot;https://localhost:8080/service/Organisation/Bruger/5&quot; binding=&quot;basicHttpBinding&quot; bindingConfiguration=&quot;BrugerBinding&quot; contract=&quot;STSBruger.BrugerPortType&quot; name=&quot;BrugerPort&quot; /&gt;" digest="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;Data address=&quot;https://localhost:8080/service/Organisation/Bruger/5&quot; binding=&quot;basicHttpBinding&quot; bindingConfiguration=&quot;BrugerBinding&quot; contract=&quot;STSBruger.BrugerPortType&quot; name=&quot;BrugerPort&quot; /&gt;" contractName="STSBruger.BrugerPortType" name="BrugerPort" />
+    <endpoint normalizedDigest="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;Data address=&quot;http://kombit.dk/sts/organisation/bruger&quot; binding=&quot;customBinding&quot; bindingConfiguration=&quot;Bruger&quot; contract=&quot;STSBruger.BrugerPortType&quot; name=&quot;Bruger&quot; /&gt;" digest="&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-16&quot;?&gt;&lt;Data address=&quot;http://kombit.dk/sts/organisation/bruger&quot; binding=&quot;customBinding&quot; bindingConfiguration=&quot;Bruger&quot; contract=&quot;STSBruger.BrugerPortType&quot; name=&quot;Bruger&quot; /&gt;" contractName="STSBruger.BrugerPortType" name="Bruger" />
   </endpoints>
 </configurationSnapshot>

@@ -69,7 +69,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 
         private static IEnumerable<EmailRecipientResponseDTO> MapEmailRecipientResponseDTOs(IEnumerable<EmailRecipientResultModel> recipients)
         {
-            return recipients.Select(MapEmailRecipientResponseDTO);
+            return recipients.Select(MapEmailRecipientResponseDTO).ToList();
         }
 
         private static EmailRecipientResponseDTO MapEmailRecipientResponseDTO(EmailRecipientResultModel notification)
@@ -82,7 +82,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 
         private static IEnumerable<RoleRecipientResponseDTO> MapRoleRecipientResponseDTOs(IEnumerable<RoleRecipientResultModel> recipients)
         {
-            return recipients.Select(MapRoleRecipientResponseDTO);
+            return recipients.Select(MapRoleRecipientResponseDTO).ToList();
         }
 
         private static RoleRecipientResponseDTO MapRoleRecipientResponseDTO(RoleRecipientResultModel recipient)

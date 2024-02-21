@@ -20,7 +20,7 @@ namespace Tests.Integration.Presentation.Web.Advice
         {
             //Arrange
             var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
-            var createAdvice = CreateAdvice(Scheduling.Day, AdviceType.Immediate, recipient);
+            var createAdvice = CreateAdvice(Scheduling.Day, AdviceType.Repeat, recipient);
 
             using var createResult = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
             Assert.Equal(HttpStatusCode.Created, createResult.StatusCode);

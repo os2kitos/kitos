@@ -58,7 +58,7 @@ namespace Presentation.Web.Controllers.API.V1
                 MapSystemsSetAsParentSystemToSystemsInOtherOrganizations(result),
                 result.DprInOtherOrganizationsWhereOrgIsDataProcessor.Select(MapToEntityWithOrganizationRelationshipDto).ToList(),
                 result.DprInOtherOrganizationsWhereOrgIsSubDataProcessor.Select(MapToEntityWithOrganizationRelationshipDto).ToList(),
-                result.ContractsInOtherOrganizationsWhereOrgIsSupplier.Select(MapToEntityWithOrganizationRelationshipDto).ToList(),
+                result.ContractsInOtherOrganizationsWhereOrgIsSupplier.Select(MapToEntityWithOrganizationRelationshipDto).OrderBy(x=> x.Organization.Name).ToList(),
                 result.SystemsInOtherOrganizationsWhereOrgIsRightsHolder.Select(MapToEntityWithOrganizationRelationshipDto).ToList(),
                 MapSystemsWhereOrgIsArchiveSupplier(result)
             );

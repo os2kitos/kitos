@@ -8,6 +8,7 @@ using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Organization.DomainServices;
+using Kombit.InfrastructureSamples.Token;
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;
@@ -25,7 +26,8 @@ namespace Tests.Unit.Core.DomainServices.Organizations
         {
             base.OnFixtureCreated(fixture);
             _companyLookupServiceMock = new Mock<IStsOrganizationCompanyLookupService>();
-            _sut = new StsOrganizationService(A<StsOrganisationIntegrationConfiguration>(), _companyLookupServiceMock.Object, new Mock<IStsOrganizationIdentityRepository>().Object, Mock.Of<ILogger>());
+            _sut = new StsOrganizationService(A<StsOrganisationIntegrationConfiguration>(), _companyLookupServiceMock.Object, new Mock<IStsOrganizationIdentityRepository>().Object, 
+                new TokenFetcher("", "", "", "", ""), Mock.Of<ILogger>());
         }
 
         [Theory]

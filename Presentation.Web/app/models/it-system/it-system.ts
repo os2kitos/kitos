@@ -22,6 +22,6 @@
         PreviousName: string;
         ArchiveDuty: string;
         ArchiveDutyComment: string;
-
+        ExternalUuid: string;
     }
 }

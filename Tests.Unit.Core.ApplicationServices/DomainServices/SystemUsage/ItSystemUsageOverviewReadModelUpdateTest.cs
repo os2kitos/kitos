@@ -78,7 +78,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             var outgoingRelationItSystem = new ItSystem
             {
                 Id = A<int>(),
-                Name = A<string>()
+                Name = A<string>(),
+                ExternalUuid = A<Guid>()
             };
             var outgoingRelationInterface = new ItInterface
             {
@@ -166,6 +167,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 OrganizationId = A<int>(),
                 Name = A<string>(),
                 Disabled = A<bool>(),
+                PreviousName= A<string>(),
                 Parent = parentSystem,
                 Uuid = A<Guid>(),
                 BelongsTo = new Organization
@@ -314,6 +316,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.HostedAt, readModel.HostedAt);
             Assert.Equal(systemUsage.riskAssesmentDate, readModel.RiskAssessmentDate);
             Assert.Equal(systemUsage.PlannedRiskAssessmentDate, readModel.PlannedRiskAssessmentDate);
+            Assert.Equal(systemUsage.ItSystem.PreviousName, readModel.SystemPreviousName);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
@@ -324,6 +327,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(system.Name, readModel.SystemName);
             Assert.Equal(system.Disabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
+            Assert.Equal(system.ExternalUuid, readModel.ExternalSystemUuid);
             Assert.Equal(system.BelongsTo.Id, readModel.ItSystemRightsHolderId);
             Assert.Equal(system.BelongsTo.Name, readModel.ItSystemRightsHolderName);
             Assert.Equal(system.BusinessType.Id, readModel.ItSystemBusinessTypeId);

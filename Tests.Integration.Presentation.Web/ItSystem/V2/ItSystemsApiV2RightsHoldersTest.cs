@@ -255,19 +255,19 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Theory]
-        [InlineData(true, true, false, true, true)]
-        [InlineData(false, true, true, true, true)]
-        [InlineData(true, false, false, true, true)]
         [InlineData(true, true, true, true, true)]
-        [InlineData(true, true, true, false, true)]
-        [InlineData(true, true, false, true, false)]
+        [InlineData(true, false, true, true, true)]
+        [InlineData(false, false, true, true, true)]
+        [InlineData(true, true, false, true, true)]
+        [InlineData(true, false, true, false, true)]
+        [InlineData(true, false, true, true, false)]
         [InlineData(false, false, false, false, false)]
 
-        public async Task Can_POST_ItSystem_As_RightsHolder(bool withProvidedUuid, bool withBusinessType, bool withKleUuid, bool withParent, bool withFormerName)
+        public async Task Can_POST_ItSystem_As_RightsHolder(bool withBusinessType, bool withKleUuid, bool withParent, bool withFormerName, bool withExternalUuid)
         {
             //Arrange
             var (userId, token, createdOrganization) = await CreateRightsHolderAccessUserInNewOrganizationAndGetFullUserAsync();
-            var input = await PrepareCreateRightsHolderSystemRequestAsync(withProvidedUuid, withBusinessType, withKleUuid, withParent, withFormerName, createdOrganization);
+            var input = await PrepareCreateRightsHolderSystemRequestAsync(withBusinessType, withKleUuid, withParent, withFormerName, withExternalUuid, createdOrganization);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(r => r.AsQueryable().ById(userId));
 
             //Act - create it and GET it to verify that response DTO matches input requests AND that a consecutive GET returns the same data
@@ -275,13 +275,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var fetchedSystem = await ItSystemV2Helper.GetSingleRightsHolderSystemAsync(token, createdSystem.Uuid);
 
             //Assert
-            if (withProvidedUuid)
-                Assert.Equal(input.Uuid, createdSystem.Uuid);
-            else
-                Assert.NotEqual(Guid.Empty, createdSystem.Uuid);
             Assert.Equal(input.Description, createdSystem.Description);
             Assert.Equal(input.Name, createdSystem.Name);
-            Assert.Equal(input.FormerName, createdSystem.FormerName);
+            Assert.Equal(input.PreviousName, createdSystem.FormerName);
             Assert.Equivalent(input.ExternalReferences, createdSystem.ExternalReferences);
             Assert.Equal(input.BusinessTypeUuid, createdSystem.BusinessType?.Uuid);
 
@@ -437,26 +433,27 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Theory]
-        [InlineData(true, true, true, true, true, true, true)]
-        [InlineData(true, true, true, true, true, true, false)]
-        [InlineData(true, true, true, true, true, false, false)]
-        [InlineData(true, true, true, true, false, false, false)]
-        [InlineData(true, true, true, false, false, false, false)]
-        [InlineData(true, true, false, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, false)]
-        public async Task Can_PUT_As_RightsHolder(bool updateName, bool updateFormerName, bool updateDescription, bool updateUrl, bool updateBusinessType, bool updateKle, bool updateParent)
+        [InlineData(true, true, true, true, true, true, true, true)]
+        [InlineData(true, true, true, true, true, true, false, false)]
+        [InlineData(true, true, true, true, true, false, false, false)]
+        [InlineData(true, true, true, true, false, false, false, false)]
+        [InlineData(true, true, true, false, false, false, false, false)]
+        [InlineData(true, true, false, false, false, false, false, false)]
+        [InlineData(true, false, false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false, true)]
+        [InlineData(false, false, false, false, false, false, false, false)]
+        public async Task Can_PUT_As_RightsHolder(bool updateName, bool updateFormerName, bool updateDescription, bool updateUrl, bool updateBusinessType, bool updateKle, bool updateParent, bool updateExternalUuid)
         {
             //Arrange
             var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
-            var createSystemRequest = await PrepareCreateRightsHolderSystemRequestAsync(false, true, false, true, true, rightsHolder);
+            var createSystemRequest = await PrepareCreateRightsHolderSystemRequestAsync(true, false, true, true, true, rightsHolder);
             var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest);
             var update = await A<RightsHolderFullItSystemRequestDTO>().Transform(async dto =>
             {
                 dto.ExternalReferences.ToList().ForEach(x => x.MasterReference = false);
                 dto.ExternalReferences.RandomItem().MasterReference = true;
                 dto.Name = updateName ? dto.Name : createdSystem.Name;
-                dto.FormerName = updateFormerName ? dto.FormerName : createdSystem.FormerName;
+                dto.PreviousName = updateFormerName ? dto.PreviousName : createdSystem.FormerName;
                 dto.Description = updateDescription ? dto.Description : createdSystem.Description;
                 dto.BusinessTypeUuid = updateBusinessType ? GetBusinessType(1) : createdSystem.BusinessType.Uuid;
                 dto.ExternalReferences = updateUrl ? dto.ExternalReferences : createdSystem.ExternalReferences.Select(er => new ExternalReferenceDataWriteRequestDTO()
@@ -467,6 +464,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                     Url = er.Url
                 });
                 dto.KLEUuids = null;
+                dto.ExternalUuid = updateExternalUuid ? dto.ExternalUuid : createdSystem.ExternalUuid;
                 dto.ParentUuid = updateParent ? (await CreateSystemAsync(rightsHolder.Id, AccessModifier.Public)).uuid : createdSystem.ParentSystem.Uuid;
                 return dto;
             });
@@ -481,7 +479,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             createdSystem.RightsHolder.ToExpectedObject().ShouldMatch(updatedSystem.RightsHolder); //No changes expected
             Assert.Equal(update.Name, updatedSystem.Name);
             Assert.Equal(update.Description, updatedSystem.Description);
-            Assert.Equal(update.FormerName, updatedSystem.FormerName);
+            Assert.Equal(update.PreviousName, updatedSystem.FormerName);
+            Assert.Equal(update.ExternalUuid, updatedSystem.ExternalUuid);
             Assert.Equal(update.BusinessTypeUuid.GetValueOrDefault(), updatedSystem.BusinessType.Uuid);
             Assert.Equal(update.ParentUuid.GetValueOrDefault(), updatedSystem.ParentSystem.Uuid);
 
@@ -492,24 +491,25 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Theory]
-        [InlineData(true, true, true, true, true, true, true)]
-        [InlineData(true, true, true, true, true, true, false)]
-        [InlineData(true, true, true, true, true, false, false)]
-        [InlineData(true, true, true, true, false, false, false)]
-        [InlineData(true, true, true, false, false, false, false)]
-        [InlineData(true, true, false, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, false)]
-        public async Task Can_PATCH_As_RightsHolder(bool updateName, bool updateFormerName, bool updateDescription, bool updateUrl, bool updateBusinessType, bool updateKle, bool updateParent)
+        [InlineData(true, true, true, true, true, true, true, true)]
+        [InlineData(true, true, true, true, true, true, false, false)]
+        [InlineData(true, true, true, true, true, false, false, false)]
+        [InlineData(true, true, true, true, false, false, false, false)]
+        [InlineData(true, true, true, false, false, false, false, false)]
+        [InlineData(true, true, false, false, false, false, false, false)]
+        [InlineData(true, false, false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false, true)]
+        [InlineData(false, false, false, false, false, false, false, false)]
+        public async Task Can_PATCH_As_RightsHolder(bool updateName, bool updateFormerName, bool updateDescription, bool updateUrl, bool updateBusinessType, bool updateKle, bool updateParent, bool updateExternalUuid)
         {
             //Arrange
             var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
-            var createSystemRequest = await PrepareCreateRightsHolderSystemRequestAsync(false, true, false, true, true, rightsHolder);
+            var createSystemRequest = await PrepareCreateRightsHolderSystemRequestAsync(true, false, true, true, true, rightsHolder);
             var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest);
 
             var changes = new Dictionary<string, object>();
             if (updateName) changes.Add(nameof(RightsHolderFullItSystemRequestDTO.Name), CreateName());
-            if (updateFormerName) changes.Add(nameof(RightsHolderFullItSystemRequestDTO.FormerName), A<string>());
+            if (updateFormerName) changes.Add(nameof(RightsHolderFullItSystemRequestDTO.PreviousName), A<string>());
             if (updateDescription) changes.Add(nameof(RightsHolderFullItSystemRequestDTO.Description), A<string>());
             if (updateBusinessType) changes.Add(nameof(RightsHolderFullItSystemRequestDTO.BusinessTypeUuid), GetBusinessType(1));
             if (updateParent) changes.Add(nameof(RightsHolderFullItSystemRequestDTO.ParentUuid), (await CreateSystemAsync(rightsHolder.Id, AccessModifier.Public)).uuid);
@@ -518,6 +518,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 x.MasterReference = true;
                 return x;
             }).WrapAsEnumerable().ToList());
+            if (updateExternalUuid) changes.Add(nameof(RightsHolderFullItSystemRequestDTO.ExternalUuid), A<Guid>());
 
             //Act
             var updatedSystem = await ItSystemV2Helper.PatchRightsHolderSystemAsync(token, createdSystem.Uuid, changes.ToArray());
@@ -527,11 +528,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(createdSystem.Created, updatedSystem.Created); //No changes expected
             createdSystem.RightsHolder.ToExpectedObject().ShouldMatch(updatedSystem.RightsHolder); //No changes expected
             Assert.Equal(updateName ? changes[nameof(RightsHolderFullItSystemRequestDTO.Name)] : createdSystem.Name, updatedSystem.Name);
-            Assert.Equal(updateFormerName ? changes[nameof(RightsHolderFullItSystemRequestDTO.FormerName)] : createdSystem.FormerName, updatedSystem.FormerName);
+            Assert.Equal(updateFormerName ? changes[nameof(RightsHolderFullItSystemRequestDTO.PreviousName)] : createdSystem.FormerName, updatedSystem.FormerName);
             Assert.Equal(updateDescription ? changes[nameof(RightsHolderFullItSystemRequestDTO.Description)] : createdSystem.Description, updatedSystem.Description);
             Assert.Equal(updateBusinessType ? changes[nameof(RightsHolderFullItSystemRequestDTO.BusinessTypeUuid)] : createdSystem.BusinessType?.Uuid, updatedSystem.BusinessType?.Uuid);
             Assert.Equal(updateParent ? changes[nameof(RightsHolderFullItSystemRequestDTO.ParentUuid)] : createdSystem.ParentSystem?.Uuid, updatedSystem.ParentSystem?.Uuid);
             Assert.Equivalent(updateUrl ? changes[nameof(RightsHolderFullItSystemRequestDTO.ExternalReferences)] : createdSystem.ExternalReferences, updatedSystem.ExternalReferences);
+            Assert.Equivalent(updateExternalUuid ? changes[nameof(RightsHolderFullItSystemRequestDTO.ExternalUuid)] : createdSystem.ExternalUuid, updatedSystem.ExternalUuid);
         }
 
         [Theory]
@@ -542,7 +544,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             //Arrange
             var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
-            var createSystemRequest = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, true, rightsHolder);
+            var createSystemRequest = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, true, false, rightsHolder);
             var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest);
             var update = A<RightsHolderFullItSystemRequestDTO>().Transform(dto =>
             {
@@ -568,7 +570,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
             var (parentUuid, _) = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
 
-            var createSystemRequest = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, true, rightsHolder);
+            var createSystemRequest = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, true, false, rightsHolder);
             var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest);
             var update = A<RightsHolderFullItSystemRequestDTO>().Transform(dto =>
             {
@@ -591,9 +593,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             //Arrange
             var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
-            var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, true, rightsHolder);
+            var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, true, false, rightsHolder);
             var createdSystem1 = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest1);
-            var createSystemRequest2 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, true, rightsHolder);
+            var createSystemRequest2 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, true, false, rightsHolder);
             var createdSystem2 = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest2);
 
             var update = A<RightsHolderFullItSystemRequestDTO>().Transform(dto =>
@@ -617,7 +619,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             //Arrange
             var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
-            var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, true, rightsHolder);
+            var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, true, false, rightsHolder);
             var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest1);
 
             var reason = A<DeactivationReasonRequestDTO>();
@@ -636,7 +638,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             //Arrange
             var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
-            var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, true, rightsHolder);
+            var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, true, false, rightsHolder);
             var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest1);
 
             var reason = new DeactivationReasonRequestDTO() { DeactivationReason = string.Empty };
@@ -687,7 +689,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             //Arrange
             var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
-            var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, true, rightsHolder);
+            var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, true, false, rightsHolder);
             var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest1);
             DatabaseAccess.MutateEntitySet<Core.DomainModel.ItSystem.ItSystem>(repository => repository.AsQueryable().ByUuid(createdSystem.Uuid).Deactivate());
 
@@ -714,11 +716,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         private async Task<RightsHolderFullItSystemRequestDTO> PrepareCreateRightsHolderSystemRequestAsync(
-            bool withProvidedUuid,
             bool withBusinessType,
             bool withKleUuid,
             bool withParent,
             bool withFormerName,
+            bool withExternalUuid,
             OrganizationDTO rightsHolderOrganization)
         {
             var parentCandidate = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), rightsHolderOrganization.Id, AccessModifier.Local);
@@ -729,13 +731,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             return new RightsHolderFullItSystemRequestDTO
             {
                 RightsHolderUuid = rightsHolderOrganization.Uuid,
-                Uuid = withProvidedUuid ? Guid.NewGuid() : null,
                 Name = $"Name_{A<string>()}",
                 Description = $"Description_{A<string>()}",
-                FormerName = withFormerName ? $"FormerName_{A<string>()}" : null,
+                PreviousName = withFormerName ? $"FormerName_{A<string>()}" : null,
                 BusinessTypeUuid = withBusinessType ? businessType : null,
-                KLEUuids = withKleUuid ? new[] { kle.uuid } : new Guid[0],
+                KLEUuids = withKleUuid ? new[] { kle.uuid } : Array.Empty<Guid>(),
                 ParentUuid = withParent ? parentCandidate.Uuid : null,
+                ExternalUuid = withExternalUuid ? A<Guid>() : null,
                 ExternalReferences = A<ExternalReferenceDataWriteRequestDTO>().Transform(x =>
                 {
                     x.MasterReference = true;

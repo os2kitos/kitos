@@ -105,4 +105,48 @@
     <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationEndpointHost']/value/text()"/>
   </parameter>
 
+  <parameter name="StsIssuer" defaultvalue="__STS_ISSUER">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsIssuer']/value/text()"/>
+  </parameter>
+
+  <parameter name="StsCertificateEndpoint" defaultvalue="__STS_CERT_ENDPOINT">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsCertificateEndpoint']/value/text()"/>
+  </parameter>
+
+  <parameter name="ServiceCertificateAliasOrg" defaultvalue="__SERVICE_CERT_ALIAS_ORG">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='ServiceCertificateAliasOrg']/value/text()"/>
+  </parameter>
+
+  <parameter name="StsCertificateAlias" defaultvalue="__STS_CERT_ALIAS">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsCertificateAlias']/value/text()"/>
+  </parameter>
+
+  <parameter name="StsCertificateThumbprint" defaultvalue="__STS_CERT_THUMBPRINT">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsCertificateThumbprint']/value/text()"/>
+  </parameter>
+
+  <parameter name="OrgService6EntityId" defaultvalue="__ORG_SERVICE_6_ENTITY_ID">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='OrgService6EntityId']/value/text()"/>
+  </parameter>
+  
+  <parameter name="StsVirksomhedPort" defaultvalue="__STS_VIRKSOMHED_PORT">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='VirksomhedPort']/@address"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsVirksomhedPort']/value/text()"/>
+  </parameter>
+  
+  <parameter name="StsOrganisationPort" defaultvalue="__STS_ORGANISATION_PORT">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='OrganisationPort']/@address"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationPort']/value/text()"/>
+  </parameter>
+  
+  <parameter name="StsOrganisationSystemPort" defaultvalue="__STS_ORGANISATION_SYSTEM_PORT">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='OrganisationSystemPort']/@address"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationSystemPort']/value/text()"/>
+  </parameter>
+  
+  <parameter name="StsOrganisationCertificateThumbprint" defaultvalue="__STS_ORGANISATION_CERTIFICATE_THUMBPRINT">
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/behaviors/endpointBehaviors/behavior/clientCredentials/serviceCertificate/defaultCertificate/@findValue"/>
+    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationCertificateThumbprint']/value/text()"/>
+  </parameter>
+
 </parameters>
