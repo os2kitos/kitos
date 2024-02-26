@@ -1,17 +1,18 @@
-﻿using System.Linq;
+﻿using System;
 using AutoFixture;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
+using System.Linq;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.DomainServices
 {
-    public class QueryExceptEntitiesWithIdsTest : WithAutoFixture
+    public class QueryExceptEntitiesWithUuidsTest : WithAutoFixture
     {
         protected override void OnFixtureCreated(Fixture fixture)
         {
-            fixture.Register(() => new ItSystem { Id = fixture.Create<int>() });
+            fixture.Register(() => new ItSystem { Uuid = fixture.Create<Guid>() });
             base.OnFixtureCreated(fixture);
         }
 
@@ -21,7 +22,7 @@ namespace Tests.Unit.Presentation.Web.DomainServices
             //Arrange
             var excludedSystems = Many<ItSystem>().ToList();
             var includedSystems = Many<ItSystem>().ToList();
-            var sut = new QueryExceptEntitiesWithIds<ItSystem>(excludedSystems.Select(x => x.Id));
+            var sut = new QueryExceptEntitiesWithUuids<ItSystem>(excludedSystems.Select(x => x.Uuid));
             var input = excludedSystems.Concat(includedSystems).AsQueryable();
 
             //Act
@@ -29,20 +30,6 @@ namespace Tests.Unit.Presentation.Web.DomainServices
 
             //Assert
             Assert.True(includedSystems.SequenceEqual(result));
-        }
-
-        [Fact]
-        public void Apply_Echoes_Input_If_No_Excluded_Ids_Provided()
-        {
-            //Arrange
-            var sut = new QueryExceptEntitiesWithIds<ItSystem>(Enumerable.Empty<int>());
-            var input = Many<ItSystem>().AsQueryable();
-
-            //Act
-            var result = sut.Apply(input);
-
-            //Assert
-            Assert.Same(input,result);
         }
     }
 }
