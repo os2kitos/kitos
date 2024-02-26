@@ -167,5 +167,43 @@ namespace Presentation.Web.Properties {
                 return ((string)(this["OrgService6EntityId"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://organisation.eksterntest-stoettesystemerne.dk/organisation/virksomhed/6")]
+        public string StsVirksomhedPort {
+            get {
+                return ((string)(this["StsVirksomhedPort"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://organisation.eksterntest-stoettesystemerne.dk/organisation/organisation/6" +
+            "")]
+        public string StsOrganisationPort {
+            get {
+                return ((string)(this["StsOrganisationPort"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://organisation.eksterntest-stoettesystemerne.dk/organisation/organisationsy" +
+            "stem/6")]
+        public string StsOrganisationSystemPort {
+            get {
+                return ((string)(this["StsOrganisationSystemPort"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2c34be56b35d993160df525c36146336ea2b2801")]
+        public string StsOrganisationCertificateThumbprint {
+            get {
+                return ((string)(this["StsOrganisationCertificateThumbprint"]));
+            }
+        }
     }
 }
