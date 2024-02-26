@@ -124,6 +124,7 @@
     <Compile Include="Queries\Interface\QueryByRightsHolder.cs" />
     <Compile Include="Queries\Interface\QueryByRightsHolderIdsOrOwnOrganizationIds.cs" />
     <Compile Include="Queries\Interface\QueryByExposingSystem.cs" />
+    <Compile Include="Queries\ItSystem\QueryExceptChildrenOfUuid.cs" />
     <Compile Include="Queries\KLE\QueryByDescriptionContent.cs" />
     <Compile Include="Queries\KLE\QueryByKeyPrefix.cs" />
     <Compile Include="Queries\KLE\QueryByParentKey.cs" />
@@ -138,6 +139,7 @@
     <Compile Include="Queries\QueryByEnabledEntitiesOnly.cs" />
     <Compile Include="Queries\QueryByOrganizationUuid.cs" />
     <Compile Include="Queries\QueryByUuid.cs" />
+    <Compile Include="Queries\QueryExceptEntitiesWithUuids.cs" />
     <Compile Include="Queries\SystemUsage\QueryByRelationToSystem.cs" />
     <Compile Include="Queries\SystemUsage\QueryByRelationToContract.cs" />
     <Compile Include="Queries\SystemUsage\QueryByRelationToSystemUsage.cs" />
