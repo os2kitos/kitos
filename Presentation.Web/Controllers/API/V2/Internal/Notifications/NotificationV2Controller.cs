@@ -281,7 +281,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
                 .Select(x => x.Select(_responseMapper.MapNotificationSentResponseDTO)
                     .ToList()
                 )
-                .Transform(Ok);
+                .Match(Ok, FromOperationError); 
         }
 
         /// <summary>
