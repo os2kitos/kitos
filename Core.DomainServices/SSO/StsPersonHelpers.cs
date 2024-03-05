@@ -1,10 +1,6 @@
 ﻿using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
-using Infrastructure.Soap.STSPerson;
-using LaesInputType = Infrastructure.Soap.STSPerson.LaesInputType;
-using laesRequest = Infrastructure.Soap.STSPerson.laesRequest;
-using LivscyklusKodeType = Infrastructure.Soap.STSPerson.LivscyklusKodeType;
-using RegistreringType1 = Infrastructure.Soap.STSPerson.RegistreringType1;
+using Kombit.InfrastructureSamples.PersonService;
 
 namespace Core.DomainServices.SSO
 {
@@ -35,9 +31,9 @@ namespace Core.DomainServices.SSO
             return client;
         }
 
-        public static bool IsStsPersonObsolete(this RegistreringType1 registreringType1)
+        public static bool IsStsPersonObsolete(this RegistreringType10 registreringType10)
         {
-            return registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Slettet) ||
-                   registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Passiveret);
+            return registreringType10.LivscyklusKode.Equals(LivscyklusKodeType.Slettet) ||
+                   registreringType10.LivscyklusKode.Equals(LivscyklusKodeType.Passiveret);
         }
     }}
