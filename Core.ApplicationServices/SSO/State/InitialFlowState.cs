@@ -85,11 +85,12 @@ namespace Core.ApplicationServices.SSO.State
 
         private bool CurrentUserHasKitosPrivilege()
         {
-            return true;
+            // For local testing using Korsbaek Kommune users, uncomment the following line
+            // return true;
 
-            //_parser
-            //.MatchPrivilege(_samlKitosReadAccessRoleIdentifier)
-            //.HasValue;
+            return _parser
+            .MatchPrivilege(_samlKitosReadAccessRoleIdentifier)
+            .HasValue;
         }
     }
 }
