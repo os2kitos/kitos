@@ -71,7 +71,7 @@ namespace Core.ApplicationServices.SSO.State
             }
             catch (Exception e)
             {
-                _logger.Error(e,"Failed to joind privileges");
+                _logger.Error(e,"Failed to join privileges");
             }
 
             return "ERROR creating privileges as string";

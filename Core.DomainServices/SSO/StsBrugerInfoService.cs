@@ -25,28 +25,28 @@ namespace Core.DomainServices.SSO
             _tokenFetcher = tokenFetcher;
         }
 
-        public Maybe<StsBrugerInfo> GetStsBrugerInfo(Guid uuid, string cvrNumber)
+        public Result<StsBrugerInfo, string> GetStsBrugerInfo(Guid uuid, string cvrNumber)
         {
             var brugerInfo = CollectStsBrugerInformationFromUuid(uuid, cvrNumber);
             if (brugerInfo.Failed)
             {
-                _logger.Error("Failed to resolve UUIDS '{error}'", brugerInfo.Error);
-                return Maybe<StsBrugerInfo>.None;
+                _logger.Error("Failed to resolve user UUID '{error}'", brugerInfo.Error);
+                return brugerInfo.Error;
             }
 
             var (emailAdresseUuid, organisationUuid, personUuid) = brugerInfo.Value;
             var emailsResult = GetStsAdresseEmailFromUuid(emailAdresseUuid, cvrNumber);
             if (emailsResult.Failed)
             {
-                _logger.Error("Failed to resolve Emails '{error}'", emailsResult.Error);
-                return Maybe<StsBrugerInfo>.None;
+                _logger.Error("Failed to resolve Email '{error}'", emailsResult.Error);
+                return brugerInfo.Error;
             }
 
             var personData = GetStsPersonFromUuid(personUuid, cvrNumber);
             if (personData.Failed)
             {
                 _logger.Error("Failed to resolve Person '{error}'", personData.Error);
-                return Maybe<StsBrugerInfo>.None;
+                return brugerInfo.Error;
             }
 
             return new StsBrugerInfo(
@@ -61,8 +61,10 @@ namespace Core.DomainServices.SSO
         private Result<(string emailAdresseUuid, string organisationUuid, string personUuid), string> CollectStsBrugerInformationFromUuid(Guid uuid, string cvrNumber)
         {
             var port = PortFactory.CreateBrugerPort(_tokenFetcher, _configuration, cvrNumber);
+            if (port.Failed) return port.Error;
+           
             var laesRequest = StsBrugerHelpers.CreateStsBrugerLaesRequest(uuid);
-            var laesResponseResult = port.laes(laesRequest);
+            var laesResponseResult = port.Value.laes(laesRequest);
 
             if (laesResponseResult == null)
                 return $"Failed to fetch data from STS Bruger from uuid {uuid}";
@@ -156,8 +158,10 @@ namespace Core.DomainServices.SSO
         private Result<IEnumerable<string>, string> GetStsAdresseEmailFromUuid(string emailAdresseUuid, string cvrNumber)
         {
             var port = PortFactory.CreateAdressePort(_tokenFetcher, _configuration, cvrNumber);
+            if (port.Failed) return port.Error;
+
             var laesRequest = StsAdresseHelpers.CreateStsAdresseLaesRequest(emailAdresseUuid);
-            var laesResponse = port.laes(laesRequest);
+            var laesResponse = port.Value.laes(laesRequest);
 
             if (laesResponse == null)
                 return $"Failed to read STS Adresse from emailAdresseUUID {emailAdresseUuid}";
@@ -207,8 +211,10 @@ namespace Core.DomainServices.SSO
         private Result<StsPersonData, string> GetStsPersonFromUuid(string personUuid, string cvrNumber)
         {
             var port = PortFactory.CreatePersonPort(_tokenFetcher, _configuration, cvrNumber);
+            if (port.Failed) return port.Error;
+
             var laesRequest = StsPersonHelpers.CreateStsPersonLaesRequest(personUuid);
-            var laesResponse = port.laes(laesRequest);
+            var laesResponse = port.Value.laes(laesRequest);
 
             if (laesResponse == null)
                 return $"Failed to read from STS Person with personUUID:{personUuid}";

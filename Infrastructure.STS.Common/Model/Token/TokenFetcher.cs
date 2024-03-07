@@ -111,8 +111,7 @@ public class TokenFetcher
             StoreLocation.LocalMachine,
             _stsCertificateThumbprint);
         factory.Credentials.ServiceCertificate.ScopedCertificates.Add(stsAddress.Uri, certificate);
-        factory.Credentials.ServiceCertificate.Authentication.CertificateValidationMode =
-            X509CertificateValidationMode.None;
+        factory.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.ChainTrust;
         // Disable revocation checking (do not use in production)
         // Should be uncommented if you intent to call DemoService locally.
         // factory.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
