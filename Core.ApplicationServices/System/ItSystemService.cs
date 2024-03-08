@@ -348,6 +348,12 @@ namespace Core.ApplicationServices.System
                 : Array.Empty<SystemDeletionConflict>();
         }
 
+        private bool GetEditVisibilityPermission(Result<ItSystem, OperationError> systemResult)
+        {
+            return systemResult.Select(system =>
+                _authorizationContext.HasPermission(new CreateEntityWithVisibilityPermission(system.AccessModifier, system, system.OrganizationId)));
+        }
+
         private static IEnumerable<SystemDeletionConflict> GetDeletionConflicts(ItSystem arg)
         {
             if (arg.Children.Any())
