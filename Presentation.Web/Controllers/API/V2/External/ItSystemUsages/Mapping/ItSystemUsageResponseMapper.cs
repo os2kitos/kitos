@@ -232,6 +232,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return systemUsage.LifeCycleStatus?.ToLifeCycleStatusChoice();
         }
 
+        public GeneralSystemRelationResponseDTO MapGeneralSystemRelationDTO(SystemRelation systemRelation)
+        {
+            var dto = new GeneralSystemRelationResponseDTO
+            {
+                ToSystemUsage = systemRelation.ToSystemUsage?.MapIdentityNamePairDTO(),
+                FromSystemUsage = systemRelation.FromSystemUsage?.MapIdentityNamePairDTO()
+            };
+            return MapSharedRelationProperties(systemRelation, dto);
+        }
+
         public OutgoingSystemRelationResponseDTO MapOutgoingSystemRelationDTO(SystemRelation systemRelation)
         {
             var dto = new OutgoingSystemRelationResponseDTO
