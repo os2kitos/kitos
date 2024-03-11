@@ -334,11 +334,13 @@ namespace Core.ApplicationServices.System
             return systemResult
                 .Transform
                 (
-                    system => ResourcePermissionsResult
-                        .FromResolutionResult(system, _authorizationContext)
-                        .Select(permissions =>
-                            new SystemPermissions(permissions, GetDeletionConflicts(system, permissions.Delete)))
-                );
+                    system =>
+                    {
+                        return ResourcePermissionsResult
+                            .FromResolutionResult(system, _authorizationContext)
+                            .Select(permissions =>
+                                new SystemPermissions(permissions, GetDeletionConflicts(system, permissions.Delete), GetEditVisibilityPermission(system, permissions.Modify)));
+                    });
         }
 
         private static IEnumerable<SystemDeletionConflict> GetDeletionConflicts(Result<ItSystem, OperationError> system, bool allowDelete)
@@ -348,10 +350,15 @@ namespace Core.ApplicationServices.System
                 : Array.Empty<SystemDeletionConflict>();
         }
 
-        private bool GetEditVisibilityPermission(Result<ItSystem, OperationError> systemResult)
+        private bool GetEditVisibilityPermission(Result<ItSystem, OperationError> system, bool allowModify)
         {
-            return systemResult.Select(system =>
-                _authorizationContext.HasPermission(new CreateEntityWithVisibilityPermission(system.AccessModifier, system, system.OrganizationId)));
+            return allowModify && system.Select(GetEditVisibilityPermission).Match(permission => permission, _ => false);
+        }
+
+        private bool GetEditVisibilityPermission(ItSystem system)
+        {
+            return system.AccessModifier == AccessModifier.Local ||
+                _authorizationContext.HasPermission(new VisibilityControlPermission(system));
         }
 
         private static IEnumerable<SystemDeletionConflict> GetDeletionConflicts(ItSystem arg)
