@@ -132,6 +132,7 @@
     <Compile Include="Contract\ItContractSequentialTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
+    <Compile Include="GDPR\V2\DataProcessingRegistrationInternalAPIV2Test.cs" />
     <Compile Include="Headers\V2EnumSerializationTest.cs" />
     <Compile Include="Interfaces\V2\BaseItInterfaceApiV2Test.cs" />
     <Compile Include="Interfaces\V2\RightsHolderItInterfaceApiV2Test.cs" />
@@ -148,6 +149,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Tools\Internal\DPR\DataProcessingRegistrationInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\ItSystemUsage\ItSystemUsageMigrationV2Helper.cs" />
     <Compile Include="Tools\Internal\Notifications\NotificationV2Helper.cs" />
     <Compile Include="Users\OrganizationRightApiTest.cs" />
@@ -294,6 +296,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
