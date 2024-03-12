@@ -359,13 +359,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Arrange
             var itSystemUsage = new ItSystemUsage();
             AssignBasicProperties(itSystemUsage);
-            var incomingSystemRelation = CreateOutgoingSystemRelation(itSystemUsage, withContract, withFrequency, withInterface);
+            var outgoingSystemRelation = CreateOutgoingSystemRelation(itSystemUsage, withContract, withFrequency, withInterface);
 
             //Act
-            var dto = _sut.MapGeneralSystemRelationDTO(incomingSystemRelation);
+            var dto = _sut.MapGeneralSystemRelationDTO(outgoingSystemRelation);
 
             //Assert
-            AssertGeneralRelation(incomingSystemRelation, dto);
+            AssertGeneralRelation(outgoingSystemRelation, dto);
         }
 
         [Fact]
