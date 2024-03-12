@@ -1439,7 +1439,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var uuid = A<Guid>();
-            var itSystem = new ItSystem { Uuid = uuid };
+            var itSystem = new ItSystem { Uuid = uuid, AccessModifier = AccessModifier.Public};
             ExpectGetSystemReturns(uuid, itSystem);
             ExpectAllowReadsReturns(itSystem, read);
             ExpectAllowModifyReturns(itSystem, modify);
@@ -1681,7 +1681,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private void ExpectAllowEditVisibilityReturns(ItSystem system, bool value)
         {
-            _authorizationContext.Setup(x => x.HasPermission(new VisibilityControlPermission(system)))
+            _authorizationContext.Setup(x => x.HasPermission(It.Is<VisibilityControlPermission>(x => x.Target.Id == system.Id)))
                 .Returns(value);
         }
 
