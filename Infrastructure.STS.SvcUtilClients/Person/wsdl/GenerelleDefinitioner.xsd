@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        targetNamespace="urn:oio:sts:6"
+        xmlns:oio="urn:oio:definitions:1.0.0"
+        oio:mapping="urn:oio:sagdok:MPD:3.0.0">
+
+    <element name="CVR-NummerTekst" oio:definition="urn:oio:sts:cvrnummer:BDD:6">
+        <simpleType>
+            <restriction base="string">
+                <pattern value="[0-9]{8}"/>
+            </restriction>
+        </simpleType>
+    </element>
+    <element name="SE-NummerTekst" oio:definition="urn:oio:sts:senummer:BDD:6">
+        <simpleType>
+            <restriction base="string">
+                <pattern value="[0-9]{8}"/>
+            </restriction>
+        </simpleType>
+    </element>
+    <element name="P-NummerTekst" oio:definition="urn:oio:sts:pnummer:BDD:6">
+        <simpleType>
+            <restriction base="string">
+                <pattern value="[0-9]{10}"/>
+            </restriction>
+        </simpleType>
+    </element>
+    <element name="CPR-NummerTekst" oio:definition="urn:oio:sts:cprnummer:BDD:6">
+        <simpleType>
+            <restriction base="string">
+                <pattern value="[0-9]{10}"/>
+            </restriction>
+        </simpleType>
+    </element>
+    <element name="NavnTekst" oio:definition="urn:oio:sts:navn:BDD:6">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="200"/>
+            </restriction>
+        </simpleType>
+    </element>
+    <simpleType name="ShortNavnTekst" oio:definition="urn:oio:sts:shortnavn:BDD:6">
+            <restriction base="string">
+                <maxLength value="100"/>
+            </restriction>
+    </simpleType>
+    <element name="AdresseTekst" oio:definition="urn:oio:sts:email:BDD:6">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="200"/>
+            </restriction>
+        </simpleType>
+    </element>
+    <element name="MyndighedsKode" oio:definition="urn:oio:sts:email:BDD:6">
+        <simpleType>
+            <restriction base="string">
+                <pattern value="[0-9]{3}|[0-9]{4}"/>
+            </restriction>
+        </simpleType>
+    </element>
+</schema>

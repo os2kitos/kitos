@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.SSO
             }
             catch (Exception e)
             {
-                _logger.Error(e, "Unknown error in SSO flow");
+                _logger.Error(e, "Unknown error in SSO flow: {errorCode}", e.Message);
             }
             // Shut down gracefully
             return SsoError(SsoErrorCode.Unknown);

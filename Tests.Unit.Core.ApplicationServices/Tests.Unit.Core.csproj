@@ -322,10 +322,6 @@
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Soap\Infrastructure.STS.SSO.csproj">
-      <Project>{a05389ea-25f4-45b5-8534-0775d9671456}</Project>
-      <Name>Infrastructure.STS.SSO</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.STS.Common\Infrastructure.STS.Common.csproj">
       <Project>{423D7522-4882-4438-94F4-7B3F5778C83F}</Project>
       <Name>Infrastructure.STS.Common</Name>

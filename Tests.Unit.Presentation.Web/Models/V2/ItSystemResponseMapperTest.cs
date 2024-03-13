@@ -81,7 +81,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_Permissions()
         {
             //Arrange
-            var input = new SystemPermissions(A<ResourcePermissionsResult>(), EnumRange.All<SystemDeletionConflict>().RandomItems(2));
+            var input = new SystemPermissions(A<ResourcePermissionsResult>(), EnumRange.All<SystemDeletionConflict>().RandomItems(2), A<bool>());
 
             //Act
             var dto = _sut.MapPermissions(input);

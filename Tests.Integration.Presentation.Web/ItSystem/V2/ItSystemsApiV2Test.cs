@@ -641,10 +641,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
-        [InlineData(OrganizationRole.LocalAdmin, true, true, true)]
-        [InlineData(OrganizationRole.User, true, false, false)]
-        public async Task Can_Get_ItSystem_Permissions(OrganizationRole role, bool read, bool modify, bool delete)
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, true, false)]
+        [InlineData(OrganizationRole.User, true, false, false, false)]
+        public async Task Can_Get_ItSystem_Permissions(OrganizationRole role, bool read, bool modify, bool delete, bool modifyVisibility)
         {
             //Arrange
             var org = await CreateOrganizationAsync();
@@ -663,7 +663,34 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 Read = read,
                 Modify = modify,
                 Delete = delete,
-                DeletionConflicts = new List<SystemDeletionConflict>()
+                DeletionConflicts = new List<SystemDeletionConflict>(),
+                ModifyVisibility = modifyVisibility
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        [Fact]
+        public async Task Can_Get_ItSystem_Modify_Visibility_Permission()
+        {
+            //Arrange
+            var org = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUser(org.Id);
+
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, org.Id).DisposeAsync();
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Local);
+
+            //Act
+            var permissionsResponseDto = await ItSystemV2Helper.GetPermissionsAsync(token, system.Uuid);
+
+            //Assert
+            var expected = new ItSystemPermissionsResponseDTO
+            {
+                Read = true,
+                Modify = true,
+                Delete = true,
+                DeletionConflicts = new List<SystemDeletionConflict>(),
+                ModifyVisibility = true
             };
             Assert.Equivalent(expected, permissionsResponseDto);
         }
@@ -711,7 +738,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             {
                 Name = A<string>(),
                 OrganizationUuid = org.Uuid,
-                Scope = RegistrationScopeChoice.Global,
+                Scope = RegistrationScopeChoice.Global
             });
             await createConflict(token.Token, system);
 
@@ -727,8 +754,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 DeletionConflicts = new List<SystemDeletionConflict>
                 {
                     expectedConflict
-                }
-
+                },
+                ModifyVisibility = true
             };
             Assert.Equivalent(expected, permissionsResponseDto);
         }

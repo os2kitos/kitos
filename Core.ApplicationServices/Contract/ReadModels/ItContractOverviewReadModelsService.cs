@@ -28,7 +28,7 @@ namespace Core.ApplicationServices.Contract.ReadModels
             return Result<IQueryable<ItContractOverviewReadModel>, OperationError>.Success(_repository.GetByOrganizationId(organizationId));
         }
 
-        public Result<IQueryable<ItContractOverviewReadModel>, OperationError> GetByOrganizationIdAndIdOrgOrganizationUnitSubTree(int organizationId, int organizationUnitId)
+        public Result<IQueryable<ItContractOverviewReadModel>, OperationError> GetByOrganizationIdOrUnitIdInSubTree(int organizationId, int organizationUnitId)
         {
             if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
             {

@@ -1,0 +1,1075 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        targetNamespace="urn:oio:sagdok:3.0.0"
+        xmlns:oio="urn:oio:definitions:1.0.0"
+        xmlns:sd="urn:oio:sagdok:3.0.0"
+        oio:mapping="urn:oio:sagdok:MPD:3.0.0">
+
+    <element name="ImportInput" type="sd:ImportInputType" oio:definition="urn:oio:sagdok:importinput:ADD:1.0.0"/>
+    <complexType name="ImportInputType" oio:definition="urn:oio:sagdok:importinput:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:NoteTekst" minOccurs="0" oio:content="note"/>
+        </sequence>
+    </complexType>
+
+    <element name="UuidNoteInput" type="sd:UuidNoteInputType" oio:definition="urn:oio:sagdok:uuidnote:ADD:1.0.0"/>
+    <complexType name="UuidNoteInputType" oio:definition="urn:oio:sagdok:uuidnote:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:UUIDIdentifikator" oio:content="uuid"/>
+            <element ref="sd:NoteTekst" minOccurs="0" oio:content="note"/>
+        </sequence>
+    </complexType>
+
+    <element name="OpretInput" type="sd:OpretInputType" oio:definition="urn:oio:sagdok:opretinput:ADD:1.0.0"/>
+    <complexType name="OpretInputType" oio:definition="urn:oio:sagdok:opretinput:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:NoteTekst" minOccurs="0" oio:content="note"/>
+        </sequence>
+    </complexType>
+
+    <element name="OpretOutput" type="sd:OpretOutputType" oio:definition="urn:oio:sagdok:opretoutput:ADD:1.0.0"/>
+    <complexType name="OpretOutputType" oio:definition="urn:oio:sagdok:opretoutput:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:BasicOutputType">
+                <sequence>
+                    <element ref="sd:UUIDIdentifikator" minOccurs="0" oio:content="uuid"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <element name="BasicOutput" type="sd:BasicOutputType" oio:definition="urn:oio:sagdok:basaloutput:ADD:1.0.0"/>
+    <complexType name="BasicOutputType" oio:definition="urn:oio:sagdok:basaloutput:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:StandardRetur" oio:content="standardretur"/>
+        </sequence>
+    </complexType>
+
+    <element name="RetInput" type="sd:RetInputType" oio:definition="urn:oio:sagdok:retinput:ADD:1.0.0"/>
+    <complexType name="RetInputType" oio:definition="urn:oio:sagdok:retinput:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:UUIDIdentifikator" oio:content="uuid"/>
+            <element ref="sd:NoteTekst" minOccurs="0" oio:content="note"/>
+        </sequence>
+    </complexType>
+
+    <element name="LaesInput" type="sd:LaesInputType" oio:definition="urn:oio:sagdok:laesinput:ADD:1.0.0"/>
+    <complexType name="LaesInputType" oio:definition="urn:oio:sagdok:laesinput:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:UUIDIdentifikator" oio:content="uuid"/>
+            <element ref="sd:VirkningFraFilter" minOccurs="0" oio:content="virkningfrafilter"/>
+            <element ref="sd:VirkningTilFilter" minOccurs="0" oio:content="virkningtilfilter"/>
+            <element ref="sd:RegistreringFraFilter" minOccurs="0" oio:content="registreringfrafilter"/>
+            <element ref="sd:RegistreringTilFilter" minOccurs="0" oio:content="registreringtilfilter"/>
+        </sequence>
+    </complexType>
+
+    <element name="ListInput" type="sd:ListInputType" oio:definition="urn:oio:sagdok:listinput:ADD:1.0.0"/>
+    <complexType name="ListInputType" oio:definition="urn:oio:sagdok:listinput:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:UUIDIdentifikator" maxOccurs="unbounded" oio:content="uuid"/>
+            <element ref="sd:VirkningFraFilter" minOccurs="0" oio:content="virkningfrafilter"/>
+            <element ref="sd:VirkningTilFilter" minOccurs="0" oio:content="virkningtilfilter"/>
+            <element ref="sd:RegistreringFraFilter" minOccurs="0" oio:content="registreringfrafilter"/>
+            <element ref="sd:RegistreringTilFilter" minOccurs="0" oio:content="registreringtilfilter"/>
+        </sequence>
+    </complexType>
+
+    <element name="ListOutput" type="sd:ListOutputType" oio:definition="urn:oio:sagdok:listoutput:ADD:1.0.0"/>
+    <complexType name="ListOutputType" oio:definition="urn:oio:sagdok:listoutput:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:StandardRetur" oio:content="standardretur"/>
+        </sequence>
+    </complexType>
+
+    <element name="SoegInput" type="sd:SoegInputType" oio:definition="urn:oio:sagdok:soeginput:ADD:1.0.0"/>
+    <complexType name="SoegInputType" oio:definition="urn:oio:sagdok:soeginput:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:FoersteResultatReference" minOccurs="0" oio:content="foersteresultat"/>
+            <element ref="sd:MaksimalAntalKvantitet" minOccurs="0" oio:content="maksimalantalresultater"/>
+            <element ref="sd:SoegRegistrering" minOccurs="0" oio:content="soegregistrering"/>
+            <element ref="sd:SoegVirkning" minOccurs="0" oio:content="soegvirkning"/>
+        </sequence>
+    </complexType>
+
+    <element name="FoersteResultatReference" type="integer" oio:definition="urn:oio:sagdok:soeginput:ADD:1.0.0#foersteresultat"/>
+    
+    <element name="MaksimalAntalKvantitet" type="integer" oio:definition="urn:oio:sagdok:soeginput:ADD:1.0.0#maksimalantalresultater"/>
+    
+    <element name="SoegOutput" type="sd:SoegOutputType" oio:definition="urn:oio:sagdok:soegoutput:ADD:1.0.0"/>
+    <complexType name="SoegOutputType" oio:definition="urn:oio:sagdok:soegoutput:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:StandardRetur" oio:content="standardretur"/>
+            <element ref="sd:IdListe" minOccurs="0" oio:content="idliste"/>
+        </sequence>
+    </complexType>
+
+    <element name="NoteTekst" oio:definition="urn:oio:sagdok:note:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="1024"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="UUIDIdentifikator" oio:definition="urn:oio:sagdok:uuid:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <pattern value="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"/>
+            </restriction>
+        </simpleType>
+    </element>
+
+    <element name="VirkningFraFilter" type="sd:TidspunktType" oio:definition="urn:oio:sagdok:virkningfrafilter:ASDD:1.0.0"/>
+    
+    <element name="VirkningTilFilter" type="sd:TidspunktType" oio:definition="urn:oio:sagdok:virkningtilfilter:ASDD:1.0.0"/>
+    
+    <element name="RegistreringFraFilter" type="sd:TidspunktType" oio:definition="urn:oio:sagdok:registreringfrafilter:ASDD:1.0.0"/>
+    
+    <element name="RegistreringTilFilter" type="sd:TidspunktType" oio:definition="urn:oio:sagdok:registreringtilfilter:ASDD:1.0.0"/>
+    
+    <element name="SoegSagDokObjekt" type="sd:SoegSagDokObjektType" oio:definition="urn:oio:sagdok:soegsagdokobjekt:ADD:1.0.0"/>
+    <complexType name="SoegSagDokObjektType" oio:definition="urn:oio:sagdok:soegsagdokobjekt:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:UUIDIdentifikator" minOccurs="0" oio:content="uuid"/>
+            <element ref="sd:SoegRegistrering" minOccurs="0" oio:content="registrering"/>
+            <element ref="sd:SoegVirkning" minOccurs="0" oio:content="virkning"/>
+        </sequence>
+    </complexType>
+
+    <element name="IdListe" type="sd:IdListeType" oio:definition="urn:oio:sagdok:idliste:ADD:1.0.0"/>
+    <complexType name="IdListeType" oio:definition="urn:oio:sagdok:idliste:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:UUIDIdentifikator" minOccurs="0" maxOccurs="unbounded" oio:content="id"/>
+        </sequence>
+    </complexType>
+
+    <element name="Adresser" type="sd:AdresseFlerRelationType" oio:definition="urn:oio:sagdok:adresser:relation:ASDD:2.0.0"/>
+    
+    <element name="Ansatte" type="sd:PersonFlerRelationType" oio:definition="urn:oio:sagdok:ansatte:relation:ASDD:2.0.0"/>
+    
+    <element name="Branche" type="sd:KlasseRelationType" oio:definition="urn:oio:sagdok:branche:relation:ASDD:2.0.0"/>
+    
+    <element name="Interessefaellesskabstype" type="sd:KlasseRelationType" oio:definition="urn:oio:sagdok:interessefaellesskabstype:relation:ASDD:2.0.0"/>
+        
+    <element name="Myndighed" type="sd:MyndighedRelationType" oio:definition="urn:oio:sagdok:myndighed:relation:ASDD:1.0.0"/>
+    
+    <element name="Myndighedstype" type="sd:KlasseRelationType" oio:definition="urn:oio:sagdok:myndighedstype:relation:ASDD:1.0.0"/>
+
+    <element name="TilknyttedeOpgaver" type="sd:KlasseFlerRelationType" oio:definition="urn:oio:sagdok:opgaver:relation:ASDD:2.0.0"/>
+
+    <element name="Opgaver" type="sd:OpgaverFlerRelationType" oio:definition="urn:oio:sagdok:opgaver:relation:ASDD:2.0.0"/>
+
+    <element name="Overordnet" type="sd:OrganisationEnhedRelationType" oio:definition="urn:oio:sagdok:overordnet:relation:ASDD:2.0.0"/>
+    
+    <element name="Produktionsenhed" type="sd:VirksomhedRelationType" oio:definition="urn:oio:sagdok:produktionsenhed:relation:ASDD:2.0.0"/>
+    
+    <element name="Skatteenhed" type="sd:VirksomhedRelationType" oio:definition="urn:oio:sagdok:skatteenhed:relation:ASDD:2.0.0"/>
+    
+    <element name="Tilhoerer" type="sd:OrganisationFlerRelationType" oio:definition="urn:oio:sagdok:tilhoerer:relation:ASDD:2.0.0"/>
+    
+    <element name="TilknyttedeBrugere" type="sd:BrugerFlerRelationType" oio:definition="urn:oio:sagdok:tilknyttedebrugere:relation:ASDD:2.0.0"/>
+    
+    <element name="TilknyttedeEnheder" type="sd:OrganisationEnhedFlerRelationType" oio:definition="urn:oio:sagdok:tilknyttedeenheder:relation:ASDD:2.0.0"/>
+    
+    <element name="TilknyttedeFunktioner" type="sd:OrganisationFunktionFlerRelationType" oio:definition="urn:oio:sagdok:tilknyttedefunktioner:relation:ASDD:2.0.0"/>
+    
+    <element name="TilknyttedeInteressefaellesskaber" type="sd:InteressefaellesskabFlerRelationType" oio:definition="urn:oio:sagdok:tilknyttedeinteressefaellesskaber:relation:ASDD:2.0.0"/>
+    
+    <element name="TilknyttedeOrganisationer" type="sd:OrganisationFlerRelationType" oio:definition="urn:oio:sagdok:tilknyttedeorganisationer:relation:ASDD:2.0.0"/>
+    
+    <element name="TilknyttedePersoner" type="sd:PersonFlerRelationType" oio:definition="urn:oio:sagdok:tilknyttedepersoner:relation:ASDD:2.0.0"/>
+    
+    <element name="TilknyttedeItSystemer" type="sd:ItSystemFlerRelationType" oio:definition="urn:oio:sagdok:tilknyttedeitsystemer:relation:ASDD:2.0.0"/>
+    
+    <element name="Virksomhed" type="sd:VirksomhedRelationType" oio:definition="urn:oio:sagdok:virksomhed:relation:ASDD:1.0.0"/>
+    
+    <element name="Virksomhedstype" type="sd:KlasseRelationType" oio:definition="urn:oio:sagdok:virksomhedstype:relation:ASDD:1.0.0"/>
+    
+    <element name="StandardRetur" type="sd:StandardReturType" oio:definition="urn:oio:sagdok:standardretur:ADD:1.0.0"/>
+    <complexType name="StandardReturType" oio:definition="urn:oio:sagdok:standardretur:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:StatusKode" oio:content="statuskode"/>
+            <element ref="sd:FejlbeskedTekst" minOccurs="0" oio:content="fejlbesked"/>
+        </sequence>
+    </complexType>
+
+    <element name="StatusKode" type="integer" oio:definition="urn:oio:sagdok:standardretur:ADD:1.0.0#statuskode"/>
+    
+    <element name="FejlbeskedTekst" type="string" oio:definition="urn:oio:sagdok:standardretur:ADD:1.0.0#fejlbesked"/>
+    
+    <element name="Tidspunkt" type="sd:TidspunktType" oio:definition="urn:oio:sagdok:tidspunkt:ADD:2.0.0"/>
+    <complexType name="TidspunktType" oio:definition="urn:oio:sagdok:tidspunkt:ADD:2.0.0">
+        <choice>
+            <element ref="sd:TidsstempelDatoTid" oio:content="tidsstempel"/>
+            <element ref="sd:GraenseIndikator" oio:content="graense"/>
+        </choice>
+    </complexType>
+
+    <element name="GraenseIndikator" type="boolean" fixed="true" oio:definition="urn:oio:sagdok:tidspunkt:ADD:2.0.0#graense"/>
+    
+    <element name="LaesFiltreretOutput" type="sd:LaesFiltreretOutputType" oio:definition="urn:oio:sagdok:laesfiltreretoutput:ADD:1.0.0"/>
+    <complexType name="LaesFiltreretOutputType" oio:definition="urn:oio:sagdok:laesfiltreretoutput:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:SagDokObjektType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="SoegRegistrering" type="sd:SoegRegistreringType" oio:definition="urn:oio:sagdok:soegregistrering:ADD:1.0.0"/>
+    <complexType name="SoegRegistreringType" oio:definition="urn:oio:sagdok:soegregistrering:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:FraTidspunkt" minOccurs="0" oio:content="fratidspunkt"/>
+            <element ref="sd:TilTidspunkt" minOccurs="0" oio:content="tiltidspunkt"/>
+            <element ref="sd:LivscyklusKode" minOccurs="0" oio:content="livscyklus"/>
+            <element ref="sd:BrugerRef" minOccurs="0" oio:content="brugerref"/>
+        </sequence>
+    </complexType>
+
+    <element name="SoegAdresser" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegadresser:ASDD:1.0.0"/>
+    
+    <element name="SoegAnsatte" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegansatte:ASDD:1.0.0"/>
+    
+    <element name="SoegBranche" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegbranche:ASDD:1.0.0"/>
+    
+    <element name="SoegMyndighed" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegmyndighed:ASDD:1.0.0"/>
+    
+    <element name="SoegMyndighedstype" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegmyndighedstype:ASDD:1.0.0"/>
+    
+    <element name="SoegOpgaver" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegopgaver:ASDD:1.0.0"/>
+    
+    <element name="SoegOverordnet" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegoverordnet:ASDD:1.0.0"/>
+    
+    <element name="SoegProduktionsenhed" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegproduktionsenhed:ASDD:1.0.0"/>
+    
+    <element name="SoegSkatteenhed" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegskatteenhed:ASDD:1.0.0"/>
+    
+    <element name="SoegTilhoerer" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegtilhoerer:ASDD:1.0.0"/>
+    
+    <element name="SoegTilknyttedeBrugere" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegtilknyttedebrugere:ASDD:1.0.0"/>
+    
+    <element name="SoegTilknyttedeEnheder" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegtilknyttedeenheder:ASDD:1.0.0"/>
+    
+    <element name="SoegTilknyttedeFunktioner" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegtilknyttedefunktioner:ASDD:1.0.0"/>
+    
+    <element name="SoegTilknyttedeInteressefaellesskaber" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegtilknyttedeinteressefaellesskaber:ASDD:1.0.0"/>
+    
+    <element name="SoegTilknyttedeOrganisationer" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegtilknyttedeorganisationer:ASDD:1.0.0"/>
+    
+    <element name="SoegTilknyttedePersoner" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegtilknyttedepersoner:ASDD:1.0.0"/>
+    
+    <element name="SoegTilknyttedeItSystemer" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegtilknyttedeitsystemer:ASDD:1.0.0"/>
+    
+    <element name="SoegVirksomhed" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegvirksomhed:ASDD:1.0.0"/>
+    
+    <element name="SoegVirksomhedstype" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegvirksomhedstype:ASDD:1.0.0"/>
+    
+    <element name="Enhedstype" type="sd:KlasseRelationType" oio:definition="urn:oio:sagdok:enhedstype:relation:ASDD:1.0.0"/>
+    
+    <element name="Organisationstype" type="sd:KlasseRelationType" oio:definition="urn:oio:sagdok:organisationstype:relation:ASDD:1.0.0"/>
+
+    <element name="SoegEnhedstype" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegenhedstype:ASDD:1.0.0"/>
+    
+    <element name="BrugerTyper" type="sd:KlasseFlerRelationType" oio:definition="urn:oio:sagdok:brugertyper:relation:ASDD:1.0.0"/>
+    
+    <element name="SoegBrugerTyper" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegbrugertyper:ASDD:1.0.0"/>
+    
+    <element name="SystemTyper" type="sd:KlasseFlerRelationType" oio:definition="urn:oio:sagdok:systemtyper:relation:ASDD:1.0.0"/>
+    
+    <element name="SoegSystemTyper" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegsystemtyper:ASDD:1.0.0"/>
+    
+    <element name="Funktionstype" type="sd:KlasseRelationType" oio:definition="urn:oio:sagdok:funktionstype:relation:ASDD:1.0.0"/>
+    
+    <element name="SoegFunktionstype" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegfunktionstype:ASDD:1.0.0"/>
+    
+    <element name="SagDokObjekt" type="sd:SagDokObjektType" oio:definition="urn:oio:sagdok:sagdokobjekt:ADD:1.0.0"/>
+    <complexType name="SagDokObjektType" oio:definition="urn:oio:sagdok:sagdokobjekt:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:UUIDIdentifikator" oio:content="id"/>
+        </sequence>
+    </complexType>
+
+    <element name="AndreBehandlere" type="sd:AktoerFlerRelationType" oio:definition="urn:oio:sagdok:andrebehandlere:relation:ASDD:2.0.0"/>
+    
+    <element name="AndreKlasser" type="sd:KlasseFlerRelationType" oio:definition="urn:oio:sagdok:andreklasser:relation:ASDD:2.0.0"/>
+    
+    <element name="AndreSager" type="sd:SagFlerRelationType" oio:definition="urn:oio:sagdok:andresager:relation:ASDD:1.0.0"/>
+    
+    <element name="Ansvarlig" type="sd:AktoerRelationType" oio:definition="urn:oio:sagdok:ansvarlig:relation:ASDD:2.0.0"/>
+    
+    <element name="Arkiv" type="sd:ArkivRelationType" oio:definition="urn:oio:sagdok:arkiv:relation:ASDD:1.0.0"/>
+    
+    <element name="Ejer" type="sd:AktoerRelationType" oio:definition="urn:oio:sagdok:ejer:relation:ASDD:2.0.0"/>
+    
+    <element name="JournalPoster" type="sd:JournalPostFlerRelationType" oio:definition="urn:oio:sagdok:journalposter:relation:ASDD:1.0.0"/>
+    
+    <element name="Parter" type="sd:PartFlerRelationType" oio:definition="urn:oio:sagdok:parter:relation:ASDD:2.0.0"/>
+    
+    <element name="PrimaerBehandler" type="sd:AktoerRelationType" oio:definition="urn:oio:sagdok:primaerbehandler:relation:ASDD:2.0.0"/>
+    
+    <element name="PrimaerKlasse" type="sd:KlasseRelationType" oio:definition="urn:oio:sagdok:primaerklasse:relation:ASDD:2.0.0"/>
+    
+    <element name="Praecedens" type="sd:SagRelationType" oio:definition="urn:oio:sagdok:praecedens:relation:ASDD:1.0.0"/>
+    
+    <element name="UdlaantTil" type="sd:AktoerRelationType" oio:definition="urn:oio:sagdok:udlaanttil:relation:ASDD:1.0.0"/>
+    
+    <element name="UnderSager" type="sd:SagFlerRelationType" oio:definition="urn:oio:sagdok:undersager:relation:ASDD:1.0.0"/>
+    
+    <element name="SoegAndreBehandlere" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegandrebehandlere:ASDD:1.0.0"/>
+    
+    <element name="SoegAndreKlasser" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegandreklasser:ASDD:1.0.0"/>
+    
+    <element name="SoegAndreSager" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegandresager:ASDD:1.0.0"/>
+    
+    <element name="SoegAnsvarlig" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegansvarlig:ASDD:1.0.0"/>
+    
+    <element name="SoegArkiv" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegarkiv:ASDD:1.0.0"/>
+    
+    <element name="SoegEjer" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegejer:ASDD:1.0.0"/>
+    
+    <element name="SoegJournalPoster" type="sd:SoegJournalPostRelationType" oio:definition="urn:oio:sagdok:soegjournalposter:ASDD:1.0.0"/>
+    
+    <element name="SoegParter" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegparter:ASDD:1.0.0"/>
+    
+    <element name="SoegPrimaerBehandler" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegprimaerbehandler:ASDD:1.0.0"/>
+    
+    <element name="SoegPrimaerKlasse" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegprimaerklasse:ASDD:1.0.0"/>
+    
+    <element name="SoegPraecedens" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegpraecedens:ASDD:1.0.0"/>
+    
+    <element name="SoegUdlaantTil" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegudlaanttil:ASDD:1.0.0"/>
+    
+    <element name="SoegUnderSager" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegundersager:ASDD:1.0.0"/>
+    
+    <element name="AndreDokumenter" type="sd:DokumentFlerRelationType" oio:definition="urn:oio:sagdok:andredokumenter:relation:ASDD:1.0.0"/>
+    
+    <element name="Arkiver" type="sd:ArkivFlerRelationType" oio:definition="urn:oio:sagdok:arkiver:relation:ASDD:1.0.0"/>
+    
+    <element name="Besvarelser" type="sd:DokumentFlerRelationType" oio:definition="urn:oio:sagdok:besvarelser:relation:ASDD:1.0.0"/>
+    
+    <element name="Bilag" type="sd:DokumentFlerRelationType" oio:definition="urn:oio:sagdok:bilag:relation:ASDD:1.0.0"/>
+    
+    <element name="FordeltTil" type="sd:AktoerRelationType" oio:definition="urn:oio:sagdok:fordelttil:relation:ASDD:1.0.0"/>
+    
+    <element name="Kommentarer" type="sd:DokumentFlerRelationType" oio:definition="urn:oio:sagdok:kommentarer:relation:ASDD:1.0.0"/>
+    
+    <element name="KopiParter" type="sd:PartFlerRelationType" oio:definition="urn:oio:sagdok:kopiparter:relation:ASDD:1.0.0"/>
+    
+    <element name="NyRevision" type="sd:DokumentRelationType" oio:definition="urn:oio:sagdok:nyrevision:relation:ASDD:1.0.0"/>
+    
+    <element name="TilknyttedeSager" type="sd:SagFlerRelationType" oio:definition="urn:oio:sagdok:tilknyttedesager:relation:ASDD:1.0.0"/>
+    
+    <element name="Udgangspunkter" type="sd:DokumentFlerRelationType" oio:definition="urn:oio:sagdok:udgangspunkter:relation:ASDD:1.0.0"/>
+    
+    <element name="SoegAndreDokumenter" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegandredokumenter:ASDD:1.0.0"/>
+    
+    <element name="SoegArkiver" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegarkiver:ASDD:1.0.0"/>
+    
+    <element name="SoegBesvarelser" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegbesvarelser:ASDD:1.0.0"/>
+    
+    <element name="SoegBilag" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegbilag:ASDD:1.0.0"/>
+    
+    <element name="SoegFordeltTil" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegfordelttil:ASDD:1.0.0"/>
+    
+    <element name="SoegKommentarer" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegkommentarer:ASDD:1.0.0"/>
+    
+    <element name="SoegKopiParter" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegkopiparter:ASDD:1.0.0"/>
+    
+    <element name="SoegNyRevision" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegnyrevision:ASDD:1.0.0"/>
+    
+    <element name="SoegTilknyttedeSager" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegtilknyttedesager:ASDD:1.0.0"/>
+    
+    <element name="SoegUdgangspunkter" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegudgangspunkter:ASDD:1.0.0"/>
+    
+    <element name="Erstatter" type="sd:KlasseFlerRelationType" oio:definition="urn:oio:sagdok:erstatter:relation:ASDD:1.0.0"/>
+    
+    <element name="Facet" type="sd:FacetRelationType" oio:definition="urn:oio:sagdok:facet:relation:ASDD:1.0.0"/>
+    
+    <element name="LovligeKombinationer" type="sd:KlasseFlerRelationType" oio:definition="urn:oio:sagdok:lovligekombinationer:relation:ASDD:1.0.0"/>
+    
+    <element name="Mapninger" type="sd:KlasseFlerRelationType" oio:definition="urn:oio:sagdok:mapninger:relation:ASDD:1.0.0"/>
+    
+    <element name="OverordnetKlasse" type="sd:KlasseRelationType" oio:definition="urn:oio:sagdok:overordnetklasse:relation:ASDD:1.0.0"/>
+    
+    <element name="Redaktoerer" type="sd:AktoerFlerRelationType" oio:definition="urn:oio:sagdok:redaktoerer:relation:ASDD:2.0.0"/>
+    
+    <element name="Sideordnede" type="sd:KlasseFlerRelationType" oio:definition="urn:oio:sagdok:sideordnede:relation:ASDD:1.0.0"/>
+    
+    <element name="Tilfoejelser" type="sd:KlasseFlerRelationType" oio:definition="urn:oio:sagdok:tilfoejelser:relation:ASDD:1.0.0"/>
+    
+    <element name="SoegErstatter" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegerstatter:ASDD:1.0.0"/>
+    
+    <element name="SoegFacet" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegfacet:ASDD:1.0.0"/>
+    
+    <element name="SoegLovligeKombinationer" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soeglovligekombinationer:ASDD:1.0.0"/>
+    
+    <element name="SoegMapninger" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegmapninger:ASDD:1.0.0"/>
+    
+    <element name="SoegRedaktoerer" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegredaktoerer:ASDD:1.0.0"/>
+    
+    <element name="SoegSideordnede" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegsideordnede:ASDD:1.0.0"/>
+    
+    <element name="SoegTilfoejelser" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegtilfoejelser:ASDD:1.0.0"/>
+    
+    <element name="FacetTilhoerer" type="sd:KlassifikationRelationType" oio:definition="urn:oio:sagdok:facettilhoerer:relation:ASDD:1.0.0"/>
+    
+    <element name="AfleveresTil" type="sd:AktoerFlerRelationType" oio:definition="urn:oio:sagdok:afleverestil:relation:ASDD:1.0.0"/>
+    
+    <element name="AndreArkiver" type="sd:ArkivFlerRelationType" oio:definition="urn:oio:sagdok:andrearkiver:relation:ASDD:1.0.0"/>
+    
+    <element name="IndgaarI" type="sd:ArkivRelationType" oio:definition="urn:oio:sagdok:indgaari:relation:ASDD:1.0.0"/>
+    
+    <element name="Klassifikation" type="sd:KlassifikationRelationType" oio:definition="urn:oio:sagdok:klassifikation:relation:ASDD:1.0.0"/>
+    
+    <element name="Skabere" type="sd:AktoerFlerRelationType" oio:definition="urn:oio:sagdok:skabere:relation:ASDD:1.0.0"/>
+    
+    <element name="SoegAfleveresTil" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegafleverestil:ASDD:1.0.0"/>
+    
+    <element name="SoegAndreArkiver" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegandrearkiver:ASDD:1.0.0"/>
+    
+    <element name="SoegIndgaarI" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegindgaari:ASDD:1.0.0"/>
+    
+    <element name="SoegKlassifikation" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegklassifikation:ASDD:1.0.0"/>
+    
+    <element name="SoegSkabere" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegskabere:ASDD:1.0.0"/>
+    
+    <element name="Registrering" type="sd:RegistreringType" oio:definition="urn:oio:sagdok:registrering:ADD:2.0.0"/>
+    <complexType name="RegistreringType" oio:definition="urn:oio:sagdok:registrering:ADD:2.0.0">
+        <sequence>
+            <element ref="sd:NoteTekst" minOccurs="0" oio:content="note"/>
+            <element name="Tidspunkt" type="dateTime" minOccurs="0" oio:content="tidsstempeldatotid"/>
+            <element ref="sd:LivscyklusKode" minOccurs="0" oio:content="livscyklus"/>
+            <element ref="sd:BrugerRef" minOccurs="0" oio:content="brugerref"/>
+        </sequence>
+    </complexType>
+
+    <element name="BrugervendtNoegleTekst" oio:definition="urn:oio:sagdok:brugervendtnoegle:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="50"/>
+            </restriction>
+        </simpleType>
+    </element>
+
+    <element name="OrganisationNavn" oio:definition="urn:oio:sagdok:organisationsnavn:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="200"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="LokalUdvidelse" type="sd:LokalUdvidelseType" oio:definition="urn:oio:sagdok:lokaludvidelse:ADD:1.0.0"/>
+    <complexType name="LokalUdvidelseType" oio:definition="urn:oio:sagdok:lokaludvidelse:ADD:1.0.0">
+        <sequence>
+            <any processContents="strict" namespace="##other" minOccurs="0" maxOccurs="unbounded" oio:content="any"/>
+        </sequence>
+    </complexType>
+
+    <element name="AdresseFlerRelation" type="sd:AdresseFlerRelationType" oio:definition="urn:oio:sagdok:adresseflerrelation:ADD:1.0.0"/>
+
+
+    <element name="PersonFlerRelation" type="sd:PersonFlerRelationType" oio:definition="urn:oio:sagdok:personflerrelation:ADD:1.0.0"/>
+    <complexType name="PersonFlerRelationType" oio:definition="urn:oio:sagdok:personflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:FlerRelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="KlasseRelation" type="sd:KlasseRelationType" oio:definition="urn:oio:sagdok:klasserelation:ADD:1.0.0"/>
+    <complexType name="KlasseRelationType" oio:definition="urn:oio:sagdok:klasserelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:RelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="MyndighedRelation" type="sd:MyndighedRelationType" oio:definition="urn:oio:sagdok:myndighedrelation:ADD:1.0.0"/>
+    <complexType name="MyndighedRelationType" oio:definition="urn:oio:sagdok:myndighedrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:RelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="KlasseFlerRelation" type="sd:KlasseFlerRelationType" oio:definition="urn:oio:sagdok:klasseflerrelation:ADD:1.0.0"/>
+    <complexType name="KlasseFlerRelationType" oio:definition="urn:oio:sagdok:klasseflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:FlerRelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="OrganisationEnhedRelation" type="sd:OrganisationEnhedRelationType" oio:definition="urn:oio:sagdok:organisationenhedrelation:ADD:1.0.0"/>
+    <complexType name="OrganisationEnhedRelationType" oio:definition="urn:oio:sagdok:organisationenhedrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:RelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="VirksomhedRelation" type="sd:VirksomhedRelationType" oio:definition="urn:oio:sagdok:virksomhedrelation:ADD:1.0.0"/>
+    <complexType name="VirksomhedRelationType" oio:definition="urn:oio:sagdok:virksomhedrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:RelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="OrganisationRelation" type="sd:OrganisationRelationType" oio:definition="urn:oio:sagdok:organisationrelation:ADD:1.0.0"/>
+    <complexType name="OrganisationRelationType" oio:definition="urn:oio:sagdok:organisationrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:RelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="BrugerFlerRelation" type="sd:BrugerFlerRelationType" oio:definition="urn:oio:sagdok:brugerflerrelation:ADD:1.0.0"/>
+    <complexType name="BrugerFlerRelationType" oio:definition="urn:oio:sagdok:brugerflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:FlerRelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="OrganisationEnhedFlerRelation" type="sd:OrganisationEnhedFlerRelationType" oio:definition="urn:oio:sagdok:organisationenhedflerrelation:ADD:1.0.0"/>
+    <complexType name="OrganisationEnhedFlerRelationType" oio:definition="urn:oio:sagdok:organisationenhedflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:FlerRelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="OrganisationFunktionFlerRelation" type="sd:OrganisationFunktionFlerRelationType" oio:definition="urn:oio:sagdok:organisationfunktionflerrelation:ADD:1.0.0"/>
+    <complexType name="OrganisationFunktionFlerRelationType" oio:definition="urn:oio:sagdok:organisationfunktionflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:FlerRelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="InteressefaellesskabFlerRelation" type="sd:InteressefaellesskabFlerRelationType" oio:definition="urn:oio:sagdok:interessefaellesskabflerrelation:ADD:1.0.0"/>
+    <complexType name="InteressefaellesskabFlerRelationType" oio:definition="urn:oio:sagdok:interessefaellesskabflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:FlerRelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="OrganisationFlerRelation" type="sd:OrganisationFlerRelationType" oio:definition="urn:oio:sagdok:organisationflerrelation:ADD:1.0.0"/>
+    <complexType name="OrganisationFlerRelationType" oio:definition="urn:oio:sagdok:organisationflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:FlerRelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="ItSystemFlerRelation" type="sd:ItSystemFlerRelationType" oio:definition="urn:oio:sagdok:itsystemflerrelation:ADD:1.0.0"/>
+    <complexType name="ItSystemFlerRelationType" oio:definition="urn:oio:sagdok:itsystemflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:FlerRelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="TidsstempelDatoTid" type="dateTime" oio:definition="urn:oio:sagdok:tidsstempel:BDD:1.0.0"/>
+    
+    <element name="FraTidspunkt" type="sd:TidspunktType" oio:definition="urn:oio:sagdok:fratidspunkt:ASDD:2.0.0"/>
+    
+    <element name="LivscyklusKode" type="sd:LivscyklusKodeType" oio:definition="urn:oio:sagdok:livscyklus:DT:2.0.0"/>
+    <simpleType name="LivscyklusKodeType" oio:definition="urn:oio:sagdok:livscyklus:DT:2.0.0">
+        <restriction base="string">
+            <enumeration value="Opstaaet"/>
+            <enumeration value="Importeret"/>
+            <enumeration value="Passiveret"/>
+            <enumeration value="Slettet"/>
+        </restriction>
+    </simpleType>
+
+    <element name="BrugerRef" type="sd:UnikIdType" oio:definition="urn:oio:sagdok:brugerreference:ASDD:1.0.0"/>
+    
+    <element name="SoegVirkning" type="sd:SoegVirkningType" oio:definition="urn:oio:sagdok:soegvirkning:ADD:1.0.0"/>
+    <complexType name="SoegVirkningType" oio:definition="urn:oio:sagdok:soegvirkning:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:FraTidspunkt" minOccurs="0" oio:content="fratidspunkt"/>
+            <element ref="sd:TilTidspunkt" minOccurs="0" oio:content="tiltidspunkt"/>
+            <element ref="sd:AktoerRef" minOccurs="0" oio:content="aktoerref"/>
+            <element ref="sd:AktoerTypeKode" minOccurs="0" oio:content="aktoertype"/>
+            <element ref="sd:NoteTekst" minOccurs="0" oio:content="note"/>
+        </sequence>
+    </complexType>
+
+    <element name="SoegRelation" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegrelation:ADD:1.0.0"/>
+    <complexType name="SoegRelationType" oio:definition="urn:oio:sagdok:soegrelation:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:SoegVirkning" minOccurs="0" oio:content="virkning"/>
+            <element ref="sd:ReferenceID" minOccurs="0" oio:content="referenceid"/>
+        </sequence>
+    </complexType>
+
+    <element name="EnhedNavn" oio:definition="urn:oio:sagdok:organisationenhedsnavn:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="200"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="BrugerNavn" oio:definition="urn:oio:sagdok:brugernavn:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="200"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="BrugerTypeTekst" oio:definition="urn:oio:sagdok:brugertype:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="50"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="InteressefaellesskabNavn" oio:definition="urn:oio:sagdok:interessefaellesskabsnavn:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="200"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="InteressefaellesskabTypeTekst" oio:definition="urn:oio:sagdok:interessefaellesskabstype:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="50"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="ItSystemNavn" oio:definition="urn:oio:sagdok:itsystemnavn:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="200"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="ItSystemTypeTekst" oio:definition="urn:oio:sagdok:itsystemtype:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="50"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="KonfigurationReference" oio:definition="urn:oio:sagdok:konfigurationselementer:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="1024"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="FunktionNavn" oio:definition="urn:oio:sagdok:organisationfunktionsnavn:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="200"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="AfleveretIndikator" type="boolean" oio:definition="urn:oio:sagdok:afleveret:BDD:1.0.0"/>
+    
+    <element name="BeskrivelseTekst" oio:definition="urn:oio:sagdok:beskrivelse:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="10000"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="HjemmelSpecifikationTekst" type="string" oio:definition="urn:oio:sagdok:hjemmel:BDD:1.0.0"/>
+    
+    <element name="KassationskodeTekst" type="string" oio:definition="urn:oio:sagdok:kassationskode:BDD:1.0.0"/>
+    
+    <element name="PrincipielIndikator" type="boolean" oio:definition="urn:oio:sagdok:principiel:BDD:1.0.0"/>
+    
+    <element name="SagsnummerTekst" type="string" oio:definition="urn:oio:sagdok:sagsnummer:BDD:1.0.0"/>
+    
+    <element name="TitelTekst" oio:definition="urn:oio:sagdok:titel:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="300"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="AktoerFlerRelation" type="sd:AktoerFlerRelationType" oio:definition="urn:oio:sagdok:aktoerflerrelation:ADD:1.0.0"/>
+    <complexType name="AktoerFlerRelationType" oio:definition="urn:oio:sagdok:aktoerflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:FlerRelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="SagFlerRelation" type="sd:SagFlerRelationType" oio:definition="urn:oio:sagdok:sagflerrelation:ADD:1.0.0"/>
+    <complexType name="SagFlerRelationType" oio:definition="urn:oio:sagdok:sagflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:FlerRelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="AktoerRelation" type="sd:AktoerRelationType" oio:definition="urn:oio:sagdok:aktoerrelation:ADD:1.0.0"/>
+    <complexType name="AktoerRelationType" oio:definition="urn:oio:sagdok:aktoerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:RelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="ArkivRelation" type="sd:ArkivRelationType" oio:definition="urn:oio:sagdok:arkivrelation:ADD:1.0.0"/>
+    <complexType name="ArkivRelationType" oio:definition="urn:oio:sagdok:arkivrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:RelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="JournalPostFlerRelation" type="sd:JournalPostFlerRelationType" oio:definition="urn:oio:sagdok:journalpostflerrelation:ADD:1.0.0"/>
+    <complexType name="JournalPostFlerRelationType" oio:definition="urn:oio:sagdok:journalpostflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:NulFlerRelationType">
+                <sequence>
+                    <element ref="sd:JournalPostIdentifikator" oio:content="journalpostid"/>
+                    <element ref="sd:TitelTekst" minOccurs="0" oio:content="titel"/>
+                    <element ref="sd:IndeksIdentifikator" minOccurs="0" oio:content="indeks"/>
+                    <element ref="sd:OffentlighedUndtaget" minOccurs="0" oio:content="offentlighedundtaget"/>
+                    <element ref="sd:TilhoersforholdKode" oio:content="tilhoersforhold"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <element name="PartFlerRelation" type="sd:PartFlerRelationType" oio:definition="urn:oio:sagdok:partflerrelation:ADD:1.0.0"/>
+    <complexType name="PartFlerRelationType" oio:definition="urn:oio:sagdok:partflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:FlerRelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="SagRelation" type="sd:SagRelationType" oio:definition="urn:oio:sagdok:sagrelation:ADD:1.0.0"/>
+    <complexType name="SagRelationType" oio:definition="urn:oio:sagdok:sagrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:RelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="SoegJournalPostRelation" type="sd:SoegJournalPostRelationType" oio:definition="urn:oio:sagdok:soegjournalpostrelation:ADD:1.0.0"/>
+    <complexType name="SoegJournalPostRelationType" oio:definition="urn:oio:sagdok:soegjournalpostrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:SoegRelationType">
+                <sequence>
+                    <element ref="sd:JournalPostIdentifikator" minOccurs="0" oio:content="journalpostid"/>
+                    <element ref="sd:TitelTekst" minOccurs="0" oio:content="titel"/>
+                    <element ref="sd:IndeksIdentifikator" minOccurs="0" oio:content="indeks"/>
+                    <element ref="sd:OffentlighedUndtaget" minOccurs="0" oio:content="offentlighedundtaget"/>
+                    <element ref="sd:TilhoersforholdKode" minOccurs="0" oio:content="tilhoersforhold"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <element name="BrevDato" type="date" oio:definition="urn:oio:sagdok:brevdato:BDD:1.0.0"/>
+    
+    <element name="VersionIdentifikator" type="integer" oio:definition="urn:oio:sagdok:major:BDD:1.0.0"/>
+    
+    <element name="UnderversionIdentifikator" type="integer" oio:definition="urn:oio:sagdok:minor:BDD:1.0.0"/>
+    
+    <element name="DokumentFlerRelation" type="sd:DokumentFlerRelationType" oio:definition="urn:oio:sagdok:dokumentflerrelation:ADD:1.0.0"/>
+    <complexType name="DokumentFlerRelationType" oio:definition="urn:oio:sagdok:dokumentflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:FlerRelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="ArkivFlerRelation" type="sd:ArkivFlerRelationType" oio:definition="urn:oio:sagdok:arkivflerrelation:ADD:1.0.0"/>
+    <complexType name="ArkivFlerRelationType" oio:definition="urn:oio:sagdok:arkivflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:FlerRelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="DokumentRelation" type="sd:DokumentRelationType" oio:definition="urn:oio:sagdok:dokumentrelation:ADD:1.0.0"/>
+    <complexType name="DokumentRelationType" oio:definition="urn:oio:sagdok:dokumentrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:RelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="KaldenavnTekst" oio:definition="urn:oio:sagdok:kaldenavn:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="50" />
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="OphavsretTekst" oio:definition="urn:oio:sagdok:ophavsret:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="4096" />
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="ErPubliceretIndikator" type="boolean" oio:definition="urn:oio:sagdok:klassepubliceretstatus:BDD:2.0.0"/>
+    
+    <element name="EksempelTekst" oio:definition="urn:oio:sagdok:klasseeksempel:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="4096" />
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="OmfangTekst" oio:definition="urn:oio:sagdok:klasseomfang:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="1024" />
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="RetskildeTekst" oio:definition="urn:oio:sagdok:retskilde:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="4096" />
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="AendringsnotatTekst" oio:definition="urn:oio:sagdok:aendringsnotat:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="1024" />
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="FacetRelation" type="sd:FacetRelationType" oio:definition="urn:oio:sagdok:facetrelation:ADD:1.0.0"/>
+    <complexType name="FacetRelationType" oio:definition="urn:oio:sagdok:facetrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:RelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="OpbygningTekst" oio:definition="urn:oio:sagdok:opbygning:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="1024" />
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="PlanIdentifikator" oio:definition="urn:oio:sagdok:plan:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <pattern value="(100)|[1-9]\d?"/>
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="SupplementTekst" oio:definition="urn:oio:sagdok:supplement:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="1024" />
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="KlassifikationRelation" type="sd:KlassifikationRelationType" oio:definition="urn:oio:sagdok:klassifikationrelation:ADD:1.0.0"/>
+    <complexType name="KlassifikationRelationType" oio:definition="urn:oio:sagdok:klassifikationrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:RelationType"/>
+        </complexContent>
+    </complexType>
+
+    <element name="BestemmelserTekst" type="string" oio:definition="urn:oio:sagdok:bestemmelser:BDD:1.0.0"/>
+    
+    <element name="Virkning" type="sd:VirkningType" oio:definition="urn:oio:sagdok:virkning:ADD:2.0.0"/>
+    <complexType name="VirkningType" oio:definition="urn:oio:sagdok:virkning:ADD:2.0.0">
+        <sequence>
+            <element ref="sd:FraTidspunkt" minOccurs="0" oio:content="fratidspunkt"/>
+            <element ref="sd:TilTidspunkt" minOccurs="0" oio:content="tiltidspunkt"/>
+            <element ref="sd:AktoerRef" minOccurs="0" oio:content="aktoerref"/>
+            <element ref="sd:AktoerTypeKode" minOccurs="0" oio:content="aktoertype"/>
+            <element ref="sd:NoteTekst" minOccurs="0" oio:content="note"/>
+        </sequence>
+    </complexType>
+
+    <element name="FlerRelation" type="sd:FlerRelationType" oio:definition="urn:oio:sagdok:flerrelation:ADD:2.0.0"/>
+    <complexType name="FlerRelationType" oio:definition="urn:oio:sagdok:flerrelation:ADD:2.0.0">
+        <sequence>
+            <element ref="sd:Virkning" minOccurs="0" oio:content="virkning"/>
+            <element ref="sd:ReferenceID" minOccurs="0" oio:content="referenceid"/>
+        </sequence>
+    </complexType>
+
+    <element name="Relation" type="sd:RelationType" oio:definition="urn:oio:sagdok:relation:ADD:2.0.0"/>
+    <complexType name="RelationType" oio:definition="urn:oio:sagdok:relation:ADD:2.0.0">
+        <sequence>
+            <element ref="sd:Virkning" minOccurs="0" oio:content="virkning"/>
+            <element ref="sd:ReferenceID" minOccurs="0" oio:content="referenceid"/>
+        </sequence>
+    </complexType>
+
+    <element name="UnikId" type="sd:UnikIdType" oio:definition="urn:oio:sagdok:unikid:ADD:1.0.0"/>
+    <complexType name="UnikIdType" oio:definition="urn:oio:sagdok:unikid:ADD:1.0.0">
+        <choice>
+            <element ref="sd:UUIDIdentifikator" oio:content="uuid"/>
+            <element ref="sd:URNIdentifikator" oio:content="urn"/>
+        </choice>
+    </complexType>
+
+    <element name="TilTidspunkt" type="sd:TidspunktType" oio:definition="urn:oio:sagdok:tiltidspunkt:ASDD:2.0.0"/>
+    
+    <element name="AktoerRef" type="sd:UnikIdType" oio:definition="urn:oio:sagdok:aktoerreference:ASDD:1.0.0"/>
+    
+    <element name="ReferenceID" type="sd:UnikIdType" oio:definition="urn:oio:sagdok:referenceid:ASDD:1.0.0"/>
+
+    <element name="OffentlighedUndtaget" type="sd:OffentlighedUndtagetType" oio:definition="urn:oio:sagdok:offentlighedundtaget:ADD:1.0.0"/>
+    <complexType name="OffentlighedUndtagetType" oio:definition="urn:oio:sagdok:offentlighedundtaget:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:TitelAlternativTekst" oio:content="alternativtitel"/>
+            <element ref="sd:OffentlighedUndtagetHjemmelTekst" oio:content="offentlighedundtagethjemmel"/>
+        </sequence>
+    </complexType>
+
+    <element name="NulFlerRelation" type="sd:NulFlerRelationType" oio:definition="urn:oio:sagdok:nulflerrelation:ADD:1.0.0"/>
+    <complexType name="NulFlerRelationType" oio:definition="urn:oio:sagdok:nulflerrelation:ADD:1.0.0">
+        <sequence>
+            <element ref="sd:Virkning" oio:content="virkning"/>
+            <element ref="sd:ReferenceID" minOccurs="0" oio:content="referenceid"/>
+        </sequence>
+    </complexType>
+
+    <element name="JournalPostIdentifikator" type="string" oio:definition="urn:oio:sagdok:journalpostid:BDD:1.0.0"/>
+    
+    <element name="IndeksIdentifikator" type="integer" oio:definition="urn:oio:sagdok:indeks:BDD:1.0.0"/>
+    
+    <element name="TilhoersforholdKode" type="sd:TilhoersforholdKodeType" oio:definition="urn:oio:sagdok:tilhoersforhold:DT:2.0.0"/>
+    <simpleType name="TilhoersforholdKodeType" oio:definition="urn:oio:sagdok:tilhoersforhold:DT:2.0.0">
+        <restriction base="string">
+            <enumeration value="Vedlagt"/>
+            <enumeration value="Tilakteret"/>
+        </restriction>
+    </simpleType>
+
+    <element name="VariantTekst" type="string" oio:definition="urn:oio:sagdok:variant:BDD:1.0.0"/>
+    
+    <element name="ArkiveringIndikator" type="boolean" oio:definition="urn:oio:sagdok:arkivering:BDD:1.0.0"/>
+    
+    <element name="DelvisSkannetIndikator" type="boolean" oio:definition="urn:oio:sagdok:scannet:BDD:1.0.0"/>
+    
+    <element name="OffentliggoerelseIndikator" type="boolean" oio:definition="urn:oio:sagdok:offentliggoerelse:BDD:1.0.0"/>
+    
+    <element name="ProduktionIndikator" type="boolean" oio:definition="urn:oio:sagdok:produktion:BDD:1.0.0"/>
+    
+    <element name="SoegeordIdentifikator" oio:definition="urn:oio:sagdok:soegeordidentifikator:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="50" />
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="SoegeordKategoriTekst" oio:definition="urn:oio:sagdok:soegeordskategori:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="1024" />
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="ArkivTypeKode" type="sd:ArkivTypeKodeType" oio:definition="urn:oio:sagdok:arkivtype:DT:2.0.0"/>
+    <simpleType name="ArkivTypeKodeType" oio:definition="urn:oio:sagdok:arkivtype:DT:2.0.0">
+        <restriction base="string">
+            <enumeration value="Forvaltning"/>
+            <enumeration value="Reference"/>
+            <enumeration value="Personlig"/>
+        </restriction>
+    </simpleType>
+
+    <element name="URNIdentifikator" oio:definition="urn:oio:sagdok:urn:BDD:1.0.0">
+        <simpleType>
+            <restriction base="string">
+                <maxLength value="255" />
+            </restriction>
+        </simpleType>
+    </element>
+    
+    <element name="AktoerTypeKode" type="sd:AktoerTypeKodeType" oio:definition="urn:oio:sagdok:aktoertype:DT:1.0.0"/>
+    <simpleType name="AktoerTypeKodeType" oio:definition="urn:oio:sagdok:aktoertype:DT:1.0.0">
+        <restriction base="string">
+            <enumeration value="Organisation"/>
+            <enumeration value="OrganisationEnhed"/>
+            <enumeration value="OrganisationFunktion"/>
+            <enumeration value="Bruger"/>
+            <enumeration value="ItSystem"/>
+            <enumeration value="Interessefaellesskab"/>
+        </restriction>
+    </simpleType>
+
+    <element name="TitelAlternativTekst" type="string" oio:definition="urn:oio:sagdok:alternativtitel:BDD:1.0.0"/>
+    
+    <element name="OffentlighedUndtagetHjemmelTekst" type="string" oio:definition="urn:oio:sagdok:offentlighedundtagethjemmel:BDD:1.0.0"/>
+    
+    <element name="DelTekst" type="string" oio:definition="urn:oio:sagdok:del:BDD:1.0.0"/>
+    
+    <element name="IndholdTekst" type="string" oio:definition="urn:oio:sagdok:indhold:BDD:1.0.0"/>
+    
+    <element name="LokationTekst" type="string" oio:definition="urn:oio:sagdok:lokation:BDD:1.0.0"/>
+    
+    <element name="MimetypeTekst" type="string" oio:definition="urn:oio:sagdok:mimetype:BDD:1.0.0"/>
+    
+    <element name="SoegUnderRedigeringAf" type="sd:SoegRelationType" oio:definition="urn:oio:sagdok:soegunderredigeringaf:ASDD:1.0.0"/>
+    
+    <element name="UnderRedigeringAf" type="sd:AktoerRelationType" oio:definition="urn:oio:sagdok:underredigeringaf:relation:ASDD:1.0.0"/>
+   
+	<complexType name="MultipleOutputType" oio:definition="urn:oio:sagdok:multipleoutput:ADD:1.0.0">
+        <sequence>
+            <xs:choice>
+                <element name="UnikRetur" type="sd:UnikReturType" minOccurs="0" maxOccurs="unbounded" oio:content="standardretur"/>
+                <element name="StandardRetur" type="sd:StandardReturType" minOccurs="0" maxOccurs="unbounded" oio:content="standardretur"/>
+            </xs:choice>
+        </sequence>
+	</complexType>
+	<complexType name="UnikReturType" oio:definition="urn:oio:sagdok:unikeretur:ADD:1.0.0">
+		<complexContent>
+			<extension base="sd:StandardReturType">
+				<sequence>
+					<element name="Type" type="string" oio:content="type"/>
+					<element ref="sd:UUIDIdentifikator" oio:content="uuid"/>
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+    <complexType name="DynamicFlerRelationType">
+        <complexContent>
+            <extension base="sd:FlerRelationType">
+                <sequence>
+                    <element name="Rolle" minOccurs="1" type="sd:UuidLabelInputType" oio:content="rolle"/>
+                    <element name="Type" minOccurs="1" type="sd:UuidLabelInputType" oio:content="type"/>
+                    <element name="Indeks" minOccurs="1" type="string" oio:content="indeks"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+    <complexType name="UuidLabelInputType" oio:definition="urn:oio:sagdok:unikidwithlabel:ADD:1.0.0" >
+        <complexContent>
+            <extension base="sd:UnikIdType">
+                <sequence>
+                    <element name="Label" type="string" minOccurs="0" oio:content="label"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+    <complexType name="OpgaverFlerRelationType" oio:definition="urn:oio:sagdok:opgaverflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:DynamicFlerRelationType"/>
+        </complexContent>
+    </complexType>
+    <complexType name="AdresseFlerRelationType" oio:definition="urn:oio:sagdok:adresseflerrelation:ADD:1.0.0">
+        <complexContent>
+            <extension base="sd:DynamicFlerRelationType"/>
+        </complexContent>
+    </complexType>
+</schema>

@@ -205,7 +205,7 @@ namespace Core.ApplicationServices.Notification
 
             using var transaction = _transactionManager.Begin();
 
-            newNotification.IsActive = newNotification.AdviceType == AdviceType.Repeat;
+            newNotification.IsActive = true;//newNotification.AdviceType == AdviceType.Repeat;
 
             _adviceRepository.Insert(newNotification);
             var error = RaiseAsRootModification(newNotification);

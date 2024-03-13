@@ -7,11 +7,13 @@ namespace Core.ApplicationServices.Model.System
     {
         public ResourcePermissionsResult BasePermissions { get; }
         public IEnumerable<SystemDeletionConflict> DeletionConflicts { get; }
+        public bool ModifyVisibility { get; }
 
-        public SystemPermissions(ResourcePermissionsResult basePermissions, IEnumerable<SystemDeletionConflict> deletionConflicts)
+        public SystemPermissions(ResourcePermissionsResult basePermissions, IEnumerable<SystemDeletionConflict> deletionConflicts, bool modifyVisibility)
         {
             BasePermissions = basePermissions;
             DeletionConflicts = deletionConflicts;
+            ModifyVisibility = modifyVisibility;
         }
     }
 }

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        targetNamespace="http://stoettesystemerne.dk/klassifikation/facet/6/"
+        xmlns:oio="urn:oio:definitions:1.0.0"
+        xmlns:facet="http://stoettesystemerne.dk/klassifikation/facet/6/"
+        xmlns:sd="urn:oio:sagdok:3.0.0"
+        oio:mapping="urn:oio:sts:MPD:3.0.0">
+
+    <import namespace = "urn:oio:sagdok:3.0.0" schemaLocation="../common/SagDokObjekt.xsd"/>
+
+    <element name="Facet" type="facet:FacetType" oio:definition="urn:oio:sagdok:facet:ADD:2.0.0"/>
+    <complexType name="FacetType" oio:definition="urn:oio:sagdok:facet:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:SagDokObjektType">
+                <sequence>
+                    <element ref="facet:Registrering" maxOccurs="unbounded" oio:content="registreringer"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <element name="AttributListe" type="facet:AttributListeType" oio:definition="urn:oio:sagdok:facetattributliste:ADD:2.0.0"/>
+    <complexType name="AttributListeType" oio:definition="urn:oio:sagdok:facetattributliste:ADD:2.0.0">
+        <sequence>
+            <element ref="facet:Egenskab" minOccurs="0" maxOccurs="unbounded" oio:content="egenskaber"/>
+        </sequence>
+    </complexType>
+
+    <element name="TilstandListe" type="facet:TilstandListeType" oio:definition="urn:oio:sagdok:facettilstandliste:ADD:2.0.0"/>
+    <complexType name="TilstandListeType" oio:definition="urn:oio:sagdok:facettilstandliste:ADD:2.0.0">
+        <sequence>
+            <element ref="facet:PubliceretStatus" minOccurs="0" maxOccurs="unbounded" oio:content="publiceret"/>
+        </sequence>
+    </complexType>
+
+    <element name="RelationListe" type="facet:RelationListeType" oio:definition="urn:oio:sagdok:facetrelationliste:ADD:2.0.0"/>
+    <complexType name="RelationListeType" oio:definition="urn:oio:sagdok:facetrelationliste:ADD:2.0.0">
+        <sequence>
+            <element ref="sd:Ansvarlig" minOccurs="0" oio:content="ansvarlig"/>
+            <element ref="sd:Ejer" minOccurs="0" oio:content="ejer"/>
+            <element ref="sd:FacetTilhoerer" minOccurs="0" oio:content="facettilhoerer"/>
+            <element ref="sd:Redaktoerer" minOccurs="0" maxOccurs="unbounded" oio:content="redaktoerer"/>
+        </sequence>
+    </complexType>
+
+    <element name="Registrering" type="facet:RegistreringType" oio:definition="urn:oio:sagdok:facetregistrering:ADD:2.0.0"/>
+    <complexType name="RegistreringType" oio:definition="urn:oio:sagdok:facetregistrering:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:RegistreringType">
+                <sequence>
+                    <element ref="facet:AttributListe" oio:content="attributter"/>
+                    <element ref="facet:TilstandListe" oio:content="tilstande"/>
+                    <element ref="facet:RelationListe" oio:content="relationer"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <element name="Egenskab" type="facet:EgenskabType" oio:definition="urn:oio:sagdok:facetegenskaber:ADD:2.0.0"/>
+    <complexType name="EgenskabType" oio:definition="urn:oio:sagdok:facetegenskaber:ADD:2.0.0">
+        <sequence>
+            <element ref="sd:Virkning" minOccurs="0" oio:content="virkning"/>
+            <element ref="sd:BrugervendtNoegleTekst" minOccurs="0" oio:content="brugervendtnoegle"/>
+            <element ref="sd:TitelTekst" minOccurs="0" oio:content="titel"/>
+            <element ref="sd:BeskrivelseTekst" minOccurs="0" oio:content="beskrivelse"/>
+            <element ref="sd:OpbygningTekst" minOccurs="0" oio:content="opbygning"/>
+            <element ref="sd:OphavsretTekst" minOccurs="0" oio:content="ophavsret"/>
+            <element ref="sd:PlanIdentifikator" minOccurs="0" oio:content="plan"/>
+            <element ref="sd:SupplementTekst" minOccurs="0" oio:content="supplement"/>
+            <element ref="sd:RetskildeTekst" minOccurs="0" oio:content="retskilde"/>
+        </sequence>
+    </complexType>
+
+    <element name="PubliceretStatus" type="facet:PubliceretStatusType" oio:definition="urn:oio:sagdok:facetpubliceret:ADD:2.0.0"/>
+    <complexType name="PubliceretStatusType" oio:definition="urn:oio:sagdok:facetpubliceret:ADD:2.0.0">
+        <sequence>
+            <element ref="sd:Virkning" minOccurs="0" oio:content="virkning"/>
+            <element ref="sd:ErPubliceretIndikator" minOccurs="0" oio:content="status"/>
+        </sequence>
+    </complexType>
+
+</schema>

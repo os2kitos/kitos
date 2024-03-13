@@ -1,6 +1,6 @@
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
-using Infrastructure.Soap.STSAdresse;
+using Kombit.InfrastructureSamples.AdresseService;
 
 namespace Core.DomainServices.SSO
 {
@@ -31,10 +31,10 @@ namespace Core.DomainServices.SSO
             return client;
         }
 
-        public static bool IsStsAdresseObsolete(this RegistreringType1 registreringType1)
+        public static bool IsStsAdresseObsolete(this RegistreringType8 registreringType8)
         {
-            return registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Slettet) ||
-                   registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Passiveret);
+            return registreringType8.LivscyklusKode.Equals(LivscyklusKodeType.Slettet) ||
+                   registreringType8.LivscyklusKode.Equals(LivscyklusKodeType.Passiveret);
         }
     }
 }

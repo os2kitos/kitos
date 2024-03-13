@@ -52,7 +52,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
                 Delete = permissions.BasePermissions.Delete,
                 Modify = permissions.BasePermissions.Modify,
                 Read = permissions.BasePermissions.Read,
-                DeletionConflicts = permissions.DeletionConflicts.Select(MapConflict).ToList()
+                DeletionConflicts = permissions.DeletionConflicts.Select(MapConflict).ToList(),
+                ModifyVisibility = permissions.ModifyVisibility
             };
         }
 

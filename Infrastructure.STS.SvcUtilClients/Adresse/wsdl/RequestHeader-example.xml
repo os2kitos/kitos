@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ns1:RequestHeader xmlns:ns1="http://kombit.dk/xml/schemas/RequestHeader/1/">
+	<ns1:TransactionUUID>e05746e3-76f6-475c-9ed6-801dfbfef247</ns1:TransactionUUID>
+</ns1:RequestHeader>
+

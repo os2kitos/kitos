@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        targetNamespace="http://stoettesystemerne.dk/organisation/organisationadministration/6/"
+        xmlns:sd="urn:oio:sagdok:3.0.0"
+        xmlns:sts="http://stoettesystemerne.dk/organisation/organisationadministration/6/">
+
+    <import namespace = "urn:oio:sagdok:3.0.0" schemaLocation="../common/SagDokObjekt.xsd"/>
+
+    <element name="FysiskSletInput" type="sts:FysiskSletInputType"/>
+    <element name="FysiskSletOutput" type="sd:BasicOutputType"/>
+
+    <complexType name="FysiskSletInputType">
+        <sequence>
+            <element name="OrganisationUUID" type="sts:UUIDType"/>
+            <element name="OrganisationEnhedUUID" type="sts:UUIDType"/>
+        </sequence>
+    </complexType>
+
+    <simpleType name="UUIDType">
+        <restriction base="string">
+            <pattern value="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="CPRType">
+        <restriction base="string">
+            <pattern value="[0-9]{10}"/>
+        </restriction>
+    </simpleType>
+
+</schema>

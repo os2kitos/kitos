@@ -2,7 +2,7 @@ using System;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Digst.OioIdws.Soap.Bindings;
-using Infrastructure.Soap.STSBruger;
+using Kombit.InfrastructureSamples.BrugerService;
 
 namespace Core.DomainServices.SSO
 {
@@ -13,6 +13,7 @@ namespace Core.DomainServices.SSO
             var laesInputType = new LaesInputType {UUIDIdentifikator = uuid.ToString()};
             var laesRequest = new laesRequest
             {
+                RequestHeader = new RequestHeaderType { TransactionUUID = Guid.NewGuid().ToString() },
                 LaesInput = laesInputType,
             };
             return laesRequest;
@@ -33,7 +34,7 @@ namespace Core.DomainServices.SSO
             return client;
         }
 
-        public static bool IsStsBrugerObsolete(this RegistreringType1 registreringType1)
+        public static bool IsStsBrugerObsolete(this RegistreringType5 registreringType1)
         {
             return registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Slettet) ||
                    registreringType1.LivscyklusKode.Equals(LivscyklusKodeType.Passiveret);

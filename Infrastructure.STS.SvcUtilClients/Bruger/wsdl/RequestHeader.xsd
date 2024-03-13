@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:tns="http://kombit.dk/xml/schemas/RequestHeader/1/"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            elementFormDefault="qualified"
+            version="1.0"
+            targetNamespace="http://kombit.dk/xml/schemas/RequestHeader/1/">
+
+	<xsd:element name="RequestHeader" type="tns:RequestHeaderType" />
+	<xsd:complexType name="RequestHeaderType">
+		<xsd:all>
+			<xsd:element ref="tns:TransactionUUID" />
+		</xsd:all>
+	</xsd:complexType>
+
+	<xsd:element name="TransactionUUID" type="tns:TransactionUUIDType"/>
+	<xsd:simpleType name="TransactionUUIDType">
+		<xsd:restriction base="tns:UUIDType"/>
+	</xsd:simpleType>
+
+	<xsd:simpleType name="UUIDType">
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>
+

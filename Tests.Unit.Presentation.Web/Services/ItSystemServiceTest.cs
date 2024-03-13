@@ -1439,11 +1439,12 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var uuid = A<Guid>();
-            var itSystem = new ItSystem { Uuid = uuid };
+            var itSystem = new ItSystem { Uuid = uuid, AccessModifier = AccessModifier.Public};
             ExpectGetSystemReturns(uuid, itSystem);
             ExpectAllowReadsReturns(itSystem, read);
             ExpectAllowModifyReturns(itSystem, modify);
             ExpectAllowDeleteReturns(itSystem, delete);
+            ExpectAllowEditVisibilityReturns(itSystem, false);
 
             //Act
             var result = _sut.GetPermissions(uuid);
@@ -1451,21 +1452,24 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var permissions = result.Value;
-            Assert.Equivalent(new SystemPermissions(new ResourcePermissionsResult(read, modify, delete), Array.Empty<SystemDeletionConflict>()), permissions);
+            Assert.Equivalent(new SystemPermissions(new ResourcePermissionsResult(read, modify, delete), Array.Empty<SystemDeletionConflict>(), false), permissions);
         }
 
         [Theory]
-        [InlineData(true, true, true, true)]
-        [InlineData(false, true, true, true)]
-        [InlineData(true, false, false, false)]
-        [InlineData(true, false, false, true)]
-        [InlineData(true, false, true, false)]
-        [InlineData(true, true, false, false)]
-        public void Can_Get_Permissions_With_Deletion_Conflicts(bool allowDelete, bool withUsages, bool withChildren, bool withExposures)
+        [InlineData(true, true, true, true, true, true)]
+        [InlineData(false, true, true, true, true, true)]
+        [InlineData(true, false, false, false, true, true)]
+        [InlineData(true, false, false, true, true, true)]
+        [InlineData(true, false, true, false, true, true)]
+        [InlineData(true, true, false, false, true, true)]
+        [InlineData(true, true, true, true, false, true)]
+        [InlineData(true, true, true, true, true, false)]
+        [InlineData(true, true, true, true, false, false)]
+        public void Can_Get_Permissions_With_Deletion_Conflicts_And_Visibility(bool allowDelete, bool withUsages, bool withChildren, bool withExposures, bool withEditVisibilityLocal, bool withEditVisibilityPermission)
         {
             //Arrange
             var uuid = A<Guid>();
-            var itSystem = new ItSystem { Uuid = uuid };
+            var itSystem = new ItSystem { Uuid = uuid, AccessModifier = AccessModifier.Public};
             ExpectGetSystemReturns(uuid, itSystem);
             ExpectAllowReadsReturns(itSystem, true);
             ExpectAllowModifyReturns(itSystem, true);
@@ -1473,7 +1477,8 @@ namespace Tests.Unit.Presentation.Web.Services
             if (withUsages) itSystem.Usages.Add(new ItSystemUsage());
             if (withExposures) itSystem.ItInterfaceExhibits.Add(new ItInterfaceExhibit());
             if (withChildren) itSystem.Children.Add(new ItSystem());
-
+            if (withEditVisibilityLocal) itSystem.AccessModifier = AccessModifier.Local;
+            ExpectAllowEditVisibilityReturns(itSystem, withEditVisibilityPermission);
 
             //Act
             var result = _sut.GetPermissions(uuid);
@@ -1488,7 +1493,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 if (withChildren) expectedConflicts.Add(SystemDeletionConflict.HasChildren);
                 if (withExposures) expectedConflicts.Add(SystemDeletionConflict.HasInterfaceExhibits);
             }
-            Assert.Equivalent(new SystemPermissions(new ResourcePermissionsResult(true, true, allowDelete), expectedConflicts), permissions);
+            Assert.Equivalent(new SystemPermissions(new ResourcePermissionsResult(true, true, allowDelete), expectedConflicts, withEditVisibilityLocal || withEditVisibilityPermission), permissions);
         }
 
         [Fact]
@@ -1672,6 +1677,12 @@ namespace Tests.Unit.Presentation.Web.Services
         private void ExpectAllowDeleteReturns(ItSystem system, bool value)
         {
             _authorizationContext.Setup(x => x.AllowDelete(system)).Returns(value);
+        }
+
+        private void ExpectAllowEditVisibilityReturns(ItSystem system, bool value)
+        {
+            _authorizationContext.Setup(x => x.HasPermission(It.Is<VisibilityControlPermission>(x => x.Target.Id == system.Id)))
+                .Returns(value);
         }
 
         private void ExpectGetSystemReturns(int id, ItSystem system)
