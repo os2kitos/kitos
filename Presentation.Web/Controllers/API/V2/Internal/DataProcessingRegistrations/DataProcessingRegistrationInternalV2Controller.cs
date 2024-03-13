@@ -15,6 +15,7 @@ using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.DomainModel.GDPR;
 using Presentation.Web.Extensions;
+using Presentation.Web.Models.API.V2.Response.DataProcessing;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistrations
 {
@@ -22,12 +23,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
     /// Internal API for the data processing registrations stored in KITOS.
     /// </summary>
     [RoutePrefix("api/v2/internal/data-processing-registrations")]
-    public class DataProcessingRegistrationInternalV2Controler : InternalApiV2Controller
+    public class DataProcessingRegistrationInternalV2Controller : InternalApiV2Controller
     {
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationService;
         private readonly IDataProcessingRegistrationResponseMapper _responseMapper;
 
-        public DataProcessingRegistrationInternalV2Controler(IDataProcessingRegistrationApplicationService dataProcessingRegistrationService, 
+        public DataProcessingRegistrationInternalV2Controller(IDataProcessingRegistrationApplicationService dataProcessingRegistrationService, 
             IDataProcessingRegistrationResponseMapper responseMapper)
         {
             _dataProcessingRegistrationService = dataProcessingRegistrationService;
@@ -35,15 +36,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
         }
 
         /// <summary>
-        /// Shallow search endpoint returning all IT-Systems available to the current user
+        /// Shallow search endpoint returning all Data Processing Registrations available to the current user
         /// </summary>
-        /// <param name="nameContains">Include only systems with a name that contains the content in the parameter</param>
-        /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
+        /// <param name="nameContains">Include only dprs with a name that contains the content in the parameter</param>
         /// <param name="orderByProperty">Ordering property</param>
         /// <returns></returns>
         [HttpGet]
         [Route("search")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemSearchResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<DataProcessingRegistrationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -51,7 +51,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
             [NonEmptyGuid] Guid organizationUuid,
             string nameContains = null,
             CommonOrderByProperty? orderByProperty = null,
-            DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -62,12 +61,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
             if(nameContains != null)
                 conditions.Add(new QueryByPartOfName<DataProcessingRegistration>(nameContains));
 
-            if (changedSinceGtEq.HasValue)
-                conditions.Add(new QueryByChangedSinceGtEq<DataProcessingRegistration>(changedSinceGtEq.Value));
-
             return _dataProcessingRegistrationService
                 .Query(conditions.ToArray())
-                .OrderApiResultsByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
+                .OrderApiResultsByDefaultConventions(false, orderByProperty)
                 .Page(paginationQuery)
                 .ToList()
                 .Select(_responseMapper.MapDataProcessingRegistrationDTO)
