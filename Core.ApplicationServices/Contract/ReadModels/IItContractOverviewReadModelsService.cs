@@ -20,6 +20,6 @@ namespace Core.ApplicationServices.Contract.ReadModels
         /// <returns>
         /// Contracts where responsibleOrganizationUnit equals <param name="organizationUnitId"> or an organization unit of it's sub tree</param>
         /// </returns>
-        Result<IQueryable<ItContractOverviewReadModel>, OperationError> GetByOrganizationIdAndIdOrgOrganizationUnitSubTree(int organizationId, int organizationUnitId);
+        Result<IQueryable<ItContractOverviewReadModel>, OperationError> GetByOrganizationIdOrUnitIdInSubTree(int organizationId, int organizationUnitId);
     }
 }
