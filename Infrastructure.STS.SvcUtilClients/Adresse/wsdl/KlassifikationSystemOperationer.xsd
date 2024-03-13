@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        targetNamespace="http://stoettesystemerne.dk/klassifikation/klassifikationsystem/6/"
+        xmlns:oio="urn:oio:definitions:1.0.0"
+        xmlns:klassifikation="http://stoettesystemerne.dk/klassifikation/klassifikation/6/"
+        xmlns:facet="http://stoettesystemerne.dk/klassifikation/facet/6/"
+        xmlns:klasse="http://stoettesystemerne.dk/klassifikation/klasse/6/"
+        xmlns:sd="urn:oio:sagdok:3.0.0"
+        xmlns:sts="http://stoettesystemerne.dk/klassifikation/klassifikationsystem/6/"
+        oio:mapping="urn:oio:sagdok:MPD:3.0.0">
+
+    <import namespace = "urn:oio:sagdok:3.0.0" schemaLocation="../common/SagDokObjekt.xsd"/>
+    <import namespace="http://stoettesystemerne.dk/klassifikation/klassifikation/6/" schemaLocation="KlassifikationOperationer.xsd"/>
+    <import namespace="http://stoettesystemerne.dk/klassifikation/facet/6/" schemaLocation="FacetOperationer.xsd"/>
+    <import namespace="http://stoettesystemerne.dk/klassifikation/klasse/6/" schemaLocation="KlasseOperationer.xsd"/>
+
+    <element name="FremsoegObjekthierarkiInput" type="sts:FremsoegObjekthierarkiInputType" oio:definition="urn:oio:sts:fremsoegobjekthierarkiinput:ADD:2.0.0"/>
+    <element name="FremsoegObjekthierarkiOutput" type="sts:FremsoegObjekthierarkiOutputType" oio:definition="urn:oio:sts:fremsoegobjekthierarkioutput:ADD:2.0.0"/>
+
+    <element name="ImporterKlassifikationSystemInput" type="sts:ImporterKlassifikationSystemInputType" oio:definition="urn:oio:sts:klassifikationssystemimportinput:ADD:2.0.0"/>
+    <element name="ImporterKlassifikationSystemOutput" type="sd:MultipleOutputType" oio:definition="urn:oio:sts:klassifikationssystemimportoutput:ADD:2.0.0"/>
+    <complexType name="FremsoegObjekthierarkiInputType" oio:definition="urn:oio:sts:fremsoegobjekthierarkiinputADD:2.0.0">
+        <complexContent>
+            <extension base="sd:SoegInputType">
+		        <sequence>
+		            <element ref="sts:KlassifikationSoegEgenskab" minOccurs="0" maxOccurs="1" oio:content="klassifikationegenskaber"/>
+		            <element ref="sts:FacetSoegEgenskab" minOccurs="0" maxOccurs="1" oio:content="facetegenskaber"/>
+		            <element ref="sts:KlasseSoegEgenskab" minOccurs="0" maxOccurs="1" oio:content="klasseegenskaber"/>
+		        </sequence>
+	        </extension>
+        </complexContent>
+    </complexType>
+    
+    <complexType name="FremsoegObjekthierarkiOutputType" oio:definition="urn:oio:sts:fremsoegobjekthierarkioutputADD:2.0.0">
+        <complexContent>
+            <extension base="sd:BasicOutputType">
+		        <sequence>
+		            <element ref="sts:Klassifikationer" oio:content="klassifikationer"/>
+		            <element ref="sts:Facetter" oio:content="facetter"/>
+		            <element ref="sts:Klasser" oio:content="klasser"/>
+		        </sequence>
+	        </extension>
+        </complexContent>
+    </complexType>
+    
+    <complexType name="ImporterKlassifikationSystemInputType" oio:definition="urn:oio:sts:klassifikationssystemimportinputtype:ADD:2.0.0">
+        <sequence>
+            <element ref="klassifikation:Klassifikation" minOccurs="1" maxOccurs="1" oio:content="urn:oio:sagdok:klassifikation:ADD:2.0.0"/>
+            <element ref="sts:FacetterInput" oio:content="facetter"/>
+            <element ref="sts:KlasserInput" oio:content="klasser"/>
+        </sequence>
+    </complexType>
+
+    <element name="KlassifikationSoegEgenskab" type="klassifikation:EgenskabType" oio:definition="urn:oio:sagdok:klassifikationsoegegenskab:ADD:1.0.0"/>
+    <element name="FacetSoegEgenskab" type="facet:EgenskabType" oio:definition="urn:oio:sagdok:facetsoegegenskab:ADD:1.0.0"/>
+    <element name="KlasseSoegEgenskab" type="klasse:EgenskabType" oio:definition="urn:oio:sagdok:klassesoegegenskab:ADD:1.0.0"/>
+
+    <element name="Klassifikationer" type="sts:KlassifikationerOutputType" oio:definition="urn:oio:sts:klassifikationer:ADD:2.0.0"/>
+    <complexType name="KlassifikationerOutputType" oio:definition="urn:oio:sts:organisationer:ADD:2.0.0">
+        <sequence>
+            <element name="FiltreretOejebliksbillede" type="klassifikation:FiltreretOejebliksbilledeType" minOccurs="0" maxOccurs="unbounded" oio:content="urn:oio:sagdok:klassifikation:ADD:2.0.0"/>
+        </sequence>
+    </complexType>
+    
+    <element name="Facetter" type="sts:FacetterOutputType" oio:definition="urn:oio:sts:facetter:ADD:2.0.0"/>
+    <complexType name="FacetterOutputType" oio:definition="urn:oio:sts:facetter:ADD:2.0.0">
+        <sequence>
+            <element name="FiltreretOejebliksbillede" type="facet:FiltreretOejebliksbilledeType" minOccurs="0" maxOccurs="unbounded" oio:content="urn:oio:sagdok:facet:ADD:2.0.0"/>
+        </sequence>
+    </complexType>
+    
+    <element name="Klasser" type="sts:KlasserOutputType" oio:definition="urn:oio:sts:klasser:ADD:2.0.0"/>
+    <complexType name="KlasserOutputType" oio:definition="urn:oio:sts:klasser:ADD:2.0.0">
+        <sequence>
+            <element name="FiltreretOejebliksbillede" type="klasse:FiltreretOejebliksbilledeType" minOccurs="0" maxOccurs="unbounded" oio:content="urn:oio:sagdok:klasse:ADD:2.0.0"/>
+        </sequence>
+    </complexType>
+    
+    <element name="FacetterInput" type="sts:FacetterInputType" oio:definition="urn:oio:sts:facetter:ADD:2.0.0"/>
+    <complexType name="FacetterInputType" oio:definition="urn:oio:sts:facetter:ADD:2.0.0">
+        <sequence>
+            <element ref="facet:Facet" minOccurs="0" maxOccurs="unbounded" oio:content="urn:oio:sagdok:facet:ADD:2.0.0"/>
+        </sequence>
+    </complexType>
+
+    <element name="KlasserInput" type="sts:KlasserInputType" oio:definition="urn:oio:sts:klasser:ADD:2.0.0"/>
+    <complexType name="KlasserInputType" oio:definition="urn:oio:sts:klasser:ADD:2.0.0">
+        <sequence>
+            <element ref="klasse:Klasse" minOccurs="0" maxOccurs="unbounded" oio:content="urn:oio:sagdok:klasse:ADD:2.0.0"/>
+        </sequence>
+    </complexType>
+    
+    <complexType name="ImportOutputElementType" oio:definition="urn:oio:sagdok:stsimportoutputelement:ADD:2.0.0">
+    	<complexContent>
+            <extension base="sd:BasicOutputType">
+            	<sequence>
+		            <element ref="sd:UUIDIdentifikator" oio:content="uuid"/>
+		            <element name="ObjektType" type="sts:KlassifikationObjektType" oio:content="objekttype"/>
+            	</sequence>
+            </extension>
+    	</complexContent>
+	</complexType>
+
+    <simpleType name="KlassifikationObjektType" oio:definition="urn:oio:sagdok:klassifikationobjekttype:DT:1.0.0">
+        <restriction base="string">
+            <enumeration value="Klassifikation"/>
+            <enumeration value="Facet"/>
+            <enumeration value="Klasse"/>
+        </restriction>
+    </simpleType>
+
+</schema>

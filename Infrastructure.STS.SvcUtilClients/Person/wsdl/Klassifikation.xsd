@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        targetNamespace="http://stoettesystemerne.dk/klassifikation/klassifikation/6/"
+        xmlns:oio="urn:oio:definitions:1.0.0"
+        xmlns:klassifikation="http://stoettesystemerne.dk/klassifikation/klassifikation/6/"
+        xmlns:sd="urn:oio:sagdok:3.0.0"
+        oio:mapping="urn:oio:sagdok:MPD:3.0.0">
+
+    <import namespace = "urn:oio:sagdok:3.0.0" schemaLocation="../common/SagDokObjekt.xsd"/>
+
+    <element name="Klassifikation" type="klassifikation:KlassifikationType" oio:definition="urn:oio:sagdok:klassifikation:ADD:2.0.0"/>
+    <complexType name="KlassifikationType" oio:definition="urn:oio:sagdok:klassifikation:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:SagDokObjektType">
+                <sequence>
+                    <element ref="klassifikation:Registrering" maxOccurs="unbounded" oio:content="registreringer"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <element name="AttributListe" type="klassifikation:AttributListeType" oio:definition="urn:oio:sagdok:klassifikationattributliste:ADD:2.0.0"/>
+    <complexType name="AttributListeType" oio:definition="urn:oio:sagdok:klassifikationattributliste:ADD:2.0.0">
+        <sequence>
+            <element ref="klassifikation:Egenskab" minOccurs="0" maxOccurs="unbounded" oio:content="egenskaber"/>
+        </sequence>
+    </complexType>
+
+    <element name="TilstandListe" type="klassifikation:TilstandListeType" oio:definition="urn:oio:sagdok:klassifikationtilstandliste:ADD:2.0.0"/>
+    <complexType name="TilstandListeType" oio:definition="urn:oio:sagdok:klassifikationtilstandliste:ADD:2.0.0">
+        <sequence>
+            <element ref="klassifikation:PubliceretStatus" minOccurs="0" maxOccurs="unbounded" oio:content="publiceret"/>
+        </sequence>
+    </complexType>
+
+    <element name="RelationListe" type="klassifikation:RelationListeType" oio:definition="urn:oio:sagdok:klassifikationrelationliste:ADD:2.0.0"/>
+    <complexType name="RelationListeType" oio:definition="urn:oio:sagdok:klassifikationrelationliste:ADD:2.0.0">
+        <sequence>
+            <element ref="sd:Ansvarlig" minOccurs="0" oio:content="ansvarlig"/>
+            <element ref="sd:Ejer" minOccurs="0" oio:content="ejer"/>
+        </sequence>
+    </complexType>
+
+    <element name="Registrering" type="klassifikation:RegistreringType" oio:definition="urn:oio:sagdok:klassifikationregistrering:ADD:2.0.0"/>
+    <complexType name="RegistreringType" oio:definition="urn:oio:sagdok:klassifikationregistrering:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:RegistreringType">
+                <sequence>
+                    <element ref="klassifikation:AttributListe" oio:content="attributter"/>
+                    <element ref="klassifikation:TilstandListe" oio:content="tilstande"/>
+                    <element ref="klassifikation:RelationListe" oio:content="relationer"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <element name="Egenskab" type="klassifikation:EgenskabType" oio:definition="urn:oio:sagdok:klassifikationegenskaber:ADD:2.0.0"/>
+    <complexType name="EgenskabType" oio:definition="urn:oio:sagdok:klassifikationegenskaber:ADD:2.0.0">
+        <sequence>
+            <element ref="sd:Virkning" minOccurs="0" oio:content="virkning"/>
+            <element ref="sd:BrugervendtNoegleTekst" minOccurs="0" oio:content="brugervendtnoegle"/>
+            <element ref="sd:TitelTekst" minOccurs="0" oio:content="titel"/>
+            <element ref="sd:BeskrivelseTekst" minOccurs="0" oio:content="beskrivelse"/>
+            <element ref="sd:KaldenavnTekst" minOccurs="0" oio:content="kaldenavn"/>
+            <element ref="sd:OphavsretTekst" minOccurs="0" oio:content="ophavsret"/>
+        </sequence>
+    </complexType>
+
+    <element name="PubliceretStatus" type="klassifikation:PubliceretStatusType" oio:definition="urn:oio:sagdok:klassifikationpubliceret:ADD:2.0.0"/>
+    <complexType name="PubliceretStatusType" oio:definition="urn:oio:sagdok:klassifikationpubliceret:ADD:2.0.0">
+        <sequence>
+            <element ref="sd:Virkning" minOccurs="0" oio:content="virkning"/>
+            <element ref="sd:ErPubliceretIndikator" minOccurs="0" oio:content="status"/>
+        </sequence>
+    </complexType>
+
+</schema>
