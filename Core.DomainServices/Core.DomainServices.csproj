@@ -41,6 +41,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IdentityModel" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -162,6 +163,7 @@
     <Compile Include="Repositories\UICustomization\UIModuleCustomizationRepository.cs" />
     <Compile Include="Role\IRoleAssignmentService.cs" />
     <Compile Include="Role\RoleAssignmentService.cs" />
+    <Compile Include="SSO\PortFactory.cs" />
     <Compile Include="SystemUsage\AttachedOptionsAssignmentService.cs" />
     <Compile Include="SystemUsage\IAttachedOptionsAssignmentService.cs" />
     <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelUpdate.cs" />
@@ -284,13 +286,13 @@
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Soap\Infrastructure.STS.SSO.csproj">
-      <Project>{a05389ea-25f4-45b5-8534-0775d9671456}</Project>
-      <Name>Infrastructure.STS.SSO</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.STS.Common\Infrastructure.STS.Common.csproj">
       <Project>{423D7522-4882-4438-94F4-7B3F5778C83F}</Project>
       <Name>Infrastructure.STS.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.STS.SvcUtilClients\Infrastructure.STS.SvcUtilClients.csproj">
+      <Project>{2DC50C99-0A51-4FAC-B53B-54401B72D699}</Project>
+      <Name>Infrastructure.STS.SvcUtilClients</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
