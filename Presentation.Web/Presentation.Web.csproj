@@ -436,6 +436,7 @@
     <Compile Include="Models\API\V2\Response\Shared\CommandPermissionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Shared\ResourceCollectionPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\BaseSystemRelationResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\SystemUsage\GeneralSystemRelationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\IncomingSystemRelationResponseDTO.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\RegistrationHierarchyNodeMapper.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\JournalPeriodUpdateRequestDTO.cs" />
