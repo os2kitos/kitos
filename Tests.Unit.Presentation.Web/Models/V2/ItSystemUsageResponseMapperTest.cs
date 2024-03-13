@@ -346,6 +346,28 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertOutgoingRelation(incomingSystemRelation, dto);
         }
 
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(false, false, false)]
+        [InlineData(true, false, false)]
+        [InlineData(true, true, false)]
+        [InlineData(false, true, false)]
+        [InlineData(false, true, true)]
+        [InlineData(true, false, true)]
+        public void Can_Map_General_System_Relation(bool withContract, bool withFrequency, bool withInterface)
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage();
+            AssignBasicProperties(itSystemUsage);
+            var outgoingSystemRelation = CreateOutgoingSystemRelation(itSystemUsage, withContract, withFrequency, withInterface);
+
+            //Act
+            var dto = _sut.MapGeneralSystemRelationDTO(outgoingSystemRelation);
+
+            //Assert
+            AssertGeneralRelation(outgoingSystemRelation, dto);
+        }
+
         [Fact]
         public void Can_Map_JournalPeriod()
         {
@@ -499,6 +521,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 EndDate = A<DateTime>(),
                 UniqueArchiveId = id ?? A<string>()
             };
+        }
+
+        private static void AssertGeneralRelation(SystemRelation expected, GeneralSystemRelationResponseDTO actual)
+        {
+            AssertIdentity(expected.ToSystemUsage, actual.ToSystemUsage);
+            AssertIdentity(expected.FromSystemUsage, actual.FromSystemUsage);
+            AssertBaseRelation(expected, actual);
         }
 
         private static void AssertOutgoingRelation(SystemRelation expected, OutgoingSystemRelationResponseDTO actual)
