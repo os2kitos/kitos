@@ -50,7 +50,7 @@ namespace Core.ApplicationServices.SSO.State
                     else
                     {
                         var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid, _cvrNumber);
-                        if (!stsBrugerInfo.HasValue)
+                        if (stsBrugerInfo.Failed)
                         {
                             context.TransitionTo(_ssoStateFactory.CreateErrorState(), _ => _.HandleUnableToResolveUserInStsOrganisation());
                         }
@@ -64,13 +64,13 @@ namespace Core.ApplicationServices.SSO.State
                 else // Try to find the user by email
                 {
                     var stsBrugerInfo = _stsBrugerInfoService.GetStsBrugerInfo(_userUuid, _cvrNumber);
-                    if (!stsBrugerInfo.HasValue)
+                    if (stsBrugerInfo.Failed)
                     {
                         context.TransitionTo(_ssoStateFactory.CreateErrorState(), _ => _.HandleUnableToResolveUserInStsOrganisation());
                     }
                     else
                     {
-                        var userByKitosEmail = FindUserByEmail(stsBrugerInfo);
+                        var userByKitosEmail = FindUserByEmail(stsBrugerInfo.Value);
                         if (userByKitosEmail.HasValue)
                         {
                             context.TransitionTo(_ssoStateFactory.CreateUserIdentifiedState(userByKitosEmail.Value, stsBrugerInfo.Value), 
@@ -87,9 +87,9 @@ namespace Core.ApplicationServices.SSO.State
             }
         }
 
-        private Maybe<User> FindUserByEmail(Maybe<StsBrugerInfo> stsBrugerInfo)
+        private Maybe<User> FindUserByEmail(StsBrugerInfo stsBrugerInfo)
         {
-            foreach (var email in stsBrugerInfo.Value.Emails)
+            foreach (var email in stsBrugerInfo.Emails)
             {
                 var user = _userRepository.GetByEmail(email);
                 if (user != null)

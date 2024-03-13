@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        targetNamespace="http://stoettesystemerne.dk/klassifikation/facet/6/"
+        xmlns:oio="urn:oio:definitions:1.0.0"
+        xmlns:facet="http://stoettesystemerne.dk/klassifikation/facet/6/"
+        xmlns:sd="urn:oio:sagdok:3.0.0"
+        oio:mapping="urn:oio:sagdok:MPD:3.0.0">
+
+    <import namespace = "urn:oio:sagdok:3.0.0" schemaLocation="../common/SagDokObjekt.xsd"/>
+    <include schemaLocation="Facet.xsd"/>
+    
+    <element name="ImportInput" type="facet:ImportInputType" oio:definition="urn:oio:sagdok:facetimportinput:ADD:2.0.0"/>
+    <element name="ImportOutput" type="sd:BasicOutputType" oio:definition="urn:oio:sagdok:facetimportoutput:ASDD:2.0.0"/>
+
+    <element name="OpretInput" type="facet:OpretInputType" oio:definition="urn:oio:sagdok:facetopretinput:ADD:2.0.0"/>
+    <element name="OpretOutput" type="sd:OpretOutputType" oio:definition="urn:oio:sagdok:facetopretoutput:ADD:2.0.0"/>
+
+    <element name="RetInput" type="facet:RetInputType" oio:definition="urn:oio:sagdok:facetretinput:ADD:2.0.0"/>
+    <element name="RetOutput" type="sd:BasicOutputType" oio:definition="urn:oio:sagdok:facetretoutput:ASDD:1.0.0"/>
+
+    <element name="PassiverInput" type="sd:UuidNoteInputType" oio:definition="urn:oio:sagdok:facetpassiverinput:ASDD:1.0.0"/>
+    <element name="PassiverOutput" type="sd:BasicOutputType" oio:definition="urn:oio:sagdok:facetpassiveroutput:ASDD:1.0.0"/>
+    
+    <element name="SletInput" type="sd:UuidNoteInputType" oio:definition="urn:oio:sagdok:facetsletinput:ASDD:1.0.0"/>
+    <element name="SletOutput" type="sd:BasicOutputType" oio:definition="urn:oio:sagdok:facetsletoutput:ASDD:1.0.0"/>
+    
+    <element name="LaesInput" type="sd:LaesInputType" oio:definition="urn:oio:sagdok:facetlaesinput:ASDD:1.0.0"/>
+    <element name="LaesOutput" type="facet:LaesOutputType" oio:definition="urn:oio:sagdok:facetlaesoutput:ADD:2.0.0"/>
+
+    <element name="ListInput" type="sd:ListInputType" oio:definition="urn:oio:sagdok:facetlistinput:ASDD:1.0.0"/>
+    <element name="ListOutput" type="facet:ListOutputType" oio:definition="urn:oio:sagdok:facetlistoutput:ADD:2.0.0"/>
+
+    <element name="SoegInput" type="facet:SoegInputType" oio:definition="urn:oio:sagdok:facetsoeginput:ADD:2.0.0"/>
+    <element name="SoegOutput" type="sd:SoegOutputType" oio:definition="urn:oio:sagdok:facetsoegoutput:ASDD:1.0.0"/>
+
+    <complexType name="ImportInputType" oio:definition="urn:oio:sagdok:facetimportinput:ADD:2.0.0">
+        <sequence>
+            <element ref="facet:Facet" oio:content="facet"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="OpretInputType" oio:definition="urn:oio:sagdok:facetopretinput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:OpretInputType">
+                <sequence>
+                    <element ref="facet:AttributListe" oio:content="attributter"/>
+                    <element ref="facet:TilstandListe" oio:content="tilstande"/>
+                    <element ref="facet:RelationListe" oio:content="relationer"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="RetInputType" oio:definition="urn:oio:sagdok:facetretinput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:RetInputType">
+                <sequence>
+                    <element ref="facet:AttributListe" minOccurs="0" oio:content="attributter"/>
+                    <element ref="facet:TilstandListe" minOccurs="0" oio:content="tilstande"/>
+                    <element ref="facet:RelationListe" minOccurs="0" oio:content="relationer"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    
+    <complexType name="LaesOutputType" oio:definition="urn:oio:sagdok:facetlaesoutput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:BasicOutputType">
+                <sequence>
+		            <element name="FiltreretOejebliksbillede" type="facet:FiltreretOejebliksbilledeType" minOccurs="0" oio:content="filtreretoejebliksbillede"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="ListOutputType" oio:definition="urn:oio:sagdok:facetlistoutput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:ListOutputType">
+                <sequence>
+		            <element name="FiltreretOejebliksbillede" type="facet:FiltreretOejebliksbilledeType" minOccurs="0" maxOccurs="unbounded" oio:content="filtreretoejebliksbillede"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="FiltreretOejebliksbilledeType" oio:definition="urn:oio:sagdok:facetfiltreretoejebliksbillede:ADD:1.0.0">
+		<sequence>
+			<element name="ObjektType" type="sd:SagDokObjektType" oio:content="objekt"/>
+			<element name="Registrering" type="facet:RegistreringType" minOccurs="0" maxOccurs="unbounded" oio:content="registrering"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="SoegInputType" oio:definition="urn:oio:sagdok:facetsoeginput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:SoegInputType">
+                <sequence>
+                <sequence>
+		            <element ref="facet:AttributListe" oio:content="soegattributter"/>
+		            <element ref="facet:TilstandListe" oio:content="soegtilstande"/>
+		            <element ref="facet:RelationListe" oio:content="soegrelationer"/>
+                </sequence>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+</schema>
