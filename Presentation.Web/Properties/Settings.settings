@@ -62,5 +62,14 @@
     <Setting Name="StsOrganisationCertificateThumbprint" Type="System.String" Scope="Application">
       <Value Profile="(Default)">2c34be56b35d993160df525c36146336ea2b2801</Value>
     </Setting>
+    <Setting Name="StsAdressePort" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://organisation.eksterntest-stoettesystemerne.dk/organisation/adresse/6</Value>
+    </Setting>
+    <Setting Name="StsBrugerPort" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://organisation.eksterntest-stoettesystemerne.dk/organisation/bruger/6</Value>
+    </Setting>
+    <Setting Name="StsPersonPort" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://organisation.eksterntest-stoettesystemerne.dk/organisation/person/6</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
