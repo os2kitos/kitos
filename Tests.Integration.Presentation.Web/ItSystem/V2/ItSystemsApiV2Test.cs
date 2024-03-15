@@ -676,7 +676,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var org = await CreateOrganizationAsync();
             var (user, token) = await CreateApiUser(org.Id);
 
-            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, org.Id).DisposeAsync();
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.GlobalAdmin, org.Id).DisposeAsync();
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Local);
 

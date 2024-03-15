@@ -357,8 +357,7 @@ namespace Core.ApplicationServices.System
 
         private bool GetEditVisibilityPermission(ItSystem system)
         {
-            return system.AccessModifier == AccessModifier.Local ||
-                _authorizationContext.HasPermission(new VisibilityControlPermission(system));
+            return _authorizationContext.HasPermission(new VisibilityControlPermission(system));
         }
 
         private static IEnumerable<SystemDeletionConflict> GetDeletionConflicts(ItSystem arg)
@@ -516,7 +515,7 @@ namespace Core.ApplicationServices.System
         {
             return Mutate(itSystemId, system => system.AccessModifier != accessModifier, updateWithResult: system =>
             {
-                if (!_authorizationContext.HasPermission(new VisibilityControlPermission(system)))
+                if (!GetEditVisibilityPermission(system))
                 {
                     return new OperationError(OperationFailure.Forbidden);
                 }
