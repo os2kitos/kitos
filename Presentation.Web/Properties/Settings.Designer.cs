@@ -205,5 +205,32 @@ namespace Presentation.Web.Properties {
                 return ((string)(this["StsOrganisationCertificateThumbprint"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://organisation.eksterntest-stoettesystemerne.dk/organisation/adresse/6")]
+        public string StsAdressePort {
+            get {
+                return ((string)(this["StsAdressePort"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://organisation.eksterntest-stoettesystemerne.dk/organisation/bruger/6")]
+        public string StsBrugerPort {
+            get {
+                return ((string)(this["StsBrugerPort"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://organisation.eksterntest-stoettesystemerne.dk/organisation/person/6")]
+        public string StsPersonPort {
+            get {
+                return ((string)(this["StsPersonPort"]));
+            }
+        }
     }
 }
