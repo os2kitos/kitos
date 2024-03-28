@@ -77,7 +77,7 @@
         "ngstorage": "^0.3.4",
         "select2": "^3.4.5",
         "select2-bootstrap-css": "^1.4.6",
-        "tinymce": "^5.10.9"
+        "tinymce": "^7.0.0"
     },
     "engines": {
         "yarn": ">= 1.0.0"
