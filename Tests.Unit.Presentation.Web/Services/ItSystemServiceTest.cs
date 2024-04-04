@@ -1456,16 +1456,16 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Theory]
-        [InlineData(true, true, true, true, true, true)]
-        [InlineData(false, true, true, true, true, true)]
-        [InlineData(true, false, false, false, true, true)]
-        [InlineData(true, false, false, true, true, true)]
-        [InlineData(true, false, true, false, true, true)]
-        [InlineData(true, true, false, false, true, true)]
-        [InlineData(true, true, true, true, false, true)]
-        [InlineData(true, true, true, true, true, false)]
-        [InlineData(true, true, true, true, false, false)]
-        public void Can_Get_Permissions_With_Deletion_Conflicts_And_Visibility(bool allowDelete, bool withUsages, bool withChildren, bool withExposures, bool withEditVisibilityLocal, bool withEditVisibilityPermission)
+        [InlineData(true, true, true, true, true)]
+        [InlineData(false, true, true, true, true)]
+        [InlineData(true, false, false, false, true)]
+        [InlineData(true, false, false, true, true)]
+        [InlineData(true, false, true, false, true)]
+        [InlineData(true, true, false, false, true)]
+        [InlineData(true, true, true, true, true)]
+        [InlineData(true, true, true, true, false)]
+        [InlineData(true, true, true, true, false)]
+        public void Can_Get_Permissions_With_Deletion_Conflicts_And_Visibility(bool allowDelete, bool withUsages, bool withChildren, bool withExposures, bool withEditVisibilityPermission)
         {
             //Arrange
             var uuid = A<Guid>();
@@ -1477,7 +1477,6 @@ namespace Tests.Unit.Presentation.Web.Services
             if (withUsages) itSystem.Usages.Add(new ItSystemUsage());
             if (withExposures) itSystem.ItInterfaceExhibits.Add(new ItInterfaceExhibit());
             if (withChildren) itSystem.Children.Add(new ItSystem());
-            if (withEditVisibilityLocal) itSystem.AccessModifier = AccessModifier.Local;
             ExpectAllowEditVisibilityReturns(itSystem, withEditVisibilityPermission);
 
             //Act
@@ -1493,7 +1492,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 if (withChildren) expectedConflicts.Add(SystemDeletionConflict.HasChildren);
                 if (withExposures) expectedConflicts.Add(SystemDeletionConflict.HasInterfaceExhibits);
             }
-            Assert.Equivalent(new SystemPermissions(new ResourcePermissionsResult(true, true, allowDelete), expectedConflicts, withEditVisibilityLocal || withEditVisibilityPermission), permissions);
+            Assert.Equivalent(new SystemPermissions(new ResourcePermissionsResult(true, true, allowDelete), expectedConflicts, withEditVisibilityPermission), permissions);
         }
 
         [Fact]
