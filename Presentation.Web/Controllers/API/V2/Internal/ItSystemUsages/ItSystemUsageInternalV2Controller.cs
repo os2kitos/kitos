@@ -20,6 +20,7 @@ using Presentation.Web.Models.API.V2.Internal.Response.ItSystem;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
+using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
 
@@ -134,7 +135,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
 
         [HttpGet]
         [Route("relations/{contractUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemSearchResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<GeneralSystemRelationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
