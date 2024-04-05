@@ -10,6 +10,9 @@ using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
+using Core.DomainModel.Organization;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
 {
@@ -165,6 +168,15 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             using var response = await SendDeleteContractAsync(token, contractUuid);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetAvailableDataProcessingRegistrationsAsync(Guid uuid, string nameQuery, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{uuid}/data-processing-registrations?nameQuery={nameQuery}"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
         }
     }
 }
