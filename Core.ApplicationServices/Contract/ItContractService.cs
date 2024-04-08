@@ -221,18 +221,20 @@ namespace Core.ApplicationServices.Contract
 
         public Result<IEnumerable<DataProcessingRegistration>, OperationError> GetDataProcessingRegistrationsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
         {
-            if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
             return WithReadAccess<IEnumerable<DataProcessingRegistration>>(id, contract =>
-                _contractDataProcessingRegistrationAssignmentService
-                    .GetApplicableDataProcessingRegistrations(contract)
-                    .ByPartOfName(nameQuery)
-                    .OrderBy(x => x.Id)
+            {
+                var query = _contractDataProcessingRegistrationAssignmentService
+                    .GetApplicableDataProcessingRegistrations(contract);
+
+                if (!string.IsNullOrEmpty(nameQuery)) query = query.ByPartOfName(nameQuery);
+
+                return query.OrderBy(x => x.Id)
                     .Take(pageSize)
                     .OrderBy(x => x.Name)
-                    .ToList()
-            );
+                    .ToList();
+            });
         }
 
         public IQueryable<ItContract> Query(params IDomainQuery<ItContract>[] conditions)

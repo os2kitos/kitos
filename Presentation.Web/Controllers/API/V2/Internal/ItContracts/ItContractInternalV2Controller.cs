@@ -37,7 +37,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetDataProcessingRegistrations(
             [NonEmptyGuid] Guid contractUuid,
-            [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+            string nameQuery = null, [FromUri] int pageSize = 25)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
