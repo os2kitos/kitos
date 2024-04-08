@@ -131,6 +131,7 @@
     <Compile Include="Contract\ItContractOverviewReadModelsApiTest.cs" />
     <Compile Include="Contract\ItContractSequentialTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
+    <Compile Include="Contract\V2\ItContractsInternalApiV2Test.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
     <Compile Include="GDPR\V2\DataProcessingRegistrationInternalAPIV2Test.cs" />
     <Compile Include="Headers\V2EnumSerializationTest.cs" />
