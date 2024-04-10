@@ -8,11 +8,10 @@ using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.System;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
 {
@@ -177,6 +176,14 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
+        }
+
+        public static async Task<ItContractPermissionsResponseDTO> GetPermissionsAsync(string token, Guid uuid)
+        {
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{uuid:D}/permissions"), token);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ItContractPermissionsResponseDTO>();
         }
     }
 }

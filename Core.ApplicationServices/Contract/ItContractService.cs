@@ -350,7 +350,27 @@ namespace Core.ApplicationServices.Contract
                 return Result<ItContract, OperationError>.Success(contract);
             }).MatchFailure();
         }
-        
+
+
+        public Result<ContractPermissions, OperationError> GetPermissions(Guid uuid)
+        {
+            return GetContract(uuid).Transform(GetPermissions);
+        }
+
+        private Result<ContractPermissions, OperationError> GetPermissions(Result<ItContract, OperationError> systemResult)
+        {
+            return systemResult
+                .Transform
+                (
+                    system =>
+                    {
+                        return ResourcePermissionsResult
+                            .FromResolutionResult(system, _authorizationContext)
+                            .Select(permissions =>
+                                new ContractPermissions(permissions));
+                    });
+        }
+
         private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)
         {
             var readAccessLevel = _authorizationContext.GetOrganizationReadAccessLevel(organizationId);

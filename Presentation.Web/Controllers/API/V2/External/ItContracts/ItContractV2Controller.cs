@@ -19,6 +19,7 @@ using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Core.Abstractions.Extensions;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Response.System;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 {
@@ -233,6 +234,28 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             return _writeService
                 .Delete(contractUuid)
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+        }
+
+        /// <summary>
+        /// Returns the permissions of the authenticated client in the context of a specific IT-Contract
+        /// </summary>
+        /// <param name="contractUuid">UUID of the contract entity</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{contractUuid}/permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractPermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItContractPermissions([NonEmptyGuid] Guid contractUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itContractService
+                .GetPermissions(contractUuid)
+                .Select(_responseMapper.MapPermissions)
+                .Match(Ok, FromOperationError);
         }
 
         private CreatedNegotiatedContentResult<ItContractResponseDTO> MapCreatedResponse(ItContractResponseDTO dto)

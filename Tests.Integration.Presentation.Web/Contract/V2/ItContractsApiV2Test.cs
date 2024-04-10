@@ -28,6 +28,7 @@ using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using Presentation.Web.Models.API.V2.Response.System;
 
 namespace Tests.Integration.Presentation.Web.Contract.V2
 {
@@ -1859,6 +1860,33 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.User, true, false, false)]
+        public async Task Can_Get_ItContract_Permissions(OrganizationRole role, bool read, bool modify, bool delete)
+        {
+            //Arrange
+            var org = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(org);
+
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
+
+            var system = await ItContractHelper.CreateContract(A<string>(), org.Id);
+
+            //Act
+            var permissionsResponseDto = await ItContractV2Helper.GetPermissionsAsync(token, system.Uuid);
+
+            //Assert
+            var expected = new ItContractPermissionsResponseDTO
+            {
+                Read = read,
+                Modify = modify,
+                Delete = delete
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
         }
 
         private async Task<List<Guid>> CreateDataProcessingRegistrationUuids(string token, OrganizationDTO organization)

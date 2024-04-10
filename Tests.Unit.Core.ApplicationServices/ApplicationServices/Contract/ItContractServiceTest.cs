@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.Model.Contracts;
+using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -719,6 +723,31 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Cannot_RemoveResponsibleUnit_If_Write_Access_Is_Denied()
         {
             Test_Command_Which_Fails_With_Contract_Insufficient_WriteAccess(id => _sut.RemoveResponsibleUnit(id));
+        }
+
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, false, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, false)]
+        [InlineData(false, false, false)]
+        public void Can_Get_Permissions(bool read, bool modify, bool delete)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var contract = new ItContract { Uuid = uuid };
+            _contractRepository.Setup(x => x.GetContract(uuid)).Returns(contract);
+            ExpectAllowReadReturns(contract, read);
+            ExpectAllowModifyReturns(contract, modify);
+            ExpectAllowDeleteReturns(contract, delete);
+
+            //Act
+            var result = _sut.GetPermissions(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var permissions = result.Value;
+            Assert.Equivalent(new ContractPermissions(new ResourcePermissionsResult(read, modify, delete)), permissions);
         }
 
         private void ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel crossOrganizationReadAccessLevel)
