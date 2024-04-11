@@ -54,22 +54,5 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
                 .Select(dprs => dprs.Select(dpr => dpr.MapIdentityNamePairDTO()))
                 .Match(Ok, FromOperationError);
         }
-
-        [HttpGet]
-        [Route("{contractUuid}/hierarchy")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegistrationHierarchyNodeResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetHierarchy([NonEmptyGuid] Guid contractUuid)
-        {
-            if(!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _itContractService.GetContract(contractUuid)
-                .Select(contract => contract.FlattenCompleteHierarchy())
-                .Select(RegistrationHierarchyNodeMapper.MapHierarchyToDtos)
-                .Match(Ok, FromOperationError);
-        }
     }
 }
