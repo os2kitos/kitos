@@ -5,15 +5,12 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Types;
-using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainServices.Generic;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Swashbuckle.Swagger.Annotations;
-using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
-using Presentation.Web.Controllers.API.V2.External.Generic;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 {

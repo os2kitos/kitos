@@ -13,7 +13,6 @@ using Xunit;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
-using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
 {
