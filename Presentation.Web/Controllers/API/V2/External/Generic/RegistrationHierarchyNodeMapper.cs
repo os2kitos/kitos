@@ -19,5 +19,16 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
                 })
                 .ToList();
         }
+
+        public static IEnumerable<RegistrationHierarchyNodeWithActivationStatusResponseDTO> MapHierarchyToDtos<TEntity>(IEnumerable<TEntity> hierarchy) where TEntity : class, IHierarchy<TEntity>, IHasUuid, IHasName
+        {
+            return hierarchy
+                .Select(x => new RegistrationHierarchyNodeWithActivationStatusResponseDTO
+                {
+                    Node = x.MapIdentityNamePairDTO(),
+                    Parent = x.Parent?.MapIdentityNamePairDTO(),
+                })
+                .ToList();
+        }
     }
 }
