@@ -130,6 +130,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digst.OioIdws.Soap", "Digst
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.STS.SvcUtilClients", "Infrastructure.STS.SvcUtilClients\Infrastructure.STS.SvcUtilClients.csproj", "{2DC50C99-0A51-4FAC-B53B-54401B72D699}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools.SAMLResponseDecryptor", "Tools.SAMLResponseDecryptor\SAMLResponseDecryptor\Tools.SAMLResponseDecryptor.csproj", "{0A9BCD09-37DF-44BB-8BB1-66A8AC7A7968}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -232,6 +234,10 @@ Global
 		{2DC50C99-0A51-4FAC-B53B-54401B72D699}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DC50C99-0A51-4FAC-B53B-54401B72D699}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DC50C99-0A51-4FAC-B53B-54401B72D699}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A9BCD09-37DF-44BB-8BB1-66A8AC7A7968}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A9BCD09-37DF-44BB-8BB1-66A8AC7A7968}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A9BCD09-37DF-44BB-8BB1-66A8AC7A7968}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A9BCD09-37DF-44BB-8BB1-66A8AC7A7968}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -268,6 +274,7 @@ Global
 		{F4D5ED91-2316-46DE-BF19-141F06765932} = {3F0ABEAA-2F6E-4385-8BB1-71695E633E0A}
 		{2BF23085-9552-4354-B070-7F1715ED5976} = {3F0ABEAA-2F6E-4385-8BB1-71695E633E0A}
 		{2DC50C99-0A51-4FAC-B53B-54401B72D699} = {EF9D5FB5-3C0D-45C0-88D4-6619D2905EFB}
+		{0A9BCD09-37DF-44BB-8BB1-66A8AC7A7968} = {1755BABD-3C1F-497A-AB69-9D643B576506}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4890FA32-C82F-4C98-AC7A-2F4EE7F21687}

@@ -3,13 +3,24 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml;
 
+Console.WriteLine(@"Enter the path for the certificate file (eg C:\Temp\mycertificate.pfx, no quotes):");
+var certificatePath = Console.ReadLine();
+if (!File.Exists(certificatePath))
+{
+    Console.WriteLine("Certificate file not found.");
+    return;
+};
+Console.WriteLine("Enter the password for the certificate (from 1pwd):");
+var certificatePassword = Console.ReadLine();
 Console.WriteLine("Enter the SAML response symmetric key (<e:CipherValue>):");
 var key = Console.ReadLine();
-var decryptedSymmetricKey = SAMLDecryptor.DecryptSymmetricKey(key, @"C:\Users\MortenHoffmann\Strongminds Dropbox\Strongminds Team Folder\Projects\Ballerup Kommune\OS2Kitos Videreudvikling\03_Maintenance and support\03_IT Hosting\Certifikater\2023\OCES3\KITOS-PRODUCTION\kitos-production.pfx");
+var decryptedSymmetricKey = SAMLDecryptor.DecryptSymmetricKey(key, certificatePath, certificatePassword);
 
 Console.WriteLine("Enter the SAML response assertion (<xenc:CipherValue>):");
 var data = Console.ReadLine();
 var decryptedAssertion = SAMLDecryptor.DecryptAssertion(data, decryptedSymmetricKey);
+Console.WriteLine("---");
+Console.WriteLine($"Decrypted assertion: {decryptedAssertion}");
 Console.WriteLine("---");
 Console.WriteLine("Extracting privilege...");
 var xml = new XmlDocument();
@@ -35,10 +46,10 @@ Console.ReadLine();
 
 public class SAMLDecryptor
 {
-    public static byte[] DecryptSymmetricKey(string encryptedKeyBase64, string privateKeyPath)
+    public static byte[] DecryptSymmetricKey(string encryptedKeyBase64, string privateKeyPath, string? certificatePassword)
     {
         // Load your private key
-        var certificate = new X509Certificate2(privateKeyPath, "-3,SfQYy7.aN", X509KeyStorageFlags.Exportable);
+        var certificate = new X509Certificate2(privateKeyPath, certificatePassword, X509KeyStorageFlags.Exportable);
         var rsa = certificate.GetRSAPrivateKey();
 
         // Convert the base64-encoded encrypted symmetric key to byte array
