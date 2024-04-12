@@ -207,7 +207,6 @@
     <Compile Include="ApplicationServices\Organizations\OrganizationTest.cs" />
     <Compile Include="ApplicationServices\Organizations\StsOrganizationSynchronizationServiceTest.cs" />
     <Compile Include="ApplicationServices\ItSystems\ItSystemWriteServiceTest.cs" />
-    <Compile Include="ApplicationServices\SSO\GetPrivilegeTest.cs" />
     <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageMigrationServiceAdapterTest.cs" />
     <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageServiceTest.cs" />
     <Compile Include="ApplicationServices\Kendo\KendoOrganizationalConfigurationServiceTest.cs" />
