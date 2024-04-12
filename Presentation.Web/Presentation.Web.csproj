@@ -361,6 +361,7 @@
     <Compile Include="Controllers\API\V2\Common\Mapping\ICommandPermissionsResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\IEntityWithDeactivatedStatusMapper.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\RecommendedArchiveDutyChoiceMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\ItContractValidationErrorChoiceExtension.cs" />
     <Compile Include="Controllers\API\V2\External\ItInterfaces\ItInterfaceInterfaceDataTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItInterfaces\ItInterfaceInterfaceTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItInterfaces\Mapping\IItInterfaceResponseMapper.cs" />
@@ -450,6 +451,7 @@
     <Compile Include="Models\API\V2\SharedProperties\IHasDeactivatedExternal.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasDeletionConflicts.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasOrganizationContext.cs" />
+    <Compile Include="Models\API\V2\Types\Contract\ItContractValidationErrorChoice.cs" />
     <Compile Include="Models\API\V2\Types\Interface\ItInterfaceDeletionConflict.cs" />
     <Compile Include="Models\API\V2\Types\Notifications\NotificationSendType.cs" />
     <Compile Include="Models\API\V2\Types\Notifications\OwnerResourceType.cs" />

@@ -8,8 +8,10 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
 using Core.Abstractions.Extensions;
+using Core.DomainModel.ItContract;
 using Core.DomainServices.Extensions;
 using ExpectedObjects;
+using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -1909,6 +1911,38 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 Create = create
             };
             Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        [Theory]
+        [InlineData(false, false, true)]
+        [InlineData(true, true, true)]
+        [InlineData(true, false, false)]
+        public async Task Can_Get_Validation_Details(bool expectDateError, bool enforceValid, bool expectValid)
+        {
+            //Arrange
+            var (token, _, org) = await CreatePrerequisitesAsync();
+            var itContractDto = await ItContractHelper.CreateContract(A<string>(), org.Id);
+            await ItContractHelper.PatchContract(itContractDto.Id, org.Id, new
+            {
+                Active = enforceValid,
+                Concluded = DateTime.Now.AddDays(expectDateError ? 1 : -1)
+            });
+
+            //Act
+            var result = await ItContractV2Helper.GetItContractAsync(token, itContractDto.Uuid);
+
+            //Assert
+            Assert.Equal(expectValid, result.General.Validity.Valid);
+            Assert.Equal(enforceValid, result.General.Validity.EnforcedValid);
+            if (expectDateError)
+            {
+                var dateError = Assert.Single(result.General.Validity.ValidationErrors);
+                Assert.Equal(ItContractValidationError.StartDateNotPassed.ToItContractValidationErrorChoice(), dateError);
+            }
+            else
+            {
+                Assert.Empty(result.General.Validity.ValidationErrors);
+            }
         }
 
         private async Task<List<Guid>> CreateDataProcessingRegistrationUuids(string token, OrganizationDTO organization)

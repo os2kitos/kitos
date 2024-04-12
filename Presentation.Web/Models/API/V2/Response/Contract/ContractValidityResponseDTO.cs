@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Presentation.Web.Models.API.V2.Types.Contract;
 
 namespace Presentation.Web.Models.API.V2.Response.Contract
 {
@@ -23,5 +25,9 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// If specified, the entity is valid up until and including this date.
         /// </summary>
         public DateTime? ValidTo { get; set; }
+        /// <summary>
+        /// Reasons as to why the contract is considered to be invalid
+        /// </summary>
+        public IEnumerable<ItContractValidationErrorChoice> ValidationErrors { get; set; }
     }
 }

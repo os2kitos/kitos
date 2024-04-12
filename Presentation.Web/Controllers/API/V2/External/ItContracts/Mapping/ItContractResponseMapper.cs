@@ -72,7 +72,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static ContractTerminationDataResponseDTO MapTermination(ItContract contract)
         {
-            return new ()
+            return new ContractTerminationDataResponseDTO
             {
                 TerminatedAt = contract.Terminated,
                 Terms = MapTerminationTerms(contract)
@@ -81,7 +81,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static ContractTerminationTermsResponseDTO MapTerminationTerms(ItContract contract)
         {
-            return new ()
+            return new ContractTerminationTermsResponseDTO
             {
                 NoticePeriodMonths = contract.TerminationDeadline?.MapIdentityNamePairDTO(),
                 NoticeByEndOf = contract.ByEnding?.ToYearSegmentChoice(), 
@@ -91,7 +91,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static ContractPaymentsDataResponseDTO MapPayments(ItContract contract)
         {
-            return new ()
+            return new ContractPaymentsDataResponseDTO
             {
                 External = contract.ExternEconomyStreams?.Select(MapPaymentResponseDTO).ToList() ?? new List<PaymentResponseDTO>(),
                 Internal = contract.InternEconomyStreams?.Select(MapPaymentResponseDTO).ToList() ?? new List<PaymentResponseDTO>()
@@ -100,7 +100,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static PaymentResponseDTO MapPaymentResponseDTO(EconomyStream economyStream)
         {
-            return new ()
+            return new PaymentResponseDTO
             {
                 AccountingEntry = economyStream.AccountingEntry,
                 Acquisition = economyStream.Acquisition,
@@ -120,7 +120,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static ContractPaymentModelDataResponseDTO MapPaymentModel(ItContract contract)
         {
-            return new ()
+            return new ContractPaymentModelDataResponseDTO
             {
                 OperationsRemunerationStartedAt = contract.OperationRemunerationBegun,
                 PaymentModel = contract.PaymentModel?.MapIdentityNamePairDTO(),
@@ -131,7 +131,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static ContractResponsibleDataResponseDTO MapResponsible(ItContract contract)
         {
-            return new ()
+            return new ContractResponsibleDataResponseDTO
             {
                 SignedBy = contract.ContractSigner,
                 Signed = contract.IsSigned,
@@ -142,7 +142,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static ContractSupplierDataResponseDTO MapSupplier(ItContract contract)
         {
-            return new ()
+            return new ContractSupplierDataResponseDTO
             {
                 SignedBy = contract.SupplierContractSigner,
                 Signed = contract.HasSupplierSigned,
@@ -153,7 +153,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static ContractProcurementDataResponseDTO MapProcurement(ItContract contract)
         {
-            return new()
+            return new ContractProcurementDataResponseDTO
             {
                 ProcurementStrategy = contract.ProcurementStrategy?.MapIdentityNamePairDTO(),
                 PurchaseType = contract.PurchaseForm?.MapIdentityNamePairDTO(),
@@ -179,7 +179,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static ContractGeneralDataResponseDTO MapGeneral(ItContract contract)
         {
-            return new()
+            return new ContractGeneralDataResponseDTO
             {
                 ContractId = contract.ItContractId,
                 Notes = contract.Note,
@@ -187,19 +187,20 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 ContractType = contract.ContractType?.MapIdentityNamePairDTO(),
                 AgreementElements = contract.AssociatedAgreementElementTypes?.Select(x => x.AgreementElementType?.MapIdentityNamePairDTO()).ToList() ?? new List<IdentityNamePairResponseDTO>(),
                 Criticality = contract.Criticality?.MapIdentityNamePairDTO(),
-                Validity = new ContractValidityResponseDTO()
+                Validity = new ContractValidityResponseDTO
                 {
                     EnforcedValid = contract.Active,
                     Valid = contract.IsActive,
                     ValidFrom = contract.Concluded,
-                    ValidTo = contract.ExpirationDate
+                    ValidTo = contract.ExpirationDate,
+                    ValidationErrors = contract.Validate().ValidationErrors.Select(x => x.ToItContractValidationErrorChoice()).ToList()
                 }
             };
         }
 
         private static RoleAssignmentResponseDTO ToRoleResponseDTO(ItContractRight right)
         {
-            return new()
+            return new RoleAssignmentResponseDTO
             {
                 Role = right.Role.MapIdentityNamePairDTO(),
                 User = right.User.MapIdentityNamePairDTO()
