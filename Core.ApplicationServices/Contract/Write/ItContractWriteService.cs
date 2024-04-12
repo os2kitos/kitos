@@ -133,6 +133,48 @@ namespace Core.ApplicationServices.Contract.Write
             return updateResult;
         }
 
+        public Maybe<OperationError> Delete(Guid itContractUuid)
+        {
+            var dbId = _entityIdentityResolver.ResolveDbId<ItContract>(itContractUuid);
+
+            if (dbId.IsNone)
+                return new OperationError("Invalid contract uuid", OperationFailure.NotFound);
+
+            return _contractService
+                .Delete(dbId.Value)
+                .Match(_ => Maybe<OperationError>.None, failure => new OperationError("Failed deleting contract", failure));
+        }
+
+        public Result<ExternalReference, OperationError> AddExternalReference(Guid contractUuid, ExternalReferenceProperties externalReferenceProperties)
+        {
+            return GetContractAndAuthorizeAccess(contractUuid)
+                .Bind(usage => _referenceService.AddReference(usage.Id, ReferenceRootType.Contract, externalReferenceProperties));
+        }
+
+        public Result<ExternalReference, OperationError> UpdateExternalReference(Guid contractUuid, Guid externalReferenceUuid,
+            ExternalReferenceProperties externalReferenceProperties)
+        {
+            return GetContractAndAuthorizeAccess(contractUuid)
+                .Bind(usage => _referenceService.UpdateReference(usage.Id, ReferenceRootType.Contract, externalReferenceUuid, externalReferenceProperties));
+        }
+
+        public Result<ExternalReference, OperationError> DeleteExternalReference(Guid contractUuid, Guid externalReferenceUuid)
+        {
+            return GetContractAndAuthorizeAccess(contractUuid)
+                .Bind(_ =>
+                {
+                    var getIdResult = _entityIdentityResolver.ResolveDbId<ExternalReference>(externalReferenceUuid);
+                    if (getIdResult.IsNone)
+                        return new OperationError($"ExternalReference with uuid: {externalReferenceUuid} was not found", OperationFailure.NotFound);
+                    var externalReferenceId = getIdResult.Value;
+
+                    return _referenceService.DeleteByReferenceId(externalReferenceId)
+                        .Match(Result<ExternalReference, OperationError>.Success,
+                            operationFailure =>
+                                new OperationError($"Failed to remove the ExternalReference with uuid: {externalReferenceUuid}", operationFailure));
+                });
+        }
+
         private Result<ItContract, OperationError> WithWriteAccess(ItContract contract)
         {
             if (!_authorizationContext.AllowModify(contract))
@@ -431,12 +473,12 @@ namespace Core.ApplicationServices.Contract.Write
                     return new OperationError($"Failed resolving agreement element with uuid:{uuid}. Message:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
                 }
 
-                var resultValue = result.Value;
-                if (resultValue.available == false && contract.AssociatedAgreementElementTypes.Any(x => x.AgreementElementType.Uuid == uuid) == false)
+                var (option, available) = result.Value;
+                if (available == false && contract.AssociatedAgreementElementTypes.Any(x => x.AgreementElementType.Uuid == uuid) == false)
                 {
                     return new OperationError($"Tried to add agreement element which is not available in the organization: {uuid}", OperationFailure.BadInput);
                 }
-                agreementElementTypes.Add(resultValue.option);
+                agreementElementTypes.Add(option);
             }
 
             var before = contract.AssociatedAgreementElementTypes.ToList();
@@ -576,16 +618,11 @@ namespace Core.ApplicationServices.Contract.Write
             );
         }
 
-        public Maybe<OperationError> Delete(Guid itContractUuid)
+        private Result<ItContract, OperationError> GetContractAndAuthorizeAccess(Guid contractUuid)
         {
-            var dbId = _entityIdentityResolver.ResolveDbId<ItContract>(itContractUuid);
-
-            if (dbId.IsNone)
-                return new OperationError("Invalid contract uuid", OperationFailure.NotFound);
-
             return _contractService
-                .Delete(dbId.Value)
-                .Match(_ => Maybe<OperationError>.None, failure => new OperationError("Failed deleting contract", failure));
+                .GetContract(contractUuid)
+                .Bind(WithWriteAccess);
         }
     }
 }

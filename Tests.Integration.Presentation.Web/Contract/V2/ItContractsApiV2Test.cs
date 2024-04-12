@@ -28,6 +28,7 @@ using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using Presentation.Web.Models.API.V2.Request.System.Regular;
 
 namespace Tests.Integration.Presentation.Web.Contract.V2
 {
@@ -1861,6 +1862,64 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
+        [Fact]
+        public async Task Can_Create_Update_And_Delete_ExternalReference()
+        {
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            var requestDto = new CreateNewContractRequestDTO
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName()
+            };
+            var request = new ExternalReferenceDataWriteRequestDTO
+            {
+                DocumentId = A<string>(),
+                MasterReference = A<bool>(),
+                Title = A<string>(),
+                Url = A<string>()
+            };
+            var contract = await ItContractV2Helper.PostContractAsync(token, requestDto);
+
+            //Act
+            var createdReference = await ItContractV2Helper.AddExternalReferenceAsync(token, contract.Uuid, request);
+
+            //Assert
+            AssertExternalReference(request, createdReference);
+
+            var afterCreate = await ItContractV2Helper.GetItContractAsync(token, contract.Uuid);
+
+            var checkCreatedExternalReference = Assert.Single(afterCreate.ExternalReferences);
+            AssertExternalReference(request, checkCreatedExternalReference);
+
+            //Arrange - update
+            var updateRequest = new ExternalReferenceDataWriteRequestDTO
+            {
+                DocumentId = A<string>(),
+                MasterReference = request.MasterReference || A<bool>(),
+                Title = A<string>(),
+                Url = A<string>()
+            };
+
+            //Act - update
+            var updatedReference = await ItContractV2Helper.UpdateExternalReferenceAsync(token, contract.Uuid, createdReference.Uuid, updateRequest);
+
+            //Assert - update
+            AssertExternalReference(updateRequest, updatedReference);
+
+            var afterUpdate = await ItContractV2Helper.GetItContractAsync(token, contract.Uuid);
+
+            var checkUpdatedExternalReference = Assert.Single(afterUpdate.ExternalReferences);
+            AssertExternalReference(updateRequest, checkUpdatedExternalReference);
+
+            //Act - delete
+            await ItContractV2Helper.DeleteExternalReferenceAsync(token, contract.Uuid, createdReference.Uuid);
+
+            //Assert - delete
+            var afterDelete = await ItContractV2Helper.GetItContractAsync(token, contract.Uuid);
+            Assert.Empty(afterDelete.ExternalReferences);
+        }
+
         private async Task<List<Guid>> CreateDataProcessingRegistrationUuids(string token, OrganizationDTO organization)
         {
             var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
@@ -2375,6 +2434,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             Assert.Equal(expected.RoleUuid, actual.Role?.Uuid);
             Assert.Equal(expected.UserUuid, actual.User?.Uuid);
+        }
+
+        private static void AssertExternalReference(ExternalReferenceDataWriteRequestDTO expected, ExternalReferenceDataResponseDTO actual)
+        {
+            Assert.Equal(expected.DocumentId, actual.DocumentId);
+            Assert.Equal(expected.Title, actual.Title);
+            Assert.Equal(expected.Url, actual.Url);
+            Assert.Equal(expected.MasterReference, actual.MasterReference);
         }
     }
 }

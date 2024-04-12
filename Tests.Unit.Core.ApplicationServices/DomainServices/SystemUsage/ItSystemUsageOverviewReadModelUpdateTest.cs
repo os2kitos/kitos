@@ -69,7 +69,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Email = $"test@tester.dk"
         };
 
-        private Mock<IGenericRepository<ItSystemUsageOverviewItContractReadModel>> _itContractReadModelRepoMock;
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewItContractReadModel>> _itContractReadModelRepoMock;
 
         [Fact]
         public void Apply_Generates_Correct_Read_Model()
@@ -385,7 +385,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(expectedContracts.Count, readModel.AssociatedContracts.Count);
             expectedContracts.ForEach(contract =>
             {
-                Assert.True(readModel.AssociatedContractsNamesCsv.Contains(contract.Name));
+                Assert.Contains(contract.Name, readModel.AssociatedContractsNamesCsv);
                 Assert.Contains(readModel.AssociatedContracts, associatedContract =>
                     associatedContract.ItContractId == contract.Id &&
                     associatedContract.ItContractName == contract.Name &&

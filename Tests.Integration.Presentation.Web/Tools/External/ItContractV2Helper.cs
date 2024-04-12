@@ -13,6 +13,7 @@ using Xunit;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
 {
@@ -38,7 +39,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
                 queryParameters.Add(new KeyValuePair<string, string>("organizationUuid", organizationUuid.Value.ToString("D")));
 
             if (systemUuid.HasValue)
-                queryParameters.Add(new KeyValuePair<string, string>("systemUuid", systemUuid.Value.ToString("D")));
+                queryParameters.Add(new KeyValuePair<string, string>("contractUuid", systemUuid.Value.ToString("D")));
 
             if (systemUsageUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("systemUsageUuid", systemUsageUuid.Value.ToString("D")));
@@ -177,6 +178,28 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
+        }
+
+        public static async Task<ExternalReferenceDataResponseDTO> AddExternalReferenceAsync(string token, Guid contractUuid, ExternalReferenceDataWriteRequestDTO request)
+        {
+            using var response = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/external-references"), request, token);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<ExternalReferenceDataResponseDTO>();
+        }
+
+        public static async Task<ExternalReferenceDataResponseDTO> UpdateExternalReferenceAsync(string token, Guid contractUuid, Guid externalReferenceUuid, ExternalReferenceDataWriteRequestDTO request)
+        {
+            using var response = await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/external-references/{externalReferenceUuid}"), token, request);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<ExternalReferenceDataResponseDTO>();
+        }
+
+        public static async Task DeleteExternalReferenceAsync(string token, Guid contractUuid, Guid externalReferenceUuid)
+        {
+            using var response = await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/external-references/{externalReferenceUuid}"), token);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
     }
 }
