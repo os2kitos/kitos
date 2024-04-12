@@ -5,10 +5,12 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Contracts;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
@@ -42,6 +44,7 @@ namespace Core.ApplicationServices.Contract
         private readonly IOptionsService<ItContract, OptionExtendType> _optionExtendOptionsService;
         private readonly IOptionsService<ItContract, TerminationDeadlineType> _terminationDeadlineOptionsService;
         private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
+        private readonly IOrganizationService _organizationService;
 
         public ItContractService(
             IItContractRepository repository,
@@ -61,7 +64,7 @@ namespace Core.ApplicationServices.Contract
             IOptionsService<ItContract, PaymentFreqencyType> paymentFrequencyOptionsService,
             IOptionsService<ItContract, OptionExtendType> optionExtendOptionsService,
             IOptionsService<ItContract, TerminationDeadlineType> terminationDeadlineOptionsService, 
-            IGenericRepository<EconomyStream> economyStreamRepository)
+            IGenericRepository<EconomyStream> economyStreamRepository, IOrganizationService organizationService)
         {
             _repository = repository;
             _referenceService = referenceService;
@@ -81,6 +84,7 @@ namespace Core.ApplicationServices.Contract
             _optionExtendOptionsService = optionExtendOptionsService;
             _terminationDeadlineOptionsService = terminationDeadlineOptionsService;
             _economyStreamRepository = economyStreamRepository;
+            _organizationService = organizationService;
         }
 
         public Result<ItContract, OperationError> Create(int organizationId, string name)
@@ -355,6 +359,13 @@ namespace Core.ApplicationServices.Contract
         public Result<ContractPermissions, OperationError> GetPermissions(Guid uuid)
         {
             return GetContract(uuid).Transform(GetPermissions);
+        }
+
+        public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid)
+                .Select(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItContract>(organization.Id, _authorizationContext));
         }
 
         private Result<ContractPermissions, OperationError> GetPermissions(Result<ItContract, OperationError> systemResult)

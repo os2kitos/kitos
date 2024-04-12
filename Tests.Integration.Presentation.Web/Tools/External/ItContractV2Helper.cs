@@ -12,6 +12,7 @@ using Xunit;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.System;
+using Presentation.Web.Models.API.V2.Response.Shared;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
 {
@@ -184,6 +185,14 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<ItContractPermissionsResponseDTO>();
+        }
+
+        public static async Task<ResourceCollectionPermissionsResponseDTO> GetCollectionPermissionsAsync(string token, Guid organizationUuid)
+        {
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/permissions?organizationUuid={organizationUuid:D}"), token);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ResourceCollectionPermissionsResponseDTO>();
         }
     }
 }

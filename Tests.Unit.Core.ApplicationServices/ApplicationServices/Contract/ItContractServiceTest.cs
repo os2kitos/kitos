@@ -7,6 +7,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Contracts;
 using Core.ApplicationServices.Model.System;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -39,6 +40,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IReferenceService> _referenceService;
         private readonly Mock<IContractDataProcessingRegistrationAssignmentService> _contractDataProcessingRegistrationAssignmentService;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
+        private readonly Mock<IOrganizationService> _organizationServiceMock;
 
         public ItContractServiceTest()
         {
@@ -60,6 +62,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var optionExtendOptionsServiceMock = new Mock<IOptionsService<ItContract, OptionExtendType>>();
             var terminationDeadlineOptionsServiceMock = new Mock<IOptionsService<ItContract, TerminationDeadlineType>>();
             _economyStreamRepository = new Mock<IGenericRepository<EconomyStream>>();
+            _organizationServiceMock = new Mock<IOrganizationService>();
 
             _sut = new ItContractService(
                 _contractRepository.Object,
@@ -79,7 +82,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 paymentFreqencyOptionsServiceMock.Object,
                 optionExtendOptionsServiceMock.Object,
                 terminationDeadlineOptionsServiceMock.Object,
-                _economyStreamRepository.Object);
+                _economyStreamRepository.Object,
+                _organizationServiceMock.Object);
         }
 
         [Fact]
@@ -750,6 +754,45 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.Equivalent(new ContractPermissions(new ResourcePermissionsResult(read, modify, delete)), permissions);
         }
 
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Get_CollectionPermissions(bool create)
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var organization = new Organization { Id = A<int>() };
+
+            ExpectOrganizationServiceGetOrganizationReturns(organizationUuid, organization);
+            ExpectAllowCreateReturns(organization.Id, create);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(organizationUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(create, result.Value.Create);
+        }
+
+        [Fact]
+        public void Get_CollectionPermissions_Returns_OperationError_When_GetOrganization_Fails()
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var error = A<OperationError>();
+
+            ExpectOrganizationServiceGetOrganizationReturns(organizationUuid, error);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(organizationUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(error.FailureType, result.Error.FailureType);
+        }
+
+
         private void ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel crossOrganizationReadAccessLevel)
         {
             _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(crossOrganizationReadAccessLevel);
@@ -919,6 +962,16 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Assert
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
+        }
+
+        private void ExpectOrganizationServiceGetOrganizationReturns(Guid uuid, Result<Organization, OperationError> result, OrganizationDataReadAccessLevel? organizationDataReadAccessLevel = null)
+        {
+            _organizationServiceMock.Setup(x => x.GetOrganization(uuid, organizationDataReadAccessLevel)).Returns(result);
+        }
+
+        private void ExpectAllowCreateReturns(int organizationId, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowCreate<ItContract>(organizationId)).Returns(value);
         }
     }
 }

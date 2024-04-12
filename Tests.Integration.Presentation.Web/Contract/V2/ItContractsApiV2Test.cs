@@ -1889,6 +1889,29 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equivalent(expected, permissionsResponseDto);
         }
 
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.User, false)]
+        public async Task Can_Get_ItContract_CollectionPermissions(OrganizationRole role, bool create)
+        {
+            //Arrange
+            var org = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(org);
+
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
+
+            //Act
+            var permissionsResponseDto = await ItContractV2Helper.GetCollectionPermissionsAsync(token, org.Uuid);
+
+            //Assert
+            var expected = new ResourceCollectionPermissionsResponseDTO
+            {
+                Create = create
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
         private async Task<List<Guid>> CreateDataProcessingRegistrationUuids(string token, OrganizationDTO organization)
         {
             var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
