@@ -28,7 +28,6 @@ using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
-using Presentation.Web.Models.API.V2.Response.System;
 
 namespace Tests.Integration.Presentation.Web.Contract.V2
 {
@@ -1862,7 +1861,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-        [Theory]
+        [Theory]    
         [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
         [InlineData(OrganizationRole.LocalAdmin, true, true, true)]
         [InlineData(OrganizationRole.User, true, false, false)]
