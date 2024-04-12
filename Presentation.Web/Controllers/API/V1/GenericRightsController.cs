@@ -100,7 +100,7 @@ namespace Presentation.Web.Controllers.API.V1
 
                 var outputDTO = Map<TRight, RightOutputDTO>(right);
 
-                FireRootUpdatedEvent(right);
+                FireRootUpdatedEvent(right, right.UserId);
                 return Created(outputDTO);
             }
             catch (Exception e)
@@ -133,7 +133,7 @@ namespace Presentation.Web.Controllers.API.V1
                 RightRepository.DeleteByKey(right.Id);
                 RightRepository.Save();
 
-                FireRootUpdatedEvent(right);
+                FireRootUpdatedEvent(right, uId);
                 return Ok();
             }
             catch (Exception e)
@@ -142,9 +142,12 @@ namespace Presentation.Web.Controllers.API.V1
             }
         }
 
-        private void FireRootUpdatedEvent(TRight right)
+        private void FireRootUpdatedEvent(TRight right, int userId)
         {
-            _domainEvents.Raise(new EntityUpdatedEvent<TObject>(_objectRepository.GetByKey(right.ObjectId)));
+            var targetObject = _objectRepository.GetByKey(right.ObjectId);
+            targetObject.LastChangedByUserId = userId;
+            targetObject.LastChanged = DateTime.Now;
+            _domainEvents.Raise(new EntityUpdatedEvent<TObject>(targetObject));
         }
     }
 }
