@@ -5,12 +5,15 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Types;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainServices.Generic;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Swashbuckle.Swagger.Annotations;
+using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 {
@@ -49,6 +52,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
                     () => new OperationError($"Id couldn't be resolved for contract with uuid: {contractUuid}",
                         OperationFailure.NotFound))
                 .Select(dprs => dprs.Select(dpr => dpr.MapIdentityNamePairDTO()))
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("{contractUuid}/hierarchy")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegistrationHierarchyNodeResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetHierarchy([NonEmptyGuid] Guid contractUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itContractService.GetContract(contractUuid)
+                .Select(contract => contract.FlattenCompleteHierarchy())
+                .Select(RegistrationHierarchyNodeMapper.MapHierarchyToDtos)
                 .Match(Ok, FromOperationError);
         }
     }
