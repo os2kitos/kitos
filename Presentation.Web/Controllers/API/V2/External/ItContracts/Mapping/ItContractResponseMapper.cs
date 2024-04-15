@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.ApplicationServices.Model.Contracts;
 using Core.DomainModel.ItContract;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Models.API.V2.Response.Contract;
@@ -43,6 +44,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 Payments = MapPayments(contract),
                 Roles = MapRoles(contract),
                 ExternalReferences = _externalReferenceResponseMapper.MapExternalReferences(contract.ExternalReferences)
+            };
+        }
+
+        public ItContractPermissionsResponseDTO MapPermissions(ContractPermissions permissions)
+        {
+            return new ItContractPermissionsResponseDTO
+            {
+                Delete = permissions.BasePermissions.Delete,
+                Modify = permissions.BasePermissions.Modify,
+                Read = permissions.BasePermissions.Read
             };
         }
 
