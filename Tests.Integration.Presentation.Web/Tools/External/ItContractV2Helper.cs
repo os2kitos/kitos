@@ -38,7 +38,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
                 queryParameters.Add(new KeyValuePair<string, string>("organizationUuid", organizationUuid.Value.ToString("D")));
 
             if (systemUuid.HasValue)
-                queryParameters.Add(new KeyValuePair<string, string>("contractUuid", systemUuid.Value.ToString("D")));
+                queryParameters.Add(new KeyValuePair<string, string>("systemUuid", systemUuid.Value.ToString("D")));
 
             if (systemUsageUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("systemUsageUuid", systemUsageUuid.Value.ToString("D")));

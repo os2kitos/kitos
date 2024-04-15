@@ -459,7 +459,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <param name="systemUuid"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("it-systems/{uuid}/external-references")]
+        [Route("it-systems/{systemUuid}/external-references")]
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ExternalReferenceDataResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -486,7 +486,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <param name="externalReferenceUuid"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("it-systems/{uuid}/external-references/{externalReferenceUuid}")]
+        [Route("it-systems/{systemUuid}/external-references/{externalReferenceUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ExternalReferenceDataResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -512,7 +512,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <param name="externalReferenceUuid"></param>
         /// <returns></returns>
         [HttpDelete]
-        [Route("it-systems/{uuid}/external-references/{externalReferenceUuid}")]
+        [Route("it-systems/{systemUuid}/external-references/{externalReferenceUuid}")]
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.NoContent)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
