@@ -23,8 +23,6 @@ using Presentation.Web.Models.API.V2.Response.Shared;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
-using Presentation.Web.Models.API.V2.Response.Shared;
-using Presentation.Web.Controllers.API.V2.External.Generic;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 {
