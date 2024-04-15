@@ -19,6 +19,9 @@ using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Core.Abstractions.Extensions;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Response.Shared;
+using System.ComponentModel.DataAnnotations;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 {
@@ -32,13 +35,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         private readonly IItContractResponseMapper _responseMapper;
         private readonly IItContractWriteModelMapper _writeModelMapper;
         private readonly IItContractWriteService _writeService;
+        private readonly IResourcePermissionsResponseMapper _permissionResponseMapper;
 
-        public ItContractV2Controller(IItContractService itContractService, IItContractResponseMapper responseMapper, IItContractWriteModelMapper writeModelMapper, IItContractWriteService writeService)
+        public ItContractV2Controller(IItContractService itContractService,
+            IItContractResponseMapper responseMapper,
+            IItContractWriteModelMapper writeModelMapper,
+            IItContractWriteService writeService,
+            IResourcePermissionsResponseMapper permissionResponseMapper)
         {
             _itContractService = itContractService;
             _responseMapper = responseMapper;
             _writeModelMapper = writeModelMapper;
             _writeService = writeService;
+            _permissionResponseMapper = permissionResponseMapper;
         }
 
         /// <summary>
@@ -233,6 +242,50 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             return _writeService
                 .Delete(contractUuid)
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+        }
+
+        /// <summary>
+        /// Returns the permissions of the authenticated client in the context of a specific IT-Contract
+        /// </summary>
+        /// <param name="contractUuid">UUID of the contract entity</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{contractUuid}/permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractPermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItContractPermissions([NonEmptyGuid] Guid contractUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itContractService
+                .GetPermissions(contractUuid)
+                .Select(_responseMapper.MapPermissions)
+                .Match(Ok, FromOperationError);
+        }
+
+
+        /// <summary>
+        /// Returns the permissions of the authenticated client for the IT-Contract resources collection in the context of an organization (IT-Contract permissions in a specific Organization)
+        /// </summary>
+        /// <param name="organizationUuid">UUID of the organization</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourceCollectionPermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItContractCollectionPermissions([Required][NonEmptyGuid] Guid organizationUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itContractService.GetCollectionPermissions(organizationUuid)
+                .Select(_permissionResponseMapper.Map)
+                .Match(Ok, FromOperationError);
         }
 
         private CreatedNegotiatedContentResult<ItContractResponseDTO> MapCreatedResponse(ItContractResponseDTO dto)
