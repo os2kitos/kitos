@@ -205,5 +205,27 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             return await response.ReadResponseBodyAsAsync<ResourceCollectionPermissionsResponseDTO>();
         }
+
+        public static async Task<ExternalReferenceDataResponseDTO> AddExternalReferenceAsync(string token, Guid contractUuid, ExternalReferenceDataWriteRequestDTO request)
+        {
+            using var response = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/external-references"), request, token);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<ExternalReferenceDataResponseDTO>();
+        }
+
+        public static async Task<ExternalReferenceDataResponseDTO> UpdateExternalReferenceAsync(string token, Guid contractUuid, Guid externalReferenceUuid, ExternalReferenceDataWriteRequestDTO request)
+        {
+            using var response = await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/external-references/{externalReferenceUuid}"), token, request);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<ExternalReferenceDataResponseDTO>();
+        }
+
+        public static async Task DeleteExternalReferenceAsync(string token, Guid contractUuid, Guid externalReferenceUuid)
+        {
+            using var response = await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/external-references/{externalReferenceUuid}"), token);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
     }
 }

@@ -70,8 +70,7 @@ namespace Core.DomainModel.ItContract
                 var terminationDate = Terminated.Value.Date;
                 if (TerminationDeadline != null)
                 {
-                    int deadline;
-                    int.TryParse(TerminationDeadline.Name, out deadline);
+                    int.TryParse(TerminationDeadline.Name, out var deadline);
                     terminationDate = terminationDate.AddMonths(deadline);
                 }
                 if (today > terminationDate.Date)

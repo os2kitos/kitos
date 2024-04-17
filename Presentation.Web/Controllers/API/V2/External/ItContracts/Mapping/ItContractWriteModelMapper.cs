@@ -43,6 +43,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             return MapUpdate(dto, true);
         }
 
+        public ExternalReferenceProperties MapExternalReference(ExternalReferenceDataWriteRequestDTO externalReferenceData)
+        {
+            return MapCommonReference(externalReferenceData);
+        }
+
         private ItContractModificationParameters MapCreate(
             CreateNewContractRequestDTO dto, bool enforceFallbackIfNotProvided)
         {

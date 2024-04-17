@@ -149,10 +149,10 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 ArchiveDuty = archiveDuty,
                 RiskAssessment = riskAssessment,
                 RiskAssessmentDate = riskAssessmentDate,
-                linkToDirectoryUrl = linkToDirectoryUrl,
-                linkToDirectoryUrlName = linkToDirectoryUrlName,
-                riskSupervisionDocumentationUrl = riskSupervisionDocumentationUrl,
-                riskSupervisionDocumentationUrlName = riskSupervisionDocumentationUrlName,
+                linkToDirectoryUrl,
+                linkToDirectoryUrlName,
+                riskSupervisionDocumentationUrl,
+                riskSupervisionDocumentationUrlName,
                 GeneralPurpose = generalPurpose,
                 HostedAt = hostedAt
             };
@@ -339,7 +339,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(expectedContracts.Count, readModel.AssociatedContracts.Count);
             foreach (var expectedContract in expectedContracts)
             {
-                Assert.True(readModel.AssociatedContractsNamesCsv.Contains(expectedContract.Name));
+                Assert.Contains(expectedContract.Name, readModel.AssociatedContractsNamesCsv);
                 Assert.Contains(readModel.AssociatedContracts, c => c.ItContractId == expectedContract.Id);
             }
 
