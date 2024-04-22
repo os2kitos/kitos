@@ -57,7 +57,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 
         [HttpGet]
         [Route("{contractUuid}/hierarchy")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegistrationHierarchyNodeResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegistrationHierarchyNodeWithActivationStatusResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
