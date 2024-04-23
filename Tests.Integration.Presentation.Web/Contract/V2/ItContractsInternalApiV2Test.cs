@@ -150,7 +150,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             return new ItContract
             {
-                Name = A<string>(),
+                Name = CreateName(),
                 OrganizationId = orgId,
                 ObjectOwnerId = TestEnvironment.DefaultUserId,
                 LastChangedByUserId = TestEnvironment.DefaultUserId
@@ -159,7 +159,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private async Task<(User user, string token)> CreateApiUser(OrganizationDTO organization)
         {
-            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
+            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.LocalAdmin, organization.Id, true, false);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
             return (user, userAndGetToken.token);
         }
@@ -178,7 +178,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return new CreateNewContractRequestDTO
             {
                 OrganizationUuid = organizationUuid,
-                Name = A<string>(),
+                Name = CreateName(),
                 Roles = roles?.ToList(),
             };
         }
