@@ -13,7 +13,9 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Swashbuckle.Swagger.Annotations;
 using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
+using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 {
@@ -69,6 +71,28 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
             return _itContractService.GetContract(contractUuid)
                 .Select(contract => contract.FlattenCompleteHierarchy())
                 .Select(RegistrationHierarchyNodeMapper.MapHierarchyToDtos)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Get roles assigned to the contract
+        /// </summary>
+        /// <param name="contractUuid"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{contractUuid}/roles")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ExtendedRoleAssignmentResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetAddRoleAssignments([NonEmptyGuid] Guid contractUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return _itContractService
+                .GetContract(contractUuid)
+                .Select(x => x.Rights.ToList())
+                .Select(rights => rights.Select(right => right.MapExtendedRoleAssignmentResponse()))
                 .Match(Ok, FromOperationError);
         }
     }

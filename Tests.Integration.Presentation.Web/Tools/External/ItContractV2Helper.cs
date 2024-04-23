@@ -13,6 +13,7 @@ using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.Shared;
+using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
 {
@@ -84,6 +85,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<ItContractResponseDTO> PostContractAsync(string token, CreateNewContractRequestDTO dto)
         {
             using var result = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts"), dto, token);
+            var res = await result.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.Created, result.StatusCode);
             return await result.ReadResponseBodyAsAsync<ItContractResponseDTO>();
         }
@@ -226,6 +228,14 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             using var response = await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/external-references/{externalReferenceUuid}"), token);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+        public static async Task<IEnumerable<ExtendedRoleAssignmentResponseDTO>> GetRoleAssignmentsInternalAsync(Guid uuid)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{uuid:D}/roles"), cookie); ;
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ExtendedRoleAssignmentResponseDTO>>();
         }
     }
 }

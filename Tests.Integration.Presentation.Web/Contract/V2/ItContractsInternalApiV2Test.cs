@@ -11,6 +11,11 @@ using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Tests.Toolkit.Extensions;
+using Core.DomainServices.Extensions;
+using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 
 namespace Tests.Integration.Presentation.Web.Contract.V2
 {
@@ -63,6 +68,43 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             }
         }
 
+        [Fact]
+        public async Task Can_GET_Roles()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+
+            var user1 = await CreateUser(organization);
+            var user2 = await CreateUser(organization);
+            var rawRoles = DatabaseAccess.MapFromEntitySet<ItContractRole, ItContractRole[]>(x => x.AsQueryable().AsEnumerable().RandomItems(2).ToArray());
+            var role1 = rawRoles.First();
+            var role2 = rawRoles.Last();
+            var roles = new List<RoleAssignmentRequestDTO>
+            {
+                new()
+                {
+                    RoleUuid = role1.Uuid,
+                    UserUuid = user1.Uuid
+                },
+                new()
+                {
+                    RoleUuid = role2.Uuid,
+                    UserUuid = user2.Uuid
+                }
+            };
+            var createdDTO = await ItContractV2Helper.PostContractAsync(token, CreatePostRequest(organization.Uuid, roles));
+
+            //Act
+            var assignedRoles = (await ItContractV2Helper.GetRoleAssignmentsInternalAsync(createdDTO.Uuid)).ToList();
+
+            //Assert
+            Assert.Equal(2, assignedRoles.Count);
+            Assert.Contains(assignedRoles, assignment => MatchExpectedAssignment(assignment, role1, user1));
+            Assert.Contains(assignedRoles, assignment => MatchExpectedAssignment(assignment, role2, user2));
+        }
+
         protected async Task<(string token, OrganizationDTO createdOrganization)> CreateStakeHolderUserInNewOrganizationAsync()
         {
             var organization = await CreateOrganizationAsync();
@@ -74,9 +116,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private (Guid rootUuid, IReadOnlyList<ItContract> createdItContracts) CreateHierarchy(int orgId)
         {
-            var rootContract = CreateContractAsync(orgId);
-            var childContract = CreateContractAsync(orgId);
-            var grandchildContract = CreateContractAsync(orgId);
+            var rootContract = CreateContract(orgId);
+            var childContract = CreateContract(orgId);
+            var grandchildContract = CreateContract(orgId);
 
             var createdSystems = new List<ItContract> { rootContract, childContract, grandchildContract };
 
@@ -104,7 +146,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return organization;
         }
 
-        private ItContract CreateContractAsync(int orgId)
+        private ItContract CreateContract(int orgId)
         {
             return new ItContract
             {
@@ -114,6 +156,42 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 LastChangedByUserId = TestEnvironment.DefaultUserId
             };
         }
+
+        private async Task<(User user, string token)> CreateApiUser(OrganizationDTO organization)
+        {
+            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
+            return (user, userAndGetToken.token);
+        }
+
+        private async Task<User> CreateUser(OrganizationDTO organization)
+        {
+            var userId = await HttpApi.CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(CreateEmail(), false), OrganizationRole.User, organization.Id);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userId));
+            return user;
+        }
+
+        private CreateNewContractRequestDTO CreatePostRequest(
+            Guid organizationUuid,
+            IEnumerable<RoleAssignmentRequestDTO> roles)
+        {
+            return new CreateNewContractRequestDTO
+            {
+                OrganizationUuid = organizationUuid,
+                Name = A<string>(),
+                Roles = roles?.ToList(),
+            };
+        }
+
+        private static bool MatchExpectedAssignment(ExtendedRoleAssignmentResponseDTO assignment, ItContractRole expectedRole, User expectedUser)
+        {
+            return assignment.Role.Name == expectedRole.Name &&
+                   assignment.Role.Uuid == expectedRole.Uuid &&
+                   assignment.User.Email == expectedUser.Email &&
+                   assignment.User.Name == expectedUser.GetFullName() &&
+                   assignment.User.Uuid == expectedUser.Uuid;
+        }
+
         private string CreateEmail()
         {
             return $"{CreateName()}@kitos.dk";
