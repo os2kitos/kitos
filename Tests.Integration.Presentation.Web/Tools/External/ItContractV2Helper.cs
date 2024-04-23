@@ -18,15 +18,15 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public static class ItContractV2Helper
     {
-        public static async Task<IEnumerable<ItContractResponseDTO>> GetItContractsAsync(string token, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, Guid? responsibleOrgUnitUuid = null, Guid? supplierUuid = null, string nameContent = null, DateTime? changedSinceGtEq = null, int page = 0, int pageSize = 10)
+        public static async Task<IEnumerable<ItContractResponseDTO>> GetItContractsAsync(string token, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, Guid? responsibleOrgUnitUuid = null, Guid? supplierUuid = null, string nameContent = null, string nameEquals = null, DateTime? changedSinceGtEq = null, int page = 0, int pageSize = 10)
         {
-            using var response = await SendGetItContractsAsync(token, organizationUuid, systemUuid, systemUsageUuid, dataProcessingRegistrationUuid, responsibleOrgUnitUuid, supplierUuid, nameContent, changedSinceGtEq, page, pageSize);
+            using var response = await SendGetItContractsAsync(token, organizationUuid, systemUuid, systemUsageUuid, dataProcessingRegistrationUuid, responsibleOrgUnitUuid, supplierUuid, nameContent, nameEquals, changedSinceGtEq, page, pageSize);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItContractResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetItContractsAsync(string token, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, Guid? responsibleOrgUnitUuid = null, Guid? supplierUuid = null, string nameContent = null, DateTime? changedSinceGtEq = null, int page = 0, int pageSize = 10)
+        public static async Task<HttpResponseMessage> SendGetItContractsAsync(string token, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, Guid? responsibleOrgUnitUuid = null, Guid? supplierUuid = null, string nameContent = null, string nameEquals = null, DateTime? changedSinceGtEq = null, int page = 0, int pageSize = 10)
         {
             var queryParameters = new List<KeyValuePair<string, string>>()
             {
@@ -54,6 +54,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (nameContent != null)
                 queryParameters.Add(new KeyValuePair<string, string>("nameContent", nameContent));
+
+            if (nameEquals != null)
+                queryParameters.Add(new KeyValuePair<string, string>("nameEquals", nameEquals));
 
             if (changedSinceGtEq.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("changedSinceGtEq", changedSinceGtEq.Value.ToString("O")));
