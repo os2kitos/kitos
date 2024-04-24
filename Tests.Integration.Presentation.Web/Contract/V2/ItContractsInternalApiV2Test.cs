@@ -16,6 +16,9 @@ using Tests.Toolkit.Extensions;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
+using System.Net;
+using Presentation.Web.Models.API.V2.Response.Contract;
+using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 
 namespace Tests.Integration.Presentation.Web.Contract.V2
 {
@@ -89,8 +92,74 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             Assert.Equal(2, assignedRoles.Count);
-            Assert.Contains(assignedRoles, assignment => MatchExpectedAssignment(assignment, roles.First(), users.First()));
-            Assert.Contains(assignedRoles, assignment => MatchExpectedAssignment(assignment, roles.Last(), users.Last()));
+            Assert.Contains(assignedRoles, assignment => MatchExpectedExtendedAssignment(assignment, roles.First(), users.First()));
+            Assert.Contains(assignedRoles, assignment => MatchExpectedExtendedAssignment(assignment, roles.Last(), users.Last()));
+        }
+
+
+        [Fact]
+        public async Task Can_PATCH_Add_RoleAssignment()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var (roles, users) = await CreateRoles(organization);
+            var createdContract = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+
+            var assignment1 = roles.First();
+            var assignment2 = roles.Last();
+
+            //Act
+            using var assignmentResponse1 = await ItContractV2Helper.SendPatchAddRoleAssignment(createdContract.Uuid, assignment1);
+            using var duplicateAssignment1 = await ItContractV2Helper.SendPatchAddRoleAssignment(createdContract.Uuid, assignment1);
+            using var assignmentResponse2 = await ItContractV2Helper.SendPatchAddRoleAssignment(createdContract.Uuid, assignment2);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, duplicateAssignment1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, assignmentResponse1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, assignmentResponse2.StatusCode);
+            var updatedDTO = await assignmentResponse2.ReadResponseBodyAsAsync<ItContractResponseDTO>();
+            var rolesDTO = updatedDTO.Roles.ToList();
+            Assert.Equal(2, rolesDTO.Count);
+            Assert.Contains(rolesDTO, r => MatchExpectedAssignment(r, assignment1, users.First()));
+            Assert.Contains(rolesDTO, r => MatchExpectedAssignment(r, assignment2, users.Last()));
+        }
+
+        [Fact]
+        public async Task Can_PATCH_Remove_RoleAssignment()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var (roles, users) = await CreateRoles(organization);
+            var createdContract = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                Roles = roles
+            });
+
+            var assignment1 = roles.First();
+            var assignment2 = roles.Last();
+
+            //Act
+            using var assignment1Response = await ItContractV2Helper.SendPatchAddRoleAssignment(createdContract.Uuid, assignment1);
+            using var assignment2Response = await ItContractV2Helper.SendPatchAddRoleAssignment(createdContract.Uuid, assignment2);
+            using var removeAssignment = await ItContractV2Helper.SendPatchRemoveRoleAssignment(createdContract.Uuid, assignment1);
+            using var duplicateRemoveAssignment = await ItContractV2Helper.SendPatchRemoveRoleAssignment(createdContract.Uuid, assignment1);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, duplicateRemoveAssignment.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, removeAssignment.StatusCode);
+            var updatedDTO = await removeAssignment.ReadResponseBodyAsAsync<ItContractResponseDTO>();
+            var roleAssignment = Assert.Single(updatedDTO.Roles);
+            MatchExpectedAssignment(roleAssignment, assignment2, users.Last());
         }
 
         protected async Task<(string token, OrganizationDTO createdOrganization)> CreateStakeHolderUserInNewOrganizationAsync()
@@ -175,12 +244,19 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return (roles, new List<User>{user1, user2});
         }
 
-        private static bool MatchExpectedAssignment(ExtendedRoleAssignmentResponseDTO assignment, RoleAssignmentRequestDTO expectedRole, User expectedUser)
+        private static bool MatchExpectedAssignment(RoleAssignmentResponseDTO assignment, RoleAssignmentRequestDTO expectedRole, User expectedUser)
         {
             return assignment.Role.Uuid == expectedRole.RoleUuid &&
-                   assignment.User.Email == expectedUser.Email &&
                    assignment.User.Name == expectedUser.GetFullName() &&
                    assignment.User.Uuid == expectedUser.Uuid;
+        }
+
+        private static bool MatchExpectedExtendedAssignment(ExtendedRoleAssignmentResponseDTO assignment, RoleAssignmentRequestDTO expectedRole, User expectedUser)
+        {
+            return assignment.Role.Uuid == expectedRole.RoleUuid &&
+                   assignment.User.Name == expectedUser.GetFullName() &&
+                   assignment.User.Uuid == expectedUser.Uuid &&
+                   assignment.User.Email == expectedUser.Email;
         }
 
         private string CreateEmail()

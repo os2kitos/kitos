@@ -175,6 +175,38 @@ namespace Core.ApplicationServices.Contract.Write
                 });
         }
 
+        public Result<ItContract, OperationError> AddRole(Guid contractUuid, UserRolePair assignment)
+        {
+            return _contractService
+                .GetContract(contractUuid)
+                .Select(ExtractAssignedRoles)
+                .Bind<ItContractModificationParameters>(existingRoles =>
+                {
+                    if (existingRoles.Contains(assignment))
+                    {
+                        return new OperationError("Role assignment exists", OperationFailure.Conflict);
+                    }
+                    return CreateRoleAssignmentUpdate(existingRoles.Append(assignment));
+                })
+                .Bind(update => Update(contractUuid, update));
+        }
+
+        public Result<ItContract, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair assignment)
+        {
+            return _contractService
+                .GetContract(systemUsageUuid)
+                .Select(ExtractAssignedRoles)
+                .Bind<ItContractModificationParameters>(existingRoles =>
+                {
+                    if (!existingRoles.Contains(assignment))
+                    {
+                        return new OperationError("Assignment does not exist", OperationFailure.BadInput);
+                    }
+                    return CreateRoleAssignmentUpdate(existingRoles.Except(assignment.WrapAsEnumerable()));
+                })
+                .Bind(update => Update(systemUsageUuid, update));
+        }
+
         private Result<ItContract, OperationError> WithWriteAccess(ItContract contract)
         {
             if (!_authorizationContext.AllowModify(contract))
@@ -623,6 +655,19 @@ namespace Core.ApplicationServices.Contract.Write
             return _contractService
                 .GetContract(contractUuid)
                 .Bind(WithWriteAccess);
+        }
+
+        private static IReadOnlyList<UserRolePair> ExtractAssignedRoles(ItContract contract)
+        {
+            return contract.Rights.Select(right => new UserRolePair(right.User.Uuid, right.Role.Uuid)).ToList();
+        }
+
+        private static ItContractModificationParameters CreateRoleAssignmentUpdate(IEnumerable<UserRolePair> existingRoles)
+        {
+            return new ItContractModificationParameters
+            {
+                Roles = existingRoles.FromNullable()
+            };
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Contract.Write;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.ItContract;
 using Core.DomainServices.Generic;
@@ -13,9 +14,13 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Swashbuckle.Swagger.Annotations;
 using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.Contract;
+using Presentation.Web.Models.API.V2.Response.SystemUsage;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 {
@@ -27,11 +32,18 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
     {
         private readonly IItContractService _itContractService;
         private readonly IEntityIdentityResolver _identityResolver;
+        private readonly IItContractWriteService _writeService;
+        private readonly IItContractResponseMapper _responseMapper;
 
-        public ItContractInternalV2Controller(IItContractService itContractService, IEntityIdentityResolver identityResolver)
+        public ItContractInternalV2Controller(IItContractService itContractService,
+            IEntityIdentityResolver identityResolver,
+            IItContractWriteService writeService,
+            IItContractResponseMapper responseMapper)
         {
             _itContractService = itContractService;
             _identityResolver = identityResolver;
+            _writeService = writeService;
+            _responseMapper = responseMapper;
         }
 
         [HttpGet]
@@ -93,6 +105,54 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
                 .GetContract(contractUuid)
                 .Select(x => x.Rights.ToList())
                 .Select(rights => rights.Select(right => right.MapExtendedRoleAssignmentResponse()))
+                .Match(Ok, FromOperationError);
+        }
+        /// Add role assignment to the it-contract
+        /// Constraint: Duplicates are not allowed (existing assignment of the same user/role)
+        /// </summary>
+        /// <param name="contractUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("{contractUuid}/roles/add")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict, Description = "If duplicate is detected")]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PatchAddRoleAssignment([NonEmptyGuid] Guid contractUuid, [FromBody] RoleAssignmentRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .AddRole(contractUuid, request.ToUserRolePair())
+                .Select(_responseMapper.MapContractDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Remove an existing role assignment to the it-contract
+        /// </summary>
+        /// <param name="contractUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("{contractUuid}/roles/remove")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PatchRemoveRoleAssignment([NonEmptyGuid] Guid contractUuid, [FromBody] RoleAssignmentRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .RemoveRole(contractUuid, request.ToUserRolePair())
+                .Select(_responseMapper.MapContractDTO)
                 .Match(Ok, FromOperationError);
         }
     }

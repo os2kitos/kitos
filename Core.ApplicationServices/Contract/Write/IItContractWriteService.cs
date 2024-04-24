@@ -20,5 +20,8 @@ namespace Core.ApplicationServices.Contract.Write
             ExternalReferenceProperties externalReferenceProperties);
         Result<ExternalReference, OperationError>
             DeleteExternalReference(Guid contractUuid, Guid externalReferenceUuid);
+
+        Result<ItContract, OperationError> AddRole(Guid contractUuid, UserRolePair assignment);
+        Result<ItContract, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair assignment);
     }
 }
