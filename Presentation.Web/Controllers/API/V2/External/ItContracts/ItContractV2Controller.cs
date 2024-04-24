@@ -79,6 +79,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             [NonEmptyGuid] Guid? responsibleOrgUnitUuid = null,
             [NonEmptyGuid] Guid? supplierUuid = null,
             string nameContent = null,
+            string nameEquals = null,
             DateTime? changedSinceGtEq = null,
             CommonOrderByProperty? orderByProperty = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
@@ -109,8 +110,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (!string.IsNullOrWhiteSpace(nameContent))
                 conditions.Add(new QueryByPartOfName<ItContract>(nameContent));
 
+            if(!string.IsNullOrWhiteSpace(nameEquals))
+                conditions.Add(new QueryByName<ItContract>(nameEquals));
+
             if (changedSinceGtEq.HasValue)
                 conditions.Add(new QueryByChangedSinceGtEq<ItContract>(changedSinceGtEq.Value));
+
 
             return _itContractService
                 .Query(conditions.ToArray())
