@@ -304,6 +304,24 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
+        public async Task Can_GET_Contracts_With_NameEqualsFiltering()
+        {
+            //Arrange
+            var fullName = $"CONTENT_{A<Guid>()}";
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            await CreateContractAsync(organization.Id, $"{fullName}ONE");
+            await CreateContractAsync(organization.Id, $"TWO{fullName}");
+            var contract3 = await CreateContractAsync(organization.Id, fullName);
+
+            //Act
+            var contracts = (await ItContractV2Helper.GetItContractsAsync(token, nameEquals: fullName)).ToList();
+
+            //Assert
+            Assert.Single(contracts);
+            AssertExpectedShallowContracts(contract3, organization, contracts);
+        }
+
+        [Fact]
         public async Task Cannot_GET_Contracts_With_Empty_Organization_Uuid()
         {
             //Arrange
