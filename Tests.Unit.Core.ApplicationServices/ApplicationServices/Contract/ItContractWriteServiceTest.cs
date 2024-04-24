@@ -33,7 +33,6 @@ using Moq;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
-using Core.DomainModel.ItSystem;
 
 namespace Tests.Unit.Core.ApplicationServices.Contract
 {
