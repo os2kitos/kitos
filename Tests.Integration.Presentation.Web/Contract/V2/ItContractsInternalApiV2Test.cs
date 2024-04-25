@@ -11,6 +11,14 @@ using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Tests.Toolkit.Extensions;
+using Core.DomainServices.Extensions;
+using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Internal.Response.Roles;
+using System.Net;
+using Presentation.Web.Models.API.V2.Response.Contract;
+using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 
 namespace Tests.Integration.Presentation.Web.Contract.V2
 {
@@ -63,6 +71,97 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             }
         }
 
+        [Fact]
+        public async Task Can_GET_Roles()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+
+            var (roles, users)= await CreateRoles(organization);
+            var createdContract = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                Roles = roles
+            });
+
+            //Act
+            var assignedRoles = (await ItContractV2Helper.GetRoleAssignmentsInternalAsync(createdContract.Uuid)).ToList();
+
+            //Assert
+            Assert.Equal(2, assignedRoles.Count);
+            Assert.Contains(assignedRoles, assignment => MatchExpectedExtendedAssignment(assignment, roles.First(), users.First()));
+            Assert.Contains(assignedRoles, assignment => MatchExpectedExtendedAssignment(assignment, roles.Last(), users.Last()));
+        }
+
+
+        [Fact]
+        public async Task Can_PATCH_Add_RoleAssignment()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var (roles, users) = await CreateRoles(organization);
+            var createdContract = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+
+            var assignment1 = roles.First();
+            var assignment2 = roles.Last();
+
+            //Act
+            using var assignmentResponse1 = await ItContractV2Helper.SendPatchAddRoleAssignment(createdContract.Uuid, assignment1);
+            using var duplicateAssignment1 = await ItContractV2Helper.SendPatchAddRoleAssignment(createdContract.Uuid, assignment1);
+            using var assignmentResponse2 = await ItContractV2Helper.SendPatchAddRoleAssignment(createdContract.Uuid, assignment2);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, duplicateAssignment1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, assignmentResponse1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, assignmentResponse2.StatusCode);
+            var updatedDTO = await assignmentResponse2.ReadResponseBodyAsAsync<ItContractResponseDTO>();
+            var rolesDTO = updatedDTO.Roles.ToList();
+            Assert.Equal(2, rolesDTO.Count);
+            Assert.Contains(rolesDTO, r => MatchExpectedAssignment(r, assignment1, users.First()));
+            Assert.Contains(rolesDTO, r => MatchExpectedAssignment(r, assignment2, users.Last()));
+        }
+
+        [Fact]
+        public async Task Can_PATCH_Remove_RoleAssignment()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var (roles, users) = await CreateRoles(organization);
+            var createdContract = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                Roles = roles
+            });
+
+            var assignment1 = roles.First();
+            var assignment2 = roles.Last();
+
+            //Act
+            using var assignment1Response = await ItContractV2Helper.SendPatchAddRoleAssignment(createdContract.Uuid, assignment1);
+            using var assignment2Response = await ItContractV2Helper.SendPatchAddRoleAssignment(createdContract.Uuid, assignment2);
+            using var removeAssignment = await ItContractV2Helper.SendPatchRemoveRoleAssignment(createdContract.Uuid, assignment1);
+            using var duplicateRemoveAssignment = await ItContractV2Helper.SendPatchRemoveRoleAssignment(createdContract.Uuid, assignment1);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, duplicateRemoveAssignment.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, removeAssignment.StatusCode);
+            var updatedDTO = await removeAssignment.ReadResponseBodyAsAsync<ItContractResponseDTO>();
+            var roleAssignment = Assert.Single(updatedDTO.Roles);
+            MatchExpectedAssignment(roleAssignment, assignment2, users.Last());
+        }
+
         protected async Task<(string token, OrganizationDTO createdOrganization)> CreateStakeHolderUserInNewOrganizationAsync()
         {
             var organization = await CreateOrganizationAsync();
@@ -74,9 +173,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private (Guid rootUuid, IReadOnlyList<ItContract> createdItContracts) CreateHierarchy(int orgId)
         {
-            var rootContract = CreateContractAsync(orgId);
-            var childContract = CreateContractAsync(orgId);
-            var grandchildContract = CreateContractAsync(orgId);
+            var rootContract = CreateContract(orgId);
+            var childContract = CreateContract(orgId);
+            var grandchildContract = CreateContract(orgId);
 
             var createdSystems = new List<ItContract> { rootContract, childContract, grandchildContract };
 
@@ -104,16 +203,62 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return organization;
         }
 
-        private ItContract CreateContractAsync(int orgId)
+        private ItContract CreateContract(int orgId)
         {
             return new ItContract
             {
-                Name = A<string>(),
+                Name = CreateName(),
                 OrganizationId = orgId,
                 ObjectOwnerId = TestEnvironment.DefaultUserId,
                 LastChangedByUserId = TestEnvironment.DefaultUserId
             };
         }
+
+        private async Task<(User user, string token)> CreateApiUserAsync(OrganizationDTO organization)
+        {
+            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.LocalAdmin, organization.Id, true, false);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
+            return (user, userAndGetToken.token);
+        }
+
+        private async Task<(List<RoleAssignmentRequestDTO>, List<User>)> CreateRoles(OrganizationDTO organization)
+        {
+            var (user1, _)= await CreateApiUserAsync(organization);
+            var (user2, _) = await CreateApiUserAsync(organization);
+            var contractRoles = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractRoles, organization.Uuid, 10, 0)).RandomItems(2).ToList();
+            var role1 = contractRoles.First();
+            var role2 = contractRoles.Last();
+            var roles = new List<RoleAssignmentRequestDTO>
+            {
+                new()
+                {
+                    RoleUuid = role1.Uuid,
+                    UserUuid = user1.Uuid
+                },
+                new()
+                {
+                    RoleUuid = role2.Uuid,
+                    UserUuid = user2.Uuid
+                }
+            };
+            return (roles, new List<User>{user1, user2});
+        }
+
+        private static bool MatchExpectedAssignment(RoleAssignmentResponseDTO assignment, RoleAssignmentRequestDTO expectedRole, User expectedUser)
+        {
+            return assignment.Role.Uuid == expectedRole.RoleUuid &&
+                   assignment.User.Name == expectedUser.GetFullName() &&
+                   assignment.User.Uuid == expectedUser.Uuid;
+        }
+
+        private static bool MatchExpectedExtendedAssignment(ExtendedRoleAssignmentResponseDTO assignment, RoleAssignmentRequestDTO expectedRole, User expectedUser)
+        {
+            return assignment.Role.Uuid == expectedRole.RoleUuid &&
+                   assignment.User.Name == expectedUser.GetFullName() &&
+                   assignment.User.Uuid == expectedUser.Uuid &&
+                   assignment.User.Email == expectedUser.Email;
+        }
+
         private string CreateEmail()
         {
             return $"{CreateName()}@kitos.dk";
