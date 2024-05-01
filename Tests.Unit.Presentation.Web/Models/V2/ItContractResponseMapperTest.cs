@@ -713,6 +713,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private void AssertPayment(EconomyStream expected, PaymentResponseDTO actual)
         {
+            Assert.Equal(expected.Id, actual.Id);
             Assert.Equal(expected.AccountingEntry, actual.AccountingEntry);
             Assert.Equal(expected.Note, actual.Note);
             Assert.Equal(expected.Acquisition, actual.Acquisition);

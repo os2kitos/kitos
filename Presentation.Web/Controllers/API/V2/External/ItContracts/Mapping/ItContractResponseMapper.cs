@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Model.Contracts;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Organization;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Types.Contract;
 using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Models.API.V2.Response.Organization;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
@@ -102,13 +104,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         {
             return new PaymentResponseDTO
             {
+                Id = economyStream.Id,
                 AccountingEntry = economyStream.AccountingEntry,
                 Acquisition = economyStream.Acquisition,
                 AuditDate = economyStream.AuditDate,
                 AuditStatus = economyStream.AuditStatus.ToPaymentAuditStatus(),
                 Note = economyStream.Note,
                 Operation = economyStream.Operation,
-                OrganizationUnit = economyStream.OrganizationUnit?.MapIdentityNamePairDTO(),
+                OrganizationUnit = ToUnitWithEanResponseDTO(economyStream.OrganizationUnit),
                 Other = economyStream.Other
             };
         }
@@ -204,6 +207,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             {
                 Role = right.Role.MapIdentityNamePairDTO(),
                 User = right.User.MapIdentityNamePairDTO()
+            };
+        }
+
+        private static OrganizationUnitWithEanResponseDTO ToUnitWithEanResponseDTO(OrganizationUnit unit)
+        {
+            return new OrganizationUnitWithEanResponseDTO
+            {
+                Uuid = unit.Uuid,
+                Name = unit.Name,
+                Ean = unit.Ean,
             };
         }
     }
