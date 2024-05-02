@@ -437,7 +437,6 @@
     <Compile Include="Models\API\V2\Response\Generic\Identity\IdentityNamePairWithDeactivatedStatusDTO.cs" />
     <Compile Include="Models\API\V2\Response\Interface\ItInterfaceDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Interface\ItInterfacePermissionsResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Response\Organization\OrganizationUnitWithEanResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Shared\CommandPermissionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Shared\ResourceCollectionPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\BaseSystemRelationResponseDTO.cs" />

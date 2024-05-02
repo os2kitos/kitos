@@ -111,7 +111,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 AuditStatus = economyStream.AuditStatus.ToPaymentAuditStatus(),
                 Note = economyStream.Note,
                 Operation = economyStream.Operation,
-                OrganizationUnit = ToUnitWithEanResponseDTO(economyStream.OrganizationUnit),
+                OrganizationUnit = economyStream.OrganizationUnit != null ? ToUnitResponseDTO(economyStream.OrganizationUnit) : null,
                 Other = economyStream.Other
             };
         }
@@ -210,13 +210,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private static OrganizationUnitWithEanResponseDTO ToUnitWithEanResponseDTO(OrganizationUnit unit)
+        private static OrganizationUnitResponseDTO ToUnitResponseDTO(OrganizationUnit unit)
         {
-            return new OrganizationUnitWithEanResponseDTO
+            return new OrganizationUnitResponseDTO
             {
                 Uuid = unit.Uuid,
                 Name = unit.Name,
                 Ean = unit.Ean,
+                ParentOrganizationUnit = unit.Parent?.MapIdentityNamePairDTO()
             };
         }
     }

@@ -13,7 +13,7 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// <summary>
         /// Optionally defined the organization unit responsible for the payment
         /// </summary>
-        public OrganizationUnitWithEanResponseDTO OrganizationUnit { get; set; }
+        public OrganizationUnitResponseDTO OrganizationUnit { get; set; }
         /// <summary>
         /// Part of payment which covers acquisition
         /// </summary>
