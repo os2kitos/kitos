@@ -18,7 +18,6 @@ namespace Presentation.Web.Controllers.API.V1.OData
     /// Search API used for DataProcessingRegistrations
     /// </summary>
     [InternalApi]
-    [ODataRoutePrefix("Organizations({organizationId})/DataProcessingRegistrationReadModels")]
     public class DataProcessingRegistrationReadModelsController : BaseOdataController
     {
         private readonly IDataProcessingRegistrationReadModelService _dataProcessingRegistrationReadModelService;
@@ -33,7 +32,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
         [EnableQuery]
         [SwaggerResponse(HttpStatusCode.OK, type:typeof(ODataListResponse<DataProcessingRegistrationReadModel>))]
-        [ODataRoute]
+        [ODataRoute("Organizations({organizationId})/DataProcessingRegistrationReadModels")]
         public IHttpActionResult Get([FromODataUri]int organizationId)
         {
             return GetOverviewReadModels(organizationId);
