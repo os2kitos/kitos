@@ -292,6 +292,43 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Fact]
+        public async Task Can_GET_All_Dprs_With_NameContentFiltering()
+        {
+            //Arrange
+            var content = $"CONTENT_{A<Guid>()}";
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var dpr1 = await CreateDPRAsync(organization.Id, $"{content}ONE");
+            var dpr2 = await CreateDPRAsync(organization.Id, $"TWO{content}");
+            await CreateDPRAsync(organization.Id);
+
+            //Act
+            var dprs = (await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, nameContains: content)).ToList();
+
+            //Assert
+            Assert.Equal(2, dprs.Count);
+            AssertExpectedShallowDPRs(dpr1, organization, dprs);
+            AssertExpectedShallowDPRs(dpr2, organization, dprs);
+        }
+
+        [Fact]
+        public async Task Can_GET_Dprs_With_NameEqualsFiltering()
+        {
+            //Arrange
+            var fullName = $"CONTENT_{A<Guid>()}";
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            await CreateDPRAsync(organization.Id, $"{fullName}ONE");
+            await CreateDPRAsync(organization.Id, $"TWO{fullName}");
+            var dpr3 = await CreateDPRAsync(organization.Id, fullName);
+
+            //Act
+            var contracts = (await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, nameEquals: fullName)).ToList();
+
+            //Assert
+            Assert.Single(contracts);
+            AssertExpectedShallowDPRs(dpr3, organization, contracts);
+        }
+
+        [Fact]
         public async Task Cannot_Get_All_Dprs_If_Empty_Guid_Used_For_Filtering()
         {
             //Arrange
@@ -1487,9 +1524,9 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             return (dataResponsible, basisForTransfer, inputDTO);
         }
 
-        private async Task<DataProcessingRegistrationDTO> CreateDPRAsync(int orgId)
+        private async Task<DataProcessingRegistrationDTO> CreateDPRAsync(int orgId, string name = null)
         {
-            return await DataProcessingRegistrationHelper.CreateAsync(orgId, CreateName());
+            return await DataProcessingRegistrationHelper.CreateAsync(orgId, name ?? CreateName());
         }
 
         private async Task<(string token, User user, OrganizationDTO organization)> CreatePrerequisitesAsync()
