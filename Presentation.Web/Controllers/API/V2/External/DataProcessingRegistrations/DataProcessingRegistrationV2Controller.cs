@@ -18,6 +18,10 @@ using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.M
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Response.Contract;
+using Presentation.Web.Models.API.V2.Response.Shared;
+using System.ComponentModel.DataAnnotations;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations
 {
@@ -31,17 +35,19 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         private readonly IDataProcessingRegistrationWriteService _writeService;
         private readonly IDataProcessingRegistrationWriteModelMapper _writeModelMapper;
         private readonly IDataProcessingRegistrationResponseMapper _responseMapper;
+        private readonly IResourcePermissionsResponseMapper _permissionResponseMapper;
 
         public DataProcessingRegistrationV2Controller(
             IDataProcessingRegistrationApplicationService dataProcessingRegistrationService,
             IDataProcessingRegistrationWriteService writeService,
             IDataProcessingRegistrationWriteModelMapper writeModelMapper,
-            IDataProcessingRegistrationResponseMapper responseMapper)
+            IDataProcessingRegistrationResponseMapper responseMapper, IResourcePermissionsResponseMapper permissionResponseMapper)
         {
             _dataProcessingRegistrationService = dataProcessingRegistrationService;
             _writeService = writeService;
             _writeModelMapper = writeModelMapper;
             _responseMapper = responseMapper;
+            _permissionResponseMapper = permissionResponseMapper;
         }
 
         /// <summary>
@@ -228,6 +234,50 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             return _writeService
                 .Delete(uuid)
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+        }
+
+        /// <summary>
+        /// Returns the permissions of the authenticated client in the context of a specific Data Processing Registration
+        /// </summary>
+        /// <param name="dprUuid">UUID of the contract entity</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{dprUuid}/permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationPermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetDataProcessingRegistrationPermissions([NonEmptyGuid] Guid dprUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _dataProcessingRegistrationService
+                .GetPermissions(dprUuid)
+                .Select(_responseMapper.MapPermissions)
+                .Match(Ok, FromOperationError);
+        }
+
+
+        /// <summary>
+        /// Returns the permissions of the authenticated client for the Data Processing Registration resources collection in the context of an organization (Data Processing Registration permissions in a specific Organization)
+        /// </summary>
+        /// <param name="organizationUuid">UUID of the organization</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourceCollectionPermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetDataProcessingRegistrationCollectionPermissions([Required][NonEmptyGuid] Guid organizationUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _dataProcessingRegistrationService.GetCollectionPermissions(organizationUuid)
+                .Select(_permissionResponseMapper.Map)
+                .Match(Ok, FromOperationError);
         }
 
         private CreatedNegotiatedContentResult<DataProcessingRegistrationResponseDTO> MapCreatedResponse(DataProcessingRegistrationResponseDTO dto)
