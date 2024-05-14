@@ -433,6 +433,7 @@
     <Compile Include="Models\API\V2\Request\System\Regular\RecommendedArchiveDutyRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\System\Shared\IItSystemWriteRequestCommonPropertiesDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\ItContractPermissionsResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessingRegistrationPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Generic\Hierarchy\RegistrationHierarchyNodeWithActivationStatusResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Generic\Identity\IdentityNamePairWithDeactivatedStatusDTO.cs" />
     <Compile Include="Models\API\V2\Response\Interface\ItInterfaceDataResponseDTO.cs" />
