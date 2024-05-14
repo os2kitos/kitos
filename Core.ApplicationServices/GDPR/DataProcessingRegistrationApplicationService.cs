@@ -20,6 +20,8 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Role;
+using Core.ApplicationServices.Model.GDPR;
+using Core.ApplicationServices.Organizations;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -41,7 +43,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IOrganizationalUserContext _userContext;
         private readonly IGenericRepository<DataProcessingRegistrationOversightDate> _dataProcessingRegistrationOversightDateRepository;
         private readonly IGenericRepository<SubDataProcessor> _sdpRepository;
-
+        private readonly IOrganizationService _organizationService;
 
         public DataProcessingRegistrationApplicationService(
             IAuthorizationContext authorizationContext,
@@ -59,7 +61,8 @@ namespace Core.ApplicationServices.GDPR
             ITransactionManager transactionManager,
             IOrganizationalUserContext userContext,
             IGenericRepository<DataProcessingRegistrationOversightDate> dataProcessingRegistrationOversightDateRepository,
-            IGenericRepository<SubDataProcessor> sdpRepository)
+            IGenericRepository<SubDataProcessor> sdpRepository, 
+            IOrganizationService organizationService)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;
@@ -77,6 +80,7 @@ namespace Core.ApplicationServices.GDPR
             _userContext = userContext;
             _dataProcessingRegistrationOversightDateRepository = dataProcessingRegistrationOversightDateRepository;
             _sdpRepository = sdpRepository;
+            _organizationService = organizationService;
         }
 
         public Result<DataProcessingRegistration, OperationError> Create(int organizationId, string name)
@@ -584,6 +588,32 @@ namespace Core.ApplicationServices.GDPR
                     dpr => _authorizationContext.AllowReads(dpr) ? dpr : new OperationError(OperationFailure.Forbidden),
                     () => new OperationError(OperationFailure.NotFound)
                 );
+        }
+
+        public Result<DataProcessingRegistrationPermissions, OperationError> GetPermissions(Guid uuid)
+        {
+            return GetByUuid(uuid).Transform(GetPermissions);
+        }
+
+        public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid)
+                .Select(organization => ResourceCollectionPermissionsResult.FromOrganizationId<DataProcessingRegistration>(organization.Id, _authorizationContext));
+        }
+
+        private Result<DataProcessingRegistrationPermissions, OperationError> GetPermissions(Result<DataProcessingRegistration, OperationError> systemResult)
+        {
+            return systemResult
+                .Transform
+                (
+                    system =>
+                    {
+                        return ResourcePermissionsResult
+                            .FromResolutionResult(system, _authorizationContext)
+                            .Select(permissions =>
+                                new DataProcessingRegistrationPermissions(permissions));
+                    });
         }
     }
 }
