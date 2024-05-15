@@ -96,7 +96,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Contains(assignedRoles, assignment => MatchExpectedExtendedAssignment(assignment, roles.Last(), users.Last()));
         }
 
-
         [Fact]
         public async Task Can_PATCH_Add_RoleAssignment()
         {

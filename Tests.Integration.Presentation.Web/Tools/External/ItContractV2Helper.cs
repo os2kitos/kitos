@@ -244,7 +244,6 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var response = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{uuid}/roles/add"), cookie, dto);
-            var res = await response.Content.ReadAsStringAsync();
             return response;
         }
 
