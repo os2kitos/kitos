@@ -82,7 +82,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 
             return _itContractService.GetContract(contractUuid)
                 .Select(contract => contract.FlattenCompleteHierarchy())
-                .Select(RegistrationHierarchyNodeMapper.MapHierarchyToDtos)
+                .Select(RegistrationHierarchyNodeMapper.MapContractHierarchyToDtos)
                 .Match(Ok, FromOperationError);
         }
 
