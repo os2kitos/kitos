@@ -98,6 +98,38 @@ namespace Core.ApplicationServices.GDPR.Write
             return Update(() => _applicationService.GetByUuid(dataProcessingRegistrationUuid), parameters);
         }
 
+        public Result<DataProcessingRegistration, OperationError> AddRole(Guid dprUuid, UserRolePair assignment)
+        {
+            return _applicationService
+                .GetByUuid(dprUuid)
+                .Select(ExtractAssignedRoles)
+                .Bind<DataProcessingRegistrationModificationParameters>(existingRoles =>
+                {
+                    if (existingRoles.Contains(assignment))
+                    {
+                        return new OperationError("Role assignment exists", OperationFailure.Conflict);
+                    }
+                    return CreateRoleAssignmentUpdate(existingRoles.Append(assignment));
+                })
+                .Bind(update => Update(dprUuid, update));
+        }
+
+        public Result<DataProcessingRegistration, OperationError> RemoveRole(Guid dprUuid, UserRolePair assignment)
+        {
+            return _applicationService
+                .GetByUuid(dprUuid)
+                .Select(ExtractAssignedRoles)
+                .Bind<DataProcessingRegistrationModificationParameters>(existingRoles =>
+                {
+                     if (!existingRoles.Contains(assignment))
+                    {
+                        return new OperationError("Assignment does not exist", OperationFailure.BadInput);
+                    }
+                    return CreateRoleAssignmentUpdate(existingRoles.Except(assignment.WrapAsEnumerable()));
+                })
+                .Bind(update => Update(dprUuid, update));
+        }
+
         private Result<DataProcessingRegistration, OperationError> Update(Func<Result<DataProcessingRegistration, OperationError>> getDpr, DataProcessingRegistrationModificationParameters parameters)
         {
             using var transaction = _transactionManager.Begin();
@@ -398,7 +430,7 @@ namespace Core.ApplicationServices.GDPR.Write
                     .Match
                     (
                         contractId => _applicationService.UpdateMainContract(dpr.Id, contractId),
-                        () => new OperationError($"It contract with uuid {contractUuid.Value} could not be found", OperationFailure.BadInput)
+                        () => new OperationError($"It dpr with uuid {contractUuid.Value} could not be found", OperationFailure.BadInput)
                     );
             }
             return _applicationService.RemoveMainContract(dpr.Id);
@@ -435,6 +467,23 @@ namespace Core.ApplicationServices.GDPR.Write
             return _applicationService
                 .Delete(dbId.Value)
                 .Match(_ => Maybe<OperationError>.None, error => error);
+        }
+
+
+        private static IReadOnlyList<UserRolePair> ExtractAssignedRoles(DataProcessingRegistration dpr)
+        {
+            return dpr.Rights.Select(right => new UserRolePair(right.User.Uuid, right.Role.Uuid)).ToList();
+        }
+
+        private static DataProcessingRegistrationModificationParameters CreateRoleAssignmentUpdate(IEnumerable<UserRolePair> existingRoles)
+        {
+            return new DataProcessingRegistrationModificationParameters
+            {
+                Roles = new UpdatedDataProcessingRegistrationRoles
+                {
+                    UserRolePairs = existingRoles.FromNullable().AsChangedValue()
+                } 
+            };
         }
     }
 }

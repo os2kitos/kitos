@@ -2137,6 +2137,102 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             AssertFailureWithKnownErrorDetails(result, "Failed to update references with error message", operationError.FailureType, transaction);
         }
 
+        [Fact]
+        public void Can_Add_Role()
+        {
+            //Arrange
+            var existingAssignment = CreateUpdatedDataProcessingRegistrationRoles(A<UserRolePair>().WrapAsEnumerable());
+            var (_, _, dpr, transaction) = SetupCreateScenarioPrerequisites(roles: existingAssignment);
+            var newRight = CreateRight(dpr, A<Guid>(), A<int>(), A<Guid>(), A<int>());
+            var newAssignment = CreateUserRolePair(newRight.Role.Uuid, newRight.User.Uuid);
+
+            ExpectGetDataProcessingRegistrationReturns(dpr.Uuid, dpr);
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(newAssignment.UserUuid, newRight.UserId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(newAssignment.RoleUuid, newRight.RoleId);
+           
+            ExpectRoleAssignmentReturns(dpr, newRight.RoleId, newRight.UserId, newRight);
+
+            //Act
+            var createResult = _sut.AddRole(dpr.Uuid, newAssignment);
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+        
+        [Fact]
+        public void Can_Remove_Role()
+        {
+            //Arrange
+            var userRolePairToRemove = A<UserRolePair>();
+            var userId = A<int>();
+            var roleId = A<int>();
+            var existingAssignment = CreateUpdatedDataProcessingRegistrationRoles(new List<UserRolePair>
+                { userRolePairToRemove, A<UserRolePair>() });
+            var (_, _, dpr, transaction) = SetupCreateScenarioPrerequisites(roles: existingAssignment);
+            var rightToRemove = CreateRight(dpr, userRolePairToRemove.RoleUuid, roleId, userRolePairToRemove.UserUuid, userId);
+            dpr.Rights = new List<DataProcessingRegistrationRight> { rightToRemove };
+
+            ExpectGetDataProcessingRegistrationReturns(dpr.Uuid, dpr);
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(userRolePairToRemove.UserUuid, userId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(userRolePairToRemove.RoleUuid, roleId);
+
+            ExpectRoleRemovalReturns(dpr, roleId, userId, rightToRemove);
+
+            //Act
+            var createResult = _sut.RemoveRole(dpr.Uuid, userRolePairToRemove);
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+        /* 
+        [Fact]
+        public void Cannot_Remove_Role_If_Not_Assigned()
+        {
+            //Arrange
+            var (_, _, transactionMock, _, _, itSystemUsage) = CreateBasicTestVariables();
+            var existingAssignment1 = A<UserRolePair>();
+            var assignmentThatDoesNotExist = A<UserRolePair>();
+            itSystemUsage.Rights.Add(new ItSystemRight { Role = new ItSystemRole { Uuid = existingAssignment1.RoleUuid }, User = new User { Uuid = existingAssignment1.UserUuid } });
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+
+            //Act
+            var createResult = _sut.RemoveRole(itSystemUsage.Uuid, assignmentThatDoesNotExist);
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Roles_If_BatchUpdateRoles_Fails()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            var userRolePairs = Many<UserRolePair>().ToList();
+
+            var input = CreateSystemUsageUpdateParametersWithData(userRolePairs);
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            var updateError = A<OperationError>();
+            _roleAssignmentService
+                .Setup(x => x.BatchUpdateRoles(itSystemUsage, It.Is<IEnumerable<(Guid roleUuid, Guid user)>>(assignments => MatchExpectedAssignments(assignments, userRolePairs))))
+                .Returns(updateError);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            AssertFailureWithExpectedOperationError(createResult, updateError, transactionMock);
+        }*/
+
         private void ExpectBatchUpdateExternalReferencesReturns(DataProcessingRegistration dpr, IEnumerable<UpdatedExternalReferenceProperties> externalReferences, Maybe<OperationError> value)
         {
             _referenceServiceMock
