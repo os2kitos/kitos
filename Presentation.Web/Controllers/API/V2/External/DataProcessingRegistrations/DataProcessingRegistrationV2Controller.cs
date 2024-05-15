@@ -75,6 +75,8 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             [NonEmptyGuid] Guid? dataProcessorUuid = null,
             [NonEmptyGuid] Guid? subDataProcessorUuid = null,
             bool? agreementConcluded = null,
+            string nameContains = null,
+            string nameEquals = null,
             DateTime? changedSinceGtEq = null,
             CommonOrderByProperty? orderByProperty = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
@@ -101,6 +103,12 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             if (agreementConcluded.HasValue)
                 conditions.Add(new QueryByAgreementConcluded(agreementConcluded.Value));
+
+            if(!string.IsNullOrWhiteSpace(nameContains))
+                conditions.Add(new QueryByPartOfName<DataProcessingRegistration>(nameContains));
+
+            if(!string.IsNullOrWhiteSpace(nameEquals))
+                conditions.Add(new QueryByName<DataProcessingRegistration>(nameEquals));
 
             if (changedSinceGtEq.HasValue)
                 conditions.Add(new QueryByChangedSinceGtEq<DataProcessingRegistration>(changedSinceGtEq.Value));
