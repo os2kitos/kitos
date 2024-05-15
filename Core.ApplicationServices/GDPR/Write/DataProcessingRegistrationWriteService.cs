@@ -430,7 +430,7 @@ namespace Core.ApplicationServices.GDPR.Write
                     .Match
                     (
                         contractId => _applicationService.UpdateMainContract(dpr.Id, contractId),
-                        () => new OperationError($"It dpr with uuid {contractUuid.Value} could not be found", OperationFailure.BadInput)
+                        () => new OperationError($"It contract with uuid {contractUuid.Value} could not be found", OperationFailure.BadInput)
                     );
             }
             return _applicationService.RemoveMainContract(dpr.Id);
