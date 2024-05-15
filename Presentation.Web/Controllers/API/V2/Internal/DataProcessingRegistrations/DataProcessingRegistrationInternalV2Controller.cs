@@ -1,9 +1,7 @@
 ﻿using Core.ApplicationServices.GDPR;
-using Core.DomainServices.Queries.DPR;
 using Core.DomainServices.Queries;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V2.Internal.Response.ItSystem;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
@@ -21,7 +19,6 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Response.Contract;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistrations
 {

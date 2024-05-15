@@ -2188,50 +2188,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transaction);
         }
-        /* 
-        [Fact]
-        public void Cannot_Remove_Role_If_Not_Assigned()
-        {
-            //Arrange
-            var (_, _, transactionMock, _, _, itSystemUsage) = CreateBasicTestVariables();
-            var existingAssignment1 = A<UserRolePair>();
-            var assignmentThatDoesNotExist = A<UserRolePair>();
-            itSystemUsage.Rights.Add(new ItSystemRight { Role = new ItSystemRole { Uuid = existingAssignment1.RoleUuid }, User = new User { Uuid = existingAssignment1.UserUuid } });
-
-            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
-            ExpectAllowModifyReturns(itSystemUsage, true);
-
-            //Act
-            var createResult = _sut.RemoveRole(itSystemUsage.Uuid, assignmentThatDoesNotExist);
-
-            //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_Roles_If_BatchUpdateRoles_Fails()
-        {
-            //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-
-            var userRolePairs = Many<UserRolePair>().ToList();
-
-            var input = CreateSystemUsageUpdateParametersWithData(userRolePairs);
-
-            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            var updateError = A<OperationError>();
-            _roleAssignmentService
-                .Setup(x => x.BatchUpdateRoles(itSystemUsage, It.Is<IEnumerable<(Guid roleUuid, Guid user)>>(assignments => MatchExpectedAssignments(assignments, userRolePairs))))
-                .Returns(updateError);
-
-            //Act
-            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
-
-            //Assert
-            AssertFailureWithExpectedOperationError(createResult, updateError, transactionMock);
-        }*/
 
         private void ExpectBatchUpdateExternalReferencesReturns(DataProcessingRegistration dpr, IEnumerable<UpdatedExternalReferenceProperties> externalReferences, Maybe<OperationError> value)
         {

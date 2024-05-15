@@ -30,8 +30,6 @@ using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Response.Shared;
-using Presentation.Web.Models.API.V2.Response.Contract;
-using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 
 namespace Tests.Integration.Presentation.Web.GDPR.V2
 {
