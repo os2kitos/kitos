@@ -4,7 +4,9 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
+using Core.ApplicationServices.Model.GDPR;
 using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -46,6 +48,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IGenericRepository<DataProcessingRegistrationOversightDate>> _dprOversightDaterepositoryMock;
         private readonly Mock<IGenericRepository<SubDataProcessor>> _sdpRepositoryMock;
+        private readonly Mock<IOrganizationService> _organizationServiceMock;
 
         public DataProcessingRegistrationApplicationServiceTest()
         {
@@ -65,6 +68,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _dprOversightDaterepositoryMock = new Mock<IGenericRepository<DataProcessingRegistrationOversightDate>>();
             _sdpRepositoryMock = new Mock<IGenericRepository<SubDataProcessor>>();
+            _organizationServiceMock = new Mock<IOrganizationService>();
             _sut = new DataProcessingRegistrationApplicationService(
                 _authorizationContextMock.Object,
                 _repositoryMock.Object,
@@ -81,7 +85,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _transactionManagerMock.Object,
                 _userContextMock.Object,
                 _dprOversightDaterepositoryMock.Object,
-                _sdpRepositoryMock.Object);
+                _sdpRepositoryMock.Object,
+                _organizationServiceMock.Object);
         }
 
         [Fact]
@@ -1910,6 +1915,68 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(OperationFailure.Forbidden, dpr.Error.FailureType);
         }
 
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, false, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, false)]
+        [InlineData(false, false, false)]
+        public void Can_Get_Permissions(bool read, bool modify, bool delete)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var registration = new DataProcessingRegistration { Id = A<int>(), Uuid = uuid };
+            _repositoryMock.Setup(x => x.AsQueryable()).Returns(CreateListOfDPRFromDpr(registration).AsQueryable());
+            ExpectAllowReadReturns(registration, read);
+            ExpectAllowModifyReturns(registration, modify);
+            ExpectAllowDeleteReturns(registration, delete);
+
+            //Act
+            var result = _sut.GetPermissions(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var permissions = result.Value;
+            Assert.Equivalent(new DataProcessingRegistrationPermissions(new ResourcePermissionsResult(read, modify, delete)), permissions);
+        }
+        
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Get_CollectionPermissions(bool create)
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var organization = new Organization { Id = A<int>() };
+
+            ExpectOrganizationServiceGetOrganizationReturns(organizationUuid, organization);
+            ExpectAllowCreateReturns(organization.Id, create);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(organizationUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(create, result.Value.Create);
+        }
+
+        [Fact]
+        public void Get_CollectionPermissions_Returns_OperationError_When_GetOrganization_Fails()
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var error = A<OperationError>();
+
+            ExpectOrganizationServiceGetOrganizationReturns(organizationUuid, error);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(organizationUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(error.FailureType, result.Error.FailureType);
+        }
+
         private List<DataProcessingRegistration> CreateListOfDPRFromDpr(DataProcessingRegistration DPR)
         {
             return new List<DataProcessingRegistration>() { DPR, new DataProcessingRegistration { Id = A<int>() } };
@@ -2058,6 +2125,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private void ExpectAllowCreateReturns(int organizationId, bool value)
         {
             _authorizationContextMock.Setup(x => x.AllowCreate<DataProcessingRegistration>(organizationId)).Returns(value);
+        }
+
+        private void ExpectOrganizationServiceGetOrganizationReturns(Guid uuid, Result<Organization, OperationError> result, OrganizationDataReadAccessLevel? organizationDataReadAccessLevel = null)
+        {
+            _organizationServiceMock.Setup(x => x.GetOrganization(uuid, organizationDataReadAccessLevel)).Returns(result);
         }
     }
 }
