@@ -78,7 +78,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
         }
 
         /// <summary>
-        /// Get roles assigned to the contract
+        /// Get roles assigned to the data processing registration
         /// </summary>
         /// <param name="contractUuid"></param>
         /// <returns></returns>
@@ -98,7 +98,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
                 .Select(rights => rights.Select(right => right.MapExtendedRoleAssignmentResponse()))
                 .Match(Ok, FromOperationError);
         }
-        /// Add role assignment to the it-contract
+        /// Add role assignment to the data processing registration
         /// Constraint: Duplicates are not allowed (existing assignment of the same user/role)
         /// </summary>
         /// <param name="dprUuid"></param>
@@ -124,7 +124,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
         }
 
         /// <summary>
-        /// Remove an existing role assignment to the it-contract
+        /// Remove an existing role assignment to the data processing registration
         /// </summary>
         /// <param name="dprUuid"></param>
         /// <param name="request"></param>
