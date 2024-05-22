@@ -1,9 +1,7 @@
 ﻿using Core.ApplicationServices.GDPR;
-using Core.DomainServices.Queries.DPR;
 using Core.DomainServices.Queries;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V2.Internal.Response.ItSystem;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
@@ -13,9 +11,14 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
+using Core.ApplicationServices.GDPR.Write;
 using Core.DomainModel.GDPR;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
+using Presentation.Web.Models.API.V2.Internal.Response.Roles;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistrations
 {
@@ -27,12 +30,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
     {
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationService;
         private readonly IDataProcessingRegistrationResponseMapper _responseMapper;
+        private readonly IDataProcessingRegistrationWriteService _writeService;
 
         public DataProcessingRegistrationInternalV2Controller(IDataProcessingRegistrationApplicationService dataProcessingRegistrationService, 
-            IDataProcessingRegistrationResponseMapper responseMapper)
+            IDataProcessingRegistrationResponseMapper responseMapper, 
+            IDataProcessingRegistrationWriteService writeService)
         {
             _dataProcessingRegistrationService = dataProcessingRegistrationService;
             _responseMapper = responseMapper;
+            _writeService = writeService;
         }
 
         /// <summary>
@@ -69,6 +75,76 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
                 .Select(_responseMapper.MapDataProcessingRegistrationDTO)
                 .ToList()
                 .Transform(Ok);
+        }
+
+        /// <summary>
+        /// Get roles assigned to the data processing registration
+        /// </summary>
+        /// <param name="contractUuid"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{dprUuid}/roles")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ExtendedRoleAssignmentResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetAddRoleAssignments([NonEmptyGuid] Guid contractUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            return _dataProcessingRegistrationService
+                .GetByUuid(contractUuid)
+                .Select(x => x.Rights.ToList())
+                .Select(rights => rights.Select(right => right.MapExtendedRoleAssignmentResponse()))
+                .Match(Ok, FromOperationError);
+        }
+        /// Add role assignment to the data processing registration
+        /// Constraint: Duplicates are not allowed (existing assignment of the same user/role)
+        /// </summary>
+        /// <param name="dprUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("{dprUuid}/roles/add")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict, Description = "If duplicate is detected")]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PatchAddRoleAssignment([NonEmptyGuid] Guid dprUuid, [FromBody] RoleAssignmentRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .AddRole(dprUuid, request.ToUserRolePair())
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Remove an existing role assignment to the data processing registration
+        /// </summary>
+        /// <param name="dprUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("{dprUuid}/roles/remove")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PatchRemoveRoleAssignment([NonEmptyGuid] Guid dprUuid, [FromBody] RoleAssignmentRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .RemoveRole(dprUuid, request.ToUserRolePair())
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(Ok, FromOperationError);
         }
     }
 }

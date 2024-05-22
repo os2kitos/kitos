@@ -30,7 +30,6 @@ using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Response.Shared;
-using Presentation.Web.Models.API.V2.Response.Contract;
 
 namespace Tests.Integration.Presentation.Web.GDPR.V2
 {
@@ -1294,6 +1293,73 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equivalent(expected, permissionsResponseDto);
         }
 
+
+        [Fact]
+        public async Task Can_PATCH_Add_RoleAssignment()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUserAsync(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var (roles, users) = await CreateRoles(organization);
+            var createdDpr = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+
+            var assignment1 = roles.First();
+            var assignment2 = roles.Last();
+
+            //Act
+            using var assignmentResponse1 = await DataProcessingRegistrationV2Helper.SendPatchAddRoleAssignment(createdDpr.Uuid, assignment1);
+            using var duplicateAssignment1 = await DataProcessingRegistrationV2Helper.SendPatchAddRoleAssignment(createdDpr.Uuid, assignment1);
+            using var assignmentResponse2 = await DataProcessingRegistrationV2Helper.SendPatchAddRoleAssignment(createdDpr.Uuid, assignment2);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, duplicateAssignment1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, assignmentResponse1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, assignmentResponse2.StatusCode);
+            var updatedDTO = await assignmentResponse2.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
+            var rolesDTO = updatedDTO.Roles.ToList();
+            Assert.Equal(2, rolesDTO.Count);
+            Assert.Contains(rolesDTO, r => MatchExpectedAssignment(r, assignment1, users.First()));
+            Assert.Contains(rolesDTO, r => MatchExpectedAssignment(r, assignment2, users.Last()));
+        }
+
+        [Fact]
+        public async Task Can_PATCH_Remove_RoleAssignment()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUserAsync(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var (roles, users) = await CreateRoles(organization);
+            var createdDpr = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                Roles = roles
+            });
+
+            var assignment1 = roles.First();
+            var assignment2 = roles.Last();
+
+            //Act
+            using var assignment1Response = await DataProcessingRegistrationV2Helper.SendPatchAddRoleAssignment(createdDpr.Uuid, assignment1);
+            using var assignment2Response = await DataProcessingRegistrationV2Helper.SendPatchAddRoleAssignment(createdDpr.Uuid, assignment2);
+            using var removeAssignment = await DataProcessingRegistrationV2Helper.SendPatchRemoveRoleAssignment(createdDpr.Uuid, assignment1);
+            using var duplicateRemoveAssignment = await DataProcessingRegistrationV2Helper.SendPatchRemoveRoleAssignment(createdDpr.Uuid, assignment1);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, duplicateRemoveAssignment.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, removeAssignment.StatusCode);
+            var updatedDTO = await removeAssignment.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
+            var roleAssignment = Assert.Single(updatedDTO.Roles);
+            MatchExpectedAssignment(roleAssignment, assignment2, users.Last());
+        }
+
+
         #region Asserters
 
         private static void AssertExternalReferenceResults(List<ExternalReferenceDataWriteRequestDTO> expected, DataProcessingRegistrationResponseDTO actual)
@@ -1434,6 +1500,13 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                 Assert.Equal(expectedSdp.InsecureThirdCountrySubjectToDataProcessingUuid, actualSdp.InsecureThirdCountrySubjectToDataProcessing?.Uuid);
                 Assert.Equal(expectedSdp.TransferToInsecureThirdCountry, actualSdp.TransferToInsecureThirdCountry);
             }
+        }
+
+        private static bool MatchExpectedAssignment(RoleAssignmentResponseDTO assignment, RoleAssignmentRequestDTO expectedRole, User expectedUser)
+        {
+            return assignment.Role.Uuid == expectedRole.RoleUuid &&
+                   assignment.User.Name == expectedUser.GetFullName() &&
+                   assignment.User.Uuid == expectedUser.Uuid;
         }
 
         #endregion
@@ -1627,6 +1700,29 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         private string CreateEmail()
         {
             return $"{A<string>()}{DateTime.Now.Ticks}@kitos.dk";
+        }
+        
+        private async Task<(List<RoleAssignmentRequestDTO>, List<User>)> CreateRoles(OrganizationDTO organization)
+        {
+            var (user1, _) = await CreateApiUserAsync(organization);
+            var (user2, _) = await CreateApiUserAsync(organization);
+            var dprRoles = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationRoles, organization.Uuid, 10, 0)).RandomItems(2).ToList();
+            var role1 = dprRoles.First();
+            var role2 = dprRoles.Last();
+            var roles = new List<RoleAssignmentRequestDTO>
+            {
+                new()
+                {
+                    RoleUuid = role1.Uuid,
+                    UserUuid = user1.Uuid
+                },
+                new()
+                {
+                    RoleUuid = role2.Uuid,
+                    UserUuid = user2.Uuid
+                }
+            };
+            return (roles, new List<User> { user1, user2 });
         }
 
         #endregion

@@ -2137,6 +2137,58 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             AssertFailureWithKnownErrorDetails(result, "Failed to update references with error message", operationError.FailureType, transaction);
         }
 
+        [Fact]
+        public void Can_Add_Role()
+        {
+            //Arrange
+            var existingAssignment = CreateUpdatedDataProcessingRegistrationRoles(A<UserRolePair>().WrapAsEnumerable());
+            var (_, _, dpr, transaction) = SetupCreateScenarioPrerequisites(roles: existingAssignment);
+            var newRight = CreateRight(dpr, A<Guid>(), A<int>(), A<Guid>(), A<int>());
+            var newAssignment = CreateUserRolePair(newRight.Role.Uuid, newRight.User.Uuid);
+
+            ExpectGetDataProcessingRegistrationReturns(dpr.Uuid, dpr);
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(newAssignment.UserUuid, newRight.UserId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(newAssignment.RoleUuid, newRight.RoleId);
+           
+            ExpectRoleAssignmentReturns(dpr, newRight.RoleId, newRight.UserId, newRight);
+
+            //Act
+            var createResult = _sut.AddRole(dpr.Uuid, newAssignment);
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+        
+        [Fact]
+        public void Can_Remove_Role()
+        {
+            //Arrange
+            var userRolePairToRemove = A<UserRolePair>();
+            var userId = A<int>();
+            var roleId = A<int>();
+            var existingAssignment = CreateUpdatedDataProcessingRegistrationRoles(new List<UserRolePair>
+                { userRolePairToRemove, A<UserRolePair>() });
+            var (_, _, dpr, transaction) = SetupCreateScenarioPrerequisites(roles: existingAssignment);
+            var rightToRemove = CreateRight(dpr, userRolePairToRemove.RoleUuid, roleId, userRolePairToRemove.UserUuid, userId);
+            dpr.Rights = new List<DataProcessingRegistrationRight> { rightToRemove };
+
+            ExpectGetDataProcessingRegistrationReturns(dpr.Uuid, dpr);
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(userRolePairToRemove.UserUuid, userId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(userRolePairToRemove.RoleUuid, roleId);
+
+            ExpectRoleRemovalReturns(dpr, roleId, userId, rightToRemove);
+
+            //Act
+            var createResult = _sut.RemoveRole(dpr.Uuid, userRolePairToRemove);
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
         private void ExpectBatchUpdateExternalReferencesReturns(DataProcessingRegistration dpr, IEnumerable<UpdatedExternalReferenceProperties> externalReferences, Maybe<OperationError> value)
         {
             _referenceServiceMock
