@@ -6,12 +6,14 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Infrastructure;
+using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.Options;
+using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Xunit;
 
@@ -216,6 +218,24 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/data-processing-registrations/{uuid}/roles/remove"), cookie, dto);
+        }
+
+        public static async Task<IEnumerable<ShallowOrganizationResponseDTO>> GetAvailableDataProcessors(Guid uuid, string nameQuery, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/data-processing-registrations/{uuid}/data-processors/available?nameQuery={nameQuery}"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ShallowOrganizationResponseDTO>>();
+        }
+
+        public static async Task<IEnumerable<ShallowOrganizationResponseDTO>> GetAvailableSubDataProcessors(Guid uuid, string nameQuery, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/data-processing-registrations/{uuid}/sub-data-processors/available?nameQuery={nameQuery}"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ShallowOrganizationResponseDTO>>();
         }
     }
 }

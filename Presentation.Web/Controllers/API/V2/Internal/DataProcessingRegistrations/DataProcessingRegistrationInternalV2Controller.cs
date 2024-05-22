@@ -11,14 +11,18 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.GDPR.Write;
 using Core.DomainModel.GDPR;
+using Core.DomainServices.Generic;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Controllers.API.V1.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistrations
 {
@@ -31,14 +35,17 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationService;
         private readonly IDataProcessingRegistrationResponseMapper _responseMapper;
         private readonly IDataProcessingRegistrationWriteService _writeService;
+        private readonly IEntityIdentityResolver _identityResolver;
 
         public DataProcessingRegistrationInternalV2Controller(IDataProcessingRegistrationApplicationService dataProcessingRegistrationService, 
             IDataProcessingRegistrationResponseMapper responseMapper, 
-            IDataProcessingRegistrationWriteService writeService)
+            IDataProcessingRegistrationWriteService writeService, 
+            IEntityIdentityResolver identityResolver)
         {
             _dataProcessingRegistrationService = dataProcessingRegistrationService;
             _responseMapper = responseMapper;
             _writeService = writeService;
+            _identityResolver = identityResolver;
         }
 
         /// <summary>
@@ -145,6 +152,50 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
                 .RemoveRole(dprUuid, request.ToUserRolePair())
                 .Select(_responseMapper.MapDataProcessingRegistrationDTO)
                 .Match(Ok, FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("{dprUuid}/data-processors/available")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ShallowOrganizationResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetAvailableDataProcessors([NonEmptyGuid] Guid dprUuid,
+            [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var idResult = _identityResolver.ResolveDbId<DataProcessingRegistration>(dprUuid);
+            if (idResult.IsNone)
+                return FromOperationError(new OperationError($"DataProcessingRegistration with uuid: {dprUuid} was not found", OperationFailure.NotFound));
+
+            return _dataProcessingRegistrationService
+                .GetDataProcessorsWhichCanBeAssigned(idResult.Value, nameQuery, pageSize)
+                .Match(organizations => Ok(organizations.Select(x => x.MapShallowOrganizationResponseDTO()).ToList()), FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("{dprUuid}/sub-data-processors/available")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ShallowOrganizationResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetAvailableSubDataProcessors([NonEmptyGuid] Guid dprUuid,
+            [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var idResult = _identityResolver.ResolveDbId<DataProcessingRegistration>(dprUuid);
+            if (idResult.IsNone)
+                return FromOperationError(new OperationError($"DataProcessingRegistration with uuid: {dprUuid} was not found", OperationFailure.NotFound));
+
+            return _dataProcessingRegistrationService
+                .GetSubDataProcessorsWhichCanBeAssigned(idResult.Value, nameQuery, pageSize)
+                .Match(organizations => Ok(organizations.Select(x => x.MapShallowOrganizationResponseDTO()).ToList()), FromOperationError);
         }
     }
 }
