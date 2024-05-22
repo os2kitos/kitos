@@ -254,18 +254,23 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<IEnumerable<Organization>, OperationError> GetDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
         {
-            if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
             return WithReadAccess<IEnumerable<Organization>>(id,
                 registration =>
-                    _dataProcessingRegistrationDataProcessorAssignmentService
-                        .GetApplicableDataProcessors(registration)
-                        .ByPartOfNameOrCvr(nameQuery)
-                        .OrderBy(x => x.Id)
-                        .Take(pageSize)
-                        .OrderBy(x => x.Name)
-                        .ToList());
+                {
+                    var query = _dataProcessingRegistrationDataProcessorAssignmentService
+                        .GetApplicableDataProcessors(registration);
+
+                    if (!string.IsNullOrEmpty(nameQuery))
+                        query = query.ByPartOfNameOrCvr(nameQuery);
+
+                    return query
+                            .OrderBy(x => x.Id)
+                            .Take(pageSize)
+                            .OrderBy(x => x.Name)
+                            .ToList();
+                });
         }
 
         public Result<Organization, OperationError> AssignDataProcessor(int id, int organizationId)
@@ -280,18 +285,23 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<IEnumerable<Organization>, OperationError> GetSubDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
         {
-            if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
             return WithReadAccess<IEnumerable<Organization>>(id,
                 registration =>
-                    _dataProcessingRegistrationDataProcessorAssignmentService
-                        .GetApplicableSubDataProcessors(registration)
-                        .ByPartOfNameOrCvr(nameQuery)
+                {
+                    var query = _dataProcessingRegistrationDataProcessorAssignmentService
+                        .GetApplicableSubDataProcessors(registration);
+
+                    if (!string.IsNullOrEmpty(nameQuery))
+                        query = query.ByPartOfNameOrCvr(nameQuery);
+
+                    return query.ByPartOfNameOrCvr(nameQuery)
                         .OrderBy(x => x.Id)
                         .Take(pageSize)
                         .OrderBy(x => x.Name)
-                        .ToList());
+                        .ToList();
+                });
         }
 
         public Result<DataProcessingRegistration, OperationError> SetSubDataProcessorsState(int id, YesNoUndecidedOption state)
