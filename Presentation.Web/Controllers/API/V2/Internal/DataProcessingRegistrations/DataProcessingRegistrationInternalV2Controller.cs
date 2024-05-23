@@ -22,7 +22,6 @@ using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Organization;
-using Presentation.Web.Controllers.API.V1.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistrations
 {
@@ -87,7 +86,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
         /// <summary>
         /// Get roles assigned to the data processing registration
         /// </summary>
-        /// <param name="contractUuid"></param>
+        /// <param name="dprUuid"></param>
         /// <returns></returns>
         [HttpGet]
         [Route("{dprUuid}/roles")]
@@ -95,12 +94,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetAddRoleAssignments([NonEmptyGuid] Guid contractUuid)
+        public IHttpActionResult GetAddRoleAssignments([NonEmptyGuid] Guid dprUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
             return _dataProcessingRegistrationService
-                .GetByUuid(contractUuid)
+                .GetByUuid(dprUuid)
                 .Select(x => x.Rights.ToList())
                 .Select(rights => rights.Select(right => right.MapExtendedRoleAssignmentResponse()))
                 .Match(Ok, FromOperationError);
