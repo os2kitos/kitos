@@ -296,8 +296,7 @@ namespace Core.ApplicationServices.GDPR
                     if (!string.IsNullOrEmpty(nameQuery))
                         query = query.ByPartOfNameOrCvr(nameQuery);
 
-                    return query.ByPartOfNameOrCvr(nameQuery)
-                        .OrderBy(x => x.Id)
+                    return query.OrderBy(x => x.Id)
                         .Take(pageSize)
                         .OrderBy(x => x.Name)
                         .ToList();
