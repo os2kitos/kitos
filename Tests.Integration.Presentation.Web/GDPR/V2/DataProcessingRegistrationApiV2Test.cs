@@ -1430,6 +1430,31 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Contains(processors, x => x.Uuid == organization.Uuid);
         }
 
+        [Fact]
+        public async Task Can_Get_Available_Systems()
+        {
+            //Arrange
+            var systemPrefix = A<Guid>().ToString("N");
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var system1Name = $"{systemPrefix}{1}";
+            var system2Name = $"{systemPrefix}{2}";
+            var filteredOutSystemName = A<string>();
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(system1Name, organizationId, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(system2Name, organizationId, AccessModifier.Public);
+            var filteredOutSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(filteredOutSystemName, organizationId, AccessModifier.Public);
+            var usage1 = await ItSystemHelper.TakeIntoUseAsync(system1.Id, organizationId);
+            var usage2 = await ItSystemHelper.TakeIntoUseAsync(system2.Id, organizationId);
+            await ItSystemHelper.TakeIntoUseAsync(filteredOutSystem.Id, organizationId);
+
+            //Act
+            var dtos = (await DataProcessingRegistrationV2Helper.GetAvailableSystemsAsync(registration.Uuid, systemPrefix)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            dtos.Select(x => new { x.Uuid, x.Name }).ToExpectedObject().ShouldMatch(new[] { new { usage1.Uuid, system1.Name }, new { usage2.Uuid, system2.Name } });
+        }
+
         #region Asserters
 
         private static void AssertExternalReferenceResults(List<ExternalReferenceDataWriteRequestDTO> expected, DataProcessingRegistrationResponseDTO actual)

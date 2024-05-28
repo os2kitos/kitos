@@ -228,17 +228,22 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<IEnumerable<ItSystemUsage>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
         {
-            if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
             return WithReadAccess<IEnumerable<ItSystemUsage>>(id, registration =>
-                _systemAssignmentService
-                    .GetApplicableSystems(registration)
-                    .Where(x => x.ItSystem.Name.Contains(nameQuery))
-                    .OrderBy(x => x.Id)
-                    .Take(pageSize)
-                    .OrderBy(x => x.ItSystem.Name)
-                    .ToList()
+                {
+                    var query = _systemAssignmentService
+                        .GetApplicableSystems(registration);
+
+                    if (!string.IsNullOrEmpty(nameQuery))
+                        query = query.Where(x => x.ItSystem.Name.Contains(nameQuery));
+
+                    return query
+                        .OrderBy(x => x.Id)
+                        .Take(pageSize)
+                        .OrderBy(x => x.ItSystem.Name)
+                        .ToList();
+                }
             );
         }
 
