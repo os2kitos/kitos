@@ -114,8 +114,7 @@ namespace Tests.Integration.Presentation.Web.KLE
             }
         }
 
-        /*TODO: Fix with task: https://os2web.atlassian.net/browse/KITOSUDV-5102
-         [Fact]
+        [Fact]
         public async Task Put_Removes_Obsoleted_TaskRefs_And_Patches_Uuids_And_Adds_Any_Missing()
         {
             //Arrange
@@ -290,7 +289,7 @@ namespace Tests.Integration.Presentation.Web.KLE
             VerifyTaskRefUsageKeys(expectedInheritedKeys, actualInheritedKeys);
             VerifyTaskRefUsageKeys(expectedOptOutKeys, actualOptOutKeys);
         }
-*/
+
         private static void ClearUUID(TaskRef taskRef)
         {
             taskRef.Uuid = Guid.Empty;
