@@ -1359,6 +1359,76 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             MatchExpectedAssignment(roleAssignment, assignment2, users.Last());
         }
 
+        [Fact]
+        public async Task Can_Get_Available_DataProcessors()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, "87654321", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            //Act
+            var processors = await DataProcessingRegistrationV2Helper.GetAvailableDataProcessors(registration.Uuid, orgPrefix);
+
+            //Assert
+            Assert.Contains(processors, x => x.Uuid == organization.Uuid);
+        }
+
+
+        [Fact]
+        public async Task Can_Get_Available_DataProcessors_By_Cvr()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var orgCvr = A<string>().Substring(0, 9);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, orgCvr, OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            //Act
+            var processors = await DataProcessingRegistrationV2Helper.GetAvailableDataProcessors(registration.Uuid, orgCvr);
+
+            //Assert
+            Assert.Contains(processors, x => x.Uuid == organization.Uuid);
+        }
+
+        [Fact]
+        public async Task Can_Get_Available_SubDataProcessors()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, "87654321", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            //Act
+            var processors = await DataProcessingRegistrationV2Helper.GetAvailableSubDataProcessors(registration.Uuid, orgPrefix);
+
+            //Assert
+            Assert.Contains(processors, x => x.Uuid == organization.Uuid);
+        }
+
+        [Fact]
+        public async Task Can_Get_Available_SubDataProcessors_By_Cvr()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var orgCvr = A<string>().Substring(0, 9);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, orgCvr, OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            //Act
+            var processors = await DataProcessingRegistrationV2Helper.GetAvailableSubDataProcessors(registration.Uuid, orgCvr);
+
+            //Assert
+            Assert.Contains(processors, x => x.Uuid == organization.Uuid);
+        }
 
         #region Asserters
 
