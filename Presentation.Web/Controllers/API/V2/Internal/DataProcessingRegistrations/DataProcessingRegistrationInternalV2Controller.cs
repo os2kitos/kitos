@@ -21,6 +21,7 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistrations
@@ -195,6 +196,28 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
             return _dataProcessingRegistrationService
                 .GetSubDataProcessorsWhichCanBeAssigned(idResult.Value, nameQuery, pageSize)
                 .Match(organizations => Ok(organizations.Select(x => x.MapShallowOrganizationResponseDTO()).ToList()), FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("{dprUuid}/system-usages/available")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetAvailableSystemUsages([NonEmptyGuid] Guid dprUuid,
+            [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        {
+            if (!ModelState.IsValid) 
+                return BadRequest(ModelState);
+
+            var idResult = _identityResolver.ResolveDbId<DataProcessingRegistration>(dprUuid);
+            if (idResult.IsNone)
+                return FromOperationError(new OperationError(
+                    $"DataProcessingRegistration with uuid: {dprUuid} was not found", OperationFailure.NotFound));
+
+            return _dataProcessingRegistrationService.GetSystemsWhichCanBeAssigned(idResult.Value, nameQuery, pageSize)
+                .Match(systemUsages => Ok(systemUsages.Select(x => x.MapIdentityNamePairDTO()).ToList()), FromOperationError);
         }
     }
 }
