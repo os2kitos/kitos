@@ -646,6 +646,9 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             updatedDpr = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, registration.Uuid);
             Assert.Equal(contract2.Uuid, updatedDpr.General.MainContract.Uuid);
             Assert.Equal(contract2.Name, updatedDpr.General.MainContract.Name);
+            Assert.Equal(2, updatedDpr.General.AssociatedContracts.Count());
+            Assert.Contains(updatedDpr.General.AssociatedContracts, x => x.Uuid == contract1.Uuid);
+            Assert.Contains(updatedDpr.General.AssociatedContracts, x => x.Uuid == contract2.Uuid);
             Assert.False(updatedDpr.General.Valid);
 
             //Act - set contract to null

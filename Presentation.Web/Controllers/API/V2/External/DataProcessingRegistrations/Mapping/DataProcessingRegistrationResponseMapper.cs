@@ -110,6 +110,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 HasSubDataProcessors = MapYesNoUndecided(dataProcessingRegistration.HasSubDataProcessors),
                 SubDataProcessors = dataProcessingRegistration.AssignedSubDataProcessors?.Select(ToSubDataProcessorDTO).ToList(),
                 MainContract = dataProcessingRegistration.MainContract?.MapIdentityNamePairDTO(),
+                AssociatedContracts = dataProcessingRegistration.AssociatedContracts?.Select(x => x.MapIdentityNamePairDTO()).ToList(),
                 Valid = dataProcessingRegistration.IsActiveAccordingToMainContract
             };
         }
