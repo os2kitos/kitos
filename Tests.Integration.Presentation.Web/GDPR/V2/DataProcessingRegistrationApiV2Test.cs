@@ -1512,6 +1512,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(expectedOversightDates.Count, actualOversightDates.Count);
             for (var i = 0; i < expectedOversightDates.Count; i++)
             {
+                Assert.NotNull(actualOversightDates[i].Uuid);
                 Assert.Equal(expectedOversightDates[i].CompletedAt, actualOversightDates[i].CompletedAt);
                 Assert.Equal(expectedOversightDates[i].Remark, actualOversightDates[i].Remark);
             }
