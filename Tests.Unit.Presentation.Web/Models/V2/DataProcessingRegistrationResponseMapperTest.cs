@@ -430,6 +430,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 .Zip(orderedActual, (expected, actual) => new { expected, actual })
                 .ToList())
             {
+                Assert.Equal(comparison.expected.Uuid, comparison.actual.Uuid);
                 Assert.Equal(comparison.expected.OversightDate, comparison.actual.CompletedAt);
                 Assert.Equal(comparison.expected.OversightRemark, comparison.actual.Remark);
             }
