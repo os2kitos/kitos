@@ -34,6 +34,7 @@
 
     app.controller('system.EditOrg', ['$scope', '$http', '$stateParams', 'selectedOrgUnits', 'responsibleOrgUnitId', 'orgUnitsTree', 'notify', 'user', "entityMapper", 
         function ($scope, $http, $stateParams, selectedOrgUnits, responsibleOrgUnitId, orgUnitsTree, notify, user, entityMapper) {
+            $scope.unmappedUnits = angular.copy(orgUnitsTree);
             $scope.orgUnitsTree = orgUnitsTree;
             $scope.selectedOrgUnits = entityMapper.mapApiResponseToSelect2ViewModel(selectedOrgUnits);
             $scope.responsibleOrgUnit = _.find($scope.selectedOrgUnits, (orgUnit) => orgUnit.id === responsibleOrgUnitId);
@@ -99,6 +100,17 @@
                 }
             };
 
+            $scope.levelChange = function () {
+                var levels = $scope.availableLevels;
+                var units = angular.copy($scope.unmappedUnits);
+                if (!levels || levels <= 0) {
+                    $scope.orgUnitsTree = units;
+                    return;
+                }
+
+                $scope.orgUnitsTree = filterLevels(units, levels);
+            }
+
             function searchTree(element, matchingId) {
                 if (element.id == matchingId) {
                     return element;
@@ -119,6 +131,17 @@
                     found.selected = true;
                 }
             });
+
+            function filterLevels(nodes, level) {
+                if (level <= 0) {
+                    return [];
+                }
+
+                nodes.forEach(node => {
+                    node.children = filterLevels(node.children, level - 1);
+                })
+                return nodes;
+            }
         }
     ]);
 })(angular, app);

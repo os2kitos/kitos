@@ -84,6 +84,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         {
             return new OversightDateDTO
             {
+                Uuid = oversightDate.Uuid,
                 CompletedAt = oversightDate.OversightDate,
                 Remark = oversightDate.OversightRemark
             };
