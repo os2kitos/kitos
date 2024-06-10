@@ -29,7 +29,7 @@ namespace Core.ApplicationServices.Model.Notification
                 return ReadOnly();
 
             var canBeModified = notification.IsActive && notification.AdviceType == AdviceType.Repeat;
-            var canBeDeactivated = canBeModified && !notification.AdviceSent.Any();
+            var canBeDeactivated = canBeModified;
             var canBeDeleted = notification.CanBeDeleted;
             return new NotificationPermissions(true, canBeModified, canBeDeleted, canBeDeactivated);
         }
