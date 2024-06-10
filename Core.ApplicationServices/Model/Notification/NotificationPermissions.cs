@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Core.Abstractions.Types;
+﻿using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.Advice;
@@ -26,7 +25,7 @@ namespace Core.ApplicationServices.Model.Notification
             if (!authorizationContext.AllowReads(relatedEntity))
                 return Empty;
             if (!authorizationContext.AllowModify(relatedEntity))
-                return ReadOnly();
+                return ReadOnly()
 
             var canBeModified = notification.IsActive && notification.AdviceType == AdviceType.Repeat;
             var canBeDeactivated = canBeModified;

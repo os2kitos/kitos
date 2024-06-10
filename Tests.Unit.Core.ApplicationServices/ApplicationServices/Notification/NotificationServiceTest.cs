@@ -729,7 +729,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         [InlineData(RelatedEntityType.itSystemUsage)]
         [InlineData(RelatedEntityType.dataProcessingRegistration)]
         [InlineData(RelatedEntityType.itContract)]
-        public void GetAccessRights_CanBeDeactivated_Is_False_When_Any_AdviceSent(RelatedEntityType relatedEntityType)
+        public void GetAccessRights_CanBeDeactivated_Is_True_When_Any_AdviceSent(RelatedEntityType relatedEntityType)
         {
             //Arrange
             var notificationUuid = A<Guid>();
@@ -750,7 +750,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var accessRights = result.Value;
             Assert.True(accessRights.Read);
             Assert.True(accessRights.Modify);
-            Assert.False(accessRights.Deactivate);
+            Assert.True(accessRights.Deactivate);
             Assert.False(accessRights.Delete);
         }
 
