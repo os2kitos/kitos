@@ -39,7 +39,7 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     $Env:StsOrganisationPort = $parameters["StsOrganisationPort"]
     $Env:StsAdressePort = $parameters["StsAdressePort"]
     $Env:StsBrugerPort = $parameters["StsBrugerPort"]
-    $Env:StsAdressePort = $parameters["StsAdressePort"]
+    $Env:StsPersonPort = $parameters["StsPersonPort"]
     $Env:StsOrganisationSystemPort = $parameters["StsOrganisationSystemPort"]
     $Env:StsOrganisationCertificateThumbprint = $parameters["StsOrganisationCertificateThumbprint"]
     
