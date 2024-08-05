@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel;
@@ -11,6 +12,7 @@ using Core.DomainServices.Model.Options;
 using Core.DomainServices.Options;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
@@ -34,6 +36,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpGet]
         [Route("overview")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageOptionsDTO))]
         public HttpResponseMessage Get(int organizationId)
         {
             if (GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
