@@ -1,10 +1,16 @@
-﻿using System.Web.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Web.Http;
+using Core.Abstractions.Types;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
+using Core.DomainServices.Generic;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1.OData.LocalOptionControllers
 {
@@ -12,9 +18,12 @@ namespace Presentation.Web.Controllers.API.V1.OData.LocalOptionControllers
     [ODataRoutePrefix("LocalItContractRoles")]
     public class LocalItContractRolesController : LocalOptionBaseController<LocalItContractRole, ItContractRight, ItContractRole>
     {
-        public LocalItContractRolesController(IGenericRepository<LocalItContractRole> repository, IGenericRepository<ItContractRole> optionsRepository)
+        private readonly IEntityIdentityResolver _identityResolver;
+
+        public LocalItContractRolesController(IGenericRepository<LocalItContractRole> repository, IGenericRepository<ItContractRole> optionsRepository, IEntityIdentityResolver identityResolver)
             : base(repository, optionsRepository)
         {
+            _identityResolver = identityResolver;
         }
 
         [EnableQuery]
@@ -34,5 +43,17 @@ namespace Presentation.Web.Controllers.API.V1.OData.LocalOptionControllers
 
         [ODataRoute]
         public override IHttpActionResult Delete(int organizationId, int key) => base.Delete(organizationId, key);
+
+        [EnableQuery]
+        [ODataRoute]
+        [SwaggerResponse(HttpStatusCode.OK, type:typeof(IEnumerable<ItContractRole>))]
+        public IHttpActionResult GetByUuid(Guid organizationUuid)
+        {
+            var roleIdResult = _identityResolver.ResolveDbId<ItContractRole>(organizationUuid);
+            if (roleIdResult.IsNone)
+                return FromOperationError(new OperationError("Invalid organization uuid", OperationFailure.NotFound));
+
+            return base.GetByOrganizationId(roleIdResult.Value);
+        }
     }
 }
