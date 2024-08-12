@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using Core.Abstractions.Types;
 using Core.DomainModel.LocalOptions;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Generic;
@@ -27,7 +28,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         public HttpResponseMessage GetByOrganizationUuid(Guid organizationUuid)
         {
-            var organizationIdResult = _entityIdentityResolver.ResolveDbId<ItContractRole>(organizationUuid);
+            var organizationIdResult = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
             if (organizationIdResult.IsNone)
                 return FromOperationError(new OperationError("Invalid organization uuid", OperationFailure.NotFound));
 
