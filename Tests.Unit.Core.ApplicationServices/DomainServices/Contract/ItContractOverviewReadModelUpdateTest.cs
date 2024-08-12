@@ -369,7 +369,8 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 Parent = isNull ? null : new ItContract()
                 {
                     Id = A<int>(),
-                    Name = A<string>()
+                    Name = A<string>(),
+                    Uuid = A<Guid>()
                 }
             };
             var itContractOverviewReadModel = new ItContractOverviewReadModel();
@@ -381,12 +382,14 @@ namespace Tests.Unit.Core.DomainServices.Contract
             if (isNull)
             {
                 Assert.Null(itContractOverviewReadModel.ParentContractName);
+                Assert.Null(itContractOverviewReadModel.ParentContractUuid);
                 Assert.Null(itContractOverviewReadModel.ParentContractId);
             }
             else
             {
                 Assert.Equal(itContract.Parent.Id, itContractOverviewReadModel.ParentContractId);
                 Assert.Equal(itContract.Parent.Name, itContractOverviewReadModel.ParentContractName);
+                Assert.Equal(itContract.Parent.Uuid, itContractOverviewReadModel.ParentContractUuid);
             }
         }
 

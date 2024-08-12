@@ -57,6 +57,7 @@ namespace Core.DomainServices.Contract
             destination.SupplierName = source.Supplier?.Name;
 
             //Parent contract
+            destination.ParentContractUuid = source.Parent?.Uuid;
             destination.ParentContractName = source.Parent?.Name;
             destination.ParentContractId = source.Parent?.Id;
 

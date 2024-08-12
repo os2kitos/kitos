@@ -25,6 +25,7 @@ namespace Core.DomainModel.ItContract.Read
         public string ContractId { get; set; }
         public int? ParentContractId { get; set; } //for linking
         public string ParentContractName { get; set; } //for presentation
+        public Guid? ParentContractUuid { get; set; }
         public int? CriticalityId { get; set; }     // For filtering
         public string CriticalityName { get; set; } // For sorting
         public int? ResponsibleOrgUnitId { get; set; }     // For filtering

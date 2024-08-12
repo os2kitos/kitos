@@ -1038,9 +1038,9 @@
     <Compile Include="Migrations\202406060800551_oversight-date-uuid.designer.cs">
       <DependentUpon>202406060800551_oversight-date-uuid.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202408120812165_ContractDataProcessingAgreementUuid.cs" />
-    <Compile Include="Migrations\202408120812165_ContractDataProcessingAgreementUuid.designer.cs">
-      <DependentUpon>202408120812165_ContractDataProcessingAgreementUuid.cs</DependentUpon>
+    <Compile Include="Migrations\202408121228045_ItContractReferenceUuids.cs" />
+    <Compile Include="Migrations\202408121228045_ItContractReferenceUuids.designer.cs">
+      <DependentUpon>202408121228045_ItContractReferenceUuids.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1058,8 +1058,8 @@
     <EmbeddedResource Include="Migrations\202406060800551_oversight-date-uuid.resx">
       <DependentUpon>202406060800551_oversight-date-uuid.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202408120812165_ContractDataProcessingAgreementUuid.resx">
-      <DependentUpon>202408120812165_ContractDataProcessingAgreementUuid.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202408121228045_ItContractReferenceUuids.resx">
+      <DependentUpon>202408121228045_ItContractReferenceUuids.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_DataRow.sql" />
     <EmbeddedResource Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.resx">
