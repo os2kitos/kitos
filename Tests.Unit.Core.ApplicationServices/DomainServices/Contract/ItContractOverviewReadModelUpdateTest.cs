@@ -663,7 +663,7 @@ namespace Tests.Unit.Core.DomainServices.Contract
         public void Apply_Can_Map_DataProcessingRegistrations()
         {
             //Arrange
-            var dataProcessingRegistrations = Many<string>().Select(name => new DataProcessingRegistration { Id = A<int>(), Name = name }).ToList();
+            var dataProcessingRegistrations = Many<string>().Select(name => new DataProcessingRegistration { Id = A<int>(), Name = name, Uuid = A<Guid>()}).ToList();
 
             //Set all but the first to concluded
             var expectedAgreements = dataProcessingRegistrations.Skip(1).ToList();
@@ -685,7 +685,8 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 Assert.Contains(itContractOverviewReadModel.DataProcessingAgreements,
                     rm =>
                         rm.DataProcessingRegistrationId == dataProcessingRegistration.Id &&
-                        rm.DataProcessingRegistrationName == dataProcessingRegistration.Name
+                        rm.DataProcessingRegistrationName == dataProcessingRegistration.Name &&
+                        rm.DataProcessingRegistrationUuid == dataProcessingRegistration.Uuid
                 );
             }
             Assert.Equal(string.Join(", ", expectedAgreements.Select(x => x.Name)), itContractOverviewReadModel.DataProcessingAgreementsCsv);
