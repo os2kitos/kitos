@@ -51,20 +51,28 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsOptional()
                 .HasIndexAnnotation("IX_DPR_TransferToInsecureThirdCountries", 0);
 
-            Property(x => x.BasisForTransfer)
+            Property(x => x.BasisForTransferName)
                 .HasMaxLength(DataProcessingRegistrationConstraints.MaxReadmodelPropertyLength)
                 .IsOptional()
                 .HasIndexAnnotation("IX_DRP_BasisForTransfer", 0);
+
+            Property(x => x.BasisForTransferUuid)
+                .IsOptional()
+                .HasIndexAnnotation("IX_DRP_BasisForTransferUuid", 0);
 
             Property(x => x.OversightInterval)
                 .IsOptional()
                 .HasIndexAnnotation("IX_DPR_OversightInterval", 0);
 
 
-            Property(x => x.DataResponsible)
+            Property(x => x.DataResponsibleName)
                 .HasMaxLength(DataProcessingRegistrationConstraints.MaxReadmodelPropertyLength)
                 .IsOptional()
                 .HasIndexAnnotation("IX_DPR_DataResponsible", 0);
+
+            Property(x => x.DataResponsibleUuid)
+                .IsOptional()
+                .HasIndexAnnotation("IX_DPR_DataResponsibleUuid", 0);
 
             Property(x => x.OversightOptionNamesAsCsv).IsOptional();
 
