@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class dataprocessingreadmodeluuids : IMigrationMetadata
+    public sealed partial class DataProcessingRegistrationChoiceTypeUuids : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(dataprocessingreadmodeluuids));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(DataProcessingRegistrationChoiceTypeUuids));
         
         string IMigrationMetadata.Id
         {
-            get { return "202408140755383_data-processing-read-model-uuids"; }
+            get { return "202408141140345_DataProcessingRegistrationChoiceTypeUuids"; }
         }
         
         string IMigrationMetadata.Source
