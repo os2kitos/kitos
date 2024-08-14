@@ -355,6 +355,7 @@
   <ItemGroup>
     <Compile Include="Controllers\API\V1\Auth\AuthorizeController.cs" />
     <Compile Include="Controllers\API\V1\ExtendedApiController.cs" />
+    <Compile Include="Controllers\API\V2\Internal\ItContracts\GridLocalItContractRolesV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\CommandPermissionsResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\EntityWithDeactivatedStatusMapper.cs" />

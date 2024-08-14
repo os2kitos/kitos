@@ -57,6 +57,7 @@ namespace Core.DomainServices.Contract
             destination.SupplierName = source.Supplier?.Name;
 
             //Parent contract
+            destination.ParentContractUuid = source.Parent?.Uuid;
             destination.ParentContractName = source.Parent?.Name;
             destination.ParentContractId = source.Parent?.Id;
 
@@ -371,6 +372,7 @@ namespace Core.DomainServices.Contract
         private static void PatchDataProcessingRegistration(ItContractOverviewReadModelDataProcessingAgreement destinationItem, DataProcessingRegistration sourceItem)
         {
             destinationItem.DataProcessingRegistrationName = sourceItem.Name; //Update the name
+            destinationItem.DataProcessingRegistrationUuid = sourceItem.Uuid; //Update the name
         }
 
         private void MapRoleAssignments(ItContract source, ItContractOverviewReadModel destination)

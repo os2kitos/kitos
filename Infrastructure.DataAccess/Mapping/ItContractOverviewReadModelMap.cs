@@ -41,6 +41,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(ItContractConstraints.MaxNameLength)
                 .HasIndexAnnotation("IX_ParentContract_Name");
 
+            Property(x => x.ParentContractUuid)
+                .IsOptional()
+                .HasIndexAnnotation("IX_ParentContract_Uuid");
+
             MapOptionTypeReference<CriticalityType>(p => p.CriticalityId, p => p.CriticalityName);
 
             Property(x => x.ResponsibleOrgUnitId)
