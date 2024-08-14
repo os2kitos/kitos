@@ -63,6 +63,7 @@ namespace Core.DomainServices.Contract
 
             //Criticality
             destination.CriticalityId = source.Criticality?.Id;
+            destination.CriticalityUuid = source.Criticality?.Uuid;
             destination.CriticalityName = source.Criticality?.Name;
 
             //ResponsibleOrgUnit
@@ -71,18 +72,22 @@ namespace Core.DomainServices.Contract
 
             //Contract type
             destination.ContractTypeId = source.ContractType?.Id;
+            destination.ContractTypeUuid = source.ContractType?.Uuid;
             destination.ContractTypeName = source.ContractType?.Name;
 
             //Contract template
             destination.ContractTemplateId = source.ContractTemplate?.Id;
+            destination.ContractTemplateUuid = source.ContractTemplate?.Uuid;
             destination.ContractTemplateName = source.ContractTemplate?.Name;
 
             //purchase form
             destination.PurchaseFormId = source.PurchaseForm?.Id;
+            destination.PurchaseFormUuid = source.PurchaseForm?.Uuid;
             destination.PurchaseFormName = source.PurchaseForm?.Name;
 
             //procurement strategy
             destination.ProcurementStrategyId = source.ProcurementStrategy?.Id;
+            destination.ProcurementStrategyUuid = source.ProcurementStrategy?.Uuid;
             destination.ProcurementStrategyName = source.ProcurementStrategy?.Name;
 
             //procurement plan
@@ -107,10 +112,12 @@ namespace Core.DomainServices.Contract
 
             //Payment model
             destination.PaymentModelId = source.PaymentModel?.Id;
+            destination.PaymentModelUuid = source.PaymentModel?.Uuid;
             destination.PaymentModelName = source.PaymentModel?.Name;
 
             //Payment frequency
             destination.PaymentFrequencyId = source.PaymentFreqency?.Id;
+            destination.PaymentFrequencyUuid = source.PaymentFreqency?.Uuid;
             destination.PaymentFrequencyName = source.PaymentFreqency?.Name;
 
             //Duration
@@ -118,10 +125,12 @@ namespace Core.DomainServices.Contract
 
             //Payment frequency
             destination.OptionExtendId = source.OptionExtend?.Id;
+            destination.OptionExtendUuid = source.OptionExtend?.Uuid;
             destination.OptionExtendName = source.OptionExtend?.Name;
 
             //Termination deadline
             destination.TerminationDeadlineId = source.TerminationDeadline?.Id;
+            destination.TerminationDeadlineUuid = source.TerminationDeadline?.Uuid;
             destination.TerminationDeadlineName = source.TerminationDeadline?.Name;
         }
 

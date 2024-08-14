@@ -404,7 +404,8 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 Criticality = isNull ? null : new CriticalityType
                 {
                     Id = A<int>(),
-                    Name = A<string>()
+                    Name = A<string>(),
+                    Uuid = A<Guid>()
                 }
             };
             var itContractOverviewReadModel = new ItContractOverviewReadModel();
@@ -416,11 +417,13 @@ namespace Tests.Unit.Core.DomainServices.Contract
             if (isNull)
             {
                 Assert.Null(itContractOverviewReadModel.CriticalityId);
+                Assert.Null(itContractOverviewReadModel.CriticalityUuid);
                 Assert.Null(itContractOverviewReadModel.CriticalityName);
             }
             else
             {
                 Assert.Equal(itContract.Criticality.Id, itContractOverviewReadModel.CriticalityId);
+                Assert.Equal(itContract.Criticality.Uuid, itContractOverviewReadModel.CriticalityUuid);
                 Assert.Equal(itContract.Criticality.Name, itContractOverviewReadModel.CriticalityName);
             }
         }
@@ -468,7 +471,8 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 ContractType = isNull ? null : new ItContractType
                 {
                     Id = A<int>(),
-                    Name = A<string>()
+                    Name = A<string>(),
+                    Uuid = A<Guid>()
                 }
             };
             var itContractOverviewReadModel = new ItContractOverviewReadModel();
@@ -480,11 +484,13 @@ namespace Tests.Unit.Core.DomainServices.Contract
             if (isNull)
             {
                 Assert.Null(itContractOverviewReadModel.ContractTypeId);
+                Assert.Null(itContractOverviewReadModel.ContractTypeUuid);
                 Assert.Null(itContractOverviewReadModel.ContractTypeName);
             }
             else
             {
                 Assert.Equal(itContract.ContractType.Id, itContractOverviewReadModel.ContractTypeId);
+                Assert.Equal(itContract.ContractType.Uuid, itContractOverviewReadModel.ContractTypeUuid);
                 Assert.Equal(itContract.ContractType.Name, itContractOverviewReadModel.ContractTypeName);
             }
         }
@@ -500,7 +506,8 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 ContractTemplate = isNull ? null : new ItContractTemplateType
                 {
                     Id = A<int>(),
-                    Name = A<string>()
+                    Name = A<string>(),
+                    Uuid = A<Guid>()
                 }
             };
             var itContractOverviewReadModel = new ItContractOverviewReadModel();
@@ -512,11 +519,13 @@ namespace Tests.Unit.Core.DomainServices.Contract
             if (isNull)
             {
                 Assert.Null(itContractOverviewReadModel.ContractTemplateId);
+                Assert.Null(itContractOverviewReadModel.ContractTemplateUuid);
                 Assert.Null(itContractOverviewReadModel.ContractTemplateName);
             }
             else
             {
                 Assert.Equal(itContract.ContractTemplate.Id, itContractOverviewReadModel.ContractTemplateId);
+                Assert.Equal(itContract.ContractTemplate.Uuid, itContractOverviewReadModel.ContractTemplateUuid);
                 Assert.Equal(itContract.ContractTemplate.Name, itContractOverviewReadModel.ContractTemplateName);
             }
         }
@@ -532,7 +541,8 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 PurchaseForm = isNull ? null : new PurchaseFormType
                 {
                     Id = A<int>(),
-                    Name = A<string>()
+                    Name = A<string>(),
+                    Uuid = A<Guid>()
                 }
             };
             var itContractOverviewReadModel = new ItContractOverviewReadModel();
@@ -544,11 +554,13 @@ namespace Tests.Unit.Core.DomainServices.Contract
             if (isNull)
             {
                 Assert.Null(itContractOverviewReadModel.PurchaseFormId);
+                Assert.Null(itContractOverviewReadModel.PurchaseFormUuid);
                 Assert.Null(itContractOverviewReadModel.PurchaseFormName);
             }
             else
             {
                 Assert.Equal(itContract.PurchaseForm.Id, itContractOverviewReadModel.PurchaseFormId);
+                Assert.Equal(itContract.PurchaseForm.Uuid, itContractOverviewReadModel.PurchaseFormUuid);
                 Assert.Equal(itContract.PurchaseForm.Name, itContractOverviewReadModel.PurchaseFormName);
             }
         }
@@ -564,7 +576,8 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 ProcurementStrategy = isNull ? null : new ProcurementStrategyType
                 {
                     Id = A<int>(),
-                    Name = A<string>()
+                    Name = A<string>(),
+                    Uuid = A<Guid>()
                 }
             };
             var itContractOverviewReadModel = new ItContractOverviewReadModel();
@@ -576,11 +589,13 @@ namespace Tests.Unit.Core.DomainServices.Contract
             if (isNull)
             {
                 Assert.Null(itContractOverviewReadModel.ProcurementStrategyId);
+                Assert.Null(itContractOverviewReadModel.ProcurementStrategyUuid);
                 Assert.Null(itContractOverviewReadModel.ProcurementStrategyName);
             }
             else
             {
                 Assert.Equal(itContract.ProcurementStrategy.Id, itContractOverviewReadModel.ProcurementStrategyId);
+                Assert.Equal(itContract.ProcurementStrategy.Uuid, itContractOverviewReadModel.ProcurementStrategyUuid);
                 Assert.Equal(itContract.ProcurementStrategy.Name, itContractOverviewReadModel.ProcurementStrategyName);
             }
         }
@@ -831,11 +846,13 @@ namespace Tests.Unit.Core.DomainServices.Contract
             if (isNull)
             {
                 Assert.Null(itContractOverviewReadModel.PaymentModelId);
+                Assert.Null(itContractOverviewReadModel.PaymentModelUuid);
                 Assert.Null(itContractOverviewReadModel.PaymentModelName);
             }
             else
             {
                 Assert.Equal(itContract.PaymentModel.Id, itContractOverviewReadModel.PaymentModelId);
+                Assert.Equal(itContract.PaymentModel.Uuid, itContractOverviewReadModel.PaymentModelUuid);
                 Assert.Equal(itContract.PaymentModel.Name, itContractOverviewReadModel.PaymentModelName);
             }
         }
@@ -851,7 +868,8 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 PaymentFreqency = isNull ? null : new PaymentFreqencyType
                 {
                     Id = A<int>(),
-                    Name = A<string>()
+                    Name = A<string>(),
+                    Uuid = A<Guid>()
                 }
             };
             var itContractOverviewReadModel = new ItContractOverviewReadModel();
@@ -863,11 +881,13 @@ namespace Tests.Unit.Core.DomainServices.Contract
             if (isNull)
             {
                 Assert.Null(itContractOverviewReadModel.PaymentFrequencyId);
+                Assert.Null(itContractOverviewReadModel.PaymentFrequencyUuid);
                 Assert.Null(itContractOverviewReadModel.PaymentFrequencyName);
             }
             else
             {
                 Assert.Equal(itContract.PaymentFreqency.Id, itContractOverviewReadModel.PaymentFrequencyId);
+                Assert.Equal(itContract.PaymentFreqency.Uuid, itContractOverviewReadModel.PaymentFrequencyUuid);
                 Assert.Equal(itContract.PaymentFreqency.Name, itContractOverviewReadModel.PaymentFrequencyName);
             }
         }
@@ -883,7 +903,8 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 OptionExtend = isNull ? null : new OptionExtendType
                 {
                     Id = A<int>(),
-                    Name = A<string>()
+                    Name = A<string>(),
+                    Uuid = A<Guid>()
                 }
             };
             var itContractOverviewReadModel = new ItContractOverviewReadModel();
@@ -895,11 +916,13 @@ namespace Tests.Unit.Core.DomainServices.Contract
             if (isNull)
             {
                 Assert.Null(itContractOverviewReadModel.OptionExtendId);
+                Assert.Null(itContractOverviewReadModel.OptionExtendUuid);
                 Assert.Null(itContractOverviewReadModel.OptionExtendName);
             }
             else
             {
                 Assert.Equal(itContract.OptionExtend.Id, itContractOverviewReadModel.OptionExtendId);
+                Assert.Equal(itContract.OptionExtend.Uuid, itContractOverviewReadModel.OptionExtendUuid);
                 Assert.Equal(itContract.OptionExtend.Name, itContractOverviewReadModel.OptionExtendName);
             }
         }
@@ -916,7 +939,8 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 TerminationDeadline = isNull ? null : new TerminationDeadlineType
                 {
                     Id = A<int>(),
-                    Name = A<string>()
+                    Name = A<string>(),
+                    Uuid = A<Guid>()
                 }
             };
             var itContractOverviewReadModel = new ItContractOverviewReadModel();
@@ -928,11 +952,13 @@ namespace Tests.Unit.Core.DomainServices.Contract
             if (isNull)
             {
                 Assert.Null(itContractOverviewReadModel.TerminationDeadlineId);
+                Assert.Null(itContractOverviewReadModel.TerminationDeadlineUuid);
                 Assert.Null(itContractOverviewReadModel.TerminationDeadlineName);
             }
             else
             {
                 Assert.Equal(itContract.TerminationDeadline.Id, itContractOverviewReadModel.TerminationDeadlineId);
+                Assert.Equal(itContract.TerminationDeadline.Uuid, itContractOverviewReadModel.TerminationDeadlineUuid);
                 Assert.Equal(itContract.TerminationDeadline.Name, itContractOverviewReadModel.TerminationDeadlineName);
             }
         }
