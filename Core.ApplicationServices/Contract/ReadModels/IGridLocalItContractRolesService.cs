@@ -7,6 +7,6 @@ namespace Core.ApplicationServices.Contract.ReadModels
 {
     public interface IGridLocalItContractRolesService
     {
-        Result<IEnumerable<ItContractRole>, OperationError> GetOverviewRoles(Guid organizationUuid)
+        Result<IEnumerable<ItContractRole>, OperationError> GetOverviewRoles(Guid organizationUuid);
     }
 }
