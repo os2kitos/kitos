@@ -165,8 +165,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(subDataProcessor.Name, readModel.SubDataProcessorNamesAsCsv);
             Assert.Equal(isAgreementConcluded, readModel.IsAgreementConcluded);
             Assert.Equal(transferToThirdCountries, readModel.TransferToInsecureThirdCountries);
-            Assert.Equal(basisForTransfer.Name, readModel.BasisForTransfer);
-            Assert.Equal(dataResponsibleOption.Name, readModel.DataResponsible);
+            Assert.Equal(basisForTransfer.Name, readModel.BasisForTransferName);
+            Assert.Equal(dataResponsibleOption.Name, readModel.DataResponsibleName);
             Assert.Equal(oversightOption.Name, readModel.OversightOptionNamesAsCsv);
             Assert.Equal(contractName, readModel.ContractNamesAsCsv);
             Assert.Equal(systemName, readModel.SystemNamesAsCsv);
