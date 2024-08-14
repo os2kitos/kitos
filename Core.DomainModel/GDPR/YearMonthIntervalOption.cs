@@ -2,9 +2,9 @@
 {
     public enum YearMonthIntervalOption
     {
-        BiYearly = 0,
+        Half_yearly = 0,
         Yearly = 1,
-        EveryOtherYear = 2,
+        Every_second_year = 2,
         Other = 3,
         Undecided = 4
     }
