@@ -11,9 +11,9 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         {
             Mapping = new EnumMap<OversightIntervalChoice, YearMonthIntervalOption>
             (
-                (OversightIntervalChoice.BiYearly, YearMonthIntervalOption.Half_yearly),
+                (OversightIntervalChoice.BiYearly, YearMonthIntervalOption.BiYearly),
                 (OversightIntervalChoice.Yearly, YearMonthIntervalOption.Yearly),
-                (OversightIntervalChoice.EveryOtherYear, YearMonthIntervalOption.Every_second_year),
+                (OversightIntervalChoice.EveryOtherYear, YearMonthIntervalOption.EveryOtherYear),
                 (OversightIntervalChoice.Other, YearMonthIntervalOption.Other),
                 (OversightIntervalChoice.Undecided, YearMonthIntervalOption.Undecided)
             );

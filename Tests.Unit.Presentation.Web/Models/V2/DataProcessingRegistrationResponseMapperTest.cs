@@ -458,9 +458,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             OversightIntervalChoice? expected = expectedFromSource switch
             {
-                YearMonthIntervalOption.Half_yearly => OversightIntervalChoice.BiYearly,
+                YearMonthIntervalOption.BiYearly => OversightIntervalChoice.BiYearly,
                 YearMonthIntervalOption.Yearly => OversightIntervalChoice.Yearly,
-                YearMonthIntervalOption.Every_second_year => OversightIntervalChoice.EveryOtherYear,
+                YearMonthIntervalOption.EveryOtherYear => OversightIntervalChoice.EveryOtherYear,
                 YearMonthIntervalOption.Other => OversightIntervalChoice.Other,
                 YearMonthIntervalOption.Undecided => OversightIntervalChoice.Undecided,
                 null => null,
