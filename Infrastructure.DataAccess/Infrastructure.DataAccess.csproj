@@ -1046,9 +1046,9 @@
     <Compile Include="Migrations\202408140740032_ItContractReadModelChoiceTypeUuids.designer.cs">
       <DependentUpon>202408140740032_ItContractReadModelChoiceTypeUuids.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202408140755383_data-processing-read-model-uuids.cs" />
-    <Compile Include="Migrations\202408140755383_data-processing-read-model-uuids.designer.cs">
-      <DependentUpon>202408140755383_data-processing-read-model-uuids.cs</DependentUpon>
+    <Compile Include="Migrations\202408141140345_DataProcessingRegistrationChoiceTypeUuids.cs" />
+    <Compile Include="Migrations\202408141140345_DataProcessingRegistrationChoiceTypeUuids.designer.cs">
+      <DependentUpon>202408141140345_DataProcessingRegistrationChoiceTypeUuids.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1072,8 +1072,8 @@
     <EmbeddedResource Include="Migrations\202408140740032_ItContractReadModelChoiceTypeUuids.resx">
       <DependentUpon>202408140740032_ItContractReadModelChoiceTypeUuids.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202408140755383_data-processing-read-model-uuids.resx">
-      <DependentUpon>202408140755383_data-processing-read-model-uuids.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202408141140345_DataProcessingRegistrationChoiceTypeUuids.resx">
+      <DependentUpon>202408141140345_DataProcessingRegistrationChoiceTypeUuids.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_DataRow.sql" />
     <EmbeddedResource Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.resx">
