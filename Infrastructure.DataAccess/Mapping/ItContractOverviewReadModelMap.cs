@@ -45,7 +45,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsOptional()
                 .HasIndexAnnotation("IX_ParentContract_Uuid");
 
-            MapOptionTypeReference<CriticalityType>(p => p.CriticalityId, p => p.CriticalityName);
+            MapOptionTypeReference<CriticalityType>(p => p.CriticalityId, p => p.CriticalityName, p => p.CriticalityUuid);
 
             Property(x => x.ResponsibleOrgUnitId)
                 .IsOptional()
@@ -66,13 +66,13 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.ContractSigner)
                 .IsOptional();
 
-            MapOptionTypeReference<ItContractType>(p => p.ContractTypeId, p => p.ContractTypeName);
+            MapOptionTypeReference<ItContractType>(p => p.ContractTypeId, p => p.ContractTypeName, p => p.ContractTypeUuid);
 
-            MapOptionTypeReference<ItContractTemplateType>(p => p.ContractTemplateId, p => p.ContractTemplateName);
+            MapOptionTypeReference<ItContractTemplateType>(p => p.ContractTemplateId, p => p.ContractTemplateName, p => p.ContractTemplateUuid);
 
-            MapOptionTypeReference<PurchaseFormType>(p => p.PurchaseFormId, p => p.PurchaseFormName);
+            MapOptionTypeReference<PurchaseFormType>(p => p.PurchaseFormId, p => p.PurchaseFormName, p => p.PurchaseFormUuid);
 
-            MapOptionTypeReference<ProcurementStrategyType>(p => p.ProcurementStrategyId, p => p.ProcurementStrategyName);
+            MapOptionTypeReference<ProcurementStrategyType>(p => p.ProcurementStrategyId, p => p.ProcurementStrategyName, p => p.ProcurementStrategyUuid);
 
             Property(x => x.ProcurementPlanYear)
                 .IsOptional()
@@ -140,9 +140,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsOptional()
                 .HasIndexAnnotation("IX_OperationRemunerationBegunDate");
 
-            MapOptionTypeReference<PaymentModelType>(p => p.PaymentModelId, p => p.PaymentModelName);
+            MapOptionTypeReference<PaymentModelType>(p => p.PaymentModelId, p => p.PaymentModelName, p => p.PaymentModelUuid);
 
-            MapOptionTypeReference<PaymentFreqencyType>(p => p.PaymentFrequencyId, p => p.PaymentFrequencyName);
+            MapOptionTypeReference<PaymentFreqencyType>(p => p.PaymentFrequencyId, p => p.PaymentFrequencyName, p => p.PaymentFrequencyUuid);
 
             Property(x => x.LatestAuditDate)
                 .IsOptional()
@@ -161,9 +161,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(100)
                 .HasIndexAnnotation("IX_Duration");
 
-            MapOptionTypeReference<OptionExtendType>(p => p.OptionExtendId, p => p.OptionExtendName);
+            MapOptionTypeReference<OptionExtendType>(p => p.OptionExtendId, p => p.OptionExtendName, p => p.OptionExtendUuid);
 
-            MapOptionTypeReference<TerminationDeadlineType>(p => p.TerminationDeadlineId, p => p.TerminationDeadlineName);
+            MapOptionTypeReference<TerminationDeadlineType>(p => p.TerminationDeadlineId, p => p.TerminationDeadlineName, p => p.TerminationDeadlineUuid);
 
             Property(x => x.IrrevocableTo)
                 .IsOptional()
@@ -195,7 +195,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("IX_ExpirationDate");
         }
 
-        private void MapOptionTypeReference<T>(Expression<Func<ItContractOverviewReadModel, int?>> idExpression, Expression<Func<ItContractOverviewReadModel, string>> nameExpression)
+        private void MapOptionTypeReference<T>(Expression<Func<ItContractOverviewReadModel, int?>> idExpression, Expression<Func<ItContractOverviewReadModel, string>> nameExpression, Expression<Func<ItContractOverviewReadModel, Guid?>> uuidExpression)
         {
             Property(idExpression)
                 .IsOptional()
@@ -204,6 +204,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsOptional()
                 .HasMaxLength(OptionEntity<T>.MaxNameLength)
                 .HasIndexAnnotation($"IX_{typeof(T).Name}_Name");
+            Property(uuidExpression)
+                .IsOptional()
+                .HasIndexAnnotation($"IX_{typeof(T).Name}_Uuid");
         }
     }
 }

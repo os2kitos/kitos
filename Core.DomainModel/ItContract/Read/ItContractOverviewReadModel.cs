@@ -27,6 +27,7 @@ namespace Core.DomainModel.ItContract.Read
         public string ParentContractName { get; set; } //for presentation
         public Guid? ParentContractUuid { get; set; }
         public int? CriticalityId { get; set; }     // For filtering
+        public Guid? CriticalityUuid { get; set; }     // For filtering
         public string CriticalityName { get; set; } // For sorting
         public int? ResponsibleOrgUnitId { get; set; }     // For filtering
         public string ResponsibleOrgUnitName { get; set; } // For sorting
@@ -34,12 +35,16 @@ namespace Core.DomainModel.ItContract.Read
         public string SupplierName { get; set; }
         public string ContractSigner { get; set; }
         public int? ContractTypeId { get; set; }     // For filtering
+        public Guid? ContractTypeUuid { get; set; }     // For filtering
         public string ContractTypeName { get; set; } // For sorting
         public int? ContractTemplateId { get; set; }     // For filtering
+        public Guid? ContractTemplateUuid { get; set; }     // For filtering
         public string ContractTemplateName { get; set; } // For sorting
         public int? PurchaseFormId { get; set; }     // For filtering
+        public Guid? PurchaseFormUuid { get; set; }     // For filtering
         public string PurchaseFormName { get; set; } // For sorting
         public int? ProcurementStrategyId { get; set; }     // For filtering
+        public Guid? ProcurementStrategyUuid { get; set; }     // For filtering
         public string ProcurementStrategyName { get; set; } // For sorting
         public int? ProcurementPlanYear { get; set; }
         public int? ProcurementPlanQuarter { get; set; }
@@ -60,8 +65,10 @@ namespace Core.DomainModel.ItContract.Read
         public int AccumulatedOtherCost { get; set; }
         public DateTime? OperationRemunerationBegunDate { get; set; }
         public int? PaymentModelId { get; set; }     // For filtering
+        public Guid? PaymentModelUuid { get; set; }     // For filtering
         public string PaymentModelName { get; set; } // For sorting
         public int? PaymentFrequencyId { get; set; }     // For filtering
+        public Guid? PaymentFrequencyUuid { get; set; }     // For filtering
         public string PaymentFrequencyName { get; set; } // For sorting
         public DateTime? LatestAuditDate { get; set; }
         public int AuditStatusWhite { get; set; }
@@ -70,8 +77,10 @@ namespace Core.DomainModel.ItContract.Read
         public int AuditStatusGreen { get; set; }
         public string Duration { get; set; }
         public int? OptionExtendId { get; set; }     // For filtering
+        public Guid? OptionExtendUuid { get; set; }     // For filtering
         public string OptionExtendName { get; set; } // For sorting
         public int? TerminationDeadlineId { get; set; }     // For filtering
+        public Guid? TerminationDeadlineUuid { get; set; }     // For filtering
         public string TerminationDeadlineName { get; set; } // For sorting
         public DateTime? IrrevocableTo { get; set; }
         public DateTime? TerminatedAt { get; set; }
