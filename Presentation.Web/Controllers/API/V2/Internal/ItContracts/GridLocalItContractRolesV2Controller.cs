@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using System.Web.Http;
 using Core.ApplicationServices.Contract.ReadModels;
+using Presentation.Web.Models.API.V2.Internal.Response.ItContract;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 {
@@ -20,7 +22,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
         [Route("{organizationUuid}")]
         public IHttpActionResult GetByOrganizationUuid(Guid organizationUuid)
         {
-            return _gridLocalItContractRolesService.GetOverviewRoles(organizationUuid).Match(Ok, FromOperationError);
+            return _gridLocalItContractRolesService.GetOverviewRoles(organizationUuid)
+                .Select(roles => roles
+                    .Select(role => new LocalItContractRolesResponseDTO(role.Id, role.Uuid, role.Name))
+                    .ToList())
+                .Match(Ok, FromOperationError);
         }
     }
 }
