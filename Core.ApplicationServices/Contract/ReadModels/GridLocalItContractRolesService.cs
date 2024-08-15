@@ -24,7 +24,7 @@ namespace Core.ApplicationServices.Contract.ReadModels
             _optionsRepository = optionsRepository;
         }
 
-        public Result<IEnumerable<(string Name, Guid Uuid, int Id)>, OperationError> GetOverviewRoles(Guid organizationUuid)
+        public Result<IEnumerable<ItContractRole>, OperationError> GetOverviewRoles(Guid organizationUuid)
         {
             var organizationIdResult = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
             if (organizationIdResult.IsNone)
@@ -60,7 +60,7 @@ namespace Core.ApplicationServices.Contract.ReadModels
 
                 returnList.Add(item);
             }
-            return returnList.Select(x => (x.Name,x.Uuid, x.Id)).ToList();
+            return returnList;
         }
     }
 }
