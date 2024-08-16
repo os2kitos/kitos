@@ -13,7 +13,9 @@ using Core.ApplicationServices.Model.GDPR;
 using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Model.Options;
 using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
@@ -31,13 +33,16 @@ namespace Presentation.Web.Controllers.API.V1
     {
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
         private readonly IDataProcessingRegistrationOptionsApplicationService _dataProcessingRegistrationOptionsApplicationService;
+        private readonly IEntityIdentityResolver _identityResolver;
 
         public DataProcessingRegistrationController(
             IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
-            IDataProcessingRegistrationOptionsApplicationService dataProcessingRegistrationOptionsApplicationService)
+            IDataProcessingRegistrationOptionsApplicationService dataProcessingRegistrationOptionsApplicationService,
+            IEntityIdentityResolver identityResolver)
         {
             _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
             _dataProcessingRegistrationOptionsApplicationService = dataProcessingRegistrationOptionsApplicationService;
+            _identityResolver = identityResolver;
         }
 
         protected override IEntity GetEntity(int id) => _dataProcessingRegistrationApplicationService.Get(id).Match(dataProcessingRegistration => dataProcessingRegistration, _ => null);
@@ -168,6 +173,23 @@ namespace Presentation.Web.Controllers.API.V1
                 .Select<IEnumerable<BusinessRoleDTO>>(result => ToDTOs(result.roles, result.registration.OrganizationId).ToList())
                 .Match(Ok, FromOperationError);
 
+        }
+
+        [HttpGet]
+        [Route("available-roles/organization-uuid")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<BusinessRoleDTO>))]
+        public HttpResponseMessage GetAvailableRolesByOrganizationUuid(Guid organizationUuid)
+        {
+            var orgDbId = _identityResolver.ResolveDbId<Organization>(organizationUuid);
+            if (orgDbId.IsNone)
+            {
+                return FromOperationError(new OperationError("Invalid org id", OperationFailure.NotFound));
+            }
+
+            return _dataProcessingRegistrationApplicationService
+                .GetAvailableRoles(orgDbId.Value)
+                .Select<IEnumerable<BusinessRoleDTO>>(result => ToDTOs(result.roles, result.registration.OrganizationId).ToList())
+                .Match(Ok, FromOperationError);
         }
 
         [HttpGet]
