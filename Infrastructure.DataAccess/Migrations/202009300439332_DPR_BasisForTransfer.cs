@@ -9,8 +9,8 @@
         {
             RenameColumn(table: "dbo.DataProcessingRegistrations", name: "DataProcessingBasisForTransferOption_Id", newName: "BasisForTransferId");
             RenameIndex(table: "dbo.DataProcessingRegistrations", name: "IX_DataProcessingBasisForTransferOption_Id", newName: "IX_BasisForTransferId");
-            AddColumn("dbo.DataProcessingRegistrationReadModels", "BasisForTransferName", c => c.String(maxLength: 100));
-            CreateIndex("dbo.DataProcessingRegistrationReadModels", "BasisForTransferName", name: "IX_DRP_BasisForTransfer");
+            AddColumn("dbo.DataProcessingRegistrationReadModels", "BasisForTransfer", c => c.String(maxLength: 100));
+            CreateIndex("dbo.DataProcessingRegistrationReadModels", "BasisForTransfer", name: "IX_DRP_BasisForTransfer");
         }
         
         public override void Down()
