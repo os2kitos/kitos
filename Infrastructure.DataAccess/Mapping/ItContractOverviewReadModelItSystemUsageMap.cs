@@ -14,7 +14,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("IX_ItContract_Read_System_Name");
 
             Property(x => x.ItSystemUsageUuid)
-                .HasIndexAnnotation("IX_ItContract_Read_System_Uuid");
+                .HasIndexAnnotation("IX_ItContract_Read_System_Usage_Uuid");
             
             Property(x => x.ItSystemUsageSystemUuid)
                 .HasMaxLength(50)
