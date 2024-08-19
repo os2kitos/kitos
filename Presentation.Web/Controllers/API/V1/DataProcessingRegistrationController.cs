@@ -176,23 +176,6 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpGet]
-        [Route("{uuid}/available-roles-by-uuid")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<BusinessRoleDTO>))]
-        public HttpResponseMessage GetAvailableRolesByUuid(Guid uuid)
-        {
-            var dprDbId = _identityResolver.ResolveDbId<DataProcessingRegistration>(uuid);
-            if (dprDbId.IsNone)
-            {
-                return FromOperationError(new OperationError("Invalid data processing registration uuid", OperationFailure.NotFound));
-            }
-
-            return _dataProcessingRegistrationApplicationService
-                .GetAvailableRoles(dprDbId.Value)
-                .Select<IEnumerable<BusinessRoleDTO>>(result => ToDTOs(result.roles, result.registration.OrganizationId).ToList())
-                .Match(Ok, FromOperationError);
-        }
-
-        [HttpGet]
         [Route("{id}/available-roles/{roleId}/applicable-users")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<UserWithEmailDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -590,19 +573,28 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetDataProcessingRegistrationOptions(int organizationId)
+        public HttpResponseMessage GetDataProcessingRegistrationOptionsById(int organizationId)
         {
-            return _dataProcessingRegistrationOptionsApplicationService
-                .GetAssignableDataProcessingRegistrationOptions(organizationId)
-                .Select<DataProcessingOptionsDTO>(result => new DataProcessingOptionsDTO
-                {
-                    DataResponsibleOptions = ToDTOs(result.DataResponsibleOptions, organizationId).ToList(),
-                    ThirdCountryOptions = ToDTOs(result.ThirdCountryOptions, organizationId).ToList(),
-                    BasisForTransferOptions = ToDTOs(result.BasisForTransferOptions, organizationId).ToList(),
-                    Roles = result.Roles.Select(ToDto).ToList(),
-                    OversightOptions = ToDTOs(result.OversightOptions, organizationId).ToList()
-                })
-                .Match(Ok, FromOperationError);
+            return GetDataProcessingRegistrationOptions(organizationId);
+        }
+
+        [HttpGet]
+        [Route("available-options-in/organization/{organizationUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetDataProcessingRegistrationOptionsByUuid(Guid organizationUuid)
+        {
+            var orgIdResult = _identityResolver.ResolveDbId<Organization>(organizationUuid);
+            if (orgIdResult.IsNone)
+            {
+                return FromOperationError(new OperationError("Invalid organization uuid", OperationFailure.NotFound));
+            }
+
+            var organizationId = orgIdResult.Value;
+            
+            return GetDataProcessingRegistrationOptions(organizationId);
         }
 
         [HttpPatch]
@@ -827,6 +819,21 @@ namespace Presentation.Web.Controllers.API.V1
             return _dataProcessingRegistrationApplicationService
                 .RemoveMainContract(id)
                 .Match(_ => Ok(), FromOperationError);
+        }
+
+        private HttpResponseMessage GetDataProcessingRegistrationOptions(int organizationId)
+        {
+            return _dataProcessingRegistrationOptionsApplicationService
+                .GetAssignableDataProcessingRegistrationOptions(organizationId)
+                .Select(result => new DataProcessingOptionsDTO
+                {
+                    DataResponsibleOptions = ToDTOs(result.DataResponsibleOptions, organizationId).ToList(),
+                    ThirdCountryOptions = ToDTOs(result.ThirdCountryOptions, organizationId).ToList(),
+                    BasisForTransferOptions = ToDTOs(result.BasisForTransferOptions, organizationId).ToList(),
+                    Roles = result.Roles.Select(ToDto).ToList(),
+                    OversightOptions = ToDTOs(result.OversightOptions, organizationId).ToList()
+                })
+                .Match(Ok, FromOperationError);
         }
 
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
@@ -1064,9 +1071,9 @@ namespace Presentation.Web.Controllers.API.V1
             };
         }
 
-        private static BusinessRoleDTO ToDto(OptionDescriptor<DataProcessingRegistrationRole> availableRole)
+        private static DataProcessingBusinessRoleDTO ToDto(OptionDescriptor<DataProcessingRegistrationRole> availableRole)
         {
-            return new BusinessRoleDTO(availableRole.Option.Id, availableRole.Option.Name, false, availableRole.Option.HasWriteAccess, availableRole.Description);
+            return new DataProcessingBusinessRoleDTO(availableRole.Option.Id, availableRole.Option.Name, false, availableRole.Option.HasWriteAccess, availableRole.Description, availableRole.Option.Uuid);
         }
 
         private static BusinessRoleDTO ToDTO(DataProcessingRegistrationRole role, IReadOnlyDictionary<int, Maybe<string>> localDescriptionOverrides, ISet<int> idsOfAvailableRoles)
