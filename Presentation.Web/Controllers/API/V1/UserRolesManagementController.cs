@@ -90,6 +90,23 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(FromOperationError, Ok);
         }
 
+        /// <summary>
+        /// Copies the selected roles to another user
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="userId"></param>
+        /// <param name="assignmentsToCopy"></param>
+        [Route("range/copy")]
+        [HttpPatch]
+        public HttpResponseMessage PatchCopyToAnotherUser(int organizationId, int userId, TransferRightsRequestDTO assignmentsToCopy)
+        {
+            var changeParameters = CreateChangeParameters(assignmentsToCopy.AdminRoles, assignmentsToCopy.BusinessRights);
+
+            return _rightsService
+                .CopyRights(userId, assignmentsToCopy.ToUserId, organizationId, changeParameters)
+                .Match(FromOperationError, Ok);
+        }
+
         private static OrganizationUserRoleAssignmentsDTO ToRoleAssignmentsDTO(UserRightsAssignments arg)
         {
             return new OrganizationUserRoleAssignmentsDTO

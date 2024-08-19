@@ -719,6 +719,7 @@ namespace Tests.Unit.Core.DomainServices.Contract
                 ItSystemUsage = new()
                 {
                     Id = A<int>(),
+                    Uuid = A<Guid>(),
                     ItSystem = new ItSystem()
                     {
                         Id = A<int>(),
@@ -746,6 +747,7 @@ namespace Tests.Unit.Core.DomainServices.Contract
                         rm.ItSystemUsageId == systemUsage.ItSystemUsage.Id &&
                         rm.ItSystemUsageSystemUuid == systemUsage.ItSystemUsage.ItSystem.Uuid.ToString("D") &&
                         rm.ItSystemUsageName == systemUsage.ItSystemUsage.ItSystem.Name &&
+                        rm.ItSystemUsageUuid == systemUsage.ItSystemUsage.Uuid &&
                         rm.ItSystemIsDisabled == systemUsage.ItSystemUsage.ItSystem.Disabled
                 );
             }
