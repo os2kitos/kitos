@@ -176,18 +176,18 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpGet]
-        [Route("available-roles")]
+        [Route("{uuid}/available-roles-by-uuid")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<BusinessRoleDTO>))]
-        public HttpResponseMessage GetAvailableRolesByOrganizationUuid(Guid organizationUuid)
+        public HttpResponseMessage GetAvailableRolesByUuid(Guid uuid)
         {
-            var orgDbId = _identityResolver.ResolveDbId<Organization>(organizationUuid);
-            if (orgDbId.IsNone)
+            var dprDbId = _identityResolver.ResolveDbId<DataProcessingRegistration>(uuid);
+            if (dprDbId.IsNone)
             {
-                return FromOperationError(new OperationError("Invalid org id", OperationFailure.NotFound));
+                return FromOperationError(new OperationError("Invalid data processing registration uuid", OperationFailure.NotFound));
             }
 
             return _dataProcessingRegistrationApplicationService
-                .GetAvailableRoles(orgDbId.Value)
+                .GetAvailableRoles(dprDbId.Value)
                 .Select<IEnumerable<BusinessRoleDTO>>(result => ToDTOs(result.roles, result.registration.OrganizationId).ToList())
                 .Match(Ok, FromOperationError);
         }
