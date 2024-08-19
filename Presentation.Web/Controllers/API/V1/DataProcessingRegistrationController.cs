@@ -176,7 +176,7 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [HttpGet]
-        [Route("available-roles/organization-uuid")]
+        [Route("available-roles")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<BusinessRoleDTO>))]
         public HttpResponseMessage GetAvailableRolesByOrganizationUuid(Guid organizationUuid)
         {
