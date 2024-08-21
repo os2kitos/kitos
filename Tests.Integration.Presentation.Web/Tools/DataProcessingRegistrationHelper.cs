@@ -122,7 +122,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<BusinessRoleDTO>>();
         }
-
+        
         public static async Task<IEnumerable<UserWithEmailDTO>> GetAvailableUsersAsync(int id, int roleId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -318,6 +318,16 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/available-options-in/{organizationId}"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<DataProcessingOptionsDTO>();
+        }
+
+        public static async Task<DataProcessingOptionsDTO> GetAvailableOptionsByUuidRequestAsync(Guid organizationUuid, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/data-processing-registration/available-options-in/organization/{organizationUuid}"), cookie);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsKitosApiResponseAsync<DataProcessingOptionsDTO>();
