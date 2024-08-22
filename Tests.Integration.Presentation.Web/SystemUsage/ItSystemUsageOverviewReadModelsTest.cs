@@ -110,7 +110,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             var dataProcessingRegistrationName = A<string>();
 
-            var system = await PrepareItSystem(systemName, systemPreviousName, organizationId, organizationName, AccessModifier.Public);
+            var system = await PrepareItSystem(systemName, systemPreviousName, systemDescription, organizationId, organizationName, AccessModifier.Public);
             var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
             var systemId = DatabaseAccess.GetEntityId<Core.DomainModel.ItSystem.ItSystem>(system.Uuid);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(systemId, organizationId);
