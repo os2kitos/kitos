@@ -294,6 +294,7 @@ namespace Core.DomainServices.Contract
                         var itSystemUsage = new ItContractOverviewReadModelItSystemUsage
                         {
                             ItSystemUsageId = newItem.Id,
+                            ItSystemUsageUuid = newItem.Uuid,
                             Parent = destination
                         };
                         PatchItSystemUsage(itSystemUsage, newItem);

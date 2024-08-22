@@ -763,10 +763,28 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Can_Get_AvailableDataResponsibleOptions()
         {
             //Arrange
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var orgId = TestEnvironment.DefaultOrganizationId;
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(orgId, A<string>());
 
             //Act
-            var dataProcessingOptions = await DataProcessingRegistrationHelper.GetAvailableOptionsRequestAsync(registrationDto.Id);
+            var dataProcessingOptions = await DataProcessingRegistrationHelper.GetAvailableOptionsRequestAsync(orgId);
+
+            //Assert
+            Assert.NotEmpty(dataProcessingOptions.DataResponsibleOptions);
+        }
+
+        [Fact]
+        public async Task Can_Get_AvailableDataResponsibleOptions_By_Uuid()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, "87654321", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(organization.Id, A<string>());
+
+            //Act
+            var dataProcessingOptions = await DataProcessingRegistrationHelper.GetAvailableOptionsByUuidRequestAsync(organization.Uuid);
 
             //Assert
             Assert.NotEmpty(dataProcessingOptions.DataResponsibleOptions);
