@@ -166,6 +166,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 OrganizationId = A<int>(),
                 Name = A<string>(),
+                Description = A<string>,
                 Disabled = A<bool>(),
                 PreviousName= A<string>(),
                 Parent = parentSystem,
@@ -317,6 +318,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.riskAssesmentDate, readModel.RiskAssessmentDate);
             Assert.Equal(systemUsage.PlannedRiskAssessmentDate, readModel.PlannedRiskAssessmentDate);
             Assert.Equal(systemUsage.ItSystem.PreviousName, readModel.SystemPreviousName);
+            Assert.Equal(systemUsage.ItSystem.Description, readModel.SystemDescription);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
