@@ -166,7 +166,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 OrganizationId = A<int>(),
                 Name = A<string>(),
-                Description = A<string>,
+                Description = A<string>(),
                 Disabled = A<bool>(),
                 PreviousName= A<string>(),
                 Parent = parentSystem,
