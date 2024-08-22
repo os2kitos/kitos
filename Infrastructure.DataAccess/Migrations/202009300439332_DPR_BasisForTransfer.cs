@@ -16,7 +16,7 @@
         public override void Down()
         {
             DropIndex("dbo.DataProcessingRegistrationReadModels", "IX_DRP_BasisForTransfer");
-            DropColumn("dbo.DataProcessingRegistrationReadModels", "BasisForTransferName");
+            DropColumn("dbo.DataProcessingRegistrationReadModels", "BasisForTransfer");
             RenameIndex(table: "dbo.DataProcessingRegistrations", name: "IX_BasisForTransferId", newName: "IX_DataProcessingBasisForTransferOption_Id");
             RenameColumn(table: "dbo.DataProcessingRegistrations", name: "BasisForTransferId", newName: "DataProcessingBasisForTransferOption_Id");
         }
