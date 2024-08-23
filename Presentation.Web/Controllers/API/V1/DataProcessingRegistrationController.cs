@@ -13,7 +13,9 @@ using Core.ApplicationServices.Model.GDPR;
 using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Model.Options;
 using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
@@ -31,13 +33,16 @@ namespace Presentation.Web.Controllers.API.V1
     {
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
         private readonly IDataProcessingRegistrationOptionsApplicationService _dataProcessingRegistrationOptionsApplicationService;
+        private readonly IEntityIdentityResolver _identityResolver;
 
         public DataProcessingRegistrationController(
             IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
-            IDataProcessingRegistrationOptionsApplicationService dataProcessingRegistrationOptionsApplicationService)
+            IDataProcessingRegistrationOptionsApplicationService dataProcessingRegistrationOptionsApplicationService,
+            IEntityIdentityResolver identityResolver)
         {
             _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
             _dataProcessingRegistrationOptionsApplicationService = dataProcessingRegistrationOptionsApplicationService;
+            _identityResolver = identityResolver;
         }
 
         protected override IEntity GetEntity(int id) => _dataProcessingRegistrationApplicationService.Get(id).Match(dataProcessingRegistration => dataProcessingRegistration, _ => null);
@@ -568,19 +573,28 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetDataProcessingRegistrationOptions(int organizationId)
+        public HttpResponseMessage GetDataProcessingRegistrationOptionsById(int organizationId)
         {
-            return _dataProcessingRegistrationOptionsApplicationService
-                .GetAssignableDataProcessingRegistrationOptions(organizationId)
-                .Select<DataProcessingOptionsDTO>(result => new DataProcessingOptionsDTO
-                {
-                    DataResponsibleOptions = ToDTOs(result.DataResponsibleOptions, organizationId).ToList(),
-                    ThirdCountryOptions = ToDTOs(result.ThirdCountryOptions, organizationId).ToList(),
-                    BasisForTransferOptions = ToDTOs(result.BasisForTransferOptions, organizationId).ToList(),
-                    Roles = result.Roles.Select(ToDto).ToList(),
-                    OversightOptions = ToDTOs(result.OversightOptions, organizationId).ToList()
-                })
-                .Match(Ok, FromOperationError);
+            return GetDataProcessingRegistrationOptions(organizationId);
+        }
+
+        [HttpGet]
+        [Route("available-options-in/organization/{organizationUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetDataProcessingRegistrationOptionsByUuid(Guid organizationUuid)
+        {
+            var orgIdResult = _identityResolver.ResolveDbId<Organization>(organizationUuid);
+            if (orgIdResult.IsNone)
+            {
+                return FromOperationError(new OperationError("Invalid organization uuid", OperationFailure.NotFound));
+            }
+
+            var organizationId = orgIdResult.Value;
+            
+            return GetDataProcessingRegistrationOptions(organizationId);
         }
 
         [HttpPatch]
@@ -805,6 +819,21 @@ namespace Presentation.Web.Controllers.API.V1
             return _dataProcessingRegistrationApplicationService
                 .RemoveMainContract(id)
                 .Match(_ => Ok(), FromOperationError);
+        }
+
+        private HttpResponseMessage GetDataProcessingRegistrationOptions(int organizationId)
+        {
+            return _dataProcessingRegistrationOptionsApplicationService
+                .GetAssignableDataProcessingRegistrationOptions(organizationId)
+                .Select(result => new DataProcessingOptionsDTO
+                {
+                    DataResponsibleOptions = ToDTOs(result.DataResponsibleOptions, organizationId).ToList(),
+                    ThirdCountryOptions = ToDTOs(result.ThirdCountryOptions, organizationId).ToList(),
+                    BasisForTransferOptions = ToDTOs(result.BasisForTransferOptions, organizationId).ToList(),
+                    Roles = result.Roles.Select(ToDto).ToList(),
+                    OversightOptions = ToDTOs(result.OversightOptions, organizationId).ToList()
+                })
+                .Match(Ok, FromOperationError);
         }
 
         private static IEnumerable<UserWithEmailDTO> ToDTOs(IEnumerable<User> users)
@@ -1042,9 +1071,9 @@ namespace Presentation.Web.Controllers.API.V1
             };
         }
 
-        private static BusinessRoleDTO ToDto(OptionDescriptor<DataProcessingRegistrationRole> availableRole)
+        private static DataProcessingBusinessRoleDTO ToDto(OptionDescriptor<DataProcessingRegistrationRole> availableRole)
         {
-            return new BusinessRoleDTO(availableRole.Option.Id, availableRole.Option.Name, false, availableRole.Option.HasWriteAccess, availableRole.Description);
+            return new DataProcessingBusinessRoleDTO(availableRole.Option.Id, availableRole.Option.Name, false, availableRole.Option.HasWriteAccess, availableRole.Description, availableRole.Option.Uuid);
         }
 
         private static BusinessRoleDTO ToDTO(DataProcessingRegistrationRole role, IReadOnlyDictionary<int, Maybe<string>> localDescriptionOverrides, ISet<int> idsOfAvailableRoles)

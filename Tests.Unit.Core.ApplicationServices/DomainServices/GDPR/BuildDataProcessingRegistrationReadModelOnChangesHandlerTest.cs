@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.BackgroundJobs;
+﻿using Core.Abstractions.Types;
+using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
@@ -19,16 +20,24 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         private readonly Mock<IDataProcessingRegistrationReadModelRepository> _repository;
         private readonly BuildDataProcessingRegistrationReadModelOnChangesHandler _sut;
         private readonly Mock<IPendingReadModelUpdateRepository> _pendingUpdatesRepository;
+        private readonly Mock<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>> _basisForTransferOptionService;
+        private readonly Mock<IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption>> _dataResponsibleOptionService;
 
         public BuildDataProcessingRegistrationReadModelOnChangesHandlerTest()
         {
+
             _repository = new Mock<IDataProcessingRegistrationReadModelRepository>();
             _pendingUpdatesRepository = new Mock<IPendingReadModelUpdateRepository>();
+            _basisForTransferOptionService =
+                new Mock<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>>();
+            _dataResponsibleOptionService =
+                new Mock<IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption>>();
+
             _sut = new BuildDataProcessingRegistrationReadModelOnChangesHandler(_repository.Object,
                 new DataProcessingRegistrationReadModelUpdate(
                     Mock.Of<IGenericRepository<DataProcessingRegistrationRoleAssignmentReadModel>>(),
-                    new Mock<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>>().Object,
-                    new Mock<IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption>>().Object,
+                    _basisForTransferOptionService.Object,
+                    _dataResponsibleOptionService.Object,
                     new Mock<IOptionsService<DataProcessingRegistration, DataProcessingOversightOption>>().Object),
                 _pendingUpdatesRepository.Object);
         }
@@ -36,13 +45,27 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         [Fact]
         public void Handle_Created_Adds_New_ReadModel()
         {
+            var dataResponsible = new DataProcessingDataResponsibleOption
+            {
+                Name = A<string>()
+            };
+            var basisForTransfer = new DataProcessingBasisForTransferOption
+            {
+                Name = A<string>()
+            };
             //Arrange
             var registration = new DataProcessingRegistration
             {
                 Id = A<int>(),
                 Name = A<string>(),
-                OrganizationId = A<int>()
+                OrganizationId = A<int>(),
+                DataResponsible = dataResponsible,
+                BasisForTransfer = basisForTransfer
             };
+            _basisForTransferOptionService.Setup(_ => _.GetOption(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(Maybe<(DataProcessingBasisForTransferOption, bool)>.Some((basisForTransfer, true)));
+            _dataResponsibleOptionService.Setup(_ => _.GetOption(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(Maybe<(DataProcessingDataResponsibleOption, bool)>.Some((dataResponsible, true)));
 
             //Act
             _sut.Handle(new EntityCreatedEvent<DataProcessingRegistration>(registration));

@@ -76,11 +76,13 @@ namespace Core.DomainServices.GDPR
         private void PatchBasisForTransfer(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.BasisForTransfer = GetNameOfOption(source, source.BasisForTransfer, _basisForTransferService);
+            destination.BasisForTransferUuid = source.BasisForTransfer?.Uuid;
         }
 
         private void PatchDataResponsible(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.DataResponsible = GetNameOfOption(source, source.DataResponsible, _dataResponsibleService);
+            destination.DataResponsibleUuid = source.DataResponsible?.Uuid;
         }
 
         private static void PatchTransferToInsecureThirdCountries(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

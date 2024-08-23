@@ -160,19 +160,19 @@ namespace Tests.Integration.Presentation.Web.Contract
             Assert.Equal(changes.Concluded.Date, readModel.Concluded);
             Assert.Equal(changes.ExpirationDate.Date, readModel.ExpirationDate);
             AssertReferencedEntity(_supplier.Id, _supplier.Name, readModel.SupplierId, readModel.SupplierName);
-            AssertReferencedEntity(parentContract.Id, parentContract.Name, readModel.ParentContractId, readModel.ParentContractName);
-            AssertReferencedEntity(criticality.Id, criticality.Name, readModel.CriticalityId, readModel.CriticalityName);
+            AssertReferencedEntity(parentContract.Id, parentContract.Name, readModel.ParentContractId, readModel.ParentContractName, parentContract.Uuid, readModel.ParentContractUuid);
+            AssertReferencedEntity(criticality.Id, criticality.Name, readModel.CriticalityId, readModel.CriticalityName, criticality.Uuid, readModel.CriticalityUuid);
             AssertReferencedEntity(organizationUnit.Id, organizationUnit.Name, readModel.ResponsibleOrgUnitId, readModel.ResponsibleOrgUnitName);
-            AssertReferencedEntity(contractType.Id, contractType.Name, readModel.ContractTypeId, readModel.ContractTypeName);
-            AssertReferencedEntity(contractTemplate.Id, contractTemplate.Name, readModel.ContractTemplateId, readModel.ContractTemplateName);
-            AssertReferencedEntity(purchaseForm.Id, purchaseForm.Name, readModel.PurchaseFormId, readModel.PurchaseFormName);
-            AssertReferencedEntity(procurementStrategy.Id, procurementStrategy.Name, readModel.ProcurementStrategyId, readModel.ProcurementStrategyName);
+            AssertReferencedEntity(contractType.Id, contractType.Name, readModel.ContractTypeId, readModel.ContractTypeName, contractType.Uuid, readModel.ContractTypeUuid);
+            AssertReferencedEntity(contractTemplate.Id, contractTemplate.Name, readModel.ContractTemplateId, readModel.ContractTemplateName, contractTemplate.Uuid, readModel.ContractTemplateUuid);
+            AssertReferencedEntity(purchaseForm.Id, purchaseForm.Name, readModel.PurchaseFormId, readModel.PurchaseFormName, purchaseForm.Uuid, readModel.PurchaseFormUuid);
+            AssertReferencedEntity(procurementStrategy.Id, procurementStrategy.Name, readModel.ProcurementStrategyId, readModel.ProcurementStrategyName, procurementStrategy.Uuid, readModel.ProcurementStrategyUuid);
             Assert.Equal(changes.ProcurementPlanQuarter, readModel.ProcurementPlanQuarter);
             Assert.Equal(changes.ProcurementPlanYear, readModel.ProcurementPlanYear);
-            AssertReferencedEntity(paymentModel.Id, paymentModel.Name, readModel.PaymentModelId, readModel.PaymentModelName);
-            AssertReferencedEntity(paymentFrequency.Id, paymentFrequency.Name, readModel.PaymentFrequencyId, readModel.PaymentFrequencyName);
-            AssertReferencedEntity(optionExtend.Id, optionExtend.Name, readModel.OptionExtendId, readModel.OptionExtendName);
-            AssertReferencedEntity(terminationDeadline.Id, terminationDeadline.Name, readModel.TerminationDeadlineId, readModel.TerminationDeadlineName);
+            AssertReferencedEntity(paymentModel.Id, paymentModel.Name, readModel.PaymentModelId, readModel.PaymentModelName, paymentModel.Uuid, readModel.PaymentModelUuid);
+            AssertReferencedEntity(paymentFrequency.Id, paymentFrequency.Name, readModel.PaymentFrequencyId, readModel.PaymentFrequencyName, paymentFrequency.Uuid, readModel.PaymentFrequencyUuid);
+            AssertReferencedEntity(optionExtend.Id, optionExtend.Name, readModel.OptionExtendId, readModel.OptionExtendName, optionExtend.Uuid, readModel.OptionExtendUuid);
+            AssertReferencedEntity(terminationDeadline.Id, terminationDeadline.Name, readModel.TerminationDeadlineId, readModel.TerminationDeadlineName, terminationDeadline.Uuid, readModel.TerminationDeadlineUuid);
             Assert.Equal("Løbende", readModel.Duration);
             Assert.Equal(referenceDto.ExternalReferenceId, readModel.ActiveReferenceExternalReferenceId);
             Assert.Equal(referenceDto.Title, readModel.ActiveReferenceTitle);
@@ -205,10 +205,15 @@ namespace Tests.Integration.Presentation.Web.Contract
                 Assert.Contains(expectedName, dpas);
         }
 
-        private static void AssertReferencedEntity(int idFromModel, string nameFromModel, int? idFromReadModel, string nameFromReadModel)
+        private static void AssertReferencedEntity(int idFromModel, string nameFromModel, int? idFromReadModel, string nameFromReadModel, Guid? uuidFromModel = null, Guid? uuidFromReadModel = null)
         {
             Assert.Equal(idFromModel, idFromReadModel);
             Assert.Equal(nameFromModel, nameFromReadModel);
+            if (uuidFromModel != null)
+            {
+                Assert.Equal(uuidFromModel, uuidFromReadModel);
+
+            }
         }
 
         private async Task<OrganizationDTO> CreateOrganizationAsync(OrganizationTypeKeys orgType)

@@ -12,6 +12,8 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.DataProcessingRegistrationName)
                 .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)
                 .HasIndexAnnotation("IX_ItContract_Read_Dpr_Name");
+            Property(x => x.DataProcessingRegistrationUuid)
+                .HasIndexAnnotation("IX_ItContract_Read_Dpr_Uuid");
         }
     }
 }

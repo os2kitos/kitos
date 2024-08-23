@@ -50,11 +50,14 @@ namespace Core.DomainModel.GDPR.Read
 
         public DateTime? LatestOversightDate { get; set; }
 
-        public string BasisForTransfer { get; set; }
+        public string BasisForTransfer{ get; set; }
+
+        public Guid? BasisForTransferUuid { get; set; }
 
         public YearMonthIntervalOption? OversightInterval { get; set; }
 
-        public string DataResponsible { get; set; }
+        public string DataResponsible{ get; set; }
+        public Guid? DataResponsibleUuid { get; set; }
 
         public string OversightOptionNamesAsCsv { get; set; }
 

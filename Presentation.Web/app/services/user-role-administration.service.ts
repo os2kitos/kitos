@@ -4,6 +4,7 @@
         getAssignedRoles(organizationId: number, userId: number): ng.IPromise<Models.Users.UserRoleAssigmentDTO>;
         removeAssignedRoles(organizationId: number, userId: number, rolesToRemove: Models.Users.UserRoleAssigmentDTO): ng.IPromise<boolean>;
         transferAssignedRoles(organizationId: number, userId: number, toUserId: number, rolesToTransfer: Models.Users.UserRoleAssigmentDTO): ng.IPromise<boolean>;
+        copyAssignedRoles(organizationId: number, userId: number, toUserId: number, rolesToTransfer: Models.Users.UserRoleAssigmentDTO): ng.IPromise<boolean>;
         removeUser(organizationId: number, userId: number): ng.IPromise<boolean>;
     }
 
@@ -83,6 +84,22 @@
                             toUserId: toUserId,
                             adminRoles: rolesToTransfer.administrativeAccessRoles,
                             businessRights: rolesToTransfer.rights
+                        }))
+                .executeAsync()
+                .then(() => true, () => false);
+        }
+
+        copyAssignedRoles(organizationId: number,
+            userId: number,
+            toUserId: number,
+            rolesToCopy: Models.Users.UserRoleAssigmentDTO): angular.IPromise<boolean> {
+            return this.apiUseCaseFactory
+                .createUpdate("Rettigheder",
+                    () => this.genericApiWrapper.patch(this.getBaseUri(organizationId, userId, "/range/copy"),
+                        {
+                            toUserId: toUserId,
+                            adminRoles: rolesToCopy.administrativeAccessRoles,
+                            businessRights: rolesToCopy.rights
                         }))
                 .executeAsync()
                 .then(() => true, () => false);
