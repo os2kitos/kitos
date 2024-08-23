@@ -80,7 +80,7 @@
 
         const states = [
             {
-                id: "local-config.current-org.edit-current-org-roles",
+                id: "local-config.org.edit-unit-roles",
                 urlSuffix: "edit-organisation-roles"
             },
             {
