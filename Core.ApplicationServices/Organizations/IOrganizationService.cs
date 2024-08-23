@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -47,5 +48,6 @@ namespace Core.ApplicationServices.Organizations
 
         Result<IEnumerable<Organization>, OperationError> GetUserOrganizations(int userId);
         Result<bool, OperationError> CanActiveUserModifyCvr(Guid organizationUuid);
+        Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid organizationUuid);
     }
 }
