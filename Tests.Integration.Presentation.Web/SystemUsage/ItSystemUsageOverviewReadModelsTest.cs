@@ -84,6 +84,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             var systemName = A<string>();
             var systemPreviousName = A<string>();
+            var systemDescription = A<string>();
             var systemDisabled = A<bool>();
 
             var systemParentName = A<string>();
@@ -109,7 +110,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             var dataProcessingRegistrationName = A<string>();
 
-            var system = await PrepareItSystem(systemName, systemPreviousName, organizationId, organizationName, AccessModifier.Public);
+            var system = await PrepareItSystem(systemName, systemPreviousName, systemDescription, organizationId, organizationName, AccessModifier.Public);
             var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
             var systemId = DatabaseAccess.GetEntityId<Core.DomainModel.ItSystem.ItSystem>(system.Uuid);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(systemId, organizationId);
@@ -287,6 +288,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // From System
             Assert.Equal(systemName, readModel.SystemName);
             Assert.Equal(systemPreviousName, readModel.SystemPreviousName);
+            Assert.Equal(systemDescription, readModel.SystemDescription);
             Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
             Assert.Equal(businessType.Id, readModel.ItSystemBusinessTypeId);
@@ -1010,7 +1012,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             return x.OrganizationUnitId == organizationUnit1.Id && x.OrganizationUnitUuid == organizationUnit1.Uuid && x.OrganizationUnitName == organizationUnit1.Name;
         }
 
-        private static async Task<ItSystemResponseDTO> PrepareItSystem(string systemName, string systemPreviousName, int organizationId, string organizationName, AccessModifier accessModifier)
+        private static async Task<ItSystemResponseDTO> PrepareItSystem(string systemName, string systemPreviousName, string systemDescription, int organizationId, string organizationName, AccessModifier accessModifier)
         {
             var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, organizationName,
                 TestCvr, OrganizationTypeKeys.Virksomhed, accessModifier);
@@ -1019,7 +1021,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             {
                 OrganizationUuid = organization.Uuid,
                 Name = systemName,
-                PreviousName = systemPreviousName
+                PreviousName = systemPreviousName,
+                Description = systemDescription
             });
             return system;
         }

@@ -64,6 +64,7 @@ namespace Core.DomainServices.SystemUsage
             destination.ExternalSystemUuid = source.ItSystem.ExternalUuid;
             destination.OrganizationId = source.OrganizationId;
             destination.SystemName = source.ItSystem.Name;
+            destination.SystemDescription = source.ItSystem.Description;
             destination.ItSystemDisabled = source.ItSystem.Disabled;
             destination.ActiveAccordingToValidityPeriod = source.IsActiveAccordingToDateFields;
             destination.ActiveAccordingToLifeCycle = source.IsActiveAccordingToLifeCycle;

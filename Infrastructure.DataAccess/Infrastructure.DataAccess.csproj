@@ -1054,6 +1054,10 @@
     <Compile Include="Migrations\202408160815331_ContractReadModelSystemUuid.designer.cs">
       <DependentUpon>202408160815331_ContractReadModelSystemUuid.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202408221223410_UsageReadModelSystemDescription.cs" />
+    <Compile Include="Migrations\202408221223410_UsageReadModelSystemDescription.designer.cs">
+      <DependentUpon>202408221223410_UsageReadModelSystemDescription.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
@@ -1081,6 +1085,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202408160815331_ContractReadModelSystemUuid.resx">
       <DependentUpon>202408160815331_ContractReadModelSystemUuid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202408221223410_UsageReadModelSystemDescription.resx">
+      <DependentUpon>202408221223410_UsageReadModelSystemDescription.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_DataRow.sql" />
     <EmbeddedResource Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.resx">

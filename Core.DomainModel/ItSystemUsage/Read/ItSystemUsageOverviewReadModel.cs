@@ -57,6 +57,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public ItSystemUsage SourceEntity { get; set; }
         public string SystemName { get; set; }
         public string SystemPreviousName { get; set; }
+        public string SystemDescription { get; set; }
         public bool ItSystemDisabled { get; set; }
         public bool ActiveAccordingToValidityPeriod { get; set; }
         public bool ActiveAccordingToLifeCycle { get; set; }
