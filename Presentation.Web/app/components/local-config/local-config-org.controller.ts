@@ -36,6 +36,8 @@
             private exportGridToExcelService,
             private user) {
 
+            $scope.localOptionType = Kitos.Services.LocalOptions.LocalOptionType;
+            $scope.currentOrganizationId = user.currentOrganizationId;
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 if (widget === this.mainGrid) {
                     this.loadGridOptions();
