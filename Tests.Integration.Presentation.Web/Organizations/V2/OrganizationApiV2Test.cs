@@ -8,6 +8,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
@@ -191,6 +192,29 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             //Assert
             var org = Assert.Single(organizations.Where(x => x.Uuid == newOrg.Uuid));
             Assert.Equal(newOrg.Uuid, org.Uuid);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.User, true, false, false)]
+        public async Task Can_Get_Specific_Organization_Permissions(OrganizationRole userRole, bool expectRead, bool expectModify, bool expectDelete)
+        {
+            //Arrange
+            var tokenResponse = await HttpApi.GetTokenAsync(userRole);
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+
+
+            //Act
+            var permissionsResponseDto = await OrganizationV2Helper.GetPermissionsAsync(tokenResponse.Token, organization.Uuid);
+
+            //Assert - exhaustive content assertions are done in the read-after-write assertion tests (POST/PUT)
+            var expected = new ResourcePermissionsResponseDTO()
+            {
+                Read = expectRead,
+                Modify = expectModify,
+                Delete = expectDelete
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
         }
 
         private static readonly IReadOnlyDictionary<OrganizationTypeKeys, OrganizationType> InnerToExternalOrgType =
