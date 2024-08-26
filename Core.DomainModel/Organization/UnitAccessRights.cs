@@ -21,7 +21,7 @@
         public bool CanBeRenamed { get; }
         public bool CanEanBeModified { get; }
         public bool CanDeviceIdBeModified { get; }
-        public bool CanBeRearranged{ get; } 
+        public bool CanBeRearranged{ get; }
         public bool CanBeDeleted { get; }
         public bool CanEditRegistrations { get; }
     }

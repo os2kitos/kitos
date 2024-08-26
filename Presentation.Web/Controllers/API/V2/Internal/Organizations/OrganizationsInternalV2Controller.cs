@@ -10,7 +10,7 @@ using Presentation.Web.Models.API.V2.Response.Shared;
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
     /// <summary>
-    /// Internal API for the local registrations related to it-systems in KITOS
+    /// Internal API for the organizations in KITOS
     /// </summary>
     [RoutePrefix("api/v2/internal/organizations")]
     public class OrganizationsInternalV2Controller : InternalApiV2Controller

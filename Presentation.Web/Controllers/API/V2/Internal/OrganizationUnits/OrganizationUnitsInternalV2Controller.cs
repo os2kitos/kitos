@@ -13,7 +13,7 @@ using Presentation.Web.Controllers.API.V2.Common.Mapping;
 namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 {
     /// <summary>
-    /// Internal API for the local registrations related to it-systems in KITOS
+    /// Internal API for the organization units in KITOS
     /// </summary>
     [RoutePrefix("api/v2/internal/organizations/{organizationUuid}/organization-units")]
     public class OrganizationUnitsInternalV2Controller : InternalApiV2Controller
