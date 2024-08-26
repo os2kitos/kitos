@@ -8,7 +8,7 @@
             UnitAccessRights = unitAccessRights;
         }
 
-        public OrganizationUnit OrganizationUnit { get; }
-        public UnitAccessRights UnitAccessRights { get; }
+        public OrganizationUnit OrganizationUnit { get; set; }
+        public UnitAccessRights UnitAccessRights { get; set; }
     }
 }

@@ -151,6 +151,64 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, true, true, true, true, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, true, true, true, true, true, true)]
+        [InlineData(OrganizationRole.User, true, false, false, false, false, false, false, false)]
+        public async Task Can_Get_Specific_Organization_Unit_Permissions(OrganizationRole role, bool canBeRead, bool canBeModified, bool canBeRenamed, bool canEanBeModified, bool canDeviceIdBeModified, bool canBeRearranged, bool canBeDeleted, bool canEditRegistrations)
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var email = CreateEmail();
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, role, organization.Id);
+            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, A<string>());
+
+            //Act
+            var accessRights = await OrganizationV2Helper.GetUnitAccessRights(organization.Uuid, unit.Uuid, cookie);
+
+            //Assert
+            Assert.NotNull(accessRights);
+
+            Assert.Equal(canBeRead, accessRights.CanBeRead);
+            Assert.Equal(canBeModified, accessRights.CanBeModified);
+            Assert.Equal(canBeRenamed, accessRights.CanBeRenamed);
+            Assert.Equal(canEanBeModified, accessRights.CanEanBeModified);
+            Assert.Equal(canDeviceIdBeModified, accessRights.CanDeviceIdBeModified);
+            Assert.Equal(canBeRearranged, accessRights.CanBeRearranged);
+            Assert.Equal(canBeDeleted, accessRights.CanBeDeleted);
+            Assert.Equal(canEditRegistrations, accessRights.CanEditRegistrations);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, true, true, true, true, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, true, true, true, true, true, true)]
+        [InlineData(OrganizationRole.User, true, false, false, false, false, false, false, false)]
+        public async Task Can_Get_All_Organization_Unit_Permissions(OrganizationRole role, bool canBeRead, bool canBeModified, bool canBeRenamed, bool canEanBeModified, bool canDeviceIdBeModified, bool canBeRearranged, bool canBeDeleted, bool canEditRegistrations)
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var email = CreateEmail();
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, role, organization.Id);
+            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, A<string>());
+
+            //Act
+            var accessRightsList = await OrganizationV2Helper.GetUnitAccessRightsForOrganization(organization.Uuid, cookie);
+
+            //Assert
+            var accessRightsWithUnit = accessRightsList.FirstOrDefault(x => x.OrganizationUnit.Uuid == unit.Uuid);
+            Assert.NotNull(accessRightsWithUnit);
+            var accessRights = accessRightsWithUnit.UnitAccessRights;
+
+            Assert.Equal(canBeRead, accessRights.CanBeRead);
+            Assert.Equal(canBeModified, accessRights.CanBeModified);
+            Assert.Equal(canBeRenamed, accessRights.CanBeRenamed);
+            Assert.Equal(canEanBeModified, accessRights.CanEanBeModified);
+            Assert.Equal(canDeviceIdBeModified, accessRights.CanDeviceIdBeModified);
+            Assert.Equal(canBeRearranged, accessRights.CanBeRearranged);
+            Assert.Equal(canBeDeleted, accessRights.CanBeDeleted);
+            Assert.Equal(canEditRegistrations, accessRights.CanEditRegistrations);
+        }
+
         private async Task<(User user, string token)> CreateApiUser(OrganizationDTO organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);

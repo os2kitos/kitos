@@ -195,17 +195,18 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Theory]
-        [InlineData(OrganizationRole.LocalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, false, false)]
         [InlineData(OrganizationRole.User, true, false, false)]
         public async Task Can_Get_Specific_Organization_Permissions(OrganizationRole userRole, bool expectRead, bool expectModify, bool expectDelete)
         {
             //Arrange
-            var tokenResponse = await HttpApi.GetTokenAsync(userRole);
+            var cookie = await HttpApi.GetCookieAsync(userRole);
             var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
 
 
             //Act
-            var permissionsResponseDto = await OrganizationV2Helper.GetPermissionsAsync(tokenResponse.Token, organization.Uuid);
+            var permissionsResponseDto = await OrganizationV2Helper.GetPermissionsAsync(cookie, organization.Uuid);
 
             //Assert - exhaustive content assertions are done in the read-after-write assertion tests (POST/PUT)
             var expected = new ResourcePermissionsResponseDTO()
