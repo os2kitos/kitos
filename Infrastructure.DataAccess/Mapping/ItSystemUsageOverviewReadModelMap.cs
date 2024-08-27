@@ -16,8 +16,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(ItSystem.MaxNameLength)
                 .IsRequired()
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_Name", 0);
-            Property(x => x.SystemName)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_System_Description", 0);
+
+            Property(x => x.SystemDescription)
+                .IsOptional();
 
             Property(x => x.ItSystemDisabled)
                 .IsRequired()
