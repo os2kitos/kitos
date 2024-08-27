@@ -378,6 +378,12 @@ namespace Core.ApplicationServices.Organizations
             return Result<IEnumerable<Organization>, OperationError>.Success(_orgRepository.AsQueryable().ByIds(userOrganizationsIds.ToList()));
         }
 
+        public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid organizationUuid)
+        {
+            return GetOrganization(organizationUuid)
+                .Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
+        }
+
         private Result<Organization, OperationError> WithDeletionAccess(Organization organization)
         {
             if (_authorizationContext.AllowDelete(organization))

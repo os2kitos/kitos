@@ -776,6 +776,46 @@ namespace Tests.Unit.Presentation.Web.Services
             VerifyOrganizationDeleted(result, transaction, organization);
         }
 
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, false, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, false)]
+        [InlineData(false, false, false)]
+        public void Can_Get_Permissions(bool read, bool modify, bool delete)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var organization = new Organization { Uuid = uuid };
+            ExpectGetOrganizationByUuidReturns(uuid, organization);
+            ExpectAllowReadReturns(organization, read);
+            ExpectAllowModifyReturns(organization, modify);
+            _authorizationContext.Setup(x => x.AllowDelete(organization)).Returns(delete);
+
+            //Act
+            var result = _sut.GetPermissions(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var permissions = result.Value;
+            Assert.Equivalent(new ResourcePermissionsResult(read, modify, delete), permissions);
+        }
+
+        [Fact]
+        public void Can_Get_Permissions_Returns_Not_Found()
+        {
+            //Arrange
+            var wrongUuid = A<Guid>();
+            ExpectGetOrganizationByUuidReturns(wrongUuid, Maybe<Organization>.None);
+
+            //Act
+            var result = _sut.GetPermissions(wrongUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
         private void VerifyOrganizationDeleted(Maybe<OperationError> result, Mock<IDatabaseTransaction> transaction, Organization organization)
         {
             Assert.True(result.IsNone);
@@ -871,6 +911,11 @@ namespace Tests.Unit.Presentation.Web.Services
         private void ExpectAllowModifyReturns(IEntity organization, bool value)
         {
             _authorizationContext.Setup(x => x.AllowModify(organization)).Returns(value);
+        }
+
+        private void ExpectAllowReadReturns(IEntity unit, bool result)
+        {
+            _authorizationContext.Setup(x => x.AllowReads(unit)).Returns(result);
         }
 
         private void ExpectAllowCreateReturns<T>(bool value) where T : IEntity
