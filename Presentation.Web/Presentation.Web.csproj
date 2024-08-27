@@ -393,6 +393,7 @@
     <Compile Include="Models\API\V2\Internal\Request\Notifications\BaseNotificationPropertiesWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\IHasBaseWriteProperties.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\NotificationSentResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Organizations\ColumnConfigurationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\OrganizationGridConfigurationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItContract\LocalItContractRolesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationPermissionsResponseDTO.cs" />
@@ -402,7 +403,7 @@
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageSearchResultResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageSystemContextResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystem\ItSystemSearchResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Internal\Response\Organizations\ColumnConfigConfigurationResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\Organizations\ColumnConfigurationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationGridConfigurationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesCreation.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesUpdate.cs" />

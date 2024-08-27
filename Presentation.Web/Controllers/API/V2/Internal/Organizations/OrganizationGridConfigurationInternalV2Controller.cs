@@ -13,12 +13,13 @@ using Core.DomainServices.Generic;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
-    [RoutePrefix("api/v2/internal/organizations/{organizationUuid}")]
+    [RoutePrefix("api/v2/internal/organizations/{organizationUuid}/grid-configuration")]
     public class OrganizationGridConfigurationInternalV2Controller : InternalApiV2Controller
     {
 
@@ -31,8 +32,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             _entityIdentityResolver = entityIdentityResolver;
         }
 
+        [Route("test")]
+        [HttpGet]
+        public IHttpActionResult test() { 
+            return Ok("Hello world");
+        }
+
         [HttpPost]
-        [Route("/grid-configuration/save")]
+        [Route("save")]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -50,7 +57,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [HttpDelete]
-        [Route("{organizationUuid}/grid-configuration/delete")]
+        [Route("delete")]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -67,8 +74,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 
         }
 
-        [HttpDelete]
-        [Route("{organizationUuid}/grid-configuration/get")]
+        [HttpGet]
+        [Route("get")]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -120,9 +127,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             };
         }
 
-        private ColumnConfigConfigurationResponseDTO mapKendoColumnConfigToConfigDTO(KendoColumnConfiguration columnConfig)
+        private ColumnConfigurationResponseDTO mapKendoColumnConfigToConfigDTO(KendoColumnConfiguration columnConfig)
         {
-            return new ColumnConfigConfigurationResponseDTO
+            return new ColumnConfigurationResponseDTO
             {
                 PersistId = columnConfig.PersistId,
                 Index = columnConfig.Index,
