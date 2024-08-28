@@ -364,6 +364,7 @@ namespace Presentation.Web.Ninject
 
             //Organization unit
             kernel.Bind<IOrganizationUnitWriteModelMapper>().To<OrganizationUnitWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IOrganizationUnitResponseModelMapper>().To<OrganizationUnitResponseModelMapper>().InCommandScope(Mode);
 
         }
 

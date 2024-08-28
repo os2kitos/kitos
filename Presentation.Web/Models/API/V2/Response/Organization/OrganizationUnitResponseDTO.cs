@@ -1,4 +1,5 @@
 ﻿using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Types.Organization;
 
 namespace Presentation.Web.Models.API.V2.Response.Organization
 {
@@ -16,5 +17,7 @@ namespace Presentation.Web.Models.API.V2.Response.Organization
         /// Optional Organization Unit Id
         /// </summary>
         public string UnitId { get; set; }
+
+        public OrganizationUnitOriginChoice Origin { get; set; }
     }
 }

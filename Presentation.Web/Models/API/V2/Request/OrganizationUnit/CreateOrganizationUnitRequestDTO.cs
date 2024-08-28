@@ -7,10 +7,6 @@ namespace Presentation.Web.Models.API.V2.Request.OrganizationUnit
 {
     public class CreateOrganizationUnitRequestDTO
     {
-        [Required]
-        [NonEmptyGuid]
-        public Guid OrganizationUuid { get; set; }
-
         public string Name { get; set; }
         public OrganizationUnitOriginChoice Origin { get; set; }
         public Guid ParentUuid { get; set; }

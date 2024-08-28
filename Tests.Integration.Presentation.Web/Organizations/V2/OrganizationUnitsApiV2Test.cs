@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -8,7 +9,9 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Types.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
@@ -207,6 +210,32 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(canBeRearranged, accessRights.CanBeRearranged);
             Assert.Equal(canBeDeleted, accessRights.CanBeDeleted);
             Assert.Equal(canEditRegistrations, accessRights.CanEditRegistrations);
+        }
+
+        [Fact]
+        public async Task Can_Create_OrganizationUnit()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+
+            var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token.Token, organization.Uuid);
+            var parentUnit = Assert.Single(units);
+
+            var request = new CreateOrganizationUnitRequestDTO
+            {
+                Name = A<string>(),
+                Origin = A<OrganizationUnitOriginChoice>(),
+                ParentUuid = parentUnit.Uuid
+            };
+
+            //Act
+            var result = await OrganizationUnitV2Helper.CreateUnitAsync(organization.Uuid, request);
+
+            Assert.Equal(request.Name, result.Name);
+            Assert.Equal(parentUnit.Name, result.ParentOrganizationUnit.Name);
+            Assert.Equal(parentUnit.Uuid, result.ParentOrganizationUnit.Uuid);
+            Assert.Equal(parentUnit.Origin, result.Origin);
         }
 
         private async Task<(User user, string token)> CreateApiUser(OrganizationDTO organization)

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.DomainModel.Organization;
+using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Xunit;
 
@@ -46,6 +48,19 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendGetOrganizationUnitAsync(string token, Guid organizationUuid, Guid organizationUnitId)
         {
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/organizations/{organizationUuid}/organization-units/{organizationUnitId:D}"), token);
+        }
+
+        public static async Task<OrganizationUnitResponseDTO> CreateUnitAsync(Guid organizationUuid,
+            CreateOrganizationUnitRequestDTO request, Cookie cookie = null)
+        {
+            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var response = await HttpApi.PostWithCookieAsync(
+                TestEnvironment.CreateUrl(
+                    $"api/v2/internal/organizations/{organizationUuid}/organization-units/create"), requestCookie, request);
+            var res = await response.Content.ReadAsStringAsync();
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<OrganizationUnitResponseDTO>();
         }
     }
 }

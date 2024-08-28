@@ -6,6 +6,7 @@ using Core.DomainModel.Organization;
 using Infrastructure.Services.DataAccess;
 using System;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Model.Shared;
 
 namespace Core.ApplicationServices.Organizations.Write
 {
@@ -43,6 +44,10 @@ namespace Core.ApplicationServices.Organizations.Write
             var parentUuid = parentUuidMaybe.Value;
             var name = parameters.Name.NewValue;
             var origin = parameters.Origin.NewValue;
+
+            parameters.Origin = OptionalValueChange<OrganizationUnitOrigin>.None;
+            parameters.Name = OptionalValueChange<string>.None;
+            parameters.ParentUuid = OptionalValueChange<Maybe<Guid>>.None;
 
             var result = _organizationUnitService.Create(organizationUuid, parentUuid, name, origin)
                 .Bind(unit => Update(unit, parameters));
