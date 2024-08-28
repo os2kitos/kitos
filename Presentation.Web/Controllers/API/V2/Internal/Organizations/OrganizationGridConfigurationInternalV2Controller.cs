@@ -40,11 +40,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var s =  MapUuidToID(organizationUuid);
-                var a  = s.Bind(id => _kendoOrganizationalConfigurationService.CreateOrUpdate(id, overviewType, config.VisibleColumns.Select(MapKendoColumnConfigDTOToKendoColumnConfig)));
-                var b = a.Bind(MapKendoConfigToGridConfig);
-                var res = b.Match(Ok, FromOperationError);
-                return res;
+            return MapUuidToId(organizationUuid)
+                .Bind(id => _kendoOrganizationalConfigurationService.CreateOrUpdate(id, overviewType, config.VisibleColumns.Select(MapKendoColumnConfigDTOToKendoColumnConfig)))
+                .Bind(MapKendoConfigToGridConfig)
+                .Match(Ok, FromOperationError);
+                
         }
 
         [HttpDelete]
@@ -58,7 +58,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return MapUuidToID(organizationUuid)
+            return MapUuidToId(organizationUuid)
                 .Bind(id => _kendoOrganizationalConfigurationService.Delete(id, overviewType))
                 .Bind(MapKendoConfigToGridConfig)
                 .Match(Ok, FromOperationError);
@@ -76,30 +76,18 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var s = MapUuidToID(organizationUuid);
-
-            var a =    s.Bind(id => _kendoOrganizationalConfigurationService.Get(id, overviewType));
-            var b = a.Bind(MapKendoConfigToGridConfig);
-            var res =    b.Match(Ok, FromOperationError);
-            return res;
+            return MapUuidToId(organizationUuid)
+                .Bind(id => _kendoOrganizationalConfigurationService.Get(id, overviewType))
+                .Bind(MapKendoConfigToGridConfig)
+                .Match(Ok, FromOperationError);
         }
 
-        private Result<int, OperationError> MapUuidToID(Guid organizationUuid)
+        private Result<int, OperationError> MapUuidToId(Guid organizationUuid)
         {
             var value = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
             if (value.IsNone)
             {
                 return new OperationError("The provided organization ID does not exist", OperationFailure.NotFound);
-            }
-            return value.Value;
-        }
-
-        private Result<Guid, OperationError> MapIdToUuid(int organizationId)
-        {
-            var value = _entityIdentityResolver.ResolveUuid<Organization>(organizationId);
-            if (value.IsNone)
-            {
-                return new OperationError("The provided organization Uuid does not exist", OperationFailure.NotFound);
             }
             return value.Value;
         }
