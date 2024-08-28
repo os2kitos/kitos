@@ -39,15 +39,16 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationGridConfigurationResponseDTO))]
-        public IHttpActionResult SaveGridConfiguration([NonEmptyGuid] Guid organizationUuid, OverviewType overviewType, [FromBody] IEnumerable<KendoColumnConfiguration> columns)
+        public IHttpActionResult SaveGridConfiguration([NonEmptyGuid] Guid organizationUuid, OverviewType overviewType, [FromBody] OrganizationGridConfigurationRequestDTO config)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return MapUuidToID(organizationUuid)
-                .Bind(id => _kendoOrganizationalConfigurationService.CreateOrUpdate(id, overviewType, columns))
-                .Bind(MapKendoConfigToGridConfig)
-                .Match(Ok, FromOperationError);
+            var s =  MapUuidToID(organizationUuid);
+                var a  = s.Bind(id => _kendoOrganizationalConfigurationService.CreateOrUpdate(id, overviewType, config.VisibleColumns.Select(MapKendoColumnConfigDTOToKendoColumnConfig)));
+                var b = a.Bind(MapKendoConfigToGridConfig);
+                var res = b.Match(Ok, FromOperationError);
+                return res;
         }
 
         [HttpDelete]
@@ -79,10 +80,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return MapUuidToID(organizationUuid)
-                .Bind(id => _kendoOrganizationalConfigurationService.Get(id, overviewType))
-                .Bind(MapKendoConfigToGridConfig)
-                .Match(Ok, FromOperationError);
+            var s = MapUuidToID(organizationUuid);
+
+            var a =    s.Bind(id => _kendoOrganizationalConfigurationService.Get(id, overviewType));
+            var b = a.Bind(MapKendoConfigToGridConfig);
+            var res =    b.Match(Ok, FromOperationError);
+            return res;
         }
 
         private Result<int, OperationError> MapUuidToID(Guid organizationUuid)
@@ -128,6 +131,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 PersistId = columnConfig.PersistId,
                 Index = columnConfig.Index,
 
+            };
+        }
+
+        private KendoColumnConfiguration MapKendoColumnConfigDTOToKendoColumnConfig(KendoColumnConfigurationDTO columnConfig)
+        {
+            return new KendoColumnConfiguration
+            {
+                PersistId = columnConfig.PersistId,
+                Index = columnConfig.Index,
             };
         }
     }

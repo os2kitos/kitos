@@ -3,38 +3,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Core.DomainModel;
 using Presentation.Web.Models.API.V1;
+using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools
 {
     internal class OrganizationGridConfigurationTestHelper
     {
-        public static async Task<HttpResponseMessage> SendSaveConfigurationRequestAsync(Guid uuid, OverviewType overviewType, IEnumerable<KendoColumnConfigurationDTO> columns, Cookie optionalLogin = null)
+
+        private static string createPath(Guid orgUuid, string operation)
         {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/v2/internal/organizations/{uuid}/grid-configuration/save?overviewType={overviewType}");
-            var body = columns;
-            return await HttpApi.PostWithCookieAsync(url, cookie, body);
+            return $"api/v2/internal/organizations/{orgUuid:D}/grid-configuration/{operation}?overviewType=0";
         }
 
-        public static async Task<HttpResponseMessage> SendGetConfigurationRequestAsync(Guid uuid, OverviewType overviewType, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendGetConfigurationRequestAsync(Guid orgUuid,
+            OrganizationRole orgRole = OrganizationRole.LocalAdmin)
         {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/v2/internal/organizations/{uuid}/grid-configuration/get?overviewType={overviewType}");
 
+            var url = TestEnvironment.CreateUrl(createPath(orgUuid, "get"));
+            var cookie = await HttpApi.GetCookieAsync(orgRole);
             return await HttpApi.GetWithCookieAsync(url, cookie);
         }
 
-        public static async Task<HttpResponseMessage> SendDeleteConfigurationRequestAsync(Guid uuid, OverviewType overviewType, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendSaveConfigurationRequestAsync(Guid orgUuid, IEnumerable<KendoColumnConfigurationDTO> columns,
+            OrganizationRole orgRole = OrganizationRole.LocalAdmin)
         {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/v2/internal/organizations/{uuid}/grid-configuration/delete?overviewType={overviewType}");
-
-            return await HttpApi.DeleteWithCookieAsync(url, cookie);
+            var url = TestEnvironment.CreateUrl(createPath(orgUuid, "save"));
+            var body = new OrganizationGridConfigurationRequestDTO { OrganizationUuid = orgUuid, VisibleColumns = columns, OverviewType = 0};
+            var cookie = await HttpApi.GetCookieAsync(orgRole);
+            return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
     }
 }

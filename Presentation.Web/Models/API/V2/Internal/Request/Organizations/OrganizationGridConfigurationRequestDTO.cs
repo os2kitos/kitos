@@ -6,9 +6,9 @@ namespace Presentation.Web.Models.API.V1
 {
     public class OrganizationGridConfigurationRequestDTO
     {
-        public Guid OrganizationUuid { get; }
-        public OverviewType OverviewType { get; }
-        public string Version { get; }
-        public IEnumerable<KendoColumnConfigurationDTO> VisibleColumns { get; }
+        public Guid OrganizationUuid { get; set; }
+        public OverviewType OverviewType { get; set; }
+        public string Version { get; set; }
+        public IEnumerable<KendoColumnConfigurationDTO> VisibleColumns { get; set; }
     }
 }
