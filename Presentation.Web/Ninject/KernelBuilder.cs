@@ -129,8 +129,10 @@ using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
 using Core.ApplicationServices.Generic;
+using Core.ApplicationServices.Organizations.Write;
 using Infrastructure.STS.OrganizationSystem.DomainServices;
 using Kombit.InfrastructureSamples.Token;
+using Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping;
 
 namespace Presentation.Web.Ninject
 {
@@ -269,6 +271,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ITrackingService>().To<TrackingService>().InCommandScope(Mode);
             kernel.Bind<IUIModuleCustomizationService>().To<UIModuleCustomizationService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationUnitService>().To<OrganizationUnitService>().InCommandScope(Mode);
+            kernel.Bind<IOrganizationUnitWriteService>().To<OrganizationUnitWriteService>().InCommandScope(Mode);
             kernel.Bind<IEntityIdMapper>().To<EntityIdMapper>().InCommandScope(Mode);
 
             //Role assignment services
@@ -358,6 +361,10 @@ namespace Presentation.Web.Ninject
             //Notifications
             kernel.Bind<INotificationWriteModelMapper>().To<NotificationWriteModelMapper>().InCommandScope(Mode);
             kernel.Bind<INotificationResponseMapper>().To<NotificationResponseMapper>().InCommandScope(Mode);
+
+            //Organization unit
+            kernel.Bind<IOrganizationUnitWriteModelMapper>().To<OrganizationUnitWriteModelMapper>().InCommandScope(Mode);
+
         }
 
         private void RegisterSSO(IKernel kernel)

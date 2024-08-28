@@ -203,6 +203,7 @@
     <Compile Include="Model\Organizations\ReportPendingFkOrganizationChangesToStakeHolders.cs" />
     <Compile Include="Model\Organizations\StsOrganizationSynchronizationDetails.cs" />
     <Compile Include="Model\Organizations\AuthorizedUpdateOrganizationFromFKOrganisationCommand.cs" />
+    <Compile Include="Model\Organizations\Write\OrganizationUnitUpdateParameters.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
     <Compile Include="Model\Shared\NamedEntityWithUuid.cs" />
     <Compile Include="Model\Shared\OptionalValueChange.cs" />
@@ -258,6 +259,8 @@
     <Compile Include="Organizations\IStsOrganizationSynchronizationService.cs" />
     <Compile Include="Organizations\OrganizationUnitService.cs" />
     <Compile Include="Organizations\StsOrganizationSynchronizationService.cs" />
+    <Compile Include="Organizations\Write\IOrganizationUnitWriteService.cs" />
+    <Compile Include="Organizations\Write\OrganizationUnitWriteService.cs" />
     <Compile Include="RightsHolders\BaseRightsHolderService.cs" />
     <Compile Include="RightsHolders\IItInterfaceRightsHolderService.cs" />
     <Compile Include="RightsHolders\IRightsHolderSystemService.cs" />

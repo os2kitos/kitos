@@ -29,6 +29,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly IDatabaseControl _databaseControl;
         private readonly IGenericRepository<OrganizationUnit> _repository;
         private readonly ICommandBus _commandBus;
+        private readonly IGenericRepository<Organization> _organizationRepository;
 
         public OrganizationUnitService(IOrganizationService organizationService,
             IOrganizationRightsService organizationRightsService,
@@ -39,7 +40,8 @@ namespace Core.ApplicationServices.Organizations
             IDomainEvents domainEvents,
             IDatabaseControl databaseControl,
             IGenericRepository<OrganizationUnit> repository,
-            ICommandBus commandBus)
+            ICommandBus commandBus, 
+            IGenericRepository<Organization> organizationRepository)
         {
             _organizationService = organizationService;
             _organizationRightsService = organizationRightsService;
@@ -51,6 +53,7 @@ namespace Core.ApplicationServices.Organizations
             _databaseControl = databaseControl;
             _repository = repository;
             _commandBus = commandBus;
+            _organizationRepository = organizationRepository;
         }
 
         public Result<UnitAccessRights, OperationError> GetAccessRights(Guid organizationUuid, Guid unitUuid)
@@ -111,6 +114,39 @@ namespace Core.ApplicationServices.Organizations
                 transaction.Commit();
             }
             return deleteResult.MatchFailure();
+        }
+
+        public Result<OrganizationUnit, OperationError> Create(Guid organizationUuid, Guid parentUuid,
+            string name, OrganizationUnitOrigin origin)
+        {
+            using var transaction = _transactionManager.Begin();
+
+            var result = _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind(WithUnitCreateAccess)
+                .Bind(organization => _organizationService.GetOrganizationUnit(parentUuid)
+                    .Select(unit => (organization, parentUnit: unit)))
+                .Bind(values=> AddUnitToOrganization(values.organization, values.parentUnit, name, origin));
+
+            if (result.Ok)
+            {
+                var newUnit = result.Value;
+                var organization = newUnit.Organization;
+                _repository.Insert(newUnit);
+                _domainEvents.Raise(new EntityCreatedEvent<OrganizationUnit>(newUnit));
+
+                _organizationRepository.Update(organization);
+                _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
+
+                _databaseControl.SaveChanges();
+                transaction.Commit();
+            }
+            else
+            {
+                transaction.Rollback();
+            }
+
+            return result;
         }
 
         public Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid, OrganizationUnitRegistrationChangeParameters parameters)
@@ -219,11 +255,24 @@ namespace Core.ApplicationServices.Organizations
             }).MatchFailure();
         }
 
-        private Result<TSuccess, OperationError> Modify<TSuccess>(Guid organizationId, Guid unitUuid, Func<Organization, OrganizationUnit, Result<TSuccess, OperationError>> mutation)
+        public Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid uuid)
+        {
+            return _organizationService.GetOrganization(uuid, OrganizationDataReadAccessLevel.All)
+                .Match
+                (
+                    organization =>
+                        _authorizationContext.AllowModify(organization) == false
+                            ? new OperationError("User is not allowed to modify the organization", OperationFailure.Forbidden)
+                            : Result<Organization, OperationError>.Success(organization),
+                    error => error
+                );
+        }
+
+        private Result<TSuccess, OperationError> Modify<TSuccess>(Guid organizationUuid, Guid unitUuid, Func<Organization, OrganizationUnit, Result<TSuccess, OperationError>> mutation)
         {
             using var transaction = _transactionManager.Begin();
 
-            var organizationResult = GetOrganizationAndAuthorizeModification(organizationId);
+            var organizationResult = GetOrganizationAndAuthorizeModification(organizationUuid);
 
             if (organizationResult.Failed)
             {
@@ -258,25 +307,26 @@ namespace Core.ApplicationServices.Organizations
             return mutationResult;
         }
 
+        private static Result<OrganizationUnit, OperationError> AddUnitToOrganization(Organization organization,
+            OrganizationUnit parentUnit, string name, OrganizationUnitOrigin origin)
+        {
+            var newUnit = new OrganizationUnit
+            {
+                Name = name,
+                Origin = origin,
+                Organization = organization,
+            };
+
+            return organization.AddOrganizationUnit(newUnit, parentUnit)
+                .Match<Result<OrganizationUnit, OperationError>>(error => error, () => newUnit);
+        }
+
         private Result<TSuccess, OperationError> ModifyRegistrations<TSuccess>(Guid organizationId, Guid unitUuid, Func<Organization, OrganizationUnit, Result<TSuccess, OperationError>> mutation)
         {
             return Modify(organizationId, unitUuid,
                 (org, orgUnit) => _authorizationContext.HasPermission(new BulkAdministerOrganizationUnitRegistrations(org.Id))
                     ? mutation(org, orgUnit)
                     : new OperationError("User is not authorized for bulk permission administration", OperationFailure.Forbidden)
-                );
-        }
-
-        private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid uuid)
-        {
-            return _organizationService.GetOrganization(uuid, OrganizationDataReadAccessLevel.All)
-                .Match
-                (
-                    organization =>
-                        _authorizationContext.AllowModify(organization) == false
-                            ? new OperationError("User is not allowed to modify the organization", OperationFailure.Forbidden)
-                            : Result<Organization, OperationError>.Success(organization),
-                    error => error
                 );
         }
 
@@ -487,6 +537,13 @@ namespace Core.ApplicationServices.Organizations
                     }
                 )
                 .Select(unit => unit.GetUnitRegistrations());
+        }
+
+        private Result<Organization, OperationError> WithUnitCreateAccess(Organization organization)
+        {
+            return _authorizationContext.AllowCreate<OrganizationUnit>(organization.Id)
+                ? organization
+                : new OperationError(OperationFailure.Forbidden);
         }
     }
 }

@@ -5,10 +5,13 @@ using System.Net;
 using System;
 using System.Linq;
 using System.Web.Http;
+using Core.ApplicationServices.Organizations.Write;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Internal.Response.OrganizationUnit;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping;
+using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 {
@@ -18,10 +21,16 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
     [RoutePrefix("api/v2/internal/organizations/{organizationUuid}/organization-units")]
     public class OrganizationUnitsInternalV2Controller : InternalApiV2Controller
     {
+        private readonly IOrganizationUnitWriteService _organizationUnitWriteService;
         private readonly IOrganizationUnitService _organizationUnitService;
+        private readonly IOrganizationUnitWriteModelMapper _organizationUnitWriteModelMapper;
 
-        public OrganizationUnitsInternalV2Controller(IOrganizationUnitService organizationUnitService)
+        public OrganizationUnitsInternalV2Controller(IOrganizationUnitWriteService organizationUnitWriteService,
+            IOrganizationUnitWriteModelMapper organizationUnitWriteModelMapper,
+            IOrganizationUnitService organizationUnitService)
         {
+            _organizationUnitWriteService = organizationUnitWriteService;
+            _organizationUnitWriteModelMapper = organizationUnitWriteModelMapper;
             _organizationUnitService = organizationUnitService;
         }
 
@@ -49,13 +58,25 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
                     new UnitAccessRightsWithUnitDataResponseDTO
                     (
                         accessRightWithUnit.UnitAccessRights, 
-                        ToUnitDTO(accessRightWithUnit.OrganizationUnit)
+                        ToUnitDto(accessRightWithUnit.OrganizationUnit)
                     )
                 ))
                 .Match(Ok, FromOperationError);
         }
 
-        private OrganizationUnitResponseDTO ToUnitDTO(OrganizationUnit unit)
+        [Route("create")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationUnitResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult CreateUnit([NonEmptyGuid] Guid organizationUuid, [FromBody] CreateOrganizationUnitRequestDTO parameters)
+        {
+            return _organizationUnitWriteService.Create(organizationUuid, _organizationUnitWriteModelMapper.FromPOST(parameters))
+                .Select(ToUnitDto)
+                .Match(Ok, FromOperationError);
+        }
+
+        private static OrganizationUnitResponseDTO ToUnitDto(OrganizationUnit unit)
         {
             return new OrganizationUnitResponseDTO
             {

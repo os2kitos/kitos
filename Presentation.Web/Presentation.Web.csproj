@@ -381,6 +381,9 @@
     <Compile Include="Controllers\API\V2\Internal\Mapping\InternalDtoModelV2MappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemUsageV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Internal\Organizations\OrganizationsInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\IOrganizationUnitWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\OrganizationUnitOriginMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\OrganizationUnitWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitsInternalV2Controller.cs" />
     <Compile Include="Infrastructure\Attributes\V2StyleJsonResponseSerializationAttribute.cs" />
     <Compile Include="Infrastructure\Config\V2JsonSerializationConfig.cs" />
@@ -411,6 +414,8 @@
     <Compile Include="Models\API\V2\Request\Interface\IItInterfaceWritablePropertiesRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\ItInterfaceDataRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\UpdateItInterfaceRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\OrganizationUnit\CreateOrganizationUnitRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Types\Organization\OrganizationUnitOriginChoice.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingCreationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\IHasJournalPeriods.cs" />
