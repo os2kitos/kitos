@@ -45,9 +45,7 @@ namespace Core.ApplicationServices.Organizations.Write
             var name = parameters.Name.NewValue;
             var origin = parameters.Origin.NewValue;
 
-            parameters.Origin = OptionalValueChange<OrganizationUnitOrigin>.None;
-            parameters.Name = OptionalValueChange<string>.None;
-            parameters.ParentUuid = OptionalValueChange<Maybe<Guid>>.None;
+            MarkCreateParametersAsChanged(parameters);
 
             var result = _organizationUnitService.Create(organizationUuid, parentUuid, name, origin)
                 .Bind(unit => Update(unit, parameters));
@@ -62,6 +60,13 @@ namespace Core.ApplicationServices.Organizations.Write
             }
 
             return result;
+        }
+
+        private static void MarkCreateParametersAsChanged(OrganizationUnitUpdateParameters parameters)
+        {
+            parameters.Origin = OptionalValueChange<OrganizationUnitOrigin>.None;
+            parameters.Name = OptionalValueChange<string>.None;
+            parameters.ParentUuid = OptionalValueChange<Maybe<Guid>>.None;
         }
 
         private Result<OrganizationUnit, OperationError> Update(OrganizationUnit unit, OrganizationUnitUpdateParameters parameters)
