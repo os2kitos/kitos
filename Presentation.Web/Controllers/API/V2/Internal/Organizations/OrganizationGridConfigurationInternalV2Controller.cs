@@ -32,12 +32,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             _entityIdentityResolver = entityIdentityResolver;
         }
 
-        [Route("test")]
-        [HttpGet]
-        public IHttpActionResult test() { 
-            return Ok("Hello world");
-        }
-
         [HttpPost]
         [Route("save")]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
