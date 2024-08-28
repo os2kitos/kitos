@@ -15,7 +15,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
-    [RoutePrefix("api/v2/internal/organizations/{organizationUuid}/grid-configuration")]
+    [RoutePrefix("api/v2/internal/organizations/{organizationUuid}/grid-configuration/{overviewType}")]
     public class OrganizationGridConfigurationInternalV2Controller : InternalApiV2Controller
     {
 
@@ -29,7 +29,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [HttpPost]
-        [Route("save/{overviewType}")]
+        [Route("save")]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -53,7 +53,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeleteGridConfiguration([NonEmptyGuid] Guid organizationUuid, OverviewType overviewType)
+        public IHttpActionResult DeleteGridConfiguration([NonEmptyGuid] Guid organizationUuid, [FromUri] OverviewType overviewType)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -71,7 +71,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetGridConfiguration([NonEmptyGuid] Guid organizationUuid, OverviewType overviewType)
+        public IHttpActionResult GetGridConfiguration([NonEmptyGuid] Guid organizationUuid, [FromUri] OverviewType overviewType)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
