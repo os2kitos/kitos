@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
@@ -10,10 +8,8 @@ using Core.DomainModel;
 using Core.DomainModel.KendoConfig;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
-using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
-using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Swashbuckle.Swagger.Annotations;
 
@@ -33,13 +29,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [HttpPost]
-        [Route("save")]
+        [Route("save/{overviewType}")]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationGridConfigurationResponseDTO))]
-        public IHttpActionResult SaveGridConfiguration([NonEmptyGuid] Guid organizationUuid, OverviewType overviewType, [FromBody] OrganizationGridConfigurationRequestDTO config)
+        public IHttpActionResult SaveGridConfiguration([NonEmptyGuid] Guid organizationUuid, [FromUri] OverviewType overviewType, [FromBody] OrganizationGridConfigurationRequestDTO config)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -98,7 +94,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             return value.Value;
         }
 
-        private Result<Guid, OperationError> mapIDToUuid(int organizationId)
+        private Result<Guid, OperationError> MapIdToUuid(int organizationId)
         {
             var value = _entityIdentityResolver.ResolveUuid<Organization>(organizationId);
             if (value.IsNone)
@@ -120,11 +116,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 OrganizationUuid = orgUuid.Value,
                 OverviewType = kendoConfig.OverviewType,
                 Version = kendoConfig.Version,
-                VisibleColumns = kendoConfig.VisibleColumns.Select(mapKendoColumnConfigToConfigDTO)
+                VisibleColumns = kendoConfig.VisibleColumns.Select(MapKendoColumnConfigToConfigDto)
             };
         }
 
-        private ColumnConfigurationResponseDTO mapKendoColumnConfigToConfigDTO(KendoColumnConfiguration columnConfig)
+        private static ColumnConfigurationResponseDTO MapKendoColumnConfigToConfigDto(KendoColumnConfiguration columnConfig)
         {
             return new ColumnConfigurationResponseDTO
             {

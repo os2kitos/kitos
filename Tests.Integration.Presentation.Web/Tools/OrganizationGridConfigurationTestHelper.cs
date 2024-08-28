@@ -22,21 +22,21 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
 
         public static async Task<HttpResponseMessage> SendGetConfigurationRequestAsync(Guid orgUuid,
-            OrganizationRole orgRole = OrganizationRole.LocalAdmin)
+            Cookie cookie = null)
         {
 
             var url = TestEnvironment.CreateUrl(createPath(orgUuid, "get"));
-            var cookie = await HttpApi.GetCookieAsync(orgRole);
-            return await HttpApi.GetWithCookieAsync(url, cookie);
+            var httpCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.GetWithCookieAsync(url, httpCookie);
         }
 
         public static async Task<HttpResponseMessage> SendSaveConfigurationRequestAsync(Guid orgUuid, IEnumerable<KendoColumnConfigurationDTO> columns,
-            OrganizationRole orgRole = OrganizationRole.LocalAdmin)
+            Cookie cookie = null)
         {
             var url = TestEnvironment.CreateUrl(createPath(orgUuid, "save"));
             var body = new OrganizationGridConfigurationRequestDTO { OrganizationUuid = orgUuid, VisibleColumns = columns, OverviewType = 0};
-            var cookie = await HttpApi.GetCookieAsync(orgRole);
-            return await HttpApi.PostWithCookieAsync(url, cookie, body);
+            var httpCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PostWithCookieAsync(url, httpCookie, body);
         }
     }
 }
