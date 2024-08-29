@@ -196,5 +196,4 @@ Database/kitosdb_log.ldf
 
 # tmp folder from protractor beautiful reporter
 tmp/
-/.vscode/settings.json
 /package-lock.json

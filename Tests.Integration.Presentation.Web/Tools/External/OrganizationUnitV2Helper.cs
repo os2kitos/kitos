@@ -54,7 +54,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             CreateOrganizationUnitRequestDTO request, Cookie cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var response = await HttpApi.PostWithCookieAsync(
+            using var response = await HttpApi.PostWithCookieAsync(
                 TestEnvironment.CreateUrl(
                     $"api/v2/internal/organizations/{organizationUuid}/organization-units/create"), requestCookie, request);
             var res = await response.Content.ReadAsStringAsync();

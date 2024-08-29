@@ -7,6 +7,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
+using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools
 {
@@ -36,6 +37,16 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PostWithCookieAsync(url, httpCookie, body);
         }
 
+        public static async Task<OrganizationGridConfigurationResponseDTO> SaveConfigurationRequestAsync(Guid orgUuid,
+            IEnumerable<KendoColumnConfigurationDTO> columns,
+            Cookie cookie = null)
+        {
+            var response = await SendSaveConfigurationRequestAsync(orgUuid, columns, cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<OrganizationGridConfigurationResponseDTO>();
+
+        }
+
         public static async Task<HttpResponseMessage> SendDeleteConfigurationRequestAsync(Guid orgUuid,
             Cookie cookie = null)
         {
@@ -46,7 +57,8 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<OrganizationGridConfigurationResponseDTO> GetResponseBodyAsync(Guid orgUuid, Cookie cookie = null)
         {
-            var response = await SendGetConfigurationRequestAsync(orgUuid, cookie);
+            using var response = await SendGetConfigurationRequestAsync(orgUuid, cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<OrganizationGridConfigurationResponseDTO>();
         }
     }
