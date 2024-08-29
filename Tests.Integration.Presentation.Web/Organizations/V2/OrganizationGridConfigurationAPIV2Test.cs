@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Generic;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Tests.Integration.Presentation.Web.Tools;
