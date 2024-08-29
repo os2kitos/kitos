@@ -145,7 +145,7 @@
     <Compile Include="ItSystem\V2\ItSystemUsageMigrationApiV2Test.cs" />
     <Compile Include="Notifications\NotificationApiV2Test.cs" />
     <Compile Include="Options\V1\OptionApiTests.cs" />
-    <Compile Include="Organizations\V2\OrganizationGridConfigurationAPIV2Test.cs" />
+    <Compile Include="Organizations\V2\OrganizationGridConfigurationApiV2Test.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
