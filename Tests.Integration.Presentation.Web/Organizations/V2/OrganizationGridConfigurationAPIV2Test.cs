@@ -21,7 +21,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var columns = CreateTestColumns().ToArray();
             var (org, localAdminCookie) = await CreatePrerequisites();
-            await OrganizationGridConfigurationTestHelper.SendSaveConfigurationRequestAsync(org.Uuid, columns, localAdminCookie);
+            await OrganizationGridConfigurationTestHelper.SaveConfigurationRequestAsync(org.Uuid, columns, localAdminCookie);
 
             using var deleteResponse = await 
                 OrganizationGridConfigurationTestHelper.SendDeleteConfigurationRequestAsync(org.Uuid, localAdminCookie);
@@ -59,7 +59,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             //Local admin saves grid config
             var columns = CreateTestColumns().ToList();
             var (org, localAdminCookie) = await CreatePrerequisites();
-            await OrganizationGridConfigurationTestHelper.SendSaveConfigurationRequestAsync(org.Uuid,
+            await OrganizationGridConfigurationTestHelper.SaveConfigurationRequestAsync(org.Uuid,
                 columns, localAdminCookie);
 
             var (_, _, userCookie) = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, org.Id);

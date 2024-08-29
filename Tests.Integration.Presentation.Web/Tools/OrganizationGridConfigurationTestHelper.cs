@@ -51,8 +51,8 @@ namespace Tests.Integration.Presentation.Web.Tools
             Cookie cookie = null)
         {
             var url = TestEnvironment.CreateUrl(CreatePath(orgUuid, "delete"));
-            var body = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
-            return await HttpApi.DeleteWithCookieAsync(url, cookie);
+            var httpCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
+            return await HttpApi.DeleteWithCookieAsync(url, httpCookie);
         }
 
         public static async Task<OrganizationGridConfigurationResponseDTO> GetResponseBodyAsync(Guid orgUuid, Cookie cookie = null)
