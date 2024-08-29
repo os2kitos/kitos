@@ -10,7 +10,6 @@ using Presentation.Web.Models.API.V2.Internal.Response.OrganizationUnit;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping;
 using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
-using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using System.Web.Http.Results;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
