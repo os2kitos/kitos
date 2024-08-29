@@ -32,6 +32,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<IDatabaseControl> _databaseControl;
         private readonly Mock<IGenericRepository<OrganizationUnit>> _repositoryMock;
+        private readonly Mock<IGenericRepository<Organization>> _organizationRepositoryMock;
         private readonly Mock<ICommandBus> _commandBusMock;
 
         public OrganizationUnitServiceTest()
@@ -45,6 +46,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _domainEvents = new Mock<IDomainEvents>();
             _databaseControl = new Mock<IDatabaseControl>();
             _repositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
+            _organizationRepositoryMock = new Mock<IGenericRepository<Organization>>();
 
             _commandBusMock = new Mock<ICommandBus>();
             _sut = new OrganizationUnitService(
@@ -57,7 +59,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _domainEvents.Object,
                 _databaseControl.Object,
                 _repositoryMock.Object,
-                _commandBusMock.Object);
+                _commandBusMock.Object,
+                _organizationRepositoryMock.Object);
         }
 
         [Fact]
@@ -688,9 +691,88 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             transaction.Verify(x => x.Rollback(), Times.Once());
         }
 
+        [Fact]
+        public void Can_Create_Organization_Unit()
+        {
+            //Arrange
+            var orgUuid = A<Guid>();
+            var orgId = A<int>();
+            var name = A<string>();
+            var origin = A<OrganizationUnitOrigin>();
+            var parentUuid = A<Guid>();
+            var parentUnit = new OrganizationUnit { Uuid = parentUuid};
+
+            var org = new Organization
+            {
+                Uuid = orgUuid,
+                Id = orgId,
+                OrgUnits = new 
+                    List<OrganizationUnit> { parentUnit }
+            };
+            var newUnit = new OrganizationUnit { Name = name, Origin = origin};
+            parentUnit.Organization = org;
+
+            var transaction = ExpectBeginTransaction();
+            ExpectGetOrganizationReturns(orgUuid, org);
+            ExpectGetOrganizationUnitReturns(parentUuid, parentUnit);
+            ExpectAllowModifyReturns(org, true);
+            ExpectWithCreateUnitAccessReturns(orgId, true);
+            _repositoryMock.Setup(mock => mock.Insert(newUnit));
+            _organizationRepositoryMock.Setup(mock => mock.Update(org));
+
+            //Act
+            var createResult = _sut.Create(orgUuid, parentUuid, name, origin);
+
+            //Assert
+            Assert.True(createResult.Ok);
+            _databaseControl.Verify(x => x.SaveChanges(), Times.Once());
+            transaction.Verify(x => x.Commit(), Times.Once());
+            _domainEvents.Verify(x => x.Raise(It.Is<EntityCreatedEvent<OrganizationUnit>>(ev => ev.Entity.Name == newUnit.Name)));
+        }
+
+        [Fact]
+        public void Cannnot_Create_Organization_Unit_If_Unauthorized()
+        {
+            //Arrange
+            var orgUuid = A<Guid>();
+            var orgId = A<int>();
+            var name = A<string>();
+            var origin = A<OrganizationUnitOrigin>();
+            var parentUuid = A<Guid>();
+            var parentUnit = new OrganizationUnit { Uuid = parentUuid};
+
+            var org = new Organization
+            {
+                Uuid = orgUuid,
+                Id = orgId,
+                OrgUnits = new 
+                    List<OrganizationUnit> { parentUnit }
+            };
+            var newUnit = new OrganizationUnit { Name = name, Origin = origin};
+            parentUnit.Organization = org;
+
+            var transaction = ExpectBeginTransaction();
+            ExpectGetOrganizationReturns(orgUuid, org);
+            ExpectGetOrganizationUnitReturns(parentUuid, parentUnit);
+            ExpectAllowModifyReturns(org, true);
+            ExpectWithCreateUnitAccessReturns(orgId, false);
+
+            //Act
+            var createResult = _sut.Create(orgUuid, parentUuid, name, origin);
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.Forbidden, createResult.Error.FailureType);
+        }
+
         private void ExpectGetOrganizationReturns(Guid uuid, Organization result)
         {
             _organizationServiceMock.Setup(x => x.GetOrganization(uuid, OrganizationDataReadAccessLevel.All)).Returns(result);
+        }
+
+        private void ExpectGetOrganizationUnitReturns(Guid unitUuid, OrganizationUnit result)
+        {
+            _organizationServiceMock.Setup(x => x.GetOrganizationUnit(unitUuid)).Returns(result);
         }
 
         private void ExpectGetOrganizationReturns(Guid uuid, OperationError result)
@@ -729,6 +811,12 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                     x.Execute<RemoveOrganizationUnitRegistrationsCommand, Maybe<OperationError>>(
                         It.Is<RemoveOrganizationUnitRegistrationsCommand>(unit => unit.OrganizationUnit == toRemove)))
                 .Returns(result);
+        }
+
+        private void ExpectWithCreateUnitAccessReturns(int orgId,
+            bool result)
+        {
+            _authorizationContextMock.Setup(mock => mock.AllowCreate<OrganizationUnit>(orgId)).Returns(result);
         }
 
         private Mock<IDatabaseTransaction> ExpectBeginTransaction()

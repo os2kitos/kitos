@@ -15,5 +15,9 @@ namespace Core.ApplicationServices.Organizations
         Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid, OrganizationUnitRegistrationChangeParameters parameters);
         Maybe<OperationError> DeleteRegistrations(Guid organizationUuid, Guid unitUuid);
         Maybe<OperationError> TransferRegistrations(Guid organizationUuid, Guid unitUuid, Guid targetUnitUuid, OrganizationUnitRegistrationChangeParameters parameters);
+
+        Result<OrganizationUnit, OperationError> Create(Guid organizationUuid, Guid parentUuid,
+            string name, OrganizationUnitOrigin origin);
+        Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid uuid);
     }
 }

@@ -205,6 +205,7 @@
     <Compile Include="ApplicationServices\Notification\RegistrationNotificationUserRelationsServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\OrganizationUnitServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\OrganizationTest.cs" />
+    <Compile Include="ApplicationServices\Organizations\OrganizationUnitWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\StsOrganizationSynchronizationServiceTest.cs" />
     <Compile Include="ApplicationServices\ItSystems\ItSystemWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageMigrationServiceAdapterTest.cs" />
