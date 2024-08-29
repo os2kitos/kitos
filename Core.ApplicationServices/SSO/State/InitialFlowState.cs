@@ -86,7 +86,7 @@ namespace Core.ApplicationServices.SSO.State
         private bool CurrentUserHasKitosPrivilege()
         {
             // For local testing using Korsbaek Kommune users, uncomment the following line
-            // return true;
+            //return true;
 
             return _parser
             .MatchPrivilege(_samlKitosReadAccessRoleIdentifier)

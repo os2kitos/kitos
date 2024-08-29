@@ -18,6 +18,7 @@ using Moq;
 using Xunit;
 using Core.DomainModel.Events;
 using Core.DomainServices;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Tests.Unit.Core.ApplicationServices.Organizations
 {

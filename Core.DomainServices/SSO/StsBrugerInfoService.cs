@@ -138,7 +138,7 @@ namespace Core.DomainServices.SSO
                 var personUuid = registreringType5
                     .RelationListe
                     ?.TilknyttedePersoner
-                    ?.OrderByDescending(p => p.Virkning.TilTidspunkt)
+                    ?.OrderByDescending(p => p.Virkning.TilTidspunkt.Item is true ? DateTime.MaxValue : p.Virkning.TilTidspunkt.Item)
                     ?.FirstOrDefault()
                     ?.ReferenceID
                     ?.Item;
