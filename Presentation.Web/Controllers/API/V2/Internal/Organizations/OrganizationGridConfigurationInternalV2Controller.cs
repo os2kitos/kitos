@@ -104,7 +104,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 OrganizationUuid = orgUuid.Value,
                 OverviewType = kendoConfig.OverviewType,
                 Version = kendoConfig.Version,
-                VisibleColumns = kendoConfig.VisibleColumns.Select(MapKendoColumnConfigToConfigDto)
+                VisibleColumns = kendoConfig.VisibleColumns.Select(MapKendoColumnConfigToConfigDto).ToList()
             };
         }
 
