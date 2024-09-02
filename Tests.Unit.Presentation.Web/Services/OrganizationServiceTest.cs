@@ -817,10 +817,21 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
-        [Fact]
-        public void LocalAdminHasLocalAdminRole()
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.GlobalAdmin, false)]
+        [InlineData(OrganizationRole.LocalAdmin,  true)]
+        [InlineData(OrganizationRole.LocalAdmin, false)]
+        [InlineData(OrganizationRole.User,  true)]
+        [InlineData(OrganizationRole.User, false)]
+        public void HasRoleWorks(OrganizationRole roleBeingAsked, bool isActualRole)
         {
-           
+            var org = CreateOrganization();
+
+            _userContext.Setup(x => x.HasRole(org.Id, roleBeingAsked)).Returns(isActualRole);
+            bool hasRole = _sut.HasRole(org.Id, roleBeingAsked);
+            
+            Assert.Equal(hasRole, isActualRole);
         }
 
         private void VerifyOrganizationDeleted(Maybe<OperationError> result, Mock<IDatabaseTransaction> transaction, Organization organization)

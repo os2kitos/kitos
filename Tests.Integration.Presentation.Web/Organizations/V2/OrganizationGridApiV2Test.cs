@@ -89,7 +89,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
-        public async Task GlobalAdminHasDoesNotHaveConfigModificationPermissions()
+        public async Task GlobalAdminDoesNotHaveConfigModificationPermissions()
         {
             var globalAdminCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var (org, _) = await CreatePrerequisites();
