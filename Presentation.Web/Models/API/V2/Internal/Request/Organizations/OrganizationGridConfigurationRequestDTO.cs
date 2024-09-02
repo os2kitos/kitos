@@ -1,8 +1,9 @@
-﻿using Core.DomainModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Core.DomainModel;
+using Presentation.Web.Models.API.V1;
 
-namespace Presentation.Web.Models.API.V1
+namespace Presentation.Web.Models.API.V2.Internal.Request.Organizations
 {
     public class OrganizationGridConfigurationRequestDTO
     {
