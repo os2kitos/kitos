@@ -393,5 +393,10 @@ namespace Core.ApplicationServices.Organizations
 
             return new OperationError(OperationFailure.Forbidden);
         }
+
+        public bool HasRole(int orgId, OrganizationRole role)
+        {
+            return _userContext.HasRole(orgId, role);
+        }
     }
 }

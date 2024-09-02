@@ -39,7 +39,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.GetWithCookieAsync(url, httpCookie);
         }
 
-        public static async Task<HttpResponseMessage> SendSaveConfigurationRequestAsync(Guid orgUuid, IEnumerable<KendoColumnConfigurationDTO> columns,
+        public static async Task<HttpResponseMessage> SendSaveConfigurationRequestAsync(Guid orgUuid, IEnumerable<ColumnConfigurationRequestDTO> columns,
             Cookie cookie = null)
         {
             var url = TestEnvironment.CreateUrl(GetPathForGridConfigOperations(orgUuid, "save"));
@@ -49,7 +49,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
 
         public static async Task<OrganizationGridConfigurationResponseDTO> SaveConfigurationRequestAsync(Guid orgUuid,
-            IEnumerable<KendoColumnConfigurationDTO> columns,
+            IEnumerable<ColumnConfigurationRequestDTO> columns,
             Cookie cookie = null)
         {
             var response = await SendSaveConfigurationRequestAsync(orgUuid, columns, cookie);
@@ -77,7 +77,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var url = TestEnvironment.CreateUrl(GetPermissionsPath(orgUuid));
             var httpCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
-            var response = await HttpApi.GetWithCookieAsync(url, httpCookie);
+            using var response = await HttpApi.GetWithCookieAsync(url, httpCookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<OrganizationGridPermissionsResponseDTO>();
         }

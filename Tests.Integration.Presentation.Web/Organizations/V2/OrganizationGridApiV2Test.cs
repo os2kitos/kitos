@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -88,13 +89,13 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
-        public async Task GlobalAdminHasConfigModificationPermissions()
+        public async Task GlobalAdminHasDoesNotHaveConfigModificationPermissions()
         {
             var globalAdminCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var (org, _) = await CreatePrerequisites();
             var permissions = await
                 OrganizationGridTestHelper.GetOrganizationPermissionsAsync(org.Uuid, globalAdminCookie);
-            Assert.True(permissions.HasConfigModificationPermissions);
+            Assert.False(permissions.HasConfigModificationPermissions);
         }
 
         [Fact]
@@ -108,12 +109,12 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
 
-            private IEnumerable<KendoColumnConfigurationDTO> CreateTestColumns()
+            private IEnumerable<ColumnConfigurationRequestDTO> CreateTestColumns()
             {
-                var cols = new List<KendoColumnConfigurationDTO>();
+                var cols = new List<ColumnConfigurationRequestDTO>();
                 for (int i = 0; i < 10; i++)
                 {
-                    cols.Add(new KendoColumnConfigurationDTO
+                    cols.Add(new ColumnConfigurationRequestDTO()
                     {
                         Index = i,
                         PersistId = A<string>()
@@ -136,7 +137,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             return $"{nameof(OrganizationUnitTests)}{A<string>()}@test.dk";
         }
 
-        private void AssertColumnsMatch(List<KendoColumnConfigurationDTO> requestedColumns,
+        private static void AssertColumnsMatch(List<ColumnConfigurationRequestDTO> requestedColumns,
             List<ColumnConfigurationResponseDTO> responseColumns)
         {
             foreach (var columnTuple in requestedColumns.Select(column => (column.Index, column.PersistId)))

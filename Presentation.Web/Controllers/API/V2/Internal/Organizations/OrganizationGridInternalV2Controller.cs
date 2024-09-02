@@ -4,7 +4,7 @@ using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.KendoConfig;
 using Core.DomainModel.Organization;
@@ -22,13 +22,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 
         private readonly IKendoOrganizationalConfigurationService _kendoOrganizationalConfigurationService;
         private readonly IEntityIdentityResolver _entityIdentityResolver;
-        private readonly IOrganizationalUserContext _organizationalUserContext;
+        private readonly IOrganizationService _organizationService;
 
-        public OrganizationGridInternalV2Controller(IKendoOrganizationalConfigurationService kendoOrganizationalConfigurationService, IEntityIdentityResolver entityIdentityResolver, IOrganizationalUserContext organizationalUserContext)
+        public OrganizationGridInternalV2Controller(IKendoOrganizationalConfigurationService kendoOrganizationalConfigurationService, IEntityIdentityResolver entityIdentityResolver, IOrganizationService organizationService)
         {
             _kendoOrganizationalConfigurationService = kendoOrganizationalConfigurationService;
             _entityIdentityResolver = entityIdentityResolver;
-            _organizationalUserContext = organizationalUserContext;
+            _organizationService = organizationService;
         }
 
         [HttpPost]
@@ -43,12 +43,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var a =  MapUuidToId(organizationUuid);
-            var b = a.Bind(id => _kendoOrganizationalConfigurationService.CreateOrUpdate(id, overviewType,
-                config.VisibleColumns.Select(MapColumnConfigRequestToKendoColumnConfig)));
-            var c = b.Bind(MapKendoConfigToGridConfig);
-            var d =     c.Match(Ok, FromOperationError);
-            return d;
+            return MapUuidToId(organizationUuid)
+                    .Bind(id => _kendoOrganizationalConfigurationService.CreateOrUpdate(id, overviewType, config.VisibleColumns.Select(MapColumnConfigRequestToKendoColumnConfig)))
+                    .Bind(MapKendoConfigToGridConfig)
+                    .Match(Ok, FromOperationError);
         }
 
         [HttpDelete]
@@ -92,19 +90,19 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        
+
         public IHttpActionResult GetGridPermissions([NonEmptyGuid] Guid organizationUuid)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             return MapUuidToId(organizationUuid)
                 .Select(orgId => new OrganizationGridPermissionsResponseDTO
-                    { HasConfigModificationPermissions = HasModifyPermissions(orgId) })
+                { HasConfigModificationPermissions = HasGridConfigModifyPermission(orgId) })
                 .Match(Ok, FromOperationError);
         }
 
-        private bool HasModifyPermissions(int orgId)
+        private bool HasGridConfigModifyPermission(int orgId)
         {
-            return _organizationalUserContext.IsGlobalAdmin() || _organizationalUserContext.HasRole(orgId, OrganizationRole.LocalAdmin);
+            return _organizationService.HasRole(orgId, OrganizationRole.LocalAdmin);
         }
 
         private Result<int, OperationError> MapUuidToId(Guid organizationUuid)
