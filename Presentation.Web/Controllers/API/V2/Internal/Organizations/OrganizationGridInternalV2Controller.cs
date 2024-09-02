@@ -10,7 +10,6 @@ using Core.DomainModel.KendoConfig;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Swashbuckle.Swagger.Annotations;
@@ -46,7 +45,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 
             var a =  MapUuidToId(organizationUuid);
             var b = a.Bind(id => _kendoOrganizationalConfigurationService.CreateOrUpdate(id, overviewType,
-                config.VisibleColumns.Select(MapKendoColumnConfigDTOToKendoColumnConfig)));
+                config.VisibleColumns.Select(MapColumnConfigRequestToKendoColumnConfig)));
             var c = b.Bind(MapKendoConfigToGridConfig);
             var d =     c.Match(Ok, FromOperationError);
             return d;
@@ -93,6 +92,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
+        
         public IHttpActionResult GetGridPermissions([NonEmptyGuid] Guid organizationUuid)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -143,7 +143,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             };
         }
 
-        private KendoColumnConfiguration MapKendoColumnConfigDTOToKendoColumnConfig(KendoColumnConfigurationDTO columnConfig)
+        private KendoColumnConfiguration MapColumnConfigRequestToKendoColumnConfig(ColumnConfigurationRequestDTO columnConfig)
         {
             return new KendoColumnConfiguration
             {
