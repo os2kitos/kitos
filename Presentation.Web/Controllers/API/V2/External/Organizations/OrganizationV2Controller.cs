@@ -15,6 +15,7 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Queries.User;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
@@ -262,17 +263,20 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
                 .Transform(ToShallowDTOs)
                 .Transform(Ok);
         }
+
         private static OrganizationUnitResponseDTO ToOrganizationUnitResponseDto(OrganizationUnit unit)
         {
-            return new()
+            return new OrganizationUnitResponseDTO
             {
                 Uuid = unit.Uuid,
                 Name = unit.Name,
                 UnitId = unit.LocalId,
                 Ean = unit.Ean,
-                ParentOrganizationUnit = unit.Parent?.Transform(parent => parent.MapIdentityNamePairDTO())
+                ParentOrganizationUnit = unit.Parent?.Transform(parent => parent.MapIdentityNamePairDTO()),
+                Origin = unit.Origin.ToOrganizationUnitOriginChoice()
             };
         }
+
         private OrganizationUserResponseDTO ToUserResponseDTO((Guid organizationUuid, User user) context)
         {
             return new()
