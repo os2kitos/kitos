@@ -79,33 +79,16 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-        [Fact]
-        public async Task LocalAdminHasConfigModificationPermissions()
+        [Theory]
+        [InlineData(OrganizationRole.User, false)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.GlobalAdmin, false)]
+        public async Task PermissionToModifyGridConfigHasCorrectValueForRoles(OrganizationRole role, bool expected)
         {
             var (org, localAdminCookie) = await CreatePrerequisites();
-            var permissions = await
-                OrganizationGridTestHelper.GetOrganizationPermissionsAsync(org.Uuid, localAdminCookie);
-            Assert.True(permissions.HasConfigModificationPermissions);
-        }
-
-        [Fact]
-        public async Task GlobalAdminDoesNotHaveConfigModificationPermissions()
-        {
-            var globalAdminCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var (org, _) = await CreatePrerequisites();
-            var permissions = await
-                OrganizationGridTestHelper.GetOrganizationPermissionsAsync(org.Uuid, globalAdminCookie);
-            Assert.False(permissions.HasConfigModificationPermissions);
-        }
-
-        [Fact]
-        public async Task RegularUserDoesNotHaveConfigModificationPermissions()
-        {
-            var (org, _) = await CreatePrerequisites();
-            var (_, _, userCookie) = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, org.Id);
-            var permissions =
-                await OrganizationGridTestHelper.GetOrganizationPermissionsAsync(org.Uuid, userCookie);
-            Assert.False(permissions.HasConfigModificationPermissions);
+            var cookie = (role == OrganizationRole.LocalAdmin) ? localAdminCookie : await HttpApi.GetCookieAsync(role);
+            var permissions = await OrganizationGridTestHelper.GetOrganizationPermissionsAsync(org.Uuid, cookie);
+            Assert.Equal(permissions.HasConfigModificationPermissions, expected);
         }
 
 
