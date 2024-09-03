@@ -17,6 +17,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired()
                 .HasMaxLength(UserConstraints.MaxNameLength)
                 .HasIndexAnnotation("IX_UserFullName", 0);
+            Property(x => x.Email);
             Property(x => x.UserId)
                 .IsRequired()
                 .HasIndexAnnotation("IX_UserId", 0);
