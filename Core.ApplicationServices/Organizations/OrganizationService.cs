@@ -384,6 +384,14 @@ namespace Core.ApplicationServices.Organizations
                 .Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
         }
 
+        public GridPermissions GetGridPermissions(int orgId)
+        {
+            return new GridPermissions
+            {
+                ConfigModificationPermission = HasRole(orgId, OrganizationRole.LocalAdmin)
+            };
+        }
+
         private Result<Organization, OperationError> WithDeletionAccess(Organization organization)
         {
             if (_authorizationContext.AllowDelete(organization))
@@ -397,14 +405,6 @@ namespace Core.ApplicationServices.Organizations
         private bool HasRole(int orgId, OrganizationRole role)
         {
             return _userContext.HasRole(orgId, role);
-        }
-
-        public GridPermissions GetGridPermissions(int orgId)
-        {
-            return new GridPermissions
-            {
-                ConfigModificationPermission = HasRole(orgId, OrganizationRole.LocalAdmin)
-            };
         }
     }
 }
