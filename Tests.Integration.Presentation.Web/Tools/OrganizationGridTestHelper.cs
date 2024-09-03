@@ -43,7 +43,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             Cookie cookie = null)
         {
             var url = TestEnvironment.CreateUrl(GetPathForGridConfigOperations(orgUuid, "save"));
-            var body = new OrganizationGridConfigurationRequestDTO { OrganizationUuid = orgUuid, VisibleColumns = columns, OverviewType = 0};
+            var body = new OrganizationGridConfigurationRequestDTO { VisibleColumns = columns};
             var httpCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
             return await HttpApi.PostWithCookieAsync(url, httpCookie, body);
         }
