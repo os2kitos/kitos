@@ -130,6 +130,61 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Equal(operationError.FailureType, result.Error.FailureType);
         }
 
+        [Fact]
+        public void PatchUnit_Returns_Ok()
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var inputParameters = A<OrganizationUnitUpdateParameters>();
+            var transactionMock = ExpectTransactionBegins();
+            var orgDbId = A<int>();
+            var name = inputParameters.Name.NewValue;
+            var origin = inputParameters.Origin.NewValue;
+            var parentUnit = new OrganizationUnit { Uuid = inputParameters.ParentUuid.NewValue.Value };
+            var unit = new OrganizationUnit { Uuid = A<Guid>(), Name = name, Origin = origin, Parent = parentUnit };
+            var organization = new Organization { Id = orgDbId, Uuid = organizationUuid, OrgUnits = new List<OrganizationUnit> { parentUnit, unit } };
+            parentUnit.Organization = organization;
+            unit.Organization = organization;
+
+            ExpectGetOrganizationAndAuthorizeModificationReturns(organizationUuid, organization);
+            ExpectWithWriteAccessReturns(unit, true);
+
+            //Act
+            var result = _sut.Patch(organizationUuid, unit.Uuid, inputParameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            var updatedUnit = result.Value;
+            transactionMock.Verify(x => x.Commit(), Times.AtLeastOnce);
+            Assert.Equal(inputParameters.Origin.NewValue, updatedUnit.Origin);
+            Assert.Equal(inputParameters.Name.NewValue, updatedUnit.Name);
+            Assert.Equal(inputParameters.ParentUuid.NewValue, updatedUnit.Parent.Uuid);
+        }
+
+        [Fact]
+        public void PatchUnit_Returns_Error_When_Patch_Fails()
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var inputParameters = A<OrganizationUnitUpdateParameters>();
+            ExpectTransactionBegins();
+            var name = inputParameters.Name.NewValue;
+            var origin = inputParameters.Origin.NewValue;
+            var unit = new OrganizationUnit { Uuid = A<Guid>(), Name = name, Origin = origin };
+
+            var error = new OperationError(A<OperationFailure>());
+
+            ExpectGetOrganizationAndAuthorizeModificationReturns(organizationUuid, error);
+            ExpectWithWriteAccessReturns(unit, true);
+
+            //Act
+            var result = _sut.Patch(organizationUuid, unit.Uuid, inputParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(error.FailureType, result.Error.FailureType);
+        }
+
         private Mock<IDatabaseTransaction> ExpectTransactionBegins()
         {
             var transactionMock = new Mock<IDatabaseTransaction>();
