@@ -4,6 +4,7 @@ using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.KendoConfig;
@@ -95,14 +96,17 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             return MapUuidToId(organizationUuid)
-                .Select(orgId => new OrganizationGridPermissionsResponseDTO
-                { HasConfigModificationPermissions = HasGridConfigModifyPermission(orgId) })
+                .Select( _organizationService.GetGridPermissions)
+                .Select(MapGridPermissionsToDTO)
                 .Match(Ok, FromOperationError);
         }
 
-        private bool HasGridConfigModifyPermission(int orgId)
+        private OrganizationGridPermissionsResponseDTO MapGridPermissionsToDTO(GridPermissions permissions)
         {
-            return _organizationService.HasRole(orgId, OrganizationRole.LocalAdmin);
+            return new OrganizationGridPermissionsResponseDTO
+            {
+                HasConfigModificationPermissions = permissions.ConfigModificationPermission
+            };
         }
 
         private Result<int, OperationError> MapUuidToId(Guid organizationUuid)
@@ -126,7 +130,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             {
                 OrganizationUuid = orgUuid.Value,
                 OverviewType = kendoConfig.OverviewType,
-                Version = kendoConfig.Version,
                 VisibleColumns = kendoConfig.VisibleColumns.Select(MapKendoColumnConfigToConfigDto).ToList()
             };
         }

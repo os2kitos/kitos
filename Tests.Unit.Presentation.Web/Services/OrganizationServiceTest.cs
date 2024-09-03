@@ -818,20 +818,16 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin, true)]
         [InlineData(OrganizationRole.GlobalAdmin, false)]
-        [InlineData(OrganizationRole.LocalAdmin,  true)]
-        [InlineData(OrganizationRole.LocalAdmin, false)]
-        [InlineData(OrganizationRole.User,  true)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
         [InlineData(OrganizationRole.User, false)]
-        public void HasRoleWorks(OrganizationRole roleBeingAsked, bool isActualRole)
+        public void Get_Grid_Permissions_Returns_Expected_Result(OrganizationRole roleBeingAsked, bool shouldHaveModificationPermission)
         {
             var org = CreateOrganization();
 
-            _userContext.Setup(x => x.HasRole(org.Id, roleBeingAsked)).Returns(isActualRole);
-            bool hasRole = _sut.HasRole(org.Id, roleBeingAsked);
-            
-            Assert.Equal(hasRole, isActualRole);
+            _userContext.Setup(x => x.HasRole(org.Id, roleBeingAsked)).Returns(true);
+            var permissions = _sut.GetGridPermissions(org.Id);
+            Assert.Equal(shouldHaveModificationPermission, permissions.ConfigModificationPermission);
         }
 
         private void VerifyOrganizationDeleted(Maybe<OperationError> result, Mock<IDatabaseTransaction> transaction, Organization organization)

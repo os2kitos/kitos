@@ -50,6 +50,6 @@ namespace Core.ApplicationServices.Organizations
         Result<bool, OperationError> CanActiveUserModifyCvr(Guid organizationUuid);
         Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid organizationUuid);
 
-        public bool HasRole(int orgId, OrganizationRole role);
+        public GridPermissions GetGridPermissions(int orgId);
     }
 }

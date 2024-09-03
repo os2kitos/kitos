@@ -394,9 +394,17 @@ namespace Core.ApplicationServices.Organizations
             return new OperationError(OperationFailure.Forbidden);
         }
 
-        public bool HasRole(int orgId, OrganizationRole role)
+        private bool HasRole(int orgId, OrganizationRole role)
         {
             return _userContext.HasRole(orgId, role);
+        }
+
+        public GridPermissions GetGridPermissions(int orgId)
+        {
+            return new GridPermissions
+            {
+                ConfigModificationPermission = HasRole(orgId, OrganizationRole.LocalAdmin)
+            };
         }
     }
 }
