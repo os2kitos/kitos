@@ -86,13 +86,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [HttpGet]
-        [Route("permissionsz")]
+        [Route("permissions")]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationGridPermissionsResponseDTO))]
-        public IHttpActionResult GetGridPermissionsz([NonEmptyGuid] Guid organizationUuid)
+        public IHttpActionResult GetOrganizationGridPermissions([NonEmptyGuid] Guid organizationUuid)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             return MapUuidToId(organizationUuid)
