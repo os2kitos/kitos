@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -13,7 +14,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Organizations.V2
 {
-    public class OrganizationGridConfigurationApiV2Test : WithAutoFixture
+    public class OrganizationGridApiV2Test : WithAutoFixture
     {
 
         [Fact]
@@ -21,10 +22,10 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var columns = CreateTestColumns().ToArray();
             var (org, localAdminCookie) = await CreatePrerequisites();
-            await OrganizationGridConfigurationTestHelper.SaveConfigurationRequestAsync(org.Uuid, columns, localAdminCookie);
+            await OrganizationGridTestHelper.SaveConfigurationRequestAsync(org.Uuid, columns, localAdminCookie);
 
             using var deleteResponse = await 
-                OrganizationGridConfigurationTestHelper.SendDeleteConfigurationRequestAsync(org.Uuid, localAdminCookie);
+                OrganizationGridTestHelper.SendDeleteConfigurationRequestAsync(org.Uuid, localAdminCookie);
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
         }
 
@@ -35,7 +36,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var (_, _, userCookie) = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, org.Id);
 
             using var response = await
-                OrganizationGridConfigurationTestHelper.SendSaveConfigurationRequestAsync(org.Uuid, CreateTestColumns(), userCookie);
+                OrganizationGridTestHelper.SendSaveConfigurationRequestAsync(org.Uuid, CreateTestColumns(), userCookie);
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
@@ -43,13 +44,13 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         public async Task RegularUserCanNotDeleteGridConfiguration()
         {
             var (org, localAdminCookie) = await CreatePrerequisites();
-            await OrganizationGridConfigurationTestHelper.SendSaveConfigurationRequestAsync(org.Uuid,
+            await OrganizationGridTestHelper.SendSaveConfigurationRequestAsync(org.Uuid,
                 CreateTestColumns(), localAdminCookie);
 
             var (_, _, userCookie) = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, org.Id);
 
             using var response = await
-                OrganizationGridConfigurationTestHelper.SendDeleteConfigurationRequestAsync(org.Uuid, userCookie);
+                OrganizationGridTestHelper.SendDeleteConfigurationRequestAsync(org.Uuid, userCookie);
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
@@ -59,31 +60,44 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             //Local admin saves grid config
             var columns = CreateTestColumns().ToList();
             var (org, localAdminCookie) = await CreatePrerequisites();
-            await OrganizationGridConfigurationTestHelper.SaveConfigurationRequestAsync(org.Uuid,
+            await OrganizationGridTestHelper.SaveConfigurationRequestAsync(org.Uuid,
                 columns, localAdminCookie);
 
             var (_, _, userCookie) = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, org.Id);
 
             //User retrieves Grid Config
-            var body = await OrganizationGridConfigurationTestHelper.GetResponseBodyAsync(org.Uuid, userCookie);
+            var body = await OrganizationGridTestHelper.GetResponseBodyAsync(org.Uuid, userCookie);
             AssertColumnsMatch(columns, body.VisibleColumns.ToList());
             
 
             //Local admin deletes grid config
-            await OrganizationGridConfigurationTestHelper.SendDeleteConfigurationRequestAsync(org.Uuid, localAdminCookie);
+            await OrganizationGridTestHelper.SendDeleteConfigurationRequestAsync(org.Uuid, localAdminCookie);
 
             //Users tries to retrieve grid config after it has been deleted
             using var response = await
-                OrganizationGridConfigurationTestHelper.SendGetConfigurationRequestAsync(org.Uuid, userCookie);
+                OrganizationGridTestHelper.SendGetConfigurationRequestAsync(org.Uuid, userCookie);
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-            private IEnumerable<KendoColumnConfigurationDTO> CreateTestColumns()
+        [Theory]
+        [InlineData(OrganizationRole.User, false)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.GlobalAdmin, false)]
+        public async Task PermissionToModifyGridConfigHasCorrectValueForRoles(OrganizationRole role, bool expected)
+        {
+            var (org, localAdminCookie) = await CreatePrerequisites();
+            var cookie = (role == OrganizationRole.LocalAdmin) ? localAdminCookie : await HttpApi.GetCookieAsync(role);
+            var permissions = await OrganizationGridTestHelper.GetOrganizationPermissionsAsync(org.Uuid, cookie);
+            Assert.Equal(permissions.HasConfigModificationPermissions, expected);
+        }
+
+
+            private IEnumerable<ColumnConfigurationRequestDTO> CreateTestColumns()
             {
-                var cols = new List<KendoColumnConfigurationDTO>();
+                var cols = new List<ColumnConfigurationRequestDTO>();
                 for (int i = 0; i < 10; i++)
                 {
-                    cols.Add(new KendoColumnConfigurationDTO
+                    cols.Add(new ColumnConfigurationRequestDTO()
                     {
                         Index = i,
                         PersistId = A<string>()
@@ -106,7 +120,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             return $"{nameof(OrganizationUnitTests)}{A<string>()}@test.dk";
         }
 
-        private void AssertColumnsMatch(List<KendoColumnConfigurationDTO> requestedColumns,
+        private static void AssertColumnsMatch(List<ColumnConfigurationRequestDTO> requestedColumns,
             List<ColumnConfigurationResponseDTO> responseColumns)
         {
             foreach (var columnTuple in requestedColumns.Select(column => (column.Index, column.PersistId)))

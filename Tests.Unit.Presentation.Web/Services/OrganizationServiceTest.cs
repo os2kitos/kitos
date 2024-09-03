@@ -42,6 +42,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IOrgUnitService> _orgUnitServiceMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IOrganizationRightsService> _organizationRightsServiceMock;
+        
 
         public OrganizationServiceTest()
         {
@@ -814,6 +815,19 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, false)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.User, false)]
+        public void Get_Grid_Permissions_Returns_Expected_Result(OrganizationRole roleBeingAsked, bool shouldHaveModificationPermission)
+        {
+            var org = CreateOrganization();
+
+            _userContext.Setup(x => x.HasRole(org.Id, roleBeingAsked)).Returns(true);
+            var permissions = _sut.GetGridPermissions(org.Id);
+            Assert.Equal(shouldHaveModificationPermission, permissions.ConfigModificationPermission);
         }
 
         private void VerifyOrganizationDeleted(Maybe<OperationError> result, Mock<IDatabaseTransaction> transaction, Organization organization)
