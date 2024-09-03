@@ -2,6 +2,8 @@
 {
     public class DataProcessingRegistrationRoleAssignmentReadModel : IHasId
     {
+        public string Email { get; set; }
+
         public int Id { get; set; }
         
         public int RoleId { get; set; }
