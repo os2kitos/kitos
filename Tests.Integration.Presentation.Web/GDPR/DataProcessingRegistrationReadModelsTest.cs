@@ -184,6 +184,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(role.Id, roleAssignment.RoleId);
             Assert.Equal(user.Id, roleAssignment.UserId);
             Assert.Equal(user.Name, roleAssignment.UserFullName);
+            Assert.Equal(user.Email, roleAssignment.Email);
 
             Console.Out.WriteLine("Role data verified");
 
