@@ -76,7 +76,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetGridConfiguration([NonEmptyGuid] Guid organizationUuid, [FromUri] OverviewType overviewType)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) 
                 return BadRequest(ModelState);
 
             return MapUuidToId(organizationUuid)
