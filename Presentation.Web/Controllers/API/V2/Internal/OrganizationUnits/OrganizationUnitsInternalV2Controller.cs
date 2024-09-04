@@ -75,6 +75,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult CreateUnit([NonEmptyGuid] Guid organizationUuid, [FromBody] CreateOrganizationUnitRequestDTO parameters)
         {
+            if (!ModelState.IsValid) return BadRequest();
             return _organizationUnitWriteService.Create(organizationUuid, _organizationUnitWriteModelMapper.FromPOST(parameters))
                 .Select(_responseMapper.ToUnitDto)
                 .Match(MapUnitCreatedResponse, FromOperationError);
