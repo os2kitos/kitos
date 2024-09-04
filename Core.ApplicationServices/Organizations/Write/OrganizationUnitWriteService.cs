@@ -62,6 +62,31 @@ namespace Core.ApplicationServices.Organizations.Write
             return result;
         }
 
+        public Result<OrganizationUnit, OperationError> Patch(Guid organizationUuid, Guid organizationUnitUuid,
+            OrganizationUnitUpdateParameters parameters)
+        {
+            using var transaction = _transactionManager.Begin();
+
+            var result = _organizationUnitService.GetOrganizationAndAuthorizeModification(organizationUuid)
+                .Bind(organization => organization.GetOrganizationUnit(organizationUnitUuid)
+                    .Match<Result<OrganizationUnit, OperationError>>(
+                        unit => unit, 
+                        () => new OperationError($"Organization unit with uuid {organizationUnitUuid} was not found", OperationFailure.NotFound))
+                )
+                .Bind(unit => Update(unit, parameters));
+
+            if (result.Ok)
+            {
+                transaction.Commit();
+            }
+            else
+            {
+                transaction.Rollback();
+            }
+
+            return result;
+        }
+
         private static void MarkCreateParametersAsChanged(OrganizationUnitUpdateParameters parameters)
         {
             parameters.Origin = OptionalValueChange<OrganizationUnitOrigin>.None;

@@ -422,7 +422,9 @@
     <Compile Include="Models\API\V2\Request\Interface\IItInterfaceWritablePropertiesRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\ItInterfaceDataRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\UpdateItInterfaceRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\OrganizationUnit\BaseOrganizationUnitRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\OrganizationUnit\CreateOrganizationUnitRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\OrganizationUnit\UpdateOrganizationUnitRequestDTO.cs" />
     <Compile Include="Models\API\V2\Types\Organization\OrganizationUnitOriginChoice.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingCreationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingUpdateRequestDTO.cs" />

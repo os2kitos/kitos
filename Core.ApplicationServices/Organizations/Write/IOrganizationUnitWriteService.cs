@@ -9,5 +9,8 @@ namespace Core.ApplicationServices.Organizations.Write
     {
         Result<OrganizationUnit, OperationError> Create(Guid organizationUuid,
             OrganizationUnitUpdateParameters parameters);
+
+        Result<OrganizationUnit, OperationError> Patch(Guid organizationUuid, Guid organizationUnitUuid,
+            OrganizationUnitUpdateParameters parameters);
     }
 }

@@ -36,6 +36,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         }
 
         [Route("{unitUuid}/permissions")]
+        [HttpGet]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UnitAccessRightsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -48,6 +49,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         }
 
         [Route("all/collection-permissions")]
+        [HttpGet]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UnitAccessRightsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -66,6 +68,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         }
 
         [Route("create")]
+        [HttpPost]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(OrganizationUnitResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -75,6 +78,20 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
             return _organizationUnitWriteService.Create(organizationUuid, _organizationUnitWriteModelMapper.FromPOST(parameters))
                 .Select(_responseMapper.ToUnitDto)
                 .Match(MapUnitCreatedResponse, FromOperationError);
+        }
+
+        [Route("{organizationUnitUuid}/patch")]
+        [HttpPatch]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(OrganizationUnitResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult PatchUnit([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid organizationUnitUuid, [FromBody] UpdateOrganizationUnitRequestDTO parameters)
+        {
+            return _organizationUnitWriteService.Patch(organizationUuid, organizationUnitUuid,
+                    _organizationUnitWriteModelMapper.FromPATCH(parameters))
+                .Select(_responseMapper.ToUnitDto)
+                .Match(Ok, FromOperationError);
         }
 
         private CreatedNegotiatedContentResult<OrganizationUnitResponseDTO> MapUnitCreatedResponse(OrganizationUnitResponseDTO dto)

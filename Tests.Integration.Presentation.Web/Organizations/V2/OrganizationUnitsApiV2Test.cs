@@ -221,12 +221,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token.Token, organization.Uuid);
             var parentUnit = Assert.Single(units);
 
-            var request = new CreateOrganizationUnitRequestDTO
-            {
-                Name = A<string>(),
-                Origin = A<OrganizationUnitOriginChoice>(),
-                ParentUuid = parentUnit.Uuid
-            };
+            var request = CreateCreateRequest(parentUnit.Uuid);
 
             //Act
             var result = await OrganizationUnitV2Helper.CreateUnitAsync(organization.Uuid, request);
@@ -235,6 +230,42 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(parentUnit.Name, result.ParentOrganizationUnit.Name);
             Assert.Equal(parentUnit.Uuid, result.ParentOrganizationUnit.Uuid);
             Assert.Equal(parentUnit.Origin, result.Origin);
+        }
+
+        [Fact]
+        public async Task Can_Update_OrganizationUnit()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+
+            var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token.Token, organization.Uuid);
+            var parentUnit = Assert.Single(units);
+
+            var request1 = CreateCreateRequest(parentUnit.Uuid);
+            var request2 = CreateCreateRequest(parentUnit.Uuid);
+
+            var testUnitFutureParent = await OrganizationUnitV2Helper.CreateUnitAsync(organization.Uuid, request1);
+            var testUnitFutureChild = await OrganizationUnitV2Helper.CreateUnitAsync(organization.Uuid, request2);
+
+            var patchRequest = new UpdateOrganizationUnitRequestDTO
+            {
+                Name = A<string>(),
+                Origin = testUnitFutureChild.Origin == OrganizationUnitOriginChoice.Kitos
+                    ? OrganizationUnitOriginChoice.STSOrganisation
+                    : OrganizationUnitOriginChoice.Kitos,
+                ParentUuid = testUnitFutureParent.Uuid
+            };
+
+            //Act
+            var result =
+                await OrganizationUnitV2Helper.PatchUnitAsync(organization.Uuid, testUnitFutureChild.Uuid,
+                    patchRequest);
+
+            //Assert
+            Assert.Equal(patchRequest.Name, result.Name);
+            Assert.Equal(patchRequest.Origin, result.Origin);
+            Assert.Equal(patchRequest.ParentUuid, result.ParentOrganizationUnit.Uuid);
         }
 
         private async Task<(User user, string token)> CreateApiUser(OrganizationDTO organization)
@@ -248,6 +279,16 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var organizationName = CreateName();
             return await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, organizationName, null, A<OrganizationTypeKeys>(), AccessModifier.Public);
+        }
+
+        private CreateOrganizationUnitRequestDTO CreateCreateRequest(Guid parentUuid)
+        {
+            return new CreateOrganizationUnitRequestDTO
+            {
+                Name = A<string>(),
+                Origin = A<OrganizationUnitOriginChoice>(),
+                ParentUuid = parentUuid
+            };
         }
 
         private string CreateName()

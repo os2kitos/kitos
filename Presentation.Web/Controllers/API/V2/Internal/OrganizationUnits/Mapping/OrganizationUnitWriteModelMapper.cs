@@ -22,7 +22,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping
             return MapParameters(request);
         }
 
-        private OrganizationUnitUpdateParameters MapParameters(CreateOrganizationUnitRequestDTO request)
+        public OrganizationUnitUpdateParameters FromPATCH(UpdateOrganizationUnitRequestDTO request)
+        {
+            return MapParameters(request);
+        }
+
+        private OrganizationUnitUpdateParameters MapParameters(BaseOrganizationUnitRequestDTO request)
         {
             var rule = CreateChangeRule<CreateOrganizationUnitRequestDTO>(true);
             var parameters = new OrganizationUnitUpdateParameters
