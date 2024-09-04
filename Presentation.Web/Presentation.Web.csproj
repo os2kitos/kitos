@@ -380,7 +380,7 @@
     <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\Mapping\ItSystemUsageMigrationResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Mapping\InternalDtoModelV2MappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemUsageV2QueryHandler.cs" />
-    <Compile Include="Controllers\API\V2\Internal\Organizations\OrganizationGridConfigurationInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Organizations\OrganizationGridInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\Organizations\OrganizationsInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\IOrganizationUnitResponseModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\IOrganizationUnitWriteModelMapper.cs" />
@@ -412,6 +412,7 @@
     <Compile Include="Models\API\V2\Internal\Response\ItSystem\ItSystemSearchResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\ColumnConfigurationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationGridConfigurationResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationGridPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\UnitAccessRightsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\UnitAccessRightsWithUnitDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesCreation.cs" />

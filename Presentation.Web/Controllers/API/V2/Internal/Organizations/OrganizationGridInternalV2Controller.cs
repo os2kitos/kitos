@@ -4,32 +4,36 @@ using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Model.Organizations;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.KendoConfig;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
-    [RoutePrefix("api/v2/internal/organizations/{organizationUuid}/grid-configuration/{overviewType}")]
-    public class OrganizationGridConfigurationInternalV2Controller : InternalApiV2Controller
+    [RoutePrefix("api/v2/internal/organizations/{organizationUuid}/grid")]
+    public class OrganizationGridInternalV2Controller : InternalApiV2Controller
     {
 
         private readonly IKendoOrganizationalConfigurationService _kendoOrganizationalConfigurationService;
         private readonly IEntityIdentityResolver _entityIdentityResolver;
+        private readonly IOrganizationService _organizationService;
 
-        public OrganizationGridConfigurationInternalV2Controller(IKendoOrganizationalConfigurationService kendoOrganizationalConfigurationService, IEntityIdentityResolver entityIdentityResolver)
+        public OrganizationGridInternalV2Controller(IKendoOrganizationalConfigurationService kendoOrganizationalConfigurationService, IEntityIdentityResolver entityIdentityResolver, IOrganizationService organizationService)
         {
             _kendoOrganizationalConfigurationService = kendoOrganizationalConfigurationService;
             _entityIdentityResolver = entityIdentityResolver;
+            _organizationService = organizationService;
         }
 
         [HttpPost]
-        [Route("save")]
+        [Route("{overviewType}/save")]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -41,14 +45,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 return BadRequest(ModelState);
 
             return MapUuidToId(organizationUuid)
-                .Bind(id => _kendoOrganizationalConfigurationService.CreateOrUpdate(id, overviewType, config.VisibleColumns.Select(MapKendoColumnConfigDTOToKendoColumnConfig)))
-                .Bind(MapKendoConfigToGridConfig)
-                .Match(Ok, FromOperationError);
-                
+                    .Bind(id => _kendoOrganizationalConfigurationService.CreateOrUpdate(id, overviewType, config.VisibleColumns.Select(MapColumnConfigRequestToKendoColumnConfig)))
+                    .Bind(MapKendoConfigToGridConfig)
+                    .Match(Ok, FromOperationError);
         }
 
         [HttpDelete]
-        [Route("delete")]
+        [Route("{overviewType}/delete")]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -66,20 +69,44 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [HttpGet]
-        [Route("get")]
+        [Route("{overviewType}/get")]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetGridConfiguration([NonEmptyGuid] Guid organizationUuid, [FromUri] OverviewType overviewType)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid) 
                 return BadRequest(ModelState);
 
             return MapUuidToId(organizationUuid)
                 .Bind(id => _kendoOrganizationalConfigurationService.Get(id, overviewType))
                 .Bind(MapKendoConfigToGridConfig)
                 .Match(Ok, FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("permissions")]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationGridPermissionsResponseDTO))]
+        public IHttpActionResult GetOrganizationGridPermissions([NonEmptyGuid] Guid organizationUuid)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            return MapUuidToId(organizationUuid)
+                .Select( _organizationService.GetGridPermissions)
+                .Select(MapGridPermissionsToDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        private OrganizationGridPermissionsResponseDTO MapGridPermissionsToDTO(GridPermissions permissions)
+        {
+            return new OrganizationGridPermissionsResponseDTO
+            {
+                HasConfigModificationPermissions = permissions.ConfigModificationPermission
+            };
         }
 
         private Result<int, OperationError> MapUuidToId(Guid organizationUuid)
@@ -103,7 +130,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             {
                 OrganizationUuid = orgUuid.Value,
                 OverviewType = kendoConfig.OverviewType,
-                Version = kendoConfig.Version,
                 VisibleColumns = kendoConfig.VisibleColumns.Select(MapKendoColumnConfigToConfigDto).ToList()
             };
         }
@@ -118,7 +144,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             };
         }
 
-        private KendoColumnConfiguration MapKendoColumnConfigDTOToKendoColumnConfig(KendoColumnConfigurationDTO columnConfig)
+        private KendoColumnConfiguration MapColumnConfigRequestToKendoColumnConfig(ColumnConfigurationRequestDTO columnConfig)
         {
             return new KendoColumnConfiguration
             {
