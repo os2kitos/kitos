@@ -4,7 +4,6 @@ using Swashbuckle.Swagger.Annotations;
 using System.Net;
 using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Web.Http;
 using Core.ApplicationServices.Organizations.Write;
 using Presentation.Web.Models.API.V2.Internal.Response.OrganizationUnit;

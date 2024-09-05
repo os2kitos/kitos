@@ -329,6 +329,7 @@ namespace Core.ApplicationServices.Organizations
                     : new OperationError("User is not authorized for bulk permission administration", OperationFailure.Forbidden)
                 );
         }
+
         private UnitAccessRights GetAccessRights(Organization organization, OrganizationUnit unit)
         {
             if (!_authorizationContext.AllowModify(unit))
