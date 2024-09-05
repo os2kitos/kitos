@@ -50,7 +50,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 Name = A<string>().AsChangedValue(),
                 Origin = A<OrganizationUnitOrigin>().AsChangedValue(),
                 ParentUuid = A<Guid>().FromNullable().AsChangedValue(),
-                Ean = A<long>().FromNullable().AsChangedValue(),
+                Ean = A<int>().FromNullable().AsChangedValue(),
                 LocalId = A<string>().FromNullable().AsChangedValue()
 
             });
