@@ -76,14 +76,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult CreateUnit([NonEmptyGuid] Guid organizationUuid, [FromBody] CreateOrganizationUnitRequestDTO parameters)
         {
-            var mapped = _organizationUnitWriteModelMapper.FromPOST(parameters);
-            var createResult = _organizationUnitWriteService.Create(organizationUuid, mapped);
-            var mappedToDto = createResult.Select(_responseMapper.ToUnitDto);
-            var matched = mappedToDto.Match(MapUnitCreatedResponse, FromOperationError);
-            return matched;
-            //return _organizationUnitWriteService.Create(organizationUuid, _organizationUnitWriteModelMapper.FromPOST(parameters))
-            //    .Select(_responseMapper.ToUnitDto)
-            //    .Match(MapUnitCreatedResponse, FromOperationError);
+            return _organizationUnitWriteService.Create(organizationUuid, _organizationUnitWriteModelMapper.FromPOST(parameters))
+                .Select(_responseMapper.ToUnitDto)
+                .Match(MapUnitCreatedResponse, FromOperationError);
         }
 
         [Route("{organizationUnitUuid}/patch")]
