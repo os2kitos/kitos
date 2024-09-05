@@ -41,8 +41,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping
                 ParentUuid = rule.MustUpdate(x => x.ParentUuid)
                     ? (request.ParentUuid.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<Guid>>.None,
-                EAN = rule.MustUpdate(x => x.EAN)
-                       ? (request.EAN.FromNullable() ?? Maybe<int>.None).AsChangedValue() : OptionalValueChange<Maybe<int>>.None,
+                Ean = rule.MustUpdate(x => x.Ean)
+                       ? (request.Ean.FromNullable() ?? Maybe<int>.None).AsChangedValue() : OptionalValueChange<Maybe<int>>.None,
                 Id = rule.MustUpdate(x => x.Id)
                     ? (request.Id.FromNullable() ?? Maybe<string>.None).AsChangedValue() : OptionalValueChange<Maybe<string>>.None,
             };

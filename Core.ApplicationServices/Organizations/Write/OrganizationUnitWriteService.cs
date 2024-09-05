@@ -121,7 +121,7 @@ namespace Core.ApplicationServices.Organizations.Write
             return organizationUnit.WithOptionalUpdate(parameters.Name, (unit, name) => unit.UpdateName(name))
                 .Bind(unit => unit.WithOptionalUpdate(parameters.Origin, (orgUnit, origin) => orgUnit.Origin = origin))
                 .Bind(unit => unit.WithOptionalUpdate(parameters.ParentUuid, UpdateParentUnit))
-                .Bind(unit => unit.WithOptionalUpdate(parameters.EAN, UpdateUnitEan))
+                .Bind(unit => unit.WithOptionalUpdate(parameters.Ean, UpdateUnitEan))
                 .Bind(unit => unit.WithOptionalUpdate(parameters.Id, UpdateUnitId));
         }
 
