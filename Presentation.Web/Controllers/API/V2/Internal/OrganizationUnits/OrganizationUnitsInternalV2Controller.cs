@@ -4,6 +4,7 @@ using Swashbuckle.Swagger.Annotations;
 using System.Net;
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web.Http;
 using Core.ApplicationServices.Organizations.Write;
 using Presentation.Web.Models.API.V2.Internal.Response.OrganizationUnit;
@@ -75,10 +76,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult CreateUnit([NonEmptyGuid] Guid organizationUuid, [FromBody] CreateOrganizationUnitRequestDTO parameters)
         {
-            if (!ModelState.IsValid) return BadRequest();
-            return _organizationUnitWriteService.Create(organizationUuid, _organizationUnitWriteModelMapper.FromPOST(parameters))
-                .Select(_responseMapper.ToUnitDto)
-                .Match(MapUnitCreatedResponse, FromOperationError);
+            var mapped = _organizationUnitWriteModelMapper.FromPOST(parameters);
+            var createResult = _organizationUnitWriteService.Create(organizationUuid, mapped);
+            var mappedToDto = createResult.Select(_responseMapper.ToUnitDto);
+            var matched = mappedToDto.Match(MapUnitCreatedResponse, FromOperationError);
+            return matched;
+            //return _organizationUnitWriteService.Create(organizationUuid, _organizationUnitWriteModelMapper.FromPOST(parameters))
+            //    .Select(_responseMapper.ToUnitDto)
+            //    .Match(MapUnitCreatedResponse, FromOperationError);
         }
 
         [Route("{organizationUnitUuid}/patch")]

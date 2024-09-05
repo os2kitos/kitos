@@ -38,13 +38,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping
                 Origin = rule.MustUpdate(x => x.Origin)
                     ? request.Origin.ToOrganizationUnitOrigin().AsChangedValue()
                     : OptionalValueChange<OrganizationUnitOrigin>.None,
-                ParentUuid = rule.MustUpdate(x => x.ParentUuid)
+                ParentUuid = rule.MustUpdate(x => ((BaseOrganizationUnitRequestDTO)x).ParentUuid)
                     ? (request.ParentUuid.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<Guid>>.None,
                 EAN = rule.MustUpdate(x => x.EAN)
                        ? (request.EAN.FromNullable() ?? Maybe<int>.None).AsChangedValue() : OptionalValueChange<Maybe<int>>.None,
                 Id = rule.MustUpdate(x => x.Id)
-                    ? (request.Id.FromNullable() ?? Maybe<int>.None).AsChangedValue() : OptionalValueChange<Maybe<int>>.None,
+                    ? (request.Id.FromNullable() ?? Maybe<string>.None).AsChangedValue() : OptionalValueChange<Maybe<string>>.None,
             };
 
             return parameters;
