@@ -34,7 +34,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var mappedGeneralSection = AssertPropertyContainsDataChange<OrganizationUnitUpdateParameters>(output);
             Assert.Equal(input.Name, AssertPropertyContainsDataChange(output.Name));
             Assert.Equal(input.Origin.ToOrganizationUnitOrigin(), AssertPropertyContainsDataChange(output.Origin));
-            Assert.Equal(((BaseOrganizationUnitRequestDTO)input).ParentUuid, AssertPropertyContainsDataChange(output.ParentUuid));
+            Assert.Equal(input.ParentUuid, AssertPropertyContainsDataChange(output.ParentUuid));
         }
     }
 }
