@@ -43,8 +43,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping
                     : OptionalValueChange<Maybe<Guid>>.None,
                 Ean = rule.MustUpdate(x => x.Ean)
                        ? (request.Ean.FromNullable() ?? Maybe<long>.None).AsChangedValue() : OptionalValueChange<Maybe<long>>.None,
-                Id = rule.MustUpdate(x => x.Id)
-                    ? (request.Id.FromNullable() ?? Maybe<string>.None).AsChangedValue() : OptionalValueChange<Maybe<string>>.None,
+                LocalId = rule.MustUpdate(x => x.LocalId)
+                    ? (request.LocalId.FromNullable() ?? Maybe<string>.None).AsChangedValue() : OptionalValueChange<Maybe<string>>.None,
             };
 
             return parameters;

@@ -11,6 +11,6 @@ namespace Core.ApplicationServices.Model.Organizations.Write
         public OptionalValueChange<OrganizationUnitOrigin> Origin { get; set; }
         public OptionalValueChange<Maybe<Guid>> ParentUuid { get; set; }
         public OptionalValueChange<Maybe<long>> Ean { get; set; }
-        public OptionalValueChange<Maybe<string>> Id { get; set; }
+        public OptionalValueChange<Maybe<string>> LocalId { get; set; }
     }
 }

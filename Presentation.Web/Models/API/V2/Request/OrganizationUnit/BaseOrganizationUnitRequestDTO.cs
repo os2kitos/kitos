@@ -9,6 +9,6 @@ namespace Presentation.Web.Models.API.V2.Request.OrganizationUnit
         public OrganizationUnitOriginChoice Origin { get; set; }
         public Guid ParentUuid { get; set; }
         public long Ean { get; set; }
-        public string Id { get; set; }
+        public string LocalId { get; set; }
     }
 }
