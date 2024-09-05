@@ -38,7 +38,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping
                 Origin = rule.MustUpdate(x => x.Origin)
                     ? request.Origin.ToOrganizationUnitOrigin().AsChangedValue()
                     : OptionalValueChange<OrganizationUnitOrigin>.None,
-                ParentUuid = rule.MustUpdate(x => ((BaseOrganizationUnitRequestDTO)x).ParentUuid)
+                ParentUuid = rule.MustUpdate(x => x.ParentUuid)
                     ? (request.ParentUuid.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<Guid>>.None,
                 EAN = rule.MustUpdate(x => x.EAN)
