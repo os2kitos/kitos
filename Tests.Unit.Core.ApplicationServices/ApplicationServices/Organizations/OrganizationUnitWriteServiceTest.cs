@@ -51,7 +51,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 ParentUuid = A<Guid>().FromNullable().AsChangedValue()
             });
         }
-        
+
         [Fact]
         public void CreateNewUnit_Returns_Ok()
         {
@@ -63,13 +63,13 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var name = inputParameters.Name.NewValue;
             var origin = inputParameters.Origin.NewValue;
             var parentUnit = new OrganizationUnit { Uuid = inputParameters.ParentUuid.NewValue.Value };
-            var organization = new Organization { Id = orgDbId, Uuid = organizationUuid, OrgUnits = new List<OrganizationUnit>{parentUnit}};
+            var organization = new Organization { Id = orgDbId, Uuid = organizationUuid, OrgUnits = new List<OrganizationUnit> { parentUnit } };
             parentUnit.Organization = organization;
-            var unit = new OrganizationUnit{Name = name, Origin = origin, Parent = parentUnit, Organization = organization};
+            var unit = new OrganizationUnit { Name = name, Origin = origin, Parent = parentUnit, Organization = organization };
 
             ExpectCreateUnitReturns(organizationUuid, parentUnit.Uuid, name, origin, unit);
             ExpectWithWriteAccessReturns(unit, true);
-            
+
             //Act
             var result = _sut.Create(organizationUuid, inputParameters);
 
@@ -88,14 +88,14 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var name = inputParameters.Name.NewValue;
             var origin = inputParameters.Origin.NewValue;
             var parentUnit = new OrganizationUnit { Uuid = inputParameters.ParentUuid.NewValue.Value };
-            var organization = new Organization { Id = orgDbId, Uuid = organizationUuid, OrgUnits = new List<OrganizationUnit>{parentUnit}};
+            var organization = new Organization { Id = orgDbId, Uuid = organizationUuid, OrgUnits = new List<OrganizationUnit> { parentUnit } };
             parentUnit.Organization = organization;
-            var unit = new OrganizationUnit{Name = name, Origin = origin, Parent = parentUnit, Organization = organization};
+            var unit = new OrganizationUnit { Name = name, Origin = origin, Parent = parentUnit, Organization = organization };
 
             ExpectTransactionBegins();
             ExpectCreateUnitReturns(organizationUuid, parentUnit.Uuid, name, origin, unit);
             ExpectWithWriteAccessReturns(unit, false);
-            
+
             //Act
             var result = _sut.Create(organizationUuid, inputParameters);
 
@@ -114,14 +114,14 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var name = inputParameters.Name.NewValue;
             var origin = inputParameters.Origin.NewValue;
             var parentUnit = new OrganizationUnit { Uuid = inputParameters.ParentUuid.NewValue.Value };
-            var organization = new Organization { Id = orgDbId, Uuid = organizationUuid, OrgUnits = new List<OrganizationUnit>{parentUnit}};
+            var organization = new Organization { Id = orgDbId, Uuid = organizationUuid, OrgUnits = new List<OrganizationUnit> { parentUnit } };
             parentUnit.Organization = organization;
 
             var operationError = A<OperationError>();
 
             ExpectTransactionBegins();
             ExpectCreateUnitReturns(organizationUuid, parentUnit.Uuid, name, origin, operationError);
-            
+
             //Act
             var result = _sut.Create(organizationUuid, inputParameters);
 
@@ -172,7 +172,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var origin = inputParameters.Origin.NewValue;
             var unit = new OrganizationUnit { Uuid = A<Guid>(), Name = name, Origin = origin };
 
-            var error = new OperationError(A<OperationFailure>());
+            var error = CreateOperationError();
 
             ExpectGetOrganizationAndAuthorizeModificationReturns(organizationUuid, error);
             ExpectWithWriteAccessReturns(unit, true);
@@ -188,13 +188,36 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         [Fact]
         public void DeleteUnit_Returns_Ok()
         {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var organizationUnitUuid = A<Guid>();
+            var transactionMock = ExpectTransactionBegins();
+            ExpectDeleteUnitReturns(organizationUuid, organizationUnitUuid, Maybe<OperationError>.None);
+            
 
+            //Act
+            var result = _sut.Delete(organizationUuid, organizationUnitUuid);
+
+            //Assert
+            transactionMock.Verify(x => x.Commit(), Times.AtLeastOnce);
+            Assert.Equal(Maybe<OperationError>.None, result);
         }
 
         [Fact]
         public void DeleteUnit_Returns_Error_When_Delete_Fails()
         {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var organizationUnitUuid = A<Guid>();
+            var error = CreateOperationError();
+            ExpectDeleteUnitReturns(organizationUuid, organizationUnitUuid, error);
+            ExpectTransactionBegins();
 
+            //Act
+            var result = _sut.Delete(organizationUuid, organizationUnitUuid);
+
+            //Assert
+            Assert.Equal(error, result);
         }
 
         private Mock<IDatabaseTransaction> ExpectTransactionBegins()
@@ -218,10 +241,21 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 service.Create(organizationUuid, parentUuid, name, origin)).Returns(result);
         }
 
+        private void ExpectDeleteUnitReturns(Guid organizationUuid, Guid organizationUnitUuid, Maybe<OperationError> result)
+        {
+            _organizationServiceMock.Setup(service => service.Delete(organizationUuid, organizationUnitUuid))
+                .Returns(result);
+        }
+
         private void ExpectWithWriteAccessReturns(IEntity entity,
             bool result)
         {
             _authorizationContextMock.Setup(mock => mock.AllowModify(entity)).Returns(result);
+        }
+
+        private OperationError CreateOperationError()
+        {
+            return new OperationError(A<OperationFailure>());
         }
     }
 }
