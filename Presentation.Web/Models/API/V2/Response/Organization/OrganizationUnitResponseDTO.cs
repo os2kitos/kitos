@@ -10,7 +10,7 @@ namespace Presentation.Web.Models.API.V2.Response.Organization
         /// </summary>
         public IdentityNamePairResponseDTO ParentOrganizationUnit { get; set; }
         /// <summary>
-        /// Optional Ean number for the organization unit.
+        /// Optional EAN number for the organization unit.
         /// </summary>
         public long? Ean { get; set; }
         /// <summary>
