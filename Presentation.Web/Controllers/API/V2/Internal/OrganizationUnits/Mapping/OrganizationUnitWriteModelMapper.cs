@@ -19,17 +19,17 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping
 
         public OrganizationUnitUpdateParameters FromPOST(CreateOrganizationUnitRequestDTO request)
         {
-            return MapParameters(request);
+            return MapParameters(request, true);
         }
 
         public OrganizationUnitUpdateParameters FromPATCH(UpdateOrganizationUnitRequestDTO request)
         {
-            return MapParameters(request);
+            return MapParameters(request, false);
         }
 
-        private OrganizationUnitUpdateParameters MapParameters(BaseOrganizationUnitRequestDTO request)
+        private OrganizationUnitUpdateParameters MapParameters(BaseOrganizationUnitRequestDTO request, bool enforceChange)
         {
-            var rule = CreateChangeRule<CreateOrganizationUnitRequestDTO>(true);
+            var rule = CreateChangeRule<CreateOrganizationUnitRequestDTO>(enforceChange);
             var parameters = new OrganizationUnitUpdateParameters
             {
                 Name = rule.MustUpdate(x => x.Name)
