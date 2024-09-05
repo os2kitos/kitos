@@ -135,7 +135,7 @@ namespace Core.ApplicationServices.Organizations.Write
             return organizationUnit;
         }
 
-        private static Result<OrganizationUnit, OperationError> UpdateUnitEan(OrganizationUnit organizationUnit, Maybe<int> ean)
+        private static Result<OrganizationUnit, OperationError> UpdateUnitEan(OrganizationUnit organizationUnit, Maybe<long> ean)
         {
             if (ean.HasValue)
             {

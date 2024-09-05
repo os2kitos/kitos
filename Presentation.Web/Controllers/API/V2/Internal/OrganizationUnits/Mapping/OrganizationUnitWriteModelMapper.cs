@@ -42,7 +42,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping
                     ? (request.ParentUuid.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<Guid>>.None,
                 Ean = rule.MustUpdate(x => x.Ean)
-                       ? (request.Ean.FromNullable() ?? Maybe<int>.None).AsChangedValue() : OptionalValueChange<Maybe<int>>.None,
+                       ? (request.Ean.FromNullable() ?? Maybe<long>.None).AsChangedValue() : OptionalValueChange<Maybe<long>>.None,
                 Id = rule.MustUpdate(x => x.Id)
                     ? (request.Id.FromNullable() ?? Maybe<string>.None).AsChangedValue() : OptionalValueChange<Maybe<string>>.None,
             };
