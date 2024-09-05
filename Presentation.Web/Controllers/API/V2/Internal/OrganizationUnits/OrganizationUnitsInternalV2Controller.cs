@@ -67,7 +67,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
                 .Match(Ok, FromOperationError);
         }
 
-        [Route("create-subunit")]
+        [Route("create")]
         [HttpPost]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(OrganizationUnitResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
