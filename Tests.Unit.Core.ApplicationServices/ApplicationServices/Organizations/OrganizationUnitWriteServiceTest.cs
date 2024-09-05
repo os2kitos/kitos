@@ -185,6 +185,18 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Equal(error.FailureType, result.Error.FailureType);
         }
 
+        [Fact]
+        public void DeleteUnit_Returns_Ok()
+        {
+
+        }
+
+        [Fact]
+        public void DeleteUnit_Returns_Error_When_Delete_Fails()
+        {
+
+        }
+
         private Mock<IDatabaseTransaction> ExpectTransactionBegins()
         {
             var transactionMock = new Mock<IDatabaseTransaction>();

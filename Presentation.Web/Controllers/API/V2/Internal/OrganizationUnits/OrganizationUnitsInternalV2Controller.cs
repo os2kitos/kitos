@@ -94,6 +94,17 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
                 .Match(Ok, FromOperationError);
         }
 
+        [Route("{organizationUnitUuid}/delete")]
+        [HttpDelete]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult DeleteUnit([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid organizationUnitUuid)
+        {
+            var result = _organizationUnitWriteService.Delete(organizationUuid, organizationUnitUuid);
+            return result.HasValue ? FromOperationError(result.Value) : Ok();
+        }
         private CreatedNegotiatedContentResult<OrganizationUnitResponseDTO> MapUnitCreatedResponse(OrganizationUnitResponseDTO dto)
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);

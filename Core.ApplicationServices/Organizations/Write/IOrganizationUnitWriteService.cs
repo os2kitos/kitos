@@ -12,5 +12,7 @@ namespace Core.ApplicationServices.Organizations.Write
 
         Result<OrganizationUnit, OperationError> Patch(Guid organizationUuid, Guid organizationUnitUuid,
             OrganizationUnitUpdateParameters parameters);
+
+        Maybe<OperationError> Delete(Guid organizationUuid, Guid organizationUnitUuid);
     }
 }
