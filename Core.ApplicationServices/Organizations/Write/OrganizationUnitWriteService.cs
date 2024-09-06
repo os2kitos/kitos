@@ -87,21 +87,6 @@ namespace Core.ApplicationServices.Organizations.Write
             return result;
         }
 
-        public Maybe<OperationError> Delete(Guid organizationUuid, Guid organizationUnitUuid)
-        {
-            using var transaction = _transactionManager.Begin();
-            var result = _organizationUnitService.Delete(organizationUuid, organizationUnitUuid);
-            if (result.HasValue)
-            {
-                transaction.Rollback();
-            }
-            else
-            {
-                transaction.Commit();
-            }
-            return result;
-        }
-
         private static void MarkCreateParametersAsChanged(OrganizationUnitUpdateParameters parameters)
         {
             parameters.Origin = OptionalValueChange<OrganizationUnitOrigin>.None;

@@ -102,7 +102,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult DeleteUnit([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid organizationUnitUuid)
         {
-            var result = _organizationUnitWriteService.Delete(organizationUuid, organizationUnitUuid);
+            var result = _organizationUnitService.Delete(organizationUuid, organizationUnitUuid);
             return result.HasValue ? FromOperationError(result.Value) : Ok();
         }
         private CreatedNegotiatedContentResult<OrganizationUnitResponseDTO> MapUnitCreatedResponse(OrganizationUnitResponseDTO dto)

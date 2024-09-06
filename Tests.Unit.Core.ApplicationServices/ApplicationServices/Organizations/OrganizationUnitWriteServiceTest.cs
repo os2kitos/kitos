@@ -196,41 +196,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Equal(error.FailureType, result.Error.FailureType);
         }
 
-        [Fact]
-        public void DeleteUnit_Returns_Ok()
-        {
-            //Arrange
-            var organizationUuid = A<Guid>();
-            var organizationUnitUuid = A<Guid>();
-            var transactionMock = ExpectTransactionBegins();
-            ExpectDeleteUnitReturns(organizationUuid, organizationUnitUuid, Maybe<OperationError>.None);
-            
-
-            //Act
-            var result = _sut.Delete(organizationUuid, organizationUnitUuid);
-
-            //Assert
-            transactionMock.Verify(x => x.Commit(), Times.AtLeastOnce);
-            Assert.Equal(Maybe<OperationError>.None, result);
-        }
-
-        [Fact]
-        public void DeleteUnit_Returns_Error_When_Delete_Fails()
-        {
-            //Arrange
-            var organizationUuid = A<Guid>();
-            var organizationUnitUuid = A<Guid>();
-            var error = CreateOperationError();
-            ExpectDeleteUnitReturns(organizationUuid, organizationUnitUuid, error);
-            ExpectTransactionBegins();
-
-            //Act
-            var result = _sut.Delete(organizationUuid, organizationUnitUuid);
-
-            //Assert
-            Assert.Equal(error, result);
-        }
-
         private Mock<IDatabaseTransaction> ExpectTransactionBegins()
         {
             var transactionMock = new Mock<IDatabaseTransaction>();
