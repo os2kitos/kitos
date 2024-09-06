@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Http;
-using System.Web.Http.Results;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Response.OrganizationUnit;
 using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
@@ -32,6 +28,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult CreateRole([NonEmptyGuid] Guid orgUuid, [NonEmptyGuid] Guid unitUuid, [FromBody] CreateOrganizationUnitRoleRequestDTO parameters)
         {
             return Ok();
@@ -43,6 +40,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult PatchRole([NonEmptyGuid] Guid orgUuid, [NonEmptyGuid] Guid unitUuid, [FromBody] UpdateOrganizationUnitRoleRequestDTO parameters)
         {
             return Ok();
@@ -54,6 +52,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult DeleteRole([NonEmptyGuid] Guid orgUuid, [NonEmptyGuid] Guid unitUuid)
         {
             return Ok();
