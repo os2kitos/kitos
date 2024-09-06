@@ -268,6 +268,28 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(patchRequest.ParentUuid, result.ParentOrganizationUnit.Uuid);
         }
 
+        [Fact]
+        public async Task Can_Delete_OrganizationUnit()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+
+            var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token.Token, organization.Uuid);
+            var parentUnit = Assert.Single(units);
+
+            var createRequest = CreateCreateRequest(parentUnit.Uuid);
+
+            var testUnit = await OrganizationUnitV2Helper.CreateUnitAsync(organization.Uuid, createRequest);
+
+            //Act
+            var deleteResult = await OrganizationUnitV2Helper.DeleteUnitAsync(organization.Uuid, testUnit.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, deleteResult.StatusCode);
+
+        }
+
         private async Task<(User user, string token)> CreateApiUser(OrganizationDTO organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
