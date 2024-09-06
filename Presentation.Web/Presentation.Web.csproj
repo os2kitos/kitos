@@ -414,6 +414,7 @@
     <Compile Include="Models\API\V2\Internal\Response\Organizations\ColumnConfigurationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationGridConfigurationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationGridPermissionsResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\OrganizationUnitRolesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\UnitAccessRightsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\UnitAccessRightsWithUnitDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesCreation.cs" />
@@ -424,8 +425,11 @@
     <Compile Include="Models\API\V2\Request\Interface\ItInterfaceDataRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\UpdateItInterfaceRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\OrganizationUnit\BaseOrganizationUnitRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\OrganizationUnit\BaseOrganizationUnitRolesRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\OrganizationUnit\CreateOrganizationUnitRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\OrganizationUnit\CreateOrganizationUnitRoleRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\OrganizationUnit\UpdateOrganizationUnitRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\OrganizationUnit\UpdateOrganizationUnitRoleRequestDTO.cs" />
     <Compile Include="Models\API\V2\Types\Organization\OrganizationUnitOriginChoice.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingCreationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingUpdateRequestDTO.cs" />
