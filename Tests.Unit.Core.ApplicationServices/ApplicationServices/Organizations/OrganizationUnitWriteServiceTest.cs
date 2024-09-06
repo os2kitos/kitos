@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Organizations.Write;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Organizations.Write;
 using Core.DomainModel;
@@ -48,7 +49,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             {
                 Name = A<string>().AsChangedValue(),
                 Origin = A<OrganizationUnitOrigin>().AsChangedValue(),
-                ParentUuid = A<Guid>().FromNullable().AsChangedValue()
+                ParentUuid = A<Guid>().FromNullable().AsChangedValue(),
+                Ean = A<int>().FromNullable().AsChangedValue(),
+                LocalId = A<string>().FromNullable().AsChangedValue()
+
             });
         }
 
@@ -64,8 +68,11 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var origin = inputParameters.Origin.NewValue;
             var parentUnit = new OrganizationUnit { Uuid = inputParameters.ParentUuid.NewValue.Value };
             var organization = new Organization { Id = orgDbId, Uuid = organizationUuid, OrgUnits = new List<OrganizationUnit> { parentUnit } };
+            var ean = inputParameters.Ean.NewValue;
+            var localId = inputParameters.LocalId.NewValue;
+
             parentUnit.Organization = organization;
-            var unit = new OrganizationUnit { Name = name, Origin = origin, Parent = parentUnit, Organization = organization };
+            var unit = new OrganizationUnit { Name = name, Origin = origin, Parent = parentUnit, Organization = organization, Ean = ean.HasValue ? ean.Value : null, LocalId = localId.HasValue ? localId.Value : null };
 
             ExpectCreateUnitReturns(organizationUuid, parentUnit.Uuid, name, origin, unit);
             ExpectWithWriteAccessReturns(unit, true);
@@ -140,9 +147,13 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var orgDbId = A<int>();
             var name = inputParameters.Name.NewValue;
             var origin = inputParameters.Origin.NewValue;
+            var ean = inputParameters.Ean.NewValue;
+            var localId = inputParameters.LocalId.NewValue;
+
             var parentUnit = new OrganizationUnit { Uuid = inputParameters.ParentUuid.NewValue.Value };
-            var unit = new OrganizationUnit { Uuid = A<Guid>(), Name = name, Origin = origin, Parent = parentUnit };
+            var unit = new OrganizationUnit { Uuid = A<Guid>(), Name = name, Origin = origin, Parent = parentUnit, Ean = ean.HasValue ? ean.Value : null, LocalId = localId.HasValue ? localId.Value : null };
             var organization = new Organization { Id = orgDbId, Uuid = organizationUuid, OrgUnits = new List<OrganizationUnit> { parentUnit, unit } };
+
             parentUnit.Organization = organization;
             unit.Organization = organization;
 

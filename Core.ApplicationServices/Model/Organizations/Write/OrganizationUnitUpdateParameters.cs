@@ -10,5 +10,7 @@ namespace Core.ApplicationServices.Model.Organizations.Write
         public OptionalValueChange<string> Name { get; set; }
         public OptionalValueChange<OrganizationUnitOrigin> Origin { get; set; }
         public OptionalValueChange<Maybe<Guid>> ParentUuid { get; set; }
+        public OptionalValueChange<Maybe<int>> Ean { get; set; }
+        public OptionalValueChange<Maybe<string>> LocalId { get; set; }
     }
 }

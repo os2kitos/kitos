@@ -135,7 +135,29 @@ namespace Core.ApplicationServices.Organizations.Write
             //Optionally apply changes across the entire update specification
             return organizationUnit.WithOptionalUpdate(parameters.Name, (unit, name) => unit.UpdateName(name))
                 .Bind(unit => unit.WithOptionalUpdate(parameters.Origin, (orgUnit, origin) => orgUnit.Origin = origin))
-                .Bind(unit => unit.WithOptionalUpdate(parameters.ParentUuid, UpdateParentUnit));
+                .Bind(unit => unit.WithOptionalUpdate(parameters.ParentUuid, UpdateParentUnit))
+                .Bind(unit => unit.WithOptionalUpdate(parameters.Ean, UpdateUnitEan))
+                .Bind(unit => unit.WithOptionalUpdate(parameters.LocalId, UpdateUnitId));
+        }
+
+        private static Result<OrganizationUnit, OperationError> UpdateUnitId(OrganizationUnit organizationUnit,
+            Maybe<string> id)
+        {
+            if (id.HasValue)
+            {
+                organizationUnit.LocalId = id.Value;
+            }
+            return organizationUnit;
+        }
+
+        private static Result<OrganizationUnit, OperationError> UpdateUnitEan(OrganizationUnit organizationUnit, Maybe<int> ean)
+        {
+            if (ean.HasValue)
+            {
+                organizationUnit.Ean = ean.Value;
+            }
+
+            return organizationUnit;
         }
 
         private static Result<OrganizationUnit, OperationError> UpdateParentUnit(OrganizationUnit organizationUnit, Maybe<Guid> parentUuid)

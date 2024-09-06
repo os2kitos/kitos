@@ -19,17 +19,17 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping
 
         public OrganizationUnitUpdateParameters FromPOST(CreateOrganizationUnitRequestDTO request)
         {
-            return MapParameters(request);
+            return MapParameters(request, true);
         }
 
         public OrganizationUnitUpdateParameters FromPATCH(UpdateOrganizationUnitRequestDTO request)
         {
-            return MapParameters(request);
+            return MapParameters(request, false);
         }
 
-        private OrganizationUnitUpdateParameters MapParameters(BaseOrganizationUnitRequestDTO request)
+        private OrganizationUnitUpdateParameters MapParameters(BaseOrganizationUnitRequestDTO request, bool enforceChange)
         {
-            var rule = CreateChangeRule<CreateOrganizationUnitRequestDTO>(true);
+            var rule = CreateChangeRule<CreateOrganizationUnitRequestDTO>(enforceChange);
             var parameters = new OrganizationUnitUpdateParameters
             {
                 Name = rule.MustUpdate(x => x.Name)
@@ -41,6 +41,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping
                 ParentUuid = rule.MustUpdate(x => x.ParentUuid)
                     ? (request.ParentUuid.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<Guid>>.None,
+                Ean = rule.MustUpdate(x => x.Ean)
+                       ? (request.Ean.FromNullable() ?? Maybe<int>.None).AsChangedValue() : OptionalValueChange<Maybe<int>>.None,
+                LocalId = rule.MustUpdate(x => x.LocalId)
+                    ? (request.LocalId.FromNullable() ?? Maybe<string>.None).AsChangedValue() : OptionalValueChange<Maybe<string>>.None,
             };
 
             return parameters;
