@@ -75,5 +75,13 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             return await response.ReadResponseBodyAsAsync<OrganizationUnitResponseDTO>();
         }
+
+        public static async Task<HttpResponseMessage> DeleteUnitAsync(Guid organizationUuid, Guid unitUuid, Cookie cookie = null)
+        {
+            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl(
+                $"api/v2/internal/organizations/{organizationUuid}/organization-units/{unitUuid}/delete");
+            return await HttpApi.DeleteWithCookieAsync(url, requestCookie);
+        }
     }
 }

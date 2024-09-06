@@ -183,7 +183,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var origin = inputParameters.Origin.NewValue;
             var unit = new OrganizationUnit { Uuid = A<Guid>(), Name = name, Origin = origin };
 
-            var error = new OperationError(A<OperationFailure>());
+            var error = CreateOperationError();
 
             ExpectGetOrganizationAndAuthorizeModificationReturns(organizationUuid, error);
             ExpectWithWriteAccessReturns(unit, true);
@@ -217,10 +217,21 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 service.Create(organizationUuid, parentUuid, name, origin)).Returns(result);
         }
 
+        private void ExpectDeleteUnitReturns(Guid organizationUuid, Guid organizationUnitUuid, Maybe<OperationError> result)
+        {
+            _organizationServiceMock.Setup(service => service.Delete(organizationUuid, organizationUnitUuid))
+                .Returns(result);
+        }
+
         private void ExpectWithWriteAccessReturns(IEntity entity,
             bool result)
         {
             _authorizationContextMock.Setup(mock => mock.AllowModify(entity)).Returns(result);
+        }
+
+        private OperationError CreateOperationError()
+        {
+            return new OperationError(A<OperationFailure>());
         }
     }
 }
