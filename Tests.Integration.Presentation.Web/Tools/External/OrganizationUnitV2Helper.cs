@@ -57,7 +57,6 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             using var response = await HttpApi.PostWithCookieAsync(
                 TestEnvironment.CreateUrl(
                     $"api/v2/internal/organizations/{organizationUuid}/organization-units/create"), requestCookie, request);
-            var res = await response.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<OrganizationUnitResponseDTO>();
@@ -70,7 +69,6 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             using var response = await HttpApi.PatchWithCookieAsync(
                 TestEnvironment.CreateUrl(
                     $"api/v2/internal/organizations/{organizationUuid}/organization-units/{unitUuid}/patch"), requestCookie, request);
-            var res = await response.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<OrganizationUnitResponseDTO>();
