@@ -15,7 +15,7 @@ using Core.DomainModel.ItSystemUsage;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 {
-    [RoutePrefix("api/v2/internal/organizations/{organizationUuid}/organization-units/{unitUuid}/registrations")]
+    [Route("api/v2/internal/organizations/{organizationUuid}/organization-units/{unitUuid}/registrations")]
     public class OrganizationUnitRegistrationInternalV2Controller : InternalApiV2Controller
     {
         private readonly IOrganizationUnitService _organizationUnitService;
@@ -25,7 +25,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
             _organizationUnitService = organizationUnitService;
         }
 
-        [Route("")]
         [HttpGet]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationRegistrationUnitResponseDTO))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -37,7 +36,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
                 .Match(Ok, FromOperationError);
         }
 
-        [Route("")]
         [HttpDelete]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -49,7 +47,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
                 .Match(FromOperationError, Ok);
         }
 
-        [Route("")]
         [HttpPut]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
