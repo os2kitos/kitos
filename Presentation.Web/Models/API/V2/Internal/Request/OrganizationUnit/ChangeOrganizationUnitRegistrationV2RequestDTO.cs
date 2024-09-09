@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Presentation.Web.Models.API.V1.Organizations;
 
 namespace Presentation.Web.Models.API.V2.Internal.Request.OrganizationUnit
 {
