@@ -63,13 +63,13 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         }
 
         public static async Task<OrganizationUnitResponseDTO> PatchUnitAsync(Guid organizationUuid, Guid unitUuid,
-            UpdateOrganizationUnitRequestDTO request, Cookie cookie = null)
+            UpdateOrganizationUnitRequestDTO request, Cookie cookie = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             using var response = await HttpApi.PatchWithCookieAsync(
                 TestEnvironment.CreateUrl(
                     $"api/v2/internal/organizations/{organizationUuid}/organization-units/{unitUuid}/patch"), requestCookie, request);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(expectedStatusCode, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<OrganizationUnitResponseDTO>();
         }

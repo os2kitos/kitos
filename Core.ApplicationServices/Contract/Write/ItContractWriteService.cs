@@ -606,12 +606,36 @@ namespace Core.ApplicationServices.Contract.Write
             );
         }
 
+
+        private IEnumerable<Guid?> CollectContractAndChildrenUuids(ItContract sourceContract)
+        {
+            var uuids = new List<Guid?>();
+
+            CollectChildUuidsHelper(sourceContract);
+            return uuids;
+
+            void CollectChildUuidsHelper(ItContract contract)
+            {
+                uuids.Add(contract.Uuid);
+                foreach (var child in contract.Children)
+                {
+                    CollectChildUuidsHelper(child);
+                }
+            }
+        }
+
         private Maybe<OperationError> UpdateParentContract(ItContract contract, Guid? newParentUuid)
         {
             if (!newParentUuid.HasValue)
             {
                 contract.ClearParent();
                 return Maybe<OperationError>.None;
+            }
+
+            var contractAndChildrenUuids = CollectContractAndChildrenUuids(contract);
+            if (contractAndChildrenUuids.Contains(newParentUuid))
+            {
+                return new OperationError($"Failed to set parent with Uuid: {newParentUuid.Value} because it is identical to or a descendant of contract with Uuid: {contract.Uuid}", OperationFailure.BadInput);
             }
 
             var getResult = _contractService.GetContract(newParentUuid.Value);

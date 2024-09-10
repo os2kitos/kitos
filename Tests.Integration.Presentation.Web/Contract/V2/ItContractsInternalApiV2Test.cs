@@ -161,6 +161,26 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             MatchExpectedAssignment(roleAssignment, assignment2, users.Last());
         }
 
+        [Fact]
+        public async Task Cannot_PATCH_Self_As_Parent()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(organization);
+            var createdContract = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+            var contractUuid = createdContract.Uuid;
+            
+            //Act
+            using var response = await ItContractV2Helper.SendPatchParentContractAsync(token, createdContract.Uuid, contractUuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
         protected async Task<(string token, OrganizationDTO createdOrganization)> CreateStakeHolderUserInNewOrganizationAsync()
         {
             var organization = await CreateOrganizationAsync();
