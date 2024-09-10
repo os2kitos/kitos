@@ -273,6 +273,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationUnitService>().To<OrganizationUnitService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationUnitWriteService>().To<OrganizationUnitWriteService>().InCommandScope(Mode);
             kernel.Bind<IEntityIdMapper>().To<EntityIdMapper>().InCommandScope(Mode);
+            kernel.Bind<IEntityTreeUuidCollector>().To<EntityTreeUuidCollector>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);

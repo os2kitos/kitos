@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
+using Core.ApplicationServices.Generic;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
@@ -45,6 +46,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> _roleAssignmentService;
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
         private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
+        private readonly IEntityTreeUuidCollector _entityTreeUuidCollector;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -61,7 +63,8 @@ namespace Core.ApplicationServices.Contract.Write
             IItSystemUsageService usageService,
             IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> roleAssignmentService,
             IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
-            IGenericRepository<EconomyStream> economyStreamRepository)
+            IGenericRepository<EconomyStream> economyStreamRepository,
+            IEntityTreeUuidCollector entityTreeUuidCollector)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -78,6 +81,7 @@ namespace Core.ApplicationServices.Contract.Write
             _roleAssignmentService = roleAssignmentService;
             _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
             _economyStreamRepository = economyStreamRepository;
+            _entityTreeUuidCollector = entityTreeUuidCollector;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -606,24 +610,6 @@ namespace Core.ApplicationServices.Contract.Write
             );
         }
 
-
-        private IEnumerable<Guid?> CollectContractAndChildrenUuids(ItContract sourceContract)
-        {
-            var uuids = new List<Guid?>();
-
-            CollectChildUuidsHelper(sourceContract);
-            return uuids;
-
-            void CollectChildUuidsHelper(ItContract contract)
-            {
-                uuids.Add(contract.Uuid);
-                foreach (var child in contract.Children)
-                {
-                    CollectChildUuidsHelper(child);
-                }
-            }
-        }
-
         private Maybe<OperationError> UpdateParentContract(ItContract contract, Guid? newParentUuid)
         {
             if (!newParentUuid.HasValue)
@@ -632,7 +618,7 @@ namespace Core.ApplicationServices.Contract.Write
                 return Maybe<OperationError>.None;
             }
 
-            var contractAndChildrenUuids = CollectContractAndChildrenUuids(contract);
+            var contractAndChildrenUuids = _entityTreeUuidCollector.Collect(contract);
             if (contractAndChildrenUuids.Contains(newParentUuid))
             {
                 return new OperationError($"Failed to set parent with Uuid: {newParentUuid.Value} because it is identical to or a descendant of contract with Uuid: {contract.Uuid}", OperationFailure.BadInput);
