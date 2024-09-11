@@ -13,6 +13,7 @@ using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Organizations
@@ -30,6 +31,9 @@ namespace Core.ApplicationServices.Organizations
         private readonly IGenericRepository<OrganizationUnit> _repository;
         private readonly ICommandBus _commandBus;
         private readonly IGenericRepository<Organization> _organizationRepository;
+        private readonly IRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit>
+            _assignmentService;
+
 
         public OrganizationUnitService(IOrganizationService organizationService,
             IOrganizationRightsService organizationRightsService,
@@ -41,7 +45,8 @@ namespace Core.ApplicationServices.Organizations
             IDatabaseControl databaseControl,
             IGenericRepository<OrganizationUnit> repository,
             ICommandBus commandBus, 
-            IGenericRepository<Organization> organizationRepository)
+            IGenericRepository<Organization> organizationRepository, IRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit>
+            assignmentService)
         {
             _organizationService = organizationService;
             _organizationRightsService = organizationRightsService;
@@ -54,6 +59,7 @@ namespace Core.ApplicationServices.Organizations
             _repository = repository;
             _commandBus = commandBus;
             _organizationRepository = organizationRepository;
+            _assignmentService = assignmentService;
         }
 
         public Result<UnitAccessRights, OperationError> GetAccessRights(Guid organizationUuid, Guid unitUuid)
@@ -266,6 +272,53 @@ namespace Core.ApplicationServices.Organizations
                             : Result<Organization, OperationError>.Success(organization),
                     error => error
                 );
+        }
+
+        public Result<IEnumerable<OrganizationUnitRight>, OperationError> GetRightsOfUnitSubtree(Guid organizationUuid,
+            Guid organizationUnitUuid)
+        {
+            var unitResult = _organizationService.GetOrganizationUnit(organizationUnitUuid);
+            if (unitResult.Failed)
+            {
+                return unitResult.Error;
+            }
+
+            var unit = unitResult.Value;
+            return GetAllSubunitRightsOfUnit(unit);
+        }
+
+        public Result<OrganizationUnitRight, OperationError> CreateRoleAssignment(Guid organizationUnitUuid, Guid roleUuid, Guid userUuid)
+        {
+            var unitResult = _organizationService.GetOrganizationUnit(organizationUnitUuid);
+            if (unitResult.Failed)
+            {
+                return unitResult.Error;
+            }
+            var unit = unitResult.Value;
+            return _assignmentService.AssignRole(unit, roleUuid, userUuid);
+        }
+
+        public Result<OrganizationUnitRight, OperationError> DeleteRoleAssignment(Guid organizationUnitUuid, Guid roleUuid, Guid userUuid)
+        {
+            var unitResult = _organizationService.GetOrganizationUnit(organizationUnitUuid);
+            if (unitResult.Failed)
+            {
+                return unitResult.Error;
+            }
+            var unit = unitResult.Value;
+            return _assignmentService.RemoveRole(unit, roleUuid, userUuid);
+        }
+
+        private List<OrganizationUnitRight> GetAllSubunitRightsOfUnit(OrganizationUnit rootUnit)
+        {
+            List<OrganizationUnitRight> rights = [];
+            rights.AddRange(rootUnit.Rights);
+            foreach (var childUnit in rootUnit.Children)
+            {
+                var childUnitTreeRights = GetAllSubunitRightsOfUnit(childUnit);
+                rights.AddRange(childUnitTreeRights);
+            }
+            return rights;
         }
 
         private Result<TSuccess, OperationError> Modify<TSuccess>(Guid organizationUuid, Guid unitUuid, Func<Organization, OrganizationUnit, Result<TSuccess, OperationError>> mutation)

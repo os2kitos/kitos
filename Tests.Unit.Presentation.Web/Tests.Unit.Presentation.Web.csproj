@@ -209,6 +209,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Presentation.Web\App_Start\NinjectWebCommon.cs">
+      <Link>NinjectWebCommon.cs</Link>
+    </Compile>
     <Compile Include="Authorization\ChildEntityCrudAuthorizationTest.cs" />
     <Compile Include="Authorization\ContextBasedAuthorizationStrategyTest.cs" />
     <Compile Include="Authorization\GlobalReadAccessPolicyTest.cs" />

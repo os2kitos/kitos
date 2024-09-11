@@ -11,6 +11,9 @@ using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping;
 using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
 using System.Web.Http.Results;
+using System.Collections.Generic;
+using Core.DomainModel.Organization;
+using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 {
@@ -105,9 +108,48 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
             var result = _organizationUnitService.Delete(organizationUuid, organizationUnitUuid);
             return result.HasValue ? FromOperationError(result.Value) : Ok();
         }
+
+        [HttpGet]
+        [Route("{organizationUnitUuid}/roles")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationUnitRolesResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetRoleAssignments([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid organizationUnitUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _organizationUnitService.GetRightsOfUnitSubtree(organizationUuid, organizationUnitUuid)
+                .Select(rights => rights.Select(MapOrganizationRightToRolesResponseDTO))
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpDelete]
+        [Route("{organizationUnitUuid}/roles/delete")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult DeleteRoleAssignment([NonEmptyGuid] Guid organizationUuid,
+            [NonEmptyGuid] Guid organizationUnitUuid)
+        {
+
+        }
+
         private CreatedNegotiatedContentResult<OrganizationUnitResponseDTO> MapUnitCreatedResponse(OrganizationUnitResponseDTO dto)
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
+        }
+
+        private OrganizationUnitRolesResponseDTO MapOrganizationRightToRolesResponseDTO(OrganizationUnitRight right)
+        {
+            return new OrganizationUnitRolesResponseDTO
+            {
+                RoleAssignment = right.MapExtendedRoleAssignmentResponse(),
+                OrganizationUnitUuid = right.Object.Uuid,
+                OrganizationUnitName = right.Object.Name,
+            };
         }
     }
 }

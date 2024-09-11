@@ -20,7 +20,6 @@ using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Contract;
-using Presentation.Web.Models.API.V2.Response.SystemUsage;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 {
