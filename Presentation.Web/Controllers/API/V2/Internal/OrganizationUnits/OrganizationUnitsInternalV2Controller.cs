@@ -53,7 +53,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 
         [Route("all/collection-permissions")]
         [HttpGet]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UnitAccessRightsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UnitAccessRightsWithUnitDataResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
