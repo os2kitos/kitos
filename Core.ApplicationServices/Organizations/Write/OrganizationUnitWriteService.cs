@@ -7,6 +7,7 @@ using Infrastructure.Services.DataAccess;
 using System;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Shared;
+using Core.DomainServices.Role;
 
 namespace Core.ApplicationServices.Organizations.Write
 {

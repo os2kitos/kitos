@@ -35,6 +35,7 @@ namespace Core.ApplicationServices.Organizations
             _assignmentService;
 
 
+
         public OrganizationUnitService(IOrganizationService organizationService,
             IOrganizationRightsService organizationRightsService,
             IItContractService contractService,
@@ -45,8 +46,9 @@ namespace Core.ApplicationServices.Organizations
             IDatabaseControl databaseControl,
             IGenericRepository<OrganizationUnit> repository,
             ICommandBus commandBus, 
-            IGenericRepository<Organization> organizationRepository, IRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit>
-            assignmentService)
+            IGenericRepository<Organization> organizationRepository,
+            IRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit>
+                assignmentService)
         {
             _organizationService = organizationService;
             _organizationRightsService = organizationRightsService;

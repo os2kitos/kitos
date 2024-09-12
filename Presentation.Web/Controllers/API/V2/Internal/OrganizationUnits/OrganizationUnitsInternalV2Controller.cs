@@ -132,10 +132,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult CreateRoleAssignment(
-            [NonEmptyGuid] Guid organizationUnitUuid, [FromBody] CreateOrganizationUnitRoleAssignmentRequestDTO parameters)
+            [NonEmptyGuid] Guid organizationUnitUuid, [FromBody] CreateOrganizationUnitRoleAssignmentRequestDTO request)
         {
-            return _organizationUnitService.CreateRoleAssignment(organizationUnitUuid, parameters.RoleUuid,
-                    parameters.UserUuid)
+            return _organizationUnitService.CreateRoleAssignment(organizationUnitUuid, request.RoleUuid,
+                    request.UserUuid)
                 .Select(MapToRoleAssignmentResponse)
                 .Match(Ok, FromOperationError);
         }
@@ -147,10 +147,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult DeleteRoleAssignment(
-            [NonEmptyGuid] Guid organizationUnitUuid, [FromBody] DeleteOrganizationUnitRoleAssignmentRequestDTO parameters)
+            [NonEmptyGuid] Guid organizationUnitUuid, [FromBody] DeleteOrganizationUnitRoleAssignmentRequestDTO request)
         {
-            return _organizationUnitService.DeleteRoleAssignment(organizationUnitUuid, parameters.RoleUuid,
-                    parameters.UserUuid)
+            return _organizationUnitService.DeleteRoleAssignment(organizationUnitUuid, request.RoleUuid,
+                    request.UserUuid)
                 .Select(MapToRoleAssignmentResponse)
                 .Match(Ok, FromOperationError);
         }
