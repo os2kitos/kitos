@@ -32,5 +32,12 @@ namespace Core.ApplicationServices.Organizations
         Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid uuid);
 
         Result<IEnumerable<OrganizationUnitRight>, OperationError> GetRightsOfUnitSubtree(Guid organizationUuid, Guid unitUuid);
+
+        Result<OrganizationUnitRight, OperationError> CreateRoleAssignment(Guid organizationUnitUuid, Guid roleUuid,
+            Guid userUuid);
+
+        Result<OrganizationUnitRight, OperationError> DeleteRoleAssignment(Guid organizationUnitUuid, Guid roleUuid,
+            Guid userUuid);
+
     }
 }
