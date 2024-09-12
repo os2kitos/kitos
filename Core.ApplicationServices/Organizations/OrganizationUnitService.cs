@@ -286,21 +286,22 @@ namespace Core.ApplicationServices.Organizations
             }
 
             var unit = unitResult.Value;
-            return GetAllSubunitRightsOfUnit(unit);
+            var rights = GetAllSubunitRightsOfUnit(unit);
+            return rights;
         }
 
         public Result<OrganizationUnitRight, OperationError> CreateRoleAssignment(Guid organizationUnitUuid, Guid roleUuid, Guid userUuid)
         {
-            var unitResult = _organizationService.GetOrganizationUnit(organizationUnitUuid);
-            if (unitResult.Failed)
-            {
-                return unitResult.Error;
-            }
-            var unit = unitResult.Value;
-            return _assignmentService.AssignRole(unit, roleUuid, userUuid);
+            return ModifyUnitRights(organizationUnitUuid, unit => _assignmentService.AssignRole(unit, roleUuid, userUuid));
         }
 
         public Result<OrganizationUnitRight, OperationError> DeleteRoleAssignment(Guid organizationUnitUuid, Guid roleUuid, Guid userUuid)
+        {
+            return ModifyUnitRights(organizationUnitUuid, unit => _assignmentService.RemoveRole(unit, roleUuid, userUuid));
+        }
+
+        private Result<OrganizationUnitRight, OperationError> ModifyUnitRights(Guid organizationUnitUuid,
+            Func<OrganizationUnit, Result<OrganizationUnitRight, OperationError>> mutation)
         {
             var unitResult = _organizationService.GetOrganizationUnit(organizationUnitUuid);
             if (unitResult.Failed)
@@ -308,7 +309,11 @@ namespace Core.ApplicationServices.Organizations
                 return unitResult.Error;
             }
             var unit = unitResult.Value;
-            return _assignmentService.RemoveRole(unit, roleUuid, userUuid);
+            if (!_authorizationContext.AllowModify(unit))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+            return mutation(unit);
         }
 
         private List<OrganizationUnitRight> GetAllSubunitRightsOfUnit(OrganizationUnit rootUnit)

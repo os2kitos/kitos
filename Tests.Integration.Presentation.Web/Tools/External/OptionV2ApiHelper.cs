@@ -45,6 +45,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string ItInterfaceTypes = "it-interface-interface-types";
             public const string ItInterfaceDataTypes = "it-interface-interface-data-types";
 
+            public const string OrganizationUnitTypes = "organization-unit-role-types";
+
         }
 
         public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetOptionsAsync(string resource, Guid orgUuid, int pageSize, int pageNumber)

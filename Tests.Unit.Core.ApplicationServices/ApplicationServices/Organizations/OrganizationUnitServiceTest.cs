@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
@@ -18,7 +19,7 @@ using Moq;
 using Xunit;
 using Core.DomainModel.Events;
 using Core.DomainServices;
-using Core.DomainModel.ItSystemUsage;
+using Core.DomainServices.Role;
 
 namespace Tests.Unit.Core.ApplicationServices.Organizations
 {
@@ -34,6 +35,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<IGenericRepository<OrganizationUnit>> _repositoryMock;
         private readonly Mock<IGenericRepository<Organization>> _organizationRepositoryMock;
         private readonly Mock<ICommandBus> _commandBusMock;
+        private readonly Mock<IRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit>>
+            _assignmentService;
 
         public OrganizationUnitServiceTest()
         {
@@ -47,6 +50,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _databaseControl = new Mock<IDatabaseControl>();
             _repositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
             _organizationRepositoryMock = new Mock<IGenericRepository<Organization>>();
+            _assignmentService =
+                new Mock<IRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit>>();
 
             _commandBusMock = new Mock<ICommandBus>();
             _sut = new OrganizationUnitService(
@@ -60,7 +65,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
                 _databaseControl.Object,
                 _repositoryMock.Object,
                 _commandBusMock.Object,
-                _organizationRepositoryMock.Object);
+                _organizationRepositoryMock.Object,
+                _assignmentService.Object);
         }
 
         [Fact]
@@ -763,6 +769,94 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             //Assert
             Assert.True(createResult.Failed);
             Assert.Equal(OperationFailure.Forbidden, createResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_Get_All_SubunitRights()
+        {
+            //Arrange
+            var nestedUnit = CreateNestedOrganizationUnit(3, 3);
+            var orgUuid = A<Guid>();
+            var unitUuid = A<Guid>();
+            nestedUnit.Uuid = unitUuid;
+            ExpectGetOrganizationUnitReturns(unitUuid, nestedUnit);
+            
+            //Act
+            var rights = _sut.GetRightsOfUnitSubtree(orgUuid, unitUuid);
+
+            //Assert
+            Assert.True(rights.Ok);
+            Assert.Equal(1 + 3 + 9 + 27, rights.Value.Count());
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Create_Role_Assignment_Returns_Expected_According_To_Modification_Rights(bool canModify)
+        {
+            //Arrange
+            var unitUuid = A<Guid>();
+            var userUuid = A<Guid>();
+            var roleUuid = A<Guid>();
+            var unit = new OrganizationUnit { };
+            var right = new OrganizationUnitRight { };
+            ExpectGetOrganizationUnitReturns(unitUuid, unit);
+            ExpectAllowModifyReturns(unit, canModify);
+            _assignmentService.Setup(x => x.AssignRole(unit, roleUuid, userUuid)).Returns(right);
+
+            //Act
+            var createResult = _sut.CreateRoleAssignment(unitUuid, roleUuid, userUuid);
+
+            //Assert
+            Assert.Equal(createResult.Ok, canModify);
+
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Delete_Role_Assignment_Returns_Expected_According_To_Modification_Rights(bool canModify)
+        {
+            //Arrange
+            var unitUuid = A<Guid>();
+            var userUuid = A<Guid>();
+            var roleUuid = A<Guid>();
+            var unit = new OrganizationUnit { };
+            var right = new OrganizationUnitRight { };
+            ExpectGetOrganizationUnitReturns(unitUuid, unit);
+            ExpectAllowModifyReturns(unit, canModify);
+            _assignmentService.Setup(x => x.RemoveRole(unit, roleUuid, userUuid)).Returns(right);
+
+            //Act
+            var createResult = _sut.DeleteRoleAssignment(unitUuid, roleUuid, userUuid);
+
+            //Assert
+            Assert.Equal(createResult.Ok, canModify);
+        }
+
+        private OrganizationUnit CreateNestedOrganizationUnit(int nestingLevel, int branchFactor)
+        {
+            var unit = CreateUnit();
+            if (nestingLevel == 0)
+            {
+                return unit;
+            }
+            ICollection<OrganizationUnit> children = [];
+            for (var i = 0; i < branchFactor; i++)
+            {
+                var childUnit = CreateNestedOrganizationUnit(nestingLevel - 1, branchFactor);
+                children.Add(childUnit);
+            }
+            unit.Children = children;
+            return unit;
+        }
+
+        private OrganizationUnit CreateUnit()
+        {
+            return new OrganizationUnit
+            {
+                Rights = [new OrganizationUnitRight()]
+            };
         }
 
         private void ExpectGetOrganizationReturns(Guid uuid, Organization result)

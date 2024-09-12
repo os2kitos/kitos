@@ -7,12 +7,15 @@ using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -288,6 +291,58 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             //Assert
             Assert.Equal(HttpStatusCode.OK, deleteResult.StatusCode);
 
+        }
+
+        [Fact]
+        public async Task Can_Create_And_Delete_Role_Assignment()
+        {
+            //Step 1 Create Role
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token.Token, organization.Uuid);
+            var unit = Assert.Single(units);
+             
+            var user = await CreateUser(organization.Id);
+            var orgUnitRoles =  await GetOrganizationUnitRoleTypesAsync(organization.Uuid);
+            var role = orgUnitRoles.RandomItem();
+            var createRequest = new CreateOrganizationUnitRoleAssignmentRequestDTO { UserUuid = user.Uuid, RoleUuid = role.Uuid};
+            
+            //Act
+            var createResponse = await OrganizationUnitV2Helper.CreateRoleAssignmentAsync(organization.Uuid, unit.Uuid, createRequest);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, createResponse.StatusCode);
+            var rights = await OrganizationUnitV2Helper.GetUnitRolesAsync(organization.Uuid, unit.Uuid);
+            var right = Assert.Single(rights);
+            Assert.Equal(right.OrganizationUnitUuid, unit.Uuid);
+            Assert.Equal(role.Uuid, right.RoleAssignment.Role.Uuid);
+            Assert.Equal(user.Uuid, right.RoleAssignment.User.Uuid);
+
+            //Step2 Delete Role
+            //Arrange
+            var deleteRequest = new DeleteOrganizationUnitRoleAssignmentRequestDTO
+                { UserUuid = user.Uuid, RoleUuid = role.Uuid };
+
+            //Act
+            var deleteResponse =
+                await OrganizationUnitV2Helper.DeleteRoleAssignmentAsync(organization.Uuid, unit.Uuid, deleteRequest);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
+        }
+
+        private async Task<IEnumerable<IdentityNamePairResponseDTO>> GetOrganizationUnitRoleTypesAsync(Guid orgUuid)
+        {
+            return await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.OrganizationUnitTypes,
+                orgUuid, 10, 0);
+        }
+
+        private async Task<User> CreateUser(int orgId)
+        {
+            var userId = await HttpApi.CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(CreateEmail(), false), OrganizationRole.User, orgId);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userId));
+            return user;
         }
 
         private async Task<(User user, string token)> CreateApiUser(OrganizationDTO organization)

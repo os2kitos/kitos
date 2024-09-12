@@ -27,7 +27,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         private readonly Mock<IDatabaseControl> _databaseControlMock;
         private readonly Mock<IOrganizationUnitService> _organizationServiceMock;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
-        private readonly Mock<IO>
 
         public OrganizationUnitWriteServiceTest()
         {
