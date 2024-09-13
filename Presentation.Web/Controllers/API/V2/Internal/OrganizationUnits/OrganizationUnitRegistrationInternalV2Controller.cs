@@ -116,12 +116,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 
         private static NamedEntityV2DTO MapToNamedEntityDTO(ItContract source)
         {
-            return new NamedEntityV2DTO(source.Id, source.Name);
+            return new NamedEntityV2DTO(source.Id, source.Uuid, source.Name);
         }
 
         public static NamedEntityWithEnabledStatusV2DTO MapToNamedEntityWithEnabledStatusDTO(ItSystemUsage source)
         {
-            return new NamedEntityWithEnabledStatusV2DTO(source.Id, source.ItSystem.Name, source.ItSystem.Disabled);
+            return new NamedEntityWithEnabledStatusV2DTO(source.Id, source.Uuid, source.ItSystem.Name, source.ItSystem.Disabled);
         }
     }
 }

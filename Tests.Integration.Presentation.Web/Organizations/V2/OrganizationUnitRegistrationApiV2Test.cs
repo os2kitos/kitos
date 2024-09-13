@@ -275,7 +275,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var dto = new OrganizationRegistrationUnitResponseDTO
             {
-                OrganizationUnitRights = registrationsUnit.OrganizationUnitRights.Select(x => new NamedEntityWithUserFullNameV2DTO(x.Id, x.Name, x.UserFullName)).ToList(),
+                OrganizationUnitRights = registrationsUnit.OrganizationUnitRights.Select(x => new NamedEntityWithUserFullNameV2DTO(x.Id, x.Uuid, x.Name, x.UserFullName)).ToList(),
             };
             return ToChangeParametersList(dto, targetUnitUuid);
         }
