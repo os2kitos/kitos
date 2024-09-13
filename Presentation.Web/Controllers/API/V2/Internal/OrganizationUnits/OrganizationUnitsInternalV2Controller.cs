@@ -149,10 +149,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         public IHttpActionResult DeleteRoleAssignment(
             [NonEmptyGuid] Guid organizationUnitUuid, [FromBody] DeleteOrganizationUnitRoleAssignmentRequestDTO request)
         {
-            return _organizationUnitService.DeleteRoleAssignment(organizationUnitUuid, request.RoleUuid,
-                    request.UserUuid)
-                .Select(MapToRoleAssignmentResponse)
-                .Match(Ok, FromOperationError);
+            var result = _organizationUnitService.DeleteRoleAssignment(organizationUnitUuid, request.RoleUuid,
+                    request.UserUuid);
+
+            return result.Ok ? Ok() : FromOperationError(result.Error);
         }
 
         private CreatedNegotiatedContentResult<OrganizationUnitResponseDTO> MapUnitCreatedResponse(OrganizationUnitResponseDTO dto)
