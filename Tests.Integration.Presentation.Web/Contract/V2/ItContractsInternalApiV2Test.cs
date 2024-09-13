@@ -181,6 +181,32 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
+        [Fact]
+        public async Task Cannot_PATCH_Child_As_Parent()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(organization);
+            var createdParentContract = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+            var createdChildContract = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                ParentContractUuid = createdParentContract.Uuid
+            });
+            var childUuid = createdChildContract.Uuid;
+
+            //Act
+            using var response = await ItContractV2Helper.SendPatchParentContractAsync(token, createdParentContract.Uuid, childUuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
         protected async Task<(string token, OrganizationDTO createdOrganization)> CreateStakeHolderUserInNewOrganizationAsync()
         {
             var organization = await CreateOrganizationAsync();
