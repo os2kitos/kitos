@@ -17,6 +17,7 @@ using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using System.Net;
+using System.Net.Http;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 
@@ -173,12 +174,12 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 OrganizationUuid = organization.Uuid
             });
             var contractUuid = createdContract.Uuid;
-            
+
             //Act
             using var response = await ItContractV2Helper.SendPatchParentContractAsync(token, createdContract.Uuid, contractUuid);
 
             //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            await AssertFailedToPatchParent(response);
         }
 
         [Fact]
@@ -204,7 +205,8 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             using var response = await ItContractV2Helper.SendPatchParentContractAsync(token, createdParentContract.Uuid, childUuid);
 
             //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            await AssertFailedToPatchParent(response);
+
         }
 
         protected async Task<(string token, OrganizationDTO createdOrganization)> CreateStakeHolderUserInNewOrganizationAsync()
@@ -312,6 +314,13 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         private string CreateName()
         {
             return $"{nameof(ItContractsInternalApiV2Test)}{A<string>()}";
+        }
+
+        private static async Task AssertFailedToPatchParent(HttpResponseMessage response)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.Contains("Failed to set parent", content);
         }
     }
 }
