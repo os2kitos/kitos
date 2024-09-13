@@ -134,6 +134,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         public IHttpActionResult CreateRoleAssignment(
             [NonEmptyGuid] Guid organizationUnitUuid, [FromBody] CreateOrganizationUnitRoleAssignmentRequestDTO request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             return _organizationUnitService.CreateRoleAssignment(organizationUnitUuid, request.RoleUuid,
                     request.UserUuid)
                 .Select(MapToRoleAssignmentResponse)
@@ -149,6 +152,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         public IHttpActionResult DeleteRoleAssignment(
             [NonEmptyGuid] Guid organizationUnitUuid, [FromBody] DeleteOrganizationUnitRoleAssignmentRequestDTO request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var result = _organizationUnitService.DeleteRoleAssignment(organizationUnitUuid, request.RoleUuid,
                     request.UserUuid);
 
