@@ -318,8 +318,8 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private static async Task AssertFailedToPatchParent(HttpResponseMessage response)
         {
-            var content = await response.Content.ReadAsStringAsync();
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var content = await response.Content.ReadAsStringAsync();
             Assert.Contains("Failed to set parent", content);
         }
     }
