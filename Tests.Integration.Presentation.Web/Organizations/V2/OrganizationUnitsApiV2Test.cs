@@ -232,6 +232,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(parentUnit.Name, result.ParentOrganizationUnit.Name);
             Assert.Equal(parentUnit.Uuid, result.ParentOrganizationUnit.Uuid);
             Assert.Equal(parentUnit.Origin, result.Origin);
+            Assert.Equal(request.LocalId, result.UnitId);
         }
 
         [Fact]
@@ -256,7 +257,8 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                 Origin = testUnitFutureChild.Origin == OrganizationUnitOriginChoice.Kitos
                     ? OrganizationUnitOriginChoice.STSOrganisation
                     : OrganizationUnitOriginChoice.Kitos,
-                ParentUuid = testUnitFutureParent.Uuid
+                ParentUuid = testUnitFutureParent.Uuid,
+                LocalId = A<string>()
             };
 
             //Act
@@ -268,6 +270,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(patchRequest.Name, result.Name);
             Assert.Equal(patchRequest.Origin, result.Origin);
             Assert.Equal(patchRequest.ParentUuid, result.ParentOrganizationUnit.Uuid);
+            Assert.Equal(patchRequest.LocalId, result.UnitId);
         }
 
         [Fact]
@@ -363,7 +366,8 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             {
                 Name = A<string>(),
                 Origin = A<OrganizationUnitOriginChoice>(),
-                ParentUuid = parentUuid
+                ParentUuid = parentUuid,
+                LocalId = A<string>()
             };
         }
 
