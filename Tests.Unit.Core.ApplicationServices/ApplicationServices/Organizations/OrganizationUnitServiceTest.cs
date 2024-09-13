@@ -855,7 +855,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
         {
             return new OrganizationUnit
             {
-                Rights = [new OrganizationUnitRight()]
+                Rights = new List<OrganizationUnitRight> {new OrganizationUnitRight() }
             };
         }
 
