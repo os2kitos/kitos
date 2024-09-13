@@ -841,7 +841,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             {
                 return unit;
             }
-            ICollection<OrganizationUnit> children = [];
+            var children = new List<OrganizationUnit>();
             for (var i = 0; i < branchFactor; i++)
             {
                 var childUnit = CreateNestedOrganizationUnit(nestingLevel - 1, branchFactor);

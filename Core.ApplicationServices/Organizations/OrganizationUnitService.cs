@@ -318,7 +318,7 @@ namespace Core.ApplicationServices.Organizations
 
         private List<OrganizationUnitRight> GetAllSubunitRightsOfUnit(OrganizationUnit rootUnit)
         {
-            List<OrganizationUnitRight> rights = [];
+            var rights = new List<OrganizationUnitRight>();
             rights.AddRange(rootUnit.Rights);
             foreach (var childUnit in rootUnit.Children)
             {
