@@ -14,7 +14,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping
                 Name = unit.Name,
                 Ean = unit.Ean,
                 Origin = unit.Origin.ToOrganizationUnitOriginChoice(),
-                ParentOrganizationUnit = unit.Parent?.MapIdentityNamePairDTO()
+                ParentOrganizationUnit = unit.Parent?.MapIdentityNamePairDTO(),
+                UnitId = unit.LocalId,
             };
         }
     }
