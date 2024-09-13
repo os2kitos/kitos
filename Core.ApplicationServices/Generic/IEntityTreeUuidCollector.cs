@@ -6,6 +6,6 @@ namespace Core.ApplicationServices.Generic
 {
     public interface IEntityTreeUuidCollector
     {
-        IEnumerable<Guid?> Collect<T>(T sourceEntity) where T: Entity, IHasUuid, IHierarchy<T>;
+        IEnumerable<Guid?> CollectSelfAndDescendantUuids<T>(T sourceEntity) where T: Entity, IHasUuid, IHierarchy<T>;
     }
 }

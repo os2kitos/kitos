@@ -618,7 +618,7 @@ namespace Core.ApplicationServices.Contract.Write
                 return Maybe<OperationError>.None;
             }
 
-            var contractAndChildrenUuids = _entityTreeUuidCollector.Collect(contract);
+            var contractAndChildrenUuids = _entityTreeUuidCollector.CollectSelfAndDescendantUuids(contract);
             if (contractAndChildrenUuids.Contains(newParentUuid))
             {
                 return new OperationError($"Failed to set parent with Uuid: {newParentUuid.Value} because it is identical to or a descendant of contract with Uuid: {contract.Uuid}", OperationFailure.BadInput);
