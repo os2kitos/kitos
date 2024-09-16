@@ -39,5 +39,11 @@ namespace Core.DomainServices.Repositories.Organization
                 .AsQueryable()
                 .ByUuid(uuid);
         }
+
+        public Maybe<DomainModel.Organization.Organization> Update(DomainModel.Organization.Organization organization)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

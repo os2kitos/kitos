@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Organizations;
+using Core.ApplicationServices.Model.Organizations.Write;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
@@ -216,6 +217,17 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError(OperationFailure.Forbidden);
             }
             return Result<IQueryable<Organization>, OperationError>.Success(_repository.GetAll());
+        }
+
+        public Result<Organization, OperationError> UpdateOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
+        {
+            var organization = _repository.GetByUuid(organizationUuid);
+            if (!organization.HasValue)
+                return new OperationError(OperationFailure.BadInput);
+            if (!_authorizationContext.AllowModify(organization.Value))
+                return new OperationError(OperationFailure.Forbidden);
+
+            return Result<Organization, OperationError>.Success(organization.Value);
         }
 
         public IQueryable<Organization> SearchAccessibleOrganizations(bool onlyWithMembershipAccess, params IDomainQuery<Organization>[] conditions)

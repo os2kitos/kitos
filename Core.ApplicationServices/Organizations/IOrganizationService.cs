@@ -4,6 +4,8 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Organizations;
+using Core.ApplicationServices.Model.Organizations.Write;
+using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
@@ -27,6 +29,9 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<Organization, OperationError> GetOrganization(Guid organizationUuid, OrganizationDataReadAccessLevel? withMinimumAccessLevel = null);
         public Result<IQueryable<Organization>, OperationError> GetAllOrganizations();
+
+        public Result<Organization, OperationError> UpdateOrganization(Guid organizationUuid,
+            OrganizationUpdateParameters parameters);
         public IQueryable<Organization> SearchAccessibleOrganizations(bool onlyWithMembershipAccess, params IDomainQuery<Organization>[] conditions);
         public IQueryable<Organization> SearchAccessibleOrganizations(params IDomainQuery<Organization>[] conditions);
 
@@ -45,6 +50,7 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="enforceDeletion">If set to <c>true</c> any removal conflicts will be ignored and the deletion will proceed</param>
         /// <returns></returns>
         Maybe<OperationError> RemoveOrganization(Guid organizationUuid, bool enforceDeletion);
+
 
         Result<IEnumerable<Organization>, OperationError> GetUserOrganizations(int userId);
         Result<bool, OperationError> CanActiveUserModifyCvr(Guid organizationUuid);

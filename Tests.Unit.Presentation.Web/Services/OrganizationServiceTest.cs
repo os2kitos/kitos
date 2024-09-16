@@ -6,6 +6,8 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Model.Organizations.Write;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -220,6 +222,72 @@ namespace Tests.Unit.Presentation.Web.Services
             {
                 Assert.Equal(originalUuid, result.Value.Uuid);
             }
+        }
+
+        [Fact]
+        public void CannotUpdateOrganizationIfNoModifyRights()
+        {
+            var organizationUuid = A<Guid>();
+            var organization = new Mock<Organization>();
+            _repositoryMock.Setup(_ => _.GetByUuid(organizationUuid)).Returns(organization.Object);
+            _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(false);
+            var newCvr = OptionalValueChange<string>.With(A<string>());
+            var updateParameters = new OrganizationUpdateParameters
+            {
+                Cvr = newCvr,
+            };
+
+            var result = _sut.UpdateOrganization(organizationUuid, updateParameters);
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void CannotUpdateOrganizationIfInvalidUuid()
+        {
+            var invalidOrganizationUuid = A<Guid>();
+            _repositoryMock.Setup(_ => _.GetByUuid(invalidOrganizationUuid)).Returns(Maybe<Organization>.None);
+            _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
+            var newCvr = OptionalValueChange<string>.With(A<string>());
+            var updateParameters = new OrganizationUpdateParameters
+            {
+                Cvr = newCvr,
+            };
+
+            var result = _sut.UpdateOrganization(invalidOrganizationUuid, updateParameters);
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void CanUpdateOrganizationIfModifyRights()
+        {
+            var organizationUuid = A<Guid>();
+            var organization = new Mock<Organization>();
+            _repositoryMock.Setup(_ => _.GetByUuid(organizationUuid)).Returns(organization.Object);
+            _repositoryMock.Setup(_ => _.Update(organization.Object)).Returns(organization.Object);
+            _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
+            var newCvr = OptionalValueChange<string>.With(A<string>());
+            var newPhone = OptionalValueChange<string>.With(A<string>());
+            var newAddress = OptionalValueChange<string>.With(A<string>());
+            var newEmail = OptionalValueChange<string>.With(A<string>());
+            var updateParameters = new OrganizationUpdateParameters
+            {
+                Cvr = newCvr,
+                Phone = newPhone,
+                Address = newAddress,
+                Email = newEmail
+            };
+
+            var result = _sut.UpdateOrganization(organizationUuid, updateParameters);
+            Assert.True(result.Ok);
+
+            var updatedOrganization = result.Value;
+            Assert.Equal(newCvr.NewValue, updatedOrganization.Cvr);
+            Assert.Equal(newPhone.NewValue, updatedOrganization.Phone);
+            Assert.Equal(newAddress.NewValue, updatedOrganization.Adress);
+            Assert.Equal(newEmail.NewValue, updatedOrganization.Email);
+            _repositoryMock.Verify(_ => _.Update(organization.Object));
         }
 
         [Fact]
