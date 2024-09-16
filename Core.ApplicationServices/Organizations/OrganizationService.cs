@@ -229,22 +229,26 @@ namespace Core.ApplicationServices.Organizations
 
             var modifiedOrganizationResult = ModifyOrganization(organizationResult.Value, parameters);
 
-            if (modifiedOrganizationResult.Failed)
-            {
-                transaction.Rollback();
-                return new OperationError(OperationFailure.BadInput);
-            }
-            
-            var resultValue = modifiedOrganizationResult.Value;
-            _repository.Update(resultValue);
-            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(resultValue));
-            transaction.Commit();
+            return modifiedOrganizationResult.Match(
+                organization =>
+                {
+                    _repository.Update(organization);
+                    _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
+                    transaction.Commit();
 
-            var updatedOrganizationResult = _repository.GetByUuid(organizationUuid);
-            return updatedOrganizationResult.Match<Result<Organization, OperationError>>(
-                updatedOrganization => updatedOrganization,
-                () => new OperationError(OperationFailure.NotFound)
+                    var updatedOrganizationResult = _repository.GetByUuid(organizationUuid);
+                    return updatedOrganizationResult.Match<Result<Organization, OperationError>>(
+                        updatedOrganization => updatedOrganization,
+                        () => new OperationError(OperationFailure.NotFound)
+                    );
+                },
+                error =>
+                {
+                    transaction.Rollback();
+                    return error;
+                }
             );
+
         }
 
         private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid organizationUuid)
