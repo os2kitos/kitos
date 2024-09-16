@@ -260,7 +260,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void CanUpdateOrganization()
+        public void CanUpdateOrganizationWithData()
         {
             var organizationUuid = A<Guid>();
             var organization = new Mock<Organization>();
@@ -288,6 +288,28 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(newPhone.NewValue, updatedOrganization.Phone);
             Assert.Equal(newAddress.NewValue, updatedOrganization.Adress);
             Assert.Equal(newEmail.NewValue, updatedOrganization.Email);
+            _repositoryMock.Verify(_ => _.Update(organization.Object));
+        }
+
+        [Fact]
+        public void CanUpdateOrganizationWithNull()
+        {
+            var organizationUuid = A<Guid>();
+            var organization = new Mock<Organization>();
+            _repositoryMock.Setup(_ => _.GetByUuid(organizationUuid)).Returns(organization.Object);
+            _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+            var updateParameters = new OrganizationUpdateParameters();
+
+            var result = _sut.UpdateOrganization(organizationUuid, updateParameters);
+            Assert.True(result.Ok);
+
+            var updatedOrganization = result.Value;
+            Assert.Null(updatedOrganization.Cvr);;
+            Assert.Null(updatedOrganization.Phone);
+            Assert.Null(updatedOrganization.Adress);
+            Assert.Null(updatedOrganization.Email);
             _repositoryMock.Verify(_ => _.Update(organization.Object));
         }
 

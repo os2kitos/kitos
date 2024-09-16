@@ -252,10 +252,10 @@ namespace Core.ApplicationServices.Organizations
         private static Result<Organization, OperationError> MutateOrganization(Organization organization,
             OrganizationUpdateParameters parameters)
         {
-            if (parameters.Cvr.HasChange) organization.Cvr = parameters.Cvr.NewValue;
-            if (parameters.Address.HasChange) organization.Adress = parameters.Address.NewValue;
-            if (parameters.Email.HasChange) organization.Email = parameters.Email.NewValue;
-            if (parameters.Phone.HasChange) organization.Phone = parameters.Phone.NewValue;
+            organization.Cvr = parameters.Cvr?.NewValue;
+            organization.Adress = parameters.Address?.NewValue;
+            organization.Email = parameters.Email?.NewValue;
+            organization.Phone = parameters.Phone?.NewValue;
             return organization;
 
         }
