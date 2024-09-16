@@ -221,14 +221,45 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<Organization, OperationError> UpdateOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
         {
-            var organization = _repository.GetByUuid(organizationUuid);
-            if (!organization.HasValue)
+            using var transaction = _transactionManager.Begin();
+
+            var organizationResult = _repository.GetByUuid(organizationUuid);
+            if (!organizationResult.HasValue)
                 return new OperationError(OperationFailure.BadInput);
-            if (!_authorizationContext.AllowModify(organization.Value))
+
+            if (!_authorizationContext.AllowModify(organizationResult.Value))
                 return new OperationError(OperationFailure.Forbidden);
 
-            return Result<Organization, OperationError>.Success(organization.Value);
+            var mutatedOrganizationResult = MutateOrganization(organizationResult.Value, parameters);
+
+            if (mutatedOrganizationResult.Failed)
+            {
+                transaction.Rollback();
+                return new OperationError(OperationFailure.BadInput);
+            }
+            else
+            {
+                var resultValue = mutatedOrganizationResult.Value;
+                _repository.Update(resultValue);
+                _domainEvents.Raise(new EntityUpdatedEvent<Organization>(resultValue));
+                transaction.Commit();
+                var updatedOrganizationResult = _repository.GetByUuid(organizationUuid);
+                return updatedOrganizationResult.GetValueOrDefault();
+
+            }
         }
+
+        private static Result<Organization, OperationError> MutateOrganization(Organization organization,
+            OrganizationUpdateParameters parameters)
+        {
+            if (parameters.Cvr.HasChange) organization.Cvr = parameters.Cvr.NewValue;
+            if (parameters.Address.HasChange) organization.Adress = parameters.Address.NewValue;
+            if (parameters.Email.HasChange) organization.Email = parameters.Email.NewValue;
+            if (parameters.Phone.HasChange) organization.Phone = parameters.Phone.NewValue;
+            return organization;
+
+        }
+
 
         public IQueryable<Organization> SearchAccessibleOrganizations(bool onlyWithMembershipAccess, params IDomainQuery<Organization>[] conditions)
         {

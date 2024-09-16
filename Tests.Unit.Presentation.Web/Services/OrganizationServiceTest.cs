@@ -260,13 +260,14 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void CanUpdateOrganizationIfModifyRights()
+        public void CanUpdateOrganization()
         {
             var organizationUuid = A<Guid>();
             var organization = new Mock<Organization>();
             _repositoryMock.Setup(_ => _.GetByUuid(organizationUuid)).Returns(organization.Object);
-            _repositoryMock.Setup(_ => _.Update(organization.Object)).Returns(organization.Object);
             _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             var newCvr = OptionalValueChange<string>.With(A<string>());
             var newPhone = OptionalValueChange<string>.With(A<string>());
             var newAddress = OptionalValueChange<string>.With(A<string>());
