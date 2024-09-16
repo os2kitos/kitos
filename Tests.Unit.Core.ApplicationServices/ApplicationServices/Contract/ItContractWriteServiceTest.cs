@@ -9,6 +9,7 @@ using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
+using Core.ApplicationServices.Generic;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared.Write;
@@ -53,6 +54,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IItSystemUsageService> _usageServiceMock;
         private readonly Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>> _roleAssignmentService;
         private readonly Mock<IDataProcessingRegistrationApplicationService> _dprServiceMock;
+        private readonly Mock<IEntityTreeUuidCollector> _entityTreeUuidCollector;
 
         public ItContractWriteServiceTest()
         {
@@ -70,7 +72,23 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _usageServiceMock = new Mock<IItSystemUsageService>();
             _roleAssignmentService = new Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>>();
             _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _referenceServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _roleAssignmentService.Object, _dprServiceMock.Object, Mock.Of<IGenericRepository<EconomyStream>>());
+            _entityTreeUuidCollector = new Mock<IEntityTreeUuidCollector>();
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, 
+                _identityResolverMock.Object, 
+                _optionResolverMock.Object, 
+                _transactionManagerMock.Object, 
+                _domainEventsMock.Object, 
+                _databaseControlMock.Object, 
+                _agreementElementTypeRepository.Object, 
+                _authContext.Object, 
+                _organizationServiceMock.Object, 
+                _referenceServiceMock.Object, 
+                _assignmentUpdateServiceMock.Object, 
+                _usageServiceMock.Object, 
+                _roleAssignmentService.Object, 
+                _dprServiceMock.Object, 
+                Mock.Of<IGenericRepository<EconomyStream>>(),
+                _entityTreeUuidCollector.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
