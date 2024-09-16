@@ -223,33 +223,44 @@ namespace Core.ApplicationServices.Organizations
         {
             using var transaction = _transactionManager.Begin();
 
-            var organizationResult = _repository.GetByUuid(organizationUuid);
-            if (!organizationResult.HasValue)
-                return new OperationError(OperationFailure.BadInput);
+            var organizationResult = GetOrganizationAndAuthorizeModification(organizationUuid);
 
-            if (!_authorizationContext.AllowModify(organizationResult.Value))
-                return new OperationError(OperationFailure.Forbidden);
+            if (organizationResult.Failed) return organizationResult.Error;
 
-            var mutatedOrganizationResult = MutateOrganization(organizationResult.Value, parameters);
+            var modifiedOrganizationResult = ModifyOrganization(organizationResult.Value, parameters);
 
-            if (mutatedOrganizationResult.Failed)
+            if (modifiedOrganizationResult.Failed)
             {
                 transaction.Rollback();
                 return new OperationError(OperationFailure.BadInput);
             }
-            else
-            {
-                var resultValue = mutatedOrganizationResult.Value;
-                _repository.Update(resultValue);
-                _domainEvents.Raise(new EntityUpdatedEvent<Organization>(resultValue));
-                transaction.Commit();
-                var updatedOrganizationResult = _repository.GetByUuid(organizationUuid);
-                return updatedOrganizationResult.GetValueOrDefault();
+            
+            var resultValue = modifiedOrganizationResult.Value;
+            _repository.Update(resultValue);
+            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(resultValue));
+            transaction.Commit();
 
-            }
+            var updatedOrganizationResult = _repository.GetByUuid(organizationUuid);
+            return updatedOrganizationResult.Match<Result<Organization, OperationError>>(
+                updatedOrganization => updatedOrganization,
+                () => new OperationError(OperationFailure.NotFound)
+            );
         }
 
-        private static Result<Organization, OperationError> MutateOrganization(Organization organization,
+        private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid organizationUuid)
+        {
+            return GetOrganization(organizationUuid)
+                .Match
+                (
+                    organization =>
+                        !_authorizationContext.AllowModify(organization)
+                            ? new OperationError(OperationFailure.Forbidden)
+                            : Result<Organization, OperationError>.Success(organization),
+                    error => error
+                );
+        }
+
+        private static Result<Organization, OperationError> ModifyOrganization(Organization organization,
             OrganizationUpdateParameters parameters)
         {
             organization.Cvr = parameters.Cvr?.NewValue;

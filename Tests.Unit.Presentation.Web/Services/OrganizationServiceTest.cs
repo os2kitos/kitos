@@ -231,6 +231,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var organization = new Mock<Organization>();
             _repositoryMock.Setup(_ => _.GetByUuid(organizationUuid)).Returns(organization.Object);
             _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(false);
+            _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
             var newCvr = OptionalValueChange<string>.With(A<string>());
             var updateParameters = new OrganizationUpdateParameters
             {
@@ -238,6 +239,7 @@ namespace Tests.Unit.Presentation.Web.Services
             };
 
             var result = _sut.UpdateOrganization(organizationUuid, updateParameters);
+
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
@@ -246,8 +248,9 @@ namespace Tests.Unit.Presentation.Web.Services
         public void CannotUpdateOrganizationIfInvalidUuid()
         {
             var invalidOrganizationUuid = A<Guid>();
-            _repositoryMock.Setup(_ => _.GetByUuid(invalidOrganizationUuid)).Returns(Maybe<Organization>.None);
+            _repositoryMock.Setup(_ => _.GetByUuid(It.IsAny<Guid>())).Returns(Maybe<Organization>.None);
             _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
             var newCvr = OptionalValueChange<string>.With(A<string>());
             var updateParameters = new OrganizationUpdateParameters
             {
@@ -256,7 +259,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             var result = _sut.UpdateOrganization(invalidOrganizationUuid, updateParameters);
             Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         [Fact]
@@ -266,6 +269,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var organization = new Mock<Organization>();
             _repositoryMock.Setup(_ => _.GetByUuid(organizationUuid)).Returns(organization.Object);
             _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             var newCvr = OptionalValueChange<string>.With(A<string>());
@@ -298,6 +302,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var organization = new Mock<Organization>();
             _repositoryMock.Setup(_ => _.GetByUuid(organizationUuid)).Returns(organization.Object);
             _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             var updateParameters = new OrganizationUpdateParameters();
