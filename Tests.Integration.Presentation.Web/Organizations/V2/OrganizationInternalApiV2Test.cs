@@ -43,6 +43,24 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Contains(patchDto.Cvr, content);
         }
 
+        [Fact]
+        public async Task CanPatchOrganizationMasterDataWithNull()
+        {
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var patchDto = new OrganizationMasterDataRequestDTO();
+
+            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250);
+            var organizationToPatch = organizations.First();
+            Assert.NotNull(organizationToPatch);
+
+            var response =
+                await OrganizationInternalV2Helper.PatchOrganizationMasterData(organizationToPatch.Uuid, patchDto);
+            var content = await response.Content.ReadAsStringAsync();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains(organizationToPatch.Uuid.ToString(), content);
+            Assert.Contains("null", content);
+        }
+
         private static string Truncate(string s, int limit)
         {
             if (string.IsNullOrEmpty(s)) return s;
