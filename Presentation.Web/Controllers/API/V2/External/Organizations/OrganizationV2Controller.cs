@@ -49,7 +49,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         }
 
         /// <summary>
-        /// Returns organizations organizations from KITOS
+        /// Returns organizations from KITOS
         /// </summary>
         /// <param name="onlyWhereUserHasMembership">If set to true, only organizations where the user has access and/or role(s) will be included.</param>
         /// <param name="nameContent">Optional query for name content</param>

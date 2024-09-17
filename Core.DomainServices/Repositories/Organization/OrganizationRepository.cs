@@ -8,26 +8,26 @@ namespace Core.DomainServices.Repositories.Organization
 {
     public class OrganizationRepository : IOrganizationRepository
     {
-        private readonly IGenericRepository<DomainModel.Organization.Organization> _repository;
+        private readonly IGenericRepository<DomainModel.Organization.Organization> _genericRepository;
 
         public OrganizationRepository(IGenericRepository<DomainModel.Organization.Organization> repository)
         {
-            _repository = repository;
+            _genericRepository = repository;
         }
 
         public IQueryable<DomainModel.Organization.Organization> GetAll()
         {
-            return _repository.AsQueryable();
+            return _genericRepository.AsQueryable();
         }
 
         public Maybe<DomainModel.Organization.Organization> GetById(int id)
         {
-            return _repository.AsQueryable().ById(id);
+            return _genericRepository.AsQueryable().ById(id);
         }
 
         public Maybe<DomainModel.Organization.Organization> GetByCvr(string cvrNumber)
         {
-            return _repository
+            return _genericRepository
                 .AsQueryable()
                 .Where(organization => organization.Cvr == cvrNumber)
                 .FirstOrDefault();
@@ -35,15 +35,15 @@ namespace Core.DomainServices.Repositories.Organization
 
         public Maybe<DomainModel.Organization.Organization> GetByUuid(Guid uuid)
         {
-            return _repository
+            return _genericRepository
                 .AsQueryable()
                 .ByUuid(uuid);
         }
 
         public void Update(DomainModel.Organization.Organization organization)
         {
-            throw new NotImplementedException();
+            _genericRepository.Update(organization);
+            _genericRepository.Save();
         }
-
     }
 }

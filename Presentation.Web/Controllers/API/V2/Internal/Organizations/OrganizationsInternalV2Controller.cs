@@ -10,14 +10,20 @@ using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Core.ApplicationServices.Model.Organizations.Write;
+using Core.ApplicationServices.Model.Shared;
+using Core.DomainModel.Organization;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
+using Presentation.Web.Models.API.V2.Request.Organization;
+using Presentation.Web.Models.API.V2.Response.Organization;
+using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
     /// <summary>
     /// Internal API for the organizations in KITOS
     /// </summary>
-    [RoutePrefix("api/v2/internal/organizations/{organizationUuid}")]
+    [RoutePrefix("api/v2/internal/organizations")]
     public class OrganizationsInternalV2Controller : InternalApiV2Controller
     {
         private readonly IOrganizationService _organizationService;
@@ -29,7 +35,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             _permissionsResponseMapper = permissionsResponseMapper;
         }
 
-        [Route("permissions")]
+        [Route("{organizationUuid}permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -39,6 +45,50 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             return _organizationService.GetPermissions(organizationUuid)
                 .Select(_permissionsResponseMapper.Map)
                 .Match(Ok, FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{organizationUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult UpdateOrganizationMasterData([FromUri] [NonEmptyGuid] Guid organizationUuid, OrganizationMasterDataRequestDTO requestDto)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            
+            var updateParameters = MapMasterDataRequestDtoToParameters(requestDto);
+            return _organizationService.UpdateOrganization(organizationUuid, updateParameters)
+                .Select(MapOrganizationToResponseDto)
+                .Match(Ok, FromOperationError);
+        }
+
+        private OrganizationResponseDTO MapOrganizationToResponseDto(Organization organization)
+        {
+            return new(organization.Uuid, organization.Name, organization.GetActiveCvr(), MapOrganizationType(organization));
+        }
+        
+        private static OrganizationType MapOrganizationType(Organization organization)
+        {
+            return organization.Type.Id switch
+            {
+                (int)OrganizationTypeKeys.Virksomhed => OrganizationType.Company,
+                (int)OrganizationTypeKeys.Kommune => OrganizationType.Municipality,
+                (int)OrganizationTypeKeys.AndenOffentligMyndighed => OrganizationType.OtherPublicAuthority,
+                (int)OrganizationTypeKeys.Interessefællesskab => OrganizationType.CommunityOfInterest,
+                _ => throw new ArgumentOutOfRangeException(nameof(organization.Type.Id), "Unknown organization type key")
+            };
+        }
+
+        private OrganizationUpdateParameters MapMasterDataRequestDtoToParameters(OrganizationMasterDataRequestDTO dto)
+        {
+            return new OrganizationUpdateParameters
+            {
+                Cvr = OptionalValueChange<string>.With(dto.Cvr),
+                Email = OptionalValueChange<string>.With(dto.Email),
+                Address = OptionalValueChange<string>.With(dto.Address),
+                Phone = OptionalValueChange<string>.With(dto.Phone),
+            };
         }
     }
 }
