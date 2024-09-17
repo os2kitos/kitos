@@ -145,6 +145,7 @@
     <Compile Include="ItSystem\V2\ItSystemUsageMigrationApiV2Test.cs" />
     <Compile Include="Notifications\NotificationApiV2Test.cs" />
     <Compile Include="Options\V1\OptionApiTests.cs" />
+    <Compile Include="Organizations\V2\OrganizationApiV2TestBase.cs" />
     <Compile Include="Organizations\V2\OrganizationGridApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationInternalApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationUnitRegistrationApiV2Test.cs" />
