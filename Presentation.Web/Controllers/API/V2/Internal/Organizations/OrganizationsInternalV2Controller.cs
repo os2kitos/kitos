@@ -37,7 +37,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             _organizationMapper = organizationMapper;
         }
 
-        [Route("{organizationUuid}permissions")]
+        [Route("{organizationUuid}/permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
