@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models.API.V2.Request.Organization;
+using Presentation.Web.Models.API.V2.Response.Organization;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.Extensions;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.Internal.Organizations;
 using Tests.Toolkit.Patterns;
@@ -26,7 +28,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var patchDto = new OrganizationMasterDataRequestDTO
             {
                 Address = A<string>(),
-                Cvr = Truncate(A<string>(), CvrMaxLength),
+                Cvr = A<string>().Truncate(CvrMaxLength),
                 Email = A<string>(),
                 Phone = A<string>()
             };
@@ -46,12 +48,9 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         [Fact]
         public async Task CanPatchOrganizationMasterDataWithNull()
         {
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
             var patchDto = new OrganizationMasterDataRequestDTO();
 
-            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250);
-            var organizationToPatch = organizations.First();
-            Assert.NotNull(organizationToPatch);
+            var organizationToPatch = await GetOrganization();
 
             var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterData(organizationToPatch.Uuid, patchDto);
@@ -61,10 +60,13 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Contains("null", content);
         }
 
-        private static string Truncate(string s, int limit)
+        private static async Task<OrganizationResponseDTO> GetOrganization()
         {
-            if (string.IsNullOrEmpty(s)) return s;
-            return s.Length <= limit ? s : s.Substring(0, limit);
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250);
+            var organizationToPatch = organizations.First();
+            Assert.NotNull(organizationToPatch);
+            return organizationToPatch;
         }
     }
 }

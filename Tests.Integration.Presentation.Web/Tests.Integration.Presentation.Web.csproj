@@ -153,6 +153,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Tools\Extensions\StringExtensions.cs" />
     <Compile Include="Tools\Internal\DPR\DataProcessingRegistrationInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\ItSystemUsage\ItSystemUsageMigrationV2Helper.cs" />
     <Compile Include="Tools\Internal\Notifications\NotificationV2Helper.cs" />
