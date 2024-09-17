@@ -367,6 +367,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationUnitWriteModelMapper>().To<OrganizationUnitWriteModelMapper>().InCommandScope(Mode);
             kernel.Bind<IOrganizationUnitResponseModelMapper>().To<OrganizationUnitResponseModelMapper>().InCommandScope(Mode);
 
+            //Organization
+            kernel.Bind<IOrganizationMapper>().To<OrganizationMapper>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)

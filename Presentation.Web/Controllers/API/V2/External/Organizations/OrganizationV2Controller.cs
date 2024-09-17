@@ -15,6 +15,7 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Queries.User;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -35,17 +36,20 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         private readonly IOrganizationService _organizationService;
         private readonly IUserService _userService;
         private readonly ILogger _logger;
+        private readonly IOrganizationMapper _organizationMapper;
 
         public OrganizationV2Controller(
             IRightsHolderSystemService rightsHolderSystemService,
             IOrganizationService organizationService,
             IUserService userService,
-            ILogger logger)
+            ILogger logger, 
+            IOrganizationMapper organizationMapper)
         {
             _rightsHolderSystemService = rightsHolderSystemService;
             _organizationService = organizationService;
             _userService = userService;
             _logger = logger;
+            _organizationMapper = organizationMapper;
         }
 
         /// <summary>
@@ -94,7 +98,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
                 .OrderApiResults(orderByProperty)
                 .Page(pagination)
                 .ToList()
-                .Select(ToDTO)
+                .Select(_organizationMapper.ToDTO)
                 .Transform(Ok);
         }
 
@@ -117,7 +121,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
 
             return _organizationService
                 .GetOrganization(organizationUuid, null)
-                .Select(ToDTO)
+                .Select(_organizationMapper.ToDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -342,23 +346,6 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         private static IEnumerable<ShallowOrganizationResponseDTO> ToShallowDTOs(IQueryable<Organization> organizations)
         {
             return organizations.ToList().Select(x => x.MapShallowOrganizationResponseDTO()).ToList();
-        }
-
-        private static OrganizationResponseDTO ToDTO(Organization organization)
-        {
-            return new(organization.Uuid, organization.Name, organization.GetActiveCvr(), MapOrganizationType(organization));
-        }
-
-        private static OrganizationType MapOrganizationType(Organization organization)
-        {
-            return organization.Type.Id switch
-            {
-                (int)OrganizationTypeKeys.Virksomhed => OrganizationType.Company,
-                (int)OrganizationTypeKeys.Kommune => OrganizationType.Municipality,
-                (int)OrganizationTypeKeys.AndenOffentligMyndighed => OrganizationType.OtherPublicAuthority,
-                (int)OrganizationTypeKeys.Interessefællesskab => OrganizationType.CommunityOfInterest,
-                _ => throw new ArgumentOutOfRangeException(nameof(organization.Type.Id), "Unknown organization type key")
-            };
         }
     }
 }

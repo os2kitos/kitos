@@ -28,11 +28,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
     {
         private readonly IOrganizationService _organizationService;
         private readonly IResourcePermissionsResponseMapper _permissionsResponseMapper;
+        private readonly IOrganizationMapper _organizationMapper;
 
-        public OrganizationsInternalV2Controller(IOrganizationService organizationService, IResourcePermissionsResponseMapper permissionsResponseMapper)
+        public OrganizationsInternalV2Controller(IOrganizationService organizationService, IResourcePermissionsResponseMapper permissionsResponseMapper, IOrganizationMapper organizationMapper)
         {
             _organizationService = organizationService;
             _permissionsResponseMapper = permissionsResponseMapper;
+            _organizationMapper = organizationMapper;
         }
 
         [Route("{organizationUuid}permissions")]
@@ -57,32 +59,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         {
             if (!ModelState.IsValid) return BadRequest();
             
-            var updateParameters = MapMasterDataRequestDtoToParameters(requestDto);
+            var updateParameters = ToUpdateParameters(requestDto);
             return _organizationService.UpdateOrganization(organizationUuid, updateParameters)
-                .Select(MapOrganizationToResponseDto)
+                .Select(_organizationMapper.ToDTO)
                 .Match(Ok, FromOperationError);
         }
 
-        private OrganizationResponseDTO MapOrganizationToResponseDto(Organization organization)
+        private OrganizationUpdateParameters ToUpdateParameters(OrganizationMasterDataRequestDTO dto)
         {
-            return new(organization.Uuid, organization.Name, organization.GetActiveCvr(), MapOrganizationType(organization));
-        }
-        
-        private static OrganizationType MapOrganizationType(Organization organization)
-        {
-            return organization.Type.Id switch
-            {
-                (int)OrganizationTypeKeys.Virksomhed => OrganizationType.Company,
-                (int)OrganizationTypeKeys.Kommune => OrganizationType.Municipality,
-                (int)OrganizationTypeKeys.AndenOffentligMyndighed => OrganizationType.OtherPublicAuthority,
-                (int)OrganizationTypeKeys.Interessefællesskab => OrganizationType.CommunityOfInterest,
-                _ => throw new ArgumentOutOfRangeException(nameof(organization.Type.Id), "Unknown organization type key")
-            };
-        }
-
-        private OrganizationUpdateParameters MapMasterDataRequestDtoToParameters(OrganizationMasterDataRequestDTO dto)
-        {
-            return new OrganizationUpdateParameters
+            return new()
             {
                 Cvr = OptionalValueChange<string>.With(dto.Cvr),
                 Email = OptionalValueChange<string>.With(dto.Email),
