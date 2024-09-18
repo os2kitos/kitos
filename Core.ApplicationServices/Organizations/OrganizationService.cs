@@ -7,6 +7,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Model.Organizations.Write;
+using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
 using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -39,6 +40,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly IOrganizationalUserContext _userContext;
         private readonly ILogger _logger;
         private readonly ITransactionManager _transactionManager;
+        private readonly IGenericRepository<DataResponsible> _dataResponsibleRepository;
 
         public OrganizationService(
             IGenericRepository<Organization> orgRepository,
@@ -53,7 +55,7 @@ namespace Core.ApplicationServices.Organizations
             IOrganizationRightsService organizationRightsService,
             IOrgUnitService orgUnitService,
             IDomainEvents domainEvents,
-            IEntityIdentityResolver identityResolver)
+            IEntityIdentityResolver identityResolver, IGenericRepository<DataResponsible> dataResponsibleRepository)
         {
             _orgRepository = orgRepository;
             _orgRightRepository = orgRightRepository;
@@ -67,6 +69,7 @@ namespace Core.ApplicationServices.Organizations
             _orgUnitService = orgUnitService;
             _domainEvents = domainEvents;
             _identityResolver = identityResolver;
+            _dataResponsibleRepository = dataResponsibleRepository;
             _organizationRightsService = organizationRightsService;
         }
 
@@ -437,14 +440,19 @@ namespace Core.ApplicationServices.Organizations
         {
             var organizationDbIdMaybe= _identityResolver.ResolveDbId<Organization>(organizationUuid);
             if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+            var orgId = organizationDbIdMaybe.Value;
 
             var contactPersonMaybe = _contactPersonRepository.AsQueryable()
-                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationDbIdMaybe.Value));
+                .FirstOrNone(cp => cp.OrganizationId.Equals(orgId));
+
+            var dataResponsibleMaybe = _dataResponsibleRepository.AsQueryable()
+                .FirstOrNone(dr => dr.OrganizationId.Equals(orgId));
 
             return new OrganizationMasterDataRoles()
             {
                 OrganizationUuid = organizationUuid,
-                ContactPerson = contactPersonMaybe.Value
+                ContactPerson = contactPersonMaybe.Value,
+                DataResponsible = dataResponsibleMaybe.Value
             };
         }
 

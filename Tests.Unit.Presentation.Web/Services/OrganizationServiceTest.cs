@@ -7,6 +7,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Organizations.Write;
+using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
@@ -47,6 +48,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IOrganizationRightsService> _organizationRightsServiceMock;
         private readonly Mock<IGenericRepository<ContactPerson>> _contactPersonRepository;
         private readonly Mock<IEntityIdentityResolver> _identityResolver;
+        private readonly Mock<IGenericRepository<DataResponsible>> _dataResponsibleRepository;
 
 
         public OrganizationServiceTest()
@@ -66,6 +68,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationRightsServiceMock = new Mock<IOrganizationRightsService>();
             _contactPersonRepository = new Mock<IGenericRepository<ContactPerson>>();
             _identityResolver = new Mock<IEntityIdentityResolver>();
+            _dataResponsibleRepository = new Mock<IGenericRepository<DataResponsible>>();
 
             _sut = new OrganizationService(
                 _organizationRepository.Object,
@@ -80,7 +83,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 _organizationRightsServiceMock.Object,
                 _orgUnitServiceMock.Object,
                 _domainEventsMock.Object,
-                _identityResolver.Object);
+                _identityResolver.Object,
+                _dataResponsibleRepository.Object);
         }
 
         [Fact]
@@ -937,30 +941,19 @@ namespace Tests.Unit.Presentation.Web.Services
         public void CanGetMasterDataRoles()
         {
             var org = CreateOrganization();
-            var expectedContactPerson = new ContactPerson
-            {
-                Email = A<string>(),
-                Name = A<string>(),
-                PhoneNumber = A<string>(),
-                OrganizationId = org.Id,
-                Id = A<int>(),
-            };
+            var orgId = org.Id;
+            var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
-                .Returns(expectedContactPerson.OrganizationId);
-            _contactPersonRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
+                .Returns(orgId);
+            var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
 
             var rolesResult = _sut.GetOrganizationMasterDataRoles(org.Uuid);
             
             Assert.True(rolesResult.Ok);
-            var contactPerson = rolesResult.Value.ContactPerson;
-            Assert.Equal(expectedContactPerson.Email, contactPerson.Email);
-            Assert.Equal(expectedContactPerson.Name, contactPerson.Name);
-            Assert.Equal(expectedContactPerson.PhoneNumber, contactPerson.PhoneNumber);
-            Assert.Equal(expectedContactPerson.OrganizationId, contactPerson.OrganizationId);
-            Assert.Equal(expectedContactPerson.Id, contactPerson.Id);
+            var value = rolesResult.Value;
+            AssertContactPerson(expectedContactPerson, value.ContactPerson);
+            AssertDataResponsible(expectedDataResponsible, value.DataResponsible);
             Assert.Equal(org.Uuid, rolesResult.Value.OrganizationUuid);
         }
 
@@ -1073,6 +1066,58 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(expectedContactPerson.PhoneNumber, contactPerson.PhoneNumber);
             Assert.Equal(expectedContactPerson.OrganizationId, contactPerson.OrganizationId);
             Assert.Equal(expectedContactPerson.Id, contactPerson.Id);
+        }
+        
+        private void AssertContactPerson(ContactPerson expected, ContactPerson actual)
+        {
+            Assert.Equal(expected.Email, actual.Email);
+            Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(expected.PhoneNumber, actual.PhoneNumber);
+            Assert.Equal(expected.OrganizationId, actual.OrganizationId);
+            Assert.Equal(expected.Id, actual.Id);
+        }
+
+        private void AssertDataResponsible(DataResponsible expected, DataResponsible actual)
+        {
+            Assert.Equal(expected.Email, actual.Email);
+            Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(expected.Cvr, actual.Cvr);
+            Assert.Equal(expected.OrganizationId, actual.OrganizationId);
+            Assert.Equal(expected.Id, actual.Id);
+            Assert.Equal(expected.Adress, actual.Adress);
+        }
+
+        private ContactPerson SetupGetMasterDataRolesContactPerson(int orgId)
+        {
+            var expectedContactPerson = new ContactPerson
+            {
+                Email = A<string>(),
+                Name = A<string>(),
+                PhoneNumber = A<string>(),
+                OrganizationId = orgId,
+                Id = A<int>(),
+            };
+            _contactPersonRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
+            return expectedContactPerson;
+        }
+
+        private DataResponsible SetupGetMasterDataRolesDataResponsible(int orgId)
+        {
+            var expectedDataResponsible = new DataResponsible
+            {
+                Email = A<string>(),
+                Name = A<string>(),
+                Cvr = A<string>(),
+                Adress = A<string>(),
+                OrganizationId = orgId,
+                Id = A<int>(),
+            };
+            _dataResponsibleRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
+            return expectedDataResponsible;
         }
 
         private void VerifyOrganizationDeleted(Maybe<OperationError> result, Mock<IDatabaseTransaction> transaction, Organization organization)

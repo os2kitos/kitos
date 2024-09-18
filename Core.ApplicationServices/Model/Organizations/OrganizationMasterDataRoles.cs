@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 
 namespace Core.ApplicationServices.Model.Organizations
 {
@@ -11,5 +12,6 @@ namespace Core.ApplicationServices.Model.Organizations
     {
         public Guid OrganizationUuid { get; set; }
         public ContactPerson ContactPerson { get; set; }
+        public DataResponsible DataResponsible { get; set; }
     }
 }

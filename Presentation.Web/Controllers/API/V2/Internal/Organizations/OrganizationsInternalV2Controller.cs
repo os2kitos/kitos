@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Core.ApplicationServices.Model.Organizations.Write;
+using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
 using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.Organization;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
