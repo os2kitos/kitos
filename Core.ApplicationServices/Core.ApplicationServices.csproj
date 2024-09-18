@@ -207,8 +207,9 @@
     <Compile Include="Model\Organizations\ReportPendingFkOrganizationChangesToStakeHolders.cs" />
     <Compile Include="Model\Organizations\StsOrganizationSynchronizationDetails.cs" />
     <Compile Include="Model\Organizations\AuthorizedUpdateOrganizationFromFKOrganisationCommand.cs" />
+    <Compile Include="Model\Organizations\Write\OrganizationMasterDataRolesUpdateParameters.cs" />
     <Compile Include="Model\Organizations\Write\OrganizationUnitUpdateParameters.cs" />
-    <Compile Include="Model\Organizations\Write\OrganizationUpdateParameters.cs" />
+    <Compile Include="Model\Organizations\Write\OrganizationMasterDataUpdateParameters.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
     <Compile Include="Model\Shared\NamedEntityWithUuid.cs" />
     <Compile Include="Model\Shared\OptionalValueChange.cs" />

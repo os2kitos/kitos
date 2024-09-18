@@ -30,8 +30,8 @@ namespace Core.ApplicationServices.Organizations
         public Result<Organization, OperationError> GetOrganization(Guid organizationUuid, OrganizationDataReadAccessLevel? withMinimumAccessLevel = null);
         public Result<IQueryable<Organization>, OperationError> GetAllOrganizations();
 
-        public Result<Organization, OperationError> UpdateOrganization(Guid organizationUuid,
-            OrganizationUpdateParameters parameters);
+        public Result<Organization, OperationError> UpdateOrganizationMasterData(Guid organizationUuid,
+            OrganizationMasterDataUpdateParameters parameters);
         public IQueryable<Organization> SearchAccessibleOrganizations(bool onlyWithMembershipAccess, params IDomainQuery<Organization>[] conditions);
         public IQueryable<Organization> SearchAccessibleOrganizations(params IDomainQuery<Organization>[] conditions);
 
@@ -60,5 +60,7 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<OrganizationMasterDataRoles, OperationError>
             GetOrganizationMasterDataRoles(Guid organizationUuid);
+
+        public Result<OrganizationMasterDataRoles, OperationError> UpdateOrganizationMasterDataRoles(Guid organizationUuid, OrganizationMasterDataRolesUpdateParameters updateParameters);
     }
 }

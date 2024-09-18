@@ -2,7 +2,7 @@
 
 namespace Core.ApplicationServices.Model.Organizations.Write
 {
-    public class OrganizationUpdateParameters
+    public class OrganizationMasterDataUpdateParameters
     {
         public OptionalValueChange<string> Cvr { get; set; }
         public OptionalValueChange<string> Phone { get; set; }

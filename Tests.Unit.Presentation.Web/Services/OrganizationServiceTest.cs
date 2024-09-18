@@ -240,12 +240,12 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(false);
             _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
             var newCvr = OptionalValueChange<string>.With(A<string>());
-            var updateParameters = new OrganizationUpdateParameters
+            var updateParameters = new OrganizationMasterDataUpdateParameters
             {
                 Cvr = newCvr,
             };
 
-            var result = _sut.UpdateOrganization(organizationUuid, updateParameters);
+            var result = _sut.UpdateOrganizationMasterData(organizationUuid, updateParameters);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
@@ -259,12 +259,12 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
             _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
             var newCvr = OptionalValueChange<string>.With(A<string>());
-            var updateParameters = new OrganizationUpdateParameters
+            var updateParameters = new OrganizationMasterDataUpdateParameters
             {
                 Cvr = newCvr,
             };
 
-            var result = _sut.UpdateOrganization(invalidOrganizationUuid, updateParameters);
+            var result = _sut.UpdateOrganizationMasterData(invalidOrganizationUuid, updateParameters);
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
@@ -283,7 +283,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var newPhone = OptionalValueChange<string>.With(A<string>());
             var newAddress = OptionalValueChange<string>.With(A<string>());
             var newEmail = OptionalValueChange<string>.With(A<string>());
-            var updateParameters = new OrganizationUpdateParameters
+            var updateParameters = new OrganizationMasterDataUpdateParameters
             {
                 Cvr = newCvr,
                 Phone = newPhone,
@@ -291,7 +291,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Email = newEmail
             };
 
-            var result = _sut.UpdateOrganization(organizationUuid, updateParameters);
+            var result = _sut.UpdateOrganizationMasterData(organizationUuid, updateParameters);
             Assert.True(result.Ok);
 
             var updatedOrganization = result.Value;
@@ -312,9 +312,9 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
-            var updateParameters = new OrganizationUpdateParameters();
+            var updateParameters = new OrganizationMasterDataUpdateParameters();
 
-            var result = _sut.UpdateOrganization(organizationUuid, updateParameters);
+            var result = _sut.UpdateOrganizationMasterData(organizationUuid, updateParameters);
             Assert.True(result.Ok);
 
             var updatedOrganization = result.Value;

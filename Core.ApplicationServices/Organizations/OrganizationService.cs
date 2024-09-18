@@ -226,7 +226,7 @@ namespace Core.ApplicationServices.Organizations
             return Result<IQueryable<Organization>, OperationError>.Success(_repository.GetAll());
         }
 
-        public Result<Organization, OperationError> UpdateOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
+        public Result<Organization, OperationError> UpdateOrganizationMasterData(Guid organizationUuid, OrganizationMasterDataUpdateParameters parameters)
         {
             using var transaction = _transactionManager.Begin();
 
@@ -272,7 +272,7 @@ namespace Core.ApplicationServices.Organizations
         }
 
         private static Result<Organization, OperationError> ModifyOrganization(Organization organization,
-            OrganizationUpdateParameters parameters)
+            OrganizationMasterDataUpdateParameters parameters)
         {
             organization.Cvr = parameters.Cvr?.NewValue;
             organization.Adress = parameters.Address?.NewValue;

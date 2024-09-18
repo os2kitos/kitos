@@ -14,6 +14,7 @@ using Core.ApplicationServices.Model.Organizations.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.Organization;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
+using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Request.Organization;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
@@ -59,8 +60,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         {
             if (!ModelState.IsValid) return BadRequest();
             
-            var updateParameters = ToUpdateParameters(requestDto);
-            return _organizationService.UpdateOrganization(organizationUuid, updateParameters)
+            var updateParameters = ToMasterDataUpdateParameters(requestDto);
+            return _organizationService.UpdateOrganizationMasterData(organizationUuid, updateParameters)
                 .Select(_organizationMapper.ToOrganizationDTO)
                 .Match(Ok, FromOperationError);
         }
@@ -80,7 +81,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 
         }
 
-        private OrganizationUpdateParameters ToUpdateParameters(OrganizationMasterDataRequestDTO dto)
+        [HttpPatch]
+        [Route("{organizationUuid}/masterData/roles")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult UpdateOrganizationMasterDataRoles([FromUri][NonEmptyGuid] Guid organizationUuid, OrganizationMasterDataRolesRequestDTO requestDto)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var updateParameters = ToMasterDataRolesUpdateParameters(requestDto);
+            return _organizationService.UpdateOrganizationMasterDataRoles(organizationUuid, updateParameters)
+                .Select(_organizationMapper.ToRolesDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        private OrganizationMasterDataUpdateParameters ToMasterDataUpdateParameters(OrganizationMasterDataRequestDTO dto)
         {
             return new()
             {
@@ -89,6 +106,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 Address = OptionalValueChange<string>.With(dto.Address),
                 Phone = OptionalValueChange<string>.With(dto.Phone),
             };
+        }
+
+        private OrganizationMasterDataRolesUpdateParameters ToMasterDataRolesUpdateParameters(
+            OrganizationMasterDataRolesRequestDTO dto)
+        {
+            throw new NotImplementedException();
         }
     }
 }
