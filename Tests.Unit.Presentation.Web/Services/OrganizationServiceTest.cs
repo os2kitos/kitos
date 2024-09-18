@@ -952,15 +952,30 @@ namespace Tests.Unit.Presentation.Web.Services
                     _.AsQueryable())
                 .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
 
-            var roles = _sut.GetOrganizationMasterDataRoles(org.Uuid);
-            Assert.True(roles.Ok);
+            var rolesResult = _sut.GetOrganizationMasterDataRoles(org.Uuid);
+            Assert.True(rolesResult.Ok);
 
-            var contactPerson = roles.Value.ContactPerson;
+            var contactPerson = rolesResult.Value.ContactPerson;
             Assert.Equal(expectedContactPerson.Email, contactPerson.Email);
             Assert.Equal(expectedContactPerson.Name, contactPerson.Name);
             Assert.Equal(expectedContactPerson.PhoneNumber, contactPerson.PhoneNumber);
             Assert.Equal(expectedContactPerson.OrganizationId, contactPerson.OrganizationId);
             Assert.Equal(expectedContactPerson.Id, contactPerson.Id);
+        }
+
+        [Fact]
+        public void GetMasterDataRolesReturnsBadInputIfInvalidUuid()
+        {
+            var org = CreateOrganization();
+            _identityResolver.Setup(_ =>
+                    _.ResolveDbId<Organization>(org.Uuid))
+                .Returns(Maybe<int>.None);
+
+            var result = _sut.GetOrganizationMasterDataRoles(org.Uuid);
+            Assert.True(result.Failed);
+
+            var error = result.Error;
+            Assert.Equal(OperationFailure.BadInput, error.FailureType);
         }
 
         private void VerifyOrganizationDeleted(Maybe<OperationError> result, Mock<IDatabaseTransaction> transaction, Organization organization)
