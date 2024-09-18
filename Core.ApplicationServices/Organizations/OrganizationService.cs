@@ -465,11 +465,9 @@ namespace Core.ApplicationServices.Organizations
             var contactPersonMaybe = _contactPersonRepository.AsQueryable()
                 .FirstOrNone(cp => cp.OrganizationId.Equals(organizationDbIdMaybe.Value));
 
-            if (contactPersonMaybe.IsNone) return new OperationError(OperationFailure.UnknownError);
-            return new OrganizationMasterDataRoles
-            {
-                ContactPerson = contactPersonMaybe.Value,
-            };
+            var roles = new OrganizationMasterDataRoles();
+            if (contactPersonMaybe.HasValue) roles.ContactPerson = contactPersonMaybe.Value;
+            return roles;
         }
 
         private Result<Organization, OperationError> WithDeletionAccess(Organization organization)
