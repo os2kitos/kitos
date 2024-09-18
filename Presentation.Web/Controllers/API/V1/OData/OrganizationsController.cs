@@ -66,20 +66,14 @@ namespace Presentation.Web.Controllers.API.V1.OData
         [EnableQuery]
         public IHttpActionResult GetUsers([FromODataUri] int key)
         {
-            return GetUsersByOrgId(key);
-        }
+            var accessLevel = GetOrganizationReadAccessLevel(key);
+            if (accessLevel < OrganizationDataReadAccessLevel.Public)
+            {
+                return Forbidden();
+            }
 
-        [EnableQuery]
-        [SwaggerResponse(HttpStatusCode.OK, type: typeof(ODataListResponse<User>))]
-        [ODataRoute("Users({organizationUuid})")]
-        public IHttpActionResult GetUsersByUuid(Guid organizationUuid)
-        {
-            var idResult = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
-            if (idResult.IsNone)
-                return NotFound();
-
-            var id = idResult.Value;
-            return GetUsersByOrgId(id);
+            var result = _userRepository.AsQueryable().Where(m => m.OrganizationRights.Any(r => r.OrganizationId == key));
+            return Ok(result);
         }
 
         [NonAction]
@@ -87,17 +81,5 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
         [NonAction]
         public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
-
-        private IHttpActionResult GetUsersByOrgId(int orgId)
-        {
-            var accessLevel = GetOrganizationReadAccessLevel(orgId);
-            if (accessLevel < OrganizationDataReadAccessLevel.Public)
-            {
-                return Forbidden();
-            }
-
-            var result = _userRepository.AsQueryable().Where(m => m.OrganizationRights.Any(r => r.OrganizationId == orgId));
-            return Ok(result);
-        }
     }
 }

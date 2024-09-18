@@ -186,6 +186,10 @@ namespace Presentation.Web
             userGetByMailAndOrgFunction.Parameter<string>("email").Required();
             userGetByMailAndOrgFunction.Parameter<int>("organizationId").Required();
 
+            var getUsersByOrgUuidFunction = builder.Function("GetUsersByUuid")
+                .ReturnsCollectionFromEntitySet<User>(userEntitySetName);
+            getUsersByOrgUuidFunction.Parameter<Guid>("organizationUuid").Required();
+
             BindItSystemUsage(builder, entitySetOrganizations, entitySetItSystems);
 
             var contracts = BindEntitySet<ItContract, ItContractsController>(builder);
