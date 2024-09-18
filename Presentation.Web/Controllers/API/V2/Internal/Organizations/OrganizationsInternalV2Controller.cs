@@ -6,13 +6,18 @@ using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Response.Shared;
+using Presentation.Web.Models.API.V2.Internal.Response.Roles;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
     /// <summary>
     /// Internal API for the organizations in KITOS
     /// </summary>
-    [RoutePrefix("api/v2/internal/organizations")]
+    [RoutePrefix("api/v2/internal/organizations/{organizationUuid}")]
     public class OrganizationsInternalV2Controller : InternalApiV2Controller
     {
         private readonly IOrganizationService _organizationService;
@@ -24,7 +29,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             _permissionsResponseMapper = permissionsResponseMapper;
         }
 
-        [Route("{organizationUuid}/permissions")]
+        [Route("permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]

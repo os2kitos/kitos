@@ -17,6 +17,7 @@ using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using System.Net;
+using System.Net.Http;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 
@@ -161,6 +162,53 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             MatchExpectedAssignment(roleAssignment, assignment2, users.Last());
         }
 
+        [Fact]
+        public async Task Cannot_PATCH_Self_As_Parent()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(organization);
+            var createdContract = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+            var contractUuid = createdContract.Uuid;
+
+            //Act
+            using var response = await ItContractV2Helper.SendPatchParentContractAsync(token, createdContract.Uuid, contractUuid);
+
+            //Assert
+            await AssertFailedToPatchParent(response);
+        }
+
+        [Fact]
+        public async Task Cannot_PATCH_Child_As_Parent()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(organization);
+            var createdParentContract = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+            var createdChildContract = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                ParentContractUuid = createdParentContract.Uuid
+            });
+            var childUuid = createdChildContract.Uuid;
+
+            //Act
+            using var response = await ItContractV2Helper.SendPatchParentContractAsync(token, createdParentContract.Uuid, childUuid);
+
+            //Assert
+            await AssertFailedToPatchParent(response);
+
+        }
+
         protected async Task<(string token, OrganizationDTO createdOrganization)> CreateStakeHolderUserInNewOrganizationAsync()
         {
             var organization = await CreateOrganizationAsync();
@@ -266,6 +314,13 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         private string CreateName()
         {
             return $"{nameof(ItContractsInternalApiV2Test)}{A<string>()}";
+        }
+
+        private static async Task AssertFailedToPatchParent(HttpResponseMessage response)
+        {
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var content = await response.Content.ReadAsStringAsync();
+            Assert.Contains("Failed to set parent", content);
         }
     }
 }

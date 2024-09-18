@@ -158,6 +158,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.Termination), dto));
         }
 
+        public static async Task<HttpResponseMessage> SendPatchParentContractAsync(string token, Guid contractUuid, Guid parentGuid)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.ParentContractUuid), parentGuid));
+        }
+
         private static Dictionary<string, object> CreatePatchPayload(string propertyName, object dto)
         {
             return dto.AsPatchPayloadOfProperty(propertyName);
