@@ -65,7 +65,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 .Match(Ok, FromOperationError);
         }
 
-        [Route("{organizationUuid}/masterDataRoles")]
+        [Route("{organizationUuid}/masterData/roles")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataRolesResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]

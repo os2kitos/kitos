@@ -6,7 +6,6 @@ using System.Linq;
 using System.Web;
 using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel;
-using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
 

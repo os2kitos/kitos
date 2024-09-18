@@ -84,14 +84,24 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Contains(organizationToPatch.Uuid.ToString(), content);
             Assert.Contains("null", content);
         }
+        
+        [Fact]
+        public async Task CanGetOrganizationMasterDataRoles()
+        {
+            var organization = await GetOrganization();
+            
+            var response = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(organization.Uuid);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
 
         private static async Task<OrganizationResponseDTO> GetOrganization()
         {
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
             var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250);
-            var organizationToPatch = organizations.First();
-            Assert.NotNull(organizationToPatch);
-            return organizationToPatch;
+            var organization = organizations.First();
+            Assert.NotNull(organization);
+            return organization;
         }
     }
 }
