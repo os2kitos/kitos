@@ -446,20 +446,6 @@ namespace Core.ApplicationServices.Organizations
             return roles;
         }
 
-        private Result<ContactPerson, OperationError> AuthorizeModificationAndModifyContactPerson(
-            int organizationId, OptionalValueChange<ContactPerson> updateContactPerson)
-        {
-            var existingContactPersonMaybe = _contactPersonRepository.AsQueryable()
-                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
-
-            if (existingContactPersonMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
-
-            var allowModify = _authorizationContext.AllowModify(existingContactPersonMaybe.Value);
-            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
-
-            return ModifyContactPerson(existingContactPersonMaybe.Value, updateContactPerson.NewValue);
-        }
-
         public Result<OrganizationMasterDataRoles, OperationError> UpdateOrganizationMasterDataRoles(Guid organizationUuid,
             OrganizationMasterDataRolesUpdateParameters updateParameters)
         {
@@ -493,6 +479,20 @@ namespace Core.ApplicationServices.Organizations
                         return error;
                     })
             ;
+        }
+
+        private Result<ContactPerson, OperationError> AuthorizeModificationAndModifyContactPerson(
+            int organizationId, Maybe<ContactPersonUpdateParameters> parameters)
+        {
+            var existingContactPersonMaybe = _contactPersonRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
+
+            if (existingContactPersonMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+
+            var allowModify = _authorizationContext.AllowModify(existingContactPersonMaybe.Value);
+            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
+
+            return parameters.HasValue ? ModifyContactPerson(existingContactPersonMaybe.Value, parameters.Value) : existingContactPersonMaybe.Value;
         }
 
         private Result<Organization, OperationError> WithDeletionAccess(Organization organization)
@@ -534,12 +534,12 @@ namespace Core.ApplicationServices.Organizations
 
         } 
         
-        private static Result<ContactPerson, OperationError> ModifyContactPerson(ContactPerson contactPerson, ContactPerson updatedContactPerson)
+        private static Result<ContactPerson, OperationError> ModifyContactPerson(ContactPerson contactPerson, ContactPersonUpdateParameters parameters)
         {
-            contactPerson.Email = updatedContactPerson.Email;
-            contactPerson.Name = updatedContactPerson.Name;
-            contactPerson.LastName = updatedContactPerson.LastName;
-            contactPerson.PhoneNumber = updatedContactPerson.PhoneNumber;
+            contactPerson.Email = parameters.Email?.NewValue;
+            contactPerson.Name = parameters.Name?.NewValue;
+            contactPerson.LastName = parameters.LastName?.NewValue;
+            contactPerson.PhoneNumber = parameters.PhoneNumber?.NewValue;
             return contactPerson;
         }
     }

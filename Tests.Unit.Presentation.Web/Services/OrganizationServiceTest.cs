@@ -1017,6 +1017,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 .Returns(false);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+            
 
             var result =
                 _sut.UpdateOrganizationMasterDataRoles(org.Uuid, new OrganizationMasterDataRolesUpdateParameters());
@@ -1034,13 +1035,21 @@ namespace Tests.Unit.Presentation.Web.Services
             {
                 Email = A<string>(),
                 Name = A<string>(),
+                LastName = A<string>(),
                 PhoneNumber = A<string>(),
                 OrganizationId = org.Id,
                 Id = A<int>(),
             };
             var updateParameters = new OrganizationMasterDataRolesUpdateParameters
             {
-                ContactPerson = OptionalValueChange<ContactPerson>.With(expectedContactPerson),
+                ContactPerson = new ContactPersonUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    LastName = OptionalValueChange<string>.With(expectedContactPerson.LastName),
+                    PhoneNumber = OptionalValueChange<string>.With(expectedContactPerson.PhoneNumber),
+                    Id = OptionalValueChange<int>.With(expectedContactPerson.Id)
+                }
             };
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
