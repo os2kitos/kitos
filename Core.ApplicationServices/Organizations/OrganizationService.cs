@@ -258,31 +258,6 @@ namespace Core.ApplicationServices.Organizations
 
         }
 
-        private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid organizationUuid)
-        {
-            return GetOrganization(organizationUuid)
-                .Match
-                (
-                    organization =>
-                        !_authorizationContext.AllowModify(organization)
-                            ? new OperationError(OperationFailure.Forbidden)
-                            : Result<Organization, OperationError>.Success(organization),
-                    error => error
-                );
-        }
-
-        private static Result<Organization, OperationError> ModifyOrganization(Organization organization,
-            OrganizationMasterDataUpdateParameters parameters)
-        {
-            organization.Cvr = parameters.Cvr?.NewValue;
-            organization.Adress = parameters.Address?.NewValue;
-            organization.Email = parameters.Email?.NewValue;
-            organization.Phone = parameters.Phone?.NewValue;
-            return organization;
-
-        }
-
-
         public IQueryable<Organization> SearchAccessibleOrganizations(bool onlyWithMembershipAccess, params IDomainQuery<Organization>[] conditions)
         {
             var crossOrganizationReadAccess = _authorizationContext.GetCrossOrganizationReadAccess();
@@ -470,6 +445,48 @@ namespace Core.ApplicationServices.Organizations
             return roles;
         }
 
+        public Result<OrganizationMasterDataRoles, OperationError> UpdateOrganizationMasterDataRoles(Guid organizationUuid,
+            OrganizationMasterDataRolesUpdateParameters updateParameters)
+        {
+            using var transaction = _transactionManager.Begin();
+
+            var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
+            if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+
+            var existingContactPersonMaybe = _contactPersonRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationDbIdMaybe.Value));
+
+            if (existingContactPersonMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+
+            var allowed = _authorizationContext.AllowModify(existingContactPersonMaybe.Value);
+            if (!allowed) return new OperationError(OperationFailure.Forbidden);
+            var modifiedContactPersonResult = ModifyContactPerson(existingContactPersonMaybe.Value, updateParameters);
+
+            return modifiedContactPersonResult.Match(
+                    contactPerson =>
+                    {
+                        _contactPersonRepository.Update(contactPerson);
+                        _domainEvents.Raise(new EntityUpdatedEvent<ContactPerson>(contactPerson));
+                        transaction.Commit();
+
+                        var updatedContactPersonMaybe = _contactPersonRepository.AsQueryable()
+                            .FirstOrNone(cp => cp.OrganizationId.Equals(organizationDbIdMaybe.Value));
+
+                        return updatedContactPersonMaybe.Match<Result<OrganizationMasterDataRoles, OperationError>>(
+                            updatedContactPerson => new OrganizationMasterDataRoles
+                                { ContactPerson = updatedContactPerson },
+                            () => new OperationError(OperationFailure.NotFound));
+                    },
+                    error =>
+                    {
+                        transaction.Rollback();
+                        return error;
+                    })
+            ;
+        }
+
+       
+
         private Result<Organization, OperationError> WithDeletionAccess(Organization organization)
         {
             if (_authorizationContext.AllowDelete(organization))
@@ -483,6 +500,44 @@ namespace Core.ApplicationServices.Organizations
         private bool HasRole(int orgId, OrganizationRole role)
         {
             return _userContext.HasRole(orgId, role);
+        }
+
+        private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid organizationUuid)
+        {
+            return GetOrganization(organizationUuid)
+                .Match
+                (
+                    organization =>
+                        !_authorizationContext.AllowModify(organization)
+                            ? new OperationError(OperationFailure.Forbidden)
+                            : Result<Organization, OperationError>.Success(organization),
+                    error => error
+                );
+        }
+
+        private static Result<Organization, OperationError> ModifyOrganization(Organization organization,
+            OrganizationMasterDataUpdateParameters parameters)
+        {
+            organization.Cvr = parameters.Cvr?.NewValue;
+            organization.Adress = parameters.Address?.NewValue;
+            organization.Email = parameters.Email?.NewValue;
+            organization.Phone = parameters.Phone?.NewValue;
+            return organization;
+
+        } 
+        
+        private static Result<ContactPerson, OperationError> ModifyContactPerson(ContactPerson contactPerson, OrganizationMasterDataRolesUpdateParameters updateParameters)
+        {
+            return updateParameters.ContactPerson.Match(
+                updatedContactPerson =>
+                {
+                    contactPerson.Email = updatedContactPerson.Email;
+                    contactPerson.Name = updatedContactPerson.Name;
+                    contactPerson.LastName = updatedContactPerson.LastName;
+                    contactPerson.PhoneNumber = updatedContactPerson.PhoneNumber;
+                    return contactPerson;
+                },
+                () => contactPerson);
         }
     }
 }

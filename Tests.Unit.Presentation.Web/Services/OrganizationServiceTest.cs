@@ -953,8 +953,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
 
             var rolesResult = _sut.GetOrganizationMasterDataRoles(org.Uuid);
+            
             Assert.True(rolesResult.Ok);
-
             var contactPerson = rolesResult.Value.ContactPerson;
             Assert.Equal(expectedContactPerson.Email, contactPerson.Email);
             Assert.Equal(expectedContactPerson.Name, contactPerson.Name);
@@ -992,6 +992,75 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Failed);
             var error = result.Error;
             Assert.Equal(OperationFailure.BadInput, error.FailureType);
+        }
+
+        [Fact]
+        public void UpdateMasterDataRolesReturnsForbiddenIfUnauthorizedToModifyContactPerson()
+        {
+            var org = CreateOrganization();
+            var expectedContactPerson = new ContactPerson
+            {
+                Email = A<string>(),
+                Name = A<string>(),
+                PhoneNumber = A<string>(),
+                OrganizationId = org.Id,
+                Id = A<int>(),
+            };
+            _identityResolver.Setup(_ =>
+                    _.ResolveDbId<Organization>(org.Uuid))
+                .Returns(expectedContactPerson.OrganizationId);
+            _contactPersonRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<ContactPerson>()))
+                .Returns(false);
+
+            var result =
+                _sut.UpdateOrganizationMasterDataRoles(org.Uuid, new OrganizationMasterDataRolesUpdateParameters());
+
+            Assert.True(result.Failed);
+            var error = result.Error;
+            Assert.Equal(OperationFailure.Forbidden, error.FailureType);
+        }
+
+        [Fact]
+        public void CanUpdateMasterDataRoles()
+        {
+            var org = CreateOrganization();
+            var expectedContactPerson = new ContactPerson
+            {
+                Email = A<string>(),
+                Name = A<string>(),
+                PhoneNumber = A<string>(),
+                OrganizationId = org.Id,
+                Id = A<int>(),
+            };
+            var updateParameters = new OrganizationMasterDataRolesUpdateParameters
+            {
+                ContactPerson = OptionalValueChange<ContactPerson>.With(expectedContactPerson),
+            };
+            _identityResolver.Setup(_ =>
+                    _.ResolveDbId<Organization>(org.Uuid))
+                .Returns(expectedContactPerson.OrganizationId);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<ContactPerson>()))
+                .Returns(true);
+            _contactPersonRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            var result = _sut.UpdateOrganizationMasterDataRoles(org.Uuid, updateParameters);
+
+            Assert.True(result.Ok);
+            var contactPerson = result.Value.ContactPerson;
+            Assert.Equal(expectedContactPerson.Email, contactPerson.Email);
+            Assert.Equal(expectedContactPerson.Name, contactPerson.Name);
+            Assert.Equal(expectedContactPerson.PhoneNumber, contactPerson.PhoneNumber);
+            Assert.Equal(expectedContactPerson.OrganizationId, contactPerson.OrganizationId);
+            Assert.Equal(expectedContactPerson.Id, contactPerson.Id);
         }
 
         private void VerifyOrganizationDeleted(Maybe<OperationError> result, Mock<IDatabaseTransaction> transaction, Organization organization)
