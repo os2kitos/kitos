@@ -441,12 +441,11 @@ namespace Core.ApplicationServices.Organizations
             var contactPersonMaybe = _contactPersonRepository.AsQueryable()
                 .FirstOrNone(cp => cp.OrganizationId.Equals(organizationDbIdMaybe.Value));
 
-            var roles = new OrganizationMasterDataRoles()
+            return new OrganizationMasterDataRoles()
             {
-                OrganizationUuid = organizationUuid
+                OrganizationUuid = organizationUuid,
+                ContactPerson = contactPersonMaybe.Value
             };
-            if (contactPersonMaybe.HasValue) roles.ContactPerson = contactPersonMaybe.Value;
-            return roles;
         }
 
         public Result<OrganizationMasterDataRoles, OperationError> UpdateOrganizationMasterDataRoles(Guid organizationUuid,
