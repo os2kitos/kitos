@@ -7,6 +7,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Model.Organizations.Write;
+using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
@@ -445,6 +446,20 @@ namespace Core.ApplicationServices.Organizations
             return roles;
         }
 
+        private Result<ContactPerson, OperationError> AuthorizeModificationAndModifyContactPerson(
+            int organizationId, OptionalValueChange<ContactPerson> updateContactPerson)
+        {
+            var existingContactPersonMaybe = _contactPersonRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
+
+            if (existingContactPersonMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+
+            var allowModify = _authorizationContext.AllowModify(existingContactPersonMaybe.Value);
+            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
+
+            return ModifyContactPerson(existingContactPersonMaybe.Value, updateContactPerson.NewValue);
+        }
+
         public Result<OrganizationMasterDataRoles, OperationError> UpdateOrganizationMasterDataRoles(Guid organizationUuid,
             OrganizationMasterDataRolesUpdateParameters updateParameters)
         {
@@ -453,14 +468,9 @@ namespace Core.ApplicationServices.Organizations
             var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
             if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
 
-            var existingContactPersonMaybe = _contactPersonRepository.AsQueryable()
-                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationDbIdMaybe.Value));
-
-            if (existingContactPersonMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
-
-            var allowed = _authorizationContext.AllowModify(existingContactPersonMaybe.Value);
-            if (!allowed) return new OperationError(OperationFailure.Forbidden);
-            var modifiedContactPersonResult = ModifyContactPerson(existingContactPersonMaybe.Value, updateParameters);
+            var modifiedContactPersonResult =
+                AuthorizeModificationAndModifyContactPerson(organizationDbIdMaybe.Value,
+                    updateParameters.ContactPerson);
 
             return modifiedContactPersonResult.Match(
                     contactPerson =>
@@ -484,8 +494,6 @@ namespace Core.ApplicationServices.Organizations
                     })
             ;
         }
-
-       
 
         private Result<Organization, OperationError> WithDeletionAccess(Organization organization)
         {
@@ -526,18 +534,13 @@ namespace Core.ApplicationServices.Organizations
 
         } 
         
-        private static Result<ContactPerson, OperationError> ModifyContactPerson(ContactPerson contactPerson, OrganizationMasterDataRolesUpdateParameters updateParameters)
+        private static Result<ContactPerson, OperationError> ModifyContactPerson(ContactPerson contactPerson, ContactPerson updatedContactPerson)
         {
-            return updateParameters.ContactPerson.Match(
-                updatedContactPerson =>
-                {
-                    contactPerson.Email = updatedContactPerson.Email;
-                    contactPerson.Name = updatedContactPerson.Name;
-                    contactPerson.LastName = updatedContactPerson.LastName;
-                    contactPerson.PhoneNumber = updatedContactPerson.PhoneNumber;
-                    return contactPerson;
-                },
-                () => contactPerson);
+            contactPerson.Email = updatedContactPerson.Email;
+            contactPerson.Name = updatedContactPerson.Name;
+            contactPerson.LastName = updatedContactPerson.LastName;
+            contactPerson.PhoneNumber = updatedContactPerson.PhoneNumber;
+            return contactPerson;
         }
     }
 }

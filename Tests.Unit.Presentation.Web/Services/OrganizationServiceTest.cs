@@ -1015,6 +1015,8 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<ContactPerson>()))
                 .Returns(false);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             var result =
                 _sut.UpdateOrganizationMasterDataRoles(org.Uuid, new OrganizationMasterDataRolesUpdateParameters());
