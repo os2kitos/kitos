@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Core.ApplicationServices.Model.Organizations;
+using Core.DomainModel;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
 
 
@@ -12,17 +15,18 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
 {
     public class OrganizationMapper: IOrganizationMapper
     {
-        public OrganizationResponseDTO ToDTO(Organization organization)
+        public OrganizationResponseDTO ToOrganizationDTO(Organization organization)
         {
             return new(organization.Uuid, organization.Name, organization.GetActiveCvr(), MapOrganizationType(organization));
         }
 
         public OrganizationMasterDataRolesResponseDTO ToRolesDTO(OrganizationMasterDataRoles roles)
         {
-            throw new NotImplementedException();
+            var contactPersonDto = ToContactPersonDTO(roles.ContactPerson);
+            return new(){ ContactPerson = contactPersonDto };
         }
 
-        private OrganizationType MapOrganizationType(Organization organization)
+        private static OrganizationType MapOrganizationType(Organization organization)
         {
             return organization.Type.Id switch
             {
@@ -34,6 +38,16 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             };
         }
 
-        
+        private static ContactPersonResponseDTO ToContactPersonDTO(ContactPerson contactPerson)
+        {
+            return new()
+            {
+                Email = contactPerson.Email,
+                Id = contactPerson.Id,
+                LastName = contactPerson.LastName,
+                Name = contactPerson.Name,
+                PhoneNumber = contactPerson.PhoneNumber,
+            };
+        }
     }
 }

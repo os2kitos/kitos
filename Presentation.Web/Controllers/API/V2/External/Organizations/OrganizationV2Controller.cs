@@ -98,7 +98,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
                 .OrderApiResults(orderByProperty)
                 .Page(pagination)
                 .ToList()
-                .Select(_organizationMapper.ToDTO)
+                .Select(_organizationMapper.ToOrganizationDTO)
                 .Transform(Ok);
         }
 
@@ -121,7 +121,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
 
             return _organizationService
                 .GetOrganization(organizationUuid, null)
-                .Select(_organizationMapper.ToDTO)
+                .Select(_organizationMapper.ToOrganizationDTO)
                 .Match(Ok, FromOperationError);
         }
 

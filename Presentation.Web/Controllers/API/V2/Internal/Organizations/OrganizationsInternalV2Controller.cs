@@ -61,7 +61,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             
             var updateParameters = ToUpdateParameters(requestDto);
             return _organizationService.UpdateOrganization(organizationUuid, updateParameters)
-                .Select(_organizationMapper.ToDTO)
+                .Select(_organizationMapper.ToOrganizationDTO)
                 .Match(Ok, FromOperationError);
         }
 

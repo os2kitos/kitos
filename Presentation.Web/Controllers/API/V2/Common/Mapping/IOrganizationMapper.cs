@@ -6,6 +6,6 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic;
 
 public interface IOrganizationMapper
 {
-    OrganizationResponseDTO ToDTO(Organization organization);
+    OrganizationResponseDTO ToOrganizationDTO(Organization organization);
     OrganizationMasterDataRolesResponseDTO ToRolesDTO(OrganizationMasterDataRoles roles);
 }
