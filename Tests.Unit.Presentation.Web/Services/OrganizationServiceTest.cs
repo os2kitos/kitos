@@ -972,8 +972,24 @@ namespace Tests.Unit.Presentation.Web.Services
                 .Returns(Maybe<int>.None);
 
             var result = _sut.GetOrganizationMasterDataRoles(org.Uuid);
-            Assert.True(result.Failed);
 
+            Assert.True(result.Failed);
+            var error = result.Error;
+            Assert.Equal(OperationFailure.BadInput, error.FailureType);
+        }
+
+        [Fact]
+        public void UpdateMasterDataRolesReturnsBadInputIfInvalidUuid()
+        {
+            var org = CreateOrganization();
+            _identityResolver.Setup(_ =>
+                    _.ResolveDbId<Organization>(org.Uuid))
+                .Returns(Maybe<int>.None);
+
+            var result =
+                _sut.UpdateOrganizationMasterDataRoles(org.Uuid, new OrganizationMasterDataRolesUpdateParameters());
+
+            Assert.True(result.Failed);
             var error = result.Error;
             Assert.Equal(OperationFailure.BadInput, error.FailureType);
         }
