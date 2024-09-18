@@ -441,7 +441,10 @@ namespace Core.ApplicationServices.Organizations
             var contactPersonMaybe = _contactPersonRepository.AsQueryable()
                 .FirstOrNone(cp => cp.OrganizationId.Equals(organizationDbIdMaybe.Value));
 
-            var roles = new OrganizationMasterDataRoles();
+            var roles = new OrganizationMasterDataRoles()
+            {
+                OrganizationUuid = organizationUuid
+            };
             if (contactPersonMaybe.HasValue) roles.ContactPerson = contactPersonMaybe.Value;
             return roles;
         }
@@ -470,7 +473,10 @@ namespace Core.ApplicationServices.Organizations
 
                         return updatedContactPersonMaybe.Match<Result<OrganizationMasterDataRoles, OperationError>>(
                             updatedContactPerson => new OrganizationMasterDataRoles
-                                { ContactPerson = updatedContactPerson },
+                            {
+                                OrganizationUuid = organizationUuid,
+                                ContactPerson = updatedContactPerson
+                            },
                             () => new OperationError(OperationFailure.NotFound));
                     },
                     error =>

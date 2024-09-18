@@ -961,6 +961,7 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(expectedContactPerson.PhoneNumber, contactPerson.PhoneNumber);
             Assert.Equal(expectedContactPerson.OrganizationId, contactPerson.OrganizationId);
             Assert.Equal(expectedContactPerson.Id, contactPerson.Id);
+            Assert.Equal(org.Uuid, rolesResult.Value.OrganizationUuid);
         }
 
         [Fact]

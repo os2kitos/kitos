@@ -9,6 +9,7 @@ namespace Core.ApplicationServices.Model.Organizations
 {
     public class OrganizationMasterDataRoles
     {
+        public Guid OrganizationUuid { get; set; }
         public ContactPerson ContactPerson { get; set; }
     }
 }
