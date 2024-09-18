@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Core.ApplicationServices.Model.Organizations;
 using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
 
 
@@ -14,6 +15,11 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
         public OrganizationResponseDTO ToDTO(Organization organization)
         {
             return new(organization.Uuid, organization.Name, organization.GetActiveCvr(), MapOrganizationType(organization));
+        }
+
+        public OrganizationMasterDataRolesResponseDTO ToRolesDTO(OrganizationMasterDataRoles roles)
+        {
+            throw new NotImplementedException();
         }
 
         private OrganizationType MapOrganizationType(Organization organization)

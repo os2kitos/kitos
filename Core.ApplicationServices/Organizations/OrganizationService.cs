@@ -13,6 +13,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Repositories.Organization;
@@ -29,7 +30,9 @@ namespace Core.ApplicationServices.Organizations
         private readonly IOrgUnitService _orgUnitService;
         private readonly IOrganizationRightsService _organizationRightsService;
         private readonly IDomainEvents _domainEvents;
+        private readonly IEntityIdentityResolver _identityResolver;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
+        private readonly IGenericRepository<ContactPerson> _contactPersonRepository;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationalUserContext _userContext;
@@ -39,6 +42,7 @@ namespace Core.ApplicationServices.Organizations
         public OrganizationService(
             IGenericRepository<Organization> orgRepository,
             IGenericRepository<OrganizationRight> orgRightRepository,
+            IGenericRepository<ContactPerson> contactPersonRepository,
             IGenericRepository<User> userRepository,
             IAuthorizationContext authorizationContext,
             IOrganizationalUserContext userContext,
@@ -47,10 +51,12 @@ namespace Core.ApplicationServices.Organizations
             IOrganizationRepository repository,
             IOrganizationRightsService organizationRightsService,
             IOrgUnitService orgUnitService,
-            IDomainEvents domainEvents)
+            IDomainEvents domainEvents,
+            IEntityIdentityResolver identityResolver)
         {
             _orgRepository = orgRepository;
             _orgRightRepository = orgRightRepository;
+            _contactPersonRepository = contactPersonRepository;
             _userRepository = userRepository;
             _authorizationContext = authorizationContext;
             _userContext = userContext;
@@ -59,6 +65,7 @@ namespace Core.ApplicationServices.Organizations
             _repository = repository;
             _orgUnitService = orgUnitService;
             _domainEvents = domainEvents;
+            _identityResolver = identityResolver;
             _organizationRightsService = organizationRightsService;
         }
 
@@ -447,6 +454,21 @@ namespace Core.ApplicationServices.Organizations
             return new GridPermissions
             {
                 ConfigModificationPermission = HasRole(orgId, OrganizationRole.LocalAdmin)
+            };
+        }
+
+        public Result<OrganizationMasterDataRoles, OperationError> GetOrganizationMasterDataRoles(Guid organizationUuid)
+        {
+            var organizationDbIdMaybe= _identityResolver.ResolveDbId<Organization>(organizationUuid);
+            if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+
+            var contactPersonMaybe = _contactPersonRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationDbIdMaybe.Value));
+
+            if (contactPersonMaybe.IsNone) return new OperationError(OperationFailure.UnknownError);
+            return new OrganizationMasterDataRoles
+            {
+                ContactPerson = contactPersonMaybe.Value,
             };
         }
 

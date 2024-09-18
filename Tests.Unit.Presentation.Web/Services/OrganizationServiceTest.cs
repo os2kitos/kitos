@@ -18,6 +18,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
@@ -44,7 +45,9 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IOrgUnitService> _orgUnitServiceMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IOrganizationRightsService> _organizationRightsServiceMock;
-        
+        private readonly Mock<IGenericRepository<ContactPerson>> _contactPersonRepository;
+        private readonly Mock<IEntityIdentityResolver> _identityResolver;
+
 
         public OrganizationServiceTest()
         {
@@ -61,10 +64,13 @@ namespace Tests.Unit.Presentation.Web.Services
             _orgUnitServiceMock = new Mock<IOrgUnitService>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _organizationRightsServiceMock = new Mock<IOrganizationRightsService>();
+            _contactPersonRepository = new Mock<IGenericRepository<ContactPerson>>();
+            _identityResolver = new Mock<IEntityIdentityResolver>();
 
             _sut = new OrganizationService(
                 _organizationRepository.Object,
                 _orgRightRepository.Object,
+                _contactPersonRepository.Object,
                 _userRepository.Object,
                 _authorizationContext.Object,
                 _userContext.Object,
@@ -73,7 +79,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 _repositoryMock.Object,
                 _organizationRightsServiceMock.Object,
                 _orgUnitServiceMock.Object,
-                _domainEventsMock.Object);
+                _domainEventsMock.Object,
+                _identityResolver.Object);
         }
 
         [Fact]
@@ -924,6 +931,36 @@ namespace Tests.Unit.Presentation.Web.Services
             _userContext.Setup(x => x.HasRole(org.Id, roleBeingAsked)).Returns(true);
             var permissions = _sut.GetGridPermissions(org.Id);
             Assert.Equal(shouldHaveModificationPermission, permissions.ConfigModificationPermission);
+        }
+
+        [Fact]
+        public void CanGetMasterDataRoles()
+        {
+            var org = CreateOrganization();
+            var expectedContactPerson = new ContactPerson
+            {
+                Email = A<string>(),
+                Name = A<string>(),
+                PhoneNumber = A<string>(),
+                OrganizationId = org.Id,
+                Id = A<int>(),
+            };
+            _identityResolver.Setup(_ =>
+                    _.ResolveDbId<Organization>(org.Uuid))
+                .Returns(expectedContactPerson.OrganizationId);
+            _contactPersonRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
+
+            var roles = _sut.GetOrganizationMasterDataRoles(org.Uuid);
+            Assert.True(roles.Ok);
+
+            var contactPerson = roles.Value.ContactPerson;
+            Assert.Equal(expectedContactPerson.Email, contactPerson.Email);
+            Assert.Equal(expectedContactPerson.Name, contactPerson.Name);
+            Assert.Equal(expectedContactPerson.PhoneNumber, contactPerson.PhoneNumber);
+            Assert.Equal(expectedContactPerson.OrganizationId, contactPerson.OrganizationId);
+            Assert.Equal(expectedContactPerson.Id, contactPerson.Id);
         }
 
         private void VerifyOrganizationDeleted(Maybe<OperationError> result, Mock<IDatabaseTransaction> transaction, Organization organization)

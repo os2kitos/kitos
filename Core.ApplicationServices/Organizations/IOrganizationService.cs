@@ -57,5 +57,8 @@ namespace Core.ApplicationServices.Organizations
         Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid organizationUuid);
 
         public GridPermissions GetGridPermissions(int orgId);
+
+        public Result<OrganizationMasterDataRoles, OperationError>
+            GetOrganizationMasterDataRoles(Guid organizationUuid);
     }
 }

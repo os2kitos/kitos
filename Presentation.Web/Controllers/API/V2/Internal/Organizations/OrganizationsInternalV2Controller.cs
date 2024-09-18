@@ -65,6 +65,21 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 .Match(Ok, FromOperationError);
         }
 
+        [Route("{organizationUuid}/masterDataRoles")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataRolesResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult GetOrganizationMasterDataRoles([FromUri][NonEmptyGuid] Guid organizationUuid)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            return _organizationService.GetOrganizationMasterDataRoles(organizationUuid)
+                .Select(_organizationMapper.ToRolesDTO)
+                .Match(Ok, FromOperationError);
+
+        }
+
         private OrganizationUpdateParameters ToUpdateParameters(OrganizationMasterDataRequestDTO dto)
         {
             return new()

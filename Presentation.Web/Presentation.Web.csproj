@@ -443,6 +443,7 @@
     <Compile Include="Models\API\V2\Request\OrganizationUnit\DeleteOrganizationUnitRoleAssignmentRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\OrganizationUnit\UpdateOrganizationUnitRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Organization\OrganizationMasterDataRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationMasterDataRolesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\Organization\OrganizationUnitOriginChoice.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingCreationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingUpdateRequestDTO.cs" />

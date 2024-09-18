@@ -200,6 +200,7 @@
     <Compile Include="Model\Notification\Write\CreateScheduledNotificationModificationParameters.cs" />
     <Compile Include="Model\Notification\Write\UpdateScheduledNotificationModificationParameters.cs" />
     <Compile Include="Model\Organizations\GridPermissions.cs" />
+    <Compile Include="Model\Organizations\OrganizationMasterDataRoles.cs" />
     <Compile Include="Model\Organizations\OrganizationUnitRegistrationChangeParameters.cs" />
     <Compile Include="Model\Organizations\OrganizationRemovalConflicts.cs" />
     <Compile Include="Model\Organizations\PaymentChangeParameters.cs" />
