@@ -11,17 +11,20 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
 {
     internal class OrganizationInternalV2Helper
     {
+        private const string apiPrefix = "api/v2/internal/organizations";
+        private const string masterDataSuffix = "masterData";
+
         public static async Task<HttpResponseMessage> PatchOrganizationMasterData(Guid organizationUuid,
             OrganizationMasterDataRequestDTO dto)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/organizations/{organizationUuid}"), cookie, dto);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"{apiPrefix}/{organizationUuid}/{masterDataSuffix}"), cookie, dto);
         }
 
         public static async Task<HttpResponseMessage> GetOrganizationMasterDataRoles(Guid organizationUuid)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/organizations/{organizationUuid}/masterData/roles"), cookie);
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"{apiPrefix}/{organizationUuid}/{masterDataSuffix}/roles"), cookie);
         }
     }
 }

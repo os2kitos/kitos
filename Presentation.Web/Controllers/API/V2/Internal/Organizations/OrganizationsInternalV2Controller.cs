@@ -50,7 +50,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [HttpPatch]
-        [Route("{organizationUuid}")]
+        [Route("{organizationUuid}/masterData")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
