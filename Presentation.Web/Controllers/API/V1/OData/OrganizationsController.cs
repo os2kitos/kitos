@@ -8,14 +8,7 @@ using Core.DomainModel;
 using System.Linq;
 using Core.ApplicationServices.Organizations;
 using Core.DomainServices.Authorization;
-using Core.DomainServices.Generic;
 using Presentation.Web.Infrastructure.Attributes;
-using Microsoft.AspNet.OData.Routing;
-using Core.DomainModel.ItSystemUsage.Read;
-using Swashbuckle.OData;
-using Swashbuckle.Swagger.Annotations;
-using System.Windows.Input;
-using System.Security.Cryptography;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
@@ -24,18 +17,15 @@ namespace Presentation.Web.Controllers.API.V1.OData
     {
         private readonly IOrganizationService _organizationService;
         private readonly IGenericRepository<User> _userRepository;
-        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
         public OrganizationsController(
             IGenericRepository<Organization> repository,
             IOrganizationService organizationService,
-            IGenericRepository<User> userRepository,
-            IEntityIdentityResolver entityIdentityResolver)
+            IGenericRepository<User> userRepository)
             : base(repository)
         {
             _organizationService = organizationService;
             _userRepository = userRepository;
-            _entityIdentityResolver = entityIdentityResolver;
         }
 
         [HttpPost]

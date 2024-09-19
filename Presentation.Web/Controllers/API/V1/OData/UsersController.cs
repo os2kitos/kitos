@@ -11,12 +11,7 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Core.DomainServices.Generic;
-using Swashbuckle.OData;
-using Swashbuckle.Swagger.Annotations;
-using System.Net;
 using Core.DomainServices.Authorization;
-using Infrastructure.DataAccess;
-using System.Security.Cryptography;
 using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.API.V1.OData
