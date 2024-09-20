@@ -21,7 +21,6 @@ using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Repositories.Organization;
-using dk.nita.saml20.Schema.Metadata;
 using Infrastructure.Services.DataAccess;
 
 using Serilog;
@@ -451,7 +450,7 @@ namespace Core.ApplicationServices.Organizations
 
             var contactPersonMaybe = _contactPersonRepository.AsQueryable()
                 .FirstOrNone(cp => cp.OrganizationId.Equals(orgId));
-
+            
             var dataResponsibleMaybe = _dataResponsibleRepository.AsQueryable()
                 .FirstOrNone(dr => dr.OrganizationId.Equals(orgId));
 
@@ -467,6 +466,45 @@ namespace Core.ApplicationServices.Organizations
             };
         }
 
+        private Result<ContactPerson, OperationError> UpsertContactPerson(ContactPerson contactPerson, int orgId)
+        {
+            _contactPersonRepository.Update(contactPerson);
+            _domainEvents.Raise(new EntityUpdatedEvent<ContactPerson>(contactPerson));
+
+            var updatedContactPersonMaybe = _contactPersonRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(orgId));
+
+            return updatedContactPersonMaybe.Match<Result<ContactPerson, OperationError>>(
+                updatedContactPerson => updatedContactPerson,
+                () => new OperationError(OperationFailure.NotFound));
+        }
+
+        private Result<DataResponsible, OperationError> UpsertDataResponsible(DataResponsible dataResponsible, int orgId)
+        {
+            _dataResponsibleRepository.Update(dataResponsible);
+            _domainEvents.Raise(new EntityUpdatedEvent<DataResponsible>(dataResponsible));
+
+            var updatedDataResponsibleMaybe = _dataResponsibleRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(orgId));
+
+            return updatedDataResponsibleMaybe.Match<Result<DataResponsible, OperationError>>(
+                updatedDataResponsible => updatedDataResponsible,
+                () => new OperationError(OperationFailure.NotFound));
+        }
+
+        private Result<DataProtectionAdvisor, OperationError> UpsertDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor, int orgId)
+        {
+            _dataProtectionAdvisorRepository.Update(dataProtectionAdvisor);
+            _domainEvents.Raise(new EntityUpdatedEvent<DataProtectionAdvisor>(dataProtectionAdvisor));
+
+            var updatedDataProtectionAdvisorMaybe = _dataProtectionAdvisorRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(orgId));
+
+            return updatedDataProtectionAdvisorMaybe.Match<Result<DataProtectionAdvisor, OperationError>>(
+                updatedDataProtectionAdvisor => updatedDataProtectionAdvisor,
+                () => new OperationError(OperationFailure.NotFound));
+        }
+
         public Result<OrganizationMasterDataRoles, OperationError> UpsertOrganizationMasterDataRoles(Guid organizationUuid,
             OrganizationMasterDataRolesUpdateParameters updateParameters)
         {
@@ -479,60 +517,19 @@ namespace Core.ApplicationServices.Organizations
             var modifiedContactPersonResult =
                 AuthorizeModificationAndModifyContactPerson(orgId,
                     updateParameters.ContactPerson);
-
-            var upsertedContactPersonResult = modifiedContactPersonResult.Match(
-                contactPerson =>
-                {
-                    _contactPersonRepository.Update(contactPerson);
-                    _domainEvents.Raise(new EntityUpdatedEvent<ContactPerson>(contactPerson));
-
-                    var updatedContactPersonMaybe = _contactPersonRepository.AsQueryable()
-                        .FirstOrNone(cp => cp.OrganizationId.Equals(orgId));
-
-                    return updatedContactPersonMaybe.Match<Result<ContactPerson, OperationError>>(
-                        updatedContactPerson => updatedContactPerson,
-                        () => new OperationError(OperationFailure.NotFound)); 
-                },
-                error => error
-                );
+            var upsertedContactPersonResult = modifiedContactPersonResult.Bind(cp => UpsertContactPerson(cp, orgId));
             if (upsertedContactPersonResult.Failed) return ConcludeMasterDataRolesUpdate(upsertedContactPersonResult.Error, transaction);
 
             var modifiedDataResponsibleResult =
                 AuthorizeModificationAndModifyDataResponsible(orgId, updateParameters.DataResponsible);
-
-            var updatedDataResponsibleResult = modifiedDataResponsibleResult.Match(
-                dataResponsible =>
-                {
-                    _dataResponsibleRepository.Update(dataResponsible);
-                    _domainEvents.Raise(new EntityUpdatedEvent<DataResponsible>(dataResponsible));
-
-                    var updatedDataResponsibleMaybe = _dataResponsibleRepository.AsQueryable()
-                        .FirstOrNone(dr => dr.OrganizationId.Equals(orgId));
-
-                    return updatedDataResponsibleMaybe.Match<Result<DataResponsible, OperationError>>(
-                        updatedDataResponsible => updatedDataResponsible,
-                        () => new OperationError(OperationFailure.NotFound));
-                },
-                error => error);
+            var updatedDataResponsibleResult =
+                modifiedDataResponsibleResult.Bind(dr => UpsertDataResponsible(dr, orgId));
             if (updatedDataResponsibleResult.Failed) return ConcludeMasterDataRolesUpdate(updatedDataResponsibleResult.Error, transaction);
 
             var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndModifyDataProtectionAdvisor(orgId,
                 updateParameters.DataProtectionAdvisor);
-
-            var updatedDataProtectionAdvisorResult = modifiedDataProtectionAdvisorResult.Match(
-                dataProtectionAdvisor =>
-                {
-                    _dataProtectionAdvisorRepository.Update(dataProtectionAdvisor);
-                    _domainEvents.Raise(new EntityUpdatedEvent<DataProtectionAdvisor>(dataProtectionAdvisor));
-
-                    var updatedDataProtectionAdvisorMaybe = _dataProtectionAdvisorRepository.AsQueryable()
-                        .FirstOrNone(dr => dr.OrganizationId.Equals(orgId));
-
-                    return updatedDataProtectionAdvisorMaybe.Match<Result<DataProtectionAdvisor, OperationError>>(
-                        updatedDataProtectionAdvisor => updatedDataProtectionAdvisor,
-                        () => new OperationError(OperationFailure.NotFound));
-                },
-                error => error);
+            var updatedDataProtectionAdvisorResult =
+                modifiedDataProtectionAdvisorResult.Bind(dpa => UpsertDataProtectionAdvisor(dpa, orgId));
             if (updatedDataProtectionAdvisorResult.Failed) return ConcludeMasterDataRolesUpdate(updatedDataProtectionAdvisorResult.Error, transaction);
 
             var roles = new OrganizationMasterDataRoles()
