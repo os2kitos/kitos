@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel;
@@ -90,10 +91,25 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         public async Task CanGetOrganizationMasterDataRoles()
         {
             var organization = await GetOrganization();
-            
+            var contactPersonDto = new ContactPersonRequestDTO()
+            {
+                Email = A<string>(),
+                LastName = A<string>(),
+                Name = A<string>(),
+                PhoneNumber = A<string>()
+            };
+            var request = new OrganizationMasterDataRolesRequestDTO()
+            {
+                ContactPerson = contactPersonDto
+            };
+            var upsertResponse =
+                await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, request);
+            Assert.Equal(HttpStatusCode.OK, upsertResponse.StatusCode);
+
             var response = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(organization.Uuid);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            AssertOrgUuidAndStringInContent(organization.Uuid, contactPersonDto.Name, response);
         }
 
         [Fact]
