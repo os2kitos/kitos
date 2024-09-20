@@ -966,12 +966,12 @@ namespace Tests.Unit.Presentation.Web.Services
         [Fact]
         public void GetMasterDataRolesReturnsBadInputIfInvalidUuid()
         {
-            var org = CreateOrganization();
+            var invalidOrganizationUuid = A<Guid>();
             _identityResolver.Setup(_ =>
-                    _.ResolveDbId<Organization>(org.Uuid))
+                    _.ResolveDbId<Organization>(invalidOrganizationUuid))
                 .Returns(Maybe<int>.None);
 
-            var result = _sut.GetOrganizationMasterDataRoles(org.Uuid);
+            var result = _sut.GetOrganizationMasterDataRoles(invalidOrganizationUuid);
 
             Assert.True(result.Failed);
             var error = result.Error;
@@ -981,13 +981,13 @@ namespace Tests.Unit.Presentation.Web.Services
         [Fact]
         public void UpdateMasterDataRolesReturnsBadInputIfInvalidUuid()
         {
-            var org = CreateOrganization();
+            var invalidOrganizationUuid = A<Guid>();
             _identityResolver.Setup(_ =>
-                    _.ResolveDbId<Organization>(org.Uuid))
+                    _.ResolveDbId<Organization>(invalidOrganizationUuid))
                 .Returns(Maybe<int>.None);
 
             var result =
-                _sut.UpdateOrganizationMasterDataRoles(org.Uuid, new OrganizationMasterDataRolesUpdateParameters());
+                _sut.UpdateOrganizationMasterDataRoles(invalidOrganizationUuid, new OrganizationMasterDataRolesUpdateParameters());
 
             Assert.True(result.Failed);
             var error = result.Error;
