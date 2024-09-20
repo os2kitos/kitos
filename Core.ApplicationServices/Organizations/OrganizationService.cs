@@ -470,35 +470,101 @@ namespace Core.ApplicationServices.Organizations
 
             var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
             if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+            var orgId = organizationDbIdMaybe.Value;
 
             var modifiedContactPersonResult =
-                AuthorizeModificationAndModifyContactPerson(organizationDbIdMaybe.Value,
+                AuthorizeModificationAndModifyContactPerson(orgId,
                     updateParameters.ContactPerson);
 
-            return modifiedContactPersonResult.Match(
-                    contactPerson =>
-                    {
-                        _contactPersonRepository.Update(contactPerson);
-                        _domainEvents.Raise(new EntityUpdatedEvent<ContactPerson>(contactPerson));
-                        transaction.Commit();
+            var updatedContactPersonResult = modifiedContactPersonResult.Match(
+                contactPerson =>
+                {
+                    _contactPersonRepository.Update(contactPerson);
+                    _domainEvents.Raise(new EntityUpdatedEvent<ContactPerson>(contactPerson));
 
-                        var updatedContactPersonMaybe = _contactPersonRepository.AsQueryable()
-                            .FirstOrNone(cp => cp.OrganizationId.Equals(organizationDbIdMaybe.Value));
+                    var updatedContactPersonMaybe = _contactPersonRepository.AsQueryable()
+                        .FirstOrNone(cp => cp.OrganizationId.Equals(orgId));
 
-                        return updatedContactPersonMaybe.Match<Result<OrganizationMasterDataRoles, OperationError>>(
-                            updatedContactPerson => new OrganizationMasterDataRoles
-                            {
-                                OrganizationUuid = organizationUuid,
-                                ContactPerson = updatedContactPerson
-                            },
-                            () => new OperationError(OperationFailure.NotFound));
-                    },
-                    error =>
-                    {
-                        transaction.Rollback();
-                        return error;
-                    })
-            ;
+                    return updatedContactPersonMaybe.Match<Result<ContactPerson, OperationError>>(
+                        
+                        updatedContactPerson => updatedContactPerson,
+                        () => new OperationError(OperationFailure.NotFound));
+                },
+                error => error);
+            
+
+            var modifiedDataResponsibleResult =
+                AuthorizeModificationAndModifyDataResponsible(orgId, updateParameters.DataResponsible);
+
+            var updatedDataResponsibleResult = modifiedDataResponsibleResult.Match(
+                dataResponsible =>
+                {
+                    _dataResponsibleRepository.Update(dataResponsible);
+                    _domainEvents.Raise(new EntityUpdatedEvent<DataResponsible>(dataResponsible));
+
+                    var updatedDataResponsibleMaybe = _dataResponsibleRepository.AsQueryable()
+                        .FirstOrNone(dr => dr.OrganizationId.Equals(orgId));
+
+                    return updatedDataResponsibleMaybe.Match<Result<DataResponsible, OperationError>>(
+                        updatedDataResponsible => updatedDataResponsible,
+                        () => new OperationError(OperationFailure.NotFound));
+                },
+                error => error);
+
+            var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndModifyDataProtectionAdvisor(orgId,
+                updateParameters.DataProtectionAdvisor);
+
+            var updatedDataProtectionAdvisorResult = modifiedDataProtectionAdvisorResult.Match(
+                dataProtectionAdvisor =>
+                {
+                    _dataProtectionAdvisorRepository.Update(dataProtectionAdvisor);
+                    _domainEvents.Raise(new EntityUpdatedEvent<DataProtectionAdvisor>(dataProtectionAdvisor));
+
+                    var updatedDataProtectionAdvisorMaybe = _dataProtectionAdvisorRepository.AsQueryable()
+                        .FirstOrNone(dr => dr.OrganizationId.Equals(orgId));
+
+                    return updatedDataProtectionAdvisorMaybe.Match<Result<DataProtectionAdvisor, OperationError>>(
+                        updatedDataProtectionAdvisor => updatedDataProtectionAdvisor,
+                        () => new OperationError(OperationFailure.NotFound));
+                },
+                error => error);
+
+            transaction.Commit();
+            return new OrganizationMasterDataRoles()
+            {
+                OrganizationUuid = organizationUuid,
+                ContactPerson = updatedContactPersonResult.Value,
+                DataProtectionAdvisor = updatedDataProtectionAdvisorResult.Value,
+                DataResponsible = updatedDataResponsibleResult.Value
+            };
+        }
+
+        private Result<DataProtectionAdvisor, OperationError> AuthorizeModificationAndModifyDataProtectionAdvisor(
+            int organizationId, Maybe<DataProtectionAdvisorUpdateParameters> parameters)
+        {
+            var existingDataProtectionAdvisorMaybe = _dataProtectionAdvisorRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
+
+            if (existingDataProtectionAdvisorMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+
+            var allowModify = _authorizationContext.AllowModify(existingDataProtectionAdvisorMaybe.Value);
+            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
+
+            return parameters.HasValue ? ModifyDataProtectionAdvisor(existingDataProtectionAdvisorMaybe.Value, parameters.Value) : existingDataProtectionAdvisorMaybe.Value;
+        }
+
+        private Result<DataResponsible, OperationError> AuthorizeModificationAndModifyDataResponsible(
+            int organizationId, Maybe<DataResponsibleUpdateParameters> parameters)
+        {
+            var existingContactPersonMaybe = _dataResponsibleRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
+
+            if (existingContactPersonMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+
+            var allowModify = _authorizationContext.AllowModify(existingContactPersonMaybe.Value);
+            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
+
+            return parameters.HasValue ? ModifyDataResponsible(existingContactPersonMaybe.Value, parameters.Value) : existingContactPersonMaybe.Value;
         }
 
         private Result<ContactPerson, OperationError> AuthorizeModificationAndModifyContactPerson(
@@ -561,6 +627,26 @@ namespace Core.ApplicationServices.Organizations
             contactPerson.LastName = parameters.LastName?.NewValue;
             contactPerson.PhoneNumber = parameters.PhoneNumber?.NewValue;
             return contactPerson;
+        }
+
+        private static Result<DataResponsible, OperationError> ModifyDataResponsible(DataResponsible dataResponsible, DataResponsibleUpdateParameters parameters)
+        {
+            dataResponsible.Email = parameters.Email?.NewValue;
+            dataResponsible.Name = parameters.Name?.NewValue;
+            dataResponsible.Cvr = parameters.Cvr?.NewValue;
+            dataResponsible.Adress = parameters.Address?.NewValue;
+            dataResponsible.Phone = parameters.Phone?.NewValue;
+            return dataResponsible;
+        }
+
+        private static Result<DataProtectionAdvisor, OperationError> ModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor, DataProtectionAdvisorUpdateParameters parameters)
+        {
+            dataProtectionAdvisor.Email = parameters.Email?.NewValue;
+            dataProtectionAdvisor.Name = parameters.Name?.NewValue;
+            dataProtectionAdvisor.Cvr = parameters.Cvr?.NewValue;
+            dataProtectionAdvisor.Adress = parameters.Address?.NewValue;
+            dataProtectionAdvisor.Phone = parameters.Phone?.NewValue;
+            return dataProtectionAdvisor;
         }
     }
 }

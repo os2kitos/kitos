@@ -946,11 +946,12 @@ namespace Tests.Unit.Presentation.Web.Services
             var org = CreateOrganization();
             var orgId = org.Id;
             var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
+            var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
+            var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
                 .Returns(orgId);
-            var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
-            var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
+
             var rolesResult = _sut.GetOrganizationMasterDataRoles(org.Uuid);
             
             Assert.True(rolesResult.Ok);
@@ -1029,16 +1030,11 @@ namespace Tests.Unit.Presentation.Web.Services
         public void CanUpdateMasterDataRoles()
         {
             var org = CreateOrganization();
-            var expectedContactPerson = new ContactPerson
-            {
-                Email = A<string>(),
-                Name = A<string>(),
-                LastName = A<string>(),
-                PhoneNumber = A<string>(),
-                OrganizationId = org.Id,
-                Id = A<int>(),
-            };
-            var updateParameters = new OrganizationMasterDataRolesUpdateParameters
+            var orgId = org.Id;
+            var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
+            var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
+            var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
+            var contactPersonUpdateParameters = new OrganizationMasterDataRolesUpdateParameters
             {
                 ContactPerson = new ContactPersonUpdateParameters()
                 {
@@ -1046,30 +1042,57 @@ namespace Tests.Unit.Presentation.Web.Services
                     Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
                     LastName = OptionalValueChange<string>.With(expectedContactPerson.LastName),
                     PhoneNumber = OptionalValueChange<string>.With(expectedContactPerson.PhoneNumber),
-                    Id = OptionalValueChange<int>.With(expectedContactPerson.Id)
+                },
+                DataResponsible = new DataResponsibleUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
+                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
+                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
+                },
+                DataProtectionAdvisor = new DataProtectionAdvisorUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
+                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
+                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
                 }
             };
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
                 .Returns(expectedContactPerson.OrganizationId);
+
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<ContactPerson>()))
                 .Returns(true);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<DataResponsible>()))
+                .Returns(true);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
+                .Returns(true);
+
             _contactPersonRepository.Setup(_ =>
                     _.AsQueryable())
                 .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
+            _dataResponsibleRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
+            _dataProtectionAdvisorRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
-            var result = _sut.UpdateOrganizationMasterDataRoles(org.Uuid, updateParameters);
+            var result = _sut.UpdateOrganizationMasterDataRoles(org.Uuid, contactPersonUpdateParameters);
 
             Assert.True(result.Ok);
-            var contactPerson = result.Value.ContactPerson;
-            Assert.Equal(expectedContactPerson.Email, contactPerson.Email);
-            Assert.Equal(expectedContactPerson.Name, contactPerson.Name);
-            Assert.Equal(expectedContactPerson.PhoneNumber, contactPerson.PhoneNumber);
-            Assert.Equal(expectedContactPerson.OrganizationId, contactPerson.OrganizationId);
-            Assert.Equal(expectedContactPerson.Id, contactPerson.Id);
+            var value = result.Value;
+            AssertContactPerson(expectedContactPerson, value.ContactPerson);
+            AssertDataResponsible(expectedDataResponsible, value.DataResponsible);
+            AssertDataProtectionAdvisor(expectedDataProtectionAdvisor, value.DataProtectionAdvisor);
         }
         
         private void AssertContactPerson(ContactPerson expected, ContactPerson actual)
@@ -1078,7 +1101,6 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(expected.Name, actual.Name);
             Assert.Equal(expected.PhoneNumber, actual.PhoneNumber);
             Assert.Equal(expected.OrganizationId, actual.OrganizationId);
-            Assert.Equal(expected.Id, actual.Id);
         }
 
         private void AssertDataResponsible(DataResponsible expected, DataResponsible actual)
@@ -1087,7 +1109,6 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(expected.Name, actual.Name);
             Assert.Equal(expected.Cvr, actual.Cvr);
             Assert.Equal(expected.OrganizationId, actual.OrganizationId);
-            Assert.Equal(expected.Id, actual.Id);
             Assert.Equal(expected.Adress, actual.Adress);
         }
 
@@ -1097,7 +1118,6 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(expected.Name, actual.Name);
             Assert.Equal(expected.Cvr, actual.Cvr);
             Assert.Equal(expected.OrganizationId, actual.OrganizationId);
-            Assert.Equal(expected.Id, actual.Id);
             Assert.Equal(expected.Adress, actual.Adress);
         }
 
