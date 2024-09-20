@@ -554,26 +554,30 @@ namespace Core.ApplicationServices.Organizations
             var existingDataProtectionAdvisorMaybe = _dataProtectionAdvisorRepository.AsQueryable()
                 .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
 
-            if (existingDataProtectionAdvisorMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+            var existingDataProtectionAdvisor = existingDataProtectionAdvisorMaybe.HasValue
+                ? existingDataProtectionAdvisorMaybe.Value
+                : new DataProtectionAdvisor { OrganizationId = organizationId };
 
-            var allowModify = _authorizationContext.AllowModify(existingDataProtectionAdvisorMaybe.Value);
+            var allowModify = _authorizationContext.AllowModify(existingDataProtectionAdvisor);
             if (!allowModify) return new OperationError(OperationFailure.Forbidden);
 
-            return parameters.HasValue ? ModifyDataProtectionAdvisor(existingDataProtectionAdvisorMaybe.Value, parameters.Value) : existingDataProtectionAdvisorMaybe.Value;
+            return parameters.HasValue ? ModifyDataProtectionAdvisor(existingDataProtectionAdvisor, parameters.Value) : existingDataProtectionAdvisor;
         }
 
         private Result<DataResponsible, OperationError> AuthorizeModificationAndModifyDataResponsible(
             int organizationId, Maybe<DataResponsibleUpdateParameters> parameters)
         {
-            var existingContactPersonMaybe = _dataResponsibleRepository.AsQueryable()
+            var existingDataResponsibleMaybe = _dataResponsibleRepository.AsQueryable()
                 .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
 
-            if (existingContactPersonMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+            var existingDataResponsible = existingDataResponsibleMaybe.HasValue
+                ? existingDataResponsibleMaybe.Value
+                : new DataResponsible { OrganizationId = organizationId };
 
-            var allowModify = _authorizationContext.AllowModify(existingContactPersonMaybe.Value);
+            var allowModify = _authorizationContext.AllowModify(existingDataResponsible);
             if (!allowModify) return new OperationError(OperationFailure.Forbidden);
 
-            return parameters.HasValue ? ModifyDataResponsible(existingContactPersonMaybe.Value, parameters.Value) : existingContactPersonMaybe.Value;
+            return parameters.HasValue ? ModifyDataResponsible(existingDataResponsible, parameters.Value) : existingDataResponsible;
         }
 
         private Result<ContactPerson, OperationError> AuthorizeModificationAndModifyContactPerson(
@@ -582,12 +586,14 @@ namespace Core.ApplicationServices.Organizations
             var existingContactPersonMaybe = _contactPersonRepository.AsQueryable()
                 .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
 
-            if (existingContactPersonMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+            var existingContactPerson = existingContactPersonMaybe.HasValue
+                ? existingContactPersonMaybe.Value
+                : new ContactPerson() { OrganizationId = organizationId };
 
-            var allowModify = _authorizationContext.AllowModify(existingContactPersonMaybe.Value);
+            var allowModify = _authorizationContext.AllowModify(existingContactPerson);
             if (!allowModify) return new OperationError(OperationFailure.Forbidden);
 
-            return parameters.HasValue ? ModifyContactPerson(existingContactPersonMaybe.Value, parameters.Value) : existingContactPersonMaybe.Value;
+            return parameters.HasValue ? ModifyContactPerson(existingContactPersonMaybe.Value, parameters.Value) : existingContactPerson;
         }
 
         private Result<Organization, OperationError> WithDeletionAccess(Organization organization)
