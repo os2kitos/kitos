@@ -10,6 +10,7 @@ using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Organizations.Write;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
 using Core.ApplicationServices.Model.Shared;
@@ -111,33 +112,39 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             OrganizationMasterDataRolesRequestDTO dto)
         {
             var contactPersonDto = dto.ContactPerson;
-            var contactPersonParameters = new ContactPersonUpdateParameters()
+            var contactPersonParameters = contactPersonDto != null
+            ? new ContactPersonUpdateParameters()
             {
                 Email = OptionalValueChange<string>.With(contactPersonDto.Email),
                 LastName = OptionalValueChange<string>.With(contactPersonDto.LastName),
                 Name = OptionalValueChange<string>.With(contactPersonDto.Name),
                 PhoneNumber = OptionalValueChange<string>.With(contactPersonDto.PhoneNumber)
-            };
+            }
+            : Maybe<ContactPersonUpdateParameters>.None;
 
             var dataResponsibleDto = dto.DataResponsible;
-            var dataResponsibleParameters = new DataResponsibleUpdateParameters()
+            var dataResponsibleParameters = dataResponsibleDto != null 
+            ? new DataResponsibleUpdateParameters()
             {
-                Address = OptionalValueChange<string>.With(dataResponsibleDto.Address),
+                Address = OptionalValueChange<string>.With(dataResponsibleDto?.Address),
                 Cvr = OptionalValueChange<string>.With(dataResponsibleDto.Cvr),
                 Email = OptionalValueChange<string>.With(dataResponsibleDto.Email),
                 Name = OptionalValueChange<string>.With(dataResponsibleDto.Name),
                 Phone = OptionalValueChange<string>.With(dataResponsibleDto.Phone)
-            };
+            }
+            : Maybe<DataResponsibleUpdateParameters>.None;
 
             var dataProtectionAdvisorDto = dto.DataProtectionAdvisor;
-            var dataProtectionAdvisorParameters = new DataProtectionAdvisorUpdateParameters()
+            var dataProtectionAdvisorParameters = dataProtectionAdvisorDto != null
+            ? new DataProtectionAdvisorUpdateParameters()
             {
                 Address = OptionalValueChange<string>.With(dataProtectionAdvisorDto.Address),
                 Cvr = OptionalValueChange<string>.With(dataProtectionAdvisorDto.Cvr),
                 Email = OptionalValueChange<string>.With(dataProtectionAdvisorDto.Email),
                 Name = OptionalValueChange<string>.With(dataProtectionAdvisorDto.Name),
                 Phone = OptionalValueChange<string>.With(dataProtectionAdvisorDto.Phone)
-            };
+            }
+            : Maybe<DataProtectionAdvisorUpdateParameters>.None;
 
             return new()
             {

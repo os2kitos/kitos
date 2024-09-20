@@ -97,7 +97,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
-        public async Task CanUpsertOrganizationMasterDataRoles()
+        public async Task CanUpsertAllOrganizationMasterDataRoles()
         {
             var organization = await GetOrganization();
             var contactPersonDto = new ContactPersonRequestDTO()
@@ -143,7 +143,71 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Contains(dataResponsibleDto.Name, content);
             Assert.Contains(dataProtectionAdvisorDto.Name, content);
         }
-        
+
+        [Theory]
+        [InlineData("contactPerson")]
+        [InlineData("dataResponsible")]
+
+        [InlineData("dataProtectionAdvisor")]
+
+        public async Task CanUpsertSingleOrganizationMasterDataRole(string propertyToPass)
+        {
+            var organization = await GetOrganization();
+            var resetRolesResponse =
+                 await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, 
+                     new OrganizationMasterDataRolesRequestDTO());
+             Assert.Equal(HttpStatusCode.OK, resetRolesResponse.StatusCode);
+            var contactPersonDto = new ContactPersonRequestDTO()
+            {
+                Email = A<string>(),
+                LastName = A<string>(),
+                Name = A<string>(),
+                PhoneNumber = A<string>()
+            };
+
+            var dataResponsibleDto = new DataResponsibleRequestDTO()
+            {
+                Address = A<string>(),
+                Cvr = A<string>(),
+                Email = A<string>(),
+                Name = A<string>(),
+                Phone = A<string>()
+            };
+
+            var dataProtectionAdvisorDto = new DataProtectionAdvisorRequestDTO()
+            {
+                Address = A<string>(),
+                Cvr = A<string>(),
+                Email = A<string>(),
+                Name = A<string>(),
+                Phone = A<string>()
+            };
+
+            var request = new OrganizationMasterDataRolesRequestDTO();
+            switch (propertyToPass)
+            {
+                case "contactPerson": request.ContactPerson = contactPersonDto;
+                    break;
+                case "dataResponsible": request.DataResponsible = dataResponsibleDto;
+                    break;
+                case "dataProtectionAdvisor": request.DataProtectionAdvisor = dataProtectionAdvisorDto; 
+                    break;
+            }
+
+            var response =
+                await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, request);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            AssertOrgUuidAndStringInContent(organization.Uuid, contactPersonDto.Name, response);
+        }
+
+        private async void AssertOrgUuidAndStringInContent(Guid orgUuid, string entityProperty, HttpResponseMessage response)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            Assert.Contains(entityProperty, content);
+            Assert.Contains(orgUuid.ToString(), content);
+        }
+
         private static async Task<OrganizationResponseDTO> GetOrganization()
         {
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
