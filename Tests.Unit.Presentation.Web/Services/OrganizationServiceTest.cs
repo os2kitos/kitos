@@ -987,7 +987,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 .Returns(Maybe<int>.None);
 
             var result =
-                _sut.UpdateOrCreateOrganizationMasterDataRoles(invalidOrganizationUuid, new OrganizationMasterDataRolesUpdateParameters());
+                _sut.UpsertOrganizationMasterDataRoles(invalidOrganizationUuid, new OrganizationMasterDataRolesUpdateParameters());
 
             Assert.True(result.Failed);
             var error = result.Error;
@@ -1017,7 +1017,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             var result =
-                _sut.UpdateOrCreateOrganizationMasterDataRoles(org.Uuid, updateParameters);
+                _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
 
             Assert.True(result.Failed);
             var error = result.Error;
@@ -1047,7 +1047,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             var result =
-                _sut.UpdateOrCreateOrganizationMasterDataRoles(org.Uuid, updateParameters);
+                _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
 
             Assert.True(result.Failed);
             var error = result.Error;
@@ -1077,7 +1077,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             var result =
-                _sut.UpdateOrCreateOrganizationMasterDataRoles(org.Uuid, updateParameters);
+                _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
 
             Assert.True(result.Failed);
             var error = result.Error;
@@ -1110,7 +1110,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
-            var result = _sut.UpdateOrCreateOrganizationMasterDataRoles(org.Uuid, updateParameters);
+            var result = _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
 
             Assert.True(result.Ok);
             var value = result.Value;
@@ -1183,7 +1183,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
-            var result = _sut.UpdateOrCreateOrganizationMasterDataRoles(org.Uuid, updateParameters);
+            var result = _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
 
             Assert.True(result.Ok);
             _contactPersonRepository.Verify(_ => _.Insert(It.IsAny<ContactPerson>()));

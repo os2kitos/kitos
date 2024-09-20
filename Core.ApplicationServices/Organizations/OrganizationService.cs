@@ -467,7 +467,7 @@ namespace Core.ApplicationServices.Organizations
             };
         }
 
-        public Result<OrganizationMasterDataRoles, OperationError> UpdateOrCreateOrganizationMasterDataRoles(Guid organizationUuid,
+        public Result<OrganizationMasterDataRoles, OperationError> UpsertOrganizationMasterDataRoles(Guid organizationUuid,
             OrganizationMasterDataRolesUpdateParameters updateParameters)
         {
             using var transaction = _transactionManager.Begin();
@@ -480,7 +480,7 @@ namespace Core.ApplicationServices.Organizations
                 AuthorizeModificationAndModifyContactPerson(orgId,
                     updateParameters.ContactPerson);
 
-            var updatedContactPersonResult = modifiedContactPersonResult.Match(
+            var upsertedContactPersonResult = modifiedContactPersonResult.Match(
                 contactPerson =>
                 {
                     _contactPersonRepository.Update(contactPerson);
@@ -495,7 +495,7 @@ namespace Core.ApplicationServices.Organizations
                 },
                 error => error
                 );
-            if (updatedContactPersonResult.Failed) return ConcludeMasterDataRolesUpdate(updatedContactPersonResult.Error, transaction);
+            if (upsertedContactPersonResult.Failed) return ConcludeMasterDataRolesUpdate(upsertedContactPersonResult.Error, transaction);
 
             var modifiedDataResponsibleResult =
                 AuthorizeModificationAndModifyDataResponsible(orgId, updateParameters.DataResponsible);
@@ -538,7 +538,7 @@ namespace Core.ApplicationServices.Organizations
             var roles = new OrganizationMasterDataRoles()
             {
                 OrganizationUuid = organizationUuid,
-                ContactPerson = updatedContactPersonResult.Value,
+                ContactPerson = upsertedContactPersonResult.Value,
                 DataProtectionAdvisor = updatedDataProtectionAdvisorResult.Value,
                 DataResponsible = updatedDataResponsibleResult.Value
             };
@@ -583,12 +583,20 @@ namespace Core.ApplicationServices.Organizations
 
             var existingDataProtectionAdvisor = existingDataProtectionAdvisorMaybe.HasValue
                 ? existingDataProtectionAdvisorMaybe.Value
-                : new DataProtectionAdvisor { OrganizationId = organizationId };
+                : CreateDataProtectionAdvisor(organizationId);
 
             var allowModify = _authorizationContext.AllowModify(existingDataProtectionAdvisor);
             if (!allowModify) return new OperationError(OperationFailure.Forbidden);
 
             return parameters.HasValue ? ModifyDataProtectionAdvisor(existingDataProtectionAdvisor, parameters.Value) : existingDataProtectionAdvisor;
+        }
+
+        private DataProtectionAdvisor CreateDataProtectionAdvisor(int orgId)
+        {
+            var newDataProtectionAdvisor = new DataProtectionAdvisor() { OrganizationId = orgId };
+            _dataProtectionAdvisorRepository.Insert(newDataProtectionAdvisor);
+            _domainEvents.Raise(new EntityCreatedEvent<DataProtectionAdvisor>(newDataProtectionAdvisor));
+            return newDataProtectionAdvisor;
         }
 
         private Result<DataResponsible, OperationError> AuthorizeModificationAndModifyDataResponsible(
@@ -599,12 +607,20 @@ namespace Core.ApplicationServices.Organizations
 
             var existingDataResponsible = existingDataResponsibleMaybe.HasValue
                 ? existingDataResponsibleMaybe.Value
-                : new DataResponsible { OrganizationId = organizationId };
+                : CreateDataResponsible(organizationId);
 
             var allowModify = _authorizationContext.AllowModify(existingDataResponsible);
             if (!allowModify) return new OperationError(OperationFailure.Forbidden);
 
             return parameters.HasValue ? ModifyDataResponsible(existingDataResponsible, parameters.Value) : existingDataResponsible;
+        }
+
+        private DataResponsible CreateDataResponsible(int orgId)
+        {
+            var newDataResponsible = new DataResponsible() { OrganizationId = orgId };
+            _dataResponsibleRepository.Insert(newDataResponsible);
+            _domainEvents.Raise(new EntityCreatedEvent<DataResponsible>(newDataResponsible));
+            return newDataResponsible;
         }
 
         private Result<Organization, OperationError> WithDeletionAccess(Organization organization)
