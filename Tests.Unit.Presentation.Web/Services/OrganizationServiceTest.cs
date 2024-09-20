@@ -999,38 +999,10 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             var org = CreateOrganization();
             var orgId = org.Id;
-            var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
-            var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
-            var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
-            var updateParameters = new OrganizationMasterDataRolesUpdateParameters
-            {
-                ContactPerson = new ContactPersonUpdateParameters()
-                {
-                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
-                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
-                    LastName = OptionalValueChange<string>.With(expectedContactPerson.LastName),
-                    PhoneNumber = OptionalValueChange<string>.With(expectedContactPerson.PhoneNumber),
-                },
-                DataResponsible = new DataResponsibleUpdateParameters()
-                {
-                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
-                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
-                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
-                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
-                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
-                },
-                DataProtectionAdvisor = new DataProtectionAdvisorUpdateParameters()
-                {
-                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
-                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
-                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
-                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
-                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
-                }
-            };
+            var updateParameters = SetupUpdateMasterDataRoles(orgId);
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
-                .Returns(expectedContactPerson.OrganizationId);
+                .Returns(orgId);
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<ContactPerson>()))
                 .Returns(true);
@@ -1040,16 +1012,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
                 .Returns(true);
-
-            _contactPersonRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
-            _dataResponsibleRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
-            _dataProtectionAdvisorRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
 
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
@@ -1067,38 +1029,10 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             var org = CreateOrganization();
             var orgId = org.Id;
-            var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
-            var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
-            var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
-            var updateParameters = new OrganizationMasterDataRolesUpdateParameters
-            {
-                ContactPerson = new ContactPersonUpdateParameters()
-                {
-                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
-                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
-                    LastName = OptionalValueChange<string>.With(expectedContactPerson.LastName),
-                    PhoneNumber = OptionalValueChange<string>.With(expectedContactPerson.PhoneNumber),
-                },
-                DataResponsible = new DataResponsibleUpdateParameters()
-                {
-                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
-                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
-                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
-                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
-                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
-                },
-                DataProtectionAdvisor = new DataProtectionAdvisorUpdateParameters()
-                {
-                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
-                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
-                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
-                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
-                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
-                }
-            };
+            var updateParameters = SetupUpdateMasterDataRoles(orgId);
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
-                .Returns(expectedContactPerson.OrganizationId);
+                .Returns(orgId);
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<ContactPerson>()))
                 .Returns(false);
@@ -1108,16 +1042,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
                 .Returns(true);
-
-            _contactPersonRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
-            _dataResponsibleRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
-            _dataProtectionAdvisorRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
 
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
@@ -1135,38 +1059,10 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             var org = CreateOrganization();
             var orgId = org.Id;
-            var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
-            var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
-            var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
-            var updateParameters = new OrganizationMasterDataRolesUpdateParameters
-            {
-                ContactPerson = new ContactPersonUpdateParameters()
-                {
-                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
-                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
-                    LastName = OptionalValueChange<string>.With(expectedContactPerson.LastName),
-                    PhoneNumber = OptionalValueChange<string>.With(expectedContactPerson.PhoneNumber),
-                },
-                DataResponsible = new DataResponsibleUpdateParameters()
-                {
-                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
-                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
-                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
-                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
-                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
-                },
-                DataProtectionAdvisor = new DataProtectionAdvisorUpdateParameters()
-                {
-                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
-                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
-                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
-                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
-                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
-                }
-            };
+            var updateParameters = SetupUpdateMasterDataRoles(orgId);
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
-                .Returns(expectedContactPerson.OrganizationId);
+                .Returns(orgId);
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<ContactPerson>()))
                 .Returns(true);
@@ -1176,16 +1072,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
                 .Returns(false);
-
-            _contactPersonRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
-            _dataResponsibleRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
-            _dataProtectionAdvisorRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
 
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
@@ -1266,7 +1152,49 @@ namespace Tests.Unit.Presentation.Web.Services
             AssertDataResponsible(expectedDataResponsible, value.DataResponsible);
             AssertDataProtectionAdvisor(expectedDataProtectionAdvisor, value.DataProtectionAdvisor);
         }
-        
+
+        private OrganizationMasterDataRolesUpdateParameters SetupUpdateMasterDataRoles(int orgId)
+        {
+            var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
+            var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
+            var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
+            _contactPersonRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
+            _dataResponsibleRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
+            _dataProtectionAdvisorRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
+            return new OrganizationMasterDataRolesUpdateParameters
+            {
+                ContactPerson = new ContactPersonUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    LastName = OptionalValueChange<string>.With(expectedContactPerson.LastName),
+                    PhoneNumber = OptionalValueChange<string>.With(expectedContactPerson.PhoneNumber),
+                },
+                DataResponsible = new DataResponsibleUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
+                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
+                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
+                },
+                DataProtectionAdvisor = new DataProtectionAdvisorUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
+                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
+                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
+                }
+            };
+        }
+
         private void AssertContactPerson(ContactPerson expected, ContactPerson actual)
         {
             Assert.Equal(expected.Email, actual.Email);

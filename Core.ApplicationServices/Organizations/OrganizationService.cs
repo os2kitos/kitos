@@ -454,7 +454,7 @@ namespace Core.ApplicationServices.Organizations
             var dataProtectionAdvisorMaybe = _dataProtectionAdvisorRepository.AsQueryable()
                 .FirstOrNone(dpa => dpa.OrganizationId.Equals(orgId));
 
-            return new OrganizationMasterDataRoles()
+            return new OrganizationMasterDataRoles
             {
                 OrganizationUuid = organizationUuid,
                 ContactPerson = contactPersonMaybe.Value,
@@ -491,7 +491,7 @@ namespace Core.ApplicationServices.Organizations
                         () => new OperationError(OperationFailure.NotFound));
                 },
                 error => error);
-            if (updatedContactPersonResult.Failed) return ConcludeUpdate(updatedContactPersonResult.Error, transaction);
+            if (updatedContactPersonResult.Failed) return ConcludeMasterDataRolesUpdate(updatedContactPersonResult.Error, transaction);
 
             var modifiedDataResponsibleResult =
                 AuthorizeModificationAndModifyDataResponsible(orgId, updateParameters.DataResponsible);
@@ -510,7 +510,7 @@ namespace Core.ApplicationServices.Organizations
                         () => new OperationError(OperationFailure.NotFound));
                 },
                 error => error);
-            if (updatedDataResponsibleResult.Failed) return ConcludeUpdate(updatedDataResponsibleResult.Error, transaction);
+            if (updatedDataResponsibleResult.Failed) return ConcludeMasterDataRolesUpdate(updatedDataResponsibleResult.Error, transaction);
 
             var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndModifyDataProtectionAdvisor(orgId,
                 updateParameters.DataProtectionAdvisor);
@@ -529,7 +529,7 @@ namespace Core.ApplicationServices.Organizations
                         () => new OperationError(OperationFailure.NotFound));
                 },
                 error => error);
-            if (updatedDataProtectionAdvisorResult.Failed) return ConcludeUpdate(updatedDataProtectionAdvisorResult.Error, transaction);
+            if (updatedDataProtectionAdvisorResult.Failed) return ConcludeMasterDataRolesUpdate(updatedDataProtectionAdvisorResult.Error, transaction);
 
             var roles = new OrganizationMasterDataRoles()
             {
@@ -538,10 +538,10 @@ namespace Core.ApplicationServices.Organizations
                 DataProtectionAdvisor = updatedDataProtectionAdvisorResult.Value,
                 DataResponsible = updatedDataResponsibleResult.Value
             };
-            return ConcludeUpdate(roles, transaction);
+            return ConcludeMasterDataRolesUpdate(roles, transaction);
         }
 
-        private Result<OrganizationMasterDataRoles, OperationError> ConcludeUpdate(Result<OrganizationMasterDataRoles, OperationError>  result, IDatabaseTransaction transaction)
+        private Result<OrganizationMasterDataRoles, OperationError> ConcludeMasterDataRolesUpdate(Result<OrganizationMasterDataRoles, OperationError>  result, IDatabaseTransaction transaction)
         {
             if (result.Ok) transaction.Commit();
             else transaction.Rollback();
