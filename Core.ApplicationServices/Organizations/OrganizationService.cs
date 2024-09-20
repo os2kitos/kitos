@@ -491,7 +491,7 @@ namespace Core.ApplicationServices.Organizations
                         () => new OperationError(OperationFailure.NotFound));
                 },
                 error => error);
-            
+            if (updatedContactPersonResult.Failed) return ConcludeUpdate(updatedContactPersonResult.Error, transaction);
 
             var modifiedDataResponsibleResult =
                 AuthorizeModificationAndModifyDataResponsible(orgId, updateParameters.DataResponsible);
@@ -510,6 +510,7 @@ namespace Core.ApplicationServices.Organizations
                         () => new OperationError(OperationFailure.NotFound));
                 },
                 error => error);
+            if (updatedDataResponsibleResult.Failed) return ConcludeUpdate(updatedDataResponsibleResult.Error, transaction);
 
             var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndModifyDataProtectionAdvisor(orgId,
                 updateParameters.DataProtectionAdvisor);
@@ -528,15 +529,23 @@ namespace Core.ApplicationServices.Organizations
                         () => new OperationError(OperationFailure.NotFound));
                 },
                 error => error);
+            if (updatedDataProtectionAdvisorResult.Failed) return ConcludeUpdate(updatedDataProtectionAdvisorResult.Error, transaction);
 
-            transaction.Commit();
-            return new OrganizationMasterDataRoles()
+            var roles = new OrganizationMasterDataRoles()
             {
                 OrganizationUuid = organizationUuid,
                 ContactPerson = updatedContactPersonResult.Value,
                 DataProtectionAdvisor = updatedDataProtectionAdvisorResult.Value,
                 DataResponsible = updatedDataResponsibleResult.Value
             };
+            return ConcludeUpdate(roles, transaction);
+        }
+
+        private Result<OrganizationMasterDataRoles, OperationError> ConcludeUpdate(Result<OrganizationMasterDataRoles, OperationError>  result, IDatabaseTransaction transaction)
+        {
+            if (result.Ok) transaction.Commit();
+            else transaction.Rollback();
+            return result;
         }
 
         private Result<DataProtectionAdvisor, OperationError> AuthorizeModificationAndModifyDataProtectionAdvisor(

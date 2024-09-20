@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using AutoFixture;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -994,32 +995,203 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void UpdateMasterDataRolesReturnsForbiddenIfUnauthorizedToModifyContactPerson()
+        public void UpdateMasterDataRolesReturnsForbiddenIfUnauthorizedToModifyDataResponsible()
         {
             var org = CreateOrganization();
-            var expectedContactPerson = new ContactPerson
+            var orgId = org.Id;
+            var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
+            var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
+            var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
+            var updateParameters = new OrganizationMasterDataRolesUpdateParameters
             {
-                Email = A<string>(),
-                Name = A<string>(),
-                PhoneNumber = A<string>(),
-                OrganizationId = org.Id,
-                Id = A<int>(),
+                ContactPerson = new ContactPersonUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    LastName = OptionalValueChange<string>.With(expectedContactPerson.LastName),
+                    PhoneNumber = OptionalValueChange<string>.With(expectedContactPerson.PhoneNumber),
+                },
+                DataResponsible = new DataResponsibleUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
+                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
+                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
+                },
+                DataProtectionAdvisor = new DataProtectionAdvisorUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
+                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
+                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
+                }
             };
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
                 .Returns(expectedContactPerson.OrganizationId);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<ContactPerson>()))
+                .Returns(true);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<DataResponsible>()))
+                .Returns(false);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
+                .Returns(true);
+
             _contactPersonRepository.Setup(_ =>
                     _.AsQueryable())
                 .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
+            _dataResponsibleRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
+            _dataProtectionAdvisorRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
+
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            var result =
+                _sut.UpdateOrganizationMasterDataRoles(org.Uuid, updateParameters);
+
+            Assert.True(result.Failed);
+            var error = result.Error;
+            Assert.Equal(OperationFailure.Forbidden, error.FailureType);
+        }
+
+        [Fact]
+        public void UpdateMasterDataRolesReturnsForbiddenIfUnauthorizedToModifyContactPerson()
+        {
+            var org = CreateOrganization();
+            var orgId = org.Id;
+            var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
+            var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
+            var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
+            var updateParameters = new OrganizationMasterDataRolesUpdateParameters
+            {
+                ContactPerson = new ContactPersonUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    LastName = OptionalValueChange<string>.With(expectedContactPerson.LastName),
+                    PhoneNumber = OptionalValueChange<string>.With(expectedContactPerson.PhoneNumber),
+                },
+                DataResponsible = new DataResponsibleUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
+                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
+                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
+                },
+                DataProtectionAdvisor = new DataProtectionAdvisorUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
+                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
+                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
+                }
+            };
+            _identityResolver.Setup(_ =>
+                    _.ResolveDbId<Organization>(org.Uuid))
+                .Returns(expectedContactPerson.OrganizationId);
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<ContactPerson>()))
                 .Returns(false);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<DataResponsible>()))
+                .Returns(true);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
+                .Returns(true);
+
+            _contactPersonRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
+            _dataResponsibleRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
+            _dataProtectionAdvisorRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
+
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
-            
 
             var result =
-                _sut.UpdateOrganizationMasterDataRoles(org.Uuid, new OrganizationMasterDataRolesUpdateParameters());
+                _sut.UpdateOrganizationMasterDataRoles(org.Uuid, updateParameters);
+
+            Assert.True(result.Failed);
+            var error = result.Error;
+            Assert.Equal(OperationFailure.Forbidden, error.FailureType);
+        }
+
+        [Fact]
+        public void UpdateMasterDataRolesReturnsForbiddenIfUnauthorizedToModifyDataProtectionAdvisor()
+        {
+            var org = CreateOrganization();
+            var orgId = org.Id;
+            var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
+            var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
+            var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
+            var updateParameters = new OrganizationMasterDataRolesUpdateParameters
+            {
+                ContactPerson = new ContactPersonUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    LastName = OptionalValueChange<string>.With(expectedContactPerson.LastName),
+                    PhoneNumber = OptionalValueChange<string>.With(expectedContactPerson.PhoneNumber),
+                },
+                DataResponsible = new DataResponsibleUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
+                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
+                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
+                },
+                DataProtectionAdvisor = new DataProtectionAdvisorUpdateParameters()
+                {
+                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
+                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
+                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
+                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
+                }
+            };
+            _identityResolver.Setup(_ =>
+                    _.ResolveDbId<Organization>(org.Uuid))
+                .Returns(expectedContactPerson.OrganizationId);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<ContactPerson>()))
+                .Returns(true);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<DataResponsible>()))
+                .Returns(true);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
+                .Returns(false);
+
+            _contactPersonRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
+            _dataResponsibleRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
+            _dataProtectionAdvisorRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
+
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            var result =
+                _sut.UpdateOrganizationMasterDataRoles(org.Uuid, updateParameters);
 
             Assert.True(result.Failed);
             var error = result.Error;
@@ -1034,7 +1206,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
             var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
             var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
-            var contactPersonUpdateParameters = new OrganizationMasterDataRolesUpdateParameters
+            var updateParameters = new OrganizationMasterDataRolesUpdateParameters
             {
                 ContactPerson = new ContactPersonUpdateParameters()
                 {
@@ -1086,7 +1258,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
-            var result = _sut.UpdateOrganizationMasterDataRoles(org.Uuid, contactPersonUpdateParameters);
+            var result = _sut.UpdateOrganizationMasterDataRoles(org.Uuid, updateParameters);
 
             Assert.True(result.Ok);
             var value = result.Value;
