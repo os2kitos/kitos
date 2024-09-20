@@ -390,6 +390,7 @@
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\OrganizationUnitWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitRegistrationInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitsInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Users\UserRightsInternalApiV2Controller.cs" />
     <Compile Include="Infrastructure\Attributes\V2StyleJsonResponseSerializationAttribute.cs" />
     <Compile Include="Infrastructure\Config\V2JsonSerializationConfig.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\NotificationTypeMappingExtensions.cs" />
@@ -427,6 +428,11 @@
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\PaymentRegistrationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\UnitAccessRightsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\UnitAccessRightsWithUnitDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\User\DataProcessingRegistrationRightResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\User\ItContractRightResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\User\ItSystemRightResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\User\OrganizationUntRightResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\User\UserRightsAssignmentsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesCreation.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesUpdate.cs" />
     <Compile Include="Models\API\V2\Request\Interface\CreateItInterfaceRequestDTO.cs" />
