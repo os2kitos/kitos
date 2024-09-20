@@ -428,11 +428,6 @@
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\PaymentRegistrationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\UnitAccessRightsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\UnitAccessRightsWithUnitDataResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Internal\Response\User\DataProcessingRegistrationRightResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Internal\Response\User\ItContractRightResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Internal\Response\User\ItSystemRightResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Internal\Response\User\OrganizationUntRightResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Internal\Response\User\UserRightsAssignmentsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesCreation.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesUpdate.cs" />
     <Compile Include="Models\API\V2\Request\Interface\CreateItInterfaceRequestDTO.cs" />
