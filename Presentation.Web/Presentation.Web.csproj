@@ -390,7 +390,6 @@
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\OrganizationUnitWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitRegistrationInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitsInternalV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\Internal\Users\UserRightsInternalApiV2Controller.cs" />
     <Compile Include="Infrastructure\Attributes\V2StyleJsonResponseSerializationAttribute.cs" />
     <Compile Include="Infrastructure\Config\V2JsonSerializationConfig.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\NotificationTypeMappingExtensions.cs" />
@@ -1848,6 +1847,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Controllers\API\V2\Internal\Users\" />
     <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
   <ItemGroup>
