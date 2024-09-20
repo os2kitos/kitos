@@ -208,6 +208,7 @@
     <Compile Include="Model\Organizations\StsOrganizationSynchronizationDetails.cs" />
     <Compile Include="Model\Organizations\AuthorizedUpdateOrganizationFromFKOrganisationCommand.cs" />
     <Compile Include="Model\Organizations\Write\MasterDataRoles\ContactPersonUpdateParameters.cs" />
+    <Compile Include="Model\Organizations\Write\MasterDataRoles\DataProtectionAdvisorUpdateParameters.cs" />
     <Compile Include="Model\Organizations\Write\MasterDataRoles\DataResponsibleUpdateParameters.cs" />
     <Compile Include="Model\Organizations\Write\MasterDataRoles\OrganizationMasterDataRolesUpdateParameters.cs" />
     <Compile Include="Model\Organizations\Write\OrganizationUnitUpdateParameters.cs" />

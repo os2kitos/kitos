@@ -13,5 +13,6 @@ namespace Core.ApplicationServices.Model.Organizations
         public Guid OrganizationUuid { get; set; }
         public ContactPerson ContactPerson { get; set; }
         public DataResponsible DataResponsible { get; set; }
+        public DataProtectionAdvisor DataProtectionAdvisor { get; set; }
     }
 }

@@ -41,6 +41,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly ILogger _logger;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataResponsible> _dataResponsibleRepository;
+        private readonly IGenericRepository<DataProtectionAdvisor> _dataProtectionAdvisorRepository;
 
         public OrganizationService(
             IGenericRepository<Organization> orgRepository,
@@ -55,7 +56,8 @@ namespace Core.ApplicationServices.Organizations
             IOrganizationRightsService organizationRightsService,
             IOrgUnitService orgUnitService,
             IDomainEvents domainEvents,
-            IEntityIdentityResolver identityResolver, IGenericRepository<DataResponsible> dataResponsibleRepository)
+            IEntityIdentityResolver identityResolver, IGenericRepository<DataResponsible> dataResponsibleRepository,
+            IGenericRepository<DataProtectionAdvisor> dataProtectionAdvisorRepository)
         {
             _orgRepository = orgRepository;
             _orgRightRepository = orgRightRepository;
@@ -70,6 +72,7 @@ namespace Core.ApplicationServices.Organizations
             _domainEvents = domainEvents;
             _identityResolver = identityResolver;
             _dataResponsibleRepository = dataResponsibleRepository;
+            _dataProtectionAdvisorRepository = dataProtectionAdvisorRepository;
             _organizationRightsService = organizationRightsService;
         }
 
@@ -448,11 +451,15 @@ namespace Core.ApplicationServices.Organizations
             var dataResponsibleMaybe = _dataResponsibleRepository.AsQueryable()
                 .FirstOrNone(dr => dr.OrganizationId.Equals(orgId));
 
+            var dataProtectionAdvisorMaybe = _dataProtectionAdvisorRepository.AsQueryable()
+                .FirstOrNone(dpa => dpa.OrganizationId.Equals(orgId));
+
             return new OrganizationMasterDataRoles()
             {
                 OrganizationUuid = organizationUuid,
                 ContactPerson = contactPersonMaybe.Value,
-                DataResponsible = dataResponsibleMaybe.Value
+                DataResponsible = dataResponsibleMaybe.Value,
+                DataProtectionAdvisor = dataProtectionAdvisorMaybe.Value
             };
         }
 

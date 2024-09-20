@@ -49,6 +49,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IGenericRepository<ContactPerson>> _contactPersonRepository;
         private readonly Mock<IEntityIdentityResolver> _identityResolver;
         private readonly Mock<IGenericRepository<DataResponsible>> _dataResponsibleRepository;
+        private readonly Mock<IGenericRepository<DataProtectionAdvisor>> _dataProtectionAdvisorRepository;
 
 
         public OrganizationServiceTest()
@@ -69,6 +70,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _contactPersonRepository = new Mock<IGenericRepository<ContactPerson>>();
             _identityResolver = new Mock<IEntityIdentityResolver>();
             _dataResponsibleRepository = new Mock<IGenericRepository<DataResponsible>>();
+            _dataProtectionAdvisorRepository = new Mock<IGenericRepository<DataProtectionAdvisor>>();
 
             _sut = new OrganizationService(
                 _organizationRepository.Object,
@@ -84,7 +86,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 _orgUnitServiceMock.Object,
                 _domainEventsMock.Object,
                 _identityResolver.Object,
-                _dataResponsibleRepository.Object);
+                _dataResponsibleRepository.Object,
+                _dataProtectionAdvisorRepository.Object);
         }
 
         [Fact]
@@ -947,13 +950,14 @@ namespace Tests.Unit.Presentation.Web.Services
                     _.ResolveDbId<Organization>(org.Uuid))
                 .Returns(orgId);
             var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
-
+            var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
             var rolesResult = _sut.GetOrganizationMasterDataRoles(org.Uuid);
             
             Assert.True(rolesResult.Ok);
             var value = rolesResult.Value;
             AssertContactPerson(expectedContactPerson, value.ContactPerson);
             AssertDataResponsible(expectedDataResponsible, value.DataResponsible);
+            AssertDataProtectionAdvisor(expectedDataProtectionAdvisor, value.DataProtectionAdvisor);
             Assert.Equal(org.Uuid, rolesResult.Value.OrganizationUuid);
         }
 
@@ -1085,6 +1089,33 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(expected.OrganizationId, actual.OrganizationId);
             Assert.Equal(expected.Id, actual.Id);
             Assert.Equal(expected.Adress, actual.Adress);
+        }
+
+        private void AssertDataProtectionAdvisor(DataProtectionAdvisor expected, DataProtectionAdvisor actual)
+        {
+            Assert.Equal(expected.Email, actual.Email);
+            Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(expected.Cvr, actual.Cvr);
+            Assert.Equal(expected.OrganizationId, actual.OrganizationId);
+            Assert.Equal(expected.Id, actual.Id);
+            Assert.Equal(expected.Adress, actual.Adress);
+        }
+
+        private DataProtectionAdvisor SetupGetMasterDataRolesDataProtectionAdvisor(int orgId)
+        {
+            var expectedDataProtectionAdvisor = new DataProtectionAdvisor()
+            {
+                Email = A<string>(),
+                Name = A<string>(),
+                Cvr = A<string>(),
+                Adress = A<string>(),
+                OrganizationId = orgId,
+                Id = A<int>(),
+            };
+            _dataProtectionAdvisorRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
+            return expectedDataProtectionAdvisor;
         }
 
         private ContactPerson SetupGetMasterDataRolesContactPerson(int orgId)
