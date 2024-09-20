@@ -9,5 +9,4 @@ public class DataProtectionAdvisorUpdateParameters
     public OptionalValueChange<string> Phone { get; set; }
     public OptionalValueChange<string> Address { get; set; }
     public OptionalValueChange<string> Email { get; set; }
-    public OptionalValueChange<int> Id { get; set; }
 }

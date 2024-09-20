@@ -93,7 +93,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var updateParameters = ToMasterDataRolesUpdateParameters(requestDto);
+            var updateParameters = ToMasterDataRolesUpdateParameters(organizationUuid, requestDto);
             return _organizationService.UpdateOrganizationMasterDataRoles(organizationUuid, updateParameters)
                 .Select(_organizationMapper.ToRolesDTO)
                 .Match(Ok, FromOperationError);
@@ -110,7 +110,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             };
         }
 
-        private OrganizationMasterDataRolesUpdateParameters ToMasterDataRolesUpdateParameters(
+        private OrganizationMasterDataRolesUpdateParameters ToMasterDataRolesUpdateParameters(Guid organizationUuid,
             OrganizationMasterDataRolesRequestDTO dto)
         {
             throw new NotImplementedException();

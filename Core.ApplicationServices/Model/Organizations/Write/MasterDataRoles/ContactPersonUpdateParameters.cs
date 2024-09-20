@@ -8,5 +8,4 @@ public class ContactPersonUpdateParameters
     public OptionalValueChange<string> LastName { get; set; }
     public OptionalValueChange<string> PhoneNumber { get; set; }
     public OptionalValueChange<string> Email { get; set; }
-    public OptionalValueChange<int> Id { get; set; }
 }
