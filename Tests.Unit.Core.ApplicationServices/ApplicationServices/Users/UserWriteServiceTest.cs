@@ -61,6 +61,51 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 
+        [Fact]
+        public void Create_Fails_If_Add_Role_Fails()
+        {
+            //Arrange
+            var createParams = SetupUserParameters();
+            var orgUuid = A<Guid>();
+            var orgId = A<int>();
+            var transaction = ExpectTransactionBegins();
+            var error = A<OperationFailure>();
+
+            AssertResolveIdReturns(orgUuid, orgId);
+            AssertAddUserReturns(createParams.User, createParams.SendMailOnCreation, orgId);
+            foreach (var organizationRole in createParams.Roles)
+            {
+                AssertAddRoleReturns(organizationRole, orgId, createParams.User.Id, error);
+            }
+
+            //Act
+            var result = _sut.Create(orgUuid, createParams);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(error, result.Error.FailureType);
+            Assert.True(result.Error.Message.HasValue);
+            Assert.True(result.Error.Message.Value.Contains("Failed to assign role"));
+            transaction.Verify(x => x.Rollback(), Times.Once);
+        }
+
+        [Fact]
+        public void Create_Fails_If_OrgId_Is_Not_Found()
+        {
+            //Arrange
+            var createParams = SetupUserParameters();
+            var orgUuid = A<Guid>();
+
+            AssertResolveIdReturns(orgUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.Create(orgUuid, createParams);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
         private void AssertAddUserReturns(User user, bool sendMailOnCreation, int orgId)
         {
             _userServiceMock.Setup(x => x.AddUser(user, sendMailOnCreation, orgId)).Returns(user);

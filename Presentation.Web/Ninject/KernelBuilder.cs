@@ -214,7 +214,7 @@ namespace Presentation.Web.Ninject
                 .WithConstructorArgument("mailSuffix", Settings.Default.MailSuffix)
                 .WithConstructorArgument("defaultUserPassword", Settings.Default.DefaultUserPassword)
                 .WithConstructorArgument("useDefaultUserPassword", bool.Parse(Settings.Default.UseDefaultPassword));
-            kernel.Bind<IUserWriteService, UserWriteService>();
+            kernel.Bind<IUserWriteService>().To<UserWriteService>().InCommandScope(Mode);
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationRoleService>().To<OrganizationRoleService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationRightsService>().To<OrganizationRightsService>().InCommandScope(Mode);

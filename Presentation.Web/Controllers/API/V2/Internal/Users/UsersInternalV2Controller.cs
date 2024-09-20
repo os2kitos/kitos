@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
             _userResponseModelMapper = userResponseModelMapper;
         }
 
-        [Route("organization/{organizationUuid}")]
+        [Route("organization/{organizationUuid}/create")]
         [HttpPost]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(UserResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
