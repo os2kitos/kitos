@@ -16,7 +16,6 @@ using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.Organization;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
-using Presentation.Web.Models.API.V2.Request.Organization;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
 
@@ -79,9 +78,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             return _organizationService.GetOrganizationMasterDataRoles(organizationUuid)
                 .Select(_organizationMapper.ToRolesDTO)
                 .Match(Ok, FromOperationError);
-
         }
-
         
         [HttpPatch]
         [Route("{organizationUuid}/masterData/roles")]
@@ -89,7 +86,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult UpdateOrganizationMasterDataRoles([FromUri][NonEmptyGuid] Guid organizationUuid, OrganizationMasterDataRolesRequestDTO requestDto)
+        public IHttpActionResult UpsertOrganizationMasterDataRoles([FromUri][NonEmptyGuid] Guid organizationUuid, OrganizationMasterDataRolesRequestDTO requestDto)
         {
             if (!ModelState.IsValid) return BadRequest();
 
@@ -110,10 +107,45 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             };
         }
 
-        private OrganizationMasterDataRolesUpdateParameters ToMasterDataRolesUpdateParameters(Guid organizationUuid,
+        private static OrganizationMasterDataRolesUpdateParameters ToMasterDataRolesUpdateParameters(Guid organizationUuid,
             OrganizationMasterDataRolesRequestDTO dto)
         {
-            throw new NotImplementedException();
+            var contactPersonDto = dto.ContactPerson;
+            var contactPersonParameters = new ContactPersonUpdateParameters()
+            {
+                Email = OptionalValueChange<string>.With(contactPersonDto.Email),
+                LastName = OptionalValueChange<string>.With(contactPersonDto.LastName),
+                Name = OptionalValueChange<string>.With(contactPersonDto.Name),
+                PhoneNumber = OptionalValueChange<string>.With(contactPersonDto.PhoneNumber)
+            };
+
+            var dataResponsibleDto = dto.DataResponsible;
+            var dataResponsibleParameters = new DataResponsibleUpdateParameters()
+            {
+                Address = OptionalValueChange<string>.With(dataResponsibleDto.Address),
+                Cvr = OptionalValueChange<string>.With(dataResponsibleDto.Cvr),
+                Email = OptionalValueChange<string>.With(dataResponsibleDto.Email),
+                Name = OptionalValueChange<string>.With(dataResponsibleDto.Name),
+                Phone = OptionalValueChange<string>.With(dataResponsibleDto.Phone)
+            };
+
+            var dataProtectionAdvisorDto = dto.DataProtectionAdvisor;
+            var dataProtectionAdvisorParameters = new DataProtectionAdvisorUpdateParameters()
+            {
+                Address = OptionalValueChange<string>.With(dataProtectionAdvisorDto.Address),
+                Cvr = OptionalValueChange<string>.With(dataProtectionAdvisorDto.Cvr),
+                Email = OptionalValueChange<string>.With(dataProtectionAdvisorDto.Email),
+                Name = OptionalValueChange<string>.With(dataProtectionAdvisorDto.Name),
+                Phone = OptionalValueChange<string>.With(dataProtectionAdvisorDto.Phone)
+            };
+
+            return new()
+            {
+                OrganizationUuid = organizationUuid,
+                ContactPerson = contactPersonParameters,
+                DataResponsible = dataResponsibleParameters,
+                DataProtectionAdvisor = dataProtectionAdvisorParameters
+            };
         }
     }
 }

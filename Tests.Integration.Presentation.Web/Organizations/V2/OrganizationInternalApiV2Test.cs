@@ -4,9 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json.Linq;
-using Presentation.Web.Models.API.V2.Request.Organization;
+using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Tests.Integration.Presentation.Web.Tools;
@@ -95,6 +96,54 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
+        [Fact]
+        public async Task CanUpsertOrganizationMasterDataRoles()
+        {
+            var organization = await GetOrganization();
+            var contactPersonDto = new ContactPersonRequestDTO()
+            {
+                Email = A<string>(),
+                LastName = A<string>(),
+                Name = A<string>(),
+                PhoneNumber = A<string>()
+            };
+
+            var dataResponsibleDto = new DataResponsibleRequestDTO()
+            {
+                Address = A<string>(),
+                Cvr = A<string>(),
+                Email = A<string>(),
+                Name = A<string>(),
+                Phone = A<string>()
+            };
+
+            var dataProtectionAdvisorDto = new DataProtectionAdvisorRequestDTO()
+            {
+                Address = A<string>(),
+                Cvr = A<string>(),
+                Email = A<string>(),
+                Name = A<string>(),
+                Phone = A<string>()
+            };
+
+            var requestDto = new OrganizationMasterDataRolesRequestDTO()
+            {
+                   ContactPerson = contactPersonDto,
+                   DataResponsible = dataResponsibleDto,
+                   DataProtectionAdvisor = dataProtectionAdvisorDto
+            };
+
+            var response =
+                await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, requestDto);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var content = await response.Content.ReadAsStringAsync();
+            Assert.Contains(contactPersonDto.Name, content);
+            Assert.Contains(organization.Uuid.ToString(), content);
+            Assert.Contains(dataResponsibleDto.Name, content);
+            Assert.Contains(dataProtectionAdvisorDto.Name, content);
+        }
+        
         private static async Task<OrganizationResponseDTO> GetOrganization()
         {
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);

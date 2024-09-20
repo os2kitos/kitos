@@ -11,5 +11,7 @@ namespace Presentation.Web.Models.API.V2.Response.Organization
     {
         public Guid OrganizationUuid { get; set; }
         public ContactPersonResponseDTO ContactPerson { get; set; }
+        public DataResponsibleResponseDTO DataResponsible { get; set; }
+        public DataProtectionAdvisorResponseDTO DataProtectionAdvisor { get; set; }
     }
 }
