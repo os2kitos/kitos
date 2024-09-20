@@ -22,7 +22,7 @@ using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Presentation.Web.Models.V2
+namespace Tests.Unit.Presentation.Web.Models.V2Internal
 {
     public class ItSystemUsageResponseMapperTest : WithAutoFixture
     {

@@ -390,6 +390,13 @@
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\OrganizationUnitWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitRegistrationInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitsInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Users\Mapping\DefaultUserStartPreferenceChoiceMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Users\Mapping\IUserResponseModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Users\Mapping\IUserWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Users\Mapping\OrganizationRoleMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Users\Mapping\UserResponseModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Users\Mapping\UserWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Users\UsersInternalV2Controller.cs" />
     <Compile Include="Infrastructure\Attributes\V2StyleJsonResponseSerializationAttribute.cs" />
     <Compile Include="Infrastructure\Config\V2JsonSerializationConfig.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\NotificationTypeMappingExtensions.cs" />
@@ -427,6 +434,7 @@
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\PaymentRegistrationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\UnitAccessRightsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\UnitAccessRightsWithUnitDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\User\UserResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesCreation.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesUpdate.cs" />
     <Compile Include="Models\API\V2\Request\Interface\CreateItInterfaceRequestDTO.cs" />
@@ -440,6 +448,10 @@
     <Compile Include="Models\API\V2\Request\OrganizationUnit\CreateOrganizationUnitRoleAssignmentRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\OrganizationUnit\DeleteOrganizationUnitRoleAssignmentRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\OrganizationUnit\UpdateOrganizationUnitRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\User\BaseUserRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\User\CreateUserRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\User\DefaultUserStartPreferenceChoice.cs" />
+    <Compile Include="Models\API\V2\Request\User\OrganizationRoleChoice.cs" />
     <Compile Include="Models\API\V2\Types\Organization\OrganizationUnitOriginChoice.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingCreationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingUpdateRequestDTO.cs" />
