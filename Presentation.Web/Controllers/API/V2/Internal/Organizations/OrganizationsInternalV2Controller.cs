@@ -94,7 +94,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             if (!ModelState.IsValid) return BadRequest();
 
             var updateParameters = ToMasterDataRolesUpdateParameters(organizationUuid, requestDto);
-            return _organizationService.UpdateOrganizationMasterDataRoles(organizationUuid, updateParameters)
+            return _organizationService.UpdateOrCreateOrganizationMasterDataRoles(organizationUuid, updateParameters)
                 .Select(_organizationMapper.ToRolesDTO)
                 .Match(Ok, FromOperationError);
         }

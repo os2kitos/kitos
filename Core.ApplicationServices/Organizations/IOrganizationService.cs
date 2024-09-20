@@ -62,6 +62,6 @@ namespace Core.ApplicationServices.Organizations
         public Result<OrganizationMasterDataRoles, OperationError>
             GetOrganizationMasterDataRoles(Guid organizationUuid);
 
-        public Result<OrganizationMasterDataRoles, OperationError> UpdateOrganizationMasterDataRoles(Guid organizationUuid, OrganizationMasterDataRolesUpdateParameters updateParameters);
+        public Result<OrganizationMasterDataRoles, OperationError> UpdateOrCreateOrganizationMasterDataRoles(Guid organizationUuid, OrganizationMasterDataRolesUpdateParameters updateParameters);
     }
 }

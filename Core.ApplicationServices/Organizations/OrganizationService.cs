@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -19,9 +21,11 @@ using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Repositories.Organization;
+using dk.nita.saml20.Schema.Metadata;
 using Infrastructure.Services.DataAccess;
 
 using Serilog;
+using Organization = Core.DomainModel.Organization.Organization;
 
 namespace Core.ApplicationServices.Organizations
 {
@@ -463,7 +467,7 @@ namespace Core.ApplicationServices.Organizations
             };
         }
 
-        public Result<OrganizationMasterDataRoles, OperationError> UpdateOrganizationMasterDataRoles(Guid organizationUuid,
+        public Result<OrganizationMasterDataRoles, OperationError> UpdateOrCreateOrganizationMasterDataRoles(Guid organizationUuid,
             OrganizationMasterDataRolesUpdateParameters updateParameters)
         {
             using var transaction = _transactionManager.Begin();
@@ -486,11 +490,11 @@ namespace Core.ApplicationServices.Organizations
                         .FirstOrNone(cp => cp.OrganizationId.Equals(orgId));
 
                     return updatedContactPersonMaybe.Match<Result<ContactPerson, OperationError>>(
-                        
                         updatedContactPerson => updatedContactPerson,
-                        () => new OperationError(OperationFailure.NotFound));
+                        () => new OperationError(OperationFailure.NotFound)); 
                 },
-                error => error);
+                error => error
+                );
             if (updatedContactPersonResult.Failed) return ConcludeMasterDataRolesUpdate(updatedContactPersonResult.Error, transaction);
 
             var modifiedDataResponsibleResult =
@@ -548,6 +552,29 @@ namespace Core.ApplicationServices.Organizations
             return result;
         }
 
+        private Result<ContactPerson, OperationError> AuthorizeModificationAndModifyContactPerson(
+            int organizationId, Maybe<ContactPersonUpdateParameters> parameters)
+        {
+            var existingContactPersonMaybe = _contactPersonRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
+            var existingContactPerson = existingContactPersonMaybe.HasValue 
+                ? existingContactPersonMaybe.Value
+                : CreateContactPerson(organizationId);
+
+            var allowModify = _authorizationContext.AllowModify(existingContactPerson);
+            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
+
+            return parameters.HasValue ? ModifyContactPerson(existingContactPerson, parameters.Value) : existingContactPerson;
+        }
+
+        private ContactPerson CreateContactPerson(int orgId)
+        {
+            var newContactPerson = new ContactPerson() { OrganizationId = orgId };
+            _contactPersonRepository.Insert(newContactPerson);
+            _domainEvents.Raise(new EntityCreatedEvent<ContactPerson>(newContactPerson));
+            return newContactPerson;
+        }
+
         private Result<DataProtectionAdvisor, OperationError> AuthorizeModificationAndModifyDataProtectionAdvisor(
             int organizationId, Maybe<DataProtectionAdvisorUpdateParameters> parameters)
         {
@@ -578,22 +605,6 @@ namespace Core.ApplicationServices.Organizations
             if (!allowModify) return new OperationError(OperationFailure.Forbidden);
 
             return parameters.HasValue ? ModifyDataResponsible(existingDataResponsible, parameters.Value) : existingDataResponsible;
-        }
-
-        private Result<ContactPerson, OperationError> AuthorizeModificationAndModifyContactPerson(
-            int organizationId, Maybe<ContactPersonUpdateParameters> parameters)
-        {
-            var existingContactPersonMaybe = _contactPersonRepository.AsQueryable()
-                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
-
-            var existingContactPerson = existingContactPersonMaybe.HasValue
-                ? existingContactPersonMaybe.Value
-                : new ContactPerson() { OrganizationId = organizationId };
-
-            var allowModify = _authorizationContext.AllowModify(existingContactPerson);
-            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
-
-            return parameters.HasValue ? ModifyContactPerson(existingContactPersonMaybe.Value, parameters.Value) : existingContactPerson;
         }
 
         private Result<Organization, OperationError> WithDeletionAccess(Organization organization)
