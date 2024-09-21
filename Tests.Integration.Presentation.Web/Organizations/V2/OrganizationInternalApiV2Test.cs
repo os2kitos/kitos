@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
@@ -55,7 +56,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var patchDto = new OrganizationMasterDataRequestDTO
             {
                 Address = A<string>(),
-                Cvr = A<string>().Truncate(CvrMaxLength),
+                Cvr = GetCvr(),
                 Email = A<string>(),
                 Phone = A<string>()
             };
@@ -66,10 +67,12 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterData(organizationToPatch.Uuid, patchDto);
-            var content = await response.Content.ReadAsStringAsync();
+            
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Contains(organizationToPatch.Uuid.ToString(), content);
-            Assert.Contains(patchDto.Cvr, content);
+            var content = await response.Content.ReadAsStringAsync();
+            var responseDto = JsonConvert.DeserializeObject<OrganizationResponseDTO>(content);
+            Assert.Equal(patchDto.Cvr, responseDto.Cvr);
+            Assert.Equal(organizationToPatch.Uuid, responseDto.Uuid);
         }
 
         [Fact]
@@ -81,10 +84,12 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterData(organizationToPatch.Uuid, patchDto);
-            var content = await response.Content.ReadAsStringAsync();
+            
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            Assert.Contains(organizationToPatch.Uuid.ToString(), content);
-            Assert.Contains("null", content);
+            var content = await response.Content.ReadAsStringAsync();
+            var responseDto = JsonConvert.DeserializeObject<OrganizationResponseDTO>(content);
+            Assert.Equal(patchDto.Cvr, responseDto.Cvr);
+            Assert.Equal(organizationToPatch.Uuid, responseDto.Uuid);
         }
         
         [Fact]
@@ -105,11 +110,18 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var upsertResponse =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, request);
             Assert.Equal(HttpStatusCode.OK, upsertResponse.StatusCode);
+            var upsertContent = await upsertResponse.Content.ReadAsStringAsync();
+            var upsertResponseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(upsertContent);
+            Assert.Equal(contactPersonDto.Name, upsertResponseDto.ContactPerson.Name);
+            Assert.Equal(organization.Uuid, upsertResponseDto.OrganizationUuid);
 
             var response = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(organization.Uuid);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            AssertOrgUuidAndStringInContent(organization.Uuid, contactPersonDto.Name, response);
+            var content = await response.Content.ReadAsStringAsync();
+            var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
+            Assert.Equal(contactPersonDto.Name, responseDto.ContactPerson.Name);
+            Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
         }
 
         [Fact]
@@ -130,17 +142,25 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
-            Assert.Contains(contactPersonDto.Name, content);
-            Assert.Contains(organization.Uuid.ToString(), content);
-            Assert.Contains(dataResponsibleDto.Name, content);
-            Assert.Contains(dataProtectionAdvisorDto.Name, content);
+            var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
+            Assert.Equal(contactPersonDto.Name, responseDto.ContactPerson.Name);
+            Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
+            Assert.Equal(dataResponsibleDto.Name, responseDto.DataResponsible.Name);
+            Assert.Equal(dataProtectionAdvisorDto.Name, responseDto.DataProtectionAdvisor.Name);
+        }
+
+        public enum RoleType
+        {
+            ContactPerson,
+            DataResponsible,
+            DataProtectionAdvisor
         }
 
         [Theory]
-        [InlineData("contactPerson")]
-        [InlineData("dataResponsible")]
-        [InlineData("dataProtectionAdvisor")]
-        public async Task CanUpsertSingleOrganizationMasterDataRole(string propertyToPass)
+        [InlineData(RoleType.ContactPerson)]
+        [InlineData(RoleType.DataResponsible)]
+        [InlineData(RoleType.DataProtectionAdvisor)]
+        public async Task CanUpsertSingleOrganizationMasterDataRole(RoleType roleType)
         {
             var organization = await GetOrganization();
             var resetRolesResponse =
@@ -149,21 +169,39 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
              Assert.Equal(HttpStatusCode.OK, resetRolesResponse.StatusCode);
              var (contactPersonDto, dataResponsibleDto, dataProtectionAdvisorDto) = GetRequestDtos();
              var request = new OrganizationMasterDataRolesRequestDTO();
-            switch (propertyToPass)
+            switch (roleType)
             {
-                case "contactPerson": request.ContactPerson = contactPersonDto;
+                case RoleType.ContactPerson: request.ContactPerson = contactPersonDto;
                     break;
-                case "dataResponsible": request.DataResponsible = dataResponsibleDto;
+                case RoleType.DataResponsible: request.DataResponsible = dataResponsibleDto;
                     break;
-                case "dataProtectionAdvisor": request.DataProtectionAdvisor = dataProtectionAdvisorDto; 
+                case RoleType.DataProtectionAdvisor: request.DataProtectionAdvisor = dataProtectionAdvisorDto; 
                     break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(roleType), roleType, null);
             }
 
             var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, request);
-
+            
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            AssertOrgUuidAndStringInContent(organization.Uuid, contactPersonDto.Name, response);
+            var content = await response.Content.ReadAsStringAsync();
+            var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
+            Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
+            switch (roleType)
+            {
+                case RoleType.ContactPerson:
+                    Assert.Equal(contactPersonDto.LastName, responseDto.ContactPerson.LastName);
+                    break;
+                case RoleType.DataResponsible:
+                    Assert.Equal(dataResponsibleDto.Email, responseDto.DataResponsible.Email);
+                    break;
+                case RoleType.DataProtectionAdvisor:
+                    Assert.Equal(dataProtectionAdvisorDto.Cvr, responseDto.DataProtectionAdvisor.Cvr);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(roleType), roleType, null);
+            }
         }
 
         private (ContactPersonRequestDTO, DataResponsibleRequestDTO, DataProtectionAdvisorRequestDTO) GetRequestDtos()
@@ -179,7 +217,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var dataResponsibleDto = new DataResponsibleRequestDTO()
             {
                 Address = A<string>(),
-                Cvr = A<string>(),
+                Cvr = GetCvr(),
                 Email = A<string>(),
                 Name = A<string>(),
                 Phone = A<string>()
@@ -188,19 +226,12 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var dataProtectionAdvisorDto = new DataProtectionAdvisorRequestDTO()
             {
                 Address = A<string>(),
-                Cvr = A<string>(),
+                Cvr = GetCvr(),
                 Email = A<string>(),
                 Name = A<string>(),
                 Phone = A<string>()
             };
             return (contactPersonDto, dataResponsibleDto, dataProtectionAdvisorDto);
-        }
-
-        private async void AssertOrgUuidAndStringInContent(Guid orgUuid, string entityProperty, HttpResponseMessage response)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            Assert.Contains(entityProperty, content);
-            Assert.Contains(orgUuid.ToString(), content);
         }
 
         private static async Task<OrganizationResponseDTO> GetOrganization()
@@ -210,6 +241,11 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var organization = organizations.First();
             Assert.NotNull(organization);
             return organization;
+        }
+
+        private string GetCvr()
+        {
+            return A<string>().Truncate(CvrMaxLength);
         }
     }
 }
