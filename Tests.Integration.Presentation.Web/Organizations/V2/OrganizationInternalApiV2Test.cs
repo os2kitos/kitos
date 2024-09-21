@@ -204,6 +204,24 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             }
         }
 
+        [Fact]
+        public async Task UpsertCanCreateOrganizationMasterDataRolesIfNull()
+        {
+            var organization = await GetOrganization();
+            var requestDto = new OrganizationMasterDataRolesRequestDTO();
+
+            var response =
+                await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, requestDto);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var content = await response.Content.ReadAsStringAsync();
+            var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
+            Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
+            Assert.Equal(1, responseDto.DataResponsible.Id);
+            Assert.Equal(1, responseDto.DataProtectionAdvisor.Id);
+
+        }
+
         private (ContactPersonRequestDTO, DataResponsibleRequestDTO, DataProtectionAdvisorRequestDTO) GetRequestDtos()
         {
             var contactPersonDto = new ContactPersonRequestDTO()
