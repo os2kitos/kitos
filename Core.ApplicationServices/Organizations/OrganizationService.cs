@@ -478,7 +478,8 @@ namespace Core.ApplicationServices.Organizations
             var modifiedContactPersonResult =
                 AuthorizeModificationAndModifyContactPerson(orgId,
                     updateParameters.ContactPerson);
-            var upsertedContactPersonResult = modifiedContactPersonResult.Bind(cp => UpsertContactPerson(cp, orgId));
+            var upsertedContactPersonResult =
+                modifiedContactPersonResult.Bind(cp => UpsertContactPerson(cp, orgId));
             if (upsertedContactPersonResult.Failed) return ConcludeMasterDataRolesUpdate(upsertedContactPersonResult.Error, transaction);
 
             var modifiedDataResponsibleResult =

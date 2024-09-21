@@ -1,24 +1,20 @@
-﻿using Core.DomainModel.Organization;
-using Presentation.Web.Models.API.V2.Response.Organization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Core.ApplicationServices.Model.Organizations;
-using Core.DomainModel;
-using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
-using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
-using System.IdentityModel.Metadata;
+﻿using System;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Model.Organizations.Write;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
 using Core.ApplicationServices.Model.Shared;
+using Core.DomainModel.Organization;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
+using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
+using Presentation.Web.Models.API.V2.Response.Organization;
+using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
 using ContactPerson = Core.DomainModel.ContactPerson;
 using Organization = Core.DomainModel.Organization.Organization;
 
 
-namespace Presentation.Web.Controllers.API.V2.External.Generic
+namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 {
     public class OrganizationMapper: IOrganizationMapper
     {
