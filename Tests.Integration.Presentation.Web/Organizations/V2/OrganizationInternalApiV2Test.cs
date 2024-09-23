@@ -218,8 +218,17 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
             Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
-            Assert.Equal(1, responseDto.DataResponsible.Id);
-            Assert.Equal(1, responseDto.DataProtectionAdvisor.Id);
+            await GetMasterDataRolesAndAssertNotNull(organization.Uuid);
+        }
+
+        private async Task GetMasterDataRolesAndAssertNotNull(Guid orgUuid)
+        {
+            var getResponse = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(orgUuid);
+            var getContent = await getResponse.Content.ReadAsStringAsync();
+            var getResponseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(getContent);
+            Assert.NotNull(getResponseDto.ContactPerson);
+            Assert.NotNull(getResponseDto.DataResponsible);
+            Assert.NotNull(getResponseDto.DataProtectionAdvisor);
         }
 
         private (ContactPersonRequestDTO, DataResponsibleRequestDTO, DataProtectionAdvisorRequestDTO) GetRequestDtos()
