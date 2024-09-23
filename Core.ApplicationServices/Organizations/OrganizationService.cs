@@ -532,9 +532,7 @@ namespace Core.ApplicationServices.Organizations
 
         private Result<OrganizationMasterDataRoles, OperationError> ConcludeMasterDataRolesUpdate(Result<OrganizationMasterDataRoles, OperationError>  result, IDatabaseTransaction transaction)
         {
-            _dataResponsibleRepository.Save();
             _dataProtectionAdvisorRepository.Save();
-            _contactPersonRepository.Save();
             transaction.Commit();
             if (result.Ok)
             {
@@ -560,12 +558,10 @@ namespace Core.ApplicationServices.Organizations
 
         private ContactPerson CreateContactPerson(int orgId)
         {
-            using var transaction = _transactionManager.Begin();
             var newContactPerson = new ContactPerson() { OrganizationId = orgId };
             _contactPersonRepository.Insert(newContactPerson);
             _domainEvents.Raise(new EntityCreatedEvent<ContactPerson>(newContactPerson));
             _contactPersonRepository.Save();
-            transaction.Commit();
             return newContactPerson;
         }
 
@@ -685,6 +681,7 @@ namespace Core.ApplicationServices.Organizations
 
             _contactPersonRepository.Update(contactPerson);
             _domainEvents.Raise(new EntityUpdatedEvent<ContactPerson>(contactPerson));
+            _contactPersonRepository.Save();
 
             return contactPerson;
         }
