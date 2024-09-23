@@ -10,6 +10,9 @@ using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization.Permissions;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
+using Core.DomainServices.Generic;
+using Core.DomainServices.Authorization;
+using Core.DomainModel.Organization;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
@@ -18,13 +21,15 @@ namespace Presentation.Web.Controllers.API.V1.OData
     {
         private readonly IUserService _userService;
         private readonly IGenericRepository<User> _repository;
+        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
         public UsersController(
             IGenericRepository<User> repository,
-            IUserService userService)
+            IUserService userService, IEntityIdentityResolver entityIdentityResolver)
             : base(repository)
         {
             _userService = userService;
+            _entityIdentityResolver = entityIdentityResolver;
             _repository = repository;
         }
 
@@ -176,6 +181,26 @@ namespace Presentation.Web.Controllers.API.V1.OData
             }
             return NotFound();
         }
+
+        [EnableQuery]
+        [ODataRoute("GetUsersByUuid(organizationUuid={organizationUuid})")]
+        public IHttpActionResult GetUsersByUuid(Guid organizationUuid)
+        {
+            var idResult = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
+            if (idResult.IsNone)
+                return NotFound();
+
+            var id = idResult.Value;
+            var accessLevel = GetOrganizationReadAccessLevel(id);
+            if (accessLevel < OrganizationDataReadAccessLevel.Public)
+            {
+                return Forbidden();
+            }
+
+            var result = _repository.AsQueryable().Where(m => m.OrganizationRights.Any(r => r.OrganizationId == id));
+            return Ok(result);
+        }
+
 
         /// <summary>
         /// Always returns 405 - Unauthorized. Please use /api/User/{id} from API - UserController instead.

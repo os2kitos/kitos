@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System;
+using System.Web.Http;
 using Microsoft.AspNet.OData.Builder;
 using Microsoft.AspNet.OData.Extensions;
 using Core.DomainModel;
@@ -184,6 +185,10 @@ namespace Presentation.Web
             var userGetByMailAndOrgFunction = builder.Function("GetUserByEmailAndOrganizationRelationship").ReturnsFromEntitySet<User>(userEntitySetName);
             userGetByMailAndOrgFunction.Parameter<string>("email").Required();
             userGetByMailAndOrgFunction.Parameter<int>("organizationId").Required();
+
+            var getUsersByOrgUuidFunction = builder.Function("GetUsersByUuid")
+                .ReturnsCollectionFromEntitySet<User>(userEntitySetName);
+            getUsersByOrgUuidFunction.Parameter<Guid>("organizationUuid").Required();
 
             BindItSystemUsage(builder, entitySetOrganizations, entitySetItSystems);
 
