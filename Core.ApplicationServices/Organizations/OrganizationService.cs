@@ -489,18 +489,16 @@ namespace Core.ApplicationServices.Organizations
             if (modifiedDataResponsibleResult.Failed) return ConcludeMasterDataRolesUpdate(modifiedDataResponsibleResult.Error, transaction);
             _dataResponsibleRepository.Save();
 
-            /*
-            var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndModifyDataProtectionAdvisor(orgId,
+            var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndUpsertDataProtectionAdvisor(orgId,
                 updateParameters.DataProtectionAdvisor);
-            var updatedDataProtectionAdvisorResult =
-                modifiedDataProtectionAdvisorResult.Bind(dpa => UpsertDataProtectionAdvisor(dpa, orgId));
-            if (updatedDataProtectionAdvisorResult.Failed) return ConcludeMasterDataRolesUpdate(updatedDataProtectionAdvisorResult.Error, transaction);*/
+             if (modifiedDataProtectionAdvisorResult.Failed) return ConcludeMasterDataRolesUpdate(modifiedDataProtectionAdvisorResult.Error, transaction);
+             _dataProtectionAdvisorRepository.Save();
 
             var roles = new OrganizationMasterDataRoles()
             {
                 OrganizationUuid = organizationUuid,
                 ContactPerson = modifiedContactPersonResult.Value,
-                DataProtectionAdvisor = new DataProtectionAdvisor(),// updatedDataProtectionAdvisorResult.Value,
+                DataProtectionAdvisor = modifiedDataProtectionAdvisorResult.Value,
                 DataResponsible = modifiedDataResponsibleResult.Value
             };
 
@@ -520,17 +518,11 @@ namespace Core.ApplicationServices.Organizations
                 .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
         }
 
-        private Result<DataProtectionAdvisor, OperationError> UpsertDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor, int orgId)
+        private Result<DataProtectionAdvisor, OperationError> UpsertDataProtectionAdvisor(int orgId)
         {
-            _dataProtectionAdvisorRepository.Update(dataProtectionAdvisor);
-            _domainEvents.Raise(new EntityUpdatedEvent<DataProtectionAdvisor>(dataProtectionAdvisor));
-
-            var updatedDataProtectionAdvisorMaybe = _dataProtectionAdvisorRepository.AsQueryable()
-                .FirstOrNone(cp => cp.OrganizationId.Equals(orgId));
-
-            return updatedDataProtectionAdvisorMaybe.Match<Result<DataProtectionAdvisor, OperationError>>(
-                updatedDataProtectionAdvisor => updatedDataProtectionAdvisor,
-                () => new OperationError(OperationFailure.NotFound));
+            return GetDataProtectionAdvisor(orgId)
+                .Match(dataProtectionAdvisor => dataProtectionAdvisor,
+                    () => CreateDataProtectionAdvisor(orgId));
         }
 
         private Result<OrganizationMasterDataRoles, OperationError> ConcludeMasterDataRolesUpdate(Result<OrganizationMasterDataRoles, OperationError>  result, IDatabaseTransaction transaction)
@@ -563,20 +555,12 @@ namespace Core.ApplicationServices.Organizations
                 .Bind(dataResponsible => ModifyDataResponsible(dataResponsible, parameters));
         }
 
-        private Result<DataProtectionAdvisor, OperationError> AuthorizeModificationAndModifyDataProtectionAdvisor(
+        private Result<DataProtectionAdvisor, OperationError> AuthorizeModificationAndUpsertDataProtectionAdvisor(
             int organizationId, Maybe<DataProtectionAdvisorUpdateParameters> parameters)
         {
-            var existingDataProtectionAdvisorMaybe = _dataProtectionAdvisorRepository.AsQueryable()
-                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
-
-            var existingDataProtectionAdvisor = existingDataProtectionAdvisorMaybe.HasValue
-                ? existingDataProtectionAdvisorMaybe.Value
-                : CreateDataProtectionAdvisor(organizationId);
-
-            var allowModify = _authorizationContext.AllowModify(existingDataProtectionAdvisor);
-            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
-
-            return parameters.HasValue ? ModifyDataProtectionAdvisor(existingDataProtectionAdvisor, parameters.Value) : existingDataProtectionAdvisor;
+            return UpsertDataProtectionAdvisor(organizationId)
+                .Bind(ValidateModifyDataProtectionAdvisor)
+                .Bind(dataProtectionAdvisor => ModifyDataProtectionAdvisor(dataProtectionAdvisor, parameters));
         }
 
         private ContactPerson CreateContactPerson(int orgId)
@@ -594,11 +578,18 @@ namespace Core.ApplicationServices.Organizations
                 .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
         }
 
+        private Maybe<DataProtectionAdvisor> GetDataProtectionAdvisor(int organizationId)
+        {
+            return _dataProtectionAdvisorRepository.AsQueryable()
+                .FirstOrNone(dpa => dpa.OrganizationId.Equals(organizationId));
+        }
+
         private DataProtectionAdvisor CreateDataProtectionAdvisor(int orgId)
         {
             var newDataProtectionAdvisor = new DataProtectionAdvisor() { OrganizationId = orgId };
             _dataProtectionAdvisorRepository.Insert(newDataProtectionAdvisor);
             _domainEvents.Raise(new EntityCreatedEvent<DataProtectionAdvisor>(newDataProtectionAdvisor));
+            _dataResponsibleRepository.Save();
             return newDataProtectionAdvisor;
         }
 
@@ -673,6 +664,14 @@ namespace Core.ApplicationServices.Organizations
             return dataResponsible;
         }
 
+        private Result<DataProtectionAdvisor, OperationError> ValidateModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor)
+        {
+            var allowModify = _authorizationContext.AllowModify(dataProtectionAdvisor);
+            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
+
+            return dataProtectionAdvisor;
+        }
+
         private Result<ContactPerson, OperationError> ModifyContactPerson(ContactPerson contactPerson, Maybe<ContactPersonUpdateParameters> parametersMaybe)
         {
             if (parametersMaybe.HasValue == false)
@@ -707,8 +706,13 @@ namespace Core.ApplicationServices.Organizations
             return dataResponsible;
         }
 
-        private static Result<DataProtectionAdvisor, OperationError> ModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor, DataProtectionAdvisorUpdateParameters parameters)
+        private static Result<DataProtectionAdvisor, OperationError> ModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor, Maybe<DataProtectionAdvisorUpdateParameters> parametersMaybe)
         {
+            if (parametersMaybe.HasValue == false)
+                return dataProtectionAdvisor;
+
+            var parameters = parametersMaybe.Value;
+
             dataProtectionAdvisor.Email = parameters.Email?.NewValue;
             dataProtectionAdvisor.Name = parameters.Name?.NewValue;
             dataProtectionAdvisor.Cvr = parameters.Cvr?.NewValue;
