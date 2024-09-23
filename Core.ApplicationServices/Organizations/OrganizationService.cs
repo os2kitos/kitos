@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -476,13 +477,11 @@ namespace Core.ApplicationServices.Organizations
             var orgId = organizationDbIdMaybe.Value;
 
             var modifiedContactPersonResult =
-                AuthorizeModificationAndModifyContactPerson(orgId,
+                AuthorizeModificationAndUpsertContactPerson(orgId,
                     updateParameters.ContactPerson);
-            var upsertedContactPersonResult =
-                modifiedContactPersonResult.Bind(cp => UpsertContactPerson(cp, orgId));
-            if (upsertedContactPersonResult.Failed) return ConcludeMasterDataRolesUpdate(upsertedContactPersonResult.Error, transaction);
+            if (modifiedContactPersonResult.Failed) return ConcludeMasterDataRolesUpdate(modifiedContactPersonResult.Error, transaction);
 
-            var modifiedDataResponsibleResult =
+            /*var modifiedDataResponsibleResult =
                 AuthorizeModificationAndModifyDataResponsible(orgId, updateParameters.DataResponsible);
             var updatedDataResponsibleResult =
                 modifiedDataResponsibleResult.Bind(dr => UpsertDataResponsible(dr, orgId));
@@ -492,29 +491,17 @@ namespace Core.ApplicationServices.Organizations
                 updateParameters.DataProtectionAdvisor);
             var updatedDataProtectionAdvisorResult =
                 modifiedDataProtectionAdvisorResult.Bind(dpa => UpsertDataProtectionAdvisor(dpa, orgId));
-            if (updatedDataProtectionAdvisorResult.Failed) return ConcludeMasterDataRolesUpdate(updatedDataProtectionAdvisorResult.Error, transaction);
+            if (updatedDataProtectionAdvisorResult.Failed) return ConcludeMasterDataRolesUpdate(updatedDataProtectionAdvisorResult.Error, transaction);*/
 
             var roles = new OrganizationMasterDataRoles()
             {
                 OrganizationUuid = organizationUuid,
-                ContactPerson = upsertedContactPersonResult.Value,
-                DataProtectionAdvisor = updatedDataProtectionAdvisorResult.Value,
-                DataResponsible = updatedDataResponsibleResult.Value
+                ContactPerson = modifiedContactPersonResult.Value,
+                DataProtectionAdvisor = new DataProtectionAdvisor(),// updatedDataProtectionAdvisorResult.Value,
+                DataResponsible = new DataResponsible()//updatedDataResponsibleResult.Value
             };
+
             return ConcludeMasterDataRolesUpdate(roles, transaction);
-        }
-
-        private Result<ContactPerson, OperationError> UpsertContactPerson(ContactPerson contactPerson, int orgId)
-        {
-            _contactPersonRepository.Update(contactPerson);
-            _domainEvents.Raise(new EntityUpdatedEvent<ContactPerson>(contactPerson));
-
-            var updatedContactPersonMaybe = _contactPersonRepository.AsQueryable()
-                .FirstOrNone(cp => cp.OrganizationId.Equals(orgId));
-
-            return updatedContactPersonMaybe.Match<Result<ContactPerson, OperationError>>(
-                updatedContactPerson => updatedContactPerson,
-                () => new OperationError(OperationFailure.NotFound));
         }
 
         private Result<DataResponsible, OperationError> UpsertDataResponsible(DataResponsible dataResponsible, int orgId)
@@ -545,31 +532,30 @@ namespace Core.ApplicationServices.Organizations
 
         private Result<OrganizationMasterDataRoles, OperationError> ConcludeMasterDataRolesUpdate(Result<OrganizationMasterDataRoles, OperationError>  result, IDatabaseTransaction transaction)
         {
+            _dataResponsibleRepository.Save();
+            _dataProtectionAdvisorRepository.Save();
+            _contactPersonRepository.Save();
+            transaction.Commit();
             if (result.Ok)
             {
-                _contactPersonRepository.Save();
-                _dataResponsibleRepository.Save();
-                _dataProtectionAdvisorRepository.Save();
-                transaction.Commit();
             }
-            else transaction.Rollback();
-            
+            //else transaction.Rollback();
+
             return result;
         }
 
-        private Result<ContactPerson, OperationError> AuthorizeModificationAndModifyContactPerson(
+        private Result<ContactPerson, OperationError> AuthorizeModificationAndUpsertContactPerson(
             int organizationId, Maybe<ContactPersonUpdateParameters> parameters)
         {
-            var existingContactPersonMaybe = _contactPersonRepository.AsQueryable()
+            return UpsertContactPerson(organizationId)
+                .Bind(ValidateContactPerson)
+                .Bind(contactPerson => ModifyContactPerson(contactPerson, parameters));
+        }
+
+        private Maybe<ContactPerson> GetContactPerson(int organizationId)
+        {
+            return _contactPersonRepository.AsQueryable()
                 .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
-            var existingContactPerson = existingContactPersonMaybe.HasValue 
-                ? existingContactPersonMaybe.Value
-                : CreateContactPerson(organizationId);
-
-            var allowModify = _authorizationContext.AllowModify(existingContactPerson);
-            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
-
-            return parameters.HasValue ? ModifyContactPerson(existingContactPerson, parameters.Value) : existingContactPerson;
         }
 
         private ContactPerson CreateContactPerson(int orgId)
@@ -668,14 +654,38 @@ namespace Core.ApplicationServices.Organizations
             organization.Phone = parameters.Phone?.NewValue;
             return organization;
 
-        } 
-        
-        private static Result<ContactPerson, OperationError> ModifyContactPerson(ContactPerson contactPerson, ContactPersonUpdateParameters parameters)
+        }
+
+        private Result<ContactPerson, OperationError> UpsertContactPerson(int organizationId)
         {
+            return GetContactPerson(organizationId)
+                .Match(contactPerson => contactPerson,
+                    () => CreateContactPerson(organizationId));
+        }
+
+        private Result<ContactPerson, OperationError> ValidateContactPerson(ContactPerson contactPerson)
+        {
+            var allowModify = _authorizationContext.AllowModify(contactPerson);
+            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
+
+            return contactPerson;
+        }
+
+        private Result<ContactPerson, OperationError> ModifyContactPerson(ContactPerson contactPerson, Maybe<ContactPersonUpdateParameters> parametersMaybe)
+        {
+            if (parametersMaybe.HasValue == false)
+                return contactPerson;
+
+            var parameters = parametersMaybe.Value;
+
             contactPerson.Email = parameters.Email?.NewValue;
             contactPerson.Name = parameters.Name?.NewValue;
             contactPerson.LastName = parameters.LastName?.NewValue;
             contactPerson.PhoneNumber = parameters.PhoneNumber?.NewValue;
+
+            _contactPersonRepository.Update(contactPerson);
+            _domainEvents.Raise(new EntityUpdatedEvent<ContactPerson>(contactPerson));
+
             return contactPerson;
         }
 

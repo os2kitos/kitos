@@ -9,6 +9,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Response.Shared;
@@ -252,11 +253,12 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             return (contactPersonDto, dataResponsibleDto, dataProtectionAdvisorDto);
         }
 
-        private static async Task<OrganizationResponseDTO> GetOrganization()
+        private async Task<OrganizationDTO> GetOrganization()
         {
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250);
-            var organization = organizations.First();
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(),
+                "11223344", OrganizationTypeKeys.Kommune, AccessModifier.Local);
+            /*var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250);
+            var organization = organizations.First();*/
             Assert.NotNull(organization);
             return organization;
         }
