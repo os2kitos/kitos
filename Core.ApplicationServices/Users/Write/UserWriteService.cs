@@ -7,7 +7,6 @@ using Core.ApplicationServices.Model.Users.Write;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Users.Write
@@ -15,21 +14,18 @@ namespace Core.ApplicationServices.Users.Write
     public class UserWriteService : IUserWriteService
     {
         private readonly IUserService _userService;
-        private readonly IEntityIdentityResolver _entityIdentityResolver;
         private readonly IOrganizationRightsService _organizationRightsService;
         private readonly ITransactionManager _transactionManager;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationService _organizationService;
 
         public UserWriteService(IUserService userService,
-            IEntityIdentityResolver entityIdentityResolver,
             IOrganizationRightsService organizationRightsService,
             ITransactionManager transactionManager, 
             IAuthorizationContext authorizationContext,
             IOrganizationService organizationService)
         {
             _userService = userService;
-            _entityIdentityResolver = entityIdentityResolver;
             _organizationRightsService = organizationRightsService;
             _transactionManager = transactionManager;
             _authorizationContext = authorizationContext;
