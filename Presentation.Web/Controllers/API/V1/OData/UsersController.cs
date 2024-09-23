@@ -182,7 +182,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             return NotFound();
         }
 
-        [EnableQuery]
+        [EnableQuery(MaxExpansionDepth = 3)]
         [ODataRoute("GetUsersByUuid(organizationUuid={organizationUuid})")]
         public IHttpActionResult GetUsersByUuid(Guid organizationUuid)
         {
