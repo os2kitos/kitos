@@ -44,6 +44,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         }
 
         [Route("organization/{organizationUuid}")]
+        [HttpGet]
 
         private CreatedNegotiatedContentResult<UserResponseDTO> MapUserCreatedResponse(UserResponseDTO dto)
         {

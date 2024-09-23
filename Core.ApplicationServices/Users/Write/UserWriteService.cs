@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Users;
 using Core.ApplicationServices.Model.Users.Write;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
@@ -18,47 +19,74 @@ namespace Core.ApplicationServices.Users.Write
         private readonly IOrganizationRightsService _organizationRightsService;
         private readonly ITransactionManager _transactionManager;
         private readonly IAuthorizationContext _authorizationContext;
+        private readonly IOrganizationService _organizationService;
 
         public UserWriteService(IUserService userService,
             IEntityIdentityResolver entityIdentityResolver,
             IOrganizationRightsService organizationRightsService,
-            ITransactionManager transactionManager, IAuthorizationContext authorizationContext)
+            ITransactionManager transactionManager, 
+            IAuthorizationContext authorizationContext,
+            IOrganizationService organizationService)
         {
             _userService = userService;
             _entityIdentityResolver = entityIdentityResolver;
             _organizationRightsService = organizationRightsService;
             _transactionManager = transactionManager;
             _authorizationContext = authorizationContext;
+            _organizationService = organizationService;
         }
 
         public Result<User, OperationError> Create(Guid organizationUuid, CreateUserParameters parameters)
         {
-            using var transaction = _transactionManager.Begin();
+            return ValidateIfCanCreateUser(organizationUuid)
+                .Bind(organization =>
+                {
+                    using var transaction = _transactionManager.Begin();
 
-            var organizationIdResult = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
-            if (organizationIdResult.IsNone)
-            {
-                return new OperationError($"Organization with uuid {organizationUuid} was not found",
-                    OperationFailure.NotFound);
-            }
+                    var user = _userService.AddUser(parameters.User, parameters.SendMailOnCreation, organization.Id);
 
-            var organizationId = organizationIdResult.Value;
-            var user = _userService.AddUser(parameters.User, parameters.SendMailOnCreation, organizationId);
+                    var roleAssignmentError = AssignUserAdministrativeRoles(organization.Id, user.Id, parameters.Roles);
 
-            var roleAssignmentError = AssignUserAdministrativeRoles(organizationId, user.Id, parameters.Roles);
+                    if (roleAssignmentError.HasValue)
+                    {
+                        transaction.Rollback();
+                        return roleAssignmentError.Value;
+                    }
 
-            if (roleAssignmentError.HasValue)
-            {
-                transaction.Rollback();
-                return roleAssignmentError.Value;
-            }
-
-            transaction.Commit();
-            return  user;
+                    transaction.Commit();
+                    return Result<User, OperationError>.Success(user);
+                });
         }
 
-        public Result<ResourceCollectionPermissionsResult>
+        public Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(
+            Guid organizationUuid)
+        {
+            return _organizationService.GetOrganization(organizationUuid)
+                .Select(org => UserCollectionPermissionsResult.FromOrganization(org, _authorizationContext));
+        }
 
+        private Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(Organization organization)
+        {
+            return UserCollectionPermissionsResult.FromOrganization(organization, _authorizationContext);
+        }
+
+        private Result<Organization, OperationError> ValidateIfCanCreateUser(Guid organizationUuid)
+        {
+            return _organizationService.GetOrganization(organizationUuid)
+                .Bind(organization =>
+                {
+                    var permissionsResult = GetCollectionPermissions(organization);
+                    if (permissionsResult.Failed)
+                        return permissionsResult.Error;
+                    if(permissionsResult.Value.Create == false)
+                        return new OperationError(
+                            $"User is not allowed to create users for organization with uuid: {organizationUuid}",
+                            OperationFailure.Forbidden);
+
+                    return Result<Organization, OperationError>.Success(organization);
+                });
+        }
+        
         private Maybe<OperationError> AssignUserAdministrativeRoles(int organizationId, int userId,
             IEnumerable<OrganizationRole> roles)
         {

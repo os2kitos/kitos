@@ -12,6 +12,7 @@ using Xunit;
 using Core.DomainModel.Organization;
 using System.Collections.Generic;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
 
 namespace Tests.Unit.Core.ApplicationServices.Users
 {
@@ -23,6 +24,8 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         private readonly Mock<IEntityIdentityResolver> _entityIdentityResolverMock;
         private readonly Mock<IOrganizationRightsService> _organizationRightsServiceMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
+        private readonly Mock<IAuthorizationContext> _authorizationContextMock;
+        private readonly Mock<IOrganizationService> _organizationServiceMock;
 
         public UserWriteServiceTest()
         {
@@ -30,11 +33,15 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             _entityIdentityResolverMock = new Mock<IEntityIdentityResolver>();
             _organizationRightsServiceMock = new Mock<IOrganizationRightsService>();
             _transactionManagerMock = new Mock<ITransactionManager>();
+            _authorizationContextMock = new Mock<IAuthorizationContext>();
+            _organizationServiceMock = new Mock<IOrganizationService>();
 
             _sut = new UserWriteService(_userServiceMock.Object, 
                 _entityIdentityResolverMock.Object,
                 _organizationRightsServiceMock.Object, 
-                _transactionManagerMock.Object);
+                _transactionManagerMock.Object,
+                _authorizationContextMock.Object,
+                _organizationServiceMock.Object);
         }
 
         [Fact]
@@ -120,6 +127,8 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         {
             _organizationRightsServiceMock.Setup(x => x.AssignRole(organizationId, userId, role)).Returns(result);
         }
+
+        private void AssertGetOrganizationReturns
 
         private Mock<IDatabaseTransaction> ExpectTransactionBegins()
         {
