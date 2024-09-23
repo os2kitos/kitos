@@ -8,5 +8,6 @@ namespace Core.ApplicationServices.Users.Write
     public interface IUserWriteService
     {
         Result<User, OperationError> Create(Guid organizationUuid, CreateUserParameters parameters);
+        Maybe<OperationError> SendNotification(Guid organizationUuid, Guid userUuid);
     }
 }

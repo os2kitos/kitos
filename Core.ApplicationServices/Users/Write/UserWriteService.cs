@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.Abstractions.Types;
-using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Users.Write;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
@@ -33,11 +32,10 @@ namespace Core.ApplicationServices.Users.Write
         {
             using var transaction = _transactionManager.Begin();
 
-            var organizationIdResult = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
-            if (organizationIdResult.IsNone)
+            var organizationIdResult = ResolveOrganizationUuidToId(organizationUuid);
+            if (organizationIdResult.Failed)
             {
-                return new OperationError($"Organization with uuid {organizationUuid} was not found",
-                    OperationFailure.NotFound);
+                return organizationIdResult.Error;
             }
 
             var organizationId = organizationIdResult.Value;
@@ -52,7 +50,24 @@ namespace Core.ApplicationServices.Users.Write
             }
 
             transaction.Commit();
-            return  user;
+            return user;
+        }
+
+        public Maybe<OperationError> SendNotification(Guid organizationUuid, Guid userUuid)
+        {
+            var orgIdResult = ResolveOrganizationUuidToId(organizationUuid);
+            if (orgIdResult.Failed)
+            {
+                return orgIdResult.Error;
+            }
+
+            var user = _userService.GetUserInOrganization(organizationUuid, userUuid);
+            if (user.Failed)
+            {
+                return user.Error;
+            }
+            _userService.IssueAdvisMail(user.Value, false, orgIdResult.Value);
+            return Maybe<OperationError>.None;
         }
 
         private Maybe<OperationError> AssignUserAdministrativeRoles(int organizationId, int userId,
@@ -66,6 +81,19 @@ namespace Core.ApplicationServices.Users.Write
             }
 
             return Maybe<OperationError>.None;
+        }
+
+        private Result<int, OperationError> ResolveOrganizationUuidToId(Guid organizationUuid)
+        {
+            var orgIdResult
+                = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
+            if (orgIdResult.IsNone)
+            {
+                return new OperationError($"Organization with uuid {organizationUuid} was not found",
+                    OperationFailure.NotFound);
+            }
+
+            return orgIdResult.Value;
         }
     }
 }
