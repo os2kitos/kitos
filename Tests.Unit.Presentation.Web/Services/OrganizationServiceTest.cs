@@ -1138,19 +1138,19 @@ namespace Tests.Unit.Presentation.Web.Services
                 },
                 DataResponsible = new DataResponsibleUpdateParameters()
                 {
-                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
-                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
+                    Email = OptionalValueChange<string>.With(expectedDataResponsible.Email),
+                    Name = OptionalValueChange<string>.With(expectedDataResponsible.Name),
                     Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
                     Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
                     Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
                 },
                 DataProtectionAdvisor = new DataProtectionAdvisorUpdateParameters()
                 {
-                    Email = OptionalValueChange<string>.With(expectedContactPerson.Email),
-                    Name = OptionalValueChange<string>.With(expectedContactPerson.Name),
-                    Cvr = OptionalValueChange<string>.With(expectedDataResponsible.Cvr),
-                    Address = OptionalValueChange<string>.With(expectedDataResponsible.Adress),
-                    Phone = OptionalValueChange<string>.With(expectedDataResponsible.Phone)
+                    Email = OptionalValueChange<string>.With(expectedDataProtectionAdvisor.Email),
+                    Name = OptionalValueChange<string>.With(expectedDataProtectionAdvisor.Name),
+                    Cvr = OptionalValueChange<string>.With(expectedDataProtectionAdvisor.Cvr),
+                    Address = OptionalValueChange<string>.With(expectedDataProtectionAdvisor.Adress),
+                    Phone = OptionalValueChange<string>.With(expectedDataProtectionAdvisor.Phone)
                 }
             }; 
             _identityResolver.Setup(_ =>
@@ -1167,18 +1167,15 @@ namespace Tests.Unit.Presentation.Web.Services
                     _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
                 .Returns(true);
 
-            _contactPersonRepository.SetupSequence(_ =>
+            _contactPersonRepository.Setup(_ =>
                     _.AsQueryable())
-                .Returns(new List<ContactPerson>().AsQueryable())
-                .Returns(new List<ContactPerson>(){expectedContactPerson}.AsQueryable());
-            _dataResponsibleRepository.SetupSequence(_ =>
+                .Returns(new List<ContactPerson>().AsQueryable());
+            _dataResponsibleRepository.Setup(_ =>
                     _.AsQueryable())
-                .Returns(new List<DataResponsible>().AsQueryable())
-                .Returns(new List<DataResponsible>(){expectedDataResponsible}.AsQueryable());
-            _dataProtectionAdvisorRepository.SetupSequence(_ =>
+                .Returns(new List<DataResponsible>().AsQueryable());
+            _dataProtectionAdvisorRepository.Setup(_ =>
                     _.AsQueryable())
-                .Returns(new List<DataProtectionAdvisor>().AsQueryable())
-                .Returns(new List<DataProtectionAdvisor>(){expectedDataProtectionAdvisor}.AsQueryable());
+                .Returns(new List<DataProtectionAdvisor>().AsQueryable());
 
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
@@ -1187,6 +1184,8 @@ namespace Tests.Unit.Presentation.Web.Services
 
             Assert.True(result.Ok);
             _contactPersonRepository.Verify(_ => _.Insert(It.IsAny<ContactPerson>()));
+            _dataResponsibleRepository.Verify(_ => _.Insert(It.IsAny<DataResponsible>()));
+            _dataProtectionAdvisorRepository.Verify(_ => _.Insert(It.IsAny<DataProtectionAdvisor>()));
             var value = result.Value;
             AssertContactPerson(expectedContactPerson, value.ContactPerson);
             AssertDataResponsible(expectedDataResponsible, value.DataResponsible);
@@ -1271,6 +1270,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Cvr = A<string>(),
                 Adress = A<string>(),
                 OrganizationId = orgId,
+                Phone = A<string>(),
                 Id = A<int>(),
             };
             _dataProtectionAdvisorRepository.Setup(_ =>
@@ -1303,6 +1303,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Name = A<string>(),
                 Cvr = A<string>(),
                 Adress = A<string>(),
+                Phone = A<string>(),
                 OrganizationId = orgId,
                 Id = A<int>(),
             };
