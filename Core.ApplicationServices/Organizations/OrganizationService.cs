@@ -644,33 +644,18 @@ namespace Core.ApplicationServices.Organizations
                     () => CreateContactPerson(organizationId));
         }
 
-        private Result<ContactPerson, OperationError> ValidateModifyContactPerson(ContactPerson contactPerson)
-        {
-            var allowModify = _authorizationContext.AllowModify(contactPerson);
-            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
+        private Result<ContactPerson, OperationError> ValidateModifyContactPerson(ContactPerson contactPerson) =>
+            _authorizationContext.AllowModify(contactPerson) ? contactPerson : new OperationError(OperationFailure.Forbidden);
 
-            return contactPerson;
-        }
+        private Result<DataResponsible, OperationError> ValidateModifyDataResponsible(DataResponsible dataResponsible) =>
+            _authorizationContext.AllowModify(dataResponsible) ? dataResponsible : new OperationError(OperationFailure.Forbidden);
 
-        private Result<DataResponsible, OperationError> ValidateModifyDataResponsible(DataResponsible dataResponsible)
-        {
-            var allowModify = _authorizationContext.AllowModify(dataResponsible);
-            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
-
-            return dataResponsible;
-        }
-
-        private Result<DataProtectionAdvisor, OperationError> ValidateModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor)
-        {
-            var allowModify = _authorizationContext.AllowModify(dataProtectionAdvisor);
-            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
-
-            return dataProtectionAdvisor;
-        }
+        private Result<DataProtectionAdvisor, OperationError> ValidateModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor) =>
+            _authorizationContext.AllowModify(dataProtectionAdvisor) ? dataProtectionAdvisor : new OperationError(OperationFailure.Forbidden);
 
         private Result<ContactPerson, OperationError> ModifyContactPerson(ContactPerson contactPerson, Maybe<ContactPersonUpdateParameters> parametersMaybe)
         {
-            if (parametersMaybe.HasValue == false)
+            if (parametersMaybe.IsNone)
                 return contactPerson;
 
             var parameters = parametersMaybe.Value;
@@ -689,7 +674,7 @@ namespace Core.ApplicationServices.Organizations
 
         private Result<DataResponsible, OperationError> ModifyDataResponsible(DataResponsible dataResponsible, Maybe<DataResponsibleUpdateParameters> parametersMaybe)
         {
-            if (parametersMaybe.HasValue == false)
+            if (parametersMaybe.IsNone)
                 return dataResponsible;
 
             var parameters = parametersMaybe.Value;
@@ -709,7 +694,7 @@ namespace Core.ApplicationServices.Organizations
 
         private Result<DataProtectionAdvisor, OperationError> ModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor, Maybe<DataProtectionAdvisorUpdateParameters> parametersMaybe)
         {
-            if (parametersMaybe.HasValue == false)
+            if (parametersMaybe.IsNone)
                 return dataProtectionAdvisor;
 
             var parameters = parametersMaybe.Value;
