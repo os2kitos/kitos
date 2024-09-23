@@ -22,6 +22,7 @@ using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Repositories.Organization;
+using dk.nita.saml20.Schema.Metadata;
 using Infrastructure.Services.DataAccess;
 
 using Serilog;
@@ -480,13 +481,13 @@ namespace Core.ApplicationServices.Organizations
                 AuthorizeModificationAndUpsertContactPerson(orgId,
                     updateParameters.ContactPerson);
             if (modifiedContactPersonResult.Failed) return ConcludeMasterDataRolesUpdate(modifiedContactPersonResult.Error, transaction);
+            _contactPersonRepository.Save();
 
-            /*var modifiedDataResponsibleResult =
-                AuthorizeModificationAndModifyDataResponsible(orgId, updateParameters.DataResponsible);
-            var updatedDataResponsibleResult =
-                modifiedDataResponsibleResult.Bind(dr => UpsertDataResponsible(dr, orgId));
-            if (updatedDataResponsibleResult.Failed) return ConcludeMasterDataRolesUpdate(updatedDataResponsibleResult.Error, transaction);
-
+            var modifiedDataResponsibleResult =
+                AuthorizeModificationAndUpsertDataResponsible(orgId, updateParameters.DataResponsible);
+            if (modifiedDataResponsibleResult.Failed) return ConcludeMasterDataRolesUpdate(modifiedDataResponsibleResult.Error, transaction);
+            _dataResponsibleRepository.Save();
+            /*
             var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndModifyDataProtectionAdvisor(orgId,
                 updateParameters.DataProtectionAdvisor);
             var updatedDataProtectionAdvisorResult =
@@ -498,23 +499,23 @@ namespace Core.ApplicationServices.Organizations
                 OrganizationUuid = organizationUuid,
                 ContactPerson = modifiedContactPersonResult.Value,
                 DataProtectionAdvisor = new DataProtectionAdvisor(),// updatedDataProtectionAdvisorResult.Value,
-                DataResponsible = new DataResponsible()//updatedDataResponsibleResult.Value
+                DataResponsible = modifiedDataResponsibleResult.Value
             };
 
             return ConcludeMasterDataRolesUpdate(roles, transaction);
         }
 
-        private Result<DataResponsible, OperationError> UpsertDataResponsible(DataResponsible dataResponsible, int orgId)
+        private Result<DataResponsible, OperationError> UpsertDataResponsible(int orgId)
         {
-            _dataResponsibleRepository.Update(dataResponsible);
-            _domainEvents.Raise(new EntityUpdatedEvent<DataResponsible>(dataResponsible));
+            return GetDataResponsible(orgId)
+                .Match(dr => dr,
+                    () => CreateDataResponsible(orgId));
+        }
 
-            var updatedDataResponsibleMaybe = _dataResponsibleRepository.AsQueryable()
-                .FirstOrNone(cp => cp.OrganizationId.Equals(orgId));
-
-            return updatedDataResponsibleMaybe.Match<Result<DataResponsible, OperationError>>(
-                updatedDataResponsible => updatedDataResponsible,
-                () => new OperationError(OperationFailure.NotFound));
+        private Maybe<DataResponsible> GetDataResponsible(int organizationId)
+        {
+            return _dataResponsibleRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
         }
 
         private Result<DataProtectionAdvisor, OperationError> UpsertDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor, int orgId)
@@ -532,7 +533,9 @@ namespace Core.ApplicationServices.Organizations
 
         private Result<OrganizationMasterDataRoles, OperationError> ConcludeMasterDataRolesUpdate(Result<OrganizationMasterDataRoles, OperationError>  result, IDatabaseTransaction transaction)
         {
-            _dataProtectionAdvisorRepository.Save();
+            //_dataResponsibleRepository.Save();
+           // _dataProtectionAdvisorRepository.Save();
+            //_contactPersonRepository.Save();
             transaction.Commit();
             if (result.Ok)
             {
@@ -546,15 +549,16 @@ namespace Core.ApplicationServices.Organizations
             int organizationId, Maybe<ContactPersonUpdateParameters> parameters)
         {
             return UpsertContactPerson(organizationId)
-                .Bind(ValidateContactPerson)
+                .Bind(ValidateModifyContactPerson)
                 .Bind(contactPerson => ModifyContactPerson(contactPerson, parameters));
         }
 
-        private Maybe<ContactPerson> GetContactPerson(int organizationId)
+        private Result<DataResponsible, OperationError> AuthorizeModificationAndUpsertDataResponsible(
+            int organizationId, Maybe<DataResponsibleUpdateParameters> parameters)
         {
-            return _contactPersonRepository.AsQueryable()
+            var x = UpsertDataResponsible(organizationId);
+            var existingDataResponsibleMaybe = _dataResponsibleRepository.AsQueryable()
                 .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
-        }
 
         private ContactPerson CreateContactPerson(int orgId)
         {
@@ -581,20 +585,18 @@ namespace Core.ApplicationServices.Organizations
             return parameters.HasValue ? ModifyDataProtectionAdvisor(existingDataProtectionAdvisor, parameters.Value) : existingDataProtectionAdvisor;
         }
 
-        private Result<DataResponsible, OperationError> AuthorizeModificationAndModifyDataResponsible(
-            int organizationId, Maybe<DataResponsibleUpdateParameters> parameters)
+        private Maybe<ContactPerson> GetContactPerson(int organizationId)
         {
-            var existingDataResponsibleMaybe = _dataResponsibleRepository.AsQueryable()
+            return _contactPersonRepository.AsQueryable()
                 .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
+        }
 
-            var existingDataResponsible = existingDataResponsibleMaybe.HasValue
-                ? existingDataResponsibleMaybe.Value
-                : CreateDataResponsible(organizationId);
-
-            var allowModify = _authorizationContext.AllowModify(existingDataResponsible);
-            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
-
-            return parameters.HasValue ? ModifyDataResponsible(existingDataResponsible, parameters.Value) : existingDataResponsible;
+        private ContactPerson CreateContactPerson(int orgId)
+        {
+            var newContactPerson = new ContactPerson() { OrganizationId = orgId };
+            _contactPersonRepository.Insert(newContactPerson);
+            _domainEvents.Raise(new EntityCreatedEvent<ContactPerson>(newContactPerson));
+            return newContactPerson;
         }
 
         private DataProtectionAdvisor CreateDataProtectionAdvisor(int orgId)
@@ -659,7 +661,7 @@ namespace Core.ApplicationServices.Organizations
                     () => CreateContactPerson(organizationId));
         }
 
-        private Result<ContactPerson, OperationError> ValidateContactPerson(ContactPerson contactPerson)
+        private Result<ContactPerson, OperationError> ValidateModifyContactPerson(ContactPerson contactPerson)
         {
             var allowModify = _authorizationContext.AllowModify(contactPerson);
             if (!allowModify) return new OperationError(OperationFailure.Forbidden);
