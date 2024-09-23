@@ -43,6 +43,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
                 .Match(MapUserCreatedResponse, FromOperationError);
         }
 
+        [Route("organization/{organizationUuid}")]
+
         private CreatedNegotiatedContentResult<UserResponseDTO> MapUserCreatedResponse(UserResponseDTO dto)
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
