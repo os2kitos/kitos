@@ -1,6 +1,7 @@
 ﻿using Core.DomainModel.Organization;
 using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Request.User;
 using Xunit;
@@ -15,11 +16,24 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             using var response = await HttpApi.PostWithCookieAsync(
                 TestEnvironment.CreateUrl(
-                    $"api/v2/internal/users/organization/{organizationUuid}/create"), requestCookie, request);
+                    $"{ControllerPrefix()}/organization/{organizationUuid}/create"), requestCookie, request);
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<UserResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendNotification(Guid organizationUuid, Guid userUuid,
+            Cookie cookie = null)
+        {
+            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"{ControllerPrefix()}/{userUuid}/organization/{organizationUuid}/notifications/send");
+            return await HttpApi.PostWithCookieAsync(url, requestCookie, null);
+        }
+
+        private static string ControllerPrefix()
+        {
+            return "api/v2/internal/users";
         }
 
     }

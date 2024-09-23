@@ -43,6 +43,18 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
                 .Match(MapUserCreatedResponse, FromOperationError);
         }
 
+        [Route("{userUuid}/organization/{organizationUuid}/notifications/send")]
+        [HttpPost]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult SendNotification([NonEmptyGuid] Guid userUuid, [NonEmptyGuid] Guid organizationUuid)
+        {
+            return _userWriteService.SendNotification(organizationUuid, userUuid)
+                .Match(FromOperationError, Ok);
+        }
+
         private CreatedNegotiatedContentResult<UserResponseDTO> MapUserCreatedResponse(UserResponseDTO dto)
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
