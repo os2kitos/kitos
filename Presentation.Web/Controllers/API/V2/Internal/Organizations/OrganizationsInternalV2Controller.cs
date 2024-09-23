@@ -6,11 +6,6 @@ using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Response.Shared;
-using Presentation.Web.Models.API.V2.Internal.Response.Roles;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
