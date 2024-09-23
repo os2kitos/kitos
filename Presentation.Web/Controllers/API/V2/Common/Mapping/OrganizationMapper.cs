@@ -119,6 +119,19 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
             };
         }
 
+        public OrganizationMasterDataResponseDTO ToMasterDataDTO(Organization organization)
+        {
+            return new()
+            {
+                Cvr = organization.Cvr,
+                Address = organization.Adress,
+                Email = organization.Email,
+                Phone = organization.Phone,
+                Uuid = organization.Uuid,
+                Name = organization.Name
+            };
+        }
+
         private static Maybe<ContactPersonUpdateParameters> ToContactPersonUpdateParameters(ContactPersonRequestDTO dto)
         {
             return dto != null

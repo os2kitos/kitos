@@ -8,6 +8,7 @@ using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
@@ -53,6 +54,20 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             var updateParameters = _organizationMapper.ToMasterDataUpdateParameters(requestDto);
             return _organizationService.UpdateOrganizationMasterData(organizationUuid, updateParameters)
                 .Select(_organizationMapper.ToOrganizationDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        [Route("{organizationUuid}/masterData")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult GetOrganizationMasterData([FromUri] [NonEmptyGuid] Guid organizationUuid)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            return _organizationService.GetOrganizationMasterData(organizationUuid)
+                .Select(_organizationMapper.ToMasterDataDTO)
                 .Match(Ok, FromOperationError);
         }
 

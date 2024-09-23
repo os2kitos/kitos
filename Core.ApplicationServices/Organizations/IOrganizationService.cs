@@ -63,5 +63,7 @@ namespace Core.ApplicationServices.Organizations
             GetOrganizationMasterDataRoles(Guid organizationUuid);
 
         public Result<OrganizationMasterDataRoles, OperationError> UpsertOrganizationMasterDataRoles(Guid organizationUuid, OrganizationMasterDataRolesUpdateParameters updateParameters);
+        public Result<Organization, OperationError> GetOrganizationMasterData(Guid organizationUuid);
+
     }
 }

@@ -501,6 +501,11 @@ namespace Core.ApplicationServices.Organizations
             return ConcludeMasterDataRolesUpdate(roles, transaction);
         }
 
+        public Result<Organization, OperationError> GetOrganizationMasterData(Guid organizationUuid)
+        {
+            throw new NotImplementedException();
+        }
+
         private Result<DataResponsible, OperationError> UpsertDataResponsible(int orgId)
         {
             return GetDataResponsible(orgId)
