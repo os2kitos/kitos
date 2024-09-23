@@ -16,7 +16,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             using var response = await HttpApi.PostWithCookieAsync(
                 TestEnvironment.CreateUrl(
                     $"api/v2/internal/users/organization/{organizationUuid}/create"), requestCookie, request);
-            var res = await response.Content.ReadAsStringAsync();
+
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<UserResponseDTO>();

@@ -17,18 +17,16 @@ namespace Core.ApplicationServices.Users.Write
         private readonly IEntityIdentityResolver _entityIdentityResolver;
         private readonly IOrganizationRightsService _organizationRightsService;
         private readonly ITransactionManager _transactionManager;
-        private readonly IAuthorizationContext _authorizationContext;
 
         public UserWriteService(IUserService userService,
             IEntityIdentityResolver entityIdentityResolver,
             IOrganizationRightsService organizationRightsService,
-            ITransactionManager transactionManager, IAuthorizationContext authorizationContext)
+            ITransactionManager transactionManager)
         {
             _userService = userService;
             _entityIdentityResolver = entityIdentityResolver;
             _organizationRightsService = organizationRightsService;
             _transactionManager = transactionManager;
-            _authorizationContext = authorizationContext;
         }
 
         public Result<User, OperationError> Create(Guid organizationUuid, CreateUserParameters parameters)
@@ -56,8 +54,6 @@ namespace Core.ApplicationServices.Users.Write
             transaction.Commit();
             return  user;
         }
-
-        public Result<ResourceCollectionPermissionsResult>
 
         private Maybe<OperationError> AssignUserAdministrativeRoles(int organizationId, int userId,
             IEnumerable<OrganizationRole> roles)
