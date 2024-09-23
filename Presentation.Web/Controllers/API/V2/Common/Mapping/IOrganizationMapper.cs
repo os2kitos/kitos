@@ -18,6 +18,6 @@ public interface IOrganizationMapper
     OrganizationMasterDataRolesUpdateParameters ToMasterDataRolesUpdateParameters(Guid organizationUuid,
         OrganizationMasterDataRolesRequestDTO dto);
 
-    OrganizationMasterDataResponseDTO ToMasterDataDTO(Organization organization);
+    OrganizationMasterDataResponseDTO ToMasterDataDTO(OrganizationMasterData masterData);
 
 }

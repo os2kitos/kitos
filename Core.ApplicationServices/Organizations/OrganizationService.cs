@@ -501,9 +501,24 @@ namespace Core.ApplicationServices.Organizations
             return ConcludeMasterDataRolesUpdate(roles, transaction);
         }
 
-        public Result<Organization, OperationError> GetOrganizationMasterData(Guid organizationUuid)
+        public Result<OrganizationMasterData, OperationError> GetOrganizationMasterData(Guid organizationUuid)
         {
-            throw new NotImplementedException();
+            var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
+            if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+            var orgId = organizationDbIdMaybe.Value;
+
+            var organization = _orgRepository.GetByKey(orgId);
+            if (organization == null) return new OperationError(OperationFailure.NotFound);
+
+            return new OrganizationMasterData()
+            {
+                Address = organization.Adress,
+                Cvr = organization.Cvr,
+                Email = organization.Email,
+                Name = organization.Name,
+                Phone = organization.Phone,
+                Uuid = organization.Uuid
+            };
         }
 
         private Result<DataResponsible, OperationError> UpsertDataResponsible(int orgId)
