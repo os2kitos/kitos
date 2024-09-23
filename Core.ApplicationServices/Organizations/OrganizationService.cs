@@ -523,14 +523,8 @@ namespace Core.ApplicationServices.Organizations
 
         private Result<OrganizationMasterDataRoles, OperationError> ConcludeMasterDataRolesUpdate(Result<OrganizationMasterDataRoles, OperationError>  result, IDatabaseTransaction transaction)
         {
-            //_dataResponsibleRepository.Save();
-           // _dataProtectionAdvisorRepository.Save();
-            //_contactPersonRepository.Save();
-            transaction.Commit();
-            if (result.Ok)
-            {
-            }
-            //else transaction.Rollback();
+            if (result.Ok) transaction.Commit();
+            else transaction.Rollback();
 
             return result;
         }
