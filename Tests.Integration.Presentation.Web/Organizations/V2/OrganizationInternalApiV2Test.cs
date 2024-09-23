@@ -220,7 +220,6 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
             Assert.Equal(1, responseDto.DataResponsible.Id);
             Assert.Equal(1, responseDto.DataProtectionAdvisor.Id);
-
         }
 
         private (ContactPersonRequestDTO, DataResponsibleRequestDTO, DataProtectionAdvisorRequestDTO) GetRequestDtos()

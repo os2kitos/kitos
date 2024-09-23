@@ -481,18 +481,14 @@ namespace Core.ApplicationServices.Organizations
                 AuthorizeModificationAndUpsertContactPerson(orgId,
                     updateParameters.ContactPerson);
             if (modifiedContactPersonResult.Failed) return ConcludeMasterDataRolesUpdate(modifiedContactPersonResult.Error, transaction);
-            _contactPersonRepository.Save();
-            //todo de her saves kan vist godt fjernes
 
             var modifiedDataResponsibleResult =
                 AuthorizeModificationAndUpsertDataResponsible(orgId, updateParameters.DataResponsible);
             if (modifiedDataResponsibleResult.Failed) return ConcludeMasterDataRolesUpdate(modifiedDataResponsibleResult.Error, transaction);
-            _dataResponsibleRepository.Save();
 
             var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndUpsertDataProtectionAdvisor(orgId,
                 updateParameters.DataProtectionAdvisor);
              if (modifiedDataProtectionAdvisorResult.Failed) return ConcludeMasterDataRolesUpdate(modifiedDataProtectionAdvisorResult.Error, transaction);
-             _dataProtectionAdvisorRepository.Save();
 
             var roles = new OrganizationMasterDataRoles()
             {
@@ -691,7 +687,7 @@ namespace Core.ApplicationServices.Organizations
             return contactPerson;
         }
 
-        private static Result<DataResponsible, OperationError> ModifyDataResponsible(DataResponsible dataResponsible, Maybe<DataResponsibleUpdateParameters> parametersMaybe)
+        private Result<DataResponsible, OperationError> ModifyDataResponsible(DataResponsible dataResponsible, Maybe<DataResponsibleUpdateParameters> parametersMaybe)
         {
             if (parametersMaybe.HasValue == false)
                 return dataResponsible;
@@ -703,10 +699,15 @@ namespace Core.ApplicationServices.Organizations
             dataResponsible.Cvr = parameters.Cvr?.NewValue;
             dataResponsible.Adress = parameters.Address?.NewValue;
             dataResponsible.Phone = parameters.Phone?.NewValue;
+
+            _dataResponsibleRepository.Update(dataResponsible);
+            _domainEvents.Raise(new EntityUpdatedEvent<DataResponsible>(dataResponsible));
+            _dataResponsibleRepository.Save();
+
             return dataResponsible;
         }
 
-        private static Result<DataProtectionAdvisor, OperationError> ModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor, Maybe<DataProtectionAdvisorUpdateParameters> parametersMaybe)
+        private Result<DataProtectionAdvisor, OperationError> ModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor, Maybe<DataProtectionAdvisorUpdateParameters> parametersMaybe)
         {
             if (parametersMaybe.HasValue == false)
                 return dataProtectionAdvisor;
@@ -718,6 +719,11 @@ namespace Core.ApplicationServices.Organizations
             dataProtectionAdvisor.Cvr = parameters.Cvr?.NewValue;
             dataProtectionAdvisor.Adress = parameters.Address?.NewValue;
             dataProtectionAdvisor.Phone = parameters.Phone?.NewValue;
+
+            _dataProtectionAdvisorRepository.Update(dataProtectionAdvisor);
+            _domainEvents.Raise(new EntityUpdatedEvent<DataProtectionAdvisor>(dataProtectionAdvisor));
+            _dataProtectionAdvisorRepository.Save();
+
             return dataProtectionAdvisor;
         }
     }
