@@ -482,11 +482,13 @@ namespace Core.ApplicationServices.Organizations
                     updateParameters.ContactPerson);
             if (modifiedContactPersonResult.Failed) return ConcludeMasterDataRolesUpdate(modifiedContactPersonResult.Error, transaction);
             _contactPersonRepository.Save();
+            //todo de her saves kan vist godt fjernes
 
             var modifiedDataResponsibleResult =
                 AuthorizeModificationAndUpsertDataResponsible(orgId, updateParameters.DataResponsible);
             if (modifiedDataResponsibleResult.Failed) return ConcludeMasterDataRolesUpdate(modifiedDataResponsibleResult.Error, transaction);
             _dataResponsibleRepository.Save();
+
             /*
             var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndModifyDataProtectionAdvisor(orgId,
                 updateParameters.DataProtectionAdvisor);
@@ -556,17 +558,9 @@ namespace Core.ApplicationServices.Organizations
         private Result<DataResponsible, OperationError> AuthorizeModificationAndUpsertDataResponsible(
             int organizationId, Maybe<DataResponsibleUpdateParameters> parameters)
         {
-            var x = UpsertDataResponsible(organizationId);
-            var existingDataResponsibleMaybe = _dataResponsibleRepository.AsQueryable()
-                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
-
-        private ContactPerson CreateContactPerson(int orgId)
-        {
-            var newContactPerson = new ContactPerson() { OrganizationId = orgId };
-            _contactPersonRepository.Insert(newContactPerson);
-            _domainEvents.Raise(new EntityCreatedEvent<ContactPerson>(newContactPerson));
-            _contactPersonRepository.Save();
-            return newContactPerson;
+            return UpsertDataResponsible(organizationId)
+                .Bind(ValidateModifyDataResponsible)
+                .Bind(dataResponsible => ModifyDataResponsible(dataResponsible, parameters));
         }
 
         private Result<DataProtectionAdvisor, OperationError> AuthorizeModificationAndModifyDataProtectionAdvisor(
@@ -585,18 +579,19 @@ namespace Core.ApplicationServices.Organizations
             return parameters.HasValue ? ModifyDataProtectionAdvisor(existingDataProtectionAdvisor, parameters.Value) : existingDataProtectionAdvisor;
         }
 
-        private Maybe<ContactPerson> GetContactPerson(int organizationId)
-        {
-            return _contactPersonRepository.AsQueryable()
-                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
-        }
-
         private ContactPerson CreateContactPerson(int orgId)
         {
             var newContactPerson = new ContactPerson() { OrganizationId = orgId };
             _contactPersonRepository.Insert(newContactPerson);
             _domainEvents.Raise(new EntityCreatedEvent<ContactPerson>(newContactPerson));
+            _contactPersonRepository.Save();
             return newContactPerson;
+        }
+
+        private Maybe<ContactPerson> GetContactPerson(int organizationId)
+        {
+            return _contactPersonRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
         }
 
         private DataProtectionAdvisor CreateDataProtectionAdvisor(int orgId)
@@ -612,6 +607,7 @@ namespace Core.ApplicationServices.Organizations
             var newDataResponsible = new DataResponsible() { OrganizationId = orgId };
             _dataResponsibleRepository.Insert(newDataResponsible);
             _domainEvents.Raise(new EntityCreatedEvent<DataResponsible>(newDataResponsible));
+            _dataResponsibleRepository.Save();
             return newDataResponsible;
         }
 
@@ -669,6 +665,14 @@ namespace Core.ApplicationServices.Organizations
             return contactPerson;
         }
 
+        private Result<DataResponsible, OperationError> ValidateModifyDataResponsible(DataResponsible dataResponsible)
+        {
+            var allowModify = _authorizationContext.AllowModify(dataResponsible);
+            if (!allowModify) return new OperationError(OperationFailure.Forbidden);
+
+            return dataResponsible;
+        }
+
         private Result<ContactPerson, OperationError> ModifyContactPerson(ContactPerson contactPerson, Maybe<ContactPersonUpdateParameters> parametersMaybe)
         {
             if (parametersMaybe.HasValue == false)
@@ -688,8 +692,13 @@ namespace Core.ApplicationServices.Organizations
             return contactPerson;
         }
 
-        private static Result<DataResponsible, OperationError> ModifyDataResponsible(DataResponsible dataResponsible, DataResponsibleUpdateParameters parameters)
+        private static Result<DataResponsible, OperationError> ModifyDataResponsible(DataResponsible dataResponsible, Maybe<DataResponsibleUpdateParameters> parametersMaybe)
         {
+            if (parametersMaybe.HasValue == false)
+                return dataResponsible;
+
+            var parameters = parametersMaybe.Value;
+
             dataResponsible.Email = parameters.Email?.NewValue;
             dataResponsible.Name = parameters.Name?.NewValue;
             dataResponsible.Cvr = parameters.Cvr?.NewValue;
