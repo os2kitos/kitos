@@ -574,9 +574,12 @@ namespace Core.ApplicationServices.Organizations
 
         private ContactPerson CreateContactPerson(int orgId)
         {
+            using var transaction = _transactionManager.Begin();
             var newContactPerson = new ContactPerson() { OrganizationId = orgId };
             _contactPersonRepository.Insert(newContactPerson);
             _domainEvents.Raise(new EntityCreatedEvent<ContactPerson>(newContactPerson));
+            _contactPersonRepository.Save();
+            transaction.Commit();
             return newContactPerson;
         }
 
