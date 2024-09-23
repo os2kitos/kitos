@@ -504,9 +504,13 @@ namespace Core.ApplicationServices.Organizations
         public Result<OrganizationMasterData, OperationError> GetOrganizationMasterData(Guid organizationUuid)
         {
             var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
-            if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
-            var orgId = organizationDbIdMaybe.Value;
-
+            return organizationDbIdMaybe.Match(
+                GetOrganizationMasterDataById,
+                () => new OperationError(OperationFailure.BadInput)
+            );
+        }
+        private Result<OrganizationMasterData, OperationError> GetOrganizationMasterDataById(int orgId)
+        {
             var organization = _orgRepository.GetByKey(orgId);
             if (organization == null) return new OperationError(OperationFailure.NotFound);
 
