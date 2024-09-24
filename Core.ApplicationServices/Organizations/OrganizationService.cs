@@ -235,7 +235,7 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<Organization, OperationError> UpdateOrganizationMasterData(Guid organizationUuid, OrganizationMasterDataUpdateParameters parameters)
         {
-            using var transaction = _transactionManager.Begin();
+            var transaction = _transactionManager.Begin();
 
             var organizationResult = GetOrganizationAndAuthorizeModification(organizationUuid);
 
