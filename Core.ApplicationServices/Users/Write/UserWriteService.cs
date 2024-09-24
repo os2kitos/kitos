@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web.ModelBinding;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Users;
 using Core.ApplicationServices.Model.Users.Write;
 using Core.ApplicationServices.Organizations;
@@ -34,24 +36,30 @@ namespace Core.ApplicationServices.Users.Write
 
         public Result<User, OperationError> Create(Guid organizationUuid, CreateUserParameters parameters)
         {
-            return ValidateIfCanCreateUser(organizationUuid)
-                .Bind(organization =>
-                {
-                    using var transaction = _transactionManager.Begin();
+            return ValidateUserCanBeCreated(parameters)
+                .Match(
+                error => error, 
+                () => 
+                    ValidateIfCanCreateUser(organizationUuid)
+                    .Bind(organization =>
+                        {
+                            using var transaction = _transactionManager.Begin();
 
-                    var user = _userService.AddUser(parameters.User, parameters.SendMailOnCreation, organization.Id);
+                            var user = _userService.AddUser(parameters.User, parameters.SendMailOnCreation, organization.Id);
 
-                    var roleAssignmentError = AssignUserAdministrativeRoles(organization.Id, user.Id, parameters.Roles);
+                            var roleAssignmentError = AssignUserAdministrativeRoles(organization.Id, user.Id, parameters.Roles);
 
-                    if (roleAssignmentError.HasValue)
-                    {
-                        transaction.Rollback();
-                        return roleAssignmentError.Value;
-                    }
+                            if (roleAssignmentError.HasValue)
+                            {
+                                transaction.Rollback();
+                                return roleAssignmentError.Value;
+                            }
 
-                    transaction.Commit();
-                    return Result<User, OperationError>.Success(user);
-                });
+                            transaction.Commit();
+                            return Result<User, OperationError>.Success(user);
+                        }
+                    )
+                );
         }
 
         public Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(
@@ -91,6 +99,36 @@ namespace Core.ApplicationServices.Users.Write
                 var result = _organizationRightsService.AssignRole(organizationId, userId, role);
                 if (result.Failed)
                     return new OperationError($"Failed to assign role: {role}", result.Error);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        private Maybe<OperationError> ValidateUserCanBeCreated(CreateUserParameters parameters)
+        {
+            var user = parameters.User;
+            if (user.Email != null && _userService.IsEmailInUse(user.Email))
+            {
+                return new OperationError("Email is already in use.", OperationFailure.BadInput);
+            }
+
+            // user is being created as global admin
+            if (user.IsGlobalAdmin)
+            {
+                // only other global admins can create global admin users
+                if (!_authorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.GlobalAdmin)))
+                {
+                    return new OperationError("You don't have permission to create a global admin user.", OperationFailure.Forbidden);
+                }
+            }
+
+            if (user.HasStakeHolderAccess)
+            {
+                // only global admins can create stakeholder access
+                if (!_authorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))
+                {
+                    return new OperationError("You don't have permission to issue stakeholder access.", OperationFailure.Forbidden);
+                }
             }
 
             return Maybe<OperationError>.None;

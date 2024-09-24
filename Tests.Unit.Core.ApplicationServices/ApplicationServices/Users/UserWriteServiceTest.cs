@@ -12,6 +12,7 @@ using Core.DomainModel.Organization;
 using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 
 namespace Tests.Unit.Core.ApplicationServices.Users
 {
@@ -47,9 +48,12 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var createParams = SetupUserParameters();
             var orgUuid = A<Guid>();
             var orgId = A<int>();
-            var org = new Organization { Id = A<int>() };
+            var org = new Organization { Id = orgId};
             var transaction = ExpectTransactionBegins();
 
+            ExpectIsEmailInUseReturns(createParams.User.Email, false);
+            ExpectHasGlobalAdminPermissionReturns(true);
+            ExpectHasStakeHolderAccessReturns(true);
             ExpectGetOrganizationReturns(orgUuid, org);
             ExpectPermissionsReturn(org, true);
             ExpectAddUserReturns(createParams.User, createParams.SendMailOnCreation, orgId);
@@ -73,10 +77,13 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var createParams = SetupUserParameters();
             var orgUuid = A<Guid>();
             var orgId = A<int>();
-            var org = new Organization { Id = A<int>() };
+            var org = new Organization { Id = orgId };
             var transaction = ExpectTransactionBegins();
             var error = A<OperationFailure>();
 
+            ExpectIsEmailInUseReturns(createParams.User.Email, false);
+            ExpectHasGlobalAdminPermissionReturns(true);
+            ExpectHasStakeHolderAccessReturns(true);
             ExpectGetOrganizationReturns(orgUuid, org);
             ExpectPermissionsReturn(org, true);
             ExpectAddUserReturns(createParams.User, createParams.SendMailOnCreation, orgId);
@@ -104,6 +111,9 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var orgUuid = A<Guid>();
             var org = new Organization { Id = A<int>() };
 
+            ExpectIsEmailInUseReturns(createParams.User.Email, false);
+            ExpectHasGlobalAdminPermissionReturns(true);
+            ExpectHasStakeHolderAccessReturns(true);
             ExpectGetOrganizationReturns(orgUuid, org);
             ExpectPermissionsReturn(org, false);
 
@@ -113,6 +123,110 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Create_Fails_If_GetOrganization_Fails()
+        {
+            //Arrange
+            var createParams = SetupUserParameters();
+            var orgUuid = A<Guid>();
+            var error = A<OperationError>();
+
+            ExpectIsEmailInUseReturns(createParams.User.Email, false);
+            ExpectHasGlobalAdminPermissionReturns(true);
+            ExpectHasStakeHolderAccessReturns(true);
+            ExpectGetOrganizationReturns(orgUuid, error);
+
+            //Act
+            var result = _sut.Create(orgUuid, createParams);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(error.FailureType, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Create_Fails_If_User_Has_No_Stakeholder_Access()
+        {
+            //Arrange
+            var createParams = SetupUserParameters();
+            var orgUuid = A<Guid>();
+
+            ExpectIsEmailInUseReturns(createParams.User.Email, false);
+            ExpectHasGlobalAdminPermissionReturns(true);
+            ExpectHasStakeHolderAccessReturns(false);
+
+            //Act
+            var result = _sut.Create(orgUuid, createParams);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Create_Fails_If_User_Has_No_GlobalAdmin_Access()
+        {
+            //Arrange
+            var createParams = SetupUserParameters();
+            var orgUuid = A<Guid>();
+
+            ExpectIsEmailInUseReturns(createParams.User.Email, false);
+            ExpectHasGlobalAdminPermissionReturns(false);
+
+            //Act
+            var result = _sut.Create(orgUuid, createParams);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Create_Fails_If_Email_Already_Exists()
+        {
+            //Arrange
+            var createParams = SetupUserParameters();
+            var orgUuid = A<Guid>();
+
+            ExpectIsEmailInUseReturns(createParams.User.Email, true);
+
+            //Act
+            var result = _sut.Create(orgUuid, createParams);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, true)]
+        [InlineData(false, true, true)]
+        [InlineData(false, false, false)]
+        public void Can_Get_User_Permissions(bool canCreate, bool canEdit, bool canDelete)
+        {
+            //Arrange
+            var orgUuid = A<Guid>();
+            var orgId = A<int>();
+            var org = new Organization { Id = orgId };
+
+            ExpectGetOrganizationReturns(orgUuid, org);
+            ExpectCreatePermissionReturns(orgId, canCreate);
+            ExpectModifyPermissionReturns(org, canEdit);
+            ExpectDeletePermissionReturns(orgId, canDelete);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(orgUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var permissions = result.Value;
+            Assert.Equal(canCreate, permissions.Create);
+            Assert.Equal(canEdit, permissions.Edit);
+            Assert.Equal(canDelete, permissions.Delete);
         }
 
         private void ExpectAddUserReturns(User user, bool sendMailOnCreation, int orgId)
@@ -152,6 +266,27 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectDeletePermissionReturns(organization.Id, result);
         }
 
+        private void ExpectIsEmailInUseReturns(string email, bool result)
+        {
+            _userServiceMock.Setup(x => x.IsEmailInUse(email)).Returns(result);
+        }
+
+        private void ExpectHasGlobalAdminPermissionReturns(bool result)
+        {
+            _authorizationContextMock.Setup(x =>
+                x.HasPermission(
+                    It.Is<AdministerGlobalPermission>(perm => perm.Permission == GlobalPermission.GlobalAdmin)))
+                .Returns(result);
+        }
+
+        private void ExpectHasStakeHolderAccessReturns(bool result)
+        {
+            _authorizationContextMock.Setup(x =>
+                x.HasPermission(
+                    It.Is<AdministerGlobalPermission>(perm => perm.Permission == GlobalPermission.StakeHolderAccess)))
+                .Returns(result);
+        }
+
         private Mock<IDatabaseTransaction> ExpectTransactionBegins()
         {
             var transactionMock = new Mock<IDatabaseTransaction>();
@@ -181,7 +316,8 @@ namespace Tests.Unit.Core.ApplicationServices.Users
                 PhoneNumber = A<string>(),
                 DefaultUserStartPreference = "index",
                 HasApiAccess = A<bool>(),
-                HasStakeHolderAccess = A<bool>(),
+                HasStakeHolderAccess = true,
+                IsGlobalAdmin = true
             };
         }
     }
