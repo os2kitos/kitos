@@ -68,7 +68,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
-        public async Task CanPatchOrganizationMasterDataWithValues()
+        public async Task Can_Patch_Organization_Master_Data_With_Values()
         {
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
             var patchDto = new OrganizationMasterDataRequestDTO
@@ -92,7 +92,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
-        public async Task CanPatchOrganizationMasterDataWithNull()
+        public async Task Can_Patch_Organization_Master_Data_With_Null()
         {
             var patchDto = new OrganizationMasterDataRequestDTO();
 
@@ -109,7 +109,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
         
         [Fact]
-        public async Task CanGetOrganizationMasterDataRoles()
+        public async Task Can_Get_Organization_Master_Data_Roles()
         {
             var organization = await CreateTestOrganization();
             var contactPersonDto = new ContactPersonRequestDTO()
@@ -141,7 +141,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
-        public async Task CanUpsertAllOrganizationMasterDataRoles()
+        public async Task Can_Upsert_All_Organization_Master_Data_Roles()
         {
             var organization = await CreateTestOrganization();
             var (contactPersonDto, dataResponsibleDto, dataProtectionAdvisorDto) = GetRequestDtos();
@@ -176,7 +176,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         [InlineData(RoleType.ContactPerson)]
         [InlineData(RoleType.DataResponsible)]
         [InlineData(RoleType.DataProtectionAdvisor)]
-        public async Task CanUpsertSingleOrganizationMasterDataRole(RoleType roleType)
+        public async Task Can_Upsert_Single_Organization_Master_Data_Role(RoleType roleType)
         {
             var organization = await CreateTestOrganization();
             var resetRolesResponse =
@@ -221,7 +221,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
-        public async Task UpsertCanCreateOrganizationMasterDataRolesIfNull()
+        public async Task Upsert_Can_Create_Organization_Master_Data_Roles_If_Null()
         {
             var organization = await CreateTestOrganization();
             var requestDto = new OrganizationMasterDataRolesRequestDTO();

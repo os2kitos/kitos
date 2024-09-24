@@ -944,7 +944,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void CanGetMasterDataRoles()
+        public void Can_Get_Master_Data_Roles()
         {
             var org = CreateOrganization();
             var orgId = org.Id;
@@ -966,7 +966,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void GetMasterDataRolesReturnsBadInputIfInvalidUuid()
+        public void Get_Master_Data_Roles_Returns_Bad_Input_If_Invalid_Uuid()
         {
             var invalidOrganizationUuid = A<Guid>();
             _identityResolver.Setup(_ =>
@@ -981,7 +981,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void UpdateMasterDataRolesReturnsBadInputIfInvalidUuid()
+        public void Update_Master_Data_Roles_Returns_Bad_Input_If_Invalid_Uuid()
         {
             var invalidOrganizationUuid = A<Guid>();
             _identityResolver.Setup(_ =>
@@ -997,7 +997,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void UpdateMasterDataRolesReturnsForbiddenIfUnauthorizedToModifyDataResponsible()
+        public void Update_Master_Data_Roles_Returns_Forbidden_If_Unauthorized_To_Modify_Data_Responsible()
         {
             var org = CreateOrganization();
             var orgId = org.Id;
@@ -1027,7 +1027,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void UpdateMasterDataRolesReturnsForbiddenIfUnauthorizedToModifyContactPerson()
+        public void Update_Master_Data_Roles_Returns_Forbidden_If_Unauthorized_To_Modify_Contact_Person()
         {
             var org = CreateOrganization();
             var orgId = org.Id;
@@ -1057,7 +1057,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void UpdateMasterDataRolesReturnsForbiddenIfUnauthorizedToModifyDataProtectionAdvisor()
+        public void Update_Master_Data_Roles_Returns_Forbidden_If_Unauthorized_To_Modify_Data_Protection_Advisor()
         {
             var org = CreateOrganization();
             var orgId = org.Id;
@@ -1087,7 +1087,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void CanUpdateMasterDataRoles()
+        public void Can_Update_Master_Data_Roles()
         {
             var org = CreateOrganization();
             var orgId = org.Id;
@@ -1122,7 +1122,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void UpdateCreatesMasterDataRolesIfNotFound()
+        public void Update_Creates_Master_Data_Roles_If_Not_Found()
         {
             var org = CreateOrganization();
             var orgId = org.Id;
