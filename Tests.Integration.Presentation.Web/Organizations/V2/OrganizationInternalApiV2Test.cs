@@ -63,9 +63,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                 Phone = A<string>()
             };
 
-            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250);
-            var organizationToPatch = organizations.First();
-            Assert.NotNull(organizationToPatch);
+            var organizationToPatch = await GetOrganization();
 
             var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterData(organizationToPatch.Uuid, patchDto);
@@ -266,8 +264,6 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(),
                 "11223344", OrganizationTypeKeys.Kommune, AccessModifier.Local);
-            /*var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250);
-            var organization = organizations.First();*/
             Assert.NotNull(organization);
             return organization;
         }
