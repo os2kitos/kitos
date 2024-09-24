@@ -1,22 +1,34 @@
 ﻿using System;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Organizations.Write;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
 using Core.ApplicationServices.Model.Shared;
+using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 
 namespace Presentation.Web.Controllers.API.V2.Common.Mapping;
 
-public class OrganizationWriteModelMapper : IOrganizationWriteModelMapper
+public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationWriteModelMapper
 {
     public OrganizationMasterDataUpdateParameters ToMasterDataUpdateParameters(OrganizationMasterDataRequestDTO dto)
     {
+        var rule = CreateChangeRule<OrganizationMasterDataRequestDTO>(false);
+
         return new()
         {
-            Cvr = OptionalValueChange<string>.With(dto.Cvr),
-            Email = OptionalValueChange<string>.With(dto.Email),
-            Address = OptionalValueChange<string>.With(dto.Address),
-            Phone = OptionalValueChange<string>.With(dto.Phone),
+            Cvr = rule.MustUpdate(x => x.Cvr)
+                ? dto.Cvr.AsChangedValue()
+                : OptionalValueChange<string>.None,
+            Email = rule.MustUpdate(x => x.Email)
+                ? dto.Email.AsChangedValue()
+                : OptionalValueChange<string>.None,
+            Address = rule.MustUpdate(x => x.Address)
+                ? dto.Address.AsChangedValue()
+                : OptionalValueChange<string>.None,
+            Phone = rule.MustUpdate(x => x.Phone)
+                ? dto.Phone.AsChangedValue()
+                : OptionalValueChange<string>.None,
         };
     }
 
@@ -81,4 +93,8 @@ public class OrganizationWriteModelMapper : IOrganizationWriteModelMapper
                 }
                 : Maybe<DataProtectionAdvisorUpdateParameters>.None;
         }
-    }
+
+        public OrganizationWriteModelMapper(ICurrentHttpRequest currentHttpRequest) : base(currentHttpRequest)
+        {
+        }
+}
