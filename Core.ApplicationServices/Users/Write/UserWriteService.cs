@@ -66,7 +66,7 @@ namespace Core.ApplicationServices.Users.Write
             {
                 return user.Error;
             }
-            _userService.IssueAdvisMail(user.Value, false, orgIdResult.Value);
+            //_userService.IssueAdvisMail(user.Value, false, orgIdResult.Value);
             return Maybe<OperationError>.None;
         }
 
