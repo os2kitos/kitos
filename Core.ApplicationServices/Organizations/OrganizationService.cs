@@ -244,25 +244,22 @@ namespace Core.ApplicationServices.Organizations
             var modifiedOrganizationResult = ModifyOrganization(organizationResult.Value, parameters);
 
             return modifiedOrganizationResult.Match(
-                organization =>
-                {
-                    _repository.Update(organization);
-                    _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
-                    transaction.Commit();
-
-                    var updatedOrganizationResult = _repository.GetByUuid(organizationUuid);
-                    return updatedOrganizationResult.Match<Result<Organization, OperationError>>(
-                        updatedOrganization => updatedOrganization,
-                        () => new OperationError(OperationFailure.NotFound)
-                    );
-                },
+                organization => UpdateOrganizationMasterDataHelper(organization, transaction),
                 error =>
                 {
                     transaction.Rollback();
                     return error;
                 }
             );
+        }
 
+        private Result<Organization, OperationError> UpdateOrganizationMasterDataHelper(Organization organization,
+            IDatabaseTransaction transaction)
+        {
+            _repository.Update(organization);
+            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
+            transaction.Commit();
+            return Result<Organization, OperationError>.Success(organization);
         }
 
         public IQueryable<Organization> SearchAccessibleOrganizations(bool onlyWithMembershipAccess, params IDomainQuery<Organization>[] conditions)
