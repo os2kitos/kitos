@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
+using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Tests.Integration.Presentation.Web.Tools;
@@ -71,7 +72,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
-            var responseDto = JsonConvert.DeserializeObject<OrganizationResponseDTO>(content);
+            var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataResponseDTO>(content);
             Assert.Equal(patchDto.Cvr, responseDto.Cvr);
             Assert.Equal(organizationToPatch.Uuid, responseDto.Uuid);
         }
@@ -88,7 +89,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
-            var responseDto = JsonConvert.DeserializeObject<OrganizationResponseDTO>(content);
+            var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataResponseDTO>(content);
             Assert.Equal(patchDto.Cvr, responseDto.Cvr);
             Assert.Equal(organizationToPatch.Uuid, responseDto.Uuid);
         }

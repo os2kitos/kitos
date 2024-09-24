@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 
         [HttpPatch]
         [Route("{organizationUuid}/masterData")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -87,7 +87,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         
         [HttpPatch]
         [Route("{organizationUuid}/masterData/roles")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataRolesResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
