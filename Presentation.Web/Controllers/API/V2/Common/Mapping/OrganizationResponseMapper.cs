@@ -39,6 +39,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
                 DataProtectionAdvisor = dataProtectionAdvisor
             };
         }
+        
 
         private static ContactPersonResponseDTO ToContactPersonDTO(ContactPerson contactPerson)
         {
