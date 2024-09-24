@@ -103,8 +103,11 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             transaction.Verify(x => x.Rollback(), Times.Once);
         }
 
-        [Fact]
-        public void Create_Fails_If_No_Create_Permission()
+        [Theory]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, true)]
+        [InlineData(false, true, true)]
+        public void Create_Returns_Forbidden_If_Permission_Is_Missing(bool accessPermissions, bool globalAdminPermission, bool stakeHolderPermission)
         {
             //Arrange
             var createParams = SetupUserParameters();
@@ -112,10 +115,10 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var org = new Organization { Id = A<int>() };
 
             ExpectIsEmailInUseReturns(createParams.User.Email, false);
-            ExpectHasGlobalAdminPermissionReturns(true);
-            ExpectHasStakeHolderAccessReturns(true);
+            ExpectHasGlobalAdminPermissionReturns(globalAdminPermission);
+            ExpectHasStakeHolderAccessReturns(stakeHolderPermission);
             ExpectGetOrganizationReturns(orgUuid, org);
-            ExpectPermissionsReturn(org, false);
+            ExpectPermissionsReturn(org, accessPermissions);
 
             //Act
             var result = _sut.Create(orgUuid, createParams);
@@ -144,43 +147,6 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(error.FailureType, result.Error.FailureType);
-        }
-
-        [Fact]
-        public void Create_Fails_If_User_Has_No_Stakeholder_Access()
-        {
-            //Arrange
-            var createParams = SetupUserParameters();
-            var orgUuid = A<Guid>();
-
-            ExpectIsEmailInUseReturns(createParams.User.Email, false);
-            ExpectHasGlobalAdminPermissionReturns(true);
-            ExpectHasStakeHolderAccessReturns(false);
-
-            //Act
-            var result = _sut.Create(orgUuid, createParams);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-        }
-
-        [Fact]
-        public void Create_Fails_If_User_Has_No_GlobalAdmin_Access()
-        {
-            //Arrange
-            var createParams = SetupUserParameters();
-            var orgUuid = A<Guid>();
-
-            ExpectIsEmailInUseReturns(createParams.User.Email, false);
-            ExpectHasGlobalAdminPermissionReturns(false);
-
-            //Act
-            var result = _sut.Create(orgUuid, createParams);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]
