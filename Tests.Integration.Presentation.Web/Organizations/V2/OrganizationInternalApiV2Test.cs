@@ -52,6 +52,22 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
+        public async Task Can_Get_Master_Data()
+        {
+            var organization = await CreateTestOrganization();
+
+            var response =
+                await OrganizationInternalV2Helper.GetOrganizationMasterData(organization.Uuid);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var content = await response.Content.ReadAsStringAsync();
+            var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataResponseDTO>(content);
+            Assert.Equal(organization.Uuid, responseDto.Uuid);
+            Assert.Equal(organization.Cvr, responseDto.Cvr);
+            Assert.Equal(organization.Phone, responseDto.Phone);
+        }
+
+        [Fact]
         public async Task CanPatchOrganizationMasterDataWithValues()
         {
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
@@ -63,7 +79,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                 Phone = A<string>()
             };
 
-            var organizationToPatch = await GetOrganization();
+            var organizationToPatch = await CreateTestOrganization();
 
             var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterData(organizationToPatch.Uuid, patchDto);
@@ -80,7 +96,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var patchDto = new OrganizationMasterDataRequestDTO();
 
-            var organizationToPatch = await GetOrganization();
+            var organizationToPatch = await CreateTestOrganization();
 
             var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterData(organizationToPatch.Uuid, patchDto);
@@ -95,7 +111,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         [Fact]
         public async Task CanGetOrganizationMasterDataRoles()
         {
-            var organization = await GetOrganization();
+            var organization = await CreateTestOrganization();
             var contactPersonDto = new ContactPersonRequestDTO()
             {
                 Email = A<string>(),
@@ -127,7 +143,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         [Fact]
         public async Task CanUpsertAllOrganizationMasterDataRoles()
         {
-            var organization = await GetOrganization();
+            var organization = await CreateTestOrganization();
             var (contactPersonDto, dataResponsibleDto, dataProtectionAdvisorDto) = GetRequestDtos();
 
             var requestDto = new OrganizationMasterDataRolesRequestDTO()
@@ -162,7 +178,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         [InlineData(RoleType.DataProtectionAdvisor)]
         public async Task CanUpsertSingleOrganizationMasterDataRole(RoleType roleType)
         {
-            var organization = await GetOrganization();
+            var organization = await CreateTestOrganization();
             var resetRolesResponse =
                  await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, 
                      new OrganizationMasterDataRolesRequestDTO());
@@ -207,7 +223,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         [Fact]
         public async Task UpsertCanCreateOrganizationMasterDataRolesIfNull()
         {
-            var organization = await GetOrganization();
+            var organization = await CreateTestOrganization();
             var requestDto = new OrganizationMasterDataRolesRequestDTO();
 
             var response =
@@ -260,7 +276,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             return (contactPersonDto, dataResponsibleDto, dataProtectionAdvisorDto);
         }
 
-        private async Task<OrganizationDTO> GetOrganization()
+        private async Task<OrganizationDTO> CreateTestOrganization()
         {
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(),
                 "11223344", OrganizationTypeKeys.Kommune, AccessModifier.Local);
