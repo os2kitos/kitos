@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Security.Cryptography;
 using AutoFixture;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -1192,55 +1190,6 @@ namespace Tests.Unit.Presentation.Web.Services
             AssertContactPerson(expectedContactPerson, value.ContactPerson);
             AssertDataResponsible(expectedDataResponsible, value.DataResponsible);
             AssertDataProtectionAdvisor(expectedDataProtectionAdvisor, value.DataProtectionAdvisor);
-        }
-
-        [Fact]
-        public void Can_Get_Master_Data()
-        {
-            var organization = CreateOrganization();
-            organization.Cvr = GetCvr();
-            organization.Adress = A<string>();
-            organization.Email = A<string>();
-            organization.Phone = A<string>();
-            _organizationRepository.Setup(_ => _.GetByKey(organization.Id))
-             .Returns(organization);
-            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(organization.Uuid))
-                .Returns(organization.Id);
-
-            var result = _sut.GetOrganizationMasterData(organization.Uuid);
-
-            Assert.True(result.Ok);
-            var masterData = result.Value;
-            Assert.Equal(organization.Cvr, masterData.Cvr);
-            Assert.Equal(organization.Adress, masterData.Address);
-            Assert.Equal(organization.Email, masterData.Email);
-            Assert.Equal(organization.Phone, masterData.Phone);
-        }
-
-        [Fact]
-        public void Get_Master_Data_Returns_Not_Found_If_No_Organization()
-        {
-            var organization = CreateOrganization();
-            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(organization.Uuid))
-                .Returns(organization.Id);
-
-            var result = _sut.GetOrganizationMasterData(organization.Uuid);
-
-            Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.NotFound, result.Error);
-        }
-
-        [Fact]
-        public void Get_Master_Data_Returns_Bad_Input_If_Invalid_Uuid()
-        {
-            var organization = CreateOrganization();
-            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(organization.Uuid))
-                .Returns(Maybe<int>.None);
-
-            var result = _sut.GetOrganizationMasterData(organization.Uuid);
-
-            Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.BadInput, result.Error);
         }
 
         private OrganizationMasterDataRolesUpdateParameters SetupUpdateMasterDataRoles(int orgId,

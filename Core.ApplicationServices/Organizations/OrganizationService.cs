@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Security.Cryptography;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -11,7 +8,6 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Model.Organizations.Write;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
-using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
@@ -22,7 +18,6 @@ using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Repositories.Organization;
-using dk.nita.saml20.Schema.Metadata;
 using Infrastructure.Services.DataAccess;
 
 using Serilog;
@@ -499,30 +494,6 @@ namespace Core.ApplicationServices.Organizations
             };
 
             return ConcludeMasterDataRolesUpdate(roles, transaction);
-        }
-
-        public Result<OrganizationMasterData, OperationError> GetOrganizationMasterData(Guid organizationUuid)
-        {
-            var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
-            return organizationDbIdMaybe.Match(
-                GetOrganizationMasterDataById,
-                () => new OperationError(OperationFailure.BadInput)
-            );
-        }
-        private Result<OrganizationMasterData, OperationError> GetOrganizationMasterDataById(int orgId)
-        {
-            var organization = _orgRepository.GetByKey(orgId);
-            if (organization == null) return new OperationError(OperationFailure.NotFound);
-
-            return new OrganizationMasterData()
-            {
-                Address = organization.Adress,
-                Cvr = organization.Cvr,
-                Email = organization.Email,
-                Name = organization.Name,
-                Phone = organization.Phone,
-                Uuid = organization.Uuid
-            };
         }
 
         private Result<DataResponsible, OperationError> UpsertDataResponsible(int orgId)

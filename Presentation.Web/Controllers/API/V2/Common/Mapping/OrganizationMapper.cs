@@ -119,16 +119,16 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
             };
         }
 
-        public OrganizationMasterDataResponseDTO ToMasterDataDTO(OrganizationMasterData masterData)
+        public OrganizationMasterDataResponseDTO ToMasterDataDTO(Organization organization)
         {
             return new()
             {
-                Cvr = masterData.Cvr,
-                Address = masterData.Address,
-                Email = masterData.Email,
-                Phone = masterData.Phone,
-                Uuid = masterData.Uuid,
-                Name = masterData.Name
+                Cvr = organization.Cvr,
+                Address = organization.Adress,
+                Email = organization.Email,
+                Phone = organization.Phone,
+                Uuid = organization.Uuid,
+                Name = organization.Name
             };
         }
 
