@@ -130,9 +130,11 @@ using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
 using Core.ApplicationServices.Generic;
 using Core.ApplicationServices.Organizations.Write;
+using Core.ApplicationServices.Users.Write;
 using Infrastructure.STS.OrganizationSystem.DomainServices;
 using Kombit.InfrastructureSamples.Token;
 using Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping;
+using Presentation.Web.Controllers.API.V2.Internal.Users.Mapping;
 
 namespace Presentation.Web.Ninject
 {
@@ -212,6 +214,7 @@ namespace Presentation.Web.Ninject
                 .WithConstructorArgument("mailSuffix", Settings.Default.MailSuffix)
                 .WithConstructorArgument("defaultUserPassword", Settings.Default.DefaultUserPassword)
                 .WithConstructorArgument("useDefaultUserPassword", bool.Parse(Settings.Default.UseDefaultPassword));
+            kernel.Bind<IUserWriteService>().To<UserWriteService>().InCommandScope(Mode);
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationRoleService>().To<OrganizationRoleService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationRightsService>().To<OrganizationRightsService>().InCommandScope(Mode);
@@ -366,6 +369,10 @@ namespace Presentation.Web.Ninject
             //Organization unit
             kernel.Bind<IOrganizationUnitWriteModelMapper>().To<OrganizationUnitWriteModelMapper>().InCommandScope(Mode);
             kernel.Bind<IOrganizationUnitResponseModelMapper>().To<OrganizationUnitResponseModelMapper>().InCommandScope(Mode);
+
+            //User
+            kernel.Bind<IUserWriteModelMapper>().To<UserWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IUserResponseModelMapper>().To<UserResponseModelMapper>().InCommandScope(Mode);
 
         }
 
