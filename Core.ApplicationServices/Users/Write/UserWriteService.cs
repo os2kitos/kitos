@@ -9,6 +9,7 @@ using Core.ApplicationServices.Model.Users.Write;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Users.Write
@@ -20,18 +21,21 @@ namespace Core.ApplicationServices.Users.Write
         private readonly ITransactionManager _transactionManager;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationService _organizationService;
+        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
         public UserWriteService(IUserService userService,
             IOrganizationRightsService organizationRightsService,
             ITransactionManager transactionManager, 
             IAuthorizationContext authorizationContext,
-            IOrganizationService organizationService)
+            IOrganizationService organizationService,
+            IEntityIdentityResolver entityIdentityResolver)
         {
             _userService = userService;
             _organizationRightsService = organizationRightsService;
             _transactionManager = transactionManager;
             _authorizationContext = authorizationContext;
             _organizationService = organizationService;
+            _entityIdentityResolver = entityIdentityResolver;
         }
 
         public Result<User, OperationError> Create(Guid organizationUuid, CreateUserParameters parameters)
@@ -133,6 +137,7 @@ namespace Core.ApplicationServices.Users.Write
             }
 
             return orgIdResult.Value;
+        }
 
         private Maybe<OperationError> ValidateUserCanBeCreated(CreateUserParameters parameters)
         {

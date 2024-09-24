@@ -45,7 +45,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
                 .Match(MapUserCreatedResponse, FromOperationError);
         }
 
-        [Route("{userUuid}/organization/{organizationUuid}/notifications/send")]
+        [Route("{userUuid}/notifications/send")]
         [HttpPost]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -55,6 +55,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         {
             return _userWriteService.SendNotification(organizationUuid, userUuid)
                 .Match(FromOperationError, Ok);
+        }
 
         [Route("permissions")]
         [HttpGet]

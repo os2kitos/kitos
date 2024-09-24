@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.DomainServices.Generic;
 
 namespace Tests.Unit.Core.ApplicationServices.Users
 {
@@ -25,6 +26,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
+        private readonly Mock<IEntityIdentityResolver> _entityIdentityResolverMock;
 
         public UserWriteServiceTest()
         {
@@ -33,13 +35,15 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             _transactionManagerMock = new Mock<ITransactionManager>();
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _organizationServiceMock = new Mock<IOrganizationService>();
+            _entityIdentityResolverMock = new Mock<IEntityIdentityResolver>();
 
 
             _sut = new UserWriteService(_userServiceMock.Object, 
                 _organizationRightsServiceMock.Object, 
                 _transactionManagerMock.Object,
                 _authorizationContextMock.Object,
-                _organizationServiceMock.Object);
+                _organizationServiceMock.Object,
+                _entityIdentityResolverMock.Object);
         }
 
         [Fact]
@@ -151,7 +155,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         }
 
 
-//[Fact]
+        [Fact]
         public void Can_Send_Notification()
         {
             //Arrange
@@ -160,7 +164,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var userUuid = A<Guid>();
             var user = SetupUser();
             user.Uuid = userUuid;
-            AssertResolveIdReturns(orgUuid, Maybe<int>.Some(orgId));
+            ExpectResolveIdReturns(orgUuid, Maybe<int>.Some(orgId));
             ExpectGetUserInOrganizationReturns(orgUuid, userUuid, user);
             //Act
             var result = _sut.SendNotification(orgUuid, userUuid);
@@ -169,12 +173,16 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             Assert.True(result.IsNone);
         }
 
+        private void ExpectResolveIdReturns(Guid orgUuid, Maybe<int> result)
+        {
+            _entityIdentityResolverMock.Setup(x => x.ResolveDbId<Organization>(orgUuid)).Returns(result);
+        }
+
         private void ExpectGetUserInOrganizationReturns(Guid organizationUuid, Guid userUuid, Result<User, OperationError> result)
         {
             _userServiceMock.Setup(x => x.GetUserInOrganization(organizationUuid, userUuid)).Returns(result);
         }
 
-        private void AssertAddUserReturns(User user, bool sendMailOnCreation, int orgId)
 
         [Fact]
         public void Create_Fails_If_Email_Already_Exists()
