@@ -25,7 +25,6 @@ using Presentation.Web.Models.API.V2.Types.Organization;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Serilog;
 using Swashbuckle.Swagger.Annotations;
-using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
 
 namespace Presentation.Web.Controllers.API.V2.External.Organizations
 {
@@ -36,20 +35,20 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         private readonly IOrganizationService _organizationService;
         private readonly IUserService _userService;
         private readonly ILogger _logger;
-        private readonly IOrganizationMapper _organizationMapper;
+        private readonly IOrganizationResponseMapper _organizationResponseMapper;
 
         public OrganizationV2Controller(
             IRightsHolderSystemService rightsHolderSystemService,
             IOrganizationService organizationService,
             IUserService userService,
             ILogger logger, 
-            IOrganizationMapper organizationMapper)
+            IOrganizationResponseMapper organizationResponseMapper)
         {
             _rightsHolderSystemService = rightsHolderSystemService;
             _organizationService = organizationService;
             _userService = userService;
             _logger = logger;
-            _organizationMapper = organizationMapper;
+            _organizationResponseMapper = organizationResponseMapper;
         }
 
         /// <summary>
@@ -98,7 +97,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
                 .OrderApiResults(orderByProperty)
                 .Page(pagination)
                 .ToList()
-                .Select(_organizationMapper.ToOrganizationDTO)
+                .Select(_organizationResponseMapper.ToOrganizationDTO)
                 .Transform(Ok);
         }
 
@@ -121,7 +120,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
 
             return _organizationService
                 .GetOrganization(organizationUuid, null)
-                .Select(_organizationMapper.ToOrganizationDTO)
+                .Select(_organizationResponseMapper.ToOrganizationDTO)
                 .Match(Ok, FromOperationError);
         }
 

@@ -9,6 +9,7 @@ using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
@@ -20,13 +21,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
     {
         private readonly IOrganizationService _organizationService;
         private readonly IResourcePermissionsResponseMapper _permissionsResponseMapper;
-        private readonly IOrganizationMapper _organizationMapper;
+        private readonly IOrganizationResponseMapper _organizationResponseMapper;
+        private readonly IOrganizationWriteModelMapper _organizationWriteModelMapper;
 
-        public OrganizationsInternalV2Controller(IOrganizationService organizationService, IResourcePermissionsResponseMapper permissionsResponseMapper, IOrganizationMapper organizationMapper)
+        public OrganizationsInternalV2Controller(IOrganizationService organizationService, IResourcePermissionsResponseMapper permissionsResponseMapper, IOrganizationResponseMapper organizationResponseMapper, IOrganizationWriteModelMapper organizationWriteModelMapper)
         {
             _organizationService = organizationService;
             _permissionsResponseMapper = permissionsResponseMapper;
-            _organizationMapper = organizationMapper;
+            _organizationResponseMapper = organizationResponseMapper;
+            _organizationWriteModelMapper = organizationWriteModelMapper;
         }
 
         [Route("permissions")]
@@ -51,9 +54,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         {
             if (!ModelState.IsValid) return BadRequest();
             
-            var updateParameters = _organizationMapper.ToMasterDataUpdateParameters(requestDto);
+            var updateParameters = _organizationWriteModelMapper.ToMasterDataUpdateParameters(requestDto);
             return _organizationService.UpdateOrganizationMasterData(organizationUuid, updateParameters)
-                .Select(_organizationMapper.ToOrganizationDTO)
+                .Select(_organizationResponseMapper.ToOrganizationDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -67,7 +70,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             if (!ModelState.IsValid) return BadRequest();
 
             return _organizationService.GetOrganization(organizationUuid)
-                .Select(_organizationMapper.ToMasterDataDTO)
+                .Select(_organizationResponseMapper.ToMasterDataDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -81,7 +84,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             if (!ModelState.IsValid) return BadRequest();
 
             return _organizationService.GetOrganizationMasterDataRoles(organizationUuid)
-                .Select(_organizationMapper.ToRolesDTO)
+                .Select(_organizationResponseMapper.ToRolesDTO)
                 .Match(Ok, FromOperationError);
         }
         
@@ -95,9 +98,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var updateParameters = _organizationMapper.ToMasterDataRolesUpdateParameters(organizationUuid, requestDto);
+            var updateParameters = _organizationWriteModelMapper.ToMasterDataRolesUpdateParameters(organizationUuid, requestDto);
             return _organizationService.UpsertOrganizationMasterDataRoles(organizationUuid, updateParameters)
-                .Select(_organizationMapper.ToRolesDTO)
+                .Select(_organizationResponseMapper.ToRolesDTO)
                 .Match(Ok, FromOperationError);
         }
     }

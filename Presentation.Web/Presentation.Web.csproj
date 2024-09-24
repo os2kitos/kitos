@@ -355,8 +355,10 @@
   <ItemGroup>
     <Compile Include="Controllers\API\V1\Auth\AuthorizeController.cs" />
     <Compile Include="Controllers\API\V1\ExtendedApiController.cs" />
-    <Compile Include="Controllers\API\V2\Common\Mapping\IOrganizationMapper.cs" />
-    <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationMapper.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\IOrganizationResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\IOrganizationWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\OrganizationUnits\OrganizationUnitRoleTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\GridLocalItContractRolesV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemV2QueryHandler.cs" />
@@ -1875,7 +1877,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\API\V2\Request\Organization\" />
-    <Folder Include="Controllers\API\V2\Internal\Users\" />
     <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
   <ItemGroup>
