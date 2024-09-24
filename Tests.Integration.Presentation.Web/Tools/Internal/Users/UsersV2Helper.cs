@@ -16,7 +16,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             using var response = await HttpApi.PostWithCookieAsync(
                 TestEnvironment.CreateUrl(
-                    $"{ControllerPrefix()}/organization/{organizationUuid}/create"), requestCookie, request);
+                    $"api/v2/internal/organization/{organizationUuid}/users/create"), requestCookie, request);
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
@@ -34,6 +34,17 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
         private static string ControllerPrefix()
         {
             return "api/v2/internal/users";
+
+        public static async Task<UserCollectionPermissionsResponseDTO> GetUserCollectionPermissions(Guid organizationUuid, Cookie cookie = null)
+        {
+            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(
+                TestEnvironment.CreateUrl(
+                    $"api/v2/internal/organization/{organizationUuid}/users/permissions"), requestCookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<UserCollectionPermissionsResponseDTO>();
         }
 
     }

@@ -235,6 +235,7 @@
     <Compile Include="Model\UiCustomization\CustomUINodeParameters.cs" />
     <Compile Include="Model\UiCustomization\UIModuleCustomizationParameters.cs" />
     <Compile Include="Model\Users\UserAdministrationPermissions.cs" />
+    <Compile Include="Model\Users\UserCollectionPermissionsResult.cs" />
     <Compile Include="Model\Users\UserRightsAssignments.cs" />
     <Compile Include="Model\Users\UserRightsChangeParameters.cs" />
     <Compile Include="Model\Users\Write\CreateUserParameters.cs" />
