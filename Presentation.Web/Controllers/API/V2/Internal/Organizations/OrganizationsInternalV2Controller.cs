@@ -15,7 +15,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
     /// <summary>
     /// Internal API for the organizations in KITOS
     /// </summary>
-    [RoutePrefix("api/v2/internal/organizations")]
+    [RoutePrefix("api/v2/internal/organizations/{organizationUuid}")]
     public class OrganizationsInternalV2Controller : InternalApiV2Controller
     {
         private readonly IOrganizationService _organizationService;
@@ -29,7 +29,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             _organizationMapper = organizationMapper;
         }
 
-        [Route("{organizationUuid}/permissions")]
+        [Route("permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -42,7 +42,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [HttpPatch]
-        [Route("{organizationUuid}/masterData")]
+        [Route("masterData")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -57,7 +57,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 .Match(Ok, FromOperationError);
         }
 
-        [Route("{organizationUuid}/masterData")]
+        [Route("masterData")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -71,7 +71,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 .Match(Ok, FromOperationError);
         }
 
-        [Route("{organizationUuid}/masterData/roles")]
+        [Route("masterData/roles")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataRolesResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -86,7 +86,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
         
         [HttpPatch]
-        [Route("{organizationUuid}/masterData/roles")]
+        [Route("masterData/roles")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataRolesResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
