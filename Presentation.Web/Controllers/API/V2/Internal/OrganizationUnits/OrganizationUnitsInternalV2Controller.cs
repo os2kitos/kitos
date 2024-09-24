@@ -30,7 +30,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 
         public OrganizationUnitsInternalV2Controller(IOrganizationUnitWriteService organizationUnitWriteService,
             IOrganizationUnitWriteModelMapper organizationUnitWriteModelMapper,
-            IOrganizationUnitService organizationUnitService, IOrganizationUnitResponseModelMapper responseMapper)
+            IOrganizationUnitService organizationUnitService, 
+            IOrganizationUnitResponseModelMapper responseMapper)
         {
             _organizationUnitWriteService = organizationUnitWriteService;
             _organizationUnitWriteModelMapper = organizationUnitWriteModelMapper;

@@ -245,6 +245,7 @@
     <Compile Include="Model\Users\UserAdministrationPermissions.cs" />
     <Compile Include="Model\Users\UserRightsAssignments.cs" />
     <Compile Include="Model\Users\UserRightsChangeParameters.cs" />
+    <Compile Include="Model\Users\Write\CreateUserParameters.cs" />
     <Compile Include="Notification\GlobalAdminNotificationService.cs" />
     <Compile Include="Notification\IGlobalAdminNotificationService.cs" />
     <Compile Include="Notification\INotificationService.cs" />
@@ -370,6 +371,8 @@
     <Compile Include="UIConfiguration\UIModuleCustomizationService.cs" />
     <Compile Include="UserService.cs" />
     <Compile Include="Users\Handlers\RemoveUserFromOrganizationCommandHandler.cs" />
+    <Compile Include="Users\Write\IUserWriteService.cs" />
+    <Compile Include="Users\Write\UserWriteService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
