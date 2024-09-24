@@ -4,7 +4,6 @@ using Core.DomainModel.Organization;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
-using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
 using ContactPerson = Core.DomainModel.ContactPerson;
 using Organization = Core.DomainModel.Organization.Organization;
 

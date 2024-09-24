@@ -70,7 +70,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Name = A<string>(),
                 Phone = A<string>()
             };
-            var orgUuid = A<Guid>();
             var roles = new OrganizationMasterDataRoles()
             {
                 ContactPerson = contactPerson,
@@ -86,6 +85,28 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertContactPerson(contactPerson, cp);
             AssertDataResponsible(dataResponsible, dr);
             AssertDataProtectionAdvisor(dataProtectionAdvisor, dpa);
+        }
+
+        [Fact]
+        public void Can_Map_To_Master_Data_Dto()
+        {
+            var organization = new Organization()
+            {
+                Uuid = A<Guid>(),
+                Name = A<string>(),
+                Cvr = GetCvr(),
+                Email = A<string>(),
+                Phone = A<string>(),
+                Adress = A<string>()
+            };
+            
+            var dto = _sut.ToMasterDataDTO(organization);
+
+            Assert.Equal(organization.Uuid, dto.Uuid);
+            Assert.Equal(organization.Name, dto.Name);
+            Assert.Equal(organization.Cvr, dto.Cvr);
+            Assert.Equal(organization.Email, dto.Email);
+            Assert.Equal(organization.Adress, dto.Address);
         }
 
         private void AssertContactPerson(ContactPerson expected, ContactPersonResponseDTO actual)
