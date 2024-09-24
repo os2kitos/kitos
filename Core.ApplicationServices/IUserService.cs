@@ -28,5 +28,6 @@ namespace Core.ApplicationServices
         Maybe<OperationError> DeleteUser(Guid userUuid, int? scopedToOrganizationId = null);
         Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries);
         Result<UserAdministrationPermissions, OperationError> GetAdministrativePermissions(Guid organizationUuid);
+        bool IsEmailInUse(string email);
     }
 }

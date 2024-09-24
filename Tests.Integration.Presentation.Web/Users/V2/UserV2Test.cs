@@ -45,6 +45,21 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
+        [Fact]
+        public async Task Can_Get_User_Collection_Permissions()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+
+            //Act
+            var response = await UsersV2Helper.GetUserCollectionPermissions(organization.Uuid);
+
+            //Assert
+            Assert.True(response.Create);
+            Assert.True(response.Modify);
+            Assert.True(response.Delete);
+        }
+
         private void AssertUserEqualsRequest(CreateUserRequestDTO request, UserResponseDTO response)
         {
             Assert.Equal(request.Email, response.Email);
