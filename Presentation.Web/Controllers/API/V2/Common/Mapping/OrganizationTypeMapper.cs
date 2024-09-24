@@ -4,7 +4,7 @@ using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.Organ
 
 namespace Presentation.Web.Controllers.API.V2.Common.Mapping;
 
-class OrganizationTypeMapper : IOrganizationTypeMapper
+public class OrganizationTypeMapper : IOrganizationTypeMapper
 {
     public OrganizationType MapOrganizationType(Core.DomainModel.Organization.OrganizationType type)
     {
