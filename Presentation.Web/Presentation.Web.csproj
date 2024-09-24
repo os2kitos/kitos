@@ -1862,6 +1862,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\API\V2\Request\Organization\" />
+    <Folder Include="Controllers\API\V2\Internal\Users\" />
     <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
   <ItemGroup>
