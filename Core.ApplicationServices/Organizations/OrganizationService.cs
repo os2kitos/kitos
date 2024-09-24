@@ -445,14 +445,11 @@ namespace Core.ApplicationServices.Organizations
             if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
             var orgId = organizationDbIdMaybe.Value;
 
-            var contactPersonMaybe = _contactPersonRepository.AsQueryable()
-                .FirstOrNone(cp => cp.OrganizationId.Equals(orgId));
-            
-            var dataResponsibleMaybe = _dataResponsibleRepository.AsQueryable()
-                .FirstOrNone(dr => dr.OrganizationId.Equals(orgId));
+            var contactPersonMaybe = GetContactPerson(orgId);
 
-            var dataProtectionAdvisorMaybe = _dataProtectionAdvisorRepository.AsQueryable()
-                .FirstOrNone(dpa => dpa.OrganizationId.Equals(orgId));
+            var dataResponsibleMaybe = GetDataResponsible(orgId);
+
+            var dataProtectionAdvisorMaybe = GetDataProtectionAdvisor(orgId);
 
             return new OrganizationMasterDataRoles
             {
