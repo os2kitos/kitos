@@ -356,8 +356,10 @@
     <Compile Include="Controllers\API\V1\Auth\AuthorizeController.cs" />
     <Compile Include="Controllers\API\V1\ExtendedApiController.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\IOrganizationResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\IOrganizationTypeMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\IOrganizationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationTypeMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\OrganizationUnits\OrganizationUnitRoleTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\GridLocalItContractRolesV2Controller.cs" />

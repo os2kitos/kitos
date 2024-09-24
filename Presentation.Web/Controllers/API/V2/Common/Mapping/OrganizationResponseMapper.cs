@@ -1,12 +1,7 @@
 ﻿using System;
-using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Organizations;
-using Core.ApplicationServices.Model.Organizations.Write;
-using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
-using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.Organization;
 using Presentation.Web.Controllers.API.V2.External.Generic;
-using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
@@ -18,10 +13,17 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 {
     public class OrganizationResponseMapper : IOrganizationResponseMapper
     {
+        private readonly IOrganizationTypeMapper _organizationTypeMapper;
+
+        public OrganizationResponseMapper(IOrganizationTypeMapper organizationTypeMapper)
+        {
+            _organizationTypeMapper = organizationTypeMapper;
+        }
+
         public OrganizationResponseDTO ToOrganizationDTO(Organization organization)
         {
             return new(organization.Uuid, organization.Name, organization.GetActiveCvr(),
-                MapOrganizationType(organization));
+                _organizationTypeMapper.MapOrganizationType(organization.Type));
         }
 
         public OrganizationMasterDataRolesResponseDTO ToRolesDTO(OrganizationMasterDataRoles roles)
@@ -35,19 +37,6 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
                 ContactPerson = contactPersonDto,
                 DataResponsible = dataResponsibleDto,
                 DataProtectionAdvisor = dataProtectionAdvisor
-            };
-        }
-
-        private static OrganizationType MapOrganizationType(Organization organization)
-        {
-            return organization.Type.Id switch
-            {
-                (int)OrganizationTypeKeys.Virksomhed => OrganizationType.Company,
-                (int)OrganizationTypeKeys.Kommune => OrganizationType.Municipality,
-                (int)OrganizationTypeKeys.AndenOffentligMyndighed => OrganizationType.OtherPublicAuthority,
-                (int)OrganizationTypeKeys.Interessefællesskab => OrganizationType.CommunityOfInterest,
-                _ => throw new ArgumentOutOfRangeException(nameof(organization.Type.Id),
-                    "Unknown organization type key")
             };
         }
 

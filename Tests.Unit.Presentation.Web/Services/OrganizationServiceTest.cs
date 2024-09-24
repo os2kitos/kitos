@@ -51,8 +51,6 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IGenericRepository<DataResponsible>> _dataResponsibleRepository;
         private readonly Mock<IGenericRepository<DataProtectionAdvisor>> _dataProtectionAdvisorRepository;
 
-        private const int CvrMaxLength = 10;
-
         public OrganizationServiceTest()
         {
             _user = new User { Id = new Fixture().Create<int>() };
@@ -1321,12 +1319,6 @@ namespace Tests.Unit.Presentation.Web.Services
             transaction.Verify(x => x.Commit(), Times.Once());
             _domainEventsMock.Verify(
                 x => x.Raise(It.Is<EntityBeingDeletedEvent<Organization>>(org => org.Entity == organization)), Times.Once());
-        }
-
-        private string GetCvr()
-        {
-            var s = A<string>();
-            return s.Length <= CvrMaxLength ? s : s.Substring(0, CvrMaxLength);
         }
 
         private ItInterface CreateInterface()
