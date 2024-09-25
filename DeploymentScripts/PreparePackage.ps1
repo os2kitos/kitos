@@ -2,7 +2,7 @@ Function Prepare-Package([String] $environmentName, $pathToArchive) {
 
     Write-Host "Environment is $environmentName"
 
-	if($environmentName -eq "integration" -or $environmentName "dev"){
+	if($environmentName -eq "integration" -or $environmentName -eq "dev"){
 
         Write-Host "Unzipping $pathToArchive to is TEMP_PresentationWeb"
 
