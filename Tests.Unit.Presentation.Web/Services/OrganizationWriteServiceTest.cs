@@ -284,7 +284,9 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
                 .Returns(true);
-
+            _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(expectedContactPerson);
+            _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(expectedDataResponsible);
+            _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(expectedDataProtectionAdvisor);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
