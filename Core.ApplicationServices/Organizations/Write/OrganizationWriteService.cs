@@ -118,15 +118,15 @@ public class OrganizationWriteService : IOrganizationWriteService{
         var modifiedContactPersonResult =
             AuthorizeModificationAndUpsertContactPerson(orgId,
                 updateParameters.ContactPerson);
-        if (modifiedContactPersonResult.Failed) return ConcludeMasterDataRolesUpdate(modifiedContactPersonResult.Error, transaction);
+        if (modifiedContactPersonResult.Failed) return modifiedContactPersonResult.Error;
 
         var modifiedDataResponsibleResult =
             AuthorizeModificationAndUpsertDataResponsible(orgId, updateParameters.DataResponsible);
-        if (modifiedDataResponsibleResult.Failed) return ConcludeMasterDataRolesUpdate(modifiedDataResponsibleResult.Error, transaction);
+        if (modifiedDataResponsibleResult.Failed) return modifiedDataResponsibleResult.Error;
 
         var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndUpsertDataProtectionAdvisor(orgId,
             updateParameters.DataProtectionAdvisor);
-        if (modifiedDataProtectionAdvisorResult.Failed) return ConcludeMasterDataRolesUpdate(modifiedDataProtectionAdvisorResult.Error, transaction);
+        if (modifiedDataProtectionAdvisorResult.Failed) return modifiedDataProtectionAdvisorResult.Error;
 
         var roles = new OrganizationMasterDataRoles()
         {
@@ -136,7 +136,8 @@ public class OrganizationWriteService : IOrganizationWriteService{
             DataResponsible = modifiedDataResponsibleResult.Value
         };
 
-        return ConcludeMasterDataRolesUpdate(roles, transaction);
+        transaction.Commit();
+        return roles;
     }
 
     private Result<ContactPerson, OperationError> AuthorizeModificationAndUpsertContactPerson(
@@ -305,13 +306,5 @@ public class OrganizationWriteService : IOrganizationWriteService{
         _dataProtectionAdvisorRepository.Save();
 
         return dataProtectionAdvisor;
-    }
-
-    private Result<OrganizationMasterDataRoles, OperationError> ConcludeMasterDataRolesUpdate(Result<OrganizationMasterDataRoles, OperationError> result, IDatabaseTransaction transaction)
-    {
-        if (result.Ok) transaction.Commit();
-        else transaction.Rollback();
-
-        return result;
     }
 }
