@@ -56,8 +56,6 @@ public class OrganizationWriteService : IOrganizationWriteService{
 
     private Result<Organization, OperationError> Update(Organization organization, OrganizationMasterDataUpdateParameters parameters)
     {
-        using var transaction = _transactionManager.Begin();
-
         var result = WithWriteAccess(organization)
             .Bind(organizationWithWriteAccess => PerformUpdates(organizationWithWriteAccess, parameters));
 
@@ -65,10 +63,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
         {
             _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
             _repository.Update(result.Value);
-            transaction.Commit();
         }
-        else transaction.Rollback();
-
         return result;
     }
 
