@@ -23,13 +23,12 @@ using Infrastructure.Services.DataAccess;
 
 using Moq;
 using Serilog;
-using Tests.Toolkit.Patterns;
 using Tests.Unit.Presentation.Web.Extensions;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Services
 {
-    public class OrganizationServiceTest : WithAutoFixture
+    public class OrganizationServiceTest : OrganizationServiceTestBase
     {
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly OrganizationService _sut;
@@ -850,6 +849,16 @@ namespace Tests.Unit.Presentation.Web.Services
             var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
             var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
             var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
+            _dataProtectionAdvisorRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
+            _contactPersonRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
+            _dataResponsibleRepository.Setup(_ =>
+                    _.AsQueryable())
+                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
+
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
                 .Returns(orgId);
@@ -903,58 +912,6 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(expected.Cvr, actual.Cvr);
             Assert.Equal(expected.OrganizationId, actual.OrganizationId);
             Assert.Equal(expected.Adress, actual.Adress);
-        }
-
-        private DataProtectionAdvisor SetupGetMasterDataRolesDataProtectionAdvisor(int orgId)
-        {
-            var expectedDataProtectionAdvisor = new DataProtectionAdvisor()
-            {
-                Email = A<string>(),
-                Name = A<string>(),
-                Cvr = A<string>(),
-                Adress = A<string>(),
-                OrganizationId = orgId,
-                Phone = A<string>(),
-                Id = A<int>(),
-            };
-            _dataProtectionAdvisorRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
-            return expectedDataProtectionAdvisor;
-        }
-
-        private ContactPerson SetupGetMasterDataRolesContactPerson(int orgId)
-        {
-            var expectedContactPerson = new ContactPerson
-            {
-                Email = A<string>(),
-                Name = A<string>(),
-                PhoneNumber = A<string>(),
-                OrganizationId = orgId,
-                Id = A<int>(),
-            };
-            _contactPersonRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
-            return expectedContactPerson;
-        }
-
-        private DataResponsible SetupGetMasterDataRolesDataResponsible(int orgId)
-        {
-            var expectedDataResponsible = new DataResponsible
-            {
-                Email = A<string>(),
-                Name = A<string>(),
-                Cvr = A<string>(),
-                Adress = A<string>(),
-                Phone = A<string>(),
-                OrganizationId = orgId,
-                Id = A<int>(),
-            };
-            _dataResponsibleRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
-            return expectedDataResponsible;
         }
 
         private void VerifyOrganizationDeleted(Maybe<OperationError> result, Mock<IDatabaseTransaction> transaction, Organization organization)

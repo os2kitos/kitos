@@ -10,19 +10,17 @@ using Moq;
 using System;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Organizations.Write;
-using Tests.Toolkit.Patterns;
 using Xunit;
 using Core.DomainModel.Events;
 using Core.DomainServices.Generic;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
 using Core.DomainModel;
-using System.Collections.Generic;
-using System.Linq;
+
 using Core.DomainServices;
 
 namespace Tests.Unit.Presentation.Web.Services
 {
-    public class OrganizationWriteServiceTest: WithAutoFixture
+    public class OrganizationWriteServiceTest: OrganizationServiceTestBase
     {
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<ITransactionManager> _transactionManager;
@@ -442,58 +440,6 @@ namespace Tests.Unit.Presentation.Web.Services
             var organizationId = A<Guid>();
             var organization = new Organization() { Uuid = organizationId, Id = A<int>() };
             return organization;
-        }
-
-        private DataProtectionAdvisor SetupGetMasterDataRolesDataProtectionAdvisor(int orgId)
-        {
-            var expectedDataProtectionAdvisor = new DataProtectionAdvisor()
-            {
-                Email = A<string>(),
-                Name = A<string>(),
-                Cvr = A<string>(),
-                Adress = A<string>(),
-                OrganizationId = orgId,
-                Phone = A<string>(),
-                Id = A<int>(),
-            };
-            _dataProtectionAdvisorRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
-            return expectedDataProtectionAdvisor;
-        }
-
-        private ContactPerson SetupGetMasterDataRolesContactPerson(int orgId)
-        {
-            var expectedContactPerson = new ContactPerson
-            {
-                Email = A<string>(),
-                Name = A<string>(),
-                PhoneNumber = A<string>(),
-                OrganizationId = orgId,
-                Id = A<int>(),
-            };
-            _contactPersonRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
-            return expectedContactPerson;
-        }
-
-        private DataResponsible SetupGetMasterDataRolesDataResponsible(int orgId)
-        {
-            var expectedDataResponsible = new DataResponsible
-            {
-                Email = A<string>(),
-                Name = A<string>(),
-                Cvr = A<string>(),
-                Adress = A<string>(),
-                Phone = A<string>(),
-                OrganizationId = orgId,
-                Id = A<int>(),
-            };
-            _dataResponsibleRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
-            return expectedDataResponsible;
         }
 
         private void AssertContactPerson(ContactPerson expected, ContactPerson actual)
