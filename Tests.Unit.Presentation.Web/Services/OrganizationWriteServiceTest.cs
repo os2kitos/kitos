@@ -165,6 +165,8 @@ namespace Tests.Unit.Presentation.Web.Services
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(invalidOrganizationUuid))
                 .Returns(Maybe<int>.None);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             var result =
                 _sut.UpsertOrganizationMasterDataRoles(invalidOrganizationUuid, new OrganizationMasterDataRolesUpdateParameters());

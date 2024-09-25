@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Security.Cryptography;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
@@ -111,6 +112,15 @@ public class OrganizationWriteService : IOrganizationWriteService{
     {
         using var transaction = _transactionManager.Begin();
 
+        var rolesResult = AuthorizeAndPerformMasterDataRolesUpsert(organizationUuid, updateParameters);
+
+        transaction.Commit();
+        return rolesResult;
+    }
+
+    private Result<OrganizationMasterDataRoles, OperationError> AuthorizeAndPerformMasterDataRolesUpsert(Guid organizationUuid,
+        OrganizationMasterDataRolesUpdateParameters updateParameters)
+    {
         var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
         if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
         var orgId = organizationDbIdMaybe.Value;
@@ -128,16 +138,13 @@ public class OrganizationWriteService : IOrganizationWriteService{
             updateParameters.DataProtectionAdvisor);
         if (modifiedDataProtectionAdvisorResult.Failed) return modifiedDataProtectionAdvisorResult.Error;
 
-        var roles = new OrganizationMasterDataRoles()
+        return new OrganizationMasterDataRoles()
         {
             OrganizationUuid = organizationUuid,
             ContactPerson = modifiedContactPersonResult.Value,
             DataProtectionAdvisor = modifiedDataProtectionAdvisorResult.Value,
             DataResponsible = modifiedDataResponsibleResult.Value
         };
-
-        transaction.Commit();
-        return roles;
     }
 
     private Result<ContactPerson, OperationError> AuthorizeModificationAndUpsertContactPerson(
