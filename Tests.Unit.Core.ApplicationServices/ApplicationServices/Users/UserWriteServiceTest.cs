@@ -233,8 +233,29 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         [Fact]
         public void Can_Update_User()
         {
-            var initialUser = SetupUser();
+            //Arrange
+            var user = SetupUser();
             var orgUuid = A<Guid>();
+            var updateParameters = A<UpdateUserParameters>();
+            _userServiceMock.Setup(x => x.GetUserInOrganization(orgUuid, user.Uuid)).Returns(user);
+            _authorizationContextMock.Setup(x => x.AllowModify(user)).Returns(true);
+            var transaction = ExpectTransactionBegins();
+
+            //Act
+            var updatedUserResult = _sut.Update(orgUuid, user.Uuid, updateParameters);
+
+            //Assert
+            Assert.True(updatedUserResult.Ok);
+            var updatedUser = updatedUserResult.Value;
+            Assert.Equal(updateParameters.Email.NewValue, updatedUser.Email);
+            Assert.Equal(updateParameters.FirstName.NewValue, updatedUser.Name);
+            Assert.Equal(updateParameters.LastName.NewValue, updatedUser.LastName);
+            Assert.Equal(updateParameters.PhoneNumber.NewValue, updatedUser.PhoneNumber);
+            Assert.Equal(updateParameters.HasApiAccess.NewValue, updatedUser.HasApiAccess);
+            Assert.Equal(updateParameters.HasStakeHolderAccess.NewValue, updatedUser.HasStakeHolderAccess);
+            Assert.Equal(updateParameters.DefaultUserStartPreference.NewValue, updatedUser.DefaultUserStartPreference);
+            transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
+            
         }
 
         private void ExpectAddUserReturns(User user, bool sendMailOnCreation, int orgId)

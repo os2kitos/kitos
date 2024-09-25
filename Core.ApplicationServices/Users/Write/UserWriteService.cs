@@ -45,8 +45,8 @@ namespace Core.ApplicationServices.Users.Write
         {
             return ValidateUserCanBeCreated(parameters)
                 .Match(
-                error => error, 
-                () => 
+                error => error,
+                () =>
                     ValidateIfCanCreateUser(organizationUuid)
                     .Bind(organization =>
                         {
@@ -69,7 +69,7 @@ namespace Core.ApplicationServices.Users.Write
                     )
                 );
         }
-        
+
         public Result<User, OperationError> Update(Guid organizationUuid, Guid userUuid, UpdateUserParameters parameters)
         {
 
@@ -92,7 +92,8 @@ namespace Core.ApplicationServices.Users.Write
             {
                 transactionManager.Rollback();
                 return updateResult.Error;
-;            }
+                ;
+            }
             transactionManager.Commit();
             return updateResult.Value;
         }
@@ -113,7 +114,7 @@ namespace Core.ApplicationServices.Users.Write
             _userService.IssueAdvisMail(user.Value, false, orgIdResult.Value);
             return Maybe<OperationError>.None;
         }
-        
+
         public Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(
             Guid organizationUuid)
         {
@@ -128,8 +129,7 @@ namespace Core.ApplicationServices.Users.Write
                     user.WithOptionalUpdate(parameters.LastName, (user, lastName) => user.LastName = lastName))
                 .Bind(user => user.WithOptionalUpdate(parameters.Email, UpdateEmail)
                     .Bind(user =>
-                        user.WithOptionalUpdate(parameters.LastName,
-                            (user, phoneNumber) => user.PhoneNumber = phoneNumber))
+                        user.WithOptionalUpdate(parameters.PhoneNumber, UpdatePhoneNumber))
                     .Bind(user => user.WithOptionalUpdate(parameters.HasStakeHolderAccess,
                         (user, hasStakeHolderAccess) => user.HasStakeHolderAccess = hasStakeHolderAccess))
                     .Bind(user => user.WithOptionalUpdate(parameters.HasApiAccess,
@@ -139,22 +139,23 @@ namespace Core.ApplicationServices.Users.Write
                     .Bind(user => user.WithOptionalUpdate(parameters.Roles, (user, roles) => UpdateRoles(organizationUuid, user, roles))));
         }
 
+        private Result<User, OperationError> UpdatePhoneNumber(User user, string phoneNumber)
+        {
+            //TODO: validation
+            user.PhoneNumber = phoneNumber;
+            return user;
+        }
+
         private Result<User, OperationError> UpdateEmail(User user, string email)
         {
-            return null; //TODO
+            ///TODO: Do some kind of validation. Valid email, does anyone else use this emaiL?
+            user.Email = email;
+            return user;
         }
 
         private Result<User, OperationError> UpdateRoles(Guid organizationUuid, User user,
             IEnumerable<OrganizationRole> roles)
         {
-            var rightsFromOtherOrganizations =
-                user.OrganizationRights.Where(right => right.Organization.Uuid != organizationUuid);
-            var organizationResult = _organizationService.GetOrganization(organizationUuid);
-            if (organizationResult.Failed)
-            {
-                return organizationResult.Error;
-            }
-
             return user; //TODO
         }
 
