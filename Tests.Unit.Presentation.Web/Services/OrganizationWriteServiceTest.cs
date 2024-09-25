@@ -435,37 +435,6 @@ namespace Tests.Unit.Presentation.Web.Services
                 }
             };
         }
-        private Organization CreateOrganization()
-        {
-            var organizationId = A<Guid>();
-            var organization = new Organization() { Uuid = organizationId, Id = A<int>() };
-            return organization;
-        }
-
-        private void AssertContactPerson(ContactPerson expected, ContactPerson actual)
-        {
-            Assert.Equal(expected.Email, actual.Email);
-            Assert.Equal(expected.Name, actual.Name);
-            Assert.Equal(expected.PhoneNumber, actual.PhoneNumber);
-            Assert.Equal(expected.OrganizationId, actual.OrganizationId);
-        }
-
-        private void AssertDataResponsible(DataResponsible expected, DataResponsible actual)
-        {
-            Assert.Equal(expected.Email, actual.Email);
-            Assert.Equal(expected.Name, actual.Name);
-            Assert.Equal(expected.Cvr, actual.Cvr);
-            Assert.Equal(expected.OrganizationId, actual.OrganizationId);
-            Assert.Equal(expected.Adress, actual.Adress);
-        }
-
-        private void AssertDataProtectionAdvisor(DataProtectionAdvisor expected, DataProtectionAdvisor actual)
-        {
-            Assert.Equal(expected.Email, actual.Email);
-            Assert.Equal(expected.Name, actual.Name);
-            Assert.Equal(expected.Cvr, actual.Cvr);
-            Assert.Equal(expected.OrganizationId, actual.OrganizationId);
-            Assert.Equal(expected.Adress, actual.Adress);
-        }
+        
     }
 }
