@@ -320,6 +320,7 @@
     <Compile Include="Models\V2\OrganizationResponseMapperTest.cs" />
     <Compile Include="Models\V2\OrganizationTypeMapperTest.cs" />
     <Compile Include="Models\V2\OrganizationUnitWriteModelMapperTest.cs" />
+    <Compile Include="Models\V2\OrganizationWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\PublicMessagesWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\WriteModelMapperTestBase.cs" />
     <Compile Include="Services\ItSystemServiceTest.cs" />
