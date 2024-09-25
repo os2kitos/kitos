@@ -235,7 +235,6 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         {
             var initialUser = SetupUser();
             var orgUuid = A<Guid>();
-            _sut.Create(in)
         }
 
         private void ExpectAddUserReturns(User user, bool sendMailOnCreation, int orgId)

@@ -123,7 +123,7 @@ namespace Core.ApplicationServices.Users.Write
 
         private Result<User, OperationError> PerformUpdates(User user, Guid organizationUuid, UpdateUserParameters parameters)
         {
-            user.WithOptionalUpdate(parameters.FirstName, (user, firstName) => user.Name = firstName)
+            return user.WithOptionalUpdate(parameters.FirstName, (user, firstName) => user.Name = firstName)
                 .Bind(user =>
                     user.WithOptionalUpdate(parameters.LastName, (user, lastName) => user.LastName = lastName))
                 .Bind(user => user.WithOptionalUpdate(parameters.Email, UpdateEmail)

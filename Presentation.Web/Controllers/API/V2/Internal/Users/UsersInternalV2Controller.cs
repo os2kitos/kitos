@@ -56,6 +56,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
             [FromBody] UpdateUserRequestDTO parameters)
         {
             return Ok();
+        }
 
         [Route("{userUuid}/notifications/send")]
         [HttpPost]
