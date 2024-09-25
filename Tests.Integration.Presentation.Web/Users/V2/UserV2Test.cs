@@ -27,7 +27,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var response = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
 
             //Assert
-            AssertUserEqualsRequest(userRequest, response);
+            AssertUserEqualsCreateRequest(userRequest, response);
         }
 
         [Fact]
@@ -60,11 +60,41 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             Assert.True(response.Delete);
         }
 
-        private void AssertUserEqualsRequest(CreateUserRequestDTO request, UserResponseDTO response)
+        [Fact]
+        public async Task Can_Update_User()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var user = await UsersV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
+
+            //Act
+            var updateRequest = A<UpdateUserRequestDTO>();
+            var response = await UsersV2Helper.UpdateUser(organization.Uuid, user.Uuid, updateRequest);
+
+            //Assert
+            AssertUserEqualsUpdateRequest(updateRequest, response);
+        }
+
+        private void AssertUserEqualsCreateRequest(CreateUserRequestDTO request, UserResponseDTO response)
         {
             Assert.Equal(request.Email, response.Email);
             Assert.Equal(request.FirstName, response.FirstName);
             Assert.Equal(request.LastName, response.LastName);
+            
+            AssertBaseUserRequestMatches(request, response);
+        }
+
+        private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
+        {
+            Assert.Equal(request.Email, response.Email);
+            Assert.Equal(request.FirstName, response.FirstName);
+            Assert.Equal(request.LastName, response.LastName);
+            
+            AssertBaseUserRequestMatches(request, response);
+        }
+
+        private void AssertBaseUserRequestMatches(BaseUserRequestDTO request, UserResponseDTO response)
+        {
             Assert.Equal(request.PhoneNumber, response.PhoneNumber);
             Assert.Equal(request.DefaultUserStartPreference, response.DefaultUserStartPreference);
             Assert.Equal(request.HasApiAccess, response.HasApiAccess);

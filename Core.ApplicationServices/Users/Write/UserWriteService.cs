@@ -12,6 +12,7 @@ using Core.ApplicationServices.Model.Users.Write;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 
@@ -25,7 +26,7 @@ namespace Core.ApplicationServices.Users.Write
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationService _organizationService;
         private readonly IEntityIdentityResolver _entityIdentityResolver;
-
+        
         public UserWriteService(IUserService userService,
             IOrganizationRightsService organizationRightsService,
             ITransactionManager transactionManager,
@@ -141,14 +142,18 @@ namespace Core.ApplicationServices.Users.Write
 
         private Result<User, OperationError> UpdatePhoneNumber(User user, string phoneNumber)
         {
-            //TODO: validation
+            //TODO: Validate if phonenumber is in use or invalid maybe? Again old UI seems to not care
             user.PhoneNumber = phoneNumber;
             return user;
         }
 
         private Result<User, OperationError> UpdateEmail(User user, string email)
         {
-            ///TODO: Do some kind of validation. Valid email, does anyone else use this emaiL?
+            if (_userService.IsEmailInUse(email))
+            {
+                return new OperationError($"Email '{email}' is already in use.", OperationFailure.Conflict);
+            }
+            //TODO: Maybe check if email is valid here? Again old UI is seems to only check for '@'
             user.Email = email;
             return user;
         }
@@ -156,6 +161,7 @@ namespace Core.ApplicationServices.Users.Write
         private Result<User, OperationError> UpdateRoles(Guid organizationUuid, User user,
             IEnumerable<OrganizationRole> roles)
         {
+            var oldRights = user.GetRolesInOrganization(organizationUuid);
             return user; //TODO
         }
 

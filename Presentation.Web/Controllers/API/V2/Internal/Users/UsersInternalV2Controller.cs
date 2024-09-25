@@ -55,7 +55,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         public IHttpActionResult PatchUnit([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid,
             [FromBody] UpdateUserRequestDTO parameters)
         {
-            return Ok();
+            return _userWriteService.Update(organizationUuid, userUuid, _writeModelMapper.FromPATCH(parameters))
+                .Select(_userResponseModelMapper.ToUserResponseDTO)
+                .Match(Ok, FromOperationError);
         }
 
         [Route("{userUuid}/notifications/send")]
