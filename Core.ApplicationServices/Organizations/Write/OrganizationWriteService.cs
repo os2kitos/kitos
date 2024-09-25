@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
@@ -7,6 +8,7 @@ using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
+using Microsoft.Owin.BuilderProperties;
 
 namespace Core.ApplicationServices.Organizations.Write;
 
@@ -72,27 +74,31 @@ public class OrganizationWriteService : IOrganizationWriteService{
     }
 
     private Result<Organization, OperationError> UpdateOrganizationAddress(Organization organization,
-        string address)
+        Maybe<string> address)
     {
-        organization.Adress = address;
+        if (address.HasValue) organization.Adress = address.Value;
+        else organization.Adress = null;
         return organization;
     }
     private Result<Organization, OperationError> UpdateOrganizationCvr(Organization organization,
-        string cvr)
+        Maybe<string> cvr)
     {
-        organization.Cvr = cvr;
+        if (cvr.HasValue) organization.Cvr = cvr.Value;
+        else organization.Cvr = null;
         return organization;
     }
     private Result<Organization, OperationError> UpdateOrganizationEmail(Organization organization,
-        string email)
+        Maybe<string> email)
     {
-        organization.Email = email;
+        if (email.HasValue) organization.Email = email.Value;
+        else organization.Email = null;
         return organization;
     }
     private Result<Organization, OperationError> UpdateOrganizationPhone(Organization organization,
-        string phone)
+        Maybe<string> phone)
     {
-        organization.Phone = phone;
+        if (phone.HasValue) organization.Phone = phone.Value;
+        else organization.Phone = null;
         return organization;
     }
 }

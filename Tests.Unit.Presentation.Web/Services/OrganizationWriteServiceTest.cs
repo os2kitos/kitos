@@ -8,6 +8,7 @@ using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using System;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Organizations.Write;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -49,7 +50,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationService.Setup(_ => _.GetOrganization(organizationUuid, null)).Returns(organization.Object);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
-            var newCvr = OptionalValueChange<string>.With(A<string>());
+            var newCvr = OptionalValueChange<Maybe<string>>.With(A<Maybe<string>>());
             var updateParameters = new OrganizationMasterDataUpdateParameters
             {
                 Cvr = newCvr,
@@ -69,7 +70,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object); _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
             _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
-            var newCvr = OptionalValueChange<string>.With(A<string>());
+            var newCvr = OptionalValueChange<Maybe<string>>.With(A<Maybe<string>>());
             var updateParameters = new OrganizationMasterDataUpdateParameters
             {
                 Cvr = newCvr,
@@ -89,10 +90,10 @@ namespace Tests.Unit.Presentation.Web.Services
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object); _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
             _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
-            var newCvr = OptionalValueChange<string>.With(A<string>());
-            var newPhone = OptionalValueChange<string>.With(A<string>());
-            var newAddress = OptionalValueChange<string>.With(A<string>());
-            var newEmail = OptionalValueChange<string>.With(A<string>());
+            var newCvr = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(A<string>()));
+            var newPhone = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(A<string>()));
+            var newAddress = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(A<string>()));
+            var newEmail = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(A<string>()));
             var updateParameters = new OrganizationMasterDataUpdateParameters
             {
                 Cvr = newCvr,
@@ -105,10 +106,10 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
 
             var updatedOrganization = result.Value;
-            Assert.Equal(newCvr.NewValue, updatedOrganization.Cvr);
-            Assert.Equal(newPhone.NewValue, updatedOrganization.Phone);
-            Assert.Equal(newAddress.NewValue, updatedOrganization.Adress);
-            Assert.Equal(newEmail.NewValue, updatedOrganization.Email);
+            Assert.Equal(newCvr.NewValue.Value, updatedOrganization.Cvr);
+            Assert.Equal(newPhone.NewValue.Value, updatedOrganization.Phone);
+            Assert.Equal(newAddress.NewValue.Value, updatedOrganization.Adress);
+            Assert.Equal(newEmail.NewValue.Value, updatedOrganization.Email);
             _organizationrepository.Verify(_ => _.Update(organization.Object));
         }
 
@@ -122,7 +123,13 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationService.Setup(_ => _.GetOrganization(organizationUuid, null)).Returns(organization.Object);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
-            var updateParameters = new OrganizationMasterDataUpdateParameters(){Address = "test"};
+            var updateParameters = new OrganizationMasterDataUpdateParameters()
+            {
+                Address = Maybe<string>.None.AsChangedValue(),
+                Cvr = Maybe<string>.None.AsChangedValue(),
+                Email = Maybe<string>.None.AsChangedValue(),
+                Phone = Maybe<string>.None.AsChangedValue()
+            };
 
             var result = _sut.UpdateMasterData(organizationUuid, updateParameters);
             Assert.True(result.Ok);

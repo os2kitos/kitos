@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Organizations.Write;
@@ -18,17 +19,17 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
         return new()
         {
             Cvr = rule.MustUpdate(x => x.Cvr)
-                ? dto.Cvr.AsChangedValue()
-                : OptionalValueChange<string>.None,
+                ? (dto.Cvr.FromNullable() ?? Maybe<string>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<string>>.None,
             Email = rule.MustUpdate(x => x.Email)
-                ? dto.Email.AsChangedValue()
-                : OptionalValueChange<string>.None,
+                ? (dto.Email.FromNullable() ?? Maybe<string>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<string>>.None,
             Address = rule.MustUpdate(x => x.Address)
-                ? dto.Address.AsChangedValue()
-                : OptionalValueChange<string>.None,
+                ? (dto.Address.FromNullable() ?? Maybe<string>.None).AsChangedValue() 
+                : OptionalValueChange<Maybe<string>>.None,
             Phone = rule.MustUpdate(x => x.Phone)
-                ? dto.Phone.AsChangedValue()
-                : OptionalValueChange<string>.None,
+                ? (dto.Phone.FromNullable() ?? Maybe<string>.None).AsChangedValue() 
+                : OptionalValueChange<Maybe<string>>.None,
         };
     }
 

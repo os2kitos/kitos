@@ -612,10 +612,10 @@ namespace Core.ApplicationServices.Organizations
         private static Result<Organization, OperationError> ModifyOrganization(Organization organization,
             OrganizationMasterDataUpdateParameters parameters)
         {
-            organization.Cvr = parameters.Cvr?.NewValue;
-            organization.Adress = parameters.Address?.NewValue;
-            organization.Email = parameters.Email?.NewValue;
-            organization.Phone = parameters.Phone?.NewValue;
+            organization.Cvr = parameters.Cvr?.NewValue.Value;
+            organization.Adress = parameters.Address?.NewValue.Value;
+            organization.Email = parameters.Email?.NewValue.Value;
+            organization.Phone = parameters.Phone?.NewValue.Value;
             return organization;
 
         }
