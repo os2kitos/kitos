@@ -10,6 +10,8 @@ namespace Core.ApplicationServices.Users.Write
     {
         Result<User, OperationError> Create(Guid organizationUuid, CreateUserParameters parameters);
 
+        Result<User, OperationError> Update(Guid organizationUuid, Guid userUuid, UpdateUserParameters parameters);
+
         Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(
             Guid organizationUuid);
     }

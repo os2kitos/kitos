@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.ModelBinding;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Users;
 using Core.ApplicationServices.Model.Users.Write;
 using Core.ApplicationServices.Organizations;
@@ -23,7 +26,7 @@ namespace Core.ApplicationServices.Users.Write
 
         public UserWriteService(IUserService userService,
             IOrganizationRightsService organizationRightsService,
-            ITransactionManager transactionManager, 
+            ITransactionManager transactionManager,
             IAuthorizationContext authorizationContext,
             IOrganizationService organizationService)
         {
@@ -38,28 +41,57 @@ namespace Core.ApplicationServices.Users.Write
         {
             return ValidateUserCanBeCreated(parameters)
                 .Match(
-                error => error, 
-                () => 
-                    ValidateIfCanCreateUser(organizationUuid)
-                    .Bind(organization =>
-                        {
-                            using var transaction = _transactionManager.Begin();
+                    error => error,
+                    () =>
+                        ValidateIfCanCreateUser(organizationUuid)
+                            .Bind(organization =>
+                                {
+                                    using var transaction = _transactionManager.Begin();
 
-                            var user = _userService.AddUser(parameters.User, parameters.SendMailOnCreation, organization.Id);
+                                    var user = _userService.AddUser(parameters.User, parameters.SendMailOnCreation,
+                                        organization.Id);
 
-                            var roleAssignmentError = AssignUserAdministrativeRoles(organization.Id, user.Id, parameters.Roles);
+                                    var roleAssignmentError =
+                                        AssignUserAdministrativeRoles(organization.Id, user.Id, parameters.Roles);
 
-                            if (roleAssignmentError.HasValue)
-                            {
-                                transaction.Rollback();
-                                return roleAssignmentError.Value;
-                            }
+                                    if (roleAssignmentError.HasValue)
+                                    {
+                                        transaction.Rollback();
+                                        return roleAssignmentError.Value;
+                                    }
 
-                            transaction.Commit();
-                            return Result<User, OperationError>.Success(user);
-                        }
-                    )
+                                    transaction.Commit();
+                                    return Result<User, OperationError>.Success(user);
+                                }
+                            )
                 );
+        }
+
+        public Result<User, OperationError> Update(Guid organizationUuid, Guid userUuid, UpdateUserParameters parameters)
+        {
+
+            using var transactionManager = _transactionManager.Begin();
+            var userRes = _userService.GetUserInOrganization(organizationUuid, userUuid);
+            if (userRes.Failed)
+            {
+                return userRes.Error;
+            }
+
+            var user = userRes.Value;
+
+            if (!_authorizationContext.AllowModify(user))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
+            var updateResult = PerformUpdates(user, organizationUuid, parameters);
+            if (updateResult.Failed)
+            {
+                transactionManager.Rollback();
+                return updateResult.Error;
+;            }
+            transactionManager.Commit();
+            return updateResult.Value;
         }
 
         public Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(
@@ -67,6 +99,43 @@ namespace Core.ApplicationServices.Users.Write
         {
             return _organizationService.GetOrganization(organizationUuid)
                 .Select(org => UserCollectionPermissionsResult.FromOrganization(org, _authorizationContext));
+        }
+
+        private Result<User, OperationError> PerformUpdates(User user, Guid organizationUuid, UpdateUserParameters parameters)
+        {
+            user.WithOptionalUpdate(parameters.FirstName, (user, firstName) => user.Name = firstName)
+                .Bind(user =>
+                    user.WithOptionalUpdate(parameters.LastName, (user, lastName) => user.LastName = lastName))
+                .Bind(user => user.WithOptionalUpdate(parameters.Email, UpdateEmail)
+                    .Bind(user =>
+                        user.WithOptionalUpdate(parameters.LastName,
+                            (user, phoneNumber) => user.PhoneNumber = phoneNumber))
+                    .Bind(user => user.WithOptionalUpdate(parameters.HasStakeHolderAccess,
+                        (user, hasStakeHolderAccess) => user.HasStakeHolderAccess = hasStakeHolderAccess))
+                    .Bind(user => user.WithOptionalUpdate(parameters.HasApiAccess,
+                        (user, hasApiAccess) => user.HasApiAccess = hasApiAccess))
+                    .Bind(user => user.WithOptionalUpdate(parameters.DefaultUserStartPreference,
+                        (user, defaultStartPreference) => user.DefaultUserStartPreference = defaultStartPreference))
+                    .Bind(user => user.WithOptionalUpdate(parameters.Roles, (user, roles) => UpdateRoles(organizationUuid, user, roles))));
+        }
+
+        private Result<User, OperationError> UpdateEmail(User user, string email)
+        {
+            return null; //TODO
+        }
+
+        private Result<User, OperationError> UpdateRoles(Guid organizationUuid, User user,
+            IEnumerable<OrganizationRole> roles)
+        {
+            var rightsFromOtherOrganizations =
+                user.OrganizationRights.Where(right => right.Organization.Uuid != organizationUuid);
+            var organizationResult = _organizationService.GetOrganization(organizationUuid);
+            if (organizationResult.Failed)
+            {
+                return organizationResult.Error;
+            }
+
+            return user; //TODO
         }
 
         private Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(Organization organization)
@@ -82,7 +151,7 @@ namespace Core.ApplicationServices.Users.Write
                     var permissionsResult = GetCollectionPermissions(organization);
                     if (permissionsResult.Failed)
                         return permissionsResult.Error;
-                    if(permissionsResult.Value.Create == false)
+                    if (permissionsResult.Value.Create == false)
                         return new OperationError(
                             $"User is not allowed to create users for organization with uuid: {organizationUuid}",
                             OperationFailure.Forbidden);
@@ -90,7 +159,7 @@ namespace Core.ApplicationServices.Users.Write
                     return Result<Organization, OperationError>.Success(organization);
                 });
         }
-        
+
         private Maybe<OperationError> AssignUserAdministrativeRoles(int organizationId, int userId,
             IEnumerable<OrganizationRole> roles)
         {
