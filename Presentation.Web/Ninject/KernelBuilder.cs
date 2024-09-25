@@ -224,6 +224,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IRegistrationNotificationUserRelationsService>().To<RegistrationNotificationUserRelationsService>().InCommandScope(Mode);
             kernel.Bind<INotificationService>().To<NotificationService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InCommandScope(Mode);
+            kernel.Bind<IOrganizationWriteService>().To<OrganizationWriteService>().InCommandScope(Mode);
             kernel.Bind<IItSystemService>().To<ItSystemService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageMigrationServiceAdapter>().To<ItSystemUsageMigrationServiceAdapter>().InCommandScope(Mode);
