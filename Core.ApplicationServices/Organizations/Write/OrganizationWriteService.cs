@@ -114,7 +114,8 @@ public class OrganizationWriteService : IOrganizationWriteService{
 
         var rolesResult = AuthorizeAndPerformMasterDataRolesUpsert(organizationUuid, updateParameters);
 
-        transaction.Commit();
+        if (rolesResult.Ok) transaction.Commit();
+        else transaction.Rollback();
         return rolesResult;
     }
 
