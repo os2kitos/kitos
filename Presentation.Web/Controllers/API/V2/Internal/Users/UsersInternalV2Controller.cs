@@ -45,6 +45,18 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
                 .Match(MapUserCreatedResponse, FromOperationError);
         }
 
+        [Route("{userUuid}/notifications/send")]
+        [HttpPost]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult SendNotification([NonEmptyGuid] Guid userUuid, [NonEmptyGuid] Guid organizationUuid)
+        {
+            return _userWriteService.SendNotification(organizationUuid, userUuid)
+                .Match(FromOperationError, Ok);
+        }
+
         [Route("permissions")]
         [HttpGet]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UserCollectionPermissionsResponseDTO))]
