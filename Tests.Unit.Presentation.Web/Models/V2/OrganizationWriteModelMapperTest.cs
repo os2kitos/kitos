@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web.Http.Results;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
@@ -42,6 +43,57 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertParamHasValidChange(result.Cvr, dto.Cvr);
             AssertParamHasValidChange(result.Address, dto.Address);
             AssertParamHasValidChange(result.Phone, dto.Phone);
+        }
+
+        [Fact]
+        public void Can_Map_Master_Data_Roles()
+        {
+            var orgUuid = A<Guid>();
+            var dto = new OrganizationMasterDataRolesRequestDTO()
+            {
+                ContactPerson = new ContactPersonRequestDTO()
+                {
+                    Email = A<string>(), LastName = A<string>(), PhoneNumber = A<string>(), Name = A<string>()
+                },
+                DataResponsible = new DataResponsibleRequestDTO()
+                {
+                    Address = A<string>(), Cvr = A<string>(), Email = A<string>(), Name = A<string>(),
+                    Phone = A<string>()
+                },
+                DataProtectionAdvisor = new DataProtectionAdvisorRequestDTO()
+                {
+                    Address = A<string>(),
+                    Cvr = A<string>(),
+                    Email = A<string>(),
+                    Name = A<string>(),
+                    Phone = A<string>()
+                }
+            };
+
+            var result = _sut.ToMasterDataRolesUpdateParameters(orgUuid, dto);
+
+            var cpDto = dto.ContactPerson;
+            var cpResult = result.ContactPerson;
+            AssertParamHasValidChange(cpResult.Value.Email, cpDto.Email);
+            AssertParamHasValidChange(cpResult.Value.LastName, cpDto.LastName);
+            AssertParamHasValidChange(cpResult.Value.Name, cpDto.Name);
+            AssertParamHasValidChange(cpResult.Value.PhoneNumber, cpDto.PhoneNumber);
+
+            var drDto = dto.DataResponsible;
+            var drResult = result.DataResponsible;
+            AssertParamHasValidChange(drResult.Value.Email, drDto.Email);
+            AssertParamHasValidChange(drResult.Value.Cvr, drDto.Cvr);
+            AssertParamHasValidChange(drResult.Value.Name, drDto.Name);
+            AssertParamHasValidChange(drResult.Value.Phone, drDto.Phone);
+            AssertParamHasValidChange(drResult.Value.Address, drDto.Address);
+
+            var dpaDto = dto.DataProtectionAdvisor;
+            var dpaResult = result.DataProtectionAdvisor;
+            AssertParamHasValidChange(dpaResult.Value.Email, dpaDto.Email);
+            AssertParamHasValidChange(dpaResult.Value.Cvr, dpaDto.Cvr);
+            AssertParamHasValidChange(dpaResult.Value.Name, dpaDto.Name);
+            AssertParamHasValidChange(dpaResult.Value.Phone, dpaDto.Phone);
+            AssertParamHasValidChange(dpaResult.Value.Address, dpaDto.Address);
         }
 
         private void AssertParamHasValidChange(OptionalValueChange<Maybe<string>> parameter, string expected)
