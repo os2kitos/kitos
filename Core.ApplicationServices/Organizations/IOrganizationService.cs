@@ -5,8 +5,6 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Model.Organizations.Write;
-using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
-using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
@@ -30,9 +28,6 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<Organization, OperationError> GetOrganization(Guid organizationUuid, OrganizationDataReadAccessLevel? withMinimumAccessLevel = null);
         public Result<IQueryable<Organization>, OperationError> GetAllOrganizations();
-
-        public Result<Organization, OperationError> UpdateOrganizationMasterData(Guid organizationUuid,
-            OrganizationMasterDataUpdateParameters parameters);
         public IQueryable<Organization> SearchAccessibleOrganizations(bool onlyWithMembershipAccess, params IDomainQuery<Organization>[] conditions);
         public IQueryable<Organization> SearchAccessibleOrganizations(params IDomainQuery<Organization>[] conditions);
 

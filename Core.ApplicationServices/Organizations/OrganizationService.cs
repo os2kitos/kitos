@@ -232,35 +232,6 @@ namespace Core.ApplicationServices.Organizations
             return Result<IQueryable<Organization>, OperationError>.Success(_repository.GetAll());
         }
 
-        public Result<Organization, OperationError> UpdateOrganizationMasterData(Guid organizationUuid, OrganizationMasterDataUpdateParameters parameters)
-        {
-            var transaction = _transactionManager.Begin();
-
-            var organizationResult = GetOrganizationAndAuthorizeModification(organizationUuid);
-
-            if (organizationResult.Failed) return organizationResult.Error;
-
-            var modifiedOrganizationResult = ModifyOrganization(organizationResult.Value, parameters);
-
-            return modifiedOrganizationResult.Match(
-                organization => UpdateOrganizationMasterDataHelper(organization, transaction),
-                error =>
-                {
-                    transaction.Rollback();
-                    return error;
-                }
-            );
-        }
-
-        private Result<Organization, OperationError> UpdateOrganizationMasterDataHelper(Organization organization,
-            IDatabaseTransaction transaction)
-        {
-            _repository.Update(organization);
-            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
-            transaction.Commit();
-            return Result<Organization, OperationError>.Success(organization);
-        }
-
         public IQueryable<Organization> SearchAccessibleOrganizations(bool onlyWithMembershipAccess, params IDomainQuery<Organization>[] conditions)
         {
             var crossOrganizationReadAccess = _authorizationContext.GetCrossOrganizationReadAccess();
@@ -487,30 +458,6 @@ namespace Core.ApplicationServices.Organizations
         private bool HasRole(int orgId, OrganizationRole role)
         {
             return _userContext.HasRole(orgId, role);
-        }
-
-        private Result<Organization, OperationError> GetOrganizationAndAuthorizeModification(Guid organizationUuid)
-        {
-            return GetOrganization(organizationUuid)
-                .Match
-                (
-                    organization =>
-                        !_authorizationContext.AllowModify(organization)
-                            ? new OperationError(OperationFailure.Forbidden)
-                            : Result<Organization, OperationError>.Success(organization),
-                    error => error
-                );
-        }
-
-        private static Result<Organization, OperationError> ModifyOrganization(Organization organization,
-            OrganizationMasterDataUpdateParameters parameters)
-        {
-            organization.Cvr = parameters.Cvr?.NewValue.Value;
-            organization.Adress = parameters.Address?.NewValue.Value;
-            organization.Email = parameters.Email?.NewValue.Value;
-            organization.Phone = parameters.Phone?.NewValue.Value;
-            return organization;
-
         }
     }
 }

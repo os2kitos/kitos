@@ -58,7 +58,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             if (!ModelState.IsValid) return BadRequest();
             
             var updateParameters = _organizationWriteModelMapper.ToMasterDataUpdateParameters(requestDto);
-            return _organizationService.UpdateOrganizationMasterData(organizationUuid, updateParameters)
+            return _organizationWriteService.UpdateMasterData(organizationUuid, updateParameters)
                 .Select(_organizationResponseMapper.ToOrganizationDTO)
                 .Match(Ok, FromOperationError);
         }

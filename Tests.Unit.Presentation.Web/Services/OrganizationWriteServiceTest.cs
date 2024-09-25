@@ -27,7 +27,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IDomainEvents> _domainEvents;
-        private readonly Mock<IOrganizationRepository> _organizationrepository;
+        private readonly Mock<IOrganizationRepository> _organizationRepository;
         private readonly Mock<IOrganizationService> _organizationService;
         private readonly Mock<IEntityIdentityResolver> _identityResolver;
         private readonly Mock<IGenericRepository<ContactPerson>> _contactPersonRepository;
@@ -41,7 +41,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext = new Mock<IAuthorizationContext>();
             _transactionManager = new Mock<ITransactionManager>();
             _domainEvents = new Mock<IDomainEvents>();  
-            _organizationrepository = new Mock<IOrganizationRepository>();
+            _organizationRepository = new Mock<IOrganizationRepository>();
             _organizationService = new Mock<IOrganizationService>();
             _identityResolver = new Mock<IEntityIdentityResolver>();
             _contactPersonRepository = new Mock<IGenericRepository<ContactPerson>>();
@@ -51,7 +51,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 _domainEvents.Object,
                 _organizationService.Object,
                 _authorizationContext.Object,
-                _organizationrepository.Object,
+                _organizationRepository.Object,
                 _identityResolver.Object,
                 _contactPersonRepository.Object,
                 _dataResponsibleRepository.Object,
@@ -128,7 +128,7 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(newPhone.NewValue.Value, updatedOrganization.Phone);
             Assert.Equal(newAddress.NewValue.Value, updatedOrganization.Adress);
             Assert.Equal(newEmail.NewValue.Value, updatedOrganization.Email);
-            _organizationrepository.Verify(_ => _.Update(organization.Object));
+            _organizationRepository.Verify(_ => _.Update(organization.Object));
         }
 
         [Fact]
@@ -157,7 +157,7 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Null(updatedOrganization.Phone);
             Assert.Null(updatedOrganization.Adress);
             Assert.Null(updatedOrganization.Email);
-            _organizationrepository.Verify(_ => _.Update(organization.Object));
+            _organizationRepository.Verify(_ => _.Update(organization.Object));
         }
 
         [Fact]
