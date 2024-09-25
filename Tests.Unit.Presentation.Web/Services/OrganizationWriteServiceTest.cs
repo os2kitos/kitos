@@ -194,7 +194,11 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
                 .Returns(true);
-
+            var dataResponsible = new DataResponsible();
+            _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(dataResponsible);
+            var contactPerson = new ContactPerson();
+            _organizationService.Setup(_ => _.GetContactPerson(orgId))
+                .Returns(contactPerson);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
@@ -212,6 +216,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var org = CreateOrganization();
             var orgId = org.Id;
             var updateParameters = SetupUpdateMasterDataRoles(orgId);
+            var contactPerson = new ContactPerson();
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
                 .Returns(orgId);
@@ -224,7 +229,8 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
                 .Returns(true);
-
+            _organizationService.Setup(_ => _.GetContactPerson(orgId))
+                .Returns(contactPerson);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
@@ -241,6 +247,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             var org = CreateOrganization();
             var orgId = org.Id;
+            var dataProtectionAdvisor = new DataProtectionAdvisor();
             var updateParameters = SetupUpdateMasterDataRoles(orgId);
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
@@ -254,7 +261,12 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
                 .Returns(false);
-
+            _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(dataProtectionAdvisor);
+            var dataResponsible = new DataResponsible();
+            _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(dataResponsible);
+            var contactPerson = new ContactPerson();
+            _organizationService.Setup(_ => _.GetContactPerson(orgId))
+                .Returns(contactPerson);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
@@ -335,7 +347,9 @@ namespace Tests.Unit.Presentation.Web.Services
             _dataProtectionAdvisorRepository.Setup(_ =>
                     _.AsQueryable())
                 .Returns(new List<DataProtectionAdvisor>().AsQueryable());
-
+            _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(Maybe<ContactPerson>.None);
+            _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(Maybe<DataResponsible>.None);
+            _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(Maybe<DataProtectionAdvisor>.None);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
@@ -357,6 +371,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var expectedContactPerson = cp ?? SetupGetMasterDataRolesContactPerson(orgId);
             var expectedDataResponsible = dr ?? SetupGetMasterDataRolesDataResponsible(orgId);
             var expectedDataProtectionAdvisor = dpa ?? SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
+            //TODO RM repo calls here? then recycle for that method which won't have repo calls too
             _contactPersonRepository.Setup(_ =>
                     _.AsQueryable())
                 .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
@@ -377,26 +392,82 @@ namespace Tests.Unit.Presentation.Web.Services
             {
                 ContactPerson = new ContactPersonUpdateParameters()
                 {
-                    Email = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedContactPerson.Email)),
-                    Name = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedContactPerson.Name)),
-                    LastName = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedContactPerson.LastName)),
-                    PhoneNumber = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedContactPerson.PhoneNumber)),
+                    Email = OptionalValueChange<Maybe<string>>.With(
+            expectedContactPerson.Email != null
+                ? Maybe<string>.Some(expectedContactPerson.Email)
+                : Maybe<string>.None
+        ),
+                    Name = OptionalValueChange<Maybe<string>>.With(
+            expectedContactPerson.Name != null
+                ? Maybe<string>.Some(expectedContactPerson.Name)
+                : Maybe<string>.None
+        ),
+                    LastName = OptionalValueChange<Maybe<string>>.With(
+            expectedContactPerson.LastName != null
+                ? Maybe<string>.Some(expectedContactPerson.LastName)
+                : Maybe<string>.None
+        ),
+                    PhoneNumber = OptionalValueChange<Maybe<string>>.With(
+            expectedContactPerson.PhoneNumber != null
+                ? Maybe<string>.Some(expectedContactPerson.PhoneNumber)
+                : Maybe<string>.None
+        ),
                 },
                 DataResponsible = new DataResponsibleUpdateParameters()
                 {
-                    Email = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedDataResponsible.Email)),
-                    Name = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedDataResponsible.Name)),
-                    Cvr = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedDataResponsible.Cvr)),
-                    Address = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedDataResponsible.Adress)),
-                    Phone = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedDataResponsible.Phone))
+                    Email = OptionalValueChange<Maybe<string>>.With(
+            expectedDataResponsible.Email != null
+                ? Maybe<string>.Some(expectedDataResponsible.Email)
+                : Maybe<string>.None
+        ),
+                    Name = OptionalValueChange<Maybe<string>>.With(
+            expectedDataResponsible.Name != null
+                ? Maybe<string>.Some(expectedDataResponsible.Name)
+                : Maybe<string>.None
+        ),
+                    Cvr = OptionalValueChange<Maybe<string>>.With(
+            expectedDataResponsible.Cvr != null
+                ? Maybe<string>.Some(expectedDataResponsible.Cvr)
+                : Maybe<string>.None
+        ),
+                    Address = OptionalValueChange<Maybe<string>>.With(
+            expectedDataResponsible.Adress != null
+                ? Maybe<string>.Some(expectedDataResponsible.Adress)
+                : Maybe<string>.None
+        ),
+                    Phone = OptionalValueChange<Maybe<string>>.With(
+            expectedDataResponsible.Phone != null
+                ? Maybe<string>.Some(expectedDataResponsible.Phone)
+                : Maybe<string>.None
+        )
                 },
                 DataProtectionAdvisor = new DataProtectionAdvisorUpdateParameters()
                 {
-                    Email = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedDataProtectionAdvisor.Email)),
-                    Name = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedDataProtectionAdvisor.Name)),
-                    Cvr = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedDataProtectionAdvisor.Cvr)),
-                    Address = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedDataProtectionAdvisor.Adress)),
-                    Phone = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(expectedDataProtectionAdvisor.Phone))
+                    Email = OptionalValueChange<Maybe<string>>.With(
+            expectedDataProtectionAdvisor.Email != null
+                ? Maybe<string>.Some(expectedDataProtectionAdvisor.Email)
+                : Maybe<string>.None
+        ),
+                    Name = OptionalValueChange<Maybe<string>>.With(
+            expectedDataProtectionAdvisor.Name != null
+                ? Maybe<string>.Some(expectedDataProtectionAdvisor.Name)
+                : Maybe<string>.None
+        ),
+                    Cvr = OptionalValueChange<Maybe<string>>.With(
+            expectedDataProtectionAdvisor.Cvr != null
+                ? Maybe<string>.Some(expectedDataProtectionAdvisor.Cvr)
+                : Maybe<string>.None
+        ),
+                    Address = OptionalValueChange<Maybe<string>>.With(
+            expectedDataProtectionAdvisor.Adress != null
+                ? Maybe<string>.Some(expectedDataProtectionAdvisor.Adress)
+                : Maybe<string>.None
+        ),
+                    Phone = OptionalValueChange<Maybe<string>>.With(
+            expectedDataProtectionAdvisor.Phone != null
+                ? Maybe<string>.Some(expectedDataProtectionAdvisor.Phone)
+                : Maybe<string>.None
+        )
                 }
             };
         }
