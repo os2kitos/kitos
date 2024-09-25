@@ -12,6 +12,8 @@ namespace Core.ApplicationServices.Users.Write
 
         Result<User, OperationError> Update(Guid organizationUuid, Guid userUuid, UpdateUserParameters parameters);
 
+        Maybe<OperationError> SendNotification(Guid organizationUuid, Guid userUuid);
+
         Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(
             Guid organizationUuid);
     }
