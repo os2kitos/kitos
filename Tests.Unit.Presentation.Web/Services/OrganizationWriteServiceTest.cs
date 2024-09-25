@@ -321,16 +321,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
                 .Returns(true);
-
-            _contactPersonRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<ContactPerson>().AsQueryable());
-            _dataResponsibleRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataResponsible>().AsQueryable());
-            _dataProtectionAdvisorRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataProtectionAdvisor>().AsQueryable());
             _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(Maybe<ContactPerson>.None);
             _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(Maybe<DataResponsible>.None);
             _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(Maybe<DataProtectionAdvisor>.None);
@@ -355,16 +345,6 @@ namespace Tests.Unit.Presentation.Web.Services
             var expectedContactPerson = cp ?? SetupGetMasterDataRolesContactPerson(orgId);
             var expectedDataResponsible = dr ?? SetupGetMasterDataRolesDataResponsible(orgId);
             var expectedDataProtectionAdvisor = dpa ?? SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
-            //TODO RM repo calls here? then recycle for that method which won't have repo calls too
-            _contactPersonRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
-            _dataResponsibleRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
-            _dataProtectionAdvisorRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
             return GetRolesUpdateParameters(expectedContactPerson, expectedDataResponsible,
                 expectedDataProtectionAdvisor);
         }
