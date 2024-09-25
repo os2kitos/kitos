@@ -1,9 +1,10 @@
-﻿using Core.ApplicationServices.Model.Shared;
+﻿using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.Shared;
 
 namespace Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
 
 public class ContactPersonUpdateParameters: OrganizationMasterDataRoleUpdateParameters
 {
-    public OptionalValueChange<string> LastName { get; set; }
-    public OptionalValueChange<string> PhoneNumber { get; set; }
+    public OptionalValueChange<Maybe<string>> LastName { get; set; }
+    public OptionalValueChange<Maybe<string>> PhoneNumber { get; set; }
 }

@@ -2,6 +2,7 @@
 using System.Net;
 using Core.ApplicationServices.Organizations;
 using System.Web.Http;
+using Core.ApplicationServices.Organizations.Write;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 using Presentation.Web.Controllers.API.V2.External.Generic;
@@ -20,16 +21,18 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
     public class OrganizationsInternalV2Controller : InternalApiV2Controller
     {
         private readonly IOrganizationService _organizationService;
+        private readonly IOrganizationWriteService _organizationWriteService;
         private readonly IResourcePermissionsResponseMapper _permissionsResponseMapper;
         private readonly IOrganizationResponseMapper _organizationResponseMapper;
         private readonly IOrganizationWriteModelMapper _organizationWriteModelMapper;
 
-        public OrganizationsInternalV2Controller(IOrganizationService organizationService, IResourcePermissionsResponseMapper permissionsResponseMapper, IOrganizationResponseMapper organizationResponseMapper, IOrganizationWriteModelMapper organizationWriteModelMapper)
+        public OrganizationsInternalV2Controller(IOrganizationService organizationService, IResourcePermissionsResponseMapper permissionsResponseMapper, IOrganizationResponseMapper organizationResponseMapper, IOrganizationWriteModelMapper organizationWriteModelMapper, IOrganizationWriteService organizationWriteService)
         {
             _organizationService = organizationService;
             _permissionsResponseMapper = permissionsResponseMapper;
             _organizationResponseMapper = organizationResponseMapper;
             _organizationWriteModelMapper = organizationWriteModelMapper;
+            _organizationWriteService = organizationWriteService;
         }
 
         [Route("permissions")]
@@ -99,7 +102,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             if (!ModelState.IsValid) return BadRequest();
 
             var updateParameters = _organizationWriteModelMapper.ToMasterDataRolesUpdateParameters(organizationUuid, requestDto);
-            return _organizationService.UpsertOrganizationMasterDataRoles(organizationUuid, updateParameters)
+            return _organizationWriteService.UpsertOrganizationMasterDataRoles(organizationUuid, updateParameters)
                 .Select(_organizationResponseMapper.ToRolesDTO)
                 .Match(Ok, FromOperationError);
         }

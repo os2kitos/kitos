@@ -56,46 +56,74 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
 
     private static Maybe<ContactPersonUpdateParameters> ToContactPersonUpdateParameters(ContactPersonRequestDTO dto)
         {
-            return dto != null
-            ? new ContactPersonUpdateParameters()
+            if (dto == null) return Maybe<ContactPersonUpdateParameters>.None;
+
+            return new ContactPersonUpdateParameters()
             {
-                Email = OptionalValueChange<string>.With(dto.Email),
-                LastName = OptionalValueChange<string>.With(dto.LastName),
-                Name = OptionalValueChange<string>.With(dto.Name),
-                PhoneNumber = OptionalValueChange<string>.With(dto.PhoneNumber)
-            }
-            : Maybe<ContactPersonUpdateParameters>.None;
+                Email = dto.Email != null 
+                    ? OptionalValueChange<Maybe<string>>.With(dto.Email) 
+                    : Maybe<string>.None.AsChangedValue(), 
+                LastName = dto.LastName != null 
+                    ? OptionalValueChange<Maybe<string>>.With(dto.LastName) 
+                    : Maybe<string>.None.AsChangedValue(),
+                Name = dto.Name != null 
+                    ? OptionalValueChange<Maybe<string>>.With(dto.Name) 
+                    : Maybe<string>.None.AsChangedValue(),
+                PhoneNumber = dto.PhoneNumber != null 
+                    ? OptionalValueChange<Maybe<string>>.With(dto.PhoneNumber) 
+                    : Maybe<string>.None.AsChangedValue()
+            };
         }
 
         private static Maybe<DataResponsibleUpdateParameters> ToDataResponsibleUpdateParameters(DataResponsibleRequestDTO dto)
         {
-            return dto != null
-                ? new DataResponsibleUpdateParameters()
+            if (dto == null) return Maybe<DataResponsibleUpdateParameters>.None;
+
+            return new DataResponsibleUpdateParameters()
                 {
-                    Email = OptionalValueChange<string>.With(dto.Email),
-                    Cvr = OptionalValueChange<string>.With(dto.Cvr),
-                    Name = OptionalValueChange<string>.With(dto.Name),
-                    Phone = OptionalValueChange<string>.With(dto.Phone),
-                    Address = OptionalValueChange<string>.With(dto.Address)
-                }
-                : Maybe<DataResponsibleUpdateParameters>.None;
+                    Email = dto.Email != null
+                        ? OptionalValueChange<Maybe<string>>.With(dto.Email)
+                        : Maybe<string>.None.AsChangedValue(),
+                    Cvr = dto.Cvr != null
+                        ? OptionalValueChange<Maybe<string>>.With(dto.Cvr)
+                        : Maybe<string>.None.AsChangedValue(),
+                    Name = dto.Name != null
+                        ? OptionalValueChange<Maybe<string>>.With(dto.Name)
+                        : Maybe<string>.None.AsChangedValue(),
+                    Phone = dto.Phone != null
+                        ? OptionalValueChange<Maybe<string>>.With(dto.Phone)
+                        : Maybe<string>.None.AsChangedValue(),
+                    Address = dto.Address != null
+                        ? OptionalValueChange<Maybe<string>>.With(dto.Address)
+                        : Maybe<string>.None.AsChangedValue()
+                };
         }
 
         private static Maybe<DataProtectionAdvisorUpdateParameters> ToDataProtectionAdvisorUpdateParameters(DataProtectionAdvisorRequestDTO dto)
         {
-            return dto != null
-                ? new DataProtectionAdvisorUpdateParameters()
-                {
-                    Email = OptionalValueChange<string>.With(dto.Email),
-                    Cvr = OptionalValueChange<string>.With(dto.Cvr),
-                    Name = OptionalValueChange<string>.With(dto.Name),
-                    Phone = OptionalValueChange<string>.With(dto.Phone),
-                    Address = OptionalValueChange<string>.With(dto.Address)
-                }
-                : Maybe<DataProtectionAdvisorUpdateParameters>.None;
-        }
+        if (dto == null) return Maybe<DataProtectionAdvisorUpdateParameters>.None;
 
-        public OrganizationWriteModelMapper(ICurrentHttpRequest currentHttpRequest) : base(currentHttpRequest)
+        return new DataProtectionAdvisorUpdateParameters()
+        {
+            Email = dto.Email != null
+                ? OptionalValueChange<Maybe<string>>.With(dto.Email)
+                : Maybe<string>.None.AsChangedValue(),
+            Cvr = dto.Cvr != null
+                ? OptionalValueChange<Maybe<string>>.With(dto.Cvr)
+                : Maybe<string>.None.AsChangedValue(),
+            Name = dto.Name != null
+                ? OptionalValueChange<Maybe<string>>.With(dto.Name)
+                : Maybe<string>.None.AsChangedValue(),
+            Phone = dto.Phone != null
+                ? OptionalValueChange<Maybe<string>>.With(dto.Phone)
+                : Maybe<string>.None.AsChangedValue(),
+            Address = dto.Address != null
+                ? OptionalValueChange<Maybe<string>>.With(dto.Address)
+                : Maybe<string>.None.AsChangedValue()
+        };
+    }
+
+    public OrganizationWriteModelMapper(ICurrentHttpRequest currentHttpRequest) : base(currentHttpRequest)
         {
         }
 }
