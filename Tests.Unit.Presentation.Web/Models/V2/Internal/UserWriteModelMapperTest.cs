@@ -3,25 +3,19 @@ using Moq;
 using Presentation.Web.Controllers.API.V2.Internal.Users.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.User;
-using Tests.Toolkit.Extensions;
-using Tests.Unit.Presentation.Web.Models.V2;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2.Internal
 {
-    public class UserWriteModelMapperTest : WriteModelMapperTestBase
+    public class UserWriteModelMapperTest : WithAutoFixture
     {
         private readonly UserWriteModelMapper _sut;
-        private readonly Mock<ICurrentHttpRequest> _currentHttpRequestMock;
 
         public UserWriteModelMapperTest()
         {
-            _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
-                .Returns(GetAllInputPropertyNames<UpdateUserRequestDTO>());
-            _sut = new UserWriteModelMapper(_currentHttpRequestMock.Object);
+            var httpRequest = new Mock<ICurrentHttpRequest>();
+            _sut = new UserWriteModelMapper(httpRequest.Object);
         }
 
         [Fact]
@@ -45,23 +39,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
                     .DefaultUserStartPreference));
             Assert.Equal(request.SendMailOnCreation, parameters.SendMailOnCreation);
             Assert.Equal(request.Roles, parameters.Roles.Select(x => x.ToOrganizationRoleChoice()));
-        }
-
-        [Fact]
-        public void Can_Map_Update_Request_To_Update_Parameters()
-        {
-            var request = A<UpdateUserRequestDTO>();
-
-            var parameters = _sut.FromPATCH(request);
-
-            Assert.Equal(request.Email, AssertPropertyContainsDataChange(parameters.Email));
-            Assert.Equal(request.FirstName, AssertPropertyContainsDataChange(parameters.FirstName));
-            Assert.Equal(request.LastName, AssertPropertyContainsDataChange(parameters.LastName));
-            Assert.Equal(request.PhoneNumber, AssertPropertyContainsDataChange(parameters.PhoneNumber));
-            Assert.Equal(request.DefaultUserStartPreference, DefaultUserStartPreferenceChoiceMapper.GetDefaultUserStartPreferenceChoice(AssertPropertyContainsDataChange(parameters.DefaultUserStartPreference)));
-            Assert.Equal(request.HasApiAccess, AssertPropertyContainsDataChange(parameters.HasApiAccess));
-            Assert.Equal(request.HasStakeHolderAccess, AssertPropertyContainsDataChange(parameters.HasStakeHolderAccess));
-            Assert.Equal(request.Roles, AssertPropertyContainsDataChange(parameters.Roles).Select(x => x.ToOrganizationRoleChoice()));
         }
     }
 }

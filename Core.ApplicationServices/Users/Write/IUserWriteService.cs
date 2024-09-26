@@ -9,11 +9,7 @@ namespace Core.ApplicationServices.Users.Write
     public interface IUserWriteService
     {
         Result<User, OperationError> Create(Guid organizationUuid, CreateUserParameters parameters);
-
-        Result<User, OperationError> Update(Guid organizationUuid, Guid userUuid, UpdateUserParameters parameters);
-
         Maybe<OperationError> SendNotification(Guid organizationUuid, Guid userUuid);
-
         Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(
             Guid organizationUuid);
     }

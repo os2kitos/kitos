@@ -45,21 +45,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
                 .Match(MapUserCreatedResponse, FromOperationError);
         }
 
-        [Route("{userUuid}/patch")]
-        [HttpPatch]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UserResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PatchUnit([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid,
-            [FromBody] UpdateUserRequestDTO parameters)
-        {
-            return _userWriteService.Update(organizationUuid, userUuid, _writeModelMapper.FromPATCH(parameters))
-                .Select(_userResponseModelMapper.ToUserResponseDTO)
-                .Match(Ok, FromOperationError);
-        }
-
         [Route("{userUuid}/notifications/send")]
         [HttpPost]
         [SwaggerResponse(HttpStatusCode.OK)]

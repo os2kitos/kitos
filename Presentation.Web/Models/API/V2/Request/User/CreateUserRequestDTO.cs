@@ -1,19 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 
 namespace Presentation.Web.Models.API.V2.Request.User
 {
     public class CreateUserRequestDTO : BaseUserRequestDTO
     {
-        [Required]
-        [EmailAddress]
-        public new string Email { get; set; }
-
-        [Required]
-        public new string FirstName { get; set; }
-
-        [Required]
-        public new string LastName { get; set; }
-
         public bool SendMailOnCreation { get; set; }
+        public IEnumerable<OrganizationRoleChoice> Roles { get; set; }
     }
 }
