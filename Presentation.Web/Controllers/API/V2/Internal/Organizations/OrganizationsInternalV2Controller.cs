@@ -59,7 +59,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             
             var updateParameters = _organizationWriteModelMapper.ToMasterDataUpdateParameters(requestDto);
             return _organizationWriteService.UpdateMasterData(organizationUuid, updateParameters)
-                .Select(_organizationResponseMapper.ToOrganizationDTO)
+                .Select(_organizationResponseMapper.ToMasterDataDTO)
                 .Match(Ok, FromOperationError);
         }
 
