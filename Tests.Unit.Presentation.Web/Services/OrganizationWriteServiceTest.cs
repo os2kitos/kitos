@@ -327,6 +327,9 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(Maybe<DataProtectionAdvisor>.None);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+            _authorizationContext.Setup(_ => _.AllowCreate<ContactPerson>(orgId)).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowCreate<DataResponsible>(orgId)).Returns(true);
 
             var result = _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
 
@@ -376,7 +379,9 @@ namespace Tests.Unit.Presentation.Web.Services
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
                 .Returns(orgId);
-
+            _authorizationContext.Setup(_ => _.AllowCreate<ContactPerson>(orgId)).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowCreate<DataResponsible>(orgId)).Returns(true);
             var rolesResult = _sut.GetOrCreateOrganizationMasterDataRoles(org.Uuid);
 
             Assert.True(rolesResult.Ok);
@@ -400,6 +405,55 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Failed);
             var error = result.Error;
             Assert.Equal(OperationFailure.BadInput, error.FailureType);
+        }
+
+        public enum RoleType
+        {
+            ContactPerson,
+            DataResponsible,
+            DataProtectionAdvisor
+        }
+
+        [Theory]
+        [InlineData(RoleType.ContactPerson)]
+        [InlineData(RoleType.DataResponsible)]
+        [InlineData(RoleType.DataProtectionAdvisor)]
+        public void Get_Or_Create_Creates_Returns_Forbidden_If_Missing_Role_Create_Rights(RoleType roleType)
+        {
+            var org = CreateOrganization();
+            var orgId = org.Id;
+            _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(Maybe<ContactPerson>.None);
+            _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(Maybe<DataResponsible>.None);
+            _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(Maybe<DataProtectionAdvisor>.None);
+            _identityResolver.Setup(_ =>
+                    _.ResolveDbId<Organization>(org.Uuid))
+                .Returns(orgId);
+            switch (roleType)
+            {
+                case RoleType.ContactPerson:
+                    _authorizationContext.Setup(_ => _.AllowCreate<ContactPerson>(orgId)).Returns(false);
+                    _authorizationContext.Setup(_ => _.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
+                    _authorizationContext.Setup(_ => _.AllowCreate<DataResponsible>(orgId)).Returns(true);
+                    break;
+                case RoleType.DataResponsible:
+                    _authorizationContext.Setup(_ => _.AllowCreate<DataResponsible>(orgId)).Returns(false);
+                    _authorizationContext.Setup(_ => _.AllowCreate<ContactPerson>(orgId)).Returns(true);
+                    _authorizationContext.Setup(_ => _.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
+
+                    break;
+                case RoleType.DataProtectionAdvisor:
+                    _authorizationContext.Setup(_ => _.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(false);
+                    _authorizationContext.Setup(_ => _.AllowCreate<ContactPerson>(orgId)).Returns(true);
+                    _authorizationContext.Setup(_ => _.AllowCreate<DataResponsible>(orgId)).Returns(true);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(roleType), roleType, null);
+            }
+
+            var rolesResult = _sut.GetOrCreateOrganizationMasterDataRoles(org.Uuid);
+
+            Assert.False(rolesResult.Ok);
+            Assert.Equal(OperationFailure.Forbidden, rolesResult.Error);
         }
 
         private OrganizationMasterDataRolesUpdateParameters SetupUpdateMasterDataRoles(int orgId,

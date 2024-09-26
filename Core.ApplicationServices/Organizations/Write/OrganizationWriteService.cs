@@ -108,6 +108,36 @@ public class OrganizationWriteService : IOrganizationWriteService{
         return organization;
     }
 
+    public Result<OrganizationMasterDataRoles, OperationError> GetOrCreateOrganizationMasterDataRoles(Guid organizationUuid)
+    {
+        var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
+        if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+        var orgId = organizationDbIdMaybe.Value;
+
+        var contactPersonResult = _organizationService.GetContactPerson(orgId)
+            .Match(cp => cp,
+                () => AuthorizeCreationAndCreateContactPerson(orgId));
+        if (contactPersonResult.Failed) return contactPersonResult.Error;
+
+        var dataResponsibleResult = _organizationService.GetDataResponsible(orgId)
+            .Match(dr => dr,
+                () => AuthorizeCreationAndCreateDataResponsible(orgId));
+        if (dataResponsibleResult.Failed) return dataResponsibleResult.Error;
+
+        var dataProtectionAdvisorResult = _organizationService.GetDataProtectionAdvisor(orgId)
+            .Match(dpa => dpa,
+                () => CreateDataProtectionAdvisor(orgId));
+        if (dataProtectionAdvisorResult.Failed) return dataProtectionAdvisorResult.Error;
+
+        return new OrganizationMasterDataRoles
+        {
+            OrganizationUuid = organizationUuid,
+            ContactPerson = contactPersonResult.Value,
+            DataResponsible = dataResponsibleResult.Value,
+            DataProtectionAdvisor = dataProtectionAdvisorResult.Value
+        };
+    }
+
     public Result<OrganizationMasterDataRoles, OperationError> UpsertOrganizationMasterDataRoles(Guid organizationUuid,
         OrganizationMasterDataRolesUpdateParameters updateParameters)
     {
@@ -161,14 +191,17 @@ public class OrganizationWriteService : IOrganizationWriteService{
         {
             return _organizationService.GetContactPerson(organizationId)
                 .Match(contactPerson => contactPerson,
-                    () => CreateContactPerson(organizationId));
+                    () => AuthorizeCreationAndCreateContactPerson(organizationId));
         }
 
     private Result<ContactPerson, OperationError> ValidateModifyContactPerson(ContactPerson contactPerson) =>
         _authorizationContext.AllowModify(contactPerson) ? contactPerson : new OperationError(OperationFailure.Forbidden);
 
-    public ContactPerson CreateContactPerson(int orgId)
+    private Result<ContactPerson, OperationError> AuthorizeCreationAndCreateContactPerson(int orgId)
     {
+        var allowCreate = _authorizationContext.AllowCreate<ContactPerson>(orgId);
+        if (!allowCreate) return new OperationError(OperationFailure.Forbidden);
+
         var newContactPerson = new ContactPerson() { OrganizationId = orgId };
         _contactPersonRepository.Insert(newContactPerson);
         _domainEvents.Raise(new EntityCreatedEvent<ContactPerson>(newContactPerson));
@@ -217,11 +250,14 @@ public class OrganizationWriteService : IOrganizationWriteService{
     {
         return _organizationService.GetDataResponsible(orgId)
             .Match(dr => dr,
-                () => CreateDataResponsible(orgId));
+                () => AuthorizeCreationAndCreateDataResponsible(orgId));
     }
 
-    public DataResponsible CreateDataResponsible(int orgId)
+    private Result<DataResponsible, OperationError> AuthorizeCreationAndCreateDataResponsible(int orgId)
     {
+        var allowCreate = _authorizationContext.AllowCreate<DataResponsible>(orgId);
+        if (!allowCreate) return new OperationError(OperationFailure.Forbidden);
+
         var newDataResponsible = new DataResponsible() { OrganizationId = orgId };
         _dataResponsibleRepository.Insert(newDataResponsible);
         _domainEvents.Raise(new EntityCreatedEvent<DataResponsible>(newDataResponsible));
@@ -274,8 +310,11 @@ public class OrganizationWriteService : IOrganizationWriteService{
             .Match(dataProtectionAdvisor => dataProtectionAdvisor,
                 () => CreateDataProtectionAdvisor(orgId));
     }
-    public DataProtectionAdvisor CreateDataProtectionAdvisor(int orgId)
+    private Result<DataProtectionAdvisor, OperationError> CreateDataProtectionAdvisor(int orgId)
     {
+        var allowCreate = _authorizationContext.AllowCreate<DataProtectionAdvisor>(orgId);
+        if (!allowCreate) return new OperationError(OperationFailure.Forbidden);
+
         var newDataProtectionAdvisor = new DataProtectionAdvisor() { OrganizationId = orgId };
         _dataProtectionAdvisorRepository.Insert(newDataProtectionAdvisor);
         _domainEvents.Raise(new EntityCreatedEvent<DataProtectionAdvisor>(newDataProtectionAdvisor));
@@ -315,32 +354,5 @@ public class OrganizationWriteService : IOrganizationWriteService{
         _dataProtectionAdvisorRepository.Save();
 
         return dataProtectionAdvisor;
-    }
-
-    public Result<OrganizationMasterDataRoles, OperationError> GetOrCreateOrganizationMasterDataRoles(Guid organizationUuid)
-    {
-        var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
-        if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
-        var orgId = organizationDbIdMaybe.Value;
-
-        var contactPersonMaybe = _organizationService.GetContactPerson(orgId)
-            .Match(cp => cp,
-                () => CreateContactPerson(orgId));
-
-        var dataResponsibleMaybe = _organizationService.GetDataResponsible(orgId)
-            .Match(dr => dr,
-                () => CreateDataResponsible(orgId));
-
-        var dataProtectionAdvisorMaybe = _organizationService.GetDataProtectionAdvisor(orgId)
-            .Match(dpa => dpa,
-                () => CreateDataProtectionAdvisor(orgId));
-
-        return new OrganizationMasterDataRoles
-        {
-            OrganizationUuid = organizationUuid,
-            ContactPerson = contactPersonMaybe,
-            DataResponsible = dataResponsibleMaybe,
-            DataProtectionAdvisor = dataProtectionAdvisorMaybe
-        };
     }
 }

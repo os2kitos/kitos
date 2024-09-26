@@ -14,9 +14,6 @@ namespace Core.ApplicationServices.Organizations.Write
             OrganizationMasterDataUpdateParameters parameters);
 
         Result<OrganizationMasterDataRoles, OperationError> UpsertOrganizationMasterDataRoles(Guid organizationUuid, OrganizationMasterDataRolesUpdateParameters updateParameters);
-        ContactPerson CreateContactPerson(int orgId);
-        DataResponsible CreateDataResponsible(int orgId);
-        DataProtectionAdvisor CreateDataProtectionAdvisor(int orgId);
         
         public Result<OrganizationMasterDataRoles, OperationError>
             GetOrCreateOrganizationMasterDataRoles(Guid organizationUuid);
