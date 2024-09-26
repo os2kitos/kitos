@@ -47,9 +47,13 @@ public class OrganizationWriteService : IOrganizationWriteService{
         var result = _organizationService.GetOrganization(organizationUuid)
             .Bind(organization => Update(organization, parameters));
 
-        if (result.Ok) transaction.Commit();
-        else transaction.Rollback();
+        if (result.Failed)
+        {
+            transaction.Rollback();
+            return result;
+        }
 
+        transaction.Commit();
         return result;
     }
 
@@ -109,11 +113,16 @@ public class OrganizationWriteService : IOrganizationWriteService{
     {
         using var transaction = _transactionManager.Begin();
 
-        var rolesResult = AuthorizeAndPerformMasterDataRolesGetOrCreate(organizationUuid);
+        var result = AuthorizeAndPerformMasterDataRolesGetOrCreate(organizationUuid);
 
-        if (rolesResult.Ok) transaction.Commit();
-        else transaction.Rollback();
-        return rolesResult;
+        if (result.Failed)
+        {
+            transaction.Rollback();
+            return result;
+        }
+
+        transaction.Commit();
+        return result;
     }
 
     private Result<OrganizationMasterDataRoles, OperationError> AuthorizeAndPerformMasterDataRolesGetOrCreate(
@@ -152,11 +161,16 @@ public class OrganizationWriteService : IOrganizationWriteService{
     {
         using var transaction = _transactionManager.Begin();
 
-        var rolesResult = AuthorizeAndPerformMasterDataRolesUpsert(organizationUuid, updateParameters);
+        var result = AuthorizeAndPerformMasterDataRolesUpsert(organizationUuid, updateParameters);
 
-        if (rolesResult.Ok) transaction.Commit();
-        else transaction.Rollback();
-        return rolesResult;
+        if (result.Failed)
+        {
+            transaction.Rollback();
+            return result;
+        }
+
+        transaction.Commit();
+        return result;
     }
 
     private Result<OrganizationMasterDataRoles, OperationError> AuthorizeAndPerformMasterDataRolesUpsert(Guid organizationUuid,
