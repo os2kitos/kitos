@@ -26,7 +26,7 @@ namespace Core.ApplicationServices.Users.Write
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationService _organizationService;
         private readonly IEntityIdentityResolver _entityIdentityResolver;
-        
+
         public UserWriteService(IUserService userService,
             IOrganizationRightsService organizationRightsService,
             ITransactionManager transactionManager,
@@ -93,7 +93,6 @@ namespace Core.ApplicationServices.Users.Write
             {
                 transactionManager.Rollback();
                 return updateResult.Error;
-                ;
             }
             transactionManager.Commit();
             return updateResult.Value;
@@ -123,28 +122,20 @@ namespace Core.ApplicationServices.Users.Write
                 .Select(org => UserCollectionPermissionsResult.FromOrganization(org, _authorizationContext));
         }
 
-        private Result<User, OperationError> PerformUpdates(User user, Guid organizationUuid, UpdateUserParameters parameters)
+        private Result<User, OperationError> PerformUpdates(User orgUser, Guid organizationUuid, UpdateUserParameters parameters)
         {
-            return user.WithOptionalUpdate(parameters.FirstName, (user, firstName) => user.Name = firstName)
+            return orgUser.WithOptionalUpdate(parameters.FirstName, (user, firstName) => user.Name = firstName)
                 .Bind(user =>
-                    user.WithOptionalUpdate(parameters.LastName, (user, lastName) => user.LastName = lastName))
+                    user.WithOptionalUpdate(parameters.LastName, (userToUpdate, lastName) => userToUpdate.LastName = lastName))
                 .Bind(user => user.WithOptionalUpdate(parameters.Email, UpdateEmail)
-                    .Bind(user =>
-                        user.WithOptionalUpdate(parameters.PhoneNumber, UpdatePhoneNumber))
-                    .Bind(user => user.WithOptionalUpdate(parameters.HasStakeHolderAccess,
-                        (user, hasStakeHolderAccess) => user.HasStakeHolderAccess = hasStakeHolderAccess))
-                    .Bind(user => user.WithOptionalUpdate(parameters.HasApiAccess,
-                        (user, hasApiAccess) => user.HasApiAccess = hasApiAccess))
-                    .Bind(user => user.WithOptionalUpdate(parameters.DefaultUserStartPreference,
-                        (user, defaultStartPreference) => user.DefaultUserStartPreference = defaultStartPreference))
-                    .Bind(user => user.WithOptionalUpdate(parameters.Roles, (user, roles) => UpdateRoles(organizationUuid, user, roles))));
-        }
-
-        private Result<User, OperationError> UpdatePhoneNumber(User user, string phoneNumber)
-        {
-            //TODO: Validate if phonenumber is in use or invalid maybe? Again old UI seems to not care
-            user.PhoneNumber = phoneNumber;
-            return user;
+                .Bind(user => user.WithOptionalUpdate(parameters.PhoneNumber, (userToUpdate, phoneNumber) => userToUpdate.PhoneNumber = phoneNumber))
+                .Bind(user => user.WithOptionalUpdate(parameters.HasStakeHolderAccess,
+                    (userToUpdate, hasStakeHolderAccess) => userToUpdate.HasStakeHolderAccess = hasStakeHolderAccess))
+                .Bind(user => user.WithOptionalUpdate(parameters.HasApiAccess,
+                    (userToUpdate, hasApiAccess) => userToUpdate.HasApiAccess = hasApiAccess))
+                .Bind(user => user.WithOptionalUpdate(parameters.DefaultUserStartPreference,
+                    (userToUpdate, defaultStartPreference) => userToUpdate.DefaultUserStartPreference = defaultStartPreference))
+                .Bind(user => user.WithOptionalUpdate(parameters.Roles, (userToUpdate, roles) => UpdateRoles(organizationUuid, userToUpdate, roles))));
         }
 
         private Result<User, OperationError> UpdateEmail(User user, string email)
@@ -153,7 +144,6 @@ namespace Core.ApplicationServices.Users.Write
             {
                 return new OperationError($"Email '{email}' is already in use.", OperationFailure.Conflict);
             }
-            //TODO: Maybe check if email is valid here? Again old UI is seems to only check for '@'
             user.Email = email;
             return user;
         }
@@ -161,8 +151,30 @@ namespace Core.ApplicationServices.Users.Write
         private Result<User, OperationError> UpdateRoles(Guid organizationUuid, User user,
             IEnumerable<OrganizationRole> roles)
         {
-            var oldRights = user.GetRolesInOrganization(organizationUuid);
-            return user; //TODO
+            var organizationResult = _organizationService.GetOrganization(organizationUuid);
+            if (organizationResult.Failed)
+            {
+                return new OperationError($"Organization with uuid {organizationUuid} was not found", OperationFailure.NotFound);
+            }
+            var organization = organizationResult.Value;
+            var defaultUnit = _organizationService.GetDefaultUnit(organization, user);
+            var rightsFromOtherOrganizations = user.OrganizationRights.Where(right => right.Organization.Uuid != organizationUuid);
+            var newRights = roles.Select(role => RoleToRight(role, user, organization, defaultUnit));
+            var updatedRights = rightsFromOtherOrganizations.Concat(newRights).ToList();
+            user.OrganizationRights = updatedRights;
+            return user;
+        }
+
+        private static OrganizationRight RoleToRight(OrganizationRole role, User user, Organization organization, OrganizationUnit defaultUnit = null)
+        {
+            return new OrganizationRight
+            {
+                UserId = user.Id,
+                Role = role,
+                OrganizationId = organization.Id,
+                Organization = organization,
+                DefaultOrgUnitId = defaultUnit?.Id,
+            };
         }
 
         private Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(Organization organization)
