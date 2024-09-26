@@ -110,6 +110,18 @@ public class OrganizationWriteService : IOrganizationWriteService{
 
     public Result<OrganizationMasterDataRoles, OperationError> GetOrCreateOrganizationMasterDataRoles(Guid organizationUuid)
     {
+        using var transaction = _transactionManager.Begin();
+
+        var rolesResult = AuthorizeAndPerformMasterDataRolesGetOrCreate(organizationUuid);
+
+        if (rolesResult.Ok) transaction.Commit();
+        else transaction.Rollback();
+        return rolesResult;
+    }
+
+    private Result<OrganizationMasterDataRoles, OperationError> AuthorizeAndPerformMasterDataRolesGetOrCreate(
+        Guid organizationUuid)
+    {
         var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
         if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
         var orgId = organizationDbIdMaybe.Value;
@@ -199,14 +211,19 @@ public class OrganizationWriteService : IOrganizationWriteService{
 
     private Result<ContactPerson, OperationError> AuthorizeCreationAndCreateContactPerson(int orgId)
     {
-        var allowCreate = _authorizationContext.AllowCreate<ContactPerson>(orgId);
-        if (!allowCreate) return new OperationError(OperationFailure.Forbidden);
-
         var newContactPerson = new ContactPerson() { OrganizationId = orgId };
-        _contactPersonRepository.Insert(newContactPerson);
-        _domainEvents.Raise(new EntityCreatedEvent<ContactPerson>(newContactPerson));
+        return ValidateCreateContactPerson(newContactPerson, orgId).Bind(SaveContactPerson);
+    }
+
+    private Result<ContactPerson, OperationError> ValidateCreateContactPerson(ContactPerson contactPerson, int orgId) =>
+        _authorizationContext.AllowCreate<ContactPerson>(orgId) ? contactPerson : new OperationError(OperationFailure.Forbidden);
+
+    private Result<ContactPerson, OperationError> SaveContactPerson(ContactPerson contactPerson)
+    {
+        _contactPersonRepository.Insert(contactPerson);
+        _domainEvents.Raise(new EntityCreatedEvent<ContactPerson>(contactPerson));
         _contactPersonRepository.Save();
-        return newContactPerson;
+        return contactPerson;
     }
     private Result<ContactPerson, OperationError> ModifyContactPerson(ContactPerson contactPerson, Maybe<ContactPersonUpdateParameters> parametersMaybe)
     {

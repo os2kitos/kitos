@@ -357,6 +357,8 @@ namespace Tests.Unit.Presentation.Web.Services
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
                 .Returns(orgId);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             var rolesResult = _sut.GetOrCreateOrganizationMasterDataRoles(org.Uuid);
 
@@ -382,6 +384,9 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ => _.AllowCreate<ContactPerson>(orgId)).Returns(true);
             _authorizationContext.Setup(_ => _.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
             _authorizationContext.Setup(_ => _.AllowCreate<DataResponsible>(orgId)).Returns(true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
             var rolesResult = _sut.GetOrCreateOrganizationMasterDataRoles(org.Uuid);
 
             Assert.True(rolesResult.Ok);
@@ -399,6 +404,8 @@ namespace Tests.Unit.Presentation.Web.Services
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(invalidOrganizationUuid))
                 .Returns(Maybe<int>.None);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             var result = _sut.GetOrCreateOrganizationMasterDataRoles(invalidOrganizationUuid);
 
@@ -425,6 +432,8 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(Maybe<ContactPerson>.None);
             _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(Maybe<DataResponsible>.None);
             _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(Maybe<DataProtectionAdvisor>.None);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             _identityResolver.Setup(_ =>
                     _.ResolveDbId<Organization>(org.Uuid))
                 .Returns(orgId);
