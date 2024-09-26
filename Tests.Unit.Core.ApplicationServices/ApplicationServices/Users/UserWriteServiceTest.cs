@@ -230,6 +230,67 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             Assert.Equal(canDelete, permissions.Delete);
         }
 
+        [Fact]
+        public void Can_Update_User()
+        {
+            //Arrange
+            var user = SetupUser();
+            var organization = new Organization {Id = A<int>(), Uuid = A<Guid>()};
+            var defaultUnit = new OrganizationUnit {Id = A<int>()};
+            var updateParameters = A<UpdateUserParameters>();
+            ExpectGetUserInOrganizationReturns(organization.Uuid, user.Uuid, user);
+            ExpectModifyPermissionsForUserReturns(user, true);
+            ExpectGetOrganizationReturns(organization.Uuid, organization);
+            _organizationServiceMock.Setup(x => x.GetDefaultUnit(organization, user)).Returns(defaultUnit);
+            var transaction = ExpectTransactionBegins();
+
+            //Act
+            var updatedUserResult = _sut.Update(organization.Uuid, user.Uuid, updateParameters);
+
+            //Assert
+            Assert.True(updatedUserResult.Ok);
+            var updatedUser = updatedUserResult.Value;
+            Assert.Equal(updateParameters.Email.NewValue, updatedUser.Email);
+            Assert.Equal(updateParameters.FirstName.NewValue, updatedUser.Name);
+            Assert.Equal(updateParameters.LastName.NewValue, updatedUser.LastName);
+            Assert.Equal(updateParameters.PhoneNumber.NewValue, updatedUser.PhoneNumber);
+            Assert.Equal(updateParameters.HasApiAccess.NewValue, updatedUser.HasApiAccess);
+            Assert.Equal(updateParameters.HasStakeHolderAccess.NewValue, updatedUser.HasStakeHolderAccess);
+            Assert.Equal(updateParameters.DefaultUserStartPreference.NewValue, updatedUser.DefaultUserStartPreference);
+            Assert.Equal(updateParameters.Roles.NewValue, updatedUser.GetRolesInOrganization(organization.Uuid));
+            transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
+        }
+
+        [Fact]
+        public void Can_Not_Update_User_If_Email_Is_Already_In_Use()
+        {
+            //Arrange
+            var user = SetupUser();
+            var orgUuid = A<Guid>();
+            var updateParameters = A<UpdateUserParameters>();
+            ExpectGetUserInOrganizationReturns(orgUuid, user.Uuid, user);
+            ExpectModifyPermissionsForUserReturns(user, true);
+            ExpectIsEmailInUseReturns(updateParameters.Email.NewValue, true);
+            ExpectTransactionBegins();
+
+            //Act
+            var updateResult = _sut.Update(orgUuid, user.Uuid, updateParameters);
+
+            //Assert
+            Assert.True(updateResult.Failed);
+
+        }
+
+        private void ExpectModifyPermissionsForUserReturns(User user, bool result)
+        {
+            _authorizationContextMock.Setup(x => x.AllowModify(user)).Returns(result);
+        }
+
+        private void ExpectGetUserReturns(Guid orgUuid, Guid userUuid, Result<User, OperationError> result)
+        {
+            _userServiceMock.Setup(x => x.GetUserInOrganization(orgUuid, userUuid)).Returns(result);
+        }
+
         private void ExpectAddUserReturns(User user, bool sendMailOnCreation, int orgId)
         {
             _userServiceMock.Setup(x => x.AddUser(user, sendMailOnCreation, orgId)).Returns(user);
