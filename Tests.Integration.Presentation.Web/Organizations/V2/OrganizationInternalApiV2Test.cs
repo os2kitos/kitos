@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -132,6 +134,39 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
             Assert.Equal(contactPersonDto.Name, responseDto.ContactPerson.Name);
             Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
+        }
+
+        [Fact]
+        public async Task Can_Get_Organization_Master_Data_Roles_If_None_Persisted()
+        {
+            var organization = await CreateTestOrganization();
+
+            var response = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(organization.Uuid);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var content = await response.Content.ReadAsStringAsync();
+            var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
+            Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
+            var cpDto = responseDto.ContactPerson;
+            var drDto = responseDto.DataResponsible;
+            var dpaDto = responseDto.DataProtectionAdvisor;
+            Assert.Null(cpDto.Name);
+            Assert.Null(drDto.Cvr);
+            Assert.Null(dpaDto.Phone);
+            var nonNullProps = new List<string>() { "OrganizationId", "Id" };
+            AssertPropertiesNull(cpDto, nonNullProps);
+            AssertPropertiesNull(drDto, nonNullProps);
+            AssertPropertiesNull(dpaDto, nonNullProps);
+        }
+
+        private void AssertPropertiesNull(object o, ICollection<string> noNullProps)
+        {
+            var type = o.GetType();
+            var properties = type.GetProperties();
+            foreach (var property in properties)
+            {
+                if (!noNullProps.Contains(property.Name)) Assert.Null(property.GetValue(o));
+            }
         }
 
         [Fact]
