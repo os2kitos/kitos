@@ -1,8 +1,8 @@
-﻿using Moq;
+﻿using System.Linq;
+using Core.ApplicationServices.Model.Organizations.Write;
+using Moq;
 using Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
-using System.Linq;
-using Core.ApplicationServices.Model.Organizations.Write;
 using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
 using Tests.Toolkit.Extensions;
 using Xunit;
