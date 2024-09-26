@@ -182,6 +182,12 @@ namespace Core.ApplicationServices
             return reset;
         }
 
+        public bool IsEmailInUse(string email)
+        {
+            var matchingEmails = _userRepository.Get(x => x.Email == email);
+            return matchingEmails.Any();
+        }
+
         private PasswordResetRequest GenerateResetRequest(User user)
         {
             var now = DateTime.UtcNow;

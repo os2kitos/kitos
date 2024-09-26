@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using Core.DomainModel.Organization;
 using Core.DomainModel;
 using Presentation.Web.Models.API.V1;
@@ -20,24 +21,43 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var user = new CreateUserRequestDTO
-            {
-                Email = CreateEmail(),
-                FirstName = CreateName(),
-                LastName = CreateName(),
-                PhoneNumber = "11223344",
-                DefaultUserStartPreference = A<DefaultUserStartPreferenceChoice>(),
-                HasApiAccess = A<bool>(),
-                HasStakeHolderAccess = A<bool>(),
-                SendMailOnCreation = A<bool>(),
-                Roles = A<IEnumerable<OrganizationRoleChoice>>()
-            };
+            var userRequest = CreateCreateUserRequest();
 
             //Act
-            var response = await UsersV2Helper.CreateUser(organization.Uuid, user);
+            var response = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
 
             //Assert
-            AssertUserEqualsRequest(user, response);
+            AssertUserEqualsRequest(userRequest, response);
+        }
+
+        [Fact]
+        public async Task Can_Send_User_Notification()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var userRequest = CreateCreateUserRequest();
+            var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
+
+            //Act
+            var response = await UsersV2Helper.SendNotification(organization.Uuid, user.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Get_User_Collection_Permissions()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+
+            //Act
+            var response = await UsersV2Helper.GetUserCollectionPermissions(organization.Uuid);
+
+            //Assert
+            Assert.True(response.Create);
+            Assert.True(response.Modify);
+            Assert.True(response.Delete);
         }
 
         private void AssertUserEqualsRequest(CreateUserRequestDTO request, UserResponseDTO response)
@@ -80,6 +100,22 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         private string CreateEmail()
         {
             return $"{CreateName()}@kitos.dk";
+        }
+
+        private CreateUserRequestDTO CreateCreateUserRequest()
+        {
+            return new CreateUserRequestDTO
+            {
+                Email = CreateEmail(),
+                FirstName = CreateName(),
+                LastName = CreateName(),
+                PhoneNumber = "11223344",
+                DefaultUserStartPreference = A<DefaultUserStartPreferenceChoice>(),
+                HasApiAccess = A<bool>(),
+                HasStakeHolderAccess = A<bool>(),
+                SendMailOnCreation = A<bool>(),
+                Roles = A<IEnumerable<OrganizationRoleChoice>>()
+            };
         }
     }
 }
