@@ -450,7 +450,6 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Equal(allowDelete,result.Value.AllowDelete);
         }
 
-
         private void ExpectGetOrganizationAccessReturns(int organizationId, OrganizationDataReadAccessLevel organizationDataReadAccessLevel)
         {
             _authorizationContextMock.Setup(x => x.GetOrganizationReadAccessLevel(organizationId))

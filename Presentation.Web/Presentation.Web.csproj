@@ -471,6 +471,7 @@
     <Compile Include="Models\API\V2\Request\User\CreateUserRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\User\DefaultUserStartPreferenceChoice.cs" />
     <Compile Include="Models\API\V2\Request\User\OrganizationRoleChoice.cs" />
+    <Compile Include="Models\API\V2\Request\User\UpdateUserRequestDTO.cs" />
     <Compile Include="Models\API\V2\Types\Organization\OrganizationUnitOriginChoice.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingCreationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingUpdateRequestDTO.cs" />
