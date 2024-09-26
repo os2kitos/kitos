@@ -139,6 +139,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
         public IHttpActionResult GetOrganizationUsers(
             [NonEmptyGuid] Guid organizationUuid,
             string nameOrEmailQuery = null,
+            string emailQuery = null,
             OrganizationUserRole? roleQuery = null,
             CommonOrderByProperty? orderByProperty = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
@@ -147,6 +148,9 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
 
             if (!string.IsNullOrWhiteSpace(nameOrEmailQuery))
                 queries.Add(new QueryUserByNameOrEmail(nameOrEmailQuery));
+
+            if (!string.IsNullOrWhiteSpace(emailQuery))
+                queries.Add(new QueryUserByEmail(emailQuery));
 
             if (roleQuery.HasValue)
                 queries.Add(new QueryByRoleAssignment(ApiRoleToDomainRoleMap[roleQuery.Value]));

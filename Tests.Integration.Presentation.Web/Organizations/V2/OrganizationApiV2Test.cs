@@ -34,7 +34,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
-        public async Task GET_Organizations_With_RightsHolders_Access_Returns_Organizations_Where_User_Has_RigtsHolderAccessRole()
+        public async Task GET_Organizations_With_RightsHolders_Access_Returns_Organizations_Where_User_Has_RightsHolderAccessRole()
         {
             //Arrange
             var email = CreateEmail();

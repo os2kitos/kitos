@@ -77,6 +77,26 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
+        public async Task Can_GET_Organization_Users_Filter_By_Email_Only()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var user1AndToken = await CreateApiUser(organization);
+            var user2 = await CreateUser(organization);
+            var user3 = await CreateUser(organization);
+
+            var rolesForUser3 = new[] { OrganizationRole.LocalAdmin, OrganizationRole.OrganizationModuleAdmin, OrganizationRole.SystemModuleAdmin };
+            await AssignRoles(organization, user3.Id, rolesForUser3);
+
+            //Act
+            var result = (await OrganizationUserV2Helper.GetOrganizationUsersAsync(user1AndToken.token, organization.Uuid, emailQuery: user2.Email)).ToList();
+
+            //Assert
+            var dto = Assert.Single(result);
+            AssertUser(user2, dto, OrganizationUserRole.User);
+        }
+
+        [Fact]
         public async Task Can_GET_Organization_Users_Filter_By_Role()
         {
             //Arrange
