@@ -246,6 +246,7 @@
     <Compile Include="Model\Users\UserRightsAssignments.cs" />
     <Compile Include="Model\Users\UserRightsChangeParameters.cs" />
     <Compile Include="Model\Users\Write\CreateUserParameters.cs" />
+    <Compile Include="Model\Users\Write\UpdateUserParameters.cs" />
     <Compile Include="Notification\GlobalAdminNotificationService.cs" />
     <Compile Include="Notification\IGlobalAdminNotificationService.cs" />
     <Compile Include="Notification\INotificationService.cs" />
