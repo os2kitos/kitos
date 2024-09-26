@@ -228,6 +228,7 @@
     <Compile Include="ApplicationServices\UIModuleCustomizationTest\UIModuleCustomizationTests.cs" />
     <Compile Include="ApplicationServices\UserRightsServiceTest.cs" />
     <Compile Include="ApplicationServices\UserServiceTest.cs" />
+    <Compile Include="ApplicationServices\Users\UserServiceTest.cs" />
     <Compile Include="ApplicationServices\Users\UserWriteServiceTest.cs" />
     <Compile Include="BackgroundJobs\ScheduleFkOrgUpdatesBackgroundJobTest.cs" />
     <Compile Include="BackgroundJobs\ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveStateTest.cs" />
