@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Security.Cryptography;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
@@ -166,7 +167,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
     private Result<ContactPerson, OperationError> ValidateModifyContactPerson(ContactPerson contactPerson) =>
         _authorizationContext.AllowModify(contactPerson) ? contactPerson : new OperationError(OperationFailure.Forbidden);
 
-    private ContactPerson CreateContactPerson(int orgId)
+    public ContactPerson CreateContactPerson(int orgId)
     {
         var newContactPerson = new ContactPerson() { OrganizationId = orgId };
         _contactPersonRepository.Insert(newContactPerson);
@@ -219,7 +220,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
                 () => CreateDataResponsible(orgId));
     }
 
-    private DataResponsible CreateDataResponsible(int orgId)
+    public DataResponsible CreateDataResponsible(int orgId)
     {
         var newDataResponsible = new DataResponsible() { OrganizationId = orgId };
         _dataResponsibleRepository.Insert(newDataResponsible);
@@ -273,7 +274,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
             .Match(dataProtectionAdvisor => dataProtectionAdvisor,
                 () => CreateDataProtectionAdvisor(orgId));
     }
-    private DataProtectionAdvisor CreateDataProtectionAdvisor(int orgId)
+    public DataProtectionAdvisor CreateDataProtectionAdvisor(int orgId)
     {
         var newDataProtectionAdvisor = new DataProtectionAdvisor() { OrganizationId = orgId };
         _dataProtectionAdvisorRepository.Insert(newDataProtectionAdvisor);
@@ -314,5 +315,32 @@ public class OrganizationWriteService : IOrganizationWriteService{
         _dataProtectionAdvisorRepository.Save();
 
         return dataProtectionAdvisor;
+    }
+
+    public Result<OrganizationMasterDataRoles, OperationError> GetOrCreateOrganizationMasterDataRoles(Guid organizationUuid)
+    {
+        var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
+        if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
+        var orgId = organizationDbIdMaybe.Value;
+
+        var contactPersonMaybe = _organizationService.GetContactPerson(orgId)
+            .Match(cp => cp,
+                () => CreateContactPerson(orgId));
+
+        var dataResponsibleMaybe = _organizationService.GetDataResponsible(orgId)
+            .Match(dr => dr,
+                () => CreateDataResponsible(orgId));
+
+        var dataProtectionAdvisorMaybe = _organizationService.GetDataProtectionAdvisor(orgId)
+            .Match(dpa => dpa,
+                () => CreateDataProtectionAdvisor(orgId));
+
+        return new OrganizationMasterDataRoles
+        {
+            OrganizationUuid = organizationUuid,
+            ContactPerson = contactPersonMaybe,
+            DataResponsible = dataResponsibleMaybe,
+            DataProtectionAdvisor = dataProtectionAdvisorMaybe
+        };
     }
 }

@@ -841,53 +841,6 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(shouldHaveModificationPermission, permissions.ConfigModificationPermission);
         }
 
-        [Fact]
-        public void Can_Get_Master_Data_Roles()
-        {
-            var org = CreateOrganization();
-            var orgId = org.Id;
-            var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
-            var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
-            var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
-            _dataProtectionAdvisorRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataProtectionAdvisor> { expectedDataProtectionAdvisor }.AsQueryable());
-            _contactPersonRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<ContactPerson> { expectedContactPerson }.AsQueryable());
-            _dataResponsibleRepository.Setup(_ =>
-                    _.AsQueryable())
-                .Returns(new List<DataResponsible> { expectedDataResponsible }.AsQueryable());
-
-            _identityResolver.Setup(_ =>
-                    _.ResolveDbId<Organization>(org.Uuid))
-                .Returns(orgId);
-
-            var rolesResult = _sut.GetOrganizationMasterDataRoles(org.Uuid);
-            
-            Assert.True(rolesResult.Ok);
-            var value = rolesResult.Value;
-            AssertContactPerson(expectedContactPerson, value.ContactPerson);
-            AssertDataResponsible(expectedDataResponsible, value.DataResponsible);
-            AssertDataProtectionAdvisor(expectedDataProtectionAdvisor, value.DataProtectionAdvisor);
-            Assert.Equal(org.Uuid, rolesResult.Value.OrganizationUuid);
-        }
-
-        [Fact]
-        public void Get_Master_Data_Roles_Returns_Bad_Input_If_Invalid_Uuid()
-        {
-            var invalidOrganizationUuid = A<Guid>();
-            _identityResolver.Setup(_ =>
-                    _.ResolveDbId<Organization>(invalidOrganizationUuid))
-                .Returns(Maybe<int>.None);
-
-            var result = _sut.GetOrganizationMasterDataRoles(invalidOrganizationUuid);
-
-            Assert.True(result.Failed);
-            var error = result.Error;
-            Assert.Equal(OperationFailure.BadInput, error.FailureType);
-        }
-
         private void VerifyOrganizationDeleted(Maybe<OperationError> result, Mock<IDatabaseTransaction> transaction, Organization organization)
         {
             Assert.True(result.IsNone);

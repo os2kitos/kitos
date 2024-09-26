@@ -81,7 +81,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 
         public OrganizationMasterDataResponseDTO ToMasterDataDTO(Organization organization)
         {
-            return new()
+            var debug = new OrganizationMasterDataResponseDTO()
             {
                 Cvr = organization.Cvr,
                 Address = organization.Adress,
@@ -90,6 +90,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
                 Uuid = organization.Uuid,
                 Name = organization.Name
             };
+            return debug;
         }
     }
 }

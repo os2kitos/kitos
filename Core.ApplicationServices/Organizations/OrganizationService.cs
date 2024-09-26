@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Organizations;
+using Core.ApplicationServices.Organizations.Write;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
@@ -397,35 +398,6 @@ namespace Core.ApplicationServices.Organizations
                 .Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
         }
 
-        public GridPermissions GetGridPermissions(int orgId)
-        {
-            return new GridPermissions
-            {
-                ConfigModificationPermission = HasRole(orgId, OrganizationRole.LocalAdmin)
-            };
-        }
-
-        public Result<OrganizationMasterDataRoles, OperationError> GetOrganizationMasterDataRoles(Guid organizationUuid)
-        {
-            var organizationDbIdMaybe= _identityResolver.ResolveDbId<Organization>(organizationUuid);
-            if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
-            var orgId = organizationDbIdMaybe.Value;
-
-            var contactPersonMaybe = GetContactPerson(orgId);
-
-            var dataResponsibleMaybe = GetDataResponsible(orgId);
-
-            var dataProtectionAdvisorMaybe = GetDataProtectionAdvisor(orgId);
-
-            return new OrganizationMasterDataRoles
-            {
-                OrganizationUuid = organizationUuid,
-                ContactPerson = contactPersonMaybe.Value,
-                DataResponsible = dataResponsibleMaybe.Value,
-                DataProtectionAdvisor = dataProtectionAdvisorMaybe.Value
-            };
-        }
-
         public Maybe<DataResponsible> GetDataResponsible(int organizationId)
         {
             return _dataResponsibleRepository.AsQueryable()
@@ -442,6 +414,13 @@ namespace Core.ApplicationServices.Organizations
         {
             return _dataProtectionAdvisorRepository.AsQueryable()
                 .FirstOrNone(dpa => dpa.OrganizationId.Equals(organizationId));
+        }
+        public GridPermissions GetGridPermissions(int orgId)
+        {
+            return new GridPermissions
+            {
+                ConfigModificationPermission = HasRole(orgId, OrganizationRole.LocalAdmin)
+            };
         }
 
         private Result<Organization, OperationError> WithDeletionAccess(Organization organization)

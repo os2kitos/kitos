@@ -2,6 +2,7 @@
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Model.Organizations.Write;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
 using System;
 
@@ -13,6 +14,11 @@ namespace Core.ApplicationServices.Organizations.Write
             OrganizationMasterDataUpdateParameters parameters);
 
         Result<OrganizationMasterDataRoles, OperationError> UpsertOrganizationMasterDataRoles(Guid organizationUuid, OrganizationMasterDataRolesUpdateParameters updateParameters);
-
+        ContactPerson CreateContactPerson(int orgId);
+        DataResponsible CreateDataResponsible(int orgId);
+        DataProtectionAdvisor CreateDataProtectionAdvisor(int orgId);
+        
+        public Result<OrganizationMasterDataRoles, OperationError>
+            GetOrCreateOrganizationMasterDataRoles(Guid organizationUuid);
     }
 }

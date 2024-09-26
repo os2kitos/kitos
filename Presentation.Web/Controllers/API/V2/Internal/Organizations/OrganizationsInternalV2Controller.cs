@@ -86,7 +86,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            return _organizationService.GetOrganizationMasterDataRoles(organizationUuid)
+            return _organizationWriteService.GetOrCreateOrganizationMasterDataRoles(organizationUuid)
                 .Select(_organizationResponseMapper.ToRolesDTO)
                 .Match(Ok, FromOperationError);
         }

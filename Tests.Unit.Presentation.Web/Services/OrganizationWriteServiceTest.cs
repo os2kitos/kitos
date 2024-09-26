@@ -15,7 +15,6 @@ using Core.DomainModel.Events;
 using Core.DomainServices.Generic;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
 using Core.DomainModel;
-
 using Core.DomainServices;
 
 namespace Tests.Unit.Presentation.Web.Services
@@ -339,6 +338,68 @@ namespace Tests.Unit.Presentation.Web.Services
             AssertContactPerson(expectedContactPerson, value.ContactPerson);
             AssertDataResponsible(expectedDataResponsible, value.DataResponsible);
             AssertDataProtectionAdvisor(expectedDataProtectionAdvisor, value.DataProtectionAdvisor);
+        }
+
+        [Fact]
+        public void Can_Get_Master_Data_Roles()
+        {
+            var org = CreateOrganization();
+            var orgId = org.Id;
+            var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
+            var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
+            var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
+            _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(expectedContactPerson);
+            _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(expectedDataResponsible);
+            _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(expectedDataProtectionAdvisor);
+            _identityResolver.Setup(_ =>
+                    _.ResolveDbId<Organization>(org.Uuid))
+                .Returns(orgId);
+
+            var rolesResult = _sut.GetOrCreateOrganizationMasterDataRoles(org.Uuid);
+
+            Assert.True(rolesResult.Ok);
+            var value = rolesResult.Value;
+            AssertContactPerson(expectedContactPerson, value.ContactPerson);
+            AssertDataResponsible(expectedDataResponsible, value.DataResponsible);
+            AssertDataProtectionAdvisor(expectedDataProtectionAdvisor, value.DataProtectionAdvisor);
+            Assert.Equal(org.Uuid, rolesResult.Value.OrganizationUuid);
+        }
+
+        [Fact]
+        public void Get_Or_Create_Creates_Master_Data_Roles_If_not_Found()
+        {
+            var org = CreateOrganization();
+            var orgId = org.Id;
+            _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(Maybe<ContactPerson>.None);
+            _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(Maybe<DataResponsible>.None);
+            _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(Maybe<DataProtectionAdvisor>.None);
+            _identityResolver.Setup(_ =>
+                    _.ResolveDbId<Organization>(org.Uuid))
+                .Returns(orgId);
+
+            var rolesResult = _sut.GetOrCreateOrganizationMasterDataRoles(org.Uuid);
+
+            Assert.True(rolesResult.Ok);
+            var value = rolesResult.Value;
+            _contactPersonRepository.Verify(_ => _.Insert(It.IsAny<ContactPerson>()));
+            _dataResponsibleRepository.Verify(_ => _.Insert(It.IsAny<DataResponsible>()));
+            _dataProtectionAdvisorRepository.Verify(_ => _.Insert(It.IsAny<DataProtectionAdvisor>()));
+            Assert.Equal(org.Uuid, rolesResult.Value.OrganizationUuid);
+        }
+
+        [Fact]
+        public void Get_Master_Data_Roles_Returns_Bad_Input_If_Invalid_Uuid()
+        {
+            var invalidOrganizationUuid = A<Guid>();
+            _identityResolver.Setup(_ =>
+                    _.ResolveDbId<Organization>(invalidOrganizationUuid))
+                .Returns(Maybe<int>.None);
+
+            var result = _sut.GetOrCreateOrganizationMasterDataRoles(invalidOrganizationUuid);
+
+            Assert.True(result.Failed);
+            var error = result.Error;
+            Assert.Equal(OperationFailure.BadInput, error.FailureType);
         }
 
         private OrganizationMasterDataRolesUpdateParameters SetupUpdateMasterDataRoles(int orgId,

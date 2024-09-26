@@ -4,7 +4,6 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Organizations;
-using Core.ApplicationServices.Model.Organizations.Write;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
@@ -53,14 +52,8 @@ namespace Core.ApplicationServices.Organizations
         Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid organizationUuid);
 
         public GridPermissions GetGridPermissions(int orgId);
-
-        public Result<OrganizationMasterDataRoles, OperationError>
-            GetOrganizationMasterDataRoles(Guid organizationUuid);
-
         public Maybe<DataResponsible> GetDataResponsible(int organizationId);
         public Maybe<ContactPerson> GetContactPerson(int organizationId);
         public Maybe<DataProtectionAdvisor> GetDataProtectionAdvisor(int organizationId);
-
-
     }
 }
