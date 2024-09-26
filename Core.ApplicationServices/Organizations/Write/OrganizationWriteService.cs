@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Net;
-using System.Security.Cryptography;
-using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
@@ -138,7 +135,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
 
         var dataProtectionAdvisorResult = _organizationService.GetDataProtectionAdvisor(orgId)
             .Match(dpa => dpa,
-                () => CreateDataProtectionAdvisor(orgId));
+                () => AuthorizeCreationAndCreateDataProtectionAdvisor(orgId));
         if (dataProtectionAdvisorResult.Failed) return dataProtectionAdvisorResult.Error;
 
         return new OrganizationMasterDataRoles
@@ -211,12 +208,11 @@ public class OrganizationWriteService : IOrganizationWriteService{
 
     private Result<ContactPerson, OperationError> AuthorizeCreationAndCreateContactPerson(int orgId)
     {
-        var newContactPerson = new ContactPerson() { OrganizationId = orgId };
-        return ValidateCreateContactPerson(newContactPerson, orgId).Bind(SaveContactPerson);
+        return ValidateCreateContactPerson(orgId).Bind(SaveContactPerson);
     }
 
-    private Result<ContactPerson, OperationError> ValidateCreateContactPerson(ContactPerson contactPerson, int orgId) =>
-        _authorizationContext.AllowCreate<ContactPerson>(orgId) ? contactPerson : new OperationError(OperationFailure.Forbidden);
+    private Result<ContactPerson, OperationError> ValidateCreateContactPerson(int orgId) =>
+        _authorizationContext.AllowCreate<ContactPerson>(orgId) ? new ContactPerson() { OrganizationId = orgId } : new OperationError(OperationFailure.Forbidden);
 
     private Result<ContactPerson, OperationError> SaveContactPerson(ContactPerson contactPerson)
     {
@@ -225,6 +221,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
         _contactPersonRepository.Save();
         return contactPerson;
     }
+
     private Result<ContactPerson, OperationError> ModifyContactPerson(ContactPerson contactPerson, Maybe<ContactPersonUpdateParameters> parametersMaybe)
     {
         if (parametersMaybe.IsNone)
@@ -272,14 +269,18 @@ public class OrganizationWriteService : IOrganizationWriteService{
 
     private Result<DataResponsible, OperationError> AuthorizeCreationAndCreateDataResponsible(int orgId)
     {
-        var allowCreate = _authorizationContext.AllowCreate<DataResponsible>(orgId);
-        if (!allowCreate) return new OperationError(OperationFailure.Forbidden);
+       return ValidateCreateDataResponsible(orgId).Bind(SaveDataResponsible);
+    }
 
-        var newDataResponsible = new DataResponsible() { OrganizationId = orgId };
-        _dataResponsibleRepository.Insert(newDataResponsible);
-        _domainEvents.Raise(new EntityCreatedEvent<DataResponsible>(newDataResponsible));
+    private Result<DataResponsible, OperationError> ValidateCreateDataResponsible(int orgId) =>
+        _authorizationContext.AllowCreate<DataResponsible>(orgId) ? new DataResponsible() { OrganizationId = orgId } : new OperationError(OperationFailure.Forbidden);
+
+    private Result<DataResponsible, OperationError> SaveDataResponsible(DataResponsible dataResponsible)
+    {
+        _dataResponsibleRepository.Insert(dataResponsible);
+        _domainEvents.Raise(new EntityCreatedEvent<DataResponsible>(dataResponsible));
         _dataResponsibleRepository.Save();
-        return newDataResponsible;
+        return dataResponsible;
     }
 
     private Result<DataResponsible, OperationError> ModifyDataResponsible(DataResponsible dataResponsible, Maybe<DataResponsibleUpdateParameters> parametersMaybe)
@@ -325,18 +326,22 @@ public class OrganizationWriteService : IOrganizationWriteService{
     {
         return _organizationService.GetDataProtectionAdvisor(orgId)
             .Match(dataProtectionAdvisor => dataProtectionAdvisor,
-                () => CreateDataProtectionAdvisor(orgId));
+                () => AuthorizeCreationAndCreateDataProtectionAdvisor(orgId));
     }
-    private Result<DataProtectionAdvisor, OperationError> CreateDataProtectionAdvisor(int orgId)
+    private Result<DataProtectionAdvisor, OperationError> AuthorizeCreationAndCreateDataProtectionAdvisor(int orgId)
     {
-        var allowCreate = _authorizationContext.AllowCreate<DataProtectionAdvisor>(orgId);
-        if (!allowCreate) return new OperationError(OperationFailure.Forbidden);
+        return ValidateCreateDataProtectionAdvisor(orgId).Bind(SaveDataProtectionAdvisor);
+    }
 
-        var newDataProtectionAdvisor = new DataProtectionAdvisor() { OrganizationId = orgId };
-        _dataProtectionAdvisorRepository.Insert(newDataProtectionAdvisor);
-        _domainEvents.Raise(new EntityCreatedEvent<DataProtectionAdvisor>(newDataProtectionAdvisor));
-        _dataResponsibleRepository.Save();
-        return newDataProtectionAdvisor;
+    private Result<DataProtectionAdvisor, OperationError> ValidateCreateDataProtectionAdvisor(int orgId) =>
+        _authorizationContext.AllowCreate<DataProtectionAdvisor>(orgId) ? new DataProtectionAdvisor() { OrganizationId = orgId } : new OperationError(OperationFailure.Forbidden);
+
+    private Result<DataProtectionAdvisor, OperationError> SaveDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor)
+    {
+        _dataProtectionAdvisorRepository.Insert(dataProtectionAdvisor);
+        _domainEvents.Raise(new EntityCreatedEvent<DataProtectionAdvisor>(dataProtectionAdvisor));
+        _dataProtectionAdvisorRepository.Save();
+        return dataProtectionAdvisor;
     }
 
     private Result<DataProtectionAdvisor, OperationError> ValidateModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor) =>
