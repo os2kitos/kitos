@@ -56,6 +56,18 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return await response.ReadResponseBodyAsAsync<UserCollectionPermissionsResponseDTO>();
         }
 
+        public static async Task<UserResponseDTO> GetUserByEmail(Guid organizationUuid, string email, Cookie cookie = null)
+        {
+            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(
+                TestEnvironment.CreateUrl(
+                    $"{ControllerPrefix(organizationUuid)}/find-any-by-email?email={email}"), requestCookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<UserResponseDTO>();
+        }
+
         private static string ControllerPrefix(Guid organizationUuid)
         {
             return $"api/v2/internal/organization/{organizationUuid}/users";

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Security;
@@ -186,6 +187,25 @@ namespace Core.ApplicationServices
         {
             var matchingEmails = _userRepository.Get(x => x.Email == email);
             return matchingEmails.Any();
+        }
+
+        public Result<User, OperationError> GetUserByEmail(Guid organizationUuid, string email)
+        {
+            return _organizationService.GetPermissions(organizationUuid)
+                .Match(permissions =>
+                {
+                    if (permissions.Read == false)
+                        return new OperationError(
+                            $"User not allowed to read organization with uuid: {organizationUuid}",
+                            OperationFailure.Forbidden);
+                    return Maybe<OperationError>.None;
+                }, error => error)
+                .Match<Result<User, OperationError>>(error => error,
+                    () =>
+                    {
+                        return _repository.AsQueryable().FirstOrDefault(u =>
+                            u.Email == email);
+                    });
         }
 
         private PasswordResetRequest GenerateResetRequest(User user)

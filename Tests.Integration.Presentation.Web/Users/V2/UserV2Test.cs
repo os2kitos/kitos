@@ -84,6 +84,22 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             AssertBaseUserRequestMatches(request, response);
         }
 
+        [Fact]
+        public async Task Can_Get_User_With_Existing_Email_In_Other_Orgs()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var organization2 = await CreateOrganizationAsync();
+            var userRequest = CreateCreateUserRequest();
+            var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
+
+            //Act
+            var response = await UsersV2Helper.GetUserByEmail(organization2.Uuid, user.Email);
+
+            //Assert
+            Assert.Equal(user.Uuid, response.Uuid);
+        }
+
         private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
         {
             Assert.Equal(request.Email, response.Email);

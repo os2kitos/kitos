@@ -8,7 +8,10 @@ using Presentation.Web.Controllers.API.V2.Internal.Users.Mapping;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
 using Presentation.Web.Models.API.V2.Request.User;
 using System.Web.Http.Results;
+using Core.ApplicationServices;
 using Core.ApplicationServices.Model.Users;
+using Presentation.Web.Controllers.API.V1.Mapping;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Users
 {
@@ -21,14 +24,17 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         private readonly IUserWriteModelMapper _writeModelMapper;
         private readonly IUserWriteService _userWriteService;
         private readonly IUserResponseModelMapper _userResponseModelMapper;
+        private readonly IUserService _userService;
 
         public UsersInternalV2Controller(IUserWriteModelMapper writeModelMapper, 
             IUserWriteService userWriteService, 
-            IUserResponseModelMapper userResponseModelMapper)
+            IUserResponseModelMapper userResponseModelMapper, 
+            IUserService userService)
         {
             _writeModelMapper = writeModelMapper;
             _userWriteService = userWriteService;
             _userResponseModelMapper = userResponseModelMapper;
+            _userService = userService;
         }
 
         [Route("create")]
@@ -66,7 +72,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult SendNotification([NonEmptyGuid] Guid userUuid, [NonEmptyGuid] Guid organizationUuid)
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult SendNotification([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid)
         {
             return _userWriteService.SendNotification(organizationUuid, userUuid)
                 .Match(FromOperationError, Ok);
@@ -78,11 +85,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetCollectionPermissions([NonEmptyGuid] Guid organizationUuid)
         {
             return _userWriteService.GetCollectionPermissions(organizationUuid)
                 .Select(MapUserCollectionPermissionsResponseDto)
+                .Match(Ok, FromOperationError);
+        }
+
+        [Route("find-any-by-email")]
+        [HttpGet]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UserResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult GetUsersByEmailInOtherOrganizations([NonEmptyGuid] Guid organizationUuid, string email)
+        {
+            return _userService.GetUserByEmail(organizationUuid, email)
+                .Select(_userResponseModelMapper.ToUserResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
