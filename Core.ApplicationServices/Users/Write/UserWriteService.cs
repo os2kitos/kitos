@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.ModelBinding;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Extensions;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Users;
 using Core.ApplicationServices.Model.Users.Write;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 
@@ -82,10 +79,15 @@ namespace Core.ApplicationServices.Users.Write
             }
 
             var user = userRes.Value;
-
             if (!_authorizationContext.AllowModify(user))
             {
                 return new OperationError(OperationFailure.Forbidden);
+            }
+
+            var orgId = ResolveOrganizationUuidToId(organizationUuid);
+            if (orgId.Failed)
+            {
+                return orgId.Error;
             }
 
             var updateResult = PerformUpdates(user, organizationUuid, parameters);
@@ -94,6 +96,8 @@ namespace Core.ApplicationServices.Users.Write
                 transactionManager.Rollback();
                 return updateResult.Error;
             }
+
+            _userService.UpdateUser(user, parameters.SendMailOnUpdate, orgId.Value);
             transactionManager.Commit();
             return updateResult.Value;
         }

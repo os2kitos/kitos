@@ -241,6 +241,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetUserInOrganizationReturns(organization.Uuid, user.Uuid, user);
             ExpectModifyPermissionsForUserReturns(user, true);
             ExpectGetOrganizationReturns(organization.Uuid, organization);
+            ExpectResolveIdReturns(organization.Uuid, organization.Id);
             _organizationServiceMock.Setup(x => x.GetDefaultUnit(organization, user)).Returns(defaultUnit);
             var transaction = ExpectTransactionBegins();
 
@@ -268,6 +269,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var user = SetupUser();
             var orgUuid = A<Guid>();
             var updateParameters = A<UpdateUserParameters>();
+            ExpectResolveIdReturns(orgUuid, A<int>());
             ExpectGetUserInOrganizationReturns(orgUuid, user.Uuid, user);
             ExpectModifyPermissionsForUserReturns(user, true);
             ExpectIsEmailInUseReturns(updateParameters.Email.NewValue, true);
