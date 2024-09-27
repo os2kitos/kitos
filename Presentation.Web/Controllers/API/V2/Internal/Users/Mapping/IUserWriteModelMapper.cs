@@ -6,5 +6,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
     public interface IUserWriteModelMapper
     {
         CreateUserParameters FromPOST(CreateUserRequestDTO request);
+
+        UpdateUserParameters FromPATCH(UpdateUserRequestDTO request);
     }
 }

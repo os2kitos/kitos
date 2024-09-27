@@ -16,19 +16,19 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
 
 using Moq;
 using Serilog;
-using Tests.Toolkit.Patterns;
 using Tests.Unit.Presentation.Web.Extensions;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Services
 {
-    public class OrganizationServiceTest : WithAutoFixture
+    public class OrganizationServiceTest : OrganizationServiceTestBase
     {
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly OrganizationService _sut;
@@ -42,7 +42,10 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IOrgUnitService> _orgUnitServiceMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IOrganizationRightsService> _organizationRightsServiceMock;
-        
+        private readonly Mock<IGenericRepository<ContactPerson>> _contactPersonRepository;
+        private readonly Mock<IEntityIdentityResolver> _identityResolver;
+        private readonly Mock<IGenericRepository<DataResponsible>> _dataResponsibleRepository;
+        private readonly Mock<IGenericRepository<DataProtectionAdvisor>> _dataProtectionAdvisorRepository;
 
         public OrganizationServiceTest()
         {
@@ -59,10 +62,15 @@ namespace Tests.Unit.Presentation.Web.Services
             _orgUnitServiceMock = new Mock<IOrgUnitService>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _organizationRightsServiceMock = new Mock<IOrganizationRightsService>();
+            _contactPersonRepository = new Mock<IGenericRepository<ContactPerson>>();
+            _identityResolver = new Mock<IEntityIdentityResolver>();
+            _dataResponsibleRepository = new Mock<IGenericRepository<DataResponsible>>();
+            _dataProtectionAdvisorRepository = new Mock<IGenericRepository<DataProtectionAdvisor>>();
 
             _sut = new OrganizationService(
                 _organizationRepository.Object,
                 _orgRightRepository.Object,
+                _contactPersonRepository.Object,
                 _userRepository.Object,
                 _authorizationContext.Object,
                 _userContext.Object,
@@ -71,7 +79,10 @@ namespace Tests.Unit.Presentation.Web.Services
                 _repositoryMock.Object,
                 _organizationRightsServiceMock.Object,
                 _orgUnitServiceMock.Object,
-                _domainEventsMock.Object);
+                _domainEventsMock.Object,
+                _identityResolver.Object,
+                _dataResponsibleRepository.Object,
+                _dataProtectionAdvisorRepository.Object);
         }
 
         [Fact]
@@ -872,13 +883,6 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetOrganizationByUuidReturns(organization.Uuid, organization);
             ExpectAllowReadOrganizationReturns(organization, allowRead);
             ExpectAllowDeleteReturns(organization, allowDelete);
-            return organization;
-        }
-
-        private Organization CreateOrganization()
-        {
-            var organizationId = A<Guid>();
-            var organization = new Organization() { Uuid = organizationId, Id = A<int>() };
             return organization;
         }
 

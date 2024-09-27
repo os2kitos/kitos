@@ -17,7 +17,7 @@ using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.Organ
 
 namespace Tests.Integration.Presentation.Web.Organizations.V2
 {
-    public class OrganizationApiV2Test : WithAutoFixture
+    public class OrganizationApiV2Test : OrganizationApiV2TestBase
     {
         [Fact]
         public async Task GET_Organizations_With_RightsHolders_Access_Returns_Empty_If_User_Does_Not_Have_RightsHoldersAccessInAnyOrganization()
@@ -194,30 +194,6 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(newOrg.Uuid, org.Uuid);
         }
 
-        [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
-        [InlineData(OrganizationRole.LocalAdmin, true, false, false)]
-        [InlineData(OrganizationRole.User, true, false, false)]
-        public async Task Can_Get_Specific_Organization_Permissions(OrganizationRole userRole, bool expectRead, bool expectModify, bool expectDelete)
-        {
-            //Arrange
-            var cookie = await HttpApi.GetCookieAsync(userRole);
-            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
-
-
-            //Act
-            var permissionsResponseDto = await OrganizationV2Helper.GetPermissionsAsync(cookie, organization.Uuid);
-
-            //Assert - exhaustive content assertions are done in the read-after-write assertion tests (POST/PUT)
-            var expected = new ResourcePermissionsResponseDTO()
-            {
-                Read = expectRead,
-                Modify = expectModify,
-                Delete = expectDelete
-            };
-            Assert.Equivalent(expected, permissionsResponseDto);
-        }
-
         private static readonly IReadOnlyDictionary<OrganizationTypeKeys, OrganizationType> InnerToExternalOrgType =
             new ReadOnlyDictionary<OrganizationTypeKeys, OrganizationType>(new Dictionary<OrganizationTypeKeys, OrganizationType>()
             {
@@ -231,19 +207,6 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var expectedResult = InnerToExternalOrgType[createdWith];
             Assert.Equal(expectedResult, dto.OrganizationType);
-        }
-
-        private async Task<OrganizationDTO> CreateOrganizationAsync(OrganizationTypeKeys orgType)
-        {
-            var organizationName = CreateName();
-            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
-                organizationName, "V2" + string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), orgType, AccessModifier.Public);
-            return organization;
-        }
-
-        private string CreateName()
-        {
-            return $"{nameof(OrganizationApiV2Test)}æøå{A<string>()}";
         }
 
         private string CreateEmail()
