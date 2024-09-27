@@ -84,7 +84,6 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             AssertBaseUserRequestMatches(request, response);
         }
 
-        private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
         [Fact]
         public async Task Can_Get_User_With_Existing_Email_In_Other_Orgs()
         {
@@ -101,7 +100,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             Assert.Equal(user.Uuid, response.Uuid);
         }
 
-        private void AssertUserEqualsRequest(CreateUserRequestDTO request, UserResponseDTO response)
+        private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
         {
             Assert.Equal(request.Email, response.Email);
             Assert.Equal(request.FirstName, response.FirstName);
