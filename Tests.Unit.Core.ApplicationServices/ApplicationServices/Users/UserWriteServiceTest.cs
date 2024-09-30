@@ -10,6 +10,8 @@ using Tests.Toolkit.Patterns;
 using Xunit;
 using Core.DomainModel.Organization;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
@@ -242,6 +244,8 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectModifyPermissionsForUserReturns(user, true);
             ExpectGetOrganizationReturns(organization.Uuid, organization);
             ExpectResolveIdReturns(organization.Uuid, organization.Id);
+            ExpectAssignRolesReturn(updateParameters.Roles.NewValue, user, organization);
+            ExpectRemoveRolesReturn(user.GetRolesInOrganization(organization.Uuid), user, organization);
             _organizationServiceMock.Setup(x => x.GetDefaultUnit(organization, user)).Returns(defaultUnit);
             var transaction = ExpectTransactionBegins();
 
@@ -267,20 +271,41 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         {
             //Arrange
             var user = SetupUser();
-            var orgUuid = A<Guid>();
+            var organization = new Organization { Id = A<int>(), Uuid = A<Guid>() };
             var updateParameters = A<UpdateUserParameters>();
-            ExpectResolveIdReturns(orgUuid, A<int>());
-            ExpectGetUserInOrganizationReturns(orgUuid, user.Uuid, user);
+            ExpectResolveIdReturns(organization.Uuid, A<int>());
+            ExpectGetOrganizationReturns(organization.Uuid, organization);
+            ExpectGetUserInOrganizationReturns(organization.Uuid, user.Uuid, user);
             ExpectModifyPermissionsForUserReturns(user, true);
             ExpectIsEmailInUseReturns(updateParameters.Email.NewValue, true);
+            ExpectAssignRolesReturn(updateParameters.Roles.NewValue, user, organization);
+            ExpectRemoveRolesReturn(user.GetRolesInOrganization(organization.Uuid), user, organization);
             ExpectTransactionBegins();
 
             //Act
-            var updateResult = _sut.Update(orgUuid, user.Uuid, updateParameters);
+            var updateResult = _sut.Update(organization.Uuid, user.Uuid, updateParameters);
 
             //Assert
             Assert.True(updateResult.Failed);
 
+        }
+
+        private void ExpectAssignRolesReturn(IEnumerable<OrganizationRole> roles, User user, Organization org)
+        {
+            foreach (var role in roles)
+            {
+                var expectedRight = new OrganizationRight { Role = role, UserId = user.Id, Organization = org, OrganizationId = org.Id };
+                _organizationRightsServiceMock.Setup(x => x.AssignRole(org.Id, user.Id, role)).Returns(expectedRight);
+            }
+        }
+
+        private void ExpectRemoveRolesReturn(IEnumerable<OrganizationRole> roles, User user, Organization org)
+        {
+            foreach (var role in roles)
+            {
+                var expectedRight = new OrganizationRight { Role = role, UserId = user.Id, OrganizationId = org.Id };
+                _organizationRightsServiceMock.Setup(x => x.RemoveRole(org.Id, user.Id, role)).Returns(expectedRight);
+            }
         }
 
         private void ExpectModifyPermissionsForUserReturns(User user, bool result)

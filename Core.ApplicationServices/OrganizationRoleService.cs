@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
