@@ -267,7 +267,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         }
 
         [Fact]
-        public void Can_Not_Update_User_If_Email_Is_Already_In_Use()
+        public void Can_Not_Update_User_If_Email_Is_Already_In_Use() 
         {
             //Arrange
             var user = SetupUser();

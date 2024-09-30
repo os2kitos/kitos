@@ -15,5 +15,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.User
         public bool? HasApiAccess { get; set; }
         public bool HasStakeHolderAccess { get; set; }
         public IEnumerable<OrganizationRoleChoice> Roles { get; set; }
+
+        public DateTime? LastSentAdvis { get; set; }
     }
 }

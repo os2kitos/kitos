@@ -70,37 +70,30 @@ namespace Core.ApplicationServices.Users.Write
 
         public Result<User, OperationError> Update(Guid organizationUuid, Guid userUuid, UpdateUserParameters parameters)
         {
-
             using var transactionManager = _transactionManager.Begin();
-            var userRes = _userService.GetUserInOrganization(organizationUuid, userUuid);
-            if (userRes.Failed)
-            {
-                return userRes.Error;
-            }
 
-            var user = userRes.Value;
-            if (!_authorizationContext.AllowModify(user))
+            var orgResult = _organizationService.GetOrganization(organizationUuid);
+            if (orgResult.Failed)
             {
-                return new OperationError(OperationFailure.Forbidden);
+                return orgResult.Error;
             }
+            var organization = orgResult.Value;
 
-            var organizationResult = _organizationService.GetOrganization(organizationUuid);
-            if (organizationResult.Failed)
-            {
-                return organizationResult.Error;
-            }
-            var organization = organizationResult.Value;
+            var updateUserResult =
+                _userService.GetUserInOrganization(organizationUuid, userUuid)
+                    .Bind(CanModifyUser)
+                    .Bind(user => PerformUpdates(user, organization, parameters));
 
-            var updateResult = PerformUpdates(user, organization, parameters);
-            if (updateResult.Failed)
+            if (updateUserResult.Failed)
             {
                 transactionManager.Rollback();
-                return updateResult.Error;
+                return updateUserResult.Error;
             }
 
+            var user = updateUserResult.Value;
             _userService.UpdateUser(user, parameters.SendMailOnUpdate, organization.Id);
             transactionManager.Commit();
-            return updateResult.Value;
+            return user;
         }
 
         public Maybe<OperationError> SendNotification(Guid organizationUuid, Guid userUuid)
@@ -158,6 +151,7 @@ namespace Core.ApplicationServices.Users.Write
         {
             var oldRoles = user.GetRolesInOrganization(organization.Uuid).ToList();
             var removeResult = RemoveRoles(user, organization, oldRoles);
+
             if (removeResult.HasValue)
             {
                 return removeResult.Value;
@@ -182,7 +176,7 @@ namespace Core.ApplicationServices.Users.Write
                 var result = _organizationRightsService.AssignRole(organization.Id, user.Id, role);
                 if (result.Failed)
                 {
-                    return new OperationError(result.Error);
+                    return new OperationError($"Failed to assign role: {role}", result.Error);
                 }
 
                 newRights.Add(result.Value);
@@ -199,7 +193,8 @@ namespace Core.ApplicationServices.Users.Write
                 var result = _organizationRightsService.RemoveRole(organization.Id, user.Id, role);
                 if (result.Failed)
                 {
-                    return Maybe<OperationError>.Some(result.Error);
+                    return new OperationError($"Failed to remove role {role}", result.Error);
+                    
                 }
             }
             return Maybe<OperationError>.None;
@@ -282,6 +277,17 @@ namespace Core.ApplicationServices.Users.Write
 
             return Maybe<OperationError>.None;
 
+        }
+
+        private Result<User, OperationError> CanModifyUser(User user)
+        {
+            if (!_authorizationContext.AllowModify(user))
+            {
+                return new OperationError($"Not allowed to modify user with uuid {user.Uuid}",
+                    OperationFailure.Forbidden);
+            }
+
+            return user;
         }
     }
 }
