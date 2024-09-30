@@ -150,20 +150,20 @@ namespace Core.ApplicationServices.Users.Write
             IEnumerable<OrganizationRole> roles)
         {
             var oldRoles = user.GetRolesInOrganization(organization.Uuid).ToList();
-            var removeResult = RemoveRoles(user, organization, oldRoles);
-
-            if (removeResult.HasValue)
-            {
-                return removeResult.Value;
-            }
-            var newRightsResult = AssignRoles(user, organization, roles);
-            if (newRightsResult.Failed)
-            {
-                return newRightsResult.Error;
-            }
             var rightsFromOtherOrganizations = user.OrganizationRights.Where(right => right.Organization.Uuid != organization.Uuid).ToList();
-            rightsFromOtherOrganizations.AddRange(newRightsResult.Value);
-            user.OrganizationRights = rightsFromOtherOrganizations;
+            var updateResult = RemoveRoles(user, organization, oldRoles)
+                .Match(error => error, 
+                () => AssignRoles(user, organization, roles)
+                );
+
+            if (updateResult.Failed)
+            {
+                return updateResult.Error;
+            }
+
+            var newOrgRights = updateResult.Value.ToList();
+            newOrgRights.AddRange(rightsFromOtherOrganizations);
+            user.OrganizationRights = newOrgRights;
             return user;
         }
 
