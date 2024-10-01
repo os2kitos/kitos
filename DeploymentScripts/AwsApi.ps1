@@ -22,8 +22,6 @@ Function Get-SSM-Parameters($environmentName) {
     Write-Host "Getting all SSM Parameters from $prefix"
 
     $response = aws ssm get-parameters-by-path --with-decryption --path "$prefix"
-    Write-Host "AWS CLI Response: $response"
-
     $parameters = ($response | ConvertFrom-Json).Parameters
     
     if ($LASTEXITCODE -ne 0) { throw "FAILED TO LOAD SSM parameters from $environmentName"
@@ -35,8 +33,6 @@ Function Get-SSM-Parameters($environmentName) {
         $name = $parameters[$i].Name
         $value = $parameters[$i].Value
         $table.Add(($name).Replace($prefix,""),$value)
-
-        Write-Host "Name: $name Value: $value"
     }
 
     #return map
