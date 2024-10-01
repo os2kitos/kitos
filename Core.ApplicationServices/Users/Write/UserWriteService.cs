@@ -127,13 +127,25 @@ namespace Core.ApplicationServices.Users.Write
                     user.WithOptionalUpdate(parameters.LastName, (userToUpdate, lastName) => userToUpdate.LastName = lastName))
                 .Bind(user => user.WithOptionalUpdate(parameters.Email, UpdateEmail)
                 .Bind(user => user.WithOptionalUpdate(parameters.PhoneNumber, (userToUpdate, phoneNumber) => userToUpdate.PhoneNumber = phoneNumber))
-                .Bind(user => user.WithOptionalUpdate(parameters.HasStakeHolderAccess,
-                    (userToUpdate, hasStakeHolderAccess) => userToUpdate.HasStakeHolderAccess = hasStakeHolderAccess))
+                .Bind(user => user.WithOptionalUpdate(parameters.HasStakeHolderAccess, UpdateStakeholderAccess))
                 .Bind(user => user.WithOptionalUpdate(parameters.HasApiAccess,
                     (userToUpdate, hasApiAccess) => userToUpdate.HasApiAccess = hasApiAccess))
                 .Bind(user => user.WithOptionalUpdate(parameters.DefaultUserStartPreference,
                     (userToUpdate, defaultStartPreference) => userToUpdate.DefaultUserStartPreference = defaultStartPreference))
                 .Bind(user => user.WithOptionalUpdate(parameters.Roles, (userToUpdate, roles) => UpdateRoles(organization, userToUpdate, roles))));
+        }
+
+        private Result<User, OperationError> UpdateStakeholderAccess(User user, bool stakeholderAccess)
+        {
+            if (stakeholderAccess &&
+                !_authorizationContext.HasPermission(
+                    new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))
+            {
+                return new OperationError("You don't have permission to issue stakeholder access.", OperationFailure.Forbidden);
+            }
+
+            user.HasStakeHolderAccess = stakeholderAccess;
+            return user;
         }
 
         private Result<User, OperationError> UpdateEmail(User user, string email)
@@ -289,5 +301,6 @@ namespace Core.ApplicationServices.Users.Write
 
             return user;
         }
+
     }
 }
