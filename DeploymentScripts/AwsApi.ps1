@@ -25,7 +25,7 @@ Function Get-SSM-Parameters($environmentName) {
     
     if ($LASTEXITCODE -ne 0 -or $parameters.Length -eq 0) {
         throw "FAILED TO LOAD SSM parameters from $environmentName"
-    }
+    }   
 
     # Convert structure to map
     $table = new-object System.Collections.Hashtable
@@ -33,6 +33,8 @@ Function Get-SSM-Parameters($environmentName) {
         $name = $parameters[$i].Name
         $value = $parameters[$i].Value
         $table.Add(($name).Replace($prefix,""),$value)
+
+        Write-Output "Name: $name Value: $value"
     }
 
     #return map
