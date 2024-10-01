@@ -244,6 +244,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectModifyPermissionsForUserReturns(user, true);
             ExpectGetOrganizationReturns(organization.Uuid, organization);
             ExpectResolveIdReturns(organization.Uuid, organization.Id);
+            ExpectHasStakeHolderAccessReturns(true);
             ExpectAssignRolesReturn(updateParameters.Roles.NewValue, user, organization);
             ExpectRemoveRolesReturn(user.GetRolesInOrganization(organization.Uuid), user, organization);
             _organizationServiceMock.Setup(x => x.GetDefaultUnit(organization, user)).Returns(defaultUnit);
@@ -277,6 +278,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetOrganizationReturns(organization.Uuid, organization);
             ExpectGetUserInOrganizationReturns(organization.Uuid, user.Uuid, user);
             ExpectModifyPermissionsForUserReturns(user, true);
+            ExpectHasStakeHolderAccessReturns(true);
             ExpectIsEmailInUseReturns(updateParameters.Email.NewValue, true);
             ExpectAssignRolesReturn(updateParameters.Roles.NewValue, user, organization);
             ExpectRemoveRolesReturn(user.GetRolesInOrganization(organization.Uuid), user, organization);
