@@ -39,9 +39,9 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     $Env:StsAdressePort = $parameters["StsAdressePort"]
     $Env:StsPersonPort = $parameters["StsPersonPort"]
 
-    Write-Output "StsBrugerPort: $Env:StsBrugerPort"
-    Write-Output "StsAdressePort: $Env:StsAdressePort"
-    Write-Output "StsPersonPort: $Env:StsPersonPort"
+    Write-Output "StsBrugerPort: ${Env:StsBrugerPort}"
+    Write-Output "StsAdressePort: ${Env:StsAdressePort}"
+    Write-Output "StsPersonPort: ${Env:StsPersonPort}"
     
     $Env:StsVirksomhedPort = $parameters["StsVirksomhedPort"]
     $Env:StsOrganisationPort = $parameters["StsOrganisationPort"]
