@@ -14,17 +14,19 @@ Function Configure-Aws($accessKeyId, $secretAccessKey) {
 Function Get-SSM-Parameter($environmentName, $parameterName) {
     Write-Output "Getting $parameterName from SSM"
     (aws ssm get-parameter --with-decryption --name "/kitos/$environmentName/$parameterName" | ConvertFrom-Json).Parameter.Value
-    if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO LOAD $parameterName from $environmentName" }
+    if($LASTEXITCODE -ne 0)	{ throw "FAILED TO LOAD $parameterName from $environmentName" }
 }
 
 Function Get-SSM-Parameters($environmentName) {
     $prefix = "/kitos/$environmentName/"
     Write-Output "Getting all SSM Parameters from $prefix"
 
-    $parameters = (aws ssm get-parameters-by-path --with-decryption --path "$prefix" | ConvertFrom-Json).Parameters
+    $response = aws ssm get-parameters-by-path --with-decryption --path "$prefix"
+    Write-Output "AWS CLI Response: $response"
+
+    $parameters = ($response | ConvertFrom-Json).Parameters
     
-    if ($LASTEXITCODE -ne 0 -or $parameters.Length -eq 0) {
-        throw "FAILED TO LOAD SSM parameters from $environmentName"
+    if ($LASTEXITCODE -ne 0) { throw "FAILED TO LOAD SSM parameters from $environmentName"
     }   
 
     # Convert structure to map

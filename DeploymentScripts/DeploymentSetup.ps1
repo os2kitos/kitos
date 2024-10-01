@@ -6,6 +6,10 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     
     $parameters = Get-SSM-Parameters -environmentName "$envName"
 
+    if($parameters.Count -eq 0) {
+        throw "No parameters found for environment $envName"
+    }
+
     $Env:KitosHostName = $parameters["HostName"]
     $Env:MsDeployUserName = $parameters["MsDeployUserName"]
     $Env:MsDeployPassword = $parameters["MsDeployPassword"]
