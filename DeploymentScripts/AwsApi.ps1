@@ -13,7 +13,7 @@ Function Configure-Aws($accessKeyId, $secretAccessKey) {
 
 Function Get-SSM-Parameter($environmentName, $parameterName) {
     Write-Host "Getting $parameterName from SSM"
-    (aws ssm get-parameter --with-decryption --name "/kitos/$environmentName/$parameterName" | ConvertFrom-Json).Parameter.Value
+    (aws ssm get-parameter --with-decryption --name "/kitos/$environmentName/$parameterName" | ConvertFrom-Json).Parameter.Value.Trim()
     if($LASTEXITCODE -ne 0)	{ throw "FAILED TO LOAD $parameterName from $environmentName" }
 }
 
@@ -31,7 +31,7 @@ Function Get-SSM-Parameters($environmentName) {
     $table = new-object System.Collections.Hashtable
     for($i = 0 ; $i -lt $parameters.Length; $i++) {
         $name = $parameters[$i].Name
-        $value = $parameters[$i].Value
+        $value = $parameters[$i].Value.Trim()
         $table.Add(($name).Replace($prefix,""),$value)
     }
 
