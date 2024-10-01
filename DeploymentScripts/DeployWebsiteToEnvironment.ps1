@@ -43,9 +43,9 @@ Deploy-Website  -packageDirectory (Resolve-Path "$PSScriptRoot\..\WebPackage") `
                 -stsCertificateAlias "$Env:StsCertificateAlias" `
                 -stsCertificateThumbprint "$Env:StsCertificateThumbprint" `
                 -orgService6EntityId "$Env:OrgService6EntityId" `
-                -$stsAdressePort "$Env:StsAdressePort" `
-                -$stsBrugerPort "$Env:StsBrugerPort" `
-                -$stsPersonPort "$Env:StsPersonPort" `
+                -stsAdressePort "$Env:StsAdressePort" `
+                -stsBrugerPort "$Env:StsBrugerPort" `
+                -stsPersonPort "$Env:StsPersonPort" `
                 -stsVirksomhedPort "$Env:StsVirksomhedPort" `
                 -stsOrganisationPort "$Env:StsOrganisationPort" `
                 -stsOrganisationSystemPort "$Env:StsOrganisationSystemPort" `
