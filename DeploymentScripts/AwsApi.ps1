@@ -21,9 +21,12 @@ Function Get-SSM-Parameters($environmentName) {
     $prefix = "/kitos/$environmentName/"
     Write-Output "Getting all SSM Parameters from $prefix"
 
-    $parameters = (aws ssm get-parameters-by-path --with-decryption --path "$prefix" | ConvertFrom-Json).Parameters
+    $response = aws ssm get-parameters-by-path --with-decryption --path "$prefix"
+    Write-Output "AWS CLI Response: $response"
+
+    $parameters = ($response | ConvertFrom-Json).Parameters
     
-    if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO LOAD SSM parameters from $environmentName" }
+    if($LASTEXITCODE -ne 0 || $parameters.Length -eq 0)	{ Throw "FAILED TO LOAD SSM parameters from $environmentName" }
 
     # Convert structure to map
     $table = new-object System.Collections.Hashtable
