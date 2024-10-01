@@ -10,8 +10,6 @@ using Presentation.Web.Models.API.V2.Request.User;
 using System.Web.Http.Results;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Model.Users;
-using Presentation.Web.Controllers.API.V1.Mapping;
-using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Users
 {

@@ -159,7 +159,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
                 DefaultUserStartPreference = A<DefaultUserStartPreferenceChoice>(),
                 HasApiAccess = A<bool>(),
                 HasStakeHolderAccess = A<bool>(),
-                SendMailOnCreation = A<bool>(),
+                SendMail = A<bool>(),
                 Roles = A<IEnumerable<OrganizationRoleChoice>>()
             };
         }

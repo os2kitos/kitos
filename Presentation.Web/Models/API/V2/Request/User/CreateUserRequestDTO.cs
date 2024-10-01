@@ -14,6 +14,5 @@ namespace Presentation.Web.Models.API.V2.Request.User
         [Required]
         public new string LastName { get; set; }
 
-        public bool SendMailOnCreation { get; set; }
     }
 }

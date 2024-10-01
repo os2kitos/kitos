@@ -20,5 +20,7 @@ namespace Core.ApplicationServices.Model.Users.Write
         public OptionalValueChange<bool> HasStakeHolderAccess { get; set; }
 
         public OptionalValueChange<IEnumerable<OrganizationRole>> Roles { get; set; }
+
+        public bool SendMailOnUpdate {get; set; }
     }
 }
