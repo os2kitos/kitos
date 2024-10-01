@@ -12,5 +12,6 @@ namespace Presentation.Web.Models.API.V2.Request.User
         public bool HasApiAccess { get; set; }
         public bool HasStakeHolderAccess { get; set; }
         public IEnumerable<OrganizationRoleChoice> Roles { get; set; }
+        public bool SendMail { get; set; }
     }
 }

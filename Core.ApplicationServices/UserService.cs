@@ -113,12 +113,24 @@ namespace Core.ApplicationServices
 
             var savedUser = _userRepository.Get(u => u.Id == user.Id).FirstOrDefault();
 
-            _domainEvents.Raise(new EntityBeingDeletedEvent<User>(savedUser));
+            _domainEvents.Raise(new EntityCreatedEvent<User>(savedUser));
 
             if (sendMailOnCreation)
                 IssueAdvisMail(savedUser, false, orgId);
 
             return savedUser;
+        }
+
+        public void UpdateUser(User user, bool sendMailOnUpdate, int orgId)
+        {
+            _userRepository.Update(user);
+
+            _domainEvents.Raise(new EntityUpdatedEvent<User>(user));
+
+            if (sendMailOnUpdate)
+            {
+                IssueAdvisMail(user, false, orgId);
+            }
         }
 
         public void IssueAdvisMail(User user, bool reminder, int orgId)
