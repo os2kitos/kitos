@@ -1,5 +1,5 @@
 Function Configure-Aws($accessKeyId, $secretAccessKey) {
-    Write-Output "Configuring AWS for access key $accessKeyId"
+    Write-Host "Configuring AWS for access key $accessKeyId"
     
     # Set defaults
     $Env:AWS_DEFAULT_REGION="eu-west-1"
@@ -8,21 +8,21 @@ Function Configure-Aws($accessKeyId, $secretAccessKey) {
     $Env:AWS_ACCESS_KEY_ID=$accessKeyId
     $Env:AWS_SECRET_ACCESS_KEY=$secretAccessKey
     
-    Write-Output "Finished configuring AWS. Active Key Id: $Env:AWS_ACCESS_KEY_ID"
+    Write-Host "Finished configuring AWS. Active Key Id: $Env:AWS_ACCESS_KEY_ID"
 }
 
 Function Get-SSM-Parameter($environmentName, $parameterName) {
-    Write-Output "Getting $parameterName from SSM"
+    Write-Host "Getting $parameterName from SSM"
     (aws ssm get-parameter --with-decryption --name "/kitos/$environmentName/$parameterName" | ConvertFrom-Json).Parameter.Value
     if($LASTEXITCODE -ne 0)	{ throw "FAILED TO LOAD $parameterName from $environmentName" }
 }
 
 Function Get-SSM-Parameters($environmentName) {
     $prefix = "/kitos/$environmentName/"
-    Write-Output "Getting all SSM Parameters from $prefix"
+    Write-Host "Getting all SSM Parameters from $prefix"
 
     $response = aws ssm get-parameters-by-path --with-decryption --path "$prefix"
-    Write-Output "AWS CLI Response: $response"
+    Write-Host "AWS CLI Response: $response"
 
     $parameters = ($response | ConvertFrom-Json).Parameters
     
@@ -36,7 +36,7 @@ Function Get-SSM-Parameters($environmentName) {
         $value = $parameters[$i].Value
         $table.Add(($name).Replace($prefix,""),$value)
 
-        Write-Output "Name: $name Value: $value"
+        Write-Host "Name: $name Value: $value"
     }
 
     #return map
