@@ -11,6 +11,8 @@ namespace Core.ApplicationServices
     public interface IUserService : IDisposable
     {
         User AddUser(User user, bool sendMailOnCreation, int orgId);
+
+        void UpdateUser(User user, bool sendMailOnUpdate, int orgId);
         void IssueAdvisMail(User user, bool reminder, int orgId);
         PasswordResetRequest IssuePasswordReset(User user, string subject, string content);
         PasswordResetRequest GetPasswordReset(string hash);

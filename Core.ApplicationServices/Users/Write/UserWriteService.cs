@@ -1,18 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.ModelBinding;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Extensions;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Users;
 using Core.ApplicationServices.Model.Users.Write;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 
@@ -73,29 +70,30 @@ namespace Core.ApplicationServices.Users.Write
 
         public Result<User, OperationError> Update(Guid organizationUuid, Guid userUuid, UpdateUserParameters parameters)
         {
-
             using var transactionManager = _transactionManager.Begin();
-            var userRes = _userService.GetUserInOrganization(organizationUuid, userUuid);
-            if (userRes.Failed)
+
+            var orgResult = _organizationService.GetOrganization(organizationUuid);
+            if (orgResult.Failed)
             {
-                return userRes.Error;
+                return orgResult.Error;
             }
+            var organization = orgResult.Value;
 
-            var user = userRes.Value;
+            var updateUserResult =
+                _userService.GetUserInOrganization(organizationUuid, userUuid)
+                    .Bind(CanModifyUser)
+                    .Bind(user => PerformUpdates(user, organization, parameters));
 
-            if (!_authorizationContext.AllowModify(user))
-            {
-                return new OperationError(OperationFailure.Forbidden);
-            }
-
-            var updateResult = PerformUpdates(user, organizationUuid, parameters);
-            if (updateResult.Failed)
+            if (updateUserResult.Failed)
             {
                 transactionManager.Rollback();
-                return updateResult.Error;
+                return updateUserResult.Error;
             }
+
+            var user = updateUserResult.Value;
+            _userService.UpdateUser(user, parameters.SendMailOnUpdate, organization.Id);
             transactionManager.Commit();
-            return updateResult.Value;
+            return user;
         }
 
         public Maybe<OperationError> SendNotification(Guid organizationUuid, Guid userUuid)
@@ -122,20 +120,32 @@ namespace Core.ApplicationServices.Users.Write
                 .Select(org => UserCollectionPermissionsResult.FromOrganization(org, _authorizationContext));
         }
 
-        private Result<User, OperationError> PerformUpdates(User orgUser, Guid organizationUuid, UpdateUserParameters parameters)
+        private Result<User, OperationError> PerformUpdates(User orgUser, Organization organization, UpdateUserParameters parameters)
         {
             return orgUser.WithOptionalUpdate(parameters.FirstName, (user, firstName) => user.Name = firstName)
                 .Bind(user =>
                     user.WithOptionalUpdate(parameters.LastName, (userToUpdate, lastName) => userToUpdate.LastName = lastName))
                 .Bind(user => user.WithOptionalUpdate(parameters.Email, UpdateEmail)
                 .Bind(user => user.WithOptionalUpdate(parameters.PhoneNumber, (userToUpdate, phoneNumber) => userToUpdate.PhoneNumber = phoneNumber))
-                .Bind(user => user.WithOptionalUpdate(parameters.HasStakeHolderAccess,
-                    (userToUpdate, hasStakeHolderAccess) => userToUpdate.HasStakeHolderAccess = hasStakeHolderAccess))
+                .Bind(user => user.WithOptionalUpdate(parameters.HasStakeHolderAccess, UpdateStakeholderAccess))
                 .Bind(user => user.WithOptionalUpdate(parameters.HasApiAccess,
                     (userToUpdate, hasApiAccess) => userToUpdate.HasApiAccess = hasApiAccess))
                 .Bind(user => user.WithOptionalUpdate(parameters.DefaultUserStartPreference,
                     (userToUpdate, defaultStartPreference) => userToUpdate.DefaultUserStartPreference = defaultStartPreference))
-                .Bind(user => user.WithOptionalUpdate(parameters.Roles, (userToUpdate, roles) => UpdateRoles(organizationUuid, userToUpdate, roles))));
+                .Bind(user => user.WithOptionalUpdate(parameters.Roles, (userToUpdate, roles) => UpdateRoles(organization, userToUpdate, roles))));
+        }
+
+        private Result<User, OperationError> UpdateStakeholderAccess(User user, bool stakeholderAccess)
+        {
+            if (stakeholderAccess &&
+                !_authorizationContext.HasPermission(
+                    new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))
+            {
+                return new OperationError("You don't have permission to issue stakeholder access.", OperationFailure.Forbidden);
+            }
+
+            user.HasStakeHolderAccess = stakeholderAccess;
+            return user;
         }
 
         private Result<User, OperationError> UpdateEmail(User user, string email)
@@ -148,33 +158,58 @@ namespace Core.ApplicationServices.Users.Write
             return user;
         }
 
-        private Result<User, OperationError> UpdateRoles(Guid organizationUuid, User user,
+        private Result<User, OperationError> UpdateRoles(Organization organization, User user,
             IEnumerable<OrganizationRole> roles)
         {
-            var organizationResult = _organizationService.GetOrganization(organizationUuid);
-            if (organizationResult.Failed)
+            var oldRoles = user.GetRolesInOrganization(organization.Uuid).ToList();
+            var rightsFromOtherOrganizations = user.OrganizationRights.Where(right => right.Organization.Uuid != organization.Uuid).ToList();
+            var updateResult = RemoveRoles(user, organization, oldRoles)
+                .Match(error => error, 
+                () => AssignRoles(user, organization, roles)
+                );
+
+            if (updateResult.Failed)
             {
-                return new OperationError($"Organization with uuid {organizationUuid} was not found", OperationFailure.NotFound);
+                return updateResult.Error;
             }
-            var organization = organizationResult.Value;
-            var defaultUnit = _organizationService.GetDefaultUnit(organization, user);
-            var rightsFromOtherOrganizations = user.OrganizationRights.Where(right => right.Organization.Uuid != organizationUuid);
-            var newRights = roles.Select(role => RoleToRight(role, user, organization, defaultUnit));
-            var updatedRights = rightsFromOtherOrganizations.Concat(newRights).ToList();
-            user.OrganizationRights = updatedRights;
+
+            var newOrgRights = updateResult.Value.ToList();
+            newOrgRights.AddRange(rightsFromOtherOrganizations);
+            user.OrganizationRights = newOrgRights;
             return user;
         }
 
-        private static OrganizationRight RoleToRight(OrganizationRole role, User user, Organization organization, OrganizationUnit defaultUnit = null)
+        private Result<IEnumerable<OrganizationRight>, OperationError> AssignRoles(User user, Organization organization,
+            IEnumerable<OrganizationRole> roles)
         {
-            return new OrganizationRight
+            var newRights = new List<OrganizationRight>();
+            foreach (var role in roles)
             {
-                UserId = user.Id,
-                Role = role,
-                OrganizationId = organization.Id,
-                Organization = organization,
-                DefaultOrgUnitId = defaultUnit?.Id,
-            };
+                var result = _organizationRightsService.AssignRole(organization.Id, user.Id, role);
+                if (result.Failed)
+                {
+                    return new OperationError($"Failed to assign role: {role}", result.Error);
+                }
+
+                newRights.Add(result.Value);
+            }
+
+            return newRights;
+        }
+
+        private Maybe<OperationError> RemoveRoles(User user, Organization organization,
+            IEnumerable<OrganizationRole> roles)
+        {
+            foreach (var role in roles)
+            {
+                var result = _organizationRightsService.RemoveRole(organization.Id, user.Id, role);
+                if (result.Failed)
+                {
+                    return new OperationError($"Failed to remove role {role}", result.Error);
+                    
+                }
+            }
+            return Maybe<OperationError>.None;
         }
 
         private Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(Organization organization)
@@ -255,5 +290,17 @@ namespace Core.ApplicationServices.Users.Write
             return Maybe<OperationError>.None;
 
         }
+
+        private Result<User, OperationError> CanModifyUser(User user)
+        {
+            if (!_authorizationContext.AllowModify(user))
+            {
+                return new OperationError($"Not allowed to modify user with uuid {user.Uuid}",
+                    OperationFailure.Forbidden);
+            }
+
+            return user;
+        }
+
     }
 }

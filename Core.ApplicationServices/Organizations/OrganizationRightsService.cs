@@ -43,12 +43,12 @@ namespace Core.ApplicationServices.Organizations
             _organizationRepository = organizationRepository;
         }
 
-        public Result<OrganizationRight, OperationFailure> AssignRole(int organizationId, int userId, OrganizationRole roleId)
+        public Result<OrganizationRight, OperationFailure> AssignRole(int organizationId, int userId, OrganizationRole role)
         {
             var right = new OrganizationRight
             {
                 OrganizationId = organizationId,
-                Role = roleId,
+                Role = role,
                 UserId = userId
             };
 
@@ -57,10 +57,10 @@ namespace Core.ApplicationServices.Organizations
                 return OperationFailure.Forbidden;
             }
 
-            var existingRight = _organizationRightRepository.AsQueryable().FirstOrDefault(x => x.OrganizationId == organizationId && x.UserId == userId && x.Role == roleId);
+            var existingRight = _organizationRightRepository.AsQueryable().FirstOrDefault(x => x.OrganizationId == organizationId && x.UserId == userId && x.Role == role);
             if (existingRight != null)
             {
-                _logger.Warning("Attempt to assign existing organization ({orgId}) role ({roleId}) to user ({userId}). Existing right ({rightId}) returned", organizationId, roleId, userId, existingRight.Id);
+                _logger.Warning("Attempt to assign existing organization ({orgId}) role ({roleId}) to user ({userId}). Existing right ({rightId}) returned", organizationId, role, userId, existingRight.Id);
                 return right;
             }
 
@@ -70,12 +70,12 @@ namespace Core.ApplicationServices.Organizations
             return right;
         }
 
-        public Result<OrganizationRight, OperationFailure> RemoveRole(int organizationId, int userId, OrganizationRole roleId)
+        public Result<OrganizationRight, OperationFailure> RemoveRole(int organizationId, int userId, OrganizationRole role)
         {
             var right = _organizationRightRepository
                 .AsQueryable()
                 .ByOrganizationId(organizationId)
-                .Where(r => r.Role == roleId && r.UserId == userId)
+                .Where(r => r.Role == role && r.UserId == userId)
                 .FirstOrDefault();
 
             return RemoveRight(right);

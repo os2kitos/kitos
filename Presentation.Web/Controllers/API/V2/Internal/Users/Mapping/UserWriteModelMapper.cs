@@ -34,7 +34,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
             return new CreateUserParameters
             {
                 User = user,
-                SendMailOnCreation = request.SendMailOnCreation,
+                SendMailOnCreation = request.SendMail,
                 Roles = request.Roles.Select(x => x.ToOrganizationRole()).ToList()
             };
         }
@@ -68,7 +68,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
                     : OptionalValueChange<bool>.None,
                 Roles = rule.MustUpdate(x => x.Roles)
                     ? request.Roles.Select(x => x.ToOrganizationRole()).AsChangedValue()
-                    : OptionalValueChange<IEnumerable<OrganizationRole>>.None
+                    : OptionalValueChange<IEnumerable<OrganizationRole>>.None,
+                SendMailOnUpdate = request.SendMail
             };
             return parameters;
         }

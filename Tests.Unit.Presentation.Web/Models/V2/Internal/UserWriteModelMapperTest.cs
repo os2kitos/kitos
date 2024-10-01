@@ -43,7 +43,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
             Assert.Equal(request.DefaultUserStartPreference,
                 DefaultUserStartPreferenceChoiceMapper.GetDefaultUserStartPreferenceChoice(parameters.User
                     .DefaultUserStartPreference));
-            Assert.Equal(request.SendMailOnCreation, parameters.SendMailOnCreation);
+            Assert.Equal(request.SendMail, parameters.SendMailOnCreation);
             Assert.Equal(request.Roles, parameters.Roles.Select(x => x.ToOrganizationRoleChoice()));
         }
 
@@ -62,6 +62,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
             Assert.Equal(request.HasApiAccess, AssertPropertyContainsDataChange(parameters.HasApiAccess));
             Assert.Equal(request.HasStakeHolderAccess, AssertPropertyContainsDataChange(parameters.HasStakeHolderAccess));
             Assert.Equal(request.Roles, AssertPropertyContainsDataChange(parameters.Roles).Select(x => x.ToOrganizationRoleChoice()));
+            Assert.Equal(request.SendMail, parameters.SendMailOnUpdate);
         }
     }
 }
