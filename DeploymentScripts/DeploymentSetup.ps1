@@ -2,7 +2,7 @@
 .$PSScriptRoot\AwsApi.ps1
 
 Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHangfireConnectionString = $true, [bool] $loadTestUsers = $true) {
-    Write-Host "Loading environment configuration from SSM"
+    Write-Output "Loading environment configuration from SSM"
     
     $parameters = Get-SSM-Parameters -environmentName "$envName"
 
@@ -38,6 +38,11 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     $Env:StsBrugerPort = $parameters["StsBrugerPort"]
     $Env:StsAdressePort = $parameters["StsAdressePort"]
     $Env:StsPersonPort = $parameters["StsPersonPort"]
+
+    Write-Output "StsBrugerPort: $Env:StsBrugerPort"
+    Write-Output "StsAdressePort: $Env:StsAdressePort"
+    Write-Output "StsPersonPort: $Env:StsPersonPort"
+    
     $Env:StsVirksomhedPort = $parameters["StsVirksomhedPort"]
     $Env:StsOrganisationPort = $parameters["StsOrganisationPort"]
     $Env:StsOrganisationSystemPort = $parameters["StsOrganisationSystemPort"]
