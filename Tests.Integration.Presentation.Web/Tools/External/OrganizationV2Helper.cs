@@ -5,9 +5,9 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
+using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.OrganizationUnit;
 using Presentation.Web.Models.API.V2.Response.Organization;
-using Presentation.Web.Models.API.V2.Response.Shared;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
@@ -67,12 +67,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/organizations/{uuid:D}"), token);
         }
 
-        public static async Task<ResourcePermissionsResponseDTO> GetPermissionsAsync(Cookie cookie, Guid uuid)
+        public static async Task<OrganizationPermissionsResponseDTO> GetPermissionsAsync(Cookie cookie, Guid uuid)
         {
             using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/organizations/{uuid:D}/permissions"), cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<ResourcePermissionsResponseDTO>();
+            return await response.ReadResponseBodyAsAsync<OrganizationPermissionsResponseDTO>();
         }
 
         public static async Task<UnitAccessRightsResponseDTO> GetUnitAccessRights(Guid organizationUuid, Guid unitUuid, Cookie optionalLogin = null)

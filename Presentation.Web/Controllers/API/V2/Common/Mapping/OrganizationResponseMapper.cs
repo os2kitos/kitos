@@ -1,7 +1,5 @@
-﻿using System;
-using Core.ApplicationServices.Model.Organizations;
+﻿using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Organization;
-using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using ContactPerson = Core.DomainModel.ContactPerson;
@@ -81,7 +79,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 
         public OrganizationMasterDataResponseDTO ToMasterDataDTO(Organization organization)
         {
-            var debug = new OrganizationMasterDataResponseDTO()
+            return new OrganizationMasterDataResponseDTO()
             {
                 Cvr = organization.Cvr,
                 Address = organization.Adress,
@@ -90,7 +88,17 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
                 Uuid = organization.Uuid,
                 Name = organization.Name
             };
-            return debug;
+        }
+
+        public OrganizationPermissionsResponseDTO ToPermissionsDTO(OrganizationPermissionsResult permissions)
+        {
+            return new()
+            {
+                Read = permissions.Read,
+                Modify = permissions.Modify,
+                Delete = permissions.Delete,
+                ModifyCvr = permissions.ModifyCvr
+            };
         }
     }
 }
