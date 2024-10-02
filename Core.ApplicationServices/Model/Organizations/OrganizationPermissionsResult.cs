@@ -7,8 +7,15 @@ namespace Core.ApplicationServices.Model.Organizations
     public class OrganizationPermissionsResult: ResourcePermissionsResult
     {
         public bool ModifyCvr { get; }
+        private static readonly OrganizationPermissionsResult Empty = new(false, false, false, false);
+
 
         public OrganizationPermissionsResult(ResourcePermissionsResult permissions, bool modifyCvr) : base(permissions.Read, permissions.Modify, permissions.Delete)
+        {
+            ModifyCvr = modifyCvr;
+        }
+
+        public OrganizationPermissionsResult(bool read, bool modify, bool delete, bool modifyCvr): base(read, modify, delete)
         {
             ModifyCvr = modifyCvr;
         }
