@@ -144,12 +144,6 @@ namespace Core.ApplicationServices.Organizations
                 _authorizationContext.HasPermission(new DefineOrganizationTypePermission(organizationType, organization.Id));
         }
 
-        public Result<bool, OperationError> CanActiveUserModifyCvr(Guid organizationUuid)
-        {
-            return GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
-                .Select(_ => _userContext.IsGlobalAdmin());
-        }
-
         public Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg)
         {
             if (newOrg == null)
@@ -394,10 +388,23 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<OrganizationPermissionsResult, OperationError> GetPermissions(Guid organizationUuid)
         {
-            var modifyCvrResult = CanActiveUserModifyCvr(organizationUuid);
+            var modifyCvrResult = GetModifyCvrPermission(organizationUuid);
             if (modifyCvrResult.Failed) return modifyCvrResult.Error;
             return GetOrganization(organizationUuid)
                 .Transform(result => OrganizationPermissionsResult.FromResolutionResult(result, _authorizationContext, modifyCvrResult.Value));
+        }
+
+        private Result<bool, OperationError> GetModifyCvrPermission(Guid organizationUuid)
+        {
+            var result = CanActiveUserModifyCvr(organizationUuid);
+            if (result.Failed && result.Error.FailureType == OperationFailure.Forbidden) return false;
+            return result;
+        }
+
+        public Result<bool, OperationError> CanActiveUserModifyCvr(Guid organizationUuid)
+        {
+            return GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Select(_ => _userContext.IsGlobalAdmin());
         }
 
         public Maybe<DataResponsible> GetDataResponsible(int organizationId)
