@@ -24,10 +24,10 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         private const int CvrMaxLength = 10;
 
         [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
-        [InlineData(OrganizationRole.LocalAdmin, true, false, false)]
-        [InlineData(OrganizationRole.User, true, false, false)]
-        public async Task Can_Get_Specific_Organization_Permissions(OrganizationRole userRole, bool expectRead, bool expectModify, bool expectDelete)
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, false, false, false)]
+        [InlineData(OrganizationRole.User, true, false, false, false)]
+        public async Task Can_Get_Specific_Organization_Permissions(OrganizationRole userRole, bool expectRead, bool expectModify, bool expectDelete, bool expectModifyCvr)
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(userRole);
@@ -38,11 +38,12 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var permissionsResponseDto = await OrganizationV2Helper.GetPermissionsAsync(cookie, organization.Uuid);
 
             //Assert - exhaustive content assertions are done in the read-after-write assertion tests (POST/PUT)
-            var expected = new ResourcePermissionsResponseDTO()
+            var expected = new OrganizationPermissionsResponseDTO()
             {
                 Read = expectRead,
                 Modify = expectModify,
-                Delete = expectDelete
+                Delete = expectDelete,
+                ModifyCvr = expectModifyCvr
             };
             Assert.Equivalent(expected, permissionsResponseDto);
         }

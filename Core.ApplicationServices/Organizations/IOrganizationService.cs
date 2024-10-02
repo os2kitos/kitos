@@ -49,7 +49,7 @@ namespace Core.ApplicationServices.Organizations
 
         Result<IEnumerable<Organization>, OperationError> GetUserOrganizations(int userId);
         Result<bool, OperationError> CanActiveUserModifyCvr(Guid organizationUuid);
-        Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid organizationUuid);
+        Result<OrganizationPermissionsResult, OperationError> GetPermissions(Guid organizationUuid);
 
         public GridPermissions GetGridPermissions(int orgId);
         public Maybe<DataResponsible> GetDataResponsible(int organizationId);

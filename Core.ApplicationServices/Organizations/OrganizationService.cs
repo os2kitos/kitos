@@ -144,12 +144,6 @@ namespace Core.ApplicationServices.Organizations
                 _authorizationContext.HasPermission(new DefineOrganizationTypePermission(organizationType, organization.Id));
         }
 
-        public Result<bool, OperationError> CanActiveUserModifyCvr(Guid organizationUuid)
-        {
-            return GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
-                .Select(_ => _userContext.IsGlobalAdmin());
-        }
-
         public Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg)
         {
             if (newOrg == null)
@@ -392,10 +386,25 @@ namespace Core.ApplicationServices.Organizations
             return Result<IEnumerable<Organization>, OperationError>.Success(_orgRepository.AsQueryable().ByIds(userOrganizationsIds.ToList()));
         }
 
-        public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid organizationUuid)
+        public Result<OrganizationPermissionsResult, OperationError> GetPermissions(Guid organizationUuid)
         {
-            return GetOrganization(organizationUuid)
-                .Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
+            return GetModifyCvrPermission(organizationUuid).Bind(modifyCvr => GetOrganization(organizationUuid)
+                .Transform(result =>
+                    OrganizationPermissionsResult.FromResolutionResult(result, _authorizationContext,
+                        modifyCvr)));
+        }
+
+        private Result<bool, OperationError> GetModifyCvrPermission(Guid organizationUuid)
+        {
+            var result = CanActiveUserModifyCvr(organizationUuid);
+            if (result.Failed && result.Error.FailureType == OperationFailure.Forbidden) return false;
+            return result;
+        }
+
+        public Result<bool, OperationError> CanActiveUserModifyCvr(Guid organizationUuid)
+        {
+            return GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Select(_ => _userContext.IsGlobalAdmin());
         }
 
         public Maybe<DataResponsible> GetDataResponsible(int organizationId)
