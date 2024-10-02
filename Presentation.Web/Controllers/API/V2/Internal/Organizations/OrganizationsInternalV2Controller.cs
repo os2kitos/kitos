@@ -5,7 +5,6 @@ using System.Web.Http;
 using Core.ApplicationServices.Organizations.Write;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
-using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
@@ -22,28 +21,26 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
     {
         private readonly IOrganizationService _organizationService;
         private readonly IOrganizationWriteService _organizationWriteService;
-        private readonly IResourcePermissionsResponseMapper _permissionsResponseMapper;
         private readonly IOrganizationResponseMapper _organizationResponseMapper;
         private readonly IOrganizationWriteModelMapper _organizationWriteModelMapper;
 
-        public OrganizationsInternalV2Controller(IOrganizationService organizationService, IResourcePermissionsResponseMapper permissionsResponseMapper, IOrganizationResponseMapper organizationResponseMapper, IOrganizationWriteModelMapper organizationWriteModelMapper, IOrganizationWriteService organizationWriteService)
+        public OrganizationsInternalV2Controller(IOrganizationService organizationService, IOrganizationResponseMapper organizationResponseMapper, IOrganizationWriteModelMapper organizationWriteModelMapper, IOrganizationWriteService organizationWriteService)
         {
             _organizationService = organizationService;
-            _permissionsResponseMapper = permissionsResponseMapper;
             _organizationResponseMapper = organizationResponseMapper;
             _organizationWriteModelMapper = organizationWriteModelMapper;
             _organizationWriteService = organizationWriteService;
         }
 
         [Route("permissions")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourcePermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationPermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetPermissions([NonEmptyGuid] Guid organizationUuid)
         {
             return _organizationService.GetPermissions(organizationUuid)
-                .Select(_permissionsResponseMapper.Map)
+                .Select(_organizationResponseMapper.ToPermissionsDTO)
                 .Match(Ok, FromOperationError);
         }
 

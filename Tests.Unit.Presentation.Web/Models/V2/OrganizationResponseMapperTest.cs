@@ -109,6 +109,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(organization.Adress, dto.Address);
         }
 
+        [Fact]
+        public void Can_Map_Permissions_Dto()
+        {
+            var permissions = new OrganizationPermissionsResult(A<bool>(), A<bool>(), A<bool>(), A<bool>());
+
+            var dto = _sut.ToPermissionsDTO(permissions);
+
+            Assert.Equal(permissions.Read, dto.Read);        
+            Assert.Equal(permissions.Modify, dto.Modify);     
+            Assert.Equal(permissions.Delete, dto.Delete);    
+            Assert.Equal(permissions.ModifyCvr, dto.ModifyCvr);
+        }
+
         private void AssertContactPerson(ContactPerson expected, ContactPersonResponseDTO actual)
         {
             Assert.Equal(expected.Email, actual.Email);

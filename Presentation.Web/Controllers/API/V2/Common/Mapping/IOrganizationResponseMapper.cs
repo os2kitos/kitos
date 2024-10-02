@@ -1,5 +1,6 @@
 ﻿using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Organization;
+using Presentation.Web.Models.API.V1.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 
@@ -11,5 +12,7 @@ public interface IOrganizationResponseMapper
     OrganizationMasterDataRolesResponseDTO ToRolesDTO(OrganizationMasterDataRoles roles);
 
     OrganizationMasterDataResponseDTO ToMasterDataDTO(Organization organization);
+
+    OrganizationPermissionsResponseDTO ToPermissionsDTO(OrganizationPermissionsResult permissions);
 
 }
