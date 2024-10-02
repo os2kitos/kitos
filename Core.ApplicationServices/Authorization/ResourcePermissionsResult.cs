@@ -35,7 +35,7 @@ namespace Core.ApplicationServices.Authorization
             T entity,
             IAuthorizationContext authorizationContext) where T : IEntity
         {
-            return new ResourcePermissionsResult(true, authorizationContext.AllowModify(entity), authorizationContext.AllowDelete(entity));
+            return new ResourcePermissionsResult(authorizationContext.AllowReads(entity), authorizationContext.AllowModify(entity), authorizationContext.AllowDelete(entity));
         }
     }
 }
