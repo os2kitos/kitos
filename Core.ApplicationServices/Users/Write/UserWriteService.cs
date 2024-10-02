@@ -161,40 +161,14 @@ namespace Core.ApplicationServices.Users.Write
         private Result<User, OperationError> UpdateRoles(Organization organization, User user,
             IEnumerable<OrganizationRole> roles)
         {
-            var oldRoles = user.GetRolesInOrganization(organization.Uuid).ToList();
-            var rightsFromOtherOrganizations = user.OrganizationRights.Where(right => right.Organization.Uuid != organization.Uuid).ToList();
-            var updateResult = RemoveRoles(user, organization, oldRoles)
-                .Match(error => error, 
-                () => AssignRoles(user, organization, roles)
-                );
+            var oldRoles = user.GetRolesInOrganization(organization.Uuid).ToHashSet();
+            var newRoles = roles.ToHashSet();
+            var rolesToAdd = newRoles.Except(oldRoles);
+            var rolesToDelete = oldRoles.Except(newRoles);
+            return RemoveRoles(user, organization, rolesToDelete)
+                .Match(error => error, () => AssignUserAdministrativeRoles(organization.Id, user.Id, rolesToAdd))
+                .Match(error => error, () => Result<User, OperationError>.Success(user));
 
-            if (updateResult.Failed)
-            {
-                return updateResult.Error;
-            }
-
-            var newOrgRights = updateResult.Value.ToList();
-            newOrgRights.AddRange(rightsFromOtherOrganizations);
-            user.OrganizationRights = newOrgRights;
-            return user;
-        }
-
-        private Result<IEnumerable<OrganizationRight>, OperationError> AssignRoles(User user, Organization organization,
-            IEnumerable<OrganizationRole> roles)
-        {
-            var newRights = new List<OrganizationRight>();
-            foreach (var role in roles)
-            {
-                var result = _organizationRightsService.AssignRole(organization.Id, user.Id, role);
-                if (result.Failed)
-                {
-                    return new OperationError($"Failed to assign role: {role}", result.Error);
-                }
-
-                newRights.Add(result.Value);
-            }
-
-            return newRights;
         }
 
         private Maybe<OperationError> RemoveRoles(User user, Organization organization,
