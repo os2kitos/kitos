@@ -5,7 +5,7 @@ namespace Core.ApplicationServices.Authorization
 {
     public class ResourcePermissionsResult
     {
-        private static readonly ResourcePermissionsResult Empty = new(false, false, false);
+        protected static readonly ResourcePermissionsResult Empty = new(false, false, false);
 
         public bool Read { get; }
         public bool Modify { get; }
