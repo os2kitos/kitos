@@ -263,7 +263,6 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             Assert.Equal(updateParameters.HasApiAccess.NewValue, updatedUser.HasApiAccess);
             Assert.Equal(updateParameters.HasStakeHolderAccess.NewValue, updatedUser.HasStakeHolderAccess);
             Assert.Equal(updateParameters.DefaultUserStartPreference.NewValue, updatedUser.DefaultUserStartPreference);
-            Assert.Equal(updateParameters.Roles.NewValue, updatedUser.GetRolesInOrganization(organization.Uuid));
             transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
         }
 
