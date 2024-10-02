@@ -388,10 +388,10 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<OrganizationPermissionsResult, OperationError> GetPermissions(Guid organizationUuid)
         {
-            var modifyCvrResult = GetModifyCvrPermission(organizationUuid);
-            if (modifyCvrResult.Failed) return modifyCvrResult.Error;
-            return GetOrganization(organizationUuid)
-                .Transform(result => OrganizationPermissionsResult.FromResolutionResult(result, _authorizationContext, modifyCvrResult.Value));
+            return GetModifyCvrPermission(organizationUuid).Bind(modifyCvr => GetOrganization(organizationUuid)
+                .Transform(result =>
+                    OrganizationPermissionsResult.FromResolutionResult(result, _authorizationContext,
+                        modifyCvr)));
         }
 
         private Result<bool, OperationError> GetModifyCvrPermission(Guid organizationUuid)
