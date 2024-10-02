@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Organization;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -69,7 +70,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         {
             //Arrange
             var orgUuid = A<Guid>();
-            var permissions = new ResourcePermissionsResult(true, true, true);
+            var permissions = new OrganizationPermissionsResult(true, true, true, true);
             var userEmail = A<string>();
             var users = new List<User>
             {
@@ -99,7 +100,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         {
             //Arrange
             var orgUuid = A<Guid>();
-            var permissions = new ResourcePermissionsResult(false, false, false);
+            var permissions = new OrganizationPermissionsResult(false, false, false, false);
 
             _organizationService.Setup(x => x.GetPermissions(orgUuid)).Returns(permissions);
 
