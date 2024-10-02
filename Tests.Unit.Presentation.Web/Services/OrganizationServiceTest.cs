@@ -6,6 +6,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -789,28 +790,45 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Theory]
-        [InlineData(true, true, true)]
-        [InlineData(true, false, true)]
-        [InlineData(true, true, false)]
-        [InlineData(true, false, false)]
-        [InlineData(false, false, false)]
-        public void Can_Get_Permissions(bool read, bool modify, bool delete)
+        [InlineData(true, true, true, true)]
+        [InlineData(true, true, true, false)]
+        [InlineData(true, true, false, true)]
+        [InlineData(true, true, false, false)]
+        [InlineData(true, false, true, true)]
+        [InlineData(true, false, true, false)]
+        [InlineData(true, false, false, true)]
+        [InlineData(true, false, false, false)]
+        [InlineData(false, true, true, true)]
+        [InlineData(false, true, true, false)]
+        [InlineData(false, true, false, true)]
+        [InlineData(false, true, false, false)]
+        [InlineData(false, false, true, true)]
+        [InlineData(false, false, true, false)]
+        [InlineData(false, false, false, true)]
+        [InlineData(false, false, false, false)]
+
+        public void Can_Get_Permissions(bool read, bool modify, bool delete, bool modifyCvr)
         {
             //Arrange
             var uuid = A<Guid>();
             var organization = new Organization { Uuid = uuid };
             ExpectGetOrganizationByUuidReturns(uuid, organization);
-            ExpectAllowReadReturns(organization, read);
+            _authorizationContext.SetupSequence(_ => _.AllowReads(organization))
+                .Returns(true)
+                .Returns(read);
             ExpectAllowModifyReturns(organization, modify);
+            _userContext.Setup(_ => _.IsGlobalAdmin()).Returns(modifyCvr);
             _authorizationContext.Setup(x => x.AllowDelete(organization)).Returns(delete);
-
+            _repositoryMock.Setup(_ => _.GetByUuid(uuid)).Returns(organization);
+            _authorizationContext.Setup(_ => _.GetOrganizationReadAccessLevel(organization.Id))
+                .Returns(OrganizationDataReadAccessLevel.All);
             //Act
             var result = _sut.GetPermissions(uuid);
 
             //Assert
             Assert.True(result.Ok);
             var permissions = result.Value;
-            Assert.Equivalent(new ResourcePermissionsResult(read, modify, delete), permissions);
+            Assert.Equivalent(new OrganizationPermissionsResult(new ResourcePermissionsResult(read, modify, delete), modifyCvr), permissions);
         }
 
         [Fact]
