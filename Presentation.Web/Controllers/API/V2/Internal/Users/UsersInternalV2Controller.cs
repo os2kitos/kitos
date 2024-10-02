@@ -93,13 +93,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
 
         [Route("find-any-by-email")]
         [HttpGet]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UserResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UserWithIsPartOfCurrentOrgResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetUsersByEmailInOtherOrganizations([NonEmptyGuid] Guid organizationUuid, string email)
         {
             return _userService.GetUserByEmail(organizationUuid, email)
-                .Select(_userResponseModelMapper.ToUserResponseDTO)
+                .Select(user => _userResponseModelMapper.ToUserWithIsPartOfCurrentOrgResponseDTO(organizationUuid, user))
                 .Match(Ok, FromOperationError);
         }
 

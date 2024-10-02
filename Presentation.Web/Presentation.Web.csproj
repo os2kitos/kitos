@@ -453,6 +453,7 @@
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\UnitAccessRightsWithUnitDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\User\UserCollectionPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\User\UserResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\User\UserWithIsPartOfCurrentOrgResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesCreation.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesUpdate.cs" />
     <Compile Include="Models\API\V2\Request\Interface\CreateItInterfaceRequestDTO.cs" />

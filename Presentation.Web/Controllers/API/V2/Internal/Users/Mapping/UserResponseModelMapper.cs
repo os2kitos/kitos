@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.DomainModel;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
 
@@ -22,6 +23,25 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
                 HasStakeHolderAccess = user.HasStakeHolderAccess,
                 Roles = user.OrganizationRights.Select(x => x.Role.ToOrganizationRoleChoice()).ToList(),
                 LastSentAdvis = user.LastAdvisDate
+            };
+        }
+        public UserWithIsPartOfCurrentOrgResponseDTO ToUserWithIsPartOfCurrentOrgResponseDTO(Guid organizationUuid, User user)
+        {
+            return new UserWithIsPartOfCurrentOrgResponseDTO
+            {
+                Uuid = user.Uuid,
+                Email = user.Email,
+                FirstName = user.Name,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                DefaultUserStartPreference =
+                    DefaultUserStartPreferenceChoiceMapper.GetDefaultUserStartPreferenceChoice(
+                        user.DefaultUserStartPreference),
+                HasApiAccess = user.HasApiAccess,
+                HasStakeHolderAccess = user.HasStakeHolderAccess,
+                Roles = user.OrganizationRights.Select(x => x.Role.ToOrganizationRoleChoice()).ToList(),
+                LastSentAdvis = user.LastAdvisDate,
+                IsPartOfCurrentOrganization = user.GetOrganizations().Any(x => x.Uuid == organizationUuid)
             };
         }
     }
