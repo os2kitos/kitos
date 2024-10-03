@@ -14,7 +14,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Users.V2
 {
-    public class UserV2Test : WithAutoFixture
+    public class UsersInternalApiV2Test : WithAutoFixture
     {
         [Fact]
         public async Task Can_Create_User()
@@ -140,7 +140,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
 
         private string CreateName()
         {
-            return $"{nameof(UserV2Test)}{A<string>()}";
+            return $"{nameof(UsersInternalApiV2Test)}{A<string>()}";
         }
 
         private string CreateEmail()
