@@ -64,6 +64,20 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
                 .Match(Ok, FromOperationError);
         }
 
+        [Route("{userUuid}")]
+        [HttpDelete]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UserResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteUser([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid)
+        {
+            return _userService.DeleteUser(userUuid, organizationUuid)
+                .Match(FromOperationError,
+                    Ok);
+        }
+
         [Route("{userUuid}/notifications/send")]
         [HttpPost]
         [SwaggerResponse(HttpStatusCode.OK)]

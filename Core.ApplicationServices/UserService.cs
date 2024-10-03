@@ -361,6 +361,11 @@ namespace Core.ApplicationServices
             return _authorizationContext.HasPermission(new DeleteAnyUserPermission(optionalOrganizationScopeId.FromNullableValueType()));
         }
 
+        public Maybe<OperationError> DeleteUser(Guid userUuid, Guid scopedToOrganizationUuid)
+        {
+            var orgDbId = _identityResolver.
+        };
+
         public Maybe<OperationError> DeleteUser(Guid userUuid, int? scopedToOrganizationId = null)
         {
             var hasOrganizationIdValue = scopedToOrganizationId.HasValue;
