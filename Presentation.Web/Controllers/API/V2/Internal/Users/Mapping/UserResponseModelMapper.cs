@@ -27,6 +27,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
         }
         public UserIsPartOfCurrentOrgResponseDTO ToUserWithIsPartOfCurrentOrgResponseDTO(Guid organizationUuid, User user)
         {
+            if (user == null)
+            {
+                return null;
+            }
+
             return new UserIsPartOfCurrentOrgResponseDTO
             {
                 Uuid = user.Uuid,
