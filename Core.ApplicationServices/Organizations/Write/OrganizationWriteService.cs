@@ -176,37 +176,53 @@ public class OrganizationWriteService : IOrganizationWriteService{
     private Result<OrganizationMasterDataRoles, OperationError> AuthorizeAndPerformMasterDataRolesUpsert(Guid organizationUuid,
         OrganizationMasterDataRolesUpdateParameters updateParameters)
     {
-        var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
-        if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
-        var orgId = organizationDbIdMaybe.Value;
+        var organizationResult = _organizationService.GetOrganization(organizationUuid);
+        return organizationResult.Match(
+            organization => CollectMasterDataRolesFromUpsert(organization, updateParameters)
+                    .Bind(roles =>
+                    {
+                        var (contactPerson, dataResponsible, dataProtectionAdvisor) = roles;
+                        return Result<OrganizationMasterDataRoles, OperationError>.Success(new OrganizationMasterDataRoles()
+                        {
+                            OrganizationUuid = organizationUuid,
+                            ContactPerson = contactPerson,
+                            DataProtectionAdvisor = dataProtectionAdvisor,
+                            DataResponsible = dataResponsible
+                        });
+                    }),
+            error => error
+        );
+    }
 
+    private Result<(ContactPerson, DataResponsible, DataProtectionAdvisor), OperationError>
+        CollectMasterDataRolesFromUpsert(Organization organization,
+            OrganizationMasterDataRolesUpdateParameters updateParameters)
+    {
         var modifiedContactPersonResult =
-            AuthorizeModificationAndUpsertContactPerson(orgId,
-                updateParameters.ContactPerson);
+            AuthorizeModificationAndUpsertContactPerson(organization, updateParameters.ContactPerson);
         if (modifiedContactPersonResult.Failed) return modifiedContactPersonResult.Error;
 
         var modifiedDataResponsibleResult =
-            AuthorizeModificationAndUpsertDataResponsible(orgId, updateParameters.DataResponsible);
+            AuthorizeModificationAndUpsertDataResponsible(organization, updateParameters.DataResponsible);
         if (modifiedDataResponsibleResult.Failed) return modifiedDataResponsibleResult.Error;
 
-        var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndUpsertDataProtectionAdvisor(orgId,
+        var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndUpsertDataProtectionAdvisor(
+            organization,
             updateParameters.DataProtectionAdvisor);
         if (modifiedDataProtectionAdvisorResult.Failed) return modifiedDataProtectionAdvisorResult.Error;
 
-        return new OrganizationMasterDataRoles()
-        {
-            OrganizationUuid = organizationUuid,
-            ContactPerson = modifiedContactPersonResult.Value,
-            DataProtectionAdvisor = modifiedDataProtectionAdvisorResult.Value,
-            DataResponsible = modifiedDataResponsibleResult.Value
-        };
+        return Result<(ContactPerson, DataResponsible, DataProtectionAdvisor), OperationError>.Success(
+            (modifiedContactPersonResult.Value,
+                modifiedDataResponsibleResult.Value,
+                modifiedDataProtectionAdvisorResult.Value)
+        );
     }
 
     private Result<ContactPerson, OperationError> AuthorizeModificationAndUpsertContactPerson(
-        int organizationId, Maybe<ContactPersonUpdateParameters> parameters)
+        Organization organization, Maybe<ContactPersonUpdateParameters> parameters)
     {
-        return UpsertContactPerson(organizationId)
-            .Bind(ValidateModifyContactPerson)
+        return UpsertContactPerson(organization.Id)
+            .Bind(contactPerson => ValidateModifyContactPersonByRootOrganization(contactPerson, organization))
             .Bind(contactPerson => ModifyContactPerson(contactPerson, parameters));
     }
     
@@ -217,8 +233,8 @@ public class OrganizationWriteService : IOrganizationWriteService{
                     () => AuthorizeCreationAndCreateContactPerson(organizationId));
         }
 
-    private Result<ContactPerson, OperationError> ValidateModifyContactPerson(ContactPerson contactPerson) =>
-        _authorizationContext.AllowModify(contactPerson) ? contactPerson : new OperationError(OperationFailure.Forbidden);
+    private Result<ContactPerson, OperationError> ValidateModifyContactPersonByRootOrganization(ContactPerson contactPerson, Organization organization) =>
+        _authorizationContext.AllowModify(organization) ? contactPerson : new OperationError(OperationFailure.Forbidden);
 
     private Result<ContactPerson, OperationError> AuthorizeCreationAndCreateContactPerson(int orgId)
     {
@@ -264,14 +280,14 @@ public class OrganizationWriteService : IOrganizationWriteService{
     }
 
     private Result<DataResponsible, OperationError> AuthorizeModificationAndUpsertDataResponsible(
-        int organizationId, Maybe<DataResponsibleUpdateParameters> parameters)
+        Organization organization, Maybe<DataResponsibleUpdateParameters> parameters)
     {
-        return UpsertDataResponsible(organizationId)
-            .Bind(ValidateModifyDataResponsible)
+        return UpsertDataResponsible(organization.Id)
+            .Bind(dataResponsible => ValidateModifyDataResponsibleByRootOrganization(dataResponsible, organization))
             .Bind(dataResponsible => ModifyDataResponsible(dataResponsible, parameters));
     }
-    private Result<DataResponsible, OperationError> ValidateModifyDataResponsible(DataResponsible dataResponsible) =>
-        _authorizationContext.AllowModify(dataResponsible) ? dataResponsible : new OperationError(OperationFailure.Forbidden);
+    private Result<DataResponsible, OperationError> ValidateModifyDataResponsibleByRootOrganization(DataResponsible dataResponsible, Organization organization) =>
+        _authorizationContext.AllowModify(organization) ? dataResponsible : new OperationError(OperationFailure.Forbidden);
 
 
     private Result<DataResponsible, OperationError> UpsertDataResponsible(int orgId)
@@ -329,10 +345,10 @@ public class OrganizationWriteService : IOrganizationWriteService{
     }
 
     private Result<DataProtectionAdvisor, OperationError> AuthorizeModificationAndUpsertDataProtectionAdvisor(
-        int organizationId, Maybe<DataProtectionAdvisorUpdateParameters> parameters)
+        Organization organization, Maybe<DataProtectionAdvisorUpdateParameters> parameters)
     {
-        return UpsertDataProtectionAdvisor(organizationId)
-            .Bind(ValidateModifyDataProtectionAdvisor)
+        return UpsertDataProtectionAdvisor(organization.Id)
+            .Bind(dataProtectionAdvisor => ValidateModifyDataProtectionAdvisorByRootOrganization(dataProtectionAdvisor, organization))
             .Bind(dataProtectionAdvisor => ModifyDataProtectionAdvisor(dataProtectionAdvisor, parameters));
     }
 
@@ -358,8 +374,8 @@ public class OrganizationWriteService : IOrganizationWriteService{
         return dataProtectionAdvisor;
     }
 
-    private Result<DataProtectionAdvisor, OperationError> ValidateModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor) =>
-        _authorizationContext.AllowModify(dataProtectionAdvisor) ? dataProtectionAdvisor : new OperationError(OperationFailure.Forbidden);
+    private Result<DataProtectionAdvisor, OperationError> ValidateModifyDataProtectionAdvisorByRootOrganization(DataProtectionAdvisor dataProtectionAdvisor, Organization organization) =>
+        _authorizationContext.AllowModify(organization) ? dataProtectionAdvisor : new OperationError(OperationFailure.Forbidden);
 
     private Result<DataProtectionAdvisor, OperationError> ModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor, Maybe<DataProtectionAdvisorUpdateParameters> parametersMaybe)
     {
