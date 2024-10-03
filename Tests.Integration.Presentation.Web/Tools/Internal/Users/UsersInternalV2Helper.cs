@@ -23,7 +23,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return await response.ReadResponseBodyAsAsync<UserResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> DeleteUser(Guid organizationUuid, Guid userUuid, Cookie cookie = null)
+        public static async Task<HttpResponseMessage> DeleteUser(Guid organizationUuid, Guid userUuid, Cookie cookie = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl(
@@ -31,7 +31,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             var response = await HttpApi.DeleteWithCookieAsync(url,
                  requestCookie);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(expectedStatusCode, response.StatusCode);
 
             return response;
         }

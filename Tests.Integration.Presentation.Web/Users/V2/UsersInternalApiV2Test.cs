@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Core.DomainModel.Organization;
@@ -109,6 +110,25 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var response = await UsersInternalV2Helper.DeleteUser(organization.Uuid, user.Uuid);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Delete_User_Returns_Not_Found_If_Invalid_Org_Uuid()
+        {
+            var organization = await CreateOrganizationAsync();
+            var user = await UsersInternalV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
+            var invalidOrgUuid = new Guid();
+
+            _ = await UsersInternalV2Helper.DeleteUser(invalidOrgUuid, user.Uuid, null, HttpStatusCode.NotFound);
+        }
+
+        [Fact]
+        public async Task Delete_User_Returns_Not_Found_If_Invalid_User_Uuid()
+        {
+            var organization = await CreateOrganizationAsync();
+            var invalidUserUuid = new Guid();
+
+            _ = await UsersInternalV2Helper.DeleteUser(organization.Uuid, invalidUserUuid, null, HttpStatusCode.NotFound);
         }
 
         private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
