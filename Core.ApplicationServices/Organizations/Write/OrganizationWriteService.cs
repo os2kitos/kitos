@@ -179,10 +179,11 @@ public class OrganizationWriteService : IOrganizationWriteService{
         var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
         if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
         var orgId = organizationDbIdMaybe.Value;
+        var organization = _organizationService.GetOrganization(organizationUuid);
+        if (organization.Failed) return new OperationError(OperationFailure.BadInput);
 
         var modifiedContactPersonResult =
-            AuthorizeModificationAndUpsertContactPerson(orgId,
-                updateParameters.ContactPerson);
+            AuthorizeModificationAndUpsertContactPerson(organization.Value, updateParameters.ContactPerson);
         if (modifiedContactPersonResult.Failed) return modifiedContactPersonResult.Error;
 
         var modifiedDataResponsibleResult =
@@ -203,10 +204,10 @@ public class OrganizationWriteService : IOrganizationWriteService{
     }
 
     private Result<ContactPerson, OperationError> AuthorizeModificationAndUpsertContactPerson(
-        int organizationId, Maybe<ContactPersonUpdateParameters> parameters)
+        Organization organization, Maybe<ContactPersonUpdateParameters> parameters)
     {
-        return UpsertContactPerson(organizationId)
-            .Bind(ValidateModifyContactPerson)
+        return UpsertContactPerson(organization.Id)
+            .Bind(contactPerson => ValidateModifyContactPersonByRootOrganization(contactPerson, organization))
             .Bind(contactPerson => ModifyContactPerson(contactPerson, parameters));
     }
     
@@ -217,8 +218,8 @@ public class OrganizationWriteService : IOrganizationWriteService{
                     () => AuthorizeCreationAndCreateContactPerson(organizationId));
         }
 
-    private Result<ContactPerson, OperationError> ValidateModifyContactPerson(ContactPerson contactPerson) =>
-        _authorizationContext.AllowModify(contactPerson) ? contactPerson : new OperationError(OperationFailure.Forbidden);
+    private Result<ContactPerson, OperationError> ValidateModifyContactPersonByRootOrganization(ContactPerson contactPerson, Organization organization) =>
+        _authorizationContext.AllowModify(organization) ? contactPerson : new OperationError(OperationFailure.Forbidden);
 
     private Result<ContactPerson, OperationError> AuthorizeCreationAndCreateContactPerson(int orgId)
     {
