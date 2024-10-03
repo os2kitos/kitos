@@ -378,22 +378,22 @@ namespace Core.ApplicationServices
                 : new OperationError(OperationFailure.Forbidden);
         }
 
-        private Maybe<OperationError> DeleteUserIfNoDeletionConflicts(Guid userUuid, int? organizationDbId)
+        private Maybe<OperationError> DeleteUserIfNoDeletionConflicts(Guid userUuid, int? scopedToOrganizationId)
         {
 
             return WithNonNullUser(userUuid)
                 .Bind(WithNonCurrentUser)
-                .Match((user) => PerformDeleteUser(user, organizationDbId), 
+                .Match((user) => PerformDeleteUser(user, scopedToOrganizationId), 
                     error => error);
         }
 
-        private Maybe<OperationError> PerformDeleteUser(User user, int? organizationDbId)
+        private Maybe<OperationError> PerformDeleteUser(User user, int? scopedToOrganizationId)
         {
-            var hasOrganizationIdValue = organizationDbId.HasValue;
+            var hasOrganizationIdValue = scopedToOrganizationId.HasValue;
 
             using var transaction = _transactionManager.Begin();
             var operationErrorMaybe = hasOrganizationIdValue
-                ? DeleteUser(organizationDbId.Value, user)
+                ? DeleteUser(scopedToOrganizationId.Value, user)
                 : DeleteUserFromKitos(user);
 
             if (!operationErrorMaybe.HasValue)
