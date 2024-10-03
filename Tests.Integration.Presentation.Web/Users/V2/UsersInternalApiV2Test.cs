@@ -24,7 +24,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var userRequest = CreateCreateUserRequest();
 
             //Act
-            var response = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
+            var response = await UsersInternalV2Helper.CreateUser(organization.Uuid, userRequest);
 
             //Assert
             AssertUserEqualsCreateRequest(userRequest, response);
@@ -36,10 +36,10 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             //Arrange
             var organization = await CreateOrganizationAsync();
             var userRequest = CreateCreateUserRequest();
-            var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
+            var user = await UsersInternalV2Helper.CreateUser(organization.Uuid, userRequest);
 
             //Act
-            var response = await UsersV2Helper.SendNotification(organization.Uuid, user.Uuid);
+            var response = await UsersInternalV2Helper.SendNotification(organization.Uuid, user.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -52,7 +52,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var organization = await CreateOrganizationAsync();
 
             //Act
-            var response = await UsersV2Helper.GetUserCollectionPermissions(organization.Uuid);
+            var response = await UsersInternalV2Helper.GetUserCollectionPermissions(organization.Uuid);
 
             //Assert
             Assert.True(response.Create);
@@ -65,11 +65,11 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var user = await UsersV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
+            var user = await UsersInternalV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
 
             //Act
             var updateRequest = A<UpdateUserRequestDTO>();
-            var response = await UsersV2Helper.UpdateUser(organization.Uuid, user.Uuid, updateRequest);
+            var response = await UsersInternalV2Helper.UpdateUser(organization.Uuid, user.Uuid, updateRequest);
 
             //Assert
             AssertUserEqualsUpdateRequest(updateRequest, response);
@@ -91,13 +91,24 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var organization = await CreateOrganizationAsync();
             var organization2 = await CreateOrganizationAsync();
             var userRequest = CreateCreateUserRequest();
-            var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
+            var user = await UsersInternalV2Helper.CreateUser(organization.Uuid, userRequest);
 
             //Act
-            var response = await UsersV2Helper.GetUserByEmail(organization2.Uuid, user.Email);
+            var response = await UsersInternalV2Helper.GetUserByEmail(organization2.Uuid, user.Email);
 
             //Assert
             Assert.Equal(user.Uuid, response.Uuid);
+        }
+
+        [Fact]
+        public async Task Can_Delete_User()
+        {
+            var organization = await CreateOrganizationAsync();
+            var user = await UsersInternalV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
+
+            var response = await UsersInternalV2Helper.DeleteUser(organization.Uuid, user.Uuid);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)

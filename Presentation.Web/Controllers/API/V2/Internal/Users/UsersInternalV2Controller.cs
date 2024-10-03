@@ -66,7 +66,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
 
         [Route("{userUuid}")]
         [HttpDelete]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UserResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]

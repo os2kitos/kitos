@@ -9,7 +9,7 @@ using Presentation.Web.Models.API.V2.Internal.Response.User;
 
 namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
 {
-    public static class UsersV2Helper
+    public static class UsersInternalV2Helper
     {
         public static async Task<UserResponseDTO> CreateUser(Guid organizationUuid, CreateUserRequestDTO request, Cookie cookie = null)
         {
@@ -21,6 +21,19 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<UserResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> DeleteUser(Guid organizationUuid, Guid userUuid, Cookie cookie = null)
+        {
+            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl(
+                $"{ControllerPrefix(organizationUuid)}/{userUuid}");
+            var response = await HttpApi.DeleteWithCookieAsync(url,
+                 requestCookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return response;
         }
 
         public static async Task<UserResponseDTO> UpdateUser(Guid organizationUuid, Guid userUuid,
