@@ -179,15 +179,17 @@ public class OrganizationWriteService : IOrganizationWriteService{
         var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
         if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
         var orgId = organizationDbIdMaybe.Value;
-        var organization = _organizationService.GetOrganization(organizationUuid);
-        if (organization.Failed) return new OperationError(OperationFailure.BadInput);
+        var organizationResult = _organizationService.GetOrganization(organizationUuid);
+        if (organizationResult.Failed) return new OperationError(OperationFailure.BadInput);
+
+        var organization = organizationResult.Value;
 
         var modifiedContactPersonResult =
-            AuthorizeModificationAndUpsertContactPerson(organization.Value, updateParameters.ContactPerson);
+            AuthorizeModificationAndUpsertContactPerson(organization, updateParameters.ContactPerson);
         if (modifiedContactPersonResult.Failed) return modifiedContactPersonResult.Error;
 
         var modifiedDataResponsibleResult =
-            AuthorizeModificationAndUpsertDataResponsible(orgId, updateParameters.DataResponsible);
+            AuthorizeModificationAndUpsertDataResponsible(organization, updateParameters.DataResponsible);
         if (modifiedDataResponsibleResult.Failed) return modifiedDataResponsibleResult.Error;
 
         var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndUpsertDataProtectionAdvisor(orgId,
@@ -265,14 +267,14 @@ public class OrganizationWriteService : IOrganizationWriteService{
     }
 
     private Result<DataResponsible, OperationError> AuthorizeModificationAndUpsertDataResponsible(
-        int organizationId, Maybe<DataResponsibleUpdateParameters> parameters)
+        Organization organization, Maybe<DataResponsibleUpdateParameters> parameters)
     {
-        return UpsertDataResponsible(organizationId)
-            .Bind(ValidateModifyDataResponsible)
+        return UpsertDataResponsible(organization.Id)
+            .Bind(dataResponsible => ValidateModifyDataResponsibleByRootOrganization(dataResponsible, organization))
             .Bind(dataResponsible => ModifyDataResponsible(dataResponsible, parameters));
     }
-    private Result<DataResponsible, OperationError> ValidateModifyDataResponsible(DataResponsible dataResponsible) =>
-        _authorizationContext.AllowModify(dataResponsible) ? dataResponsible : new OperationError(OperationFailure.Forbidden);
+    private Result<DataResponsible, OperationError> ValidateModifyDataResponsibleByRootOrganization(DataResponsible dataResponsible, Organization organization) =>
+        _authorizationContext.AllowModify(organization) ? dataResponsible : new OperationError(OperationFailure.Forbidden);
 
 
     private Result<DataResponsible, OperationError> UpsertDataResponsible(int orgId)
