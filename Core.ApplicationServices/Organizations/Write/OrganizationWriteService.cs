@@ -177,7 +177,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
         OrganizationMasterDataRolesUpdateParameters updateParameters)
     {
         var organizationResult = _organizationService.GetOrganization(organizationUuid);
-        if (organizationResult.Failed) return new OperationError(OperationFailure.BadInput);
+        if (organizationResult.Failed) return organizationResult.Error;
 
         var organization = organizationResult.Value;
 
