@@ -381,33 +381,30 @@ namespace Core.ApplicationServices
         private Maybe<OperationError> DeleteUserIfNoDeletionConflicts(Guid userUuid, int? organizationDbId)
         {
 
-            var hasOrganizationIdValue = organizationDbId.HasValue;
             return WithNonNullUser(userUuid)
                 .Bind(WithNonCurrentUser)
-                .Match((user) =>
-                {
-                    using var transaction = _transactionManager.Begin();
-                    var result = hasOrganizationIdValue
-                        ? DeleteUser(organizationDbId.Value, user)
-                        : DeleteUserFromKitos(user);
+                .Match((user) => PerformDeleteUser(user, organizationDbId), 
+                    error => error);
+        }
 
-                    if (result.HasValue)
-                    {
-                        transaction.Rollback();
-                    }
-                    else
-                    {
-                        _userRepository.Save();
-                        transaction.Commit();
-                        _domainEvents.Raise(new AdministrativeAccessRightsChanged(user.Id));
-                    }
+        private Maybe<OperationError> PerformDeleteUser(User user, int? organizationDbId)
+        {
+            var hasOrganizationIdValue = organizationDbId.HasValue;
 
-                    return result;
-                }, 
-                    error => error)
-                ;
+            using var transaction = _transactionManager.Begin();
+            var operationErrorMaybe = hasOrganizationIdValue
+                ? DeleteUser(organizationDbId.Value, user)
+                : DeleteUserFromKitos(user);
 
+            if (!operationErrorMaybe.HasValue)
+            {
+                _userRepository.Save();
+                transaction.Commit();
+                _domainEvents.Raise(new AdministrativeAccessRightsChanged(user.Id));
+            }
+            else transaction.Rollback();
             
+            return operationErrorMaybe;
         }
 
         private Result<User, OperationError> WithNonNullUser(Guid userUuid)
