@@ -178,30 +178,43 @@ public class OrganizationWriteService : IOrganizationWriteService{
     {
         var organizationResult = _organizationService.GetOrganization(organizationUuid);
         return organizationResult.Match(
-            organization =>
-            {
-                var modifiedContactPersonResult =
-                    AuthorizeModificationAndUpsertContactPerson(organization, updateParameters.ContactPerson);
-                if (modifiedContactPersonResult.Failed) return modifiedContactPersonResult.Error;
-
-                var modifiedDataResponsibleResult =
-                    AuthorizeModificationAndUpsertDataResponsible(organization, updateParameters.DataResponsible);
-                if (modifiedDataResponsibleResult.Failed) return modifiedDataResponsibleResult.Error;
-
-                var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndUpsertDataProtectionAdvisor(
-                    organization,
-                    updateParameters.DataProtectionAdvisor);
-                if (modifiedDataProtectionAdvisorResult.Failed) return modifiedDataProtectionAdvisorResult.Error;
-
-                return Result<OrganizationMasterDataRoles, OperationError>.Success(new OrganizationMasterDataRoles()
-                {
-                    OrganizationUuid = organizationUuid,
-                    ContactPerson = modifiedContactPersonResult.Value,
-                    DataProtectionAdvisor = modifiedDataProtectionAdvisorResult.Value,
-                    DataResponsible = modifiedDataResponsibleResult.Value
-                });
-            },
+            organization => CollectMasterDataRolesFromUpsert(organization, updateParameters)
+                    .Bind(roles =>
+                    {
+                        var (contactPerson, dataResponsible, dataProtectionAdvisor) = roles;
+                        return Result<OrganizationMasterDataRoles, OperationError>.Success(new OrganizationMasterDataRoles()
+                        {
+                            OrganizationUuid = organizationUuid,
+                            ContactPerson = contactPerson,
+                            DataProtectionAdvisor = dataProtectionAdvisor,
+                            DataResponsible = dataResponsible
+                        });
+                    }),
             error => error
+        );
+    }
+
+    private Result<(ContactPerson, DataResponsible, DataProtectionAdvisor), OperationError>
+        CollectMasterDataRolesFromUpsert(Organization organization,
+            OrganizationMasterDataRolesUpdateParameters updateParameters)
+    {
+        var modifiedContactPersonResult =
+            AuthorizeModificationAndUpsertContactPerson(organization, updateParameters.ContactPerson);
+        if (modifiedContactPersonResult.Failed) return modifiedContactPersonResult.Error;
+
+        var modifiedDataResponsibleResult =
+            AuthorizeModificationAndUpsertDataResponsible(organization, updateParameters.DataResponsible);
+        if (modifiedDataResponsibleResult.Failed) return modifiedDataResponsibleResult.Error;
+
+        var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndUpsertDataProtectionAdvisor(
+            organization,
+            updateParameters.DataProtectionAdvisor);
+        if (modifiedDataProtectionAdvisorResult.Failed) return modifiedDataProtectionAdvisorResult.Error;
+
+        return Result<(ContactPerson, DataResponsible, DataProtectionAdvisor), OperationError>.Success(
+            (modifiedContactPersonResult.Value,
+                modifiedDataResponsibleResult.Value,
+                modifiedDataProtectionAdvisorResult.Value)
         );
     }
 
