@@ -192,7 +192,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
             AuthorizeModificationAndUpsertDataResponsible(organization, updateParameters.DataResponsible);
         if (modifiedDataResponsibleResult.Failed) return modifiedDataResponsibleResult.Error;
 
-        var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndUpsertDataProtectionAdvisor(orgId,
+        var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndUpsertDataProtectionAdvisor(organization,
             updateParameters.DataProtectionAdvisor);
         if (modifiedDataProtectionAdvisorResult.Failed) return modifiedDataProtectionAdvisorResult.Error;
 
@@ -332,10 +332,10 @@ public class OrganizationWriteService : IOrganizationWriteService{
     }
 
     private Result<DataProtectionAdvisor, OperationError> AuthorizeModificationAndUpsertDataProtectionAdvisor(
-        int organizationId, Maybe<DataProtectionAdvisorUpdateParameters> parameters)
+        Organization organization, Maybe<DataProtectionAdvisorUpdateParameters> parameters)
     {
-        return UpsertDataProtectionAdvisor(organizationId)
-            .Bind(ValidateModifyDataProtectionAdvisor)
+        return UpsertDataProtectionAdvisor(organization.Id)
+            .Bind(dataProtectionAdvisor => ValidateModifyDataProtectionAdvisorByRootOrganization(dataProtectionAdvisor, organization))
             .Bind(dataProtectionAdvisor => ModifyDataProtectionAdvisor(dataProtectionAdvisor, parameters));
     }
 
@@ -361,8 +361,8 @@ public class OrganizationWriteService : IOrganizationWriteService{
         return dataProtectionAdvisor;
     }
 
-    private Result<DataProtectionAdvisor, OperationError> ValidateModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor) =>
-        _authorizationContext.AllowModify(dataProtectionAdvisor) ? dataProtectionAdvisor : new OperationError(OperationFailure.Forbidden);
+    private Result<DataProtectionAdvisor, OperationError> ValidateModifyDataProtectionAdvisorByRootOrganization(DataProtectionAdvisor dataProtectionAdvisor, Organization organization) =>
+        _authorizationContext.AllowModify(organization) ? dataProtectionAdvisor : new OperationError(OperationFailure.Forbidden);
 
     private Result<DataProtectionAdvisor, OperationError> ModifyDataProtectionAdvisor(DataProtectionAdvisor dataProtectionAdvisor, Maybe<DataProtectionAdvisorUpdateParameters> parametersMaybe)
     {

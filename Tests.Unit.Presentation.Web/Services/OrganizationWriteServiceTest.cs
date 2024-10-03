@@ -227,14 +227,9 @@ namespace Tests.Unit.Presentation.Web.Services
                     _.ResolveDbId<Organization>(org.Uuid))
                 .Returns(expectedContactPerson.OrganizationId);
 
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
             _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<ContactPerson>()))
-                .Returns(true);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<DataResponsible>()))
-                .Returns(true);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
+                    _.AllowModify(It.IsAny<Organization>()))
                 .Returns(true);
             _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(expectedContactPerson);
             _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(expectedDataResponsible);
