@@ -80,10 +80,10 @@ namespace Core.ApplicationServices.Users.Write
             var organization = orgResult.Value;
 
             var updateUserResult =
-                _userService.GetUserInOrganization(organizationUuid, userUuid)
+                _userService.GetUserByUuid(userUuid)
                     .Bind(CanModifyUser)
                     .Bind(user => PerformUpdates(user, organization, parameters));
-
+            
             if (updateUserResult.Failed)
             {
                 transactionManager.Rollback();
