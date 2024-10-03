@@ -175,6 +175,72 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(OperationFailure.BadInput, error.FailureType);
         }
 
+        [Fact]
+        public void Update_Master_Data_Roles_Returns_Forbidden_If_Unauthorized_To_Modify_Data_Responsible()
+        {
+            var org = GetOrgAndSetupForVerifyUnauthorized();
+            var orgId = org.Id;
+            var updateParameters = SetupUpdateMasterDataRoles(orgId);
+            _identityResolver.Setup(_ =>
+                    _.ResolveDbId<Organization>(org.Uuid))
+                .Returns(orgId);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<ContactPerson>()))
+                .Returns(true);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<DataResponsible>()))
+                .Returns(false);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
+                .Returns(true);
+
+            var result =
+                _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
+
+            Assert.True(result.Failed);
+            var error = result.Error;
+            Assert.Equal(OperationFailure.Forbidden, error.FailureType);
+        }
+
+        [Fact]
+        public void Update_Master_Data_Roles_Returns_Forbidden_If_Unauthorized_To_Modify_Contact_Person()
+        {
+            var org = GetOrgAndSetupForVerifyUnauthorized();
+            var orgId = org.Id;
+            var updateParameters = SetupUpdateMasterDataRoles(orgId);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<ContactPerson>()))
+                .Returns(false);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<DataResponsible>()))
+                .Returns(true);
+            _authorizationContext.Setup(_ =>
+                    _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
+                .Returns(true);
+
+            var result =
+                _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
+
+            Assert.True(result.Failed);
+            var error = result.Error;
+            Assert.Equal(OperationFailure.Forbidden, error.FailureType);
+        }
+
+        [Fact]
+        public void Update_Master_Data_Roles_Returns_Forbidden_If_Unauthorized_To_Modify_Data_Protection_Advisor()
+        {
+            var org = GetOrgAndSetupForVerifyUnauthorized();
+            var orgId = org.Id;
+            var updateParameters = SetupUpdateMasterDataRoles(orgId);
+            
+            var result =
+                _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
+
+            Assert.True(result.Failed);
+            var error = result.Error;
+            Assert.Equal(OperationFailure.Forbidden, error.FailureType);
+        }
+
         public Organization GetOrgAndSetupForVerifyUnauthorized()
         {
             var org = CreateOrganization();
