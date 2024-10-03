@@ -73,7 +73,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult DeleteUser([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid)
         {
-            return _userService.DeleteUser(userUuid, organizationUuid)
+            return _userService.DeleteUserByOrganizationUuid(userUuid, organizationUuid)
                 .Match(FromOperationError,
                     Ok);
         }

@@ -29,7 +29,7 @@ namespace Core.ApplicationServices
         /// <returns></returns>
         Maybe<OperationError> DeleteUser(Guid userUuid, int? scopedToOrganizationId = null);
 
-        Maybe<OperationError> DeleteUser(Guid userUuid, Guid scopedToOrganizationUuid);
+        Maybe<OperationError> DeleteUserByOrganizationUuid(Guid userUuid, Guid scopedToOrganizationUuid);
         
         Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries);
         Result<UserAdministrationPermissions, OperationError> GetAdministrativePermissions(Guid organizationUuid);
