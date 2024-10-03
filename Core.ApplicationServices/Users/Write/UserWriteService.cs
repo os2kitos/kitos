@@ -8,6 +8,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Users;
 using Core.ApplicationServices.Model.Users.Write;
 using Core.ApplicationServices.Organizations;
+using Core.ApplicationServices.Rights;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
@@ -23,13 +24,15 @@ namespace Core.ApplicationServices.Users.Write
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationService _organizationService;
         private readonly IEntityIdentityResolver _entityIdentityResolver;
+        private readonly IUserRightsService _userRightsService;
 
         public UserWriteService(IUserService userService,
             IOrganizationRightsService organizationRightsService,
             ITransactionManager transactionManager,
             IAuthorizationContext authorizationContext,
             IOrganizationService organizationService,
-            IEntityIdentityResolver entityIdentityResolver)
+            IEntityIdentityResolver entityIdentityResolver,
+            IUserRightsService userRightsService)
         {
             _userService = userService;
             _organizationRightsService = organizationRightsService;
@@ -37,6 +40,7 @@ namespace Core.ApplicationServices.Users.Write
             _authorizationContext = authorizationContext;
             _organizationService = organizationService;
             _entityIdentityResolver = entityIdentityResolver;
+            _userRightsService = userRightsService;
         }
 
         public Result<User, OperationError> Create(Guid organizationUuid, CreateUserParameters parameters)
@@ -118,6 +122,27 @@ namespace Core.ApplicationServices.Users.Write
         {
             return _organizationService.GetOrganization(organizationUuid)
                 .Select(org => UserCollectionPermissionsResult.FromOrganization(org, _authorizationContext));
+        }
+
+        public Maybe<OperationError> CopyUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid,
+            UserRightsChangeParameters parameters)
+        {
+            var org = _organizationService.GetOrganization(organizationUuid);
+            if (org.Failed)
+            {
+                return org.Error;
+            }
+
+            var fromUser = _userService.GetUserInOrganization(organizationUuid, fromUserUuid);
+            if (fromUser.Failed)
+            {
+                return fromUser.Error;
+            }
+
+            return _userService.GetUserInOrganization(organizationUuid, toUserUuid)
+                .Bind(CanModifyUser)
+                .Match(toUser => _userRightsService.CopyRights(fromUser.Value.Id, toUser.Id, org.Value.Id, parameters), 
+                    error => error);
         }
 
         private Result<User, OperationError> PerformUpdates(User orgUser, Organization organization, UpdateUserParameters parameters)

@@ -2,6 +2,9 @@
 using Swashbuckle.Swagger.Annotations;
 using System.Net;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Policy;
 using System.Web.Http;
 using Core.ApplicationServices.Users.Write;
 using Presentation.Web.Controllers.API.V2.Internal.Users.Mapping;
@@ -10,6 +13,11 @@ using Presentation.Web.Models.API.V2.Request.User;
 using System.Web.Http.Results;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Model.Users;
+using Core.ApplicationServices.Model.Users.Write;
+using Core.ApplicationServices.Rights;
+using Core.DomainModel.Organization;
+using Core.DomainServices.Generic;
+using Presentation.Web.Models.API.V2.Internal.Request.User;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Users
 {
@@ -23,16 +31,22 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         private readonly IUserWriteService _userWriteService;
         private readonly IUserResponseModelMapper _userResponseModelMapper;
         private readonly IUserService _userService;
+        private readonly IUserRightsService _userRightsService;
+        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
         public UsersInternalV2Controller(IUserWriteModelMapper writeModelMapper, 
             IUserWriteService userWriteService, 
             IUserResponseModelMapper userResponseModelMapper, 
-            IUserService userService)
+            IUserService userService,
+            IUserRightsService userRightsService,
+            IEntityIdentityResolver entityIdentityResolver)
         {
             _writeModelMapper = writeModelMapper;
             _userWriteService = userWriteService;
             _userResponseModelMapper = userResponseModelMapper;
             _userService = userService;
+            _userRightsService = userRightsService;
+            _entityIdentityResolver = entityIdentityResolver;
         }
 
         [Route("create")]
@@ -103,6 +117,19 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
                 .Match(Ok, FromOperationError);
         }
 
+        [Route("{fromUserUuid}/copy-roles/{toUserUuid}")]
+        [HttpPost]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult CopyRoles([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid fromUserUuid, [NonEmptyGuid] Guid toUserUuid, [FromBody] CopyUserRightsRequestDTO request)
+        {
+            var parameters = MapCopyRightsDTOToParameters(request);
+            _userWriteService.CopyUserRights(organizationUuid, fromUserUuid, toUserUuid, parameters);
+            return Ok();
+        }
+
         private CreatedNegotiatedContentResult<UserResponseDTO> MapUserCreatedResponse(UserResponseDTO dto)
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
@@ -113,6 +140,20 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         {
             return new UserCollectionPermissionsResponseDTO(permissions.Create, permissions.Edit, permissions.Delete);
 
+        }
+
+        private UserRightsChangeParameters MapCopyRightsDTOToParameters(CopyUserRightsRequestDTO request)
+        {
+            var unitRights = MapUserRightsDTOToRoleIdSet(request.UnitRights);
+            var systemRights = MapUserRightsDTOToRoleIdSet(request.SystemRights);
+            var contractRights = MapUserRightsDTOToRoleIdSet(request.ContractRights);
+            var dprRights = MapUserRightsDTOToRoleIdSet(request.DataProcessingRights);
+            return new UserRightsChangeParameters(new List<OrganizationRole>(), dprRights, systemRights, contractRights, unitRights);
+        }
+
+        private IEnumerable<int> MapUserRightsDTOToRoleIdSet(IEnumerable<CopyRightRequestDTO> rights)
+        {
+            return rights.Select(right => right.RoleId);
         }
     }
 }
