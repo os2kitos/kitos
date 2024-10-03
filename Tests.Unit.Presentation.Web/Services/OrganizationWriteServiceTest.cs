@@ -158,7 +158,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Update_Master_Data_Roles_Returns_Bad_Input_If_Invalid_Uuid()
+        public void Update_Master_Data_Roles_Returns_Not_Found_If_Invalid_Uuid()
         {
             var invalidOrganizationUuid = A<Guid>();
             _identityResolver.Setup(_ =>
@@ -166,13 +166,14 @@ namespace Tests.Unit.Presentation.Web.Services
                 .Returns(Maybe<int>.None);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+            _organizationService.Setup(_ => _.GetOrganization(invalidOrganizationUuid, null)).Returns(new OperationError(OperationFailure.NotFound));
 
             var result =
                 _sut.UpsertOrganizationMasterDataRoles(invalidOrganizationUuid, new OrganizationMasterDataRolesUpdateParameters());
 
             Assert.True(result.Failed);
             var error = result.Error;
-            Assert.Equal(OperationFailure.BadInput, error.FailureType);
+            Assert.Equal(OperationFailure.NotFound, error.FailureType);
         }
 
         [Fact]
