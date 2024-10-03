@@ -32,5 +32,6 @@ namespace Core.ApplicationServices
         Result<UserAdministrationPermissions, OperationError> GetAdministrativePermissions(Guid organizationUuid);
         bool IsEmailInUse(string email);
         Result<User, OperationError> GetUserByEmail(Guid organizationUuid, string email);
+        Result<User, OperationError> GetUserByUuid(Guid userUuid);
     }
 }
