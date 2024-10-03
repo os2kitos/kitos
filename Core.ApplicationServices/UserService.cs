@@ -373,42 +373,58 @@ namespace Core.ApplicationServices
 
         public Maybe<OperationError> DeleteUser(Guid userUuid, int? scopedToOrganizationId = null)
         {
-            var hasOrganizationIdValue = scopedToOrganizationId.HasValue;
+            return AllowDelete(scopedToOrganizationId) 
+                ? DeleteUserIfNoDeletionConflicts(userUuid, scopedToOrganizationId) 
+                : new OperationError(OperationFailure.Forbidden);
+        }
 
-            if (AllowDelete(scopedToOrganizationId))
+        private Maybe<OperationError> DeleteUserIfNoDeletionConflicts(Guid userUuid, int? organizationDbId)
+        {
+
+            var hasOrganizationIdValue = organizationDbId.HasValue;
+            return WithNonNullUser(userUuid)
+                .Bind(WithNonCurrentUser)
+                .Match((user) =>
+                {
+                    using var transaction = _transactionManager.Begin();
+                    var result = hasOrganizationIdValue
+                        ? DeleteUser(organizationDbId.Value, user)
+                        : DeleteUserFromKitos(user);
+
+                    if (result.HasValue)
+                    {
+                        transaction.Rollback();
+                    }
+                    else
+                    {
+                        _userRepository.Save();
+                        transaction.Commit();
+                        _domainEvents.Raise(new AdministrativeAccessRightsChanged(user.Id));
+                    }
+
+                    return result;
+                }, 
+                    error => error)
+                ;
+
+            
+        }
+
+        private Result<User, OperationError> WithNonNullUser(Guid userUuid)
+        {
+            var user = _userRepository.AsQueryable().ByUuid(userUuid);
+            return user != null ? user : new OperationError($"User with Uuid {userUuid} was not found", OperationFailure.NotFound);
+        }
+
+        private Result<User, OperationError> WithNonCurrentUser(User user)
+        {
+            if (_organizationalUserContext.UserId == user.Id)
             {
-                var user = _userRepository.AsQueryable().ByUuid(userUuid);
-                if (user == null)
-                {
-                    return new OperationError($"User with Uuid {userUuid} was not found", OperationFailure.NotFound);
-                }
-
-                if (_organizationalUserContext.UserId == user.Id)
-                {
-                    return new OperationError("You cannot delete a user you are currently logged in as", OperationFailure.Forbidden);
-                }
-
-                using var transaction = _transactionManager.Begin();
-                var result = hasOrganizationIdValue
-                    ? DeleteUser(scopedToOrganizationId.Value, user)
-                    : DeleteUserFromKitos(user);
-
-                if (result.HasValue)
-                {
-                    transaction.Rollback();
-                }
-                else
-                {
-                    _userRepository.Save();
-                    transaction.Commit();
-
-                    _domainEvents.Raise(new AdministrativeAccessRightsChanged(user.Id));
-                }
-
-                return result;
+                return new OperationError("You cannot delete a user you are currently logged in as",
+                    OperationFailure.Forbidden);
             }
-
-            return new OperationError(OperationFailure.Forbidden);
+            return _organizationalUserContext.UserId != user.Id ? user : new OperationError("You cannot delete a user you are currently logged in as",
+                OperationFailure.Forbidden);
         }
 
         private Maybe<OperationError> DeleteUserFromKitos(User userToDelete)
