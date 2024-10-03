@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.DomainModel;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
 
@@ -6,7 +7,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
 {
     public class UserResponseModelMapper : IUserResponseModelMapper
     {
-        public UserResponseDTO ToUserResponseDTO(User user)
+        public UserResponseDTO ToUserResponseDTO(Guid organizationUuid, User user)
         {
             return new UserResponseDTO
             {
@@ -20,8 +21,16 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
                         user.DefaultUserStartPreference),
                 HasApiAccess = user.HasApiAccess,
                 HasStakeHolderAccess = user.HasStakeHolderAccess,
-                Roles = user.OrganizationRights.Select(x => x.Role.ToOrganizationRoleChoice()).ToList(),
+                Roles = user.GetRolesInOrganization(organizationUuid).Select(x => x.ToOrganizationRoleChoice()).ToList(),
                 LastSentAdvis = user.LastAdvisDate
+            };
+        }
+        public UserIsPartOfCurrentOrgResponseDTO ToUserWithIsPartOfCurrentOrgResponseDTO(Guid organizationUuid, User user)
+        {
+            return new UserIsPartOfCurrentOrgResponseDTO
+            {
+                Uuid = user.Uuid,
+                IsPartOfCurrentOrganization = user.GetOrganizations().Any(x => x.Uuid == organizationUuid)
             };
         }
     }
