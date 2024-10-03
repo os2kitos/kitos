@@ -31,22 +31,16 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         private readonly IUserWriteService _userWriteService;
         private readonly IUserResponseModelMapper _userResponseModelMapper;
         private readonly IUserService _userService;
-        private readonly IUserRightsService _userRightsService;
-        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
         public UsersInternalV2Controller(IUserWriteModelMapper writeModelMapper, 
             IUserWriteService userWriteService, 
             IUserResponseModelMapper userResponseModelMapper, 
-            IUserService userService,
-            IUserRightsService userRightsService,
-            IEntityIdentityResolver entityIdentityResolver)
+            IUserService userService)
         {
             _writeModelMapper = writeModelMapper;
             _userWriteService = userWriteService;
             _userResponseModelMapper = userResponseModelMapper;
             _userService = userService;
-            _userRightsService = userRightsService;
-            _entityIdentityResolver = entityIdentityResolver;
         }
 
         [Route("create")]
