@@ -7,7 +7,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
 {
     public class UserResponseModelMapper : IUserResponseModelMapper
     {
-        public UserResponseDTO ToUserResponseDTO(User user)
+        public UserResponseDTO ToUserResponseDTO(Guid organizationUuid, User user)
         {
             return new UserResponseDTO
             {
@@ -21,26 +21,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
                         user.DefaultUserStartPreference),
                 HasApiAccess = user.HasApiAccess,
                 HasStakeHolderAccess = user.HasStakeHolderAccess,
-                Roles = user.OrganizationRights.Select(x => x.Role.ToOrganizationRoleChoice()).ToList(),
+                Roles = user.GetRolesInOrganization(organizationUuid).Select(x => x.ToOrganizationRoleChoice()).ToList(),
                 LastSentAdvis = user.LastAdvisDate
             };
         }
-        public UserWithIsPartOfCurrentOrgResponseDTO ToUserWithIsPartOfCurrentOrgResponseDTO(Guid organizationUuid, User user)
+        public UserIsPartOfCurrentOrgResponseDTO ToUserWithIsPartOfCurrentOrgResponseDTO(Guid organizationUuid, User user)
         {
-            return new UserWithIsPartOfCurrentOrgResponseDTO
+            return new UserIsPartOfCurrentOrgResponseDTO
             {
                 Uuid = user.Uuid,
-                Email = user.Email,
-                FirstName = user.Name,
-                LastName = user.LastName,
-                PhoneNumber = user.PhoneNumber,
-                DefaultUserStartPreference =
-                    DefaultUserStartPreferenceChoiceMapper.GetDefaultUserStartPreferenceChoice(
-                        user.DefaultUserStartPreference),
-                HasApiAccess = user.HasApiAccess,
-                HasStakeHolderAccess = user.HasStakeHolderAccess,
-                Roles = user.OrganizationRights.Select(x => x.Role.ToOrganizationRoleChoice()).ToList(),
-                LastSentAdvis = user.LastAdvisDate,
                 IsPartOfCurrentOrganization = user.GetOrganizations().Any(x => x.Uuid == organizationUuid)
             };
         }

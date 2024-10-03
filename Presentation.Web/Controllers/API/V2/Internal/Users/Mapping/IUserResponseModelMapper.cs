@@ -6,7 +6,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
 {
     public interface IUserResponseModelMapper
     {
-        UserResponseDTO ToUserResponseDTO(User user);
-        UserWithIsPartOfCurrentOrgResponseDTO ToUserWithIsPartOfCurrentOrgResponseDTO(Guid organizationUuid, User user);
+        UserResponseDTO ToUserResponseDTO(Guid organizationUuid, User user);
+        UserIsPartOfCurrentOrgResponseDTO ToUserWithIsPartOfCurrentOrgResponseDTO(Guid organizationUuid, User user);
     }
 }
