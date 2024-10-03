@@ -176,9 +176,6 @@ public class OrganizationWriteService : IOrganizationWriteService{
     private Result<OrganizationMasterDataRoles, OperationError> AuthorizeAndPerformMasterDataRolesUpsert(Guid organizationUuid,
         OrganizationMasterDataRolesUpdateParameters updateParameters)
     {
-        var organizationDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
-        if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.BadInput);
-        var orgId = organizationDbIdMaybe.Value;
         var organizationResult = _organizationService.GetOrganization(organizationUuid);
         if (organizationResult.Failed) return new OperationError(OperationFailure.BadInput);
 
