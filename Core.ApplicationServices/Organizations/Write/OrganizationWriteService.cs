@@ -177,29 +177,32 @@ public class OrganizationWriteService : IOrganizationWriteService{
         OrganizationMasterDataRolesUpdateParameters updateParameters)
     {
         var organizationResult = _organizationService.GetOrganization(organizationUuid);
-        if (organizationResult.Failed) return organizationResult.Error;
+        return organizationResult.Match(
+            organization =>
+            {
+                var modifiedContactPersonResult =
+                    AuthorizeModificationAndUpsertContactPerson(organization, updateParameters.ContactPerson);
+                if (modifiedContactPersonResult.Failed) return modifiedContactPersonResult.Error;
 
-        var organization = organizationResult.Value;
+                var modifiedDataResponsibleResult =
+                    AuthorizeModificationAndUpsertDataResponsible(organization, updateParameters.DataResponsible);
+                if (modifiedDataResponsibleResult.Failed) return modifiedDataResponsibleResult.Error;
 
-        var modifiedContactPersonResult =
-            AuthorizeModificationAndUpsertContactPerson(organization, updateParameters.ContactPerson);
-        if (modifiedContactPersonResult.Failed) return modifiedContactPersonResult.Error;
+                var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndUpsertDataProtectionAdvisor(
+                    organization,
+                    updateParameters.DataProtectionAdvisor);
+                if (modifiedDataProtectionAdvisorResult.Failed) return modifiedDataProtectionAdvisorResult.Error;
 
-        var modifiedDataResponsibleResult =
-            AuthorizeModificationAndUpsertDataResponsible(organization, updateParameters.DataResponsible);
-        if (modifiedDataResponsibleResult.Failed) return modifiedDataResponsibleResult.Error;
-
-        var modifiedDataProtectionAdvisorResult = AuthorizeModificationAndUpsertDataProtectionAdvisor(organization,
-            updateParameters.DataProtectionAdvisor);
-        if (modifiedDataProtectionAdvisorResult.Failed) return modifiedDataProtectionAdvisorResult.Error;
-
-        return new OrganizationMasterDataRoles()
-        {
-            OrganizationUuid = organizationUuid,
-            ContactPerson = modifiedContactPersonResult.Value,
-            DataProtectionAdvisor = modifiedDataProtectionAdvisorResult.Value,
-            DataResponsible = modifiedDataResponsibleResult.Value
-        };
+                return Result<OrganizationMasterDataRoles, OperationError>.Success(new OrganizationMasterDataRoles()
+                {
+                    OrganizationUuid = organizationUuid,
+                    ContactPerson = modifiedContactPersonResult.Value,
+                    DataProtectionAdvisor = modifiedDataProtectionAdvisorResult.Value,
+                    DataResponsible = modifiedDataResponsibleResult.Value
+                });
+            },
+            error => error
+        );
     }
 
     private Result<ContactPerson, OperationError> AuthorizeModificationAndUpsertContactPerson(
