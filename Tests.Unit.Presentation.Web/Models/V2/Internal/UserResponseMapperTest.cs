@@ -18,6 +18,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
         public void Can_Map_User_To_Dto()
         {
             //Arrange
+            var orgUuid = A<Guid>();
             var user = new User
             {
                 Uuid = A<Guid>(),
@@ -32,13 +33,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
                 {
                     new()
                     {
-                        Role = A<OrganizationRole>()
+                        Role = A<OrganizationRole>(),
+                        Organization = new Organization{ Uuid = orgUuid} 
                     }
                 }
             };
 
             //Act
-            var response = _sut.ToUserResponseDTO(user);
+            var response = _sut.ToUserResponseDTO(orgUuid, user);
 
             //Assert
             Assert.Equal(user.Uuid, response.Uuid);

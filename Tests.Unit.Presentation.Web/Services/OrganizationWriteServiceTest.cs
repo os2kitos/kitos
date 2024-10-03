@@ -158,7 +158,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Update_Master_Data_Roles_Returns_Bad_Input_If_Invalid_Uuid()
+        public void Update_Master_Data_Roles_Returns_Not_Found_If_Invalid_Uuid()
         {
             var invalidOrganizationUuid = A<Guid>();
             _identityResolver.Setup(_ =>
@@ -166,73 +166,27 @@ namespace Tests.Unit.Presentation.Web.Services
                 .Returns(Maybe<int>.None);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+            _organizationService.Setup(_ => _.GetOrganization(invalidOrganizationUuid, null)).Returns(new OperationError(OperationFailure.NotFound));
 
             var result =
                 _sut.UpsertOrganizationMasterDataRoles(invalidOrganizationUuid, new OrganizationMasterDataRolesUpdateParameters());
 
             Assert.True(result.Failed);
             var error = result.Error;
-            Assert.Equal(OperationFailure.BadInput, error.FailureType);
+            Assert.Equal(OperationFailure.NotFound, error.FailureType);
         }
 
         [Fact]
-        public void Update_Master_Data_Roles_Returns_Forbidden_If_Unauthorized_To_Modify_Data_Responsible()
+        public void Update_Master_Data_Roles_Returns_Forbidden_If_Unauthorized_To_Modify_Root_Organization()
         {
             var org = GetOrgAndSetupForVerifyUnauthorized();
             var orgId = org.Id;
             var updateParameters = SetupUpdateMasterDataRoles(orgId);
-            _identityResolver.Setup(_ =>
-                    _.ResolveDbId<Organization>(org.Uuid))
-                .Returns(orgId);
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
             _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<ContactPerson>()))
-                .Returns(true);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<DataResponsible>()))
+                    _.AllowModify(It.IsAny<Organization>()))
                 .Returns(false);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
-                .Returns(true);
 
-            var result =
-                _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
-
-            Assert.True(result.Failed);
-            var error = result.Error;
-            Assert.Equal(OperationFailure.Forbidden, error.FailureType);
-        }
-
-        [Fact]
-        public void Update_Master_Data_Roles_Returns_Forbidden_If_Unauthorized_To_Modify_Contact_Person()
-        {
-            var org = GetOrgAndSetupForVerifyUnauthorized();
-            var orgId = org.Id;
-            var updateParameters = SetupUpdateMasterDataRoles(orgId);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<ContactPerson>()))
-                .Returns(false);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<DataResponsible>()))
-                .Returns(true);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
-                .Returns(true);
-
-            var result =
-                _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
-
-            Assert.True(result.Failed);
-            var error = result.Error;
-            Assert.Equal(OperationFailure.Forbidden, error.FailureType);
-        }
-
-        [Fact]
-        public void Update_Master_Data_Roles_Returns_Forbidden_If_Unauthorized_To_Modify_Data_Protection_Advisor()
-        {
-            var org = GetOrgAndSetupForVerifyUnauthorized();
-            var orgId = org.Id;
-            var updateParameters = SetupUpdateMasterDataRoles(orgId);
-            
             var result =
                 _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
 
@@ -274,14 +228,9 @@ namespace Tests.Unit.Presentation.Web.Services
                     _.ResolveDbId<Organization>(org.Uuid))
                 .Returns(expectedContactPerson.OrganizationId);
 
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
             _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<ContactPerson>()))
-                .Returns(true);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<DataResponsible>()))
-                .Returns(true);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
+                    _.AllowModify(It.IsAny<Organization>()))
                 .Returns(true);
             _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(expectedContactPerson);
             _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(expectedDataResponsible);
@@ -313,11 +262,9 @@ namespace Tests.Unit.Presentation.Web.Services
                     _.ResolveDbId<Organization>(org.Uuid))
                 .Returns(expectedContactPerson.OrganizationId);
 
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
             _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<ContactPerson>()))
-                .Returns(true);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<DataResponsible>()))
+                    _.AllowModify(It.IsAny<Organization>()))
                 .Returns(true);
             _authorizationContext.Setup(_ =>
                     _.AllowModify(It.IsAny<DataProtectionAdvisor>()))

@@ -223,6 +223,24 @@ namespace Core.ApplicationServices
                     });
         }
 
+        public Result<User, OperationError> GetUserByUuid(Guid userUuid)
+        {
+            return _repository.GetByUuid(userUuid)
+                .Match<Result<User, OperationError>>(user => user,
+                    () => new OperationError("User is not member of the organization", OperationFailure.NotFound))
+                .Bind(user =>
+                {
+                    if (_authorizationContext.AllowReads(user) == false)
+                    {
+                        return new OperationError($"Not allowed to read User with uuid: {userUuid}",
+                            OperationFailure.Forbidden);
+                    }
+
+                    return Result<User, OperationError>.Success(user);
+                });
+        }
+
+
         private PasswordResetRequest GenerateResetRequest(User user)
         {
             var now = DateTime.UtcNow;
