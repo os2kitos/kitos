@@ -10,8 +10,6 @@ using Tests.Toolkit.Patterns;
 using Xunit;
 using Core.DomainModel.Organization;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
@@ -180,17 +178,6 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             Assert.True(result.IsNone);
         }
 
-        private void ExpectResolveIdReturns(Guid orgUuid, Maybe<int> result)
-        {
-            _entityIdentityResolverMock.Setup(x => x.ResolveDbId<Organization>(orgUuid)).Returns(result);
-        }
-
-        private void ExpectGetUserInOrganizationReturns(Guid organizationUuid, Guid userUuid, Result<User, OperationError> result)
-        {
-            _userServiceMock.Setup(x => x.GetUserInOrganization(organizationUuid, userUuid)).Returns(result);
-        }
-
-
         [Fact]
         public void Create_Fails_If_Email_Already_Exists()
         {
@@ -245,7 +232,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var organization = new Organization {Id = A<int>(), Uuid = A<Guid>()};
             var defaultUnit = new OrganizationUnit {Id = A<int>()};
             var updateParameters = A<UpdateUserParameters>();
-            ExpectGetUserInOrganizationReturns(organization.Uuid, user.Uuid, user);
+            ExpectGetUserByUuid(user.Uuid, user);
             ExpectModifyPermissionsForUserReturns(user, true);
             ExpectGetOrganizationReturns(organization.Uuid, organization);
             ExpectResolveIdReturns(organization.Uuid, organization.Id);
@@ -280,7 +267,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var updateParameters = A<UpdateUserParameters>();
             ExpectResolveIdReturns(organization.Uuid, A<int>());
             ExpectGetOrganizationReturns(organization.Uuid, organization);
-            ExpectGetUserInOrganizationReturns(organization.Uuid, user.Uuid, user);
+            ExpectGetUserByUuid(user.Uuid, user);
             ExpectModifyPermissionsForUserReturns(user, true);
             ExpectHasStakeHolderAccessReturns(true);
             ExpectIsEmailInUseReturns(updateParameters.Email.NewValue, true);
@@ -334,14 +321,25 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             }
         }
 
+        private void ExpectResolveIdReturns(Guid orgUuid, Maybe<int> result)
+        {
+            _entityIdentityResolverMock.Setup(x => x.ResolveDbId<Organization>(orgUuid)).Returns(result);
+        }
+
+        private void ExpectGetUserInOrganizationReturns(Guid organizationUuid, Guid userUuid, Result<User, OperationError> result)
+        {
+            _userServiceMock.Setup(x => x.GetUserInOrganization(organizationUuid, userUuid)).Returns(result);
+        }
+
+        private void ExpectGetUserByUuid(Guid userUuid, Result<User, OperationError> result)
+        {
+            _userServiceMock.Setup(x => x.GetUserByUuid(userUuid)).Returns(result);
+        }
+
+
         private void ExpectModifyPermissionsForUserReturns(User user, bool result)
         {
             _authorizationContextMock.Setup(x => x.AllowModify(user)).Returns(result);
-        }
-
-        private void ExpectGetUserReturns(Guid orgUuid, Guid userUuid, Result<User, OperationError> result)
-        {
-            _userServiceMock.Setup(x => x.GetUserInOrganization(orgUuid, userUuid)).Returns(result);
         }
 
         private void ExpectAddUserReturns(User user, bool sendMailOnCreation, int orgId)

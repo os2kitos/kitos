@@ -53,7 +53,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         public IHttpActionResult CreateUnit([NonEmptyGuid] Guid organizationUuid, [FromBody] CreateUserRequestDTO parameters)
         {
             return _userWriteService.Create(organizationUuid, _writeModelMapper.FromPOST(parameters))
-                .Select(_userResponseModelMapper.ToUserResponseDTO)
+                .Select(user => _userResponseModelMapper.ToUserResponseDTO(organizationUuid, user))
                 .Match(MapUserCreatedResponse, FromOperationError);
         }
 
@@ -68,7 +68,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
             [FromBody] UpdateUserRequestDTO parameters)
         {
             return _userWriteService.Update(organizationUuid, userUuid, _writeModelMapper.FromPATCH(parameters))
-                .Select(_userResponseModelMapper.ToUserResponseDTO)
+                .Select(user => _userResponseModelMapper.ToUserResponseDTO(organizationUuid, user))
                 .Match(Ok, FromOperationError);
         }
 
@@ -101,13 +101,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
 
         [Route("find-any-by-email")]
         [HttpGet]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UserResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UserIsPartOfCurrentOrgResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetUsersByEmailInOtherOrganizations([NonEmptyGuid] Guid organizationUuid, string email)
         {
             return _userService.GetUserByEmail(organizationUuid, email)
-                .Select(_userResponseModelMapper.ToUserResponseDTO)
+                .Select(user => _userResponseModelMapper.ToUserWithIsPartOfCurrentOrgResponseDTO(organizationUuid, user))
                 .Match(Ok, FromOperationError);
         }
 
