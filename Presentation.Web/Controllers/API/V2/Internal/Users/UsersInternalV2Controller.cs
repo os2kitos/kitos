@@ -103,6 +103,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
                 .Match(Ok, FromOperationError);
         }
 
+
+
         private CreatedNegotiatedContentResult<UserResponseDTO> MapUserCreatedResponse(UserResponseDTO dto)
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
