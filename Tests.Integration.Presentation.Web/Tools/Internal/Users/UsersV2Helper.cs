@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Request.User;
 using Xunit;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
+using Presentation.Web.Models.API.V2.Internal.Request.User;
 
 namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
 {
@@ -68,10 +69,19 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return await response.ReadResponseBodyAsAsync<UserResponseDTO>();
         }
 
+        public static async Task<HttpResponseMessage> CopyRoles(Guid organizationUuid, Guid fromUser, Guid toUser,
+            CopyUserRightsRequestDTO request)
+        {
+            var requestCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"{ControllerPrefix(organizationUuid)}/{fromUser}/copy-roles/{toUser}");
+            return await HttpApi.PostWithCookieAsync(url, requestCookie, request);
+        }
+
         private static string ControllerPrefix(Guid organizationUuid)
         {
             return $"api/v2/internal/organization/{organizationUuid}/users";
         }
+
 
     }
 }
