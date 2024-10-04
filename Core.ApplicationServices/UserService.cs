@@ -398,7 +398,6 @@ namespace Core.ApplicationServices
 
         private Maybe<OperationError> DeleteUserIfNoDeletionConflicts(Guid userUuid, int? scopedToOrganizationId)
         {
-
             return WithNonNullUser(userUuid)
                 .Bind(WithNonCurrentUser)
                 .Match((user) => PerformDeleteUser(user, scopedToOrganizationId), 

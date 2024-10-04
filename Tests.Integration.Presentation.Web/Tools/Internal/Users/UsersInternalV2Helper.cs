@@ -23,17 +23,17 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return await response.ReadResponseBodyAsAsync<UserResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> DeleteUser(Guid organizationUuid, Guid userUuid, Cookie cookie = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
+        public static async Task<HttpStatusCode> DeleteUserAndVerifyStatusCode(Guid organizationUuid, Guid userUuid, Cookie cookie = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl(
                 $"{ControllerPrefix(organizationUuid)}/{userUuid}");
-            var response = await HttpApi.DeleteWithCookieAsync(url,
+            using var response = await HttpApi.DeleteWithCookieAsync(url,
                  requestCookie);
+            var statusCode = response.StatusCode;
+            Assert.Equal(expectedStatusCode, statusCode);
 
-            Assert.Equal(expectedStatusCode, response.StatusCode);
-
-            return response;
+            return statusCode;
         }
 
         public static async Task<UserResponseDTO> UpdateUser(Guid organizationUuid, Guid userUuid,
