@@ -5,9 +5,6 @@ using Core.DomainModel.Organization;
 using Core.DomainModel;
 using Presentation.Web.Models.API.V1;
 using System.Threading.Tasks;
-using Presentation.Web.Controllers.API.V2.Internal.Mapping;
-using Presentation.Web.Models.API.V2.Internal.Request.User;
-using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
 using Presentation.Web.Models.API.V2.Request.User;
 using Tests.Integration.Presentation.Web.Tools;
@@ -115,11 +112,6 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var result = await UsersV2Helper.CopyRoles(organization.Uuid, fromUser.Uuid, toUser.Uuid, request);
             //Assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-        }
-
-        private async Task<UserResponseDTO> CreateUserAsync(Guid organizationUuid)
-        {
-            return await UsersV2Helper.CreateUser(organizationUuid, CreateCreateUserRequest());
         }
 
         private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)

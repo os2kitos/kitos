@@ -4,7 +4,6 @@ using System.Net;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Policy;
 using System.Web.Http;
 using Core.ApplicationServices.Users.Write;
 using Presentation.Web.Controllers.API.V2.Internal.Users.Mapping;
@@ -13,11 +12,7 @@ using Presentation.Web.Models.API.V2.Request.User;
 using System.Web.Http.Results;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Model.Users;
-using Core.ApplicationServices.Model.Users.Write;
-using Core.ApplicationServices.Rights;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Generic;
-using System.Linq;
 using Presentation.Web.Models.API.V2.Internal.Request.User;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Users
@@ -123,20 +118,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
             var parameters = MapCopyRightsDTOToParameters(request);
             _userWriteService.CopyUserRights(organizationUuid, fromUserUuid, toUserUuid, parameters);
             return Ok();
-        }
-
-        private UserRightsChangeParameters MapCopyRightsDTOToParameters(CopyUserRightsRequestDTO request)
-        {
-            var unitRights = MapUserRightsDTOToRoleIdSet(request.UnitRights);
-            var systemRights = MapUserRightsDTOToRoleIdSet(request.SystemRights);
-            var contractRights = MapUserRightsDTOToRoleIdSet(request.ContractRights);
-            var dprRights = MapUserRightsDTOToRoleIdSet(request.DataProcessingRights);
-            return new UserRightsChangeParameters(new List<OrganizationRole>(), dprRights, systemRights, contractRights, unitRights);
-        }
-        
-        private IEnumerable<int> MapUserRightsDTOToRoleIdSet(IEnumerable<CopyRightRequestDTO> rights)
-        {
-            return rights.Select(right => right.RoleId);
         }
 
         private CreatedNegotiatedContentResult<UserResponseDTO> MapUserCreatedResponse(UserResponseDTO dto)
