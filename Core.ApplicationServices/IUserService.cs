@@ -28,9 +28,6 @@ namespace Core.ApplicationServices
         /// <param name="scopedToOrganizationId">If provided the operation will be scoped to the organization identified by this parameter</param>
         /// <returns></returns>
         Maybe<OperationError> DeleteUser(Guid userUuid, int? scopedToOrganizationId = null);
-
-        Maybe<OperationError> DeleteUserByOrganizationUuid(Guid userUuid, Guid scopedToOrganizationUuid);
-        
         Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries);
         Result<UserAdministrationPermissions, OperationError> GetAdministrativePermissions(Guid organizationUuid);
         bool IsEmailInUse(string email);
