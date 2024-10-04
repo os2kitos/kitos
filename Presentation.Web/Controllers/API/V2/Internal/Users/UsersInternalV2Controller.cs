@@ -17,6 +17,7 @@ using Core.ApplicationServices.Model.Users.Write;
 using Core.ApplicationServices.Rights;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
+using System.Linq;
 using Presentation.Web.Models.API.V2.Internal.Request.User;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Users
@@ -50,7 +51,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult CreateUser([NonEmptyGuid] Guid organizationUuid, [FromBody] CreateUserRequestDTO parameters)
+        public IHttpActionResult CreateUnit([NonEmptyGuid] Guid organizationUuid, [FromBody] CreateUserRequestDTO parameters)
         {
             return _userWriteService.Create(organizationUuid, _writeModelMapper.FromPOST(parameters))
                 .Select(user => _userResponseModelMapper.ToUserResponseDTO(organizationUuid, user))
@@ -64,26 +65,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PatchUser([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid,
+        public IHttpActionResult PatchUnit([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid,
             [FromBody] UpdateUserRequestDTO parameters)
         {
             return _userWriteService.Update(organizationUuid, userUuid, _writeModelMapper.FromPATCH(parameters))
                 .Select(user => _userResponseModelMapper.ToUserResponseDTO(organizationUuid, user))
                 .Match(Ok, FromOperationError);
-        }
-
-        [Route("{userUuid}")]
-        [HttpDelete]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult DeleteUser([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid)
-        {
-            return _userService.DeleteUserByOrganizationUuid(userUuid, organizationUuid)
-                .Match(FromOperationError,
-                    Ok);
         }
 
         [Route("{userUuid}/notifications/send")]
@@ -136,6 +123,20 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
             var parameters = MapCopyRightsDTOToParameters(request);
             _userWriteService.CopyUserRights(organizationUuid, fromUserUuid, toUserUuid, parameters);
             return Ok();
+        }
+
+        private UserRightsChangeParameters MapCopyRightsDTOToParameters(CopyUserRightsRequestDTO request)
+        {
+            var unitRights = MapUserRightsDTOToRoleIdSet(request.UnitRights);
+            var systemRights = MapUserRightsDTOToRoleIdSet(request.SystemRights);
+            var contractRights = MapUserRightsDTOToRoleIdSet(request.ContractRights);
+            var dprRights = MapUserRightsDTOToRoleIdSet(request.DataProcessingRights);
+            return new UserRightsChangeParameters(new List<OrganizationRole>(), dprRights, systemRights, contractRights, unitRights);
+        }
+        
+        private IEnumerable<int> MapUserRightsDTOToRoleIdSet(IEnumerable<CopyRightRequestDTO> rights)
+        {
+            return rights.Select(right => right.RoleId);
         }
 
         private CreatedNegotiatedContentResult<UserResponseDTO> MapUserCreatedResponse(UserResponseDTO dto)

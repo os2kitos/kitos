@@ -289,7 +289,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             //Arrange
             var fromUser = SetupUser();
             var toUser = SetupUser();
-            var org = new Organization{ Id = A<int>(), Uuid = A<Guid>()};
+            var org = new Organization { Id = A<int>(), Uuid = A<Guid>() };
             var updateParameters = A<UserRightsChangeParameters>();
             ExpectGetUserInOrganizationReturns(org.Uuid, fromUser.Uuid, fromUser);
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);

@@ -7,10 +7,11 @@ using Presentation.Web.Models.API.V2.Internal.Request.User;
 using Presentation.Web.Models.API.V2.Request.User;
 using Xunit;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
+using Presentation.Web.Models.API.V2.Internal.Request.User;
 
 namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
 {
-    public static class UsersInternalV2Helper
+    public static class UsersV2Helper
     {
         public static async Task<UserResponseDTO> CreateUser(Guid organizationUuid, CreateUserRequestDTO request, Cookie cookie = null)
         {
@@ -22,19 +23,6 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<UserResponseDTO>();
-        }
-
-        public static async Task<HttpStatusCode> DeleteUserAndVerifyStatusCode(Guid organizationUuid, Guid userUuid, Cookie cookie = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
-        {
-            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl(
-                $"{ControllerPrefix(organizationUuid)}/{userUuid}");
-            using var response = await HttpApi.DeleteWithCookieAsync(url,
-                 requestCookie);
-            var statusCode = response.StatusCode;
-            Assert.Equal(expectedStatusCode, statusCode);
-
-            return statusCode;
         }
 
         public static async Task<UserResponseDTO> UpdateUser(Guid organizationUuid, Guid userUuid,
@@ -94,6 +82,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
         {
             return $"api/v2/internal/organization/{organizationUuid}/users";
         }
+
 
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Core.DomainModel.Organization;
@@ -15,10 +14,12 @@ using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Internal.Users;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using System;
+using Presentation.Web.Models.API.V2.Internal.Request.User;
 
 namespace Tests.Integration.Presentation.Web.Users.V2
 {
-    public class UsersInternalApiV2Test : WithAutoFixture
+    public class UserV2Test : WithAutoFixture
     {
         [Fact]
         public async Task Can_Create_User()
@@ -28,7 +29,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var userRequest = CreateCreateUserRequest();
 
             //Act
-            var response = await UsersInternalV2Helper.CreateUser(organization.Uuid, userRequest);
+            var response = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
 
             //Assert
             AssertUserEqualsCreateRequest(userRequest, response);
@@ -39,11 +40,10 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var userRequest = CreateCreateUserRequest();
-            var user = await UsersInternalV2Helper.CreateUserAsync(organization.Uuid, userRequest);
+            var user = await CreateUserAsync(organization.Uuid); ;
 
             //Act
-            var response = await UsersInternalV2Helper.SendNotification(organization.Uuid, user.Uuid);
+            var response = await UsersV2Helper.SendNotification(organization.Uuid, user.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -56,7 +56,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var organization = await CreateOrganizationAsync();
 
             //Act
-            var response = await UsersInternalV2Helper.GetUserCollectionPermissions(organization.Uuid);
+            var response = await UsersV2Helper.GetUserCollectionPermissions(organization.Uuid);
 
             //Assert
             Assert.True(response.Create);
@@ -69,11 +69,11 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var user = await UsersInternalV2Helper.CreateUserAsync(organization.Uuid, CreateCreateUserRequest());
+            var user = await CreateUserAsync(organization.Uuid); ;
 
             //Act
             var updateRequest = A<UpdateUserRequestDTO>();
-            var response = await UsersInternalV2Helper.UpdateUser(organization.Uuid, user.Uuid, updateRequest);
+            var response = await UsersV2Helper.UpdateUser(organization.Uuid, user.Uuid, updateRequest);
 
             //Assert
             AssertUserEqualsUpdateRequest(updateRequest, response);
@@ -94,43 +94,15 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             //Arrange
             var organization = await CreateOrganizationAsync();
             var organization2 = await CreateOrganizationAsync();
-            var userRequest = CreateCreateUserRequest();
-            var user = await UsersInternalV2Helper.CreateUserAsync(organization.Uuid, userRequest);
+            var user = await CreateUserAsync(organization.Uuid); ;
 
             //Act
-            var response = await UsersInternalV2Helper.GetUserByEmail(organization2.Uuid, user.Email);
+            var response = await UsersV2Helper.GetUserByEmail(organization2.Uuid, user.Email);
 
             //Assert
             Assert.Equal(user.Uuid, response.Uuid);
         }
 
-        [Fact]
-        public async Task Can_Delete_User()
-        {
-            var organization = await CreateOrganizationAsync();
-            var user = await UsersInternalV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
-
-            _ = await UsersInternalV2Helper.DeleteUserAndVerifyStatusCode(organization.Uuid, user.Uuid);
-        }
-
-        [Fact]
-        public async Task Delete_User_Returns_Not_Found_If_Invalid_Org_Uuid()
-        {
-            var organization = await CreateOrganizationAsync();
-            var user = await UsersInternalV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
-            var invalidOrgUuid = new Guid();
-
-            _ = await UsersInternalV2Helper.DeleteUserAndVerifyStatusCode(invalidOrgUuid, user.Uuid, null, HttpStatusCode.NotFound);
-        }
-
-        [Fact]
-        public async Task Delete_User_Returns_Not_Found_If_Invalid_User_Uuid()
-        {
-            var organization = await CreateOrganizationAsync();
-            var invalidUserUuid = new Guid();
-
-            _ = await UsersInternalV2Helper.DeleteUserAndVerifyStatusCode(organization.Uuid, invalidUserUuid, null, HttpStatusCode.NotFound);
-        
         [Fact]
         public async Task Can_Copy_User_Roles()
         {
@@ -139,12 +111,15 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var fromUser = await CreateUserAsync(organization.Uuid);
             var toUser = await CreateUserAsync(organization.Uuid);
             var request = A<CopyUserRightsRequestDTO>();
-
             //Act
             var result = await UsersV2Helper.CopyRoles(organization.Uuid, fromUser.Uuid, toUser.Uuid, request);
-
             //Assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        }
+
+        private async Task<UserResponseDTO> CreateUserAsync(Guid organizationUuid)
+        {
+            return await UsersV2Helper.CreateUser(organizationUuid, CreateCreateUserRequest());
         }
 
         private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
@@ -193,7 +168,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
 
         private string CreateName()
         {
-            return $"{nameof(UsersInternalApiV2Test)}{A<string>()}";
+            return $"{nameof(UserV2Test)}{A<string>()}";
         }
 
         private string CreateEmail()
