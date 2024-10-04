@@ -120,9 +120,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var organization = await CreateOrganizationAsync();
             var user = await UsersV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
 
-            var response = await UsersV2Helper.DeleteUser(organization.Uuid, user.Uuid);
-
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            _ = await UsersV2Helper.DeleteUserAndVerifyStatusCode(organization.Uuid, user.Uuid);
         }
 
         [Fact]
@@ -132,7 +130,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var user = await UsersV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
             var invalidOrgUuid = new Guid();
 
-            _ = await UsersV2Helper.DeleteUser(invalidOrgUuid, user.Uuid, null, HttpStatusCode.NotFound);
+            _ = await UsersV2Helper.DeleteUserAndVerifyStatusCode(invalidOrgUuid, user.Uuid, null, HttpStatusCode.NotFound);
         }
 
         [Fact]
@@ -141,7 +139,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var organization = await CreateOrganizationAsync();
             var invalidUserUuid = new Guid();
 
-            _ = await UsersV2Helper.DeleteUser(organization.Uuid, invalidUserUuid, null, HttpStatusCode.NotFound);
+            _ = await UsersV2Helper.DeleteUserAndVerifyStatusCode(organization.Uuid, invalidUserUuid, null, HttpStatusCode.NotFound);
         }
 
         private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)

@@ -45,17 +45,17 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return await HttpApi.PostWithCookieAsync(url, requestCookie, null);
         }
 
-        public static async Task<HttpResponseMessage> DeleteUser(Guid organizationUuid, Guid userUuid, Cookie cookie = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
+        public static async Task<HttpStatusCode> DeleteUserAndVerifyStatusCode(Guid organizationUuid, Guid userUuid, Cookie cookie = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl(
                 $"{ControllerPrefix(organizationUuid)}/{userUuid}");
-            var response = await HttpApi.DeleteWithCookieAsync(url,
+            using var response = await HttpApi.DeleteWithCookieAsync(url,
                 requestCookie);
 
-            Assert.Equal(expectedStatusCode, response.StatusCode);
-
-            return response;
+            var statusCode = response.StatusCode;
+            Assert.Equal(expectedStatusCode, statusCode);
+            return statusCode;
         }
 
         public static async Task<UserCollectionPermissionsResponseDTO> GetUserCollectionPermissions(Guid organizationUuid, Cookie cookie = null)
