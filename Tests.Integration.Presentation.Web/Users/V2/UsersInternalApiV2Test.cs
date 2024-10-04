@@ -6,6 +6,9 @@ using Core.DomainModel.Organization;
 using Core.DomainModel;
 using Presentation.Web.Models.API.V1;
 using System.Threading.Tasks;
+using Presentation.Web.Controllers.API.V2.Internal.Mapping;
+using Presentation.Web.Models.API.V2.Internal.Request.User;
+using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
 using Presentation.Web.Models.API.V2.Request.User;
 using Tests.Integration.Presentation.Web.Tools;
@@ -37,7 +40,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             //Arrange
             var organization = await CreateOrganizationAsync();
             var userRequest = CreateCreateUserRequest();
-            var user = await UsersInternalV2Helper.CreateUser(organization.Uuid, userRequest);
+            var user = await UsersInternalV2Helper.CreateUserAsync(organization.Uuid, userRequest);
 
             //Act
             var response = await UsersInternalV2Helper.SendNotification(organization.Uuid, user.Uuid);
@@ -66,7 +69,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var user = await UsersInternalV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
+            var user = await UsersInternalV2Helper.CreateUserAsync(organization.Uuid, CreateCreateUserRequest());
 
             //Act
             var updateRequest = A<UpdateUserRequestDTO>();
@@ -92,7 +95,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var organization = await CreateOrganizationAsync();
             var organization2 = await CreateOrganizationAsync();
             var userRequest = CreateCreateUserRequest();
-            var user = await UsersInternalV2Helper.CreateUser(organization.Uuid, userRequest);
+            var user = await UsersInternalV2Helper.CreateUserAsync(organization.Uuid, userRequest);
 
             //Act
             var response = await UsersInternalV2Helper.GetUserByEmail(organization2.Uuid, user.Email);
@@ -127,6 +130,21 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var invalidUserUuid = new Guid();
 
             _ = await UsersInternalV2Helper.DeleteUserAndVerifyStatusCode(organization.Uuid, invalidUserUuid, null, HttpStatusCode.NotFound);
+        
+        [Fact]
+        public async Task Can_Copy_User_Roles()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var fromUser = await CreateUserAsync(organization.Uuid);
+            var toUser = await CreateUserAsync(organization.Uuid);
+            var request = A<CopyUserRightsRequestDTO>();
+
+            //Act
+            var result = await UsersV2Helper.CopyRoles(organization.Uuid, fromUser.Uuid, toUser.Uuid, request);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
         }
 
         private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
@@ -158,6 +176,12 @@ namespace Tests.Integration.Presentation.Web.Users.V2
                 Assert.Contains(requestRole, responseRolesList);
             }
         }
+
+        private async Task<UserResponseDTO> CreateUserAsync(Guid organizationUuid)
+        {
+            return await UsersV2Helper.CreateUser(organizationUuid, CreateCreateUserRequest());
+        }
+        
 
         private async Task<OrganizationDTO> CreateOrganizationAsync()
         {
