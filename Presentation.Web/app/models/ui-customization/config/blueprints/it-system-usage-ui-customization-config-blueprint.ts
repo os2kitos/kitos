@@ -16,6 +16,12 @@
                     },
                     lifeCycleStatus: {
                         text: "Livscyklus"
+                    },
+                    template: {
+                        text: "Kontraktskabelon"
+                    },
+                    criticality: {
+                        text: "Kritikalitet"
                     }
                 }
             },
