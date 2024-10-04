@@ -16,7 +16,5 @@ namespace Core.ApplicationServices.Users.Write
 
         Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(
             Guid organizationUuid);
-
-        Maybe<OperationError> CopyUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid, UserRightsChangeParameters parameters);
     }
 }
