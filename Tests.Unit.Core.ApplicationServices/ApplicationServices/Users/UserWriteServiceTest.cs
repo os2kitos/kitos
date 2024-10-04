@@ -296,10 +296,15 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
             ExpectGetOrganizationReturns(org.Uuid, org);
             ExpectModifyPermissionsForUserReturns(toUser, true);
+            _userRightsServiceMock.Setup(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, updateParameters))
+                .Returns(Maybe<OperationError>.None);
+            var transaction = ExpectTransactionBegins();
             //Act
             var result = _sut.CopyUserRights(org.Uuid, fromUser.Uuid, toUser.Uuid, updateParameters);
             //Assert
+            Assert.True(result.IsNone);
             _userRightsServiceMock.Verify(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, updateParameters));
+            transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
 
 
         }

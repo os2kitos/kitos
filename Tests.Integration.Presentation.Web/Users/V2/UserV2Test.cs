@@ -12,10 +12,7 @@ using Tests.Integration.Presentation.Web.Tools.Internal.Users;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using System;
-using Core.DomainModel.ItContract;
-using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V2.Internal.Request.User;
-using Newtonsoft.Json;
 
 namespace Tests.Integration.Presentation.Web.Users.V2
 {
