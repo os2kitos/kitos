@@ -114,6 +114,36 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
         }
 
+        [Fact]
+        public async Task Can_Delete_User()
+        {
+            var organization = await CreateOrganizationAsync();
+            var user = await UsersV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
+
+            var response = await UsersV2Helper.DeleteUser(organization.Uuid, user.Uuid);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Delete_User_Returns_Not_Found_If_Invalid_Org_Uuid()
+        {
+            var organization = await CreateOrganizationAsync();
+            var user = await UsersV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
+            var invalidOrgUuid = new Guid();
+
+            _ = await UsersV2Helper.DeleteUser(invalidOrgUuid, user.Uuid, null, HttpStatusCode.NotFound);
+        }
+
+        [Fact]
+        public async Task Delete_User_Returns_Not_Found_If_Invalid_User_Uuid()
+        {
+            var organization = await CreateOrganizationAsync();
+            var invalidUserUuid = new Guid();
+
+            _ = await UsersV2Helper.DeleteUser(organization.Uuid, invalidUserUuid, null, HttpStatusCode.NotFound);
+        }
+
         private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
         {
             Assert.Equal(request.Email, response.Email);

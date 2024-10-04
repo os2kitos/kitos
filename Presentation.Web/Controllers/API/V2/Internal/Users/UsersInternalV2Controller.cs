@@ -46,7 +46,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult CreateUnit([NonEmptyGuid] Guid organizationUuid, [FromBody] CreateUserRequestDTO parameters)
+        public IHttpActionResult CreateUser([NonEmptyGuid] Guid organizationUuid, [FromBody] CreateUserRequestDTO parameters)
         {
             return _userWriteService.Create(organizationUuid, _writeModelMapper.FromPOST(parameters))
                 .Select(user => _userResponseModelMapper.ToUserResponseDTO(organizationUuid, user))
@@ -60,7 +60,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PatchUnit([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid,
+        public IHttpActionResult PatchUser([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid,
             [FromBody] UpdateUserRequestDTO parameters)
         {
             return _userWriteService.Update(organizationUuid, userUuid, _writeModelMapper.FromPATCH(parameters))
@@ -118,6 +118,20 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
             var parameters = MapCopyRightsDTOToParameters(request);
             _userWriteService.CopyUserRights(organizationUuid, fromUserUuid, toUserUuid, parameters);
             return Ok();
+        }
+
+        [Route("{userUuid}")]
+        [HttpDelete]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteUser([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid)
+        {
+            return _userService.DeleteUserByOrganizationUuid(userUuid, organizationUuid)
+                .Match(FromOperationError,
+                    Ok);
         }
 
         private CreatedNegotiatedContentResult<UserResponseDTO> MapUserCreatedResponse(UserResponseDTO dto)

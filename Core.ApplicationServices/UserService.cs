@@ -23,6 +23,7 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Infrastructure.Services.DataAccess;
+using Core.DomainServices.Generic;
 
 
 namespace Core.ApplicationServices
@@ -47,6 +48,7 @@ namespace Core.ApplicationServices
         private readonly SHA256Managed _crypt;
         private readonly IOrganizationalUserContext _organizationalUserContext;
         private readonly ICommandBus _commandBus;
+        private readonly IEntityIdentityResolver _identityResolver;
         private static readonly RNGCryptoServiceProvider rngCsp = new();
         private const string KitosManualsLink = "https://info.kitos.dk/s/qZPox9byHBRsMi2";
 
@@ -66,7 +68,8 @@ namespace Core.ApplicationServices
             IOrganizationService organizationService,
             ITransactionManager transactionManager,
             IOrganizationalUserContext organizationalUserContext,
-            ICommandBus commandBus)
+            ICommandBus commandBus
+            , IEntityIdentityResolver identityResolver)
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
@@ -85,6 +88,7 @@ namespace Core.ApplicationServices
             _transactionManager = transactionManager;
             _organizationalUserContext = organizationalUserContext;
             _commandBus = commandBus;
+            _identityResolver = identityResolver;
             _crypt = new SHA256Managed();
             if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
             {
@@ -377,6 +381,13 @@ namespace Core.ApplicationServices
         private bool AllowDelete(int? optionalOrganizationScopeId)
         {
             return _authorizationContext.HasPermission(new DeleteAnyUserPermission(optionalOrganizationScopeId.FromNullableValueType()));
+        }
+
+        public Maybe<OperationError> DeleteUserByOrganizationUuid(Guid userUuid, Guid scopedToOrganizationUuid)
+        {
+            return _identityResolver.ResolveDbId<Organization>(scopedToOrganizationUuid)
+                .Match(orgDbId => DeleteUser(userUuid, orgDbId),
+                    () => new OperationError(OperationFailure.NotFound));
         }
 
         public Maybe<OperationError> DeleteUser(Guid userUuid, int? scopedToOrganizationId = null)
