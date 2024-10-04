@@ -12,7 +12,10 @@ using Tests.Integration.Presentation.Web.Tools.Internal.Users;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using System;
+using Core.DomainModel.ItContract;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V2.Internal.Request.User;
+using Newtonsoft.Json;
 
 namespace Tests.Integration.Presentation.Web.Users.V2
 {
@@ -101,17 +104,29 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         }
 
         [Fact]
+        public async Task Receive_Error_If_Try_To_Copy_Roles_From_User_To_Itself()
+        {
+            var organization = await CreateOrganizationAsync();
+            var user = await CreateUserAsync(organization.Uuid);
+
+            var response = await UsersV2Helper.CopyRoles(organization.Uuid, user.Uuid, user.Uuid,
+                A<CopyUserRightsRequestDTO>());
+
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        }
+
+        [Fact]
         public async Task Can_Copy_User_Roles()
         {
-            //Arrange
             var organization = await CreateOrganizationAsync();
             var fromUser = await CreateUserAsync(organization.Uuid);
             var toUser = await CreateUserAsync(organization.Uuid);
             var request = A<CopyUserRightsRequestDTO>();
-            //Act
+            
             var result = await UsersV2Helper.CopyRoles(organization.Uuid, fromUser.Uuid, toUser.Uuid, request);
-            //Assert
+
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            
         }
 
         private async Task<UserResponseDTO> CreateUserAsync(Guid organizationUuid)

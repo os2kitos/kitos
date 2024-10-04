@@ -139,10 +139,18 @@ namespace Core.ApplicationServices.Users.Write
                 return fromUser.Error;
             }
 
-            return _userService.GetUserInOrganization(organizationUuid, toUserUuid)
+            using var transactionManager = _transactionManager.Begin();
+            var copyResult = _userService.GetUserInOrganization(organizationUuid, toUserUuid)
                 .Bind(CanModifyUser)
                 .Match(toUser => _userRightsService.CopyRights(fromUser.Value.Id, toUser.Id, org.Value.Id, parameters), 
                     error => error);
+            if (copyResult.HasValue)
+            {
+                transactionManager.Rollback();
+                return copyResult.Value;
+            }
+            transactionManager.Commit();
+            return Maybe<OperationError>.None;
         }
 
         private Result<User, OperationError> PerformUpdates(User orgUser, Organization organization, UpdateUserParameters parameters)

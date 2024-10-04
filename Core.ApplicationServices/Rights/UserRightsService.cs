@@ -174,7 +174,7 @@ namespace Core.ApplicationServices.Rights
         {
             if (fromUserId == toUserId)
             {
-                return Maybe<OperationError>.None;
+                return new OperationError("Tried to copy roles from the user to itself", OperationFailure.Conflict);
             }
             return MutateUserRights(
                 fromUserId,
