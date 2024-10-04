@@ -13,9 +13,7 @@ using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
-using Core.ApplicationServices.Rights;
 using Core.DomainServices.Generic;
-using Core.ApplicationServices.Model.Users;
 
 namespace Tests.Unit.Core.ApplicationServices.Users
 {
@@ -29,7 +27,6 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IEntityIdentityResolver> _entityIdentityResolverMock;
-        private readonly Mock<IUserRightsService> _userRightsServiceMock;
 
         public UserWriteServiceTest()
         {
@@ -39,7 +36,6 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _organizationServiceMock = new Mock<IOrganizationService>();
             _entityIdentityResolverMock = new Mock<IEntityIdentityResolver>();
-            _userRightsServiceMock = new Mock<IUserRightsService>();
 
 
             _sut = new UserWriteService(_userServiceMock.Object, 
@@ -47,8 +43,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
                 _transactionManagerMock.Object,
                 _authorizationContextMock.Object,
                 _organizationServiceMock.Object,
-                _entityIdentityResolverMock.Object,
-                _userRightsServiceMock.Object);
+                _entityIdentityResolverMock.Object);
         }
 
         [Fact]
@@ -281,26 +276,6 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             //Assert
             Assert.True(updateResult.Failed);
 
-        }
-
-        [Fact]
-        public void Can_Copy_Roles()
-        {
-            //Arrange
-            var fromUser = SetupUser();
-            var toUser = SetupUser();
-            var org = new Organization{ Id = A<int>(), Uuid = A<Guid>()};
-            var updateParameters = A<UserRightsChangeParameters>();
-            ExpectGetUserInOrganizationReturns(org.Uuid, fromUser.Uuid, fromUser);
-            ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
-            ExpectGetOrganizationReturns(org.Uuid, org);
-            ExpectModifyPermissionsForUserReturns(toUser, true);
-
-            //Act
-            var result = _sut.CopyUserRights(org.Uuid, fromUser.Uuid, toUser.Uuid, updateParameters);
-
-            //Assert
-            _userRightsServiceMock.Verify(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, updateParameters));
         }
 
         private void ExpectAssignRolesReturn(IEnumerable<OrganizationRole> roles, User user, Organization org)
