@@ -16,7 +16,7 @@ using Presentation.Web.Models.API.V2.Internal.Request.User;
 
 namespace Tests.Integration.Presentation.Web.Users.V2
 {
-    public class UserV2Test : WithAutoFixture
+    public class UserInternalApiV2Test : WithAutoFixture
     {
         [Fact]
         public async Task Can_Create_User()
@@ -160,7 +160,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
 
         private string CreateName()
         {
-            return $"{nameof(UserV2Test)}{A<string>()}";
+            return $"{nameof(UserInternalApiV2Test)}{A<string>()}";
         }
 
         private string CreateEmail()
