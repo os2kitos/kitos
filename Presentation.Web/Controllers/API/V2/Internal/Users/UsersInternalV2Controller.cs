@@ -10,6 +10,10 @@ using Presentation.Web.Models.API.V2.Request.User;
 using System.Web.Http.Results;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Model.Users;
+using Core.DomainModel.Organization;
+using System.Collections.Generic;
+using System.Linq;
+using Presentation.Web.Models.API.V2.Internal.Request.User;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Users
 {
@@ -101,6 +105,32 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
             return _userService.GetUserByEmail(organizationUuid, email)
                 .Select(user => _userResponseModelMapper.ToUserWithIsPartOfCurrentOrgResponseDTO(organizationUuid, user))
                 .Match(Ok, FromOperationError);
+        }
+
+        [Route("{fromUserUuid}/copy-roles/{toUserUuid}")]
+        [HttpPost]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult CopyRoles([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid fromUserUuid, [NonEmptyGuid] Guid toUserUuid, [FromBody] CopyUserRightsRequestDTO request)
+        {
+            var parameters = MapCopyRightsDTOToParameters(request);
+            _userWriteService.CopyUserRights(organizationUuid, fromUserUuid, toUserUuid, parameters);
+            return Ok();
+        }
+
+        private UserRightsChangeParameters MapCopyRightsDTOToParameters(CopyUserRightsRequestDTO request)
+        {
+            var unitRights = MapUserRightsDTOToRoleIdSet(request.UnitRights);
+            var systemRights = MapUserRightsDTOToRoleIdSet(request.SystemRights);
+            var contractRights = MapUserRightsDTOToRoleIdSet(request.ContractRights);
+            var dprRights = MapUserRightsDTOToRoleIdSet(request.DataProcessingRights);
+            return new UserRightsChangeParameters(new List<OrganizationRole>(), dprRights, systemRights, contractRights, unitRights);
+        }
+        private IEnumerable<int> MapUserRightsDTOToRoleIdSet(IEnumerable<CopyRightRequestDTO> rights)
+        {
+            return rights.Select(right => right.RoleId);
         }
 
         private CreatedNegotiatedContentResult<UserResponseDTO> MapUserCreatedResponse(UserResponseDTO dto)

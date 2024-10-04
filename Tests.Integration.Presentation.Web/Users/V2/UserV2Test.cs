@@ -11,6 +11,8 @@ using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Internal.Users;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using System;
+using Presentation.Web.Models.API.V2.Internal.Request.User;
 
 namespace Tests.Integration.Presentation.Web.Users.V2
 {
@@ -35,8 +37,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var userRequest = CreateCreateUserRequest();
-            var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
+            var user = await CreateUserAsync(organization.Uuid); ;
 
             //Act
             var response = await UsersV2Helper.SendNotification(organization.Uuid, user.Uuid);
@@ -65,7 +66,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var user = await UsersV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
+            var user = await CreateUserAsync(organization.Uuid); ;
 
             //Act
             var updateRequest = A<UpdateUserRequestDTO>();
@@ -90,14 +91,32 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             //Arrange
             var organization = await CreateOrganizationAsync();
             var organization2 = await CreateOrganizationAsync();
-            var userRequest = CreateCreateUserRequest();
-            var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
+            var user = await CreateUserAsync(organization.Uuid); ;
 
             //Act
             var response = await UsersV2Helper.GetUserByEmail(organization2.Uuid, user.Email);
 
             //Assert
             Assert.Equal(user.Uuid, response.Uuid);
+        }
+
+        [Fact]
+        public async Task Can_Copy_User_Roles()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var fromUser = await CreateUserAsync(organization.Uuid);
+            var toUser = await CreateUserAsync(organization.Uuid);
+            var request = A<CopyUserRightsRequestDTO>();
+            //Act
+            var result = await UsersV2Helper.CopyRoles(organization.Uuid, fromUser.Uuid, toUser.Uuid, request);
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        }
+
+        private async Task<UserResponseDTO> CreateUserAsync(Guid organizationUuid)
+        {
+            return await UsersV2Helper.CreateUser(organizationUuid, CreateCreateUserRequest());
         }
 
         private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
