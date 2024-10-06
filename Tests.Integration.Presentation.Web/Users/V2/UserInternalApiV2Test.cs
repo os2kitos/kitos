@@ -16,7 +16,7 @@ using Presentation.Web.Models.API.V2.Internal.Request.User;
 
 namespace Tests.Integration.Presentation.Web.Users.V2
 {
-    public class UserV2Test : WithAutoFixture
+    public class UserInternalApiV2Test : WithAutoFixture
     {
         [Fact]
         public async Task Can_Create_User()
@@ -114,9 +114,32 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
         }
 
-        private async Task<UserResponseDTO> CreateUserAsync(Guid organizationUuid)
+        [Fact]
+        public async Task Can_Delete_User()
         {
-            return await UsersV2Helper.CreateUser(organizationUuid, CreateCreateUserRequest());
+            var organization = await CreateOrganizationAsync();
+            var user = await UsersV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
+
+            _ = await UsersV2Helper.DeleteUserAndVerifyStatusCode(organization.Uuid, user.Uuid);
+        }
+
+        [Fact]
+        public async Task Delete_User_Returns_Not_Found_If_Invalid_Org_Uuid()
+        {
+            var organization = await CreateOrganizationAsync();
+            var user = await UsersV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
+            var invalidOrgUuid = new Guid();
+
+            _ = await UsersV2Helper.DeleteUserAndVerifyStatusCode(invalidOrgUuid, user.Uuid, null, HttpStatusCode.NotFound);
+        }
+
+        [Fact]
+        public async Task Delete_User_Returns_Not_Found_If_Invalid_User_Uuid()
+        {
+            var organization = await CreateOrganizationAsync();
+            var invalidUserUuid = new Guid();
+
+            _ = await UsersV2Helper.DeleteUserAndVerifyStatusCode(organization.Uuid, invalidUserUuid, null, HttpStatusCode.NotFound);
         }
 
         private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
@@ -149,6 +172,12 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             }
         }
 
+        private async Task<UserResponseDTO> CreateUserAsync(Guid organizationUuid)
+        {
+            return await UsersV2Helper.CreateUser(organizationUuid, CreateCreateUserRequest());
+        }
+        
+
         private async Task<OrganizationDTO> CreateOrganizationAsync()
         {
             var organizationName = CreateName();
@@ -159,7 +188,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
 
         private string CreateName()
         {
-            return $"{nameof(UserV2Test)}{A<string>()}";
+            return $"{nameof(UserInternalApiV2Test)}{A<string>()}";
         }
 
         private string CreateEmail()

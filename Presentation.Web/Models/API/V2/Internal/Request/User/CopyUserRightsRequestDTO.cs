@@ -7,6 +7,5 @@ namespace Presentation.Web.Models.API.V2.Internal.Request.User
         public IEnumerable<CopyRightRequestDTO> SystemRights { get; set; }
         public IEnumerable<CopyRightRequestDTO> ContractRights { get; set; }
         public IEnumerable<CopyRightRequestDTO> DataProcessingRights { get; set; }
-
     }
 }
