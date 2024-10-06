@@ -120,6 +120,19 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
             return Ok();
         }
 
+        [Route("{fromUserUuid}/transfer-roles/{toUserUuid}")]
+        [HttpPost]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult TransferRoles([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid fromUserUuid, [NonEmptyGuid] Guid toUserUuid, [FromBody] CopyUserRightsRequestDTO request)
+        {
+            var parameters = MapCopyRightsDTOToParameters(request);
+            return _userWriteService.TransferUserRights(organizationUuid, fromUserUuid, toUserUuid, parameters)
+                .Match(FromOperationError, Ok);
+        }
+
         [Route("{userUuid}")]
         [HttpDelete]
         [SwaggerResponse(HttpStatusCode.OK)]
