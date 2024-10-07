@@ -145,6 +145,28 @@ namespace Core.ApplicationServices.Users.Write
                     error => error);
         }
 
+        public Maybe<OperationError> TransferUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid,
+            UserRightsChangeParameters parameters)
+        {
+            var organizationDbIdMaybe = this._entityIdentityResolver.ResolveDbId<Organization>(organizationUuid); 
+            //todo test returns not found if no orgid
+            var orgDbId = organizationDbIdMaybe.Value;
+
+            var fromUserResult = _userService.GetUserInOrganization(organizationUuid, fromUserUuid);
+            if (fromUserResult.Failed)
+            {
+                return fromUserResult.Error;
+            }
+
+            var fromUser = fromUserResult.Value;
+
+            return _userService.GetUserInOrganization(organizationUuid, toUserUuid)
+                .Bind(CanModifyUser)
+                .Match(toUser => _userRightsService.TransferRights(fromUser.Id, toUser.Id, orgDbId, parameters),
+                    error => error);
+
+        }
+
         private Result<User, OperationError> PerformUpdates(User orgUser, Organization organization, UpdateUserParameters parameters)
         {
             return orgUser.WithOptionalUpdate(parameters.FirstName, (user, firstName) => user.Name = firstName)

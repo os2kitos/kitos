@@ -303,6 +303,26 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             _userRightsServiceMock.Verify(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, updateParameters));
         }
 
+        [Fact]
+        public void Can_Transfer_Roles()
+        {
+            //Arrange
+            var fromUser = SetupUser();
+            var toUser = SetupUser();
+            var org = new Organization { Id = A<int>(), Uuid = A<Guid>() };
+            var updateParameters = A<UserRightsChangeParameters>();
+            ExpectGetUserInOrganizationReturns(org.Uuid, fromUser.Uuid, fromUser);
+            ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
+            ExpectModifyPermissionsForUserReturns(toUser, true);
+            _entityIdentityResolverMock.Setup(_ => _.ResolveDbId<Organization>(org.Uuid)).Returns(org.Id);
+
+            //Act
+            _ = _sut.TransferUserRights(org.Uuid, fromUser.Uuid, toUser.Uuid, updateParameters);
+
+            //Assert
+            _userRightsServiceMock.Verify(x => x.TransferRights(fromUser.Id, toUser.Id, org.Id, updateParameters));
+        }
+
         private void ExpectAssignRolesReturn(IEnumerable<OrganizationRole> roles, User user, Organization org)
         {
             foreach (var role in roles)
