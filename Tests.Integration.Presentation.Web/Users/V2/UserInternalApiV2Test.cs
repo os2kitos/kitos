@@ -127,6 +127,22 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         }
 
         [Fact]
+        public async Task Copy_Roles_Ignores_Existing_Roles()
+        {
+            var organization = await CreateOrganizationAsync();
+            var fromUser = await CreateUserAsync(organization.Uuid);
+            var toUser = await CreateUserAsync(organization.Uuid);
+            var request = A<CopyUserRightsRequestDTO>();
+            await UsersV2Helper.CopyRoles(organization.Uuid, fromUser.Uuid, toUser.Uuid, request);
+
+            var repeatedRequestResult =
+                await UsersV2Helper.CopyRoles(organization.Uuid, fromUser.Uuid, toUser.Uuid, request);
+
+            Assert.Equal(HttpStatusCode.OK, repeatedRequestResult.StatusCode);
+
+        }
+
+        [Fact]
         public async Task Can_Delete_User()
         {
             var organization = await CreateOrganizationAsync();
