@@ -148,8 +148,8 @@ namespace Core.ApplicationServices.Users.Write
         public Maybe<OperationError> TransferUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid,
             UserRightsChangeParameters parameters)
         {
-            var organizationDbIdMaybe = this._entityIdentityResolver.ResolveDbId<Organization>(organizationUuid); 
-            //todo test returns not found if no orgid
+            var organizationDbIdMaybe = this._entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
+            if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.NotFound);
             var orgDbId = organizationDbIdMaybe.Value;
 
             var fromUserResult = _userService.GetUserInOrganization(organizationUuid, fromUserUuid);
