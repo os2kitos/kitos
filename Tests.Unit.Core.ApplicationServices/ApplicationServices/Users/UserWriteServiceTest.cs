@@ -293,7 +293,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var updateParameters = A<UserRightsChangeParameters>();
             ExpectGetUserInOrganizationReturns(org.Uuid, fromUser.Uuid, fromUser);
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
-            ExpectGetOrganizationReturns(org.Uuid, org);
+            _entityIdentityResolverMock.Setup(_ => _.ResolveDbId<Organization>(org.Uuid)).Returns(org.Id);
             ExpectModifyPermissionsForUserReturns(toUser, true);
 
             //Act

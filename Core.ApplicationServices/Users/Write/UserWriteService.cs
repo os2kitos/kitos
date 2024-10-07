@@ -127,44 +127,46 @@ namespace Core.ApplicationServices.Users.Write
         public Maybe<OperationError> CopyUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid,
             UserRightsChangeParameters parameters)
         {
-            var org = _organizationService.GetOrganization(organizationUuid);
-            if (org.Failed)
-            {
-                return org.Error;
-            }
+            return ResolveOrganizationUuidToId(organizationUuid)
+                .Match(orgDbId =>
+                {
+                    var fromUser = _userService.GetUserInOrganization(organizationUuid, fromUserUuid);
+                    if (fromUser.Failed)
+                    {
+                        return fromUser.Error;
+                    }
 
-            var fromUser = _userService.GetUserInOrganization(organizationUuid, fromUserUuid);
-            if (fromUser.Failed)
-            {
-                return fromUser.Error;
-            }
-
-            return _userService.GetUserInOrganization(organizationUuid, toUserUuid)
-                .Bind(CanModifyUser)
-                .Match(toUser => _userRightsService.CopyRights(fromUser.Value.Id, toUser.Id, org.Value.Id, parameters), 
-                    error => error);
+                    return _userService.GetUserInOrganization(organizationUuid, toUserUuid)
+                        .Bind(CanModifyUser)
+                        .Match(
+                            toUser => _userRightsService.CopyRights(fromUser.Value.Id, toUser.Id, orgDbId, parameters),
+                            error => error);
+                }, error => error);
         }
 
         public Maybe<OperationError> TransferUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid,
             UserRightsChangeParameters parameters)
         {
-            var organizationDbIdMaybe = this._entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
-            if (organizationDbIdMaybe.IsNone) return new OperationError(OperationFailure.NotFound);
-            var orgDbId = organizationDbIdMaybe.Value;
+            return ResolveOrganizationUuidToId(organizationUuid)
+                .Match(orgDbId =>
+                    {
+                        var fromUserResult = _userService.GetUserInOrganization(organizationUuid, fromUserUuid);
+                        if (fromUserResult.Failed)
+                        {
+                            return fromUserResult.Error;
+                        }
 
-            var fromUserResult = _userService.GetUserInOrganization(organizationUuid, fromUserUuid);
-            if (fromUserResult.Failed)
-            {
-                return fromUserResult.Error;
-            }
+                        var fromUser = fromUserResult.Value;
 
-            var fromUser = fromUserResult.Value;
-
-            return _userService.GetUserInOrganization(organizationUuid, toUserUuid)
-                .Bind(CanModifyUser)
-                .Match(toUser => _userRightsService.TransferRights(fromUser.Id, toUser.Id, orgDbId, parameters),
-                    error => error);
-
+                        return _userService.GetUserInOrganization(organizationUuid, toUserUuid)
+                            .Bind(CanModifyUser)
+                            .Match(
+                                toUser => _userRightsService.TransferRights(fromUser.Id, toUser.Id, orgDbId,
+                                    parameters),
+                                error => error);
+                    },
+                    error => error
+                );
         }
 
         private Result<User, OperationError> PerformUpdates(User orgUser, Organization organization, UpdateUserParameters parameters)
