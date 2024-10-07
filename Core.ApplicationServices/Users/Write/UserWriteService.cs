@@ -127,24 +127,20 @@ namespace Core.ApplicationServices.Users.Write
         public Maybe<OperationError> CopyUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid,
             UserRightsChangeParameters parameters)
         {
-            return ResolveOrganizationUuidToId(organizationUuid)
-                .Match(orgDbId =>
-                {
-                    var fromUser = _userService.GetUserInOrganization(organizationUuid, fromUserUuid);
-                    if (fromUser.Failed)
-                    {
-                        return fromUser.Error;
-                    }
-
-                    return _userService.GetUserInOrganization(organizationUuid, toUserUuid)
-                        .Bind(CanModifyUser)
-                        .Match(
-                            toUser => _userRightsService.CopyRights(fromUser.Value.Id, toUser.Id, orgDbId, parameters),
-                            error => error);
-                }, error => error);
+            return CollectUsersAndMutateRoles(_userRightsService.CopyRights, organizationUuid, fromUserUuid, toUserUuid,
+                parameters);
         }
 
         public Maybe<OperationError> TransferUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid,
+            UserRightsChangeParameters parameters)
+        {
+            return CollectUsersAndMutateRoles(_userRightsService.TransferRights, organizationUuid, fromUserUuid, toUserUuid, parameters);
+        }
+
+
+        private Maybe<OperationError> CollectUsersAndMutateRoles(Func<int, int, int, UserRightsChangeParameters, Maybe<OperationError>> mutateAction,
+            Guid organizationUuid, Guid fromUserUuid,
+            Guid toUserUuid,
             UserRightsChangeParameters parameters)
         {
             return ResolveOrganizationUuidToId(organizationUuid)
@@ -161,7 +157,7 @@ namespace Core.ApplicationServices.Users.Write
                         return _userService.GetUserInOrganization(organizationUuid, toUserUuid)
                             .Bind(CanModifyUser)
                             .Match(
-                                toUser => _userRightsService.TransferRights(fromUser.Id, toUser.Id, orgDbId,
+                                toUser => mutateAction(fromUser.Id, toUser.Id, orgDbId,
                                     parameters),
                                 error => error);
                     },
