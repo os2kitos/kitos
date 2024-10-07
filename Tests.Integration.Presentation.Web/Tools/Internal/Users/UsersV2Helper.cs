@@ -3,10 +3,10 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Presentation.Web.Models.API.V2.Internal.Request.User;
 using Presentation.Web.Models.API.V2.Request.User;
 using Xunit;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
-using Presentation.Web.Models.API.V2.Internal.Request.User;
 
 namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
 {
@@ -43,6 +43,19 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"{ControllerPrefix(organizationUuid)}/{userUuid}/notifications/send");
             return await HttpApi.PostWithCookieAsync(url, requestCookie, null);
+        }
+
+        public static async Task<HttpStatusCode> DeleteUserAndVerifyStatusCode(Guid organizationUuid, Guid userUuid, Cookie cookie = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
+        {
+            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl(
+                $"{ControllerPrefix(organizationUuid)}/{userUuid}");
+            using var response = await HttpApi.DeleteWithCookieAsync(url,
+                requestCookie);
+
+            var statusCode = response.StatusCode;
+            Assert.Equal(expectedStatusCode, statusCode);
+            return statusCode;
         }
 
         public static async Task<UserCollectionPermissionsResponseDTO> GetUserCollectionPermissions(Guid organizationUuid, Cookie cookie = null)
