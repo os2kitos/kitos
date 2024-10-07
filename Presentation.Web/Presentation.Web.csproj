@@ -428,8 +428,8 @@
     <Compile Include="Models\API\V2\Internal\Request\OrganizationUnit\ChangeOrganizationUnitRegistrationV2RequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\OrganizationUnit\ChangePaymentRegistrationV2RequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\OrganizationUnit\TransferOrganizationUnitRegistrationV2RequestDTO.cs" />
-    <Compile Include="Models\API\V2\Internal\Request\User\CopyRightRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Internal\Request\User\CopyUserRightsRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\User\MutateRightRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\User\MutateUserRightsRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItContract\LocalItContractRolesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationV2ResponseDTO.cs" />

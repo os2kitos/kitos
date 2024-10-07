@@ -108,7 +108,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var organization = await CreateOrganizationAsync();
             var fromUser = await CreateUserAsync(organization.Uuid);
             var toUser = await CreateUserAsync(organization.Uuid);
-            var request = A<CopyUserRightsRequestDTO>();
+            var request = A<MutateUserRightsRequestDTO>();
             //Act
             var result = await UsersV2Helper.CopyRoles(organization.Uuid, fromUser.Uuid, toUser.Uuid, request);
             //Assert
@@ -122,7 +122,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var organization = await CreateOrganizationAsync();
             var fromUser = await CreateUserAsync(organization.Uuid);
             var toUser = await CreateUserAsync(organization.Uuid);
-            var request = A<CopyUserRightsRequestDTO>();
+            var request = A<MutateUserRightsRequestDTO>();
             //Act
             var result = await UsersV2Helper.TransferRoles(organization.Uuid, fromUser.Uuid, toUser.Uuid, request);
             //Assert
