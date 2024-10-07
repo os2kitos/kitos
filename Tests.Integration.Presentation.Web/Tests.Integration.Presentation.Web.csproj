@@ -255,7 +255,7 @@
     <Compile Include="Users\UserPermissionsAPITest.cs" />
     <Compile Include="Users\UserRolesManagementApiTest.cs" />
     <Compile Include="Users\UserTest.cs" />
-    <Compile Include="Users\V2\UserV2Test.cs" />
+    <Compile Include="Users\V2\UserInternalApiV2Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

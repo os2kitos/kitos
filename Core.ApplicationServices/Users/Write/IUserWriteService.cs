@@ -18,6 +18,5 @@ namespace Core.ApplicationServices.Users.Write
             Guid organizationUuid);
 
         Maybe<OperationError> CopyUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid, UserRightsChangeParameters parameters);
-
     }
 }
