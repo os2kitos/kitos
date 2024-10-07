@@ -12,6 +12,7 @@ using Tests.Integration.Presentation.Web.Tools.Internal.Users;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using System;
+using AutoFixture;
 using Presentation.Web.Models.API.V2.Internal.Request.User;
 
 namespace Tests.Integration.Presentation.Web.Users.V2
@@ -110,6 +111,20 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var request = A<CopyUserRightsRequestDTO>();
             //Act
             var result = await UsersV2Helper.CopyRoles(organization.Uuid, fromUser.Uuid, toUser.Uuid, request);
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Transfer_User_Roles()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var fromUser = await CreateUserAsync(organization.Uuid);
+            var toUser = await CreateUserAsync(organization.Uuid);
+            var request = A<CopyUserRightsRequestDTO>();
+            //Act
+            var result = await UsersV2Helper.TransferRoles(organization.Uuid, fromUser.Uuid, toUser.Uuid, request);
             //Assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
         }

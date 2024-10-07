@@ -90,6 +90,14 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return await HttpApi.PostWithCookieAsync(url, requestCookie, request);
         }
 
+        public static async Task<HttpResponseMessage> TransferRoles(Guid organizationUuid, Guid fromUser, Guid toUser,
+            CopyUserRightsRequestDTO request)
+        {
+            var requestCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"{ControllerPrefix(organizationUuid)}/{fromUser}/transfer-roles/{toUser}");
+            return await HttpApi.PostWithCookieAsync(url, requestCookie, request);
+        }
+
         private static string ControllerPrefix(Guid organizationUuid)
         {
             return $"api/v2/internal/organization/{organizationUuid}/users";
