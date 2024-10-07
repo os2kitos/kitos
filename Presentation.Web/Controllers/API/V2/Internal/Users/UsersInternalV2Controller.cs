@@ -116,8 +116,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         public IHttpActionResult CopyRoles([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid fromUserUuid, [NonEmptyGuid] Guid toUserUuid, [FromBody] CopyUserRightsRequestDTO request)
         {
             var parameters = MapCopyRightsDTOToParameters(request);
-            _userWriteService.CopyUserRights(organizationUuid, fromUserUuid, toUserUuid, parameters);
-            return Ok();
+            return _userWriteService.CopyUserRights(organizationUuid, fromUserUuid, toUserUuid, parameters)
+                .Match(FromOperationError, Ok);
         }
 
         [Route("{userUuid}")]

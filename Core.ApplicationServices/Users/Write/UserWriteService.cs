@@ -139,10 +139,47 @@ namespace Core.ApplicationServices.Users.Write
                 return fromUser.Error;
             }
 
-            return _userService.GetUserInOrganization(organizationUuid, toUserUuid)
+            using var transactionManager = _transactionManager.Begin();
+            var copyResult = _userService.GetUserInOrganization(organizationUuid, toUserUuid)
                 .Bind(CanModifyUser)
-                .Match(toUser => _userRightsService.CopyRights(fromUser.Value.Id, toUser.Id, org.Value.Id, parameters), 
+                .Match(toUser =>
+                    {
+                        return FilterOutExistingRights(toUser, org.Value, parameters)
+                            .Match(
+                                filteredRights => _userRightsService.CopyRights(fromUser.Value.Id, toUser.Id,
+                                    org.Value.Id, filteredRights),
+                                error => error);
+                    }, 
                     error => error);
+            if (copyResult.HasValue)
+            {
+                transactionManager.Rollback();
+                return copyResult.Value;
+            }
+            transactionManager.Commit();
+            return Maybe<OperationError>.None;
+        }
+
+        private Result<UserRightsChangeParameters, OperationError> FilterOutExistingRights(User user, Organization organization, UserRightsChangeParameters request)
+        {
+            var existingRightsResult = _userRightsService.GetUserRights(user.Id, organization.Id);
+            if (existingRightsResult.Failed) return existingRightsResult.Error;
+            var existingRights = existingRightsResult.Value;
+            var filteredUnitRights = GetRightsToCopy(existingRights.OrganizationUnitRights, request.OrganizationUnitRightsIds);
+            var filteredItSystemRights = GetRightsToCopy(existingRights.SystemRights, request.SystemRightIds);
+            var filteredContractRights = GetRightsToCopy(existingRights.ContractRights, request.ContractRightIds);
+            var filteredDprRights = GetRightsToCopy(existingRights.DataProcessingRegistrationRights, request.DataProcessingRegistrationRightIds);
+            return new UserRightsChangeParameters(request.AdministrativeAccessRoles, filteredDprRights,
+                filteredItSystemRights, filteredContractRights, filteredUnitRights);
+        }
+
+        private ISet<int> GetRightsToCopy<TObject, TRight, TRole>(IEnumerable<IRight<TObject, TRight, TRole>> oldRights, ISet<int> roleIdsToCopy)
+            where TRight : Entity, IRight<TObject, TRight, TRole>
+            where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
+            where TObject : HasRightsEntity<TObject, TRight, TRole>, IOwnedByOrganization
+        {
+            var oldRightsIds = oldRights.Select(right => right.RoleId);
+            return roleIdsToCopy.Except(oldRightsIds).ToHashSet();
         }
 
         private Result<User, OperationError> PerformUpdates(User orgUser, Organization organization, UpdateUserParameters parameters)
