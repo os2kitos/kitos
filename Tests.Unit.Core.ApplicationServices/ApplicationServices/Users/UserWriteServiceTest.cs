@@ -16,6 +16,9 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Rights;
 using Core.DomainServices.Generic;
 using Core.ApplicationServices.Model.Users;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
 
 namespace Tests.Unit.Core.ApplicationServices.Users
 {
@@ -295,12 +298,28 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
             ExpectGetOrganizationReturns(org.Uuid, org);
             ExpectModifyPermissionsForUserReturns(toUser, true);
+            ExpectGetUserRightsReturnsNothing(toUser, org);
+
+            _userRightsServiceMock.Setup(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, It.IsAny<UserRightsChangeParameters>()))
+                .Returns(Maybe<OperationError>.None);
+            var transaction = ExpectTransactionBegins();
 
             //Act
             var result = _sut.CopyUserRights(org.Uuid, fromUser.Uuid, toUser.Uuid, updateParameters);
 
             //Assert
-            _userRightsServiceMock.Verify(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, updateParameters));
+            Assert.True(result.IsNone);
+            _userRightsServiceMock.Verify(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, It.IsAny<UserRightsChangeParameters>()));
+
+            transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
+        }
+
+        private void ExpectGetUserRightsReturnsNothing(User user, Organization org)
+        {
+            var emptyAssignments = new UserRightsAssignments(new List<OrganizationRole>(),
+                new List<DataProcessingRegistrationRight>(), new List<ItSystemRight>(), new List<ItContractRight>(),
+                new List<OrganizationUnitRight>());
+            _userRightsServiceMock.Setup(x => x.GetUserRights(user.Id, org.Id)).Returns(emptyAssignments);
         }
 
         private void ExpectAssignRolesReturn(IEnumerable<OrganizationRole> roles, User user, Organization org)
