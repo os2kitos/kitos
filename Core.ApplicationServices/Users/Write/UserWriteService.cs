@@ -11,6 +11,7 @@ using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Rights;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices.GDPR;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 
@@ -156,7 +157,7 @@ namespace Core.ApplicationServices.Users.Write
                             .Bind(CanModifyUser)
                             .Match(toUser =>
                                 {
-                                    return FilterOutExistingRights(toUser, orgDbId, parameters)
+                                    return FilterOutExistingRights(fromUser, toUser, orgDbId, parameters)
                                         .Match(
                                             filteredRights => mutateAction(fromUser.Id, toUser.Id,
                                                 orgDbId, filteredRights),
@@ -168,21 +169,39 @@ namespace Core.ApplicationServices.Users.Write
                 );
         }
 
-        private Result<UserRightsChangeParameters, OperationError> FilterOutExistingRights(User user, int organizationDbId, UserRightsChangeParameters request)
+        private Result<UserRightsChangeParameters, OperationError> FilterOutExistingRights(User fromUser, User toUser, int organizationDbId, UserRightsChangeParameters request)
         {
-            var existingRightsResult = _userRightsService.GetUserRights(user.Id, organizationDbId);
+            var fromUserRightsResult = _userRightsService.GetUserRights(fromUser.Id, organizationDbId);
+            if (fromUserRightsResult.Failed) return fromUserRightsResult.Error;
+            var fromUserRights = fromUserRightsResult.Value;
+            var existingRightsResult = _userRightsService.GetUserRights(toUser.Id, organizationDbId);
             if (existingRightsResult.Failed) return existingRightsResult.Error;
             var existingRights = existingRightsResult.Value;
-            var filteredUnitRights = GetRightsToCopy(existingRights.OrganizationUnitRights, request.OrganizationUnitRightsIds);
+            var filteredUnitRights = fromUserRights.OrganizationUnitRights.Where(right =>
+                !existingRights.OrganizationUnitRights.Any(r => r.RoleId == right.RoleId)).Select(right => right.Id).Where(id => request.OrganizationUnitRightsIds.Contains(id));
+                    
+                    
+                    ;
             var filteredItSystemRights = GetRightsToCopy(existingRights.SystemRights, request.SystemRightIds);
             var filteredContractRights = GetRightsToCopy(existingRights.ContractRights, request.ContractRightIds);
+            existingRights.ContractRights.Select(x => x.Id);
             var filteredDprRights = GetRightsToCopy(existingRights.DataProcessingRegistrationRights, request.DataProcessingRegistrationRightIds);
             return new UserRightsChangeParameters(request.AdministrativeAccessRoles, filteredDprRights,
                 filteredItSystemRights, filteredContractRights, filteredUnitRights);
         }
 
+        private IEnumerable<int> GetRightsToCopy<TObject, TRight, TRole>(
+            IEnumerable<IRight<TObject, TRight, TRole>> fromUserRights,
+            IEnumerable<IRight<TObject, TRight, TRole>> toUserRights, ISet<int> requestedIds)
+            where TRight : Entity, IRight<TObject, TRight, TRole>, IHasId
+            where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
+            where TObject : HasRightsEntity<TObject, TRight, TRole>, IOwnedByOrganization
+        {
+            return new HashSet<int>();
+        }
+
         private ISet<int> GetRightsToCopy<TObject, TRight, TRole>(IEnumerable<IRight<TObject, TRight, TRole>> oldRights, ISet<int> roleIdsToCopy)
-            where TRight : Entity, IRight<TObject, TRight, TRole>
+            where TRight : Entity, IRight<TObject, TRight, TRole>, IHasId
             where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
             where TObject : HasRightsEntity<TObject, TRight, TRole>, IOwnedByOrganization
         {
