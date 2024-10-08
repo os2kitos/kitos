@@ -176,9 +176,14 @@ namespace Core.ApplicationServices.Users.Write
 
                         return _userService.GetUserInOrganization(organizationUuid, toUserUuid)
                             .Bind(CanModifyUser)
-                            .Match(
-                                toUser => mutateAction(fromUser.Id, toUser.Id, orgDbId,
-                                    parameters),
+                            .Match(toUser =>
+                                {
+                                    return FilterOutExistingRights(toUser, orgDbId, parameters)
+                                        .Match(
+                                            filteredRights => mutateAction(fromUser.Id, toUser.Id,
+                                                orgDbId, filteredRights),
+                                            error => error);
+                                },
                                 error => error);
                     },
                     error => error

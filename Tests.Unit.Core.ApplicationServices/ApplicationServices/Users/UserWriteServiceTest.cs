@@ -334,12 +334,13 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
             ExpectModifyPermissionsForUserReturns(toUser, true);
             _entityIdentityResolverMock.Setup(_ => _.ResolveDbId<Organization>(org.Uuid)).Returns(org.Id);
+            ExpectGetUserRightsReturnsNothing(toUser, org);
 
             //Act
             _ = _sut.TransferUserRights(org.Uuid, fromUser.Uuid, toUser.Uuid, updateParameters);
 
             //Assert
-            _userRightsServiceMock.Verify(x => x.TransferRights(fromUser.Id, toUser.Id, org.Id, updateParameters));
+            _userRightsServiceMock.Verify(x => x.TransferRights(fromUser.Id, toUser.Id, org.Id, It.IsAny<UserRightsChangeParameters>()));
         }
 
         [Fact]
