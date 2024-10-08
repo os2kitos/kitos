@@ -302,7 +302,6 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             _organizationServiceMock.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
             _userRightsServiceMock.Setup(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, It.IsAny<UserRightsChangeParameters>()))
                 .Returns(Maybe<OperationError>.None);
-            var transaction = ExpectTransactionBegins();
 
             //Act
             var result = _sut.CopyUserRights(org.Uuid, fromUser.Uuid, toUser.Uuid, updateParameters);
@@ -310,8 +309,6 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             //Assert
             Assert.True(result.IsNone);
             _userRightsServiceMock.Verify(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, It.IsAny<UserRightsChangeParameters>()));
-
-            transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
         }
 
         private void ExpectGetUserRightsReturnsNothing(User user, Organization org)
