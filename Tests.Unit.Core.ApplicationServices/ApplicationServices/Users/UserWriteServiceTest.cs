@@ -296,7 +296,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var updateParameters = A<UserRightsChangeParameters>();
             ExpectGetUserInOrganizationReturns(org.Uuid, fromUser.Uuid, fromUser);
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
-            _entityIdentityResolverMock.Setup(_ => _.ResolveDbId<Organization>(org.Uuid)).Returns(org.Id);
+            ExpectResolveIdReturns(org.Uuid, org.Id);
             ExpectModifyPermissionsForUserReturns(toUser, true);
             ExpectGetUserRightsReturnsNothing(toUser, org);
             _organizationServiceMock.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
@@ -333,7 +333,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetUserInOrganizationReturns(org.Uuid, fromUser.Uuid, fromUser);
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
             ExpectModifyPermissionsForUserReturns(toUser, true);
-            _entityIdentityResolverMock.Setup(_ => _.ResolveDbId<Organization>(org.Uuid)).Returns(org.Id);
+            ExpectResolveIdReturns(org.Uuid, org.Id);
             ExpectGetUserRightsReturnsNothing(toUser, org);
 
             //Act
@@ -354,7 +354,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetUserInOrganizationReturns(org.Uuid, fromUser.Uuid, fromUser);
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
             ExpectModifyPermissionsForUserReturns(toUser, true);
-            _entityIdentityResolverMock.Setup(_ => _.ResolveDbId<Organization>(org.Uuid)).Returns(Maybe<int>.None);
+            ExpectResolveIdReturns(org.Uuid, Maybe<int>.None);
 
             //Act
             var result = _sut.TransferUserRights(org.Uuid, fromUser.Uuid, toUser.Uuid, updateParameters);
