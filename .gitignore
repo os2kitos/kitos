@@ -196,3 +196,6 @@ Database/kitosdb_log.ldf
 
 # tmp folder from protractor beautiful reporter
 tmp/
+
+# Jetbrains IDE (Rider)
+.idea/
