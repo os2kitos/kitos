@@ -164,18 +164,9 @@ namespace Core.ApplicationServices.Users.Write
         public Maybe<OperationError> TransferUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid,
             UserRightsChangeParameters parameters)
         {
-            using var transaction = _transactionManager.Begin();
-            var maybeOperationError = CollectUsersAndMutateRoles(_userRightsService.TransferRights, organizationUuid, fromUserUuid, toUserUuid, parameters);
-            if (maybeOperationError.HasValue)
-            {
-                transaction.Rollback();
-                return maybeOperationError.Value;
-            }
-            transaction.Commit();
-            return Maybe<OperationError>.None;
-        }
+            return CollectUsersAndMutateRoles(_userRightsService.TransferRights, organizationUuid, fromUserUuid, toUserUuid, parameters);}
 
-        private Maybe<OperationError> CollectUsersAndMutateRoles(Func<int, int, int, UserRightsChangeParameters, Maybe<OperationError>> mutateAction,
+            private Maybe<OperationError> CollectUsersAndMutateRoles(Func<int, int, int, UserRightsChangeParameters, Maybe<OperationError>> mutateAction,
             Guid organizationUuid, Guid fromUserUuid,
             Guid toUserUuid,
             UserRightsChangeParameters parameters)
@@ -188,6 +179,7 @@ namespace Core.ApplicationServices.Users.Write
                         {
                             return fromUserResult.Error;
                         }
+
                         var fromUser = fromUserResult.Value;
 
                         return _userService.GetUserInOrganization(organizationUuid, toUserUuid)
