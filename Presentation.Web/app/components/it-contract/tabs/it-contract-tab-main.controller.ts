@@ -94,6 +94,8 @@
                 $scope.showProcurementStrategySelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementStrategy);
                 $scope.showProcurementInitiated = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementInitiated);
                 $scope.isContractIdEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.contractId);
+                $scope.isContractTemplateEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.template);
+                $scope.isCritialityEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.criticality);
                 $scope.isContractTypeEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.contractType);
                 $scope.isPurchaseFormEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.purchaseForm);
                 $scope.isExternalSignerEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.externalSigner);
