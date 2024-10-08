@@ -174,7 +174,7 @@ namespace Core.ApplicationServices.Rights
         {
             if (fromUserId == toUserId)
             {
-                return Maybe<OperationError>.None;
+                return new OperationError("Tried to copy roles from the user to itself", OperationFailure.Conflict);
             }
             return MutateUserRights(
                 fromUserId,
@@ -184,10 +184,10 @@ namespace Core.ApplicationServices.Rights
                     (
                         context.organization,
                         toUserId,
-                        context.dprRights.Where(right => parameters.DataProcessingRegistrationRightIds.Contains(right.Id)).ToList(),
-                        context.contractRights.Where(right => parameters.ContractRightIds.Contains(right.Id)).ToList(),
-                        context.systemRights.Where(right => parameters.SystemRightIds.Contains(right.Id)).ToList(),
-                        context.organizationUnitRights.Where(right => parameters.OrganizationUnitRightsIds.Contains(right.Id)).ToList(),
+                        context.dprRights.Where(right => parameters.DataProcessingRegistrationRightIds.Contains(right.RoleId)).ToList(),
+                        context.contractRights.Where(right => parameters.ContractRightIds.Contains(right.RoleId)).ToList(),
+                        context.systemRights.Where(right => parameters.SystemRightIds.Contains(right.RoleId)).ToList(),
+                        context.organizationUnitRights.Where(right => parameters.OrganizationUnitRightsIds.Contains(right.RoleId)).ToList(),
                         context.rolesInOrganization.Where(role => parameters.AdministrativeAccessRoles.Contains(role)).ToList()
                     )
             );
@@ -549,7 +549,7 @@ namespace Core.ApplicationServices.Rights
                         typeof(TRight).Name, right.RoleId, right.Object.GetType().Name, right.Object.Id, toUserId, organization.Id, assignResult.Error.ToString()
                     );
                     {
-                        return new OperationError($"Failed to assign role of type {typeof(TRight).Name} with role {right.RoleId}:{assignResult.Error}", assignResult.Error.FailureType);
+                        return assignResult.Error;
                     }
                 }
             }
