@@ -160,7 +160,12 @@ namespace Core.ApplicationServices.Users.Write
             return Maybe<OperationError>.None;
         }
 
-
+        public Maybe<OperationError> TransferUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid,
+            UserRightsChangeParameters parameters)
+        {
+            return CollectUsersAndMutateRoles(_userRightsService.TransferRights, organizationUuid, fromUserUuid,
+                toUserUuid, parameters);
+        }
 
         private Maybe<OperationError> CollectUsersAndMutateRoles(Func<int, int, int, UserRightsChangeParameters, Maybe<OperationError>> mutateAction,
             Guid organizationUuid, Guid fromUserUuid,
@@ -189,7 +194,7 @@ namespace Core.ApplicationServices.Users.Write
                 );
         }
 
-        rivate Result<UserRightsChangeParameters, OperationError> FilterOutExistingRights(User user, Organization organization, UserRightsChangeParameters request)
+        private Result<UserRightsChangeParameters, OperationError> FilterOutExistingRights(User user, Organization organization, UserRightsChangeParameters request)
         {
             var existingRightsResult = _userRightsService.GetUserRights(user.Id, organization.Id);
             if (existingRightsResult.Failed) return existingRightsResult.Error;

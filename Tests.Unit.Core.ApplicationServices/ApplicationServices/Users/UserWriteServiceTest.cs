@@ -299,7 +299,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             _entityIdentityResolverMock.Setup(_ => _.ResolveDbId<Organization>(org.Uuid)).Returns(org.Id);
             ExpectModifyPermissionsForUserReturns(toUser, true);
             ExpectGetUserRightsReturnsNothing(toUser, org);
-
+            _organizationServiceMock.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
             _userRightsServiceMock.Setup(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, It.IsAny<UserRightsChangeParameters>()))
                 .Returns(Maybe<OperationError>.None);
             var transaction = ExpectTransactionBegins();
