@@ -108,7 +108,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var user = await CreateUserAsync(organization.Uuid);
 
             var response = await UsersV2Helper.CopyRoles(organization.Uuid, user.Uuid, user.Uuid,
-                A<CopyUserRightsRequestDTO>());
+                A<MutateUserRightsRequestDTO>());
 
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         }
