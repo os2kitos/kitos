@@ -133,7 +133,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var organization = await CreateOrganizationAsync();
             var fromUser = await CreateUserAsync(organization.Uuid);
             var toUser = await CreateUserAsync(organization.Uuid);
-            var request = A<CopyUserRightsRequestDTO>();
+            var request = A<MutateUserRightsRequestDTO>();
             await UsersV2Helper.CopyRoles(organization.Uuid, fromUser.Uuid, toUser.Uuid, request);
 
             var repeatedRequestResult =
