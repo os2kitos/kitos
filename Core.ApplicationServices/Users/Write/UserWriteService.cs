@@ -127,47 +127,46 @@ namespace Core.ApplicationServices.Users.Write
         public Maybe<OperationError> CopyUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid,
             UserRightsChangeParameters parameters)
         {
-            var org = _organizationService.GetOrganization(organizationUuid);
-            if (org.Failed)
-            {
-                return org.Error;
-            }
-
-            var fromUser = _userService.GetUserInOrganization(organizationUuid, fromUserUuid);
-            if (fromUser.Failed)
-            {
-                return fromUser.Error;
-            }
-
-            using var transactionManager = _transactionManager.Begin();
-            var copyResult = _userService.GetUserInOrganization(organizationUuid, toUserUuid)
-                .Bind(CanModifyUser)
-                .Match(toUser =>
+            return ResolveOrganizationUuidToId(organizationUuid)
+                .Match(orgDbId =>
+                {
+                    var fromUser = _userService.GetUserInOrganization(organizationUuid, fromUserUuid);
+                    if (fromUser.Failed)
                     {
-                        return FilterOutExistingRights(toUser, org.Value, parameters)
-                            .Match(
-                                filteredRights => _userRightsService.CopyRights(fromUser.Value.Id, toUser.Id,
-                                    org.Value.Id, filteredRights),
-                                error => error);
-                    }, 
+                        return fromUser.Error;
+                    }
+
+                    using var transactionManager = _transactionManager.Begin();
+                    var copyResult = _userService.GetUserInOrganization(organizationUuid, toUserUuid)
+                        .Bind(CanModifyUser)
+                        .Match(toUser =>
+                            {
+                                return FilterOutExistingRights(toUser, orgDbId, parameters)
+                                    .Match(
+                                        filteredRights => _userRightsService.CopyRights(fromUser.Value.Id, toUser.Id,
+                                            orgDbId, filteredRights),
+                                        error => error);
+                            }, 
+                            error => error);
+                    if (copyResult.HasValue)
+                    {
+                        transactionManager.Rollback();
+                        return copyResult.Value;
+                    }
+                    transactionManager.Commit();
+                    return Maybe<OperationError>.None;
+                },
                     error => error);
-            if (copyResult.HasValue)
-            {
-                transactionManager.Rollback();
-                return copyResult.Value;
-            }
-            transactionManager.Commit();
-            return Maybe<OperationError>.None;
+
+            
         }
 
         public Maybe<OperationError> TransferUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid,
             UserRightsChangeParameters parameters)
         {
-            return CollectUsersAndMutateRoles(_userRightsService.TransferRights, organizationUuid, fromUserUuid,
-                toUserUuid, parameters);
-        }
+            return CollectUsersAndMutateRoles(_userRightsService.TransferRights, organizationUuid, fromUserUuid, toUserUuid, parameters);}
 
-        private Maybe<OperationError> CollectUsersAndMutateRoles(Func<int, int, int, UserRightsChangeParameters, Maybe<OperationError>> mutateAction,
+            private Maybe<OperationError> CollectUsersAndMutateRoles(Func<int, int, int, UserRightsChangeParameters, Maybe<OperationError>> mutateAction,
             Guid organizationUuid, Guid fromUserUuid,
             Guid toUserUuid,
             UserRightsChangeParameters parameters)
@@ -194,9 +193,9 @@ namespace Core.ApplicationServices.Users.Write
                 );
         }
 
-        private Result<UserRightsChangeParameters, OperationError> FilterOutExistingRights(User user, Organization organization, UserRightsChangeParameters request)
+        private Result<UserRightsChangeParameters, OperationError> FilterOutExistingRights(User user, int organizationDbId, UserRightsChangeParameters request)
         {
-            var existingRightsResult = _userRightsService.GetUserRights(user.Id, organization.Id);
+            var existingRightsResult = _userRightsService.GetUserRights(user.Id, organizationDbId);
             if (existingRightsResult.Failed) return existingRightsResult.Error;
             var existingRights = existingRightsResult.Value;
             var filteredUnitRights = GetRightsToCopy(existingRights.OrganizationUnitRights, request.OrganizationUnitRightsIds);
