@@ -136,8 +136,7 @@ namespace Core.ApplicationServices.Users.Write
                         return fromUser.Error;
                     }
 
-                    using var transactionManager = _transactionManager.Begin();
-                    var copyResult = _userService.GetUserInOrganization(organizationUuid, toUserUuid)
+                    return _userService.GetUserInOrganization(organizationUuid, toUserUuid)
                         .Bind(CanModifyUser)
                         .Match(toUser =>
                             {
@@ -148,13 +147,6 @@ namespace Core.ApplicationServices.Users.Write
                                         error => error);
                             }, 
                             error => error);
-                    if (copyResult.HasValue)
-                    {
-                        transactionManager.Rollback();
-                        return copyResult.Value;
-                    }
-                    transactionManager.Commit();
-                    return Maybe<OperationError>.None;
                 },
                     error => error);
 
@@ -166,7 +158,7 @@ namespace Core.ApplicationServices.Users.Write
         {
             return CollectUsersAndMutateRoles(_userRightsService.TransferRights, organizationUuid, fromUserUuid, toUserUuid, parameters);}
 
-            private Maybe<OperationError> CollectUsersAndMutateRoles(Func<int, int, int, UserRightsChangeParameters, Maybe<OperationError>> mutateAction,
+        private Maybe<OperationError> CollectUsersAndMutateRoles(Func<int, int, int, UserRightsChangeParameters, Maybe<OperationError>> mutateAction,
             Guid organizationUuid, Guid fromUserUuid,
             Guid toUserUuid,
             UserRightsChangeParameters parameters)
