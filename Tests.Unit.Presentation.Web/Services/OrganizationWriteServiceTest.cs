@@ -425,6 +425,27 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
+        public void Update_Organization_Only_Checks_Cvr_Modify_Permission_If_Cvr_Has_Change()
+        {
+            var org = CreateOrganization();
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
+            var updateParams = new OrganizationUpdateParameters()
+            {
+                Cvr = OptionalValueChange<Maybe<string>>.None,
+                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
+            };
+
+            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+
+            Assert.True(result.Ok);
+            Assert.Equal(updateParams.Name.NewValue, result.Value.Name);
+            Assert.Equal(org.Cvr, result.Value.Cvr);
+        }
+
+        [Fact]
         public void Update_Organization_Returns_Not_Found_If_No_Org()
         {
             var org = CreateOrganization();

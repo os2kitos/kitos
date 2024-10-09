@@ -111,7 +111,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
     private Result<Organization, OperationError> WithModifyCvrAccessIfRequired(Organization organization,
         OrganizationUpdateParameters parameters)
     {
-        //todo return true right away if !params.haschange for cvr
+        if (!parameters.Cvr.HasChange) return organization;
         return _organizationService.CanActiveUserModifyCvr(organization.Uuid)
             .Match(canModifyCvr => canModifyCvr
                 ? Result<Organization, OperationError>.Success(organization)
