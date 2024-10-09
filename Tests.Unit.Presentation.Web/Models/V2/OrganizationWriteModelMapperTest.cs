@@ -27,6 +27,20 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Fact]
+        public void Can_Map_Organization_Update_Params()
+        {
+            var dto = new OrganizationUpdateRequestDTO()
+            {
+                Cvr = A<string>(),
+                Name = A<string>()
+            };
+
+            var result = _sut.ToOrganizationUpdateParameters(dto);
+            AssertParamHasValidChange(result.Cvr, dto.Cvr);
+            AssertParamHasValidChange(result.Name, dto.Name);
+        }
+
+        [Fact]
         public void Can_Map_Master_Data_Update_Params()
         {
             var dto = new OrganizationMasterDataRequestDTO()

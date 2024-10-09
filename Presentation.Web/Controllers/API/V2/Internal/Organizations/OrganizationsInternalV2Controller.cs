@@ -5,7 +5,6 @@ using System.Web.Http;
 using Core.ApplicationServices.Organizations.Write;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
-using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
@@ -41,6 +40,21 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         {
             return _organizationService.GetPermissions(organizationUuid)
                 .Select(_organizationResponseMapper.ToPermissionsDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpPatch]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult UpdateOrganization([FromUri][NonEmptyGuid] Guid organizationUuid, OrganizationUpdateRequestDTO requestDto)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var updateParameters = _organizationWriteModelMapper.ToOrganizationUpdateParameters(requestDto);
+            return _organizationWriteService.UpdateOrganization(organizationUuid, updateParameters)
+                .Select(_organizationResponseMapper.ToMasterDataDTO)
                 .Match(Ok, FromOperationError);
         }
 
