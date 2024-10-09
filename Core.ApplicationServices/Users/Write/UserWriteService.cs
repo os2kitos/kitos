@@ -15,7 +15,6 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainServices.GDPR;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 
