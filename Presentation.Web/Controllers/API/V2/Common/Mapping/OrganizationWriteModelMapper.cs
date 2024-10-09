@@ -56,7 +56,7 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
 
     public OrganizationUpdateParameters ToOrganizationUpdateParameters(OrganizationUpdateRequestDTO dto)
     {
-        var rule = CreateChangeRule<OrganizationUpdateRequestDTO>(true);
+        var rule = CreateChangeRule<OrganizationUpdateRequestDTO>(false);
 
         return new()
         {
