@@ -383,6 +383,43 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(updateParams.Name.NewValue, value.Name);
         }
 
+        [Fact]
+        public void Update_Organization_Returns_Forbidden_If_Unauthorized()
+        {
+            var org = CreateOrganization();
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(false);
+            var updateParams = new OrganizationUpdateParameters()
+            {
+                Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
+                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
+            };
+
+            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Update_Organization_Returns_Not_Found_If_No_Org()
+        {
+            var org = CreateOrganization();
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound));
+            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            var updateParams = new OrganizationUpdateParameters()
+            {
+                Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
+                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
+            };
+
+            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
         public enum RoleType
         {
             ContactPerson,
