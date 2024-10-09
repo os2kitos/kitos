@@ -298,6 +298,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
             ExpectResolveIdReturns(org.Uuid, org.Id);
             ExpectModifyPermissionsForUserReturns(toUser, true);
+            ExpectGetUserRightsReturnsNothing(fromUser, org);
             ExpectGetUserRightsReturnsNothing(toUser, org);
             _organizationServiceMock.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
             _userRightsServiceMock.Setup(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, It.IsAny<UserRightsChangeParameters>()))
@@ -331,6 +332,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
             ExpectModifyPermissionsForUserReturns(toUser, true);
             ExpectResolveIdReturns(org.Uuid, org.Id);
+            ExpectGetUserRightsReturnsNothing(fromUser, org);
             ExpectGetUserRightsReturnsNothing(toUser, org);
 
             //Act

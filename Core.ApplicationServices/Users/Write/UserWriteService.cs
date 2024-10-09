@@ -198,13 +198,15 @@ namespace Core.ApplicationServices.Users.Write
                 filteredItSystemRights, filteredContractRights, filteredUnitRights);
         }
 
-        private IEnumerable<int> GetRightsToCopy<TRight, TObject, TRole>(IEnumerable<TRight> fromRights, IEnumerable<TRight> toRights, ISet<int> requestIds)
+        private IEnumerable<int> GetRightsToCopy<TRight, TObject, TRole>(IEnumerable<TRight> fromUserRights, IEnumerable<TRight> toUserRights, ISet<int> requestIds)
             where TRight : Entity, IRight<TObject, TRight, TRole>, IHasId
             where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
             where TObject : HasRightsEntity<TObject, TRight, TRole>, IOwnedByOrganization
         {
-            return fromRights
-                .Where(right => !toRights.Any(r => r.RoleId == right.RoleId && right.Object.Id == r.Object.Id))
+            ISet<(int, int)> toUserRoleAndObjectIdPairs =
+                toUserRights.Select(right => (right.RoleId, right.Object.Id)).ToHashSet();
+            return fromUserRights
+                .Where(right => !toUserRoleAndObjectIdPairs.Contains((right.RoleId, right.Object.Id)))
                 .Select(right => right.Id)
                 .Intersect(requestIds);
         }
