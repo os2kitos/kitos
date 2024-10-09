@@ -45,7 +45,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
     {
         using var transaction = _transactionManager.Begin();
         var result = _organizationService.GetOrganization(organizationUuid)
-            .Bind(organization => Update(organization, parameters));
+            .Bind(organization => UpdateMasterDataIfWriteAccess(organization, parameters));
 
         if (result.Failed)
         {
@@ -57,10 +57,10 @@ public class OrganizationWriteService : IOrganizationWriteService{
         return result;
     }
 
-    private Result<Organization, OperationError> Update(Organization organization, OrganizationMasterDataUpdateParameters parameters)
+    private Result<Organization, OperationError> UpdateMasterDataIfWriteAccess(Organization organization, OrganizationMasterDataUpdateParameters parameters)
     {
         var result = WithWriteAccess(organization)
-            .Bind(organizationWithWriteAccess => PerformUpdates(organizationWithWriteAccess, parameters));
+            .Bind(organizationWithWriteAccess => PerformMasterDataUpdates(organizationWithWriteAccess, parameters));
 
         if (result.Ok)
         {
@@ -70,12 +70,49 @@ public class OrganizationWriteService : IOrganizationWriteService{
         return result;
     }
 
+    public Result<Organization, OperationError> UpdateOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
+    {
+        using var transaction = _transactionManager.Begin();
+        var result = _organizationService.GetOrganization(organizationUuid)
+            .Bind(organization => UpdateOrganizationIfWriteAccess(organization, parameters));
+
+        if (result.Failed)
+        {
+            transaction.Rollback();
+            return result;
+        }
+
+        transaction.Commit();
+        return result;
+
+    }
+
+    private Result<Organization, OperationError> UpdateOrganizationIfWriteAccess(Organization organization,
+        OrganizationUpdateParameters parameters)
+    {
+        var result = WithWriteAccess(organization)
+            .Bind(organizationWithWriteAccess => PerformOrganizationUpdates(organizationWithWriteAccess, parameters));
+        
+        if (result.Ok)
+        {
+            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
+            _repository.Update(result.Value);
+        }
+        return result;
+    }
+
+    private Result<Organization, OperationError> PerformOrganizationUpdates(Organization organization, OrganizationUpdateParameters parameters)
+    {
+        return organization.WithOptionalUpdate(parameters.Cvr, UpdateOrganizationCvr)
+            .Bind(org => org.WithOptionalUpdate(parameters.Name, UpdateOrganizationName));
+    }
+
     private Result<Organization, OperationError> WithWriteAccess(Organization org)
     {
         return _authorizationContext.AllowModify(org) ? org : new OperationError(OperationFailure.Forbidden);
     }
 
-    private Result<Organization, OperationError> PerformUpdates(Organization organization, OrganizationMasterDataUpdateParameters parameters)
+    private Result<Organization, OperationError> PerformMasterDataUpdates(Organization organization, OrganizationMasterDataUpdateParameters parameters)
     {
         return organization
             .WithOptionalUpdate(parameters.Address, UpdateOrganizationAddress)
@@ -106,6 +143,12 @@ public class OrganizationWriteService : IOrganizationWriteService{
         Maybe<string> phone)
     {
         organization.Phone = phone.HasValue ? phone.Value : null;
+        return organization;
+    }
+
+    private Result<Organization, OperationError> UpdateOrganizationName(Organization organization, Maybe<string> name)
+    {
+        organization.Name = name.HasValue ? name.Value : null;
         return organization;
     }
 

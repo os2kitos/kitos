@@ -16,6 +16,7 @@ using Core.DomainServices.Generic;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
 using Core.DomainModel;
 using Core.DomainServices;
+using Tests.Unit.Presentation.Web.Extensions;
 
 namespace Tests.Unit.Presentation.Web.Services
 {
@@ -359,6 +360,27 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Failed);
             var error = result.Error;
             Assert.Equal(OperationFailure.BadInput, error.FailureType);
+        }
+
+        [Fact]
+        public void Can_Update_Organization_Name_And_Cvr()
+        {
+            var org = CreateOrganization();
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
+            var updateParams = new OrganizationUpdateParameters()
+            {
+                Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
+                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
+            };
+
+            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+
+            Assert.True(result.Ok);
+            var value = result.Value;
+            Assert.Equal(updateParams.Cvr.NewValue, value.Cvr);
+            Assert.Equal(updateParams.Name.NewValue, value.Name);
         }
 
         public enum RoleType
