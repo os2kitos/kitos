@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Web.Http.Results;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
 using Moq;

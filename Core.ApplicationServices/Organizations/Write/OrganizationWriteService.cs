@@ -60,7 +60,8 @@ public class OrganizationWriteService : IOrganizationWriteService{
     private Result<Organization, OperationError> UpdateMasterDataIfWriteAccess(Organization organization, OrganizationMasterDataUpdateParameters parameters)
     {
         var result = WithWriteAccess(organization)
-            .Bind(organizationWithWriteAccess => PerformMasterDataUpdates(organizationWithWriteAccess, parameters));
+            .Bind(organizationWithWriteAccess => WithModifyCvrAccessIfRequired(organizationWithWriteAccess, parameters))
+            .Bind(organizationWithConfirmedAccess => PerformMasterDataUpdates(organizationWithConfirmedAccess, parameters));
 
         if (result.Ok)
         {
@@ -92,7 +93,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
     {
         var result = WithWriteAccess(organization)
             .Bind(organizationWithWriteAccess => WithModifyCvrAccessIfRequired(organizationWithWriteAccess, parameters))
-            .Bind(organizationWithWriteAccess => PerformOrganizationUpdates(organizationWithWriteAccess, parameters));
+            .Bind(organizationWithConfirmedAccess => PerformOrganizationUpdates(organizationWithConfirmedAccess, parameters));
         
         if (result.Ok)
         {
@@ -109,7 +110,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
     }
 
     private Result<Organization, OperationError> WithModifyCvrAccessIfRequired(Organization organization,
-        OrganizationUpdateParameters parameters)
+        OrganizationCvrUpdateParameter parameters)
     {
         if (!parameters.Cvr.HasChange) return organization;
         return _organizationService.CanActiveUserModifyCvr(organization.Uuid)

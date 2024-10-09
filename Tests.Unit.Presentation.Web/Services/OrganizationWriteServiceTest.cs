@@ -106,6 +106,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object); _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
             _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
+            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(It.IsAny<Guid>())).Returns(true);
             var newCvr = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(A<string>()));
             var newPhone = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(A<string>()));
             var newAddress = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(A<string>()));
@@ -137,6 +138,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
             _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
             _organizationService.Setup(_ => _.GetOrganization(organizationUuid, null)).Returns(organization.Object);
+            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(It.IsAny<Guid>())).Returns(true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             var updateParameters = new OrganizationMasterDataUpdateParameters()

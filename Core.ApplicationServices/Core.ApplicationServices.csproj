@@ -213,6 +213,7 @@
     <Compile Include="Model\Organizations\Write\MasterDataRoles\DataResponsibleUpdateParameters.cs" />
     <Compile Include="Model\Organizations\Write\MasterDataRoles\OrganizationMasterDataRoleUpdateParameters.cs" />
     <Compile Include="Model\Organizations\Write\MasterDataRoles\OrganizationMasterDataRolesUpdateParameters.cs" />
+    <Compile Include="Model\Organizations\Write\OrganizationCvrUpdateParameter.cs" />
     <Compile Include="Model\Organizations\Write\OrganizationUnitUpdateParameters.cs" />
     <Compile Include="Model\Organizations\Write\OrganizationMasterDataUpdateParameters.cs" />
     <Compile Include="Model\Organizations\Write\OrganizationUpdateParameters.cs" />
