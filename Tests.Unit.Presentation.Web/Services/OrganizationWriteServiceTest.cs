@@ -369,6 +369,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
             _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
+            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
             var updateParams = new OrganizationUpdateParameters()
             {
                 Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
@@ -384,11 +385,32 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Update_Organization_Returns_Forbidden_If_Unauthorized()
+        public void Update_Organization_Returns_Forbidden_If_Unauthorized_To_Modify_Cvr()
         {
             var org = CreateOrganization();
             _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
             _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
+            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(false);
+            var updateParams = new OrganizationUpdateParameters()
+            {
+                Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
+                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
+            };
+
+            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Update_Organization_Returns_Forbidden_If_Unauthorized_For_Org()
+        {
+            var org = CreateOrganization();
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(false);
             var updateParams = new OrganizationUpdateParameters()
             {

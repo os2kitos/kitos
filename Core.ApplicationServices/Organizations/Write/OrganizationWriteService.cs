@@ -91,6 +91,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
         OrganizationUpdateParameters parameters)
     {
         var result = WithWriteAccess(organization)
+            .Bind(organizationWithWriteAccess => WithModifyCvrAccessIfRequired(organizationWithWriteAccess, parameters))
             .Bind(organizationWithWriteAccess => PerformOrganizationUpdates(organizationWithWriteAccess, parameters));
         
         if (result.Ok)
@@ -105,6 +106,17 @@ public class OrganizationWriteService : IOrganizationWriteService{
     {
         return organization.WithOptionalUpdate(parameters.Cvr, UpdateOrganizationCvr)
             .Bind(org => org.WithOptionalUpdate(parameters.Name, UpdateOrganizationName));
+    }
+
+    private Result<Organization, OperationError> WithModifyCvrAccessIfRequired(Organization organization,
+        OrganizationUpdateParameters parameters)
+    {
+        //todo return true right away if !params.haschange for cvr
+        return _organizationService.CanActiveUserModifyCvr(organization.Uuid)
+            .Match(canModifyCvr => canModifyCvr
+                ? Result<Organization, OperationError>.Success(organization)
+                : new OperationError("User is not authorized to modify organization CVR", OperationFailure.Forbidden),
+                error => error);
     }
 
     private Result<Organization, OperationError> WithWriteAccess(Organization org)
