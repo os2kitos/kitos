@@ -55,5 +55,25 @@ namespace Core.DomainModel
         public bool IsEnabled { get; set; }
         public int Priority { get; set; }
         public Guid Uuid { get; set; }
+
+        public void UpdateLocalOptionValues<TLocal>(LocalOptionEntity<TLocal>? localOption)
+        {
+            if (localOption == null)
+            {
+                ResetLocalOptionValues();
+                return;
+            }
+
+            IsLocallyAvailable = localOption.IsActive;
+            if (!string.IsNullOrEmpty(localOption.Description))
+            {
+                Description = localOption.Description;
+            }
+        }
+
+        private void ResetLocalOptionValues()
+        {
+            IsLocallyAvailable = false;
+        }
     }
 }
