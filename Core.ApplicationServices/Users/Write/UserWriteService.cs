@@ -204,7 +204,7 @@ namespace Core.ApplicationServices.Users.Write
             where TObject : HasRightsEntity<TObject, TRight, TRole>, IOwnedByOrganization
         {
             return fromRights
-                .Where(right => !toRights.Any(r => r.RoleId == right.RoleId))
+                .Where(right => !toRights.Any(r => r.RoleId == right.RoleId && right.Object.Id == r.Object.Id))
                 .Select(right => right.Id)
                 .Intersect(requestIds);
         }
