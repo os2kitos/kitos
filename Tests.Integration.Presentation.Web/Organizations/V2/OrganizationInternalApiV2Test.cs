@@ -264,6 +264,36 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             await GetMasterDataRolesAndAssertNotNull(organization.Uuid);
         }
 
+        [Fact]
+        public async Task Can_Update_Organization()
+        {
+            var organization = await CreateTestOrganization();
+            var requestDto = new OrganizationUpdateRequestDTO()
+            {
+                Cvr = GetCvr(),
+                Name = A<string>()
+            };
+
+            var response = await OrganizationInternalV2Helper.PatchOrganization(organization.Uuid, requestDto);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Update_Organization_Returns_Bad_Request_If_Invalid_Uuid()
+        {
+            var invalidUuid = new Guid();
+            var requestDto = new OrganizationUpdateRequestDTO()
+            {
+                Cvr = GetCvr(),
+                Name = A<string>()
+            };
+
+            var response = await OrganizationInternalV2Helper.PatchOrganization(invalidUuid, requestDto);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
         private async Task GetMasterDataRolesAndAssertNotNull(Guid orgUuid)
         {
             var getResponse = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(orgUuid);
