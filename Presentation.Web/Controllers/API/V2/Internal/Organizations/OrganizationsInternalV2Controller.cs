@@ -44,6 +44,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [HttpPatch]
+        [Route("patch")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -54,7 +55,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 
             var updateParameters = _organizationWriteModelMapper.ToOrganizationUpdateParameters(requestDto);
             return _organizationWriteService.UpdateOrganization(organizationUuid, updateParameters)
-                .Select(_organizationResponseMapper.ToMasterDataDTO)
+                .Select(_organizationResponseMapper.ToOrganizationDTO)
                 .Match(Ok, FromOperationError);
         }
 
