@@ -113,10 +113,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult CopyRoles([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid fromUserUuid, [NonEmptyGuid] Guid toUserUuid, [FromBody] CopyUserRightsRequestDTO request)
+        public IHttpActionResult CopyRoles([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid fromUserUuid, [NonEmptyGuid] Guid toUserUuid, [FromBody] MutateUserRightsRequestDTO request)
         {
             var parameters = MapCopyRightsDTOToParameters(request);
             return _userWriteService.CopyUserRights(organizationUuid, fromUserUuid, toUserUuid, parameters)
+                .Match(FromOperationError, Ok);
+        }
+
+        [Route("{fromUserUuid}/transfer-roles/{toUserUuid}")]
+        [HttpPost]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult TransferRoles([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid fromUserUuid, [NonEmptyGuid] Guid toUserUuid, [FromBody] MutateUserRightsRequestDTO request)
+        {
+            var parameters = MapCopyRightsDTOToParameters(request);
+            return _userWriteService.TransferUserRights(organizationUuid, fromUserUuid, toUserUuid, parameters)
                 .Match(FromOperationError, Ok);
         }
 
@@ -146,7 +159,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
 
         }
 
-        private UserRightsChangeParameters MapCopyRightsDTOToParameters(CopyUserRightsRequestDTO request)
+        private UserRightsChangeParameters MapCopyRightsDTOToParameters(MutateUserRightsRequestDTO request)
         {
             var unitRights = MapUserRightsDTOToRoleIdSet(request.UnitRights);
             var systemRights = MapUserRightsDTOToRoleIdSet(request.SystemRights);
@@ -155,7 +168,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
             return new UserRightsChangeParameters(new List<OrganizationRole>(), dprRights, systemRights, contractRights, unitRights);
         }
 
-        private IEnumerable<int> MapUserRightsDTOToRoleIdSet(IEnumerable<CopyRightRequestDTO> rights)
+        private IEnumerable<int> MapUserRightsDTOToRoleIdSet(IEnumerable<MutateRightRequestDTO> rights)
         {
             return rights.Select(right => right.RoleId);
         }

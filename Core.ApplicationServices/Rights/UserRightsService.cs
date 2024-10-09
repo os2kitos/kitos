@@ -184,10 +184,10 @@ namespace Core.ApplicationServices.Rights
                     (
                         context.organization,
                         toUserId,
-                        context.dprRights.Where(right => parameters.DataProcessingRegistrationRightIds.Contains(right.RoleId)).ToList(),
-                        context.contractRights.Where(right => parameters.ContractRightIds.Contains(right.RoleId)).ToList(),
-                        context.systemRights.Where(right => parameters.SystemRightIds.Contains(right.RoleId)).ToList(),
-                        context.organizationUnitRights.Where(right => parameters.OrganizationUnitRightsIds.Contains(right.RoleId)).ToList(),
+                        context.dprRights.Where(right => parameters.DataProcessingRegistrationRightIds.Contains(right.Id)).ToList(),
+                        context.contractRights.Where(right => parameters.ContractRightIds.Contains(right.Id)).ToList(),
+                        context.systemRights.Where(right => parameters.SystemRightIds.Contains(right.Id)).ToList(),
+                        context.organizationUnitRights.Where(right => parameters.OrganizationUnitRightsIds.Contains(right.Id)).ToList(),
                         context.rolesInOrganization.Where(role => parameters.AdministrativeAccessRoles.Contains(role)).ToList()
                     )
             );
