@@ -8,6 +8,7 @@ using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Tests.Toolkit.Extensions;
+using Tests.Unit.Presentation.Web.Extensions;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
@@ -20,18 +21,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public OrganizationWriteModelMapperTest()
         {
             _httpRequest = new Mock<ICurrentHttpRequest>();
-            _httpRequest.Setup(x => 
-                x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
-                .Returns(GetAllInputPropertyNames<OrganizationMasterDataRequestDTO>());
             _sut = new OrganizationWriteModelMapper(_httpRequest.Object);
         }
 
         [Fact]
         public void Can_Map_Organization_Update_Params()
         {
+            ExpectHttpRequestPropertyNames<OrganizationUpdateRequestDTO>();
             var dto = new OrganizationUpdateRequestDTO()
             {
-                Cvr = A<string>(),
+                Cvr = A<string>().AsCvr(),
                 Name = A<string>()
             };
 
@@ -43,6 +42,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         [Fact]
         public void Can_Map_Master_Data_Update_Params()
         {
+            ExpectHttpRequestPropertyNames<OrganizationMasterDataRequestDTO>();
             var dto = new OrganizationMasterDataRequestDTO()
             {
                 Address = A<string>(),
@@ -62,6 +62,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         [Fact]
         public void Can_Map_Master_Data_Roles()
         {
+            ExpectHttpRequestPropertyNames<OrganizationMasterDataRolesRequestDTO>();
             var orgUuid = A<Guid>();
             var dto = new OrganizationMasterDataRolesRequestDTO()
             {
@@ -114,6 +115,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             Assert.True(parameter.HasChange && parameter.NewValue.HasValue);
             Assert.Equal(expected, parameter.NewValue.Value);
+        }
+
+        private void ExpectHttpRequestPropertyNames<T>()
+        {
+            _httpRequest.Setup(x =>
+                    x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
+                .Returns(GetAllInputPropertyNames<T>());
         }
     }
 }
