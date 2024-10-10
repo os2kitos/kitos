@@ -2,9 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Configuration;
 
-namespace Presentation.Web.Models.API.V2.Internal.Response.Organizations
+namespace Presentation.Web.Models.API.V2.Internal.Request.Organizations
 {
-    public class CustomizedUINodeResponseDTO
+    public class CustomizedUINodeRequestDTO
     {
         [Required]
         [RegexStringValidator(UIModuleConfigurationConstants.ConfigurationKeyRegex)]

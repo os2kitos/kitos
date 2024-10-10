@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Core.ApplicationServices.Model.Organizations;
-using Core.ApplicationServices.Model.UiCustomization;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.UIConfiguration;
@@ -188,23 +187,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             {
                 key = string.IsNullOrEmpty(key) ? GenerateKey() : key;
                 nodes.Add(new CustomizedUINode { Key = key, Enabled = isEnabled });
-            }
-
-            return nodes;
-        }
-
-        private UIModuleCustomizationParameters PrepareTestUiModuleCustomizationParameters(int orgId = 0, string module = "", int numberOfElements = 1, string key = "", bool isEnabled = false)
-        {
-            return new UIModuleCustomizationParameters(orgId, module, PrepareTestNodesParameters(numberOfElements, key, isEnabled));
-        }
-
-        private List<CustomUINodeParameters> PrepareTestNodesParameters(int numberOfElements = 1, string key = "", bool isEnabled = false)
-        {
-            var nodes = new List<CustomUINodeParameters>();
-            for (var i = 0; i < numberOfElements; i++)
-            {
-                key = string.IsNullOrEmpty(key) ? GenerateKey() : key;
-                nodes.Add(new CustomUINodeParameters(key, isEnabled));
             }
 
             return nodes;

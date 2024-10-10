@@ -109,11 +109,11 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
             return new()
             {
                 Module = uiModuleCustomization.Module,
-                Nodes = ToCustomizedUINodeDTOS(uiModuleCustomization.Nodes)
+                Nodes = ToCustomizedUINodeDTOs(uiModuleCustomization.Nodes)
             };
         }
 
-        private IEnumerable<CustomizedUINodeResponseDTO> ToCustomizedUINodeDTOS(ICollection<CustomizedUINode> nodes)
+        private IEnumerable<CustomizedUINodeResponseDTO> ToCustomizedUINodeDTOs(ICollection<CustomizedUINode> nodes)
         {
             return nodes.Select(ToCustomizedUINodeDTO);
         }

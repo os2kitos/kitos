@@ -70,9 +70,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var updateParameters =
-                _organizationWriteModelMapper.ToUIModuleCustomizationParameters(organizationUuid, dto);
-            var updateCustomizationErrorMaybe = _uiModuleCustomizationService.UpdateModule(updateParameters);
+            var updateParametersResult =
+                _organizationWriteModelMapper.ToUIModuleCustomizationParameters(organizationUuid, moduleName, dto);
+            if (updateParametersResult.Failed) return FromOperationError(updateParametersResult.Error);
+
+            var updateCustomizationErrorMaybe = _uiModuleCustomizationService.UpdateModule(updateParametersResult.Value);
             
             return updateCustomizationErrorMaybe.Match(
                 FromOperationError,
