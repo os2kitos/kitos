@@ -12,7 +12,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
     internal class OrganizationInternalV2Helper
     {
         private const string ApiPrefix = "api/v2/internal/organizations";
-        private const string MasterDataSuffix = "masterData";
+        private const string MasterDataSuffix = "master-data";
         private const string RolesSuffix = "roles";
 
         public static async Task<HttpResponseMessage> GetOrganizationMasterData(Guid organizationUuid)
