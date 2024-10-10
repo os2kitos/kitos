@@ -104,8 +104,8 @@ public class OrganizationWriteService : IOrganizationWriteService{
 
     private Result<Organization, OperationError> PerformOrganizationUpdates(Organization organization, OrganizationUpdateParameters parameters)
     {
-        return organization.WithOptionalUpdate(parameters.Cvr, UpdateOrganizationCvr)
-            .Bind(org => org.WithOptionalUpdate(parameters.Name, UpdateOrganizationName));
+        return organization.WithOptionalUpdate(parameters.Cvr, (org, cvr) => org.UpdateCvr(cvr))
+            .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)));
     }
 
     private Result<Organization, OperationError> WithModifyCvrAccessIfRequired(Organization organization,
@@ -127,34 +127,16 @@ public class OrganizationWriteService : IOrganizationWriteService{
     private Result<Organization, OperationError> PerformMasterDataUpdates(Organization organization, OrganizationMasterDataUpdateParameters parameters)
     {
         return organization
-            .WithOptionalUpdate(parameters.Address, UpdateOrganizationAddress)
-            .Bind(org => org.WithOptionalUpdate(parameters.Cvr, UpdateOrganizationCvr))
-            .Bind(org => org.WithOptionalUpdate(parameters.Email, UpdateOrganizationEmail))
-            .Bind(org => org.WithOptionalUpdate(parameters.Phone, UpdateOrganizationPhone));
+            .WithOptionalUpdate(parameters.Address, (org, address) => org.UpdateAddress(address))
+            .Bind(org => org.WithOptionalUpdate(parameters.Cvr, (org, cvr) => org.UpdateCvr(cvr)))
+            .Bind(org => org.WithOptionalUpdate(parameters.Email, (org, email) => org.UpdateEmail(email)))
+            .Bind(org => org.WithOptionalUpdate(parameters.Phone, (org, phone) => org.UpdatePhone(phone)));
     }
 
-    private Result<Organization, OperationError> UpdateOrganizationAddress(Organization organization,
-        Maybe<string> address)
-    {
-        organization.Adress = address.HasValue ? address.Value : null;
-        return organization;
-    }
     private Result<Organization, OperationError> UpdateOrganizationCvr(Organization organization,
         Maybe<string> cvr)
     {
         organization.Cvr = cvr.HasValue ? cvr.Value : null;
-        return organization;
-    }
-    private Result<Organization, OperationError> UpdateOrganizationEmail(Organization organization,
-        Maybe<string> email)
-    {
-        organization.Email = email.HasValue ? email.Value : null;
-        return organization;
-    }
-    private Result<Organization, OperationError> UpdateOrganizationPhone(Organization organization,
-        Maybe<string> phone)
-    {
-        organization.Phone = phone.HasValue ? phone.Value : null;
         return organization;
     }
 
