@@ -116,19 +116,6 @@ public class OrganizationWriteService : IOrganizationWriteService{
             .Bind(org => org.WithOptionalUpdate(parameters.Phone, (org, phone) => org.UpdatePhone(phone)));
     }
 
-    private Result<Organization, OperationError> UpdateOrganizationCvr(Organization organization,
-        Maybe<string> cvr)
-    {
-        organization.Cvr = cvr.HasValue ? cvr.Value : null;
-        return organization;
-    }
-
-    private Result<Organization, OperationError> UpdateOrganizationName(Organization organization, Maybe<string> name)
-    {
-        organization.Name = name.HasValue ? name.Value : null;
-        return organization;
-    }
-
     public Result<OrganizationMasterDataRoles, OperationError> GetOrCreateOrganizationMasterDataRoles(Guid organizationUuid)
     {
         using var transaction = _transactionManager.Begin();
