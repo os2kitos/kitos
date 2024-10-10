@@ -46,14 +46,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 .Match(Ok, FromOperationError);
         }
 
-        [Route("ui-config")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(int))] //todo add type here
+        [Route("ui-module-customization/{moduleName}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UIModuleCustomizationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult GetModuleUIConfig([NonEmptyGuid] Guid organizationUuid, string module)
+        public IHttpActionResult GetUIModuleCustomization([NonEmptyGuid] Guid organizationUuid, [FromUri] string moduleName)
         {
-            return _uiModuleCustomizationService.GetModuleConfigurationByOrganizationUuid(organizationUuid, module)
+            return _uiModuleCustomizationService.GetModuleCustomizationByOrganizationUuid(organizationUuid, moduleName)
              .Select(_organizationResponseMapper.ToUIModuleCustomizationResponseDTO)
              .Match(Ok, FromOperationError);
         }
