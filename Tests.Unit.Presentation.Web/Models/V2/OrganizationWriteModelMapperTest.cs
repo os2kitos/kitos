@@ -82,7 +82,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Map_UI_Module_Customization_Params_Returns_Not_Found_If_Cannot_Resolve_Org_Id()
         {
             var orgUuid = A<Guid>();
-            var expectedDbId = A<int>();
             var moduleName = A<string>();
             var dto = new UIModuleCustomizationRequestDTO()
             {
@@ -93,8 +92,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var result = _sut.ToUIModuleCustomizationParameters(orgUuid, moduleName, dto);
 
             Assert.True(result.Failed);
-            Assert.Equal(result.Error.FailureType, OperationFailure.NotFound);
-            
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         private List<CustomizedUINodeRequestDTO> PrepareTestNodes(int numberOfElements = 1, string key = "", bool isEnabled = false)

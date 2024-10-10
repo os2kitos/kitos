@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
         private const string ApiPrefix = "api/v2/internal/organizations";
         private const string MasterDataSuffix = "master-data";
         private const string RolesSuffix = "roles";
+        private const string UiCustomizationSuffix = "ui-customization";
 
         public static async Task<HttpResponseMessage> GetOrganizationMasterData(Guid organizationUuid)
         {
@@ -44,7 +46,13 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
         public static async Task<HttpResponseMessage> GetUIModuleCustomization(Guid organizationUuid, string moduleName)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/ui-customization/{moduleName}"), cookie);
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/{UiCustomizationSuffix}/{moduleName}"), cookie);
+        }
+
+        public static async Task<HttpResponseMessage> PutUIModuleCustomization(Guid organizationUuid, string moduleName, UIModuleCustomizationRequestDTO dto, Cookie cookie = null)
+        {
+            cookie ??= await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PutWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/{UiCustomizationSuffix}/{moduleName}"), cookie, dto);
         }
     }
 }
