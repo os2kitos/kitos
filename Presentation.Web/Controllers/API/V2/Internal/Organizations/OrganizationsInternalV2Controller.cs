@@ -10,7 +10,6 @@ using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
-using Presentation.Web.Models.API.V2.Internal.Request;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
@@ -48,7 +47,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [Route("ui-customization/{moduleName}")]
-        [HttpPut]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UIModuleCustomizationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -61,6 +59,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [Route("ui-customization/{moduleName}")]
+        [HttpPut]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UIModuleCustomizationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
