@@ -3,6 +3,7 @@ using System.Net;
 using Core.ApplicationServices.Organizations;
 using System.Web.Http;
 using Core.ApplicationServices.Organizations.Write;
+using Core.ApplicationServices.UIConfiguration;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
@@ -22,13 +23,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         private readonly IOrganizationWriteService _organizationWriteService;
         private readonly IOrganizationResponseMapper _organizationResponseMapper;
         private readonly IOrganizationWriteModelMapper _organizationWriteModelMapper;
+        private readonly IUIModuleCustomizationService _uiModuleCustomizationService;
 
-        public OrganizationsInternalV2Controller(IOrganizationService organizationService, IOrganizationResponseMapper organizationResponseMapper, IOrganizationWriteModelMapper organizationWriteModelMapper, IOrganizationWriteService organizationWriteService)
+        public OrganizationsInternalV2Controller(IOrganizationService organizationService, IOrganizationResponseMapper organizationResponseMapper, IOrganizationWriteModelMapper organizationWriteModelMapper, IOrganizationWriteService organizationWriteService, IUIModuleCustomizationService uiModuleCustomizationService)
         {
             _organizationService = organizationService;
             _organizationResponseMapper = organizationResponseMapper;
             _organizationWriteModelMapper = organizationWriteModelMapper;
             _organizationWriteService = organizationWriteService;
+            _uiModuleCustomizationService = uiModuleCustomizationService;
         }
 
         [Route("permissions")]
@@ -41,6 +44,18 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             return _organizationService.GetPermissions(organizationUuid)
                 .Select(_organizationResponseMapper.ToPermissionsDTO)
                 .Match(Ok, FromOperationError);
+        }
+
+        [Route("ui-config")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(int))] //todo add type here
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult GetModuleUIConfig([NonEmptyGuid] Guid organizationUuid, string module)
+        {
+            return _uiModuleCustomizationService.GetModuleConfigurationByOrganizationUuid(organizationUuid, module)
+             .Select(_organizationResponseMapper.ToUIModuleCustomizationResponseDTO)
+             .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]

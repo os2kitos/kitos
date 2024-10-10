@@ -50,6 +50,12 @@ namespace Core.ApplicationServices.UIConfiguration
                 );
         }
 
+        public Result<UIModuleCustomization, OperationError> GetModuleConfigurationByOrganizationUuid(Guid organizationUuid, string module)
+        {
+            throw new NotImplementedException();
+        }
+
+
         public Maybe<OperationError> UpdateModule(UIModuleCustomizationParameters parameters)
         {
             if(parameters == null)

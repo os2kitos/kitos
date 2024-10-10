@@ -1,5 +1,6 @@
 ﻿using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Organization;
+using Core.DomainModel.UIConfiguration;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using ContactPerson = Core.DomainModel.ContactPerson;
@@ -99,6 +100,11 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
                 Delete = permissions.Delete,
                 ModifyCvr = permissions.ModifyCvr
             };
+        }
+
+        public UIModuleCustomizationResponseDTO ToUIModuleCustomizationResponseDTO<T>(UIModuleCustomization arg)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }
