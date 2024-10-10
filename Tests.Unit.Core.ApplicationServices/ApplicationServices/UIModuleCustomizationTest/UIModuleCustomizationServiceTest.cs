@@ -167,7 +167,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             ExpectResolveUuidReturns(organizationId, orgUuid);
             ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound), orgUuid);
 
-            var result = _sut.GetModuleConfigurationForOrganization(organizationId, module);
+            var result = _sut.GetModuleCustomizationForOrganization(organizationId, module);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
@@ -183,7 +183,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             ExpectResolveUuidReturns(organizationId, orgUuid);
             ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound), orgUuid);
 
-            var result = _sut.GetModuleConfigurationForOrganization(organizationId, module);
+            var result = _sut.GetModuleCustomizationForOrganization(organizationId, module);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
@@ -199,7 +199,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             ExpectResolveUuidReturns(organizationId, orgUuid);
             ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Success(new Organization()), orgUuid);
 
-            var result = _sut.GetModuleConfigurationForOrganization(organizationId, module);
+            var result = _sut.GetModuleCustomizationForOrganization(organizationId, module);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
@@ -210,7 +210,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
         {
             var (organization, moduleObject) = SetupGetModuleCustomization();
 
-            var result = _sut.GetModuleConfigurationForOrganization(organization.Id, moduleObject.Module);
+            var result = _sut.GetModuleCustomizationForOrganization(organization.Id, moduleObject.Module);
             
             Assert.True(result.Ok);
             Assert.NotNull(result.Value);
@@ -223,7 +223,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             var (organization, moduleObject) = SetupGetModuleCustomization();
             ExpectResolveIdReturns(organization.Uuid, organization.Id);
 
-            var result = _sut.GetModuleConfigurationByOrganizationUuid(organization.Uuid, moduleObject.Module);
+            var result = _sut.GetModuleCustomizationByOrganizationUuid(organization.Uuid, moduleObject.Module);
 
             Assert.True(result.Ok);
             Assert.Equal(moduleObject, result.Value);
@@ -237,7 +237,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             ExpectResolveIdReturns(organization.Uuid, Maybe<int>.None);
 
 
-            var result = _sut.GetModuleConfigurationByOrganizationUuid(organization.Uuid, moduleObject.Module);
+            var result = _sut.GetModuleCustomizationByOrganizationUuid(organization.Uuid, moduleObject.Module);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
