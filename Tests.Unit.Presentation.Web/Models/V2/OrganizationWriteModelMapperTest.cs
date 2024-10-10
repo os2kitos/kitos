@@ -78,7 +78,24 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }
         }
 
-        //TODO also test for failing to get orgid
+        [Fact]
+        public void Map_UI_Module_Customization_Params_Returns_Not_Found_If_Cannot_Resolve_Org_Id()
+        {
+            var orgUuid = A<Guid>();
+            var expectedDbId = A<int>();
+            var moduleName = A<string>();
+            var dto = new UIModuleCustomizationRequestDTO()
+            {
+                Nodes = PrepareTestNodes(5, A<string>())
+            };
+            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(Maybe<int>.None);
+
+            var result = _sut.ToUIModuleCustomizationParameters(orgUuid, moduleName, dto);
+
+            Assert.True(result.Failed);
+            Assert.Equal(result.Error.FailureType, OperationFailure.NotFound);
+            
+        }
 
         private List<CustomizedUINodeRequestDTO> PrepareTestNodes(int numberOfElements = 1, string key = "", bool isEnabled = false)
         {
