@@ -19,7 +19,7 @@ using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
 {
-    public class UIModuleCustomizationTests : WithAutoFixture
+    public class UIModuleCustomizationServiceTest : WithAutoFixture
     {
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
@@ -27,9 +27,9 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
         private readonly Mock<IEntityIdentityResolver> _identityResolverMock;
         private readonly Mock<IUIModuleCustomizationRepository> _organizationRepositoryMock;
 
-        private readonly UIModuleCustomizationService _uiModuleCustomizationService;
+        private readonly UIModuleCustomizationService _sut;
 
-        public UIModuleCustomizationTests()
+        public UIModuleCustomizationServiceTest()
         {
             _transactionManagerMock = new Mock<ITransactionManager>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
@@ -37,7 +37,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             _identityResolverMock = new Mock<IEntityIdentityResolver>();
             _organizationRepositoryMock = new Mock<IUIModuleCustomizationRepository>();
 
-            _uiModuleCustomizationService = new UIModuleCustomizationService(
+            _sut = new UIModuleCustomizationService(
                 _transactionManagerMock.Object,
                 _userContextMock.Object,
                 _organizationServiceMock.Object,
@@ -133,7 +133,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             ExpectResolveUuidReturns(uiModule.OrganizationId, orgUuid);
             ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound), orgUuid);
             
-            var result = _uiModuleCustomizationService.UpdateModule(uiModule);
+            var result = _sut.UpdateModule(uiModule);
 
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
@@ -151,7 +151,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Success(new Organization()), orgUuid);
             ExpectHasRoleReturns(uiModule.OrganizationId, organizationRole, false);
             
-            var result = _uiModuleCustomizationService.UpdateModule(uiModule);
+            var result = _sut.UpdateModule(uiModule);
 
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
@@ -167,7 +167,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             ExpectResolveUuidReturns(organizationId, orgUuid);
             ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound), orgUuid);
 
-            var result = _uiModuleCustomizationService.GetModuleConfigurationForOrganization(organizationId, module);
+            var result = _sut.GetModuleConfigurationForOrganization(organizationId, module);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
@@ -183,7 +183,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             ExpectResolveUuidReturns(organizationId, orgUuid);
             ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound), orgUuid);
 
-            var result = _uiModuleCustomizationService.GetModuleConfigurationForOrganization(organizationId, module);
+            var result = _sut.GetModuleConfigurationForOrganization(organizationId, module);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
@@ -199,7 +199,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             ExpectResolveUuidReturns(organizationId, orgUuid);
             ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Success(new Organization()), orgUuid);
 
-            var result = _uiModuleCustomizationService.GetModuleConfigurationForOrganization(organizationId, module);
+            var result = _sut.GetModuleConfigurationForOrganization(organizationId, module);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
@@ -208,30 +208,62 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
         [Fact]
         public void GET_Returns_List_Filtered_By_Module()
         {
+            var (organization, moduleObject) = SetupGetModuleCustomization();
+
+            var result = _sut.GetModuleConfigurationForOrganization(organization.Id, moduleObject.Module);
+            
+            Assert.True(result.Ok);
+            Assert.NotNull(result.Value);
+            Assert.Equal(moduleObject, result.Value);
+        }
+
+        [Fact]
+        public void Can_Get_Module_Customization_By_Org_Uuid()
+        {
+            var (organization, moduleObject) = SetupGetModuleCustomization();
+            ExpectResolveIdReturns(organization.Uuid, organization.Id);
+
+            var result = _sut.GetModuleConfigurationByOrganizationUuid(organization.Uuid, moduleObject.Module);
+
+            Assert.True(result.Ok);
+            Assert.Equal(moduleObject, result.Value);
+        }
+
+
+        [Fact]
+        public void Get_Module_Customization_By_Org_Uuid_Returns_Not_Found_If_No_Org_Id()
+        {
+            var (organization, moduleObject) = SetupGetModuleCustomization();
+            ExpectResolveIdReturns(organization.Uuid, Maybe<int>.None);
+
+
+            var result = _sut.GetModuleConfigurationByOrganizationUuid(organization.Uuid, moduleObject.Module);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        private (Organization, UIModuleCustomization) SetupGetModuleCustomization()
+        {
             var organizationId = A<int>();
+            var orgUuid = new Guid();
             var module1 = A<string>();
             var module2 = A<string>();
             var moduleObject1 = PrepareTestUiModuleCustomization(organizationId, module1);
             var moduleObject2 = PrepareTestUiModuleCustomization(organizationId, module2);
-            var orgUuid = Guid.NewGuid();
             var organization = new Organization
             {
-                Id = organizationId, 
+                Id = organizationId,
+                Uuid = orgUuid,
                 UIModuleCustomizations = new List<UIModuleCustomization>()
                 {
                     moduleObject1,
                     moduleObject2
                 }
             };
-
             ExpectResolveUuidReturns(organizationId, orgUuid);
             ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Success(organization), orgUuid);
-
-            var result = _uiModuleCustomizationService.GetModuleConfigurationForOrganization(organizationId, module1);
-            
-            Assert.True(result.Ok);
-            Assert.NotNull(result.Value);
-            Assert.Equal(moduleObject1, result.Value);
+            return (organization, moduleObject1);
         }
 
         private UIModuleCustomization PrepareTestUiModuleCustomization(int orgId = 0, string module = "", int numberOfElements = 1, string key = "", bool isEnabled = false)
@@ -287,7 +319,12 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
         {
             _identityResolverMock.Setup(x => x.ResolveUuid<Organization>(organizationId)).Returns(uuid);
         }
-        
+
+        private void ExpectResolveIdReturns(Guid uuid, Maybe<int> dbId)
+        {
+            _identityResolverMock.Setup(x => x.ResolveDbId<Organization>(uuid)).Returns(dbId);
+        }
+
         private void ExpectTransactionBeginReturns()
         {
             var transaction = new Mock<IDatabaseTransaction>();

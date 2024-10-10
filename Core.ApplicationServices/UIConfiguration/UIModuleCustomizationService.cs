@@ -52,7 +52,9 @@ namespace Core.ApplicationServices.UIConfiguration
 
         public Result<UIModuleCustomization, OperationError> GetModuleConfigurationByOrganizationUuid(Guid organizationUuid, string module)
         {
-            throw new NotImplementedException();
+            return _identityResolver.ResolveDbId<Organization>(organizationUuid)
+                .Match(dbId => GetModuleConfigurationForOrganization(dbId, module),
+                    () => new OperationError(OperationFailure.NotFound));
         }
 
 

@@ -447,6 +447,7 @@
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationMasterDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationMasterDataRoleResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationPermissionsResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\Organizations\UIModuleCustomizationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\OrganizationUnitRoleAssignmentResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\OrganizationUnitRolesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\OrganizationRegistrationUnitResponseDTO.cs" />

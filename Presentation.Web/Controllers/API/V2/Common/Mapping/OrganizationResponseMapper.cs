@@ -102,7 +102,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
             };
         }
 
-        public UIModuleCustomizationResponseDTO ToUIModuleCustomizationResponseDTO<T>(UIModuleCustomization arg)
+        public UIModuleCustomizationResponseDTO ToUIModuleCustomizationResponseDTO(UIModuleCustomization uiModuleCustomization)
         {
             throw new System.NotImplementedException();
         }
