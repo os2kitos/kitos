@@ -10,6 +10,7 @@ using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Models.API.V2.Internal.Request;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
@@ -47,6 +48,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [Route("ui-customization/{moduleName}")]
+        [HttpPut]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UIModuleCustomizationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -56,6 +58,28 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             return _uiModuleCustomizationService.GetModuleCustomizationByOrganizationUuid(organizationUuid, moduleName)
              .Select(_organizationResponseMapper.ToUIModuleCustomizationResponseDTO)
              .Match(Ok, FromOperationError);
+        }
+
+        [Route("ui-customization/{moduleName}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UIModuleCustomizationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult PutUIModuleCustomization([NonEmptyGuid] Guid organizationUuid, [FromUri] string moduleName,
+            UIModuleCustomizationRequestDTO dto)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var updateParameters =
+                _organizationWriteModelMapper.ToUIModuleCustomizationParameters(organizationUuid, dto);
+            var updateCustomizationErrorMaybe = _uiModuleCustomizationService.UpdateModule(updateParameters);
+            
+            return updateCustomizationErrorMaybe.Match(
+                FromOperationError,
+                () => _uiModuleCustomizationService.GetModuleCustomizationByOrganizationUuid(organizationUuid, moduleName)
+                    .Select(_organizationResponseMapper.ToUIModuleCustomizationResponseDTO)
+                    .Match(Ok, FromOperationError));
+
         }
 
         [HttpPatch]
