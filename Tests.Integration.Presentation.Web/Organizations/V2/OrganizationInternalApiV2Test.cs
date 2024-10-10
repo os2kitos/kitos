@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using AutoFixture;
-using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json;
@@ -63,6 +62,24 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
+        public async Task Can_Get_UI_Customization()
+        {
+            var moduleName = "ItSystemUsages";
+            var (cookie, organization) = await CreateUiCustomizationPrerequisitesAsync();
+            var dto = new UIModuleCustomizationRequestDTO()
+            {
+                Nodes = GetNodeDTOs(5),
+            };
+            var putResponse = await OrganizationInternalV2Helper.PutUIModuleCustomization(organization.Uuid, moduleName, dto, cookie);
+            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
+
+            var response = await OrganizationInternalV2Helper.GetUIModuleCustomization(organization.Uuid, moduleName);
+
+            AssertUICustomizationResponse(dto, response);
+
+        }
+
+        [Fact]
         public async Task Can_Put_UI_Customization()
         {
             var moduleName = "ItSystemUsages";
@@ -74,20 +91,8 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             };
 
             var response = await OrganizationInternalV2Helper.PutUIModuleCustomization(organization.Uuid, moduleName, dto, cookie);
-            
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var content = await response.Content.ReadAsStringAsync();
-            var responseDto = JsonConvert.DeserializeObject<UIModuleCustomizationResponseDTO>(content);
-            var expectedNodes = dto.Nodes.ToList();
-            var actualNodes = responseDto.Nodes.ToList();
-            Assert.Equal(expectedNodes.Count, actualNodes.Count);
-            foreach (var expectedNode in expectedNodes)
-            {
-                var actual = actualNodes.FirstOrDefault(nodeDto => nodeDto.Key == expectedNode.Key);
 
-                Assert.NotNull(actual);
-                Assert.Equal(expectedNode.Enabled, actual.Enabled);
-            }
+            AssertUICustomizationResponse(dto, response);
         }
 
         [Fact]
@@ -367,6 +372,23 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var (_, _, loginCookie) =
                 await HttpApi.CreateUserAndLogin(UIConfigurationHelper.CreateEmail(), OrganizationRole.LocalAdmin, organization.Id);
             return (loginCookie, organization);
+        }
+
+        private async Task AssertUICustomizationResponse(UIModuleCustomizationRequestDTO expected, HttpResponseMessage response)
+        {
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var content = await response.Content.ReadAsStringAsync();
+            var responseDto = JsonConvert.DeserializeObject<UIModuleCustomizationResponseDTO>(content);
+            var expectedNodes = expected.Nodes.ToList();
+            var actualNodes = responseDto.Nodes.ToList();
+            Assert.Equal(expectedNodes.Count, actualNodes.Count);
+            foreach (var expectedNode in expectedNodes)
+            {
+                var actual = actualNodes.FirstOrDefault(nodeDto => nodeDto.Key == expectedNode.Key);
+
+                Assert.NotNull(actual);
+                Assert.Equal(expectedNode.Enabled, actual.Enabled);
+            }
         }
 
         private IList<CustomizedUINodeRequestDTO> GetNodeDTOs(int numberOfNodes)
