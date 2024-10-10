@@ -150,7 +150,7 @@ namespace Core.ApplicationServices.Rights
         {
             if (fromUserId == toUserId)
             {
-                return Maybe<OperationError>.None;
+                return new OperationError("Tried to transfer roles from the user to itself", OperationFailure.Conflict);
             }
             return MutateUserRights(
                 fromUserId,
@@ -489,7 +489,7 @@ namespace Core.ApplicationServices.Rights
             Organization organization,
             int toUserId,
             IEnumerable<TRight> rights,
-            IRoleAssignmentService<TRight, TRole, TModel> assignmentService)
+            IRoleAssignmentService<TRight, TRole, TModel> assignmentService) 
             where TRight : Entity, IRight<TModel, TRight, TRole>
             where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
             where TModel : HasRightsEntity<TModel, TRight, TRole>, IOwnedByOrganization
@@ -509,16 +509,12 @@ namespace Core.ApplicationServices.Rights
             foreach (var right in rightsInfoSnapshot)
             {
                 var assignResult = assignmentService.AssignRole(right.Object, right.RoleId, toUserId);
-                if (assignResult.Failed)
-                {
-                    _logger.Error(
-                        "Failed to assign right of type {rightType} with role {roleId} on object: {objectType}:{objectId} to user {userId} in organization {organizationId}. Failed with {error}",
-                        typeof(TRight).Name, right.RoleId, right.Object.GetType().Name, right.Object.Id, toUserId, organization.Id, assignResult.Error.ToString()
-                    );
-                    {
-                        return new OperationError($"Failed to assign role of type {typeof(TRight).Name} with role {right.RoleId}:{assignResult.Error}", assignResult.Error.FailureType);
-                    }
-                }
+                if (!assignResult.Failed || assignResult.Error.FailureType == OperationFailure.Conflict) continue;
+                _logger.Error(
+                    "Failed to assign right of type {rightType} with role {roleId} on object: {objectType}:{objectId} to user {userId} in organization {organizationId}. Failed with {error}",
+                    typeof(TRight).Name, right.RoleId, right.Object.GetType().Name, right.Object.Id, toUserId, organization.Id, assignResult.Error.ToString()
+                );
+                return assignResult.Error;
             }
 
             return Maybe<OperationError>.None;
@@ -542,16 +538,12 @@ namespace Core.ApplicationServices.Rights
             foreach (var right in rightsInfoSnapshot)
             {
                 var assignResult = assignmentService.AssignRole(right.Object, right.RoleId, toUserId);
-                if (assignResult.Failed)
-                {
-                    _logger.Error(
-                        "Failed to assign right of type {rightType} with role {roleId} on object: {objectType}:{objectId} to user {userId} in organization {organizationId}. Failed with {error}",
-                        typeof(TRight).Name, right.RoleId, right.Object.GetType().Name, right.Object.Id, toUserId, organization.Id, assignResult.Error.ToString()
-                    );
-                    {
-                        return assignResult.Error;
-                    }
-                }
+                if (!assignResult.Failed || assignResult.Error.FailureType == OperationFailure.Conflict) continue;
+                _logger.Error(
+                    "Failed to assign right of type {rightType} with role {roleId} on object: {objectType}:{objectId} to user {userId} in organization {organizationId}. Failed with {error}",
+                    typeof(TRight).Name, right.RoleId, right.Object.GetType().Name, right.Object.Id, toUserId, organization.Id, assignResult.Error.ToString()
+                );
+                return assignResult.Error;
             }
 
             return Maybe<OperationError>.None;

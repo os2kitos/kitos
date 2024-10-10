@@ -174,6 +174,7 @@ namespace Core.ApplicationServices.Users.Write
 
         private Result<UserRightsChangeParameters, OperationError> FilterOutExistingRights(User fromUser, User toUser, int organizationDbId, UserRightsChangeParameters request)
         {
+            return request;
             var fromUserRightsResult = _userRightsService.GetUserRights(fromUser.Id, organizationDbId);
             if (fromUserRightsResult.Failed) return fromUserRightsResult.Error;
             var fromUserRights = fromUserRightsResult.Value;
