@@ -44,8 +44,8 @@ public class OrganizationWriteService : IOrganizationWriteService{
     public Result<Organization, OperationError> UpdateMasterData(Guid organizationUuid, OrganizationMasterDataUpdateParameters parameters)
     {
         using var transaction = _transactionManager.Begin();
-        var result = _organizationService.GetOrganization(organizationUuid)
-            .Bind(organization => UpdateMasterDataIfWriteAccess(organization, parameters));
+        var result = GetOrganizationAndVerifyWriteAccess(organizationUuid)
+            .Bind(organization => PerformMasterDataUpdates(organization, parameters));
 
         if (result.Failed)
         {
@@ -53,21 +53,16 @@ public class OrganizationWriteService : IOrganizationWriteService{
             return result;
         }
 
+        _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
+        _repository.Update(result.Value);
         transaction.Commit();
         return result;
     }
 
-    private Result<Organization, OperationError> UpdateMasterDataIfWriteAccess(Organization organization, OrganizationMasterDataUpdateParameters parameters)
+    private Result<Organization, OperationError> GetOrganizationAndVerifyWriteAccess(Guid organizationUuid)
     {
-        var result = WithWriteAccess(organization)
-            .Bind(organizationWithWriteAccess => PerformMasterDataUpdates(organizationWithWriteAccess, parameters));
-
-        if (result.Ok)
-        {
-            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
-            _repository.Update(result.Value);
-        }
-        return result;
+        return _organizationService.GetOrganization(organizationUuid)
+            .Bind(WithWriteAccess);
     }
 
     public Result<Organization, OperationError> UpdateOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
