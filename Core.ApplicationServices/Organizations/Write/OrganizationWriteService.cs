@@ -68,8 +68,9 @@ public class OrganizationWriteService : IOrganizationWriteService{
     public Result<Organization, OperationError> UpdateOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
     {
         using var transaction = _transactionManager.Begin();
-        var result = _organizationService.GetOrganization(organizationUuid)
-            .Bind(organization => UpdateOrganizationIfWriteAccess(organization, parameters));
+        var result = GetOrganizationAndVerifyWriteAccess(organizationUuid)
+            .Bind(organization => WithModifyCvrAccessIfRequired(organization, parameters))
+            .Bind(organizationWithWriteAccess => PerformOrganizationUpdates(organizationWithWriteAccess, parameters));
 
         if (result.Failed)
         {
@@ -77,24 +78,11 @@ public class OrganizationWriteService : IOrganizationWriteService{
             return result;
         }
 
+        _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
+        _repository.Update(result.Value);
         transaction.Commit();
         return result;
 
-    }
-
-    private Result<Organization, OperationError> UpdateOrganizationIfWriteAccess(Organization organization,
-        OrganizationUpdateParameters parameters)
-    {
-        var result = WithWriteAccess(organization)
-            .Bind(organizationWithWriteAccess => WithModifyCvrAccessIfRequired(organizationWithWriteAccess, parameters))
-            .Bind(organizationWithWriteAccess => PerformOrganizationUpdates(organizationWithWriteAccess, parameters));
-        
-        if (result.Ok)
-        {
-            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
-            _repository.Update(result.Value);
-        }
-        return result;
     }
 
     private Result<Organization, OperationError> PerformOrganizationUpdates(Organization organization, OrganizationUpdateParameters parameters)
