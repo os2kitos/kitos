@@ -276,6 +276,10 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             using var response = await OrganizationInternalV2Helper.PatchOrganization(organization.Uuid, requestDto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var updatedOrganization = await OrganizationHelper.GetOrganizationAsync(organization.Id, cookie);
+            Assert.Equal(requestDto.Cvr, updatedOrganization.Cvr);
+            Assert.Equal(requestDto.Name, updatedOrganization.Name);
         }
 
         [Fact]
