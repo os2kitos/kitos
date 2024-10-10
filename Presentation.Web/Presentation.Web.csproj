@@ -440,6 +440,7 @@
     <Compile Include="Models\API\V2\Internal\Response\ItSystem\ItSystemSearchResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\ColumnConfigurationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\ContactPersonResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\Organizations\CustomizedUINodeResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\DataProtectionAdvisorResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\DataResponsibleResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationGridConfigurationResponseDTO.cs" />

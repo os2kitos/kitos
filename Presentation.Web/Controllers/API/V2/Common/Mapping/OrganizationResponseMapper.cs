@@ -1,4 +1,6 @@
-﻿using Core.ApplicationServices.Model.Organizations;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Organization;
 using Core.DomainModel.UIConfiguration;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
@@ -104,7 +106,25 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 
         public UIModuleCustomizationResponseDTO ToUIModuleCustomizationResponseDTO(UIModuleCustomization uiModuleCustomization)
         {
-            throw new System.NotImplementedException();
+            return new()
+            {
+                Module = uiModuleCustomization.Module,
+                Nodes = ToCustomizedUINodeDTOS(uiModuleCustomization.Nodes)
+            };
+        }
+
+        private IEnumerable<CustomizedUINodeResponseDTO> ToCustomizedUINodeDTOS(ICollection<CustomizedUINode> nodes)
+        {
+            return nodes.Select(ToCustomizedUINodeDTO);
+        }
+
+        private CustomizedUINodeResponseDTO ToCustomizedUINodeDTO(CustomizedUINode node)
+        {
+            return new()
+            {
+                Key = node.Key,
+                Enabled = node.Enabled
+            };
         }
     }
 }
