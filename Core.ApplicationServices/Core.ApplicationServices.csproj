@@ -175,6 +175,7 @@
     <Compile Include="Model\Interface\ItInterfaceWriteModel.cs" />
     <Compile Include="Model\Interface\ItInterfaceWriteModelParametersBase.cs" />
     <Compile Include="Model\LocalOptions\LocalOptionCreateParameters.cs" />
+    <Compile Include="Model\LocalOptions\LocalOptionUpdateParameters.cs" />
     <Compile Include="Model\Messages\WritePublicMessagesParams.cs" />
     <Compile Include="Model\Messages\PublicMessages.cs" />
     <Compile Include="Model\Notification\EmailRecipientModel.cs" />

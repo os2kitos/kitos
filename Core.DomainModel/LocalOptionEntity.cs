@@ -28,5 +28,15 @@ namespace Core.DomainModel
         {
             IsActive = true;
         }
+
+        public void Deactivate()
+        {
+            IsActive = false;
+        }
+
+        public void UpdateLocalOption(string description)
+        {
+            Description = description;
+        }
     }
 }

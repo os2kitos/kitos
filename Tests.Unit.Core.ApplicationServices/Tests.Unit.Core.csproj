@@ -199,6 +199,7 @@
     <Compile Include="ApplicationServices\Handlers\SendEmailToStakeholdersOnExternalOrganizationConnectionUpdatedHandlerTest.cs" />
     <Compile Include="ApplicationServices\Interface\ItInterfaceWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
+    <Compile Include="ApplicationServices\LocalOptions\GenericLocalOptionsServiceTest.cs" />
     <Compile Include="ApplicationServices\Messages\PublicMessagesServiceTest.cs" />
     <Compile Include="ApplicationServices\Notification\NotificationServiceTest.cs" />
     <Compile Include="ApplicationServices\Notification\RegistrationNotificationServiceTest.cs" />
