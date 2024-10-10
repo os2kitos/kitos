@@ -47,14 +47,13 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
-        public async Task Can_Get_UI_Config_For_It_System_Usages()
+        public async Task Get_UI_Customization_Returns_Not_Found_If_None_Added()
         {
             var moduleName = "ItSystemUsages";
             var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
 
-            var response = await OrganizationInternalV2Helper.GetUIModuleConfig(organization.Uuid, moduleName);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-           
+            var response = await OrganizationInternalV2Helper.GetUIModuleCustomization(organization.Uuid, moduleName);
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Fact]

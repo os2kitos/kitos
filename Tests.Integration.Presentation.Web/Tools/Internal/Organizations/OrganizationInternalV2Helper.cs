@@ -41,10 +41,10 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/{MasterDataSuffix}/{RolesSuffix}"), cookie, dto);
         }
 
-        public static async Task<HttpResponseMessage> GetUIModuleConfig(Guid organizationUuid, string moduleName)
+        public static async Task<HttpResponseMessage> GetUIModuleCustomization(Guid organizationUuid, string moduleName)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/ui-module-customization/{moduleName}"), cookie);
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/ui-customization/{moduleName}"), cookie);
         }
     }
 }
