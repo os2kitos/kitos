@@ -49,7 +49,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult UpdateOrganization([FromUri][NonEmptyGuid] Guid organizationUuid, OrganizationUpdateRequestDTO requestDto)
+        public IHttpActionResult PatchOrganization([FromUri][NonEmptyGuid] Guid organizationUuid, OrganizationUpdateRequestDTO requestDto)
         {
             if (!ModelState.IsValid) return BadRequest();
 
@@ -65,7 +65,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult UpdateOrganizationMasterData([FromUri] [NonEmptyGuid] Guid organizationUuid, OrganizationMasterDataRequestDTO requestDto)
+        public IHttpActionResult PatchOrganizationMasterData([FromUri] [NonEmptyGuid] Guid organizationUuid, OrganizationMasterDataRequestDTO requestDto)
         {
             if (!ModelState.IsValid) return BadRequest();
             
