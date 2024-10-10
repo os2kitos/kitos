@@ -47,6 +47,17 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
+        public async Task Can_Get_UI_Config_For_It_System_Usages()
+        {
+            var moduleName = "ItSystemUsages";
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+
+            var response = await OrganizationInternalV2Helper.GetUIModuleConfig(organization.Uuid, moduleName);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+           
+        }
+
+        [Fact]
         public async Task Can_Get_Master_Data()
         {
             var organization = await CreateTestOrganization();
