@@ -296,13 +296,13 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var updateParameters = A<UserRightsChangeParameters>();
             ExpectGetUserInOrganizationReturns(org.Uuid, fromUser.Uuid, fromUser);
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
-            ExpectGetOrganizationReturns(org.Uuid, org);
+            ExpectResolveIdReturns(org.Uuid, org.Id);
             ExpectModifyPermissionsForUserReturns(toUser, true);
+            ExpectGetUserRightsReturnsNothing(fromUser, org);
             ExpectGetUserRightsReturnsNothing(toUser, org);
-
+            _organizationServiceMock.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
             _userRightsServiceMock.Setup(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, It.IsAny<UserRightsChangeParameters>()))
                 .Returns(Maybe<OperationError>.None);
-            var transaction = ExpectTransactionBegins();
 
             //Act
             var result = _sut.CopyUserRights(org.Uuid, fromUser.Uuid, toUser.Uuid, updateParameters);
@@ -310,8 +310,6 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             //Assert
             Assert.True(result.IsNone);
             _userRightsServiceMock.Verify(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, It.IsAny<UserRightsChangeParameters>()));
-
-            transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
         }
 
         private void ExpectGetUserRightsReturnsNothing(User user, Organization org)
@@ -320,6 +318,49 @@ namespace Tests.Unit.Core.ApplicationServices.Users
                 new List<DataProcessingRegistrationRight>(), new List<ItSystemRight>(), new List<ItContractRight>(),
                 new List<OrganizationUnitRight>());
             _userRightsServiceMock.Setup(x => x.GetUserRights(user.Id, org.Id)).Returns(emptyAssignments);
+        }
+
+        [Fact]
+        public void Can_Transfer_Roles()
+        {
+            //Arrange
+            var fromUser = SetupUser();
+            var toUser = SetupUser();
+            var org = new Organization { Id = A<int>(), Uuid = A<Guid>() };
+            var updateParameters = A<UserRightsChangeParameters>();
+            ExpectGetUserInOrganizationReturns(org.Uuid, fromUser.Uuid, fromUser);
+            ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
+            ExpectModifyPermissionsForUserReturns(toUser, true);
+            ExpectResolveIdReturns(org.Uuid, org.Id);
+            ExpectGetUserRightsReturnsNothing(fromUser, org);
+            ExpectGetUserRightsReturnsNothing(toUser, org);
+
+            //Act
+            _ = _sut.TransferUserRights(org.Uuid, fromUser.Uuid, toUser.Uuid, updateParameters);
+
+            //Assert
+            _userRightsServiceMock.Verify(x => x.TransferRights(fromUser.Id, toUser.Id, org.Id, It.IsAny<UserRightsChangeParameters>()));
+        }
+
+        [Fact]
+        public void Transfer_Roles_Returns_Not_Found_If_No_Org_Id()
+        {
+            //Arrange
+            var fromUser = SetupUser();
+            var toUser = SetupUser();
+            var org = new Organization { Id = A<int>(), Uuid = A<Guid>() };
+            var updateParameters = A<UserRightsChangeParameters>();
+            ExpectGetUserInOrganizationReturns(org.Uuid, fromUser.Uuid, fromUser);
+            ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
+            ExpectModifyPermissionsForUserReturns(toUser, true);
+            ExpectResolveIdReturns(org.Uuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.TransferUserRights(org.Uuid, fromUser.Uuid, toUser.Uuid, updateParameters);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
         }
 
         private void ExpectAssignRolesReturn(IEnumerable<OrganizationRole> roles, User user, Organization org)
