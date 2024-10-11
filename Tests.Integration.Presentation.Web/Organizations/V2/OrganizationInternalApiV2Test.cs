@@ -51,7 +51,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var organization = await CreateTestOrganization();
 
-            var response =
+            using var response =
                 await OrganizationInternalV2Helper.GetOrganizationMasterData(organization.Uuid);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -65,7 +65,6 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         [Fact]
         public async Task Can_Patch_Organization_Master_Data_With_Values()
         {
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
             var patchDto = new OrganizationMasterDataRequestDTO
             {
                 Address = A<string>(),
@@ -76,7 +75,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             var organizationToPatch = await CreateTestOrganization();
 
-            var response =
+            using var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterData(organizationToPatch.Uuid, patchDto);
             
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -93,7 +92,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             var organizationToPatch = await CreateTestOrganization();
 
-            var response =
+            using var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterData(organizationToPatch.Uuid, patchDto);
             
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -126,7 +125,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(contactPersonDto.Name, upsertResponseDto.ContactPerson.Name);
             Assert.Equal(organization.Uuid, upsertResponseDto.OrganizationUuid);
 
-            var response = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(organization.Uuid);
+            using var response = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(organization.Uuid);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
@@ -140,7 +139,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var organization = await CreateTestOrganization();
 
-            var response = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(organization.Uuid);
+            using var response = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(organization.Uuid);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
@@ -181,7 +180,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                    DataProtectionAdvisor = dataProtectionAdvisorDto
             };
 
-            var response =
+            using var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, requestDto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -225,7 +224,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                     throw new ArgumentOutOfRangeException(nameof(roleType), roleType, null);
             }
 
-            var response =
+            using var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, request);
             
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -254,7 +253,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var organization = await CreateTestOrganization();
             var requestDto = new OrganizationMasterDataRolesRequestDTO();
 
-            var response =
+            using var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, requestDto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -262,6 +261,40 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
             Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
             await GetMasterDataRolesAndAssertNotNull(organization.Uuid);
+        }
+
+        [Fact]
+        public async Task Can_Update_Organization()
+        {
+            var organization = await CreateTestOrganization();
+            var requestDto = new OrganizationUpdateRequestDTO()
+            {
+                Cvr = GetCvr(),
+                Name = A<string>()
+            };
+
+            using var response = await OrganizationInternalV2Helper.PatchOrganization(organization.Uuid, requestDto);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var updatedOrganization = await OrganizationHelper.GetOrganizationAsync(organization.Id, cookie);
+            Assert.Equal(requestDto.Cvr, updatedOrganization.Cvr);
+            Assert.Equal(requestDto.Name, updatedOrganization.Name);
+        }
+
+        [Fact]
+        public async Task Update_Organization_Returns_Bad_Request_If_Invalid_Uuid()
+        {
+            var invalidUuid = new Guid();
+            var requestDto = new OrganizationUpdateRequestDTO()
+            {
+                Cvr = GetCvr(),
+                Name = A<string>()
+            };
+
+            using var response = await OrganizationInternalV2Helper.PatchOrganization(invalidUuid, requestDto);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         private async Task GetMasterDataRolesAndAssertNotNull(Guid orgUuid)

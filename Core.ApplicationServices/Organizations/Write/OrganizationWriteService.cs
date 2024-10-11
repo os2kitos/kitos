@@ -44,8 +44,8 @@ public class OrganizationWriteService : IOrganizationWriteService{
     public Result<Organization, OperationError> UpdateMasterData(Guid organizationUuid, OrganizationMasterDataUpdateParameters parameters)
     {
         using var transaction = _transactionManager.Begin();
-        var result = _organizationService.GetOrganization(organizationUuid)
-            .Bind(organization => Update(organization, parameters));
+        var result = GetOrganizationAndVerifyWriteAccess(organizationUuid)
+            .Bind(organization => PerformMasterDataUpdates(organization, parameters));
 
         if (result.Failed)
         {
@@ -53,21 +53,53 @@ public class OrganizationWriteService : IOrganizationWriteService{
             return result;
         }
 
+        _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
+        _repository.Update(result.Value);
         transaction.Commit();
         return result;
     }
 
-    private Result<Organization, OperationError> Update(Organization organization, OrganizationMasterDataUpdateParameters parameters)
+    private Result<Organization, OperationError> GetOrganizationAndVerifyWriteAccess(Guid organizationUuid)
     {
-        var result = WithWriteAccess(organization)
-            .Bind(organizationWithWriteAccess => PerformUpdates(organizationWithWriteAccess, parameters));
+        return _organizationService.GetOrganization(organizationUuid)
+            .Bind(WithWriteAccess);
+    }
 
-        if (result.Ok)
+    public Result<Organization, OperationError> UpdateOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
+    {
+        using var transaction = _transactionManager.Begin();
+        var result = GetOrganizationAndVerifyWriteAccess(organizationUuid)
+            .Bind(organization => WithModifyCvrAccessIfRequired(organization, parameters))
+            .Bind(organizationWithWriteAccess => PerformOrganizationUpdates(organizationWithWriteAccess, parameters));
+
+        if (result.Failed)
         {
-            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
-            _repository.Update(result.Value);
+            transaction.Rollback();
+            return result;
         }
+
+        _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
+        _repository.Update(result.Value);
+        transaction.Commit();
         return result;
+
+    }
+
+    private Result<Organization, OperationError> PerformOrganizationUpdates(Organization organization, OrganizationUpdateParameters parameters)
+    {
+        return organization.WithOptionalUpdate(parameters.Cvr, (org, cvr) => org.UpdateCvr(cvr))
+            .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)));
+    }
+
+    private Result<Organization, OperationError> WithModifyCvrAccessIfRequired(Organization organization,
+        OrganizationUpdateParameters parameters)
+    {
+        if (!parameters.Cvr.HasChange) return organization;
+        return _organizationService.CanActiveUserModifyCvr(organization.Uuid)
+            .Match(canModifyCvr => canModifyCvr
+                ? Result<Organization, OperationError>.Success(organization)
+                : new OperationError("User is not authorized to modify organization CVR", OperationFailure.Forbidden),
+                error => error);
     }
 
     private Result<Organization, OperationError> WithWriteAccess(Organization org)
@@ -75,38 +107,13 @@ public class OrganizationWriteService : IOrganizationWriteService{
         return _authorizationContext.AllowModify(org) ? org : new OperationError(OperationFailure.Forbidden);
     }
 
-    private Result<Organization, OperationError> PerformUpdates(Organization organization, OrganizationMasterDataUpdateParameters parameters)
+    private Result<Organization, OperationError> PerformMasterDataUpdates(Organization organization, OrganizationMasterDataUpdateParameters parameters)
     {
         return organization
-            .WithOptionalUpdate(parameters.Address, UpdateOrganizationAddress)
-            .Bind(org => org.WithOptionalUpdate(parameters.Cvr, UpdateOrganizationCvr))
-            .Bind(org => org.WithOptionalUpdate(parameters.Email, UpdateOrganizationEmail))
-            .Bind(org => org.WithOptionalUpdate(parameters.Phone, UpdateOrganizationPhone));
-    }
-
-    private Result<Organization, OperationError> UpdateOrganizationAddress(Organization organization,
-        Maybe<string> address)
-    {
-        organization.Adress = address.HasValue ? address.Value : null;
-        return organization;
-    }
-    private Result<Organization, OperationError> UpdateOrganizationCvr(Organization organization,
-        Maybe<string> cvr)
-    {
-        organization.Cvr = cvr.HasValue ? cvr.Value : null;
-        return organization;
-    }
-    private Result<Organization, OperationError> UpdateOrganizationEmail(Organization organization,
-        Maybe<string> email)
-    {
-        organization.Email = email.HasValue ? email.Value : null;
-        return organization;
-    }
-    private Result<Organization, OperationError> UpdateOrganizationPhone(Organization organization,
-        Maybe<string> phone)
-    {
-        organization.Phone = phone.HasValue ? phone.Value : null;
-        return organization;
+            .WithOptionalUpdate(parameters.Address, (org, address) => org.UpdateAddress(address))
+            .Bind(org => org.WithOptionalUpdate(parameters.Cvr, (org, cvr) => org.UpdateCvr(cvr)))
+            .Bind(org => org.WithOptionalUpdate(parameters.Email, (org, email) => org.UpdateEmail(email)))
+            .Bind(org => org.WithOptionalUpdate(parameters.Phone, (org, phone) => org.UpdatePhone(phone)));
     }
 
     public Result<OrganizationMasterDataRoles, OperationError> GetOrCreateOrganizationMasterDataRoles(Guid organizationUuid)
