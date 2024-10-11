@@ -82,6 +82,7 @@ namespace Core.ApplicationServices.LocalOptions.Base
                         .Match(existingLocalOption =>
                         {
                             existingLocalOption.Activate();
+                            _localOptionRepository.Update(existingLocalOption);
                             _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(existingLocalOption));
                             _localOptionRepository.Save();
 
@@ -144,8 +145,8 @@ namespace Core.ApplicationServices.LocalOptions.Base
                     () => new OperationError($"Local option in organization with uuid: {organizationUuid} with option id: {optionId} was not found", OperationFailure.NotFound))
                 .Bind(localOption =>
                 {
-
                     localOption.Deactivate();
+                    _localOptionRepository.Update(localOption);
                     _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(localOption));
 
                     _localOptionRepository.Save();
