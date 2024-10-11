@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.LocalOptions.Base;
+using Core.ApplicationServices.Model.LocalOptions;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
@@ -75,6 +76,54 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             Assert.Equal(expectedLocal.First().Description, option.Description);
             Assert.Equal(optionId, option.Id);
             Assert.True(option.IsLocallyAvailable);
+        }
+
+        [Fact]
+        public void Can_Create_Local_Option()
+        {
+            var orgUuid = A<Guid>();
+            var orgDbId = A<int>();
+            var parameters = new LocalOptionCreateParameters()
+            {
+                OptionId = A<int>()
+            };
+            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
+            _authenticationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
+
+            var result = _sut.CreateLocalOption(orgUuid, parameters);
+
+            Assert.True(result.Ok);
+            var option = result.Value;
+            Assert.Equal(parameters.OptionId, option.OptionId);
+            Assert.True(option.IsActive);
+            _localOptionsRepository.Verify(_ => _.Insert(It.IsAny<TestLocalOptionEntity>()), Times.Once);
+            _localOptionsRepository.Verify(_ => _.Save(), Times.Once);
+        }
+
+        [Fact]
+        public void Create_Can_Activate_Existing_Local_Option()
+        {
+            var orgUuid = A<Guid>();
+            var orgDbId = A<int>();
+            var optionId = A<int>();
+            var parameters = new LocalOptionCreateParameters()
+            {
+                OptionId = optionId
+            };
+            var existingOptionsList = new List<TestLocalOptionEntity>()
+                { new() { OptionId = optionId, Organization = new Organization() { Uuid = orgUuid } } };
+            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
+            _authenticationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
+            _localOptionsRepository.Setup(_ => _.AsQueryable())
+                .Returns(existingOptionsList.AsQueryable());
+            var result = _sut.CreateLocalOption(orgUuid, parameters);
+
+            Assert.True(result.Ok);
+            var option = result.Value;
+            Assert.Equal(parameters.OptionId, option.OptionId);
+            Assert.True(option.IsActive);
+            _localOptionsRepository.Verify(_ => _.Insert(It.IsAny<TestLocalOptionEntity>()), Times.Never);
+            _localOptionsRepository.Verify(_ => _.Save(), Times.Once);
         }
 
         private IList<TestLocalOptionEntity> SetupOptionRepositories(Guid orgUuid, int? staticOptionId = null)
