@@ -23,7 +23,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
     {
         private Mock<IGenericRepository<TestOptionEntity>> _optionsRepository;
         private Mock<IGenericRepository<TestLocalOptionEntity>> _localOptionsRepository;
-        private Mock<IAuthorizationContext> _authenticationContext;
+        private Mock<IAuthorizationContext> _authorizationContext;
         private Mock<IEntityIdentityResolver> _identityResolver;
         private Mock<IDomainEvents> _domainEvents;
 
@@ -32,14 +32,14 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
         {
             _optionsRepository = new Mock<IGenericRepository<TestOptionEntity>>();
             _localOptionsRepository = new Mock<IGenericRepository<TestLocalOptionEntity>>();
-            _authenticationContext = new Mock<IAuthorizationContext>();
+            _authorizationContext = new Mock<IAuthorizationContext>();
             _identityResolver = new Mock<IEntityIdentityResolver>();
             _domainEvents = new Mock<IDomainEvents>();
 
             _sut = new GenericLocalOptionsService<TestLocalOptionEntity, TestDomainModel, TestOptionEntity>(
                 _optionsRepository.Object
                 , _localOptionsRepository.Object,
-                _authenticationContext.Object,
+                _authorizationContext.Object,
                 _identityResolver.Object,
                 _domainEvents.Object);
         }
@@ -89,7 +89,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
                 OptionId = A<int>()
             };
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
-            _authenticationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
 
             var result = _sut.CreateLocalOption(orgUuid, parameters);
 
@@ -108,7 +108,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             };
             SetupLocalRepositoryReturnsOneOption(optionId, orgUuid);
            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
-            _authenticationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
             
             var result = _sut.CreateLocalOption(orgUuid, parameters);
 
@@ -125,7 +125,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
                 OptionId = A<int>()
             };
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
-            _authenticationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(false);
+            _authorizationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(false);
 
             var result = _sut.CreateLocalOption(orgUuid, parameters);
 
@@ -144,7 +144,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
                 Description = A<string>()
             };
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
-            _authenticationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
 
 
             var result = _sut.PatchLocalOption(orgUuid, optionId, parameters);
@@ -166,7 +166,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
                 Description = A<string>()
             };
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
-            _authenticationContext.Setup(_ => _.AllowModify(It.IsAny<TestLocalOptionEntity>())).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowModify(It.IsAny<TestLocalOptionEntity>())).Returns(true);
             SetupLocalRepositoryReturnsOneOption(optionId, orgUuid);
 
             var result = _sut.PatchLocalOption(orgUuid, optionId, parameters);
@@ -175,6 +175,35 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             Assert.Equal(parameters.Description, result.Value.Description);
             _localOptionsRepository.Verify(_ => _.Update(It.IsAny<TestLocalOptionEntity>()));
             _localOptionsRepository.Verify(_ => _.Save());
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Patch_Returns_Forbidden_If_Unauthorized(bool optionExists)
+        {
+            var orgUuid = A<Guid>();
+            var orgDbId = A<int>();
+            var optionId = A<int>();
+            var parameters = new LocalOptionUpdateParameters()
+            {
+                Description = A<string>()
+            };
+            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
+            if (optionExists)
+            {
+                SetupLocalRepositoryReturnsOneOption(optionId, orgUuid);
+                _authorizationContext.Setup(_ => _.AllowModify(It.IsAny<TestLocalOptionEntity>())).Returns(false);
+            }
+            else
+            {
+                _authorizationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(false);
+            }
+
+            var result = _sut.PatchLocalOption(orgUuid, optionId, parameters);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         private void SetupLocalRepositoryReturnsOneOption(int optionId, Guid orgUuid)
