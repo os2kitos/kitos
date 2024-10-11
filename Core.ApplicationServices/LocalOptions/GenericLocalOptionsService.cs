@@ -40,7 +40,6 @@ namespace Core.ApplicationServices.LocalOptions.Base
         public Result<IEnumerable<TOptionType>, OperationError> GetByOrganizationUuid(Guid organizationUuid)
         {
             var globalOptionsResult = GetOptionsAsQueryable()
-                .Where(x => x.IsEnabled)
                 .ToList();
             
             var localOptionsResult = GetLocalOptionsByOrganizationUuid(organizationUuid)

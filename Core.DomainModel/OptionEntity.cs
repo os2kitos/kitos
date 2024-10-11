@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 
 namespace Core.DomainModel
 {
@@ -63,12 +64,19 @@ namespace Core.DomainModel
                 ResetLocalOptionValues();
                 return;
             }
+            UpdateIsLocallyAvailable(localOption.IsActive);
+            UpdateDescription(localOption.Description);
+        }
 
-            IsLocallyAvailable = localOption.IsActive;
-            if (!string.IsNullOrEmpty(localOption.Description))
-            {
-                Description = localOption.Description;
-            }
+        private void UpdateIsLocallyAvailable(bool isActive)
+        {
+            if (IsObligatory && !isActive) return;
+            if (IsEnabled) IsLocallyAvailable = isActive;
+        }
+
+        private void UpdateDescription(string description)
+        {
+           if (!string.IsNullOrEmpty(description)) Description = description;
         }
 
         private void ResetLocalOptionValues()
