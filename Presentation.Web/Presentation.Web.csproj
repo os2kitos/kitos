@@ -425,6 +425,7 @@
     <Compile Include="Models\API\V2\Internal\Request\Organizations\OrganizationGridConfigurationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\OrganizationMasterDataRoleRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\OrganizationMasterDataRolesRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Organizations\OrganizationUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\OrganizationUnit\ChangeOrganizationUnitRegistrationV2RequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\OrganizationUnit\ChangePaymentRegistrationV2RequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\OrganizationUnit\TransferOrganizationUnitRegistrationV2RequestDTO.cs" />

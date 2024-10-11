@@ -16,6 +16,7 @@ using Core.DomainServices.Generic;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
 using Core.DomainModel;
 using Core.DomainServices;
+using Tests.Unit.Presentation.Web.Extensions;
 
 namespace Tests.Unit.Presentation.Web.Services
 {
@@ -359,6 +360,107 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Failed);
             var error = result.Error;
             Assert.Equal(OperationFailure.BadInput, error.FailureType);
+        }
+
+        [Fact]
+        public void Can_Update_Organization_Name_And_Cvr()
+        {
+            var org = CreateOrganization();
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
+            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
+            var updateParams = new OrganizationUpdateParameters()
+            {
+                Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
+                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
+            };
+
+            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+
+            Assert.True(result.Ok);
+            var value = result.Value;
+            Assert.Equal(updateParams.Cvr.NewValue, value.Cvr);
+            Assert.Equal(updateParams.Name.NewValue, value.Name);
+        }
+
+        [Fact]
+        public void Update_Organization_Returns_Forbidden_If_Unauthorized_To_Modify_Cvr()
+        {
+            var org = CreateOrganization();
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
+            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(false);
+            var updateParams = new OrganizationUpdateParameters()
+            {
+                Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
+                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
+            };
+
+            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Update_Organization_Returns_Forbidden_If_Unauthorized_For_Org()
+        {
+            var org = CreateOrganization();
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(false);
+            var updateParams = new OrganizationUpdateParameters()
+            {
+                Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
+                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
+            };
+
+            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Update_Organization_Only_Checks_Cvr_Modify_Permission_If_Cvr_Has_Change()
+        {
+            var org = CreateOrganization();
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
+            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
+            var updateParams = new OrganizationUpdateParameters()
+            {
+                Cvr = OptionalValueChange<Maybe<string>>.None,
+                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
+            };
+
+            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+
+            Assert.True(result.Ok);
+            Assert.Equal(updateParams.Name.NewValue, result.Value.Name);
+            Assert.Equal(org.Cvr, result.Value.Cvr);
+        }
+
+        [Fact]
+        public void Update_Organization_Returns_Not_Found_If_No_Org()
+        {
+            var org = CreateOrganization();
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound));
+            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            var updateParams = new OrganizationUpdateParameters()
+            {
+                Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
+                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
+            };
+
+            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         public enum RoleType
