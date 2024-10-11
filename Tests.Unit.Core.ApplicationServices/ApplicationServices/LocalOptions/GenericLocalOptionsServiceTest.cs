@@ -54,8 +54,10 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             var expectedLocal = Enumerable.Range(1, 2)
                 .Select(i => new TestLocalOptionEntity()
                 {
-                    OptionId = i, OrganizationId = orgDbId,
-                    Description = A<string>(), IsActive = true
+                    OptionId = i,
+                    Description = A<string>(), 
+                    IsActive = true,
+                    Organization = new Organization(){ Uuid = orgUuid }
                 }).ToList();
             _optionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedGlobal.AsQueryable());
             _localOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedLocal.AsQueryable());
@@ -71,7 +73,6 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
                 var expectedDescription = expectedLocal.First(o => o.OptionId == option.Id).Description;
                 Assert.Equal(expectedDescription, option.Description);
             }
-
         }
     }
 }
