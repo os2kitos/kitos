@@ -298,10 +298,8 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
             ExpectResolveIdReturns(org.Uuid, org.Id);
             ExpectModifyPermissionsForUserReturns(toUser, true);
-            ExpectGetUserRightsReturnsNothing(fromUser, org);
-            ExpectGetUserRightsReturnsNothing(toUser, org);
             _organizationServiceMock.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
-            _userRightsServiceMock.Setup(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, It.IsAny<UserRightsChangeParameters>()))
+            _userRightsServiceMock.Setup(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, updateParameters))
                 .Returns(Maybe<OperationError>.None);
 
             //Act
@@ -309,15 +307,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
 
             //Assert
             Assert.True(result.IsNone);
-            _userRightsServiceMock.Verify(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, It.IsAny<UserRightsChangeParameters>()));
-        }
-
-        private void ExpectGetUserRightsReturnsNothing(User user, Organization org)
-        {
-            var emptyAssignments = new UserRightsAssignments(new List<OrganizationRole>(),
-                new List<DataProcessingRegistrationRight>(), new List<ItSystemRight>(), new List<ItContractRight>(),
-                new List<OrganizationUnitRight>());
-            _userRightsServiceMock.Setup(x => x.GetUserRights(user.Id, org.Id)).Returns(emptyAssignments);
+            _userRightsServiceMock.Verify(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, updateParameters));
         }
 
         [Fact]
@@ -332,14 +322,12 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
             ExpectModifyPermissionsForUserReturns(toUser, true);
             ExpectResolveIdReturns(org.Uuid, org.Id);
-            ExpectGetUserRightsReturnsNothing(fromUser, org);
-            ExpectGetUserRightsReturnsNothing(toUser, org);
 
             //Act
             _ = _sut.TransferUserRights(org.Uuid, fromUser.Uuid, toUser.Uuid, updateParameters);
 
             //Assert
-            _userRightsServiceMock.Verify(x => x.TransferRights(fromUser.Id, toUser.Id, org.Id, It.IsAny<UserRightsChangeParameters>()));
+            _userRightsServiceMock.Verify(x => x.TransferRights(fromUser.Id, toUser.Id, org.Id, updateParameters));
         }
 
         [Fact]
