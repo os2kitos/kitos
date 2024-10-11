@@ -47,22 +47,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
         {
             var orgUuid = A<Guid>();
             var orgDbId = A<int>();
-            var expectedGlobal = Enumerable.Range(1,2)
-                .Select(i => new TestOptionEntity()
-                {
-                    Id = i,
-                    IsEnabled = true,
-                }).ToList();
-            var expectedLocal = Enumerable.Range(1, 2)
-                .Select(i => new TestLocalOptionEntity()
-                {
-                    OptionId = i,
-                    Description = A<string>(), 
-                    IsActive = true,
-                    Organization = new Organization(){ Uuid = orgUuid }
-                }).ToList();
-            _optionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedGlobal.AsQueryable());
-            _localOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedLocal.AsQueryable());
+            var expectedLocal = SetupOptionRepositories(orgUuid);
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
 
             var result = _sut.GetByOrganizationUuid(orgUuid);
@@ -82,23 +67,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
         {
             var orgUuid = A<Guid>();
             var optionId = A<int>();
-            var expectedGlobal = Enumerable.Range(1, 1)
-                .Select(i => new TestOptionEntity()
-                {
-                    Id = optionId,
-                    IsEnabled = true,
-                }).ToList();
-            var expectedLocal = Enumerable.Range(1, 2)
-                .Select(i => new TestLocalOptionEntity()
-                {
-                    OptionId = optionId,
-                    Description = A<string>(),
-                    IsActive = true,
-                    Organization = new Organization() { Uuid = orgUuid }
-                }).ToList();
-            _optionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedGlobal.AsQueryable());
-            _localOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedLocal.AsQueryable());
-
+            var expectedLocal = SetupOptionRepositories(orgUuid, optionId);
             var result = _sut.GetByOrganizationUuidAndOptionId(orgUuid, optionId);
 
             Assert.True(result.Ok);
@@ -106,6 +75,28 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             Assert.Equal(expectedLocal.First().Description, option.Description);
             Assert.Equal(optionId, option.Id);
             Assert.True(option.IsLocallyAvailable);
+        }
+
+        private IList<TestLocalOptionEntity> SetupOptionRepositories(Guid orgUuid, int? staticOptionId = null)
+        {
+            var expectedGlobal = Enumerable.Range(1, 1)
+                .Select(i => new TestOptionEntity()
+                {
+                    Id = staticOptionId ?? i,
+                    IsEnabled = true,
+                }).ToList();
+            var expectedLocal = Enumerable.Range(1, 2)
+                .Select(i => new TestLocalOptionEntity()
+                {
+                    OptionId = staticOptionId ?? i,
+                    Description = A<string>(),
+                    IsActive = true,
+                    Organization = new Organization() { Uuid = orgUuid }
+                }).ToList();
+            _optionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedGlobal.AsQueryable());
+            _localOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedLocal.AsQueryable());
+
+            return expectedLocal;
         }
     }
 }
