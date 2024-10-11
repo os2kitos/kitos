@@ -39,12 +39,12 @@ namespace Core.ApplicationServices.LocalOptions.Base
 
         public Result<IEnumerable<TOptionType>, OperationError> GetByOrganizationUuid(Guid organizationUuid)
         {
-            var localOptionsResult = GetLocalOptionsByOrganizationUuid(organizationUuid)
-                .ToDictionary(x => x.OptionId);
-
             var globalOptionsResult = GetOptionsAsQueryable()
                 .Where(x => x.IsEnabled)
                 .ToList();
+            
+            var localOptionsResult = GetLocalOptionsByOrganizationUuid(organizationUuid)
+                .ToDictionary(x => x.OptionId);
 
             var returnList = new List<TOptionType>();
 
@@ -59,15 +59,15 @@ namespace Core.ApplicationServices.LocalOptions.Base
             return returnList;
         }
 
-        public Result<TOptionType, OperationError> GetByOrganizationUuidAndRoleId(Guid organizationUuid, int roleId)
+        public Result<TOptionType, OperationError> GetByOrganizationUuidAndOptionId(Guid organizationUuid, int optionId)
         {
-            var option = GetOptionsAsQueryable().FirstOrDefault(x => x.Id == roleId);
+            var option = GetOptionsAsQueryable().FirstOrDefault(x => x.Id == optionId);
 
             if (option == null)
-                return new OperationError($"No option with Uuid: {roleId} found", OperationFailure.NotFound);
+                return new OperationError($"No option with Id: {optionId} found", OperationFailure.NotFound);
             
-            var localOption =GetLocalOptionsByOrganizationUuid(organizationUuid)
-                    .FirstOrDefault(x => x.OptionId == roleId);
+            var localOption = GetLocalOptionsByOrganizationUuid(organizationUuid)
+                    .FirstOrDefault(x => x.OptionId == optionId);
             
             option.UpdateLocalOptionValues(localOption);
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.LocalOptions.Base;
@@ -40,6 +41,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
                 _identityResolver.Object,
                 _domainEvents.Object);
         }
+
         [Fact]
         public void Can_Get_Options_By_Organization_Uuid()
         {
@@ -73,6 +75,37 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
                 var expectedDescription = expectedLocal.First(o => o.OptionId == option.Id).Description;
                 Assert.Equal(expectedDescription, option.Description);
             }
+        }
+
+        [Fact]
+        public void Can_Get_Option_By_Org_Uuid_And_Option_Id()
+        {
+            var orgUuid = A<Guid>();
+            var optionId = A<int>();
+            var expectedGlobal = Enumerable.Range(1, 1)
+                .Select(i => new TestOptionEntity()
+                {
+                    Id = optionId,
+                    IsEnabled = true,
+                }).ToList();
+            var expectedLocal = Enumerable.Range(1, 2)
+                .Select(i => new TestLocalOptionEntity()
+                {
+                    OptionId = optionId,
+                    Description = A<string>(),
+                    IsActive = true,
+                    Organization = new Organization() { Uuid = orgUuid }
+                }).ToList();
+            _optionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedGlobal.AsQueryable());
+            _localOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedLocal.AsQueryable());
+
+            var result = _sut.GetByOrganizationUuidAndOptionId(orgUuid, optionId);
+
+            Assert.True(result.Ok);
+            var option = result.Value;
+            Assert.Equal(expectedLocal.First().Description, option.Description);
+            Assert.Equal(optionId, option.Id);
+            Assert.True(option.IsLocallyAvailable);
         }
     }
 }
