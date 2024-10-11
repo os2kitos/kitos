@@ -118,6 +118,23 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             ExpectCreateSuccess(result, optionId);
         }
 
+        [Fact]
+        public void Create_Local_Option_Returns_Forbidden_If_Not_Authorized()
+        {
+            var orgUuid = A<Guid>();
+            var orgDbId = A<int>();
+            var parameters = new LocalOptionCreateParameters()
+            {
+                OptionId = A<int>()
+            };
+            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
+            _authenticationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(false);
+
+            var result = _sut.CreateLocalOption(orgUuid, parameters);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
         private void ExpectCreateSuccess(Result<TestLocalOptionEntity, OperationError> result, int optionId, bool expectNewlyInserted = false)
         {
             Assert.True(result.Ok);
