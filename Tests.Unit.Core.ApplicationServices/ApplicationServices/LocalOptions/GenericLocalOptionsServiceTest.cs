@@ -106,13 +106,10 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             {
                 OptionId = optionId
             };
-            var existingOptionsList = new List<TestLocalOptionEntity>()
-                { new() { OptionId = optionId, Organization = new Organization() { Uuid = orgUuid } } };
-            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
+            SetupLocalRepositoryReturnsOneOption(optionId, orgUuid);
+           _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
             _authenticationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
-            _localOptionsRepository.Setup(_ => _.AsQueryable())
-                .Returns(existingOptionsList.AsQueryable());
-
+            
             var result = _sut.CreateLocalOption(orgUuid, parameters);
 
             ExpectCreateSuccess(result, optionId);
@@ -135,6 +132,59 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
+
+        [Fact]
+        public void Can_Patch_Nonexisting_Local_Option_By_Creating_It()
+        {
+            var orgUuid = A<Guid>();
+            var orgDbId = A<int>();
+            var optionId = A<int>();
+            var parameters = new LocalOptionUpdateParameters()
+            {
+                Description = A<string>()
+            };
+            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
+            _authenticationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
+
+
+            var result = _sut.PatchLocalOption(orgUuid, optionId, parameters);
+
+            Assert.True(result.Ok);
+            Assert.Equal(parameters.Description, result.Value.Description);
+            _localOptionsRepository.Verify(_ => _.Insert(It.IsAny<TestLocalOptionEntity>()));
+            _localOptionsRepository.Verify(_ => _.Save());
+        }
+
+        [Fact]
+        public void Can_Patch_Existing_Local_Option()
+        {
+            var orgUuid = A<Guid>();
+            var orgDbId = A<int>();
+            var optionId = A<int>();
+            var parameters = new LocalOptionUpdateParameters()
+            {
+                Description = A<string>()
+            };
+            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
+            _authenticationContext.Setup(_ => _.AllowModify(It.IsAny<TestLocalOptionEntity>())).Returns(true);
+            SetupLocalRepositoryReturnsOneOption(optionId, orgUuid);
+
+            var result = _sut.PatchLocalOption(orgUuid, optionId, parameters);
+
+            Assert.True(result.Ok);
+            Assert.Equal(parameters.Description, result.Value.Description);
+            _localOptionsRepository.Verify(_ => _.Update(It.IsAny<TestLocalOptionEntity>()));
+            _localOptionsRepository.Verify(_ => _.Save());
+        }
+
+        private void SetupLocalRepositoryReturnsOneOption(int optionId, Guid orgUuid)
+        {
+            var existingOptionsList = new List<TestLocalOptionEntity>()
+                { new() { OptionId = optionId, Organization = new Organization() { Uuid = orgUuid } } };
+            _localOptionsRepository.Setup(_ => _.AsQueryable())
+                .Returns(existingOptionsList.AsQueryable());
+        }
+
         private void ExpectCreateSuccess(Result<TestLocalOptionEntity, OperationError> result, int optionId, bool expectNewlyInserted = false)
         {
             Assert.True(result.Ok);
