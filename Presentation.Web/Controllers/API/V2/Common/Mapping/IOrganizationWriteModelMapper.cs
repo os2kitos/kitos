@@ -10,5 +10,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         OrganizationMasterDataUpdateParameters ToMasterDataUpdateParameters(OrganizationMasterDataRequestDTO dto);
         OrganizationMasterDataRolesUpdateParameters ToMasterDataRolesUpdateParameters(Guid organizationUuid,
             OrganizationMasterDataRolesRequestDTO dto);
+
+        OrganizationUpdateParameters ToOrganizationUpdateParameters(OrganizationUpdateRequestDTO dto);
     }
 }

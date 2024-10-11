@@ -4,9 +4,9 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Moq;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
-using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Tests.Toolkit.Patterns;
+using Tests.Unit.Presentation.Web.Extensions;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
@@ -15,7 +15,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     {
         private OrganizationResponseMapper _sut;
         private Mock<IOrganizationTypeMapper> _organizationTypeMapper;
-        private const int CvrMaxLength = 10;
 
         public OrganizationResponseMapperTest()
         {
@@ -30,7 +29,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             {
                 Uuid = A<Guid>(),
                 Name = A<string>(),
-                Cvr = GetCvr(),
+                Cvr = A<string>().AsCvr(),
                 Type = new OrganizationType(){ Id = 1 }
             };
             var expectedOrganizationType =
@@ -94,7 +93,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             {
                 Uuid = A<Guid>(),
                 Name = A<string>(),
-                Cvr = GetCvr(),
+                Cvr = A<string>().AsCvr(),
                 Email = A<string>(),
                 Phone = A<string>(),
                 Adress = A<string>()
@@ -146,12 +145,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected.Cvr, actual.Cvr);
             Assert.Equal(expected.Phone, actual.Phone);
             Assert.Equal(expected.Adress, actual.Address);
-        }
-
-        private string GetCvr()
-        {
-            var s = A<string>();
-            return s.Length <= CvrMaxLength ? s : s.Substring(0, CvrMaxLength);
         }
 }
 }

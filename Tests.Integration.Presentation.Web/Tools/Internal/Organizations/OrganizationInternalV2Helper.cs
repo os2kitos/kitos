@@ -21,6 +21,12 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
             return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/{MasterDataSuffix}"), cookie);
         }
 
+        public static async Task<HttpResponseMessage> PatchOrganization(Guid organizationUuid, OrganizationUpdateRequestDTO dto)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/patch"), cookie, dto);
+        }
+
         public static async Task<HttpResponseMessage> PatchOrganizationMasterData(Guid organizationUuid,
             OrganizationMasterDataRequestDTO dto)
         {
