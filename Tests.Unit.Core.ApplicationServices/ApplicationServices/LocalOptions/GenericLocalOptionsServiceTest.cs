@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.LocalOptions.Base;
 using Core.ApplicationServices.Model.LocalOptions;
@@ -92,12 +93,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
 
             var result = _sut.CreateLocalOption(orgUuid, parameters);
 
-            Assert.True(result.Ok);
-            var option = result.Value;
-            Assert.Equal(parameters.OptionId, option.OptionId);
-            Assert.True(option.IsActive);
-            _localOptionsRepository.Verify(_ => _.Insert(It.IsAny<TestLocalOptionEntity>()), Times.Once);
-            _localOptionsRepository.Verify(_ => _.Save(), Times.Once);
+            ExpectCreateSuccess(result, parameters.OptionId, true);
         }
 
         [Fact]
@@ -116,14 +112,22 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             _authenticationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
             _localOptionsRepository.Setup(_ => _.AsQueryable())
                 .Returns(existingOptionsList.AsQueryable());
+
             var result = _sut.CreateLocalOption(orgUuid, parameters);
 
+            ExpectCreateSuccess(result, optionId);
+        }
+
+        private void ExpectCreateSuccess(Result<TestLocalOptionEntity, OperationError> result, int optionId, bool expectNewlyInserted = false)
+        {
             Assert.True(result.Ok);
             var option = result.Value;
-            Assert.Equal(parameters.OptionId, option.OptionId);
+            Assert.Equal(optionId, option.OptionId);
             Assert.True(option.IsActive);
-            _localOptionsRepository.Verify(_ => _.Insert(It.IsAny<TestLocalOptionEntity>()), Times.Never);
             _localOptionsRepository.Verify(_ => _.Save(), Times.Once);
+            var insertedTimes = expectNewlyInserted ? Times.Once() : Times.Never();
+            _localOptionsRepository.Verify(_ => _.Insert(It.IsAny<TestLocalOptionEntity>()), insertedTimes);
+
         }
 
         private IList<TestLocalOptionEntity> SetupOptionRepositories(Guid orgUuid, int? staticOptionId = null)
