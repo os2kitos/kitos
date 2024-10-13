@@ -13,9 +13,9 @@ using Core.ApplicationServices.Model.LocalOptions;
 
 namespace Core.ApplicationServices.LocalOptions.Base
 {
-    public class GenericLocalOptionsService<TLocalOptionType, TDomainModelType, TOptionType> : IGenericLocalOptionsService<TLocalOptionType, TDomainModelType, TOptionType>
+    public class GenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType> : IGenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType>
     where TLocalOptionType : LocalOptionEntity<TOptionType>, new ()
-    where TOptionType : OptionEntity<TDomainModelType>
+    where TOptionType : OptionEntity<TReferenceType>
     {
         private readonly IGenericRepository<TOptionType> _optionsRepository;
         private readonly IGenericRepository<TLocalOptionType> _localOptionRepository;

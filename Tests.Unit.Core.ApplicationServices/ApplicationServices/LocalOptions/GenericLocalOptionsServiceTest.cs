@@ -17,8 +17,8 @@ using Xunit;
 namespace Tests.Unit.Core.ApplicationServices.LocalOptions
 {
     public class TestLocalOptionEntity : LocalOptionEntity<TestOptionEntity> { }
-    public class TestOptionEntity : OptionEntity<TestDomainModel> { }
-    public class TestDomainModel { }
+    public class TestOptionEntity : OptionEntity<TestReferenceType> { }
+    public class TestReferenceType { }
     public class GenericLocalOptionsServiceTest: WithAutoFixture
     {
         private Mock<IGenericRepository<TestOptionEntity>> _optionsRepository;
@@ -27,7 +27,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
         private Mock<IEntityIdentityResolver> _identityResolver;
         private Mock<IDomainEvents> _domainEvents;
 
-        private GenericLocalOptionsService<TestLocalOptionEntity, TestDomainModel, TestOptionEntity> _sut;
+        private GenericLocalOptionsService<TestLocalOptionEntity, TestReferenceType, TestOptionEntity> _sut;
         public GenericLocalOptionsServiceTest()
         {
             _optionsRepository = new Mock<IGenericRepository<TestOptionEntity>>();
@@ -36,7 +36,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             _identityResolver = new Mock<IEntityIdentityResolver>();
             _domainEvents = new Mock<IDomainEvents>();
 
-            _sut = new GenericLocalOptionsService<TestLocalOptionEntity, TestDomainModel, TestOptionEntity>(
+            _sut = new GenericLocalOptionsService<TestLocalOptionEntity, TestReferenceType, TestOptionEntity>(
                 _optionsRepository.Object
                 , _localOptionsRepository.Object,
                 _authorizationContext.Object,
