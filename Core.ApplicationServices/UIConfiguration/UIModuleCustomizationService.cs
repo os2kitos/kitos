@@ -54,7 +54,7 @@ namespace Core.ApplicationServices.UIConfiguration
         {
             return _identityResolver.ResolveDbId<Organization>(organizationUuid)
                 .Match(dbId => GetModuleCustomizationForOrganization(dbId, module),
-                    () => new OperationError(OperationFailure.NotFound));
+                    () => new OperationError($"Unable to resolve organization id for organization UUID: {organizationUuid}", OperationFailure.NotFound));
         }
 
 
