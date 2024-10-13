@@ -65,6 +65,21 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
         };
     }
 
+    public OrganizationUpdateParameters ToOrganizationUpdateParameters(OrganizationUpdateRequestDTO dto)
+    {
+        var rule = CreateChangeRule<OrganizationUpdateRequestDTO>(false);
+
+        return new()
+        {
+            Cvr = rule.MustUpdate(x => x.Cvr)
+                ? (dto.Cvr.FromNullable() ?? Maybe<string>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<string>>.None,
+            Name = rule.MustUpdate(x => x.Name)
+                ? (dto.Name.FromNullable() ?? Maybe<string>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<string>>.None
+        };
+    }
+
     public Result<UIModuleCustomizationParameters, OperationError> ToUIModuleCustomizationParameters(Guid organizationUuid, string moduleName,
         UIModuleCustomizationRequestDTO dto)
     { 

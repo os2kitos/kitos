@@ -84,12 +84,28 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [HttpPatch]
+        [Route("patch")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult PatchOrganization([FromUri][NonEmptyGuid] Guid organizationUuid, OrganizationUpdateRequestDTO requestDto)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var updateParameters = _organizationWriteModelMapper.ToOrganizationUpdateParameters(requestDto);
+            return _organizationWriteService.UpdateOrganization(organizationUuid, updateParameters)
+                .Select(_organizationResponseMapper.ToOrganizationDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpPatch]
         [Route("master-data")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult UpdateOrganizationMasterData([FromUri] [NonEmptyGuid] Guid organizationUuid, OrganizationMasterDataRequestDTO requestDto)
+        public IHttpActionResult PatchOrganizationMasterData([FromUri] [NonEmptyGuid] Guid organizationUuid, OrganizationMasterDataRequestDTO requestDto)
         {
             if (!ModelState.IsValid) return BadRequest();
             
