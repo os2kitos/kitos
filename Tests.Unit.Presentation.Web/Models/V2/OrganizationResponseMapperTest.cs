@@ -174,12 +174,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected.Adress, actual.Address);
         }
 
-        private string GetCvr()
-        {
-            var s = A<string>();
-            return s.Length <= CvrMaxLength ? s : s.Substring(0, CvrMaxLength);
-        }
-
         private List<CustomizedUINode> PrepareTestNodes(int numberOfElements = 1, string key = "", bool isEnabled = false)
         {
             var nodes = new List<CustomizedUINode>();
