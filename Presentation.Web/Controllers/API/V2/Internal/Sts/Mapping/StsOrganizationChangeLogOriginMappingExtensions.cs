@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models.API.V1.Organizations;
+using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 
-namespace Presentation.Web.Controllers.API.V1.Mapping
+namespace Presentation.Web.Controllers.API.V2.Internal.Sts.Mapping
 {
     public static class StsOrganizationChangeLogOriginMappingExtensions
     {
