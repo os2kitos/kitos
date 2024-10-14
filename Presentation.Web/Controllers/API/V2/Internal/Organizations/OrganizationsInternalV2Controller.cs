@@ -94,7 +94,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             if (!ModelState.IsValid) return BadRequest();
 
             var updateParameters = _organizationWriteModelMapper.ToOrganizationUpdateParameters(requestDto);
-            return _organizationWriteService.UpdateOrganization(organizationUuid, updateParameters)
+            return _organizationWriteService.PatchOrganization(organizationUuid, updateParameters)
                 .Select(_organizationResponseMapper.ToOrganizationDTO)
                 .Match(Ok, FromOperationError);
         }
@@ -110,7 +110,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             if (!ModelState.IsValid) return BadRequest();
             
             var updateParameters = _organizationWriteModelMapper.ToMasterDataUpdateParameters(requestDto);
-            return _organizationWriteService.UpdateMasterData(organizationUuid, updateParameters)
+            return _organizationWriteService.PatchMasterData(organizationUuid, updateParameters)
                 .Select(_organizationResponseMapper.ToMasterDataDTO)
                 .Match(Ok, FromOperationError);
         }
@@ -154,7 +154,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             if (!ModelState.IsValid) return BadRequest();
 
             var updateParameters = _organizationWriteModelMapper.ToMasterDataRolesUpdateParameters(organizationUuid, requestDto);
-            return _organizationWriteService.UpsertOrganizationMasterDataRoles(organizationUuid, updateParameters)
+            return _organizationWriteService.PatchOrganizationMasterDataRoles(organizationUuid, updateParameters)
                 .Select(_organizationResponseMapper.ToRolesDTO)
                 .Match(Ok, FromOperationError);
         }

@@ -72,7 +72,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Cvr = newCvr,
             };
 
-            var result = _sut.UpdateMasterData(organizationUuid, updateParameters);
+            var result = _sut.PatchMasterData(organizationUuid, updateParameters);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
@@ -92,7 +92,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Cvr = newCvr,
             };
 
-            var result = _sut.UpdateMasterData(invalidOrganizationUuid, updateParameters);
+            var result = _sut.PatchMasterData(invalidOrganizationUuid, updateParameters);
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
@@ -119,7 +119,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Email = newEmail
             };
 
-            var result = _sut.UpdateMasterData(organizationUuid, updateParameters);
+            var result = _sut.PatchMasterData(organizationUuid, updateParameters);
             Assert.True(result.Ok);
 
             var updatedOrganization = result.Value;
@@ -149,7 +149,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Phone = Maybe<string>.None.AsChangedValue()
             };
 
-            var result = _sut.UpdateMasterData(organizationUuid, updateParameters);
+            var result = _sut.PatchMasterData(organizationUuid, updateParameters);
             Assert.True(result.Ok);
 
             var updatedOrganization = result.Value;
@@ -172,7 +172,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationService.Setup(_ => _.GetOrganization(invalidOrganizationUuid, null)).Returns(new OperationError(OperationFailure.NotFound));
 
             var result =
-                _sut.UpsertOrganizationMasterDataRoles(invalidOrganizationUuid, new OrganizationMasterDataRolesUpdateParameters());
+                _sut.PatchOrganizationMasterDataRoles(invalidOrganizationUuid, new OrganizationMasterDataRolesUpdateParameters());
 
             Assert.True(result.Failed);
             var error = result.Error;
@@ -191,7 +191,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 .Returns(false);
 
             var result =
-                _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
+                _sut.PatchOrganizationMasterDataRoles(org.Uuid, updateParameters);
 
             Assert.True(result.Failed);
             var error = result.Error;
@@ -241,7 +241,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
-            var result = _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
+            var result = _sut.PatchOrganizationMasterDataRoles(org.Uuid, updateParameters);
 
             Assert.True(result.Ok);
             var value = result.Value;
@@ -281,7 +281,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ => _.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
             _authorizationContext.Setup(_ => _.AllowCreate<DataResponsible>(orgId)).Returns(true);
 
-            var result = _sut.UpsertOrganizationMasterDataRoles(org.Uuid, updateParameters);
+            var result = _sut.PatchOrganizationMasterDataRoles(org.Uuid, updateParameters);
 
             Assert.True(result.Ok);
             _contactPersonRepository.Verify(_ => _.Insert(It.IsAny<ContactPerson>()));

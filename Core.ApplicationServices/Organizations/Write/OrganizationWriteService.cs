@@ -41,7 +41,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
         _dataProtectionAdvisorRepository = dataProtectionAdvisorRepository;
     }
 
-    public Result<Organization, OperationError> UpdateMasterData(Guid organizationUuid, OrganizationMasterDataUpdateParameters parameters)
+    public Result<Organization, OperationError> PatchMasterData(Guid organizationUuid, OrganizationMasterDataUpdateParameters parameters)
     {
         using var transaction = _transactionManager.Begin();
         var result = GetOrganizationAndVerifyWriteAccess(organizationUuid)
@@ -164,7 +164,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
         };
     }
 
-    public Result<OrganizationMasterDataRoles, OperationError> UpsertOrganizationMasterDataRoles(Guid organizationUuid,
+    public Result<OrganizationMasterDataRoles, OperationError> PatchOrganizationMasterDataRoles(Guid organizationUuid,
         OrganizationMasterDataRolesUpdateParameters updateParameters)
     {
         using var transaction = _transactionManager.Begin();
