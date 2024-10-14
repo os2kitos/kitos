@@ -396,7 +396,7 @@
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\OrganizationUnitWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitRegistrationInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitsInternalV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\Internal\Sts\StsOrganiationSynchronizationInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Sts\StsOrganizationSynchronizationInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\Users\Mapping\DefaultUserStartPreferenceChoiceMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Users\Mapping\IUserResponseModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Users\Mapping\IUserWriteModelMapper.cs" />

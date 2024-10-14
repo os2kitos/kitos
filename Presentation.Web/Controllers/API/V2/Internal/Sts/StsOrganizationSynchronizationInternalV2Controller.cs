@@ -8,18 +8,16 @@ using Core.ApplicationServices.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Web;
 using System.Web.Http;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Sts
 {
     [RoutePrefix("api/v2/internal/organizations/{organizationUuid}/sts-organization-synchronization")]
-    public class StsOrganiationSynchronizationInternalV2Controller : InternalApiV2Controller
+    public class StsOrganizationSynchronizationInternalV2Controller : InternalApiV2Controller
     {
         private readonly IStsOrganizationSynchronizationService _stsOrganizationSynchronizationService;
 
-        public StsOrganiationSynchronizationInternalV2Controller(IStsOrganizationSynchronizationService stsOrganizationSynchronizationService)
+        public StsOrganizationSynchronizationInternalV2Controller(IStsOrganizationSynchronizationService stsOrganizationSynchronizationService)
         {
             _stsOrganizationSynchronizationService = stsOrganizationSynchronizationService;
         }
