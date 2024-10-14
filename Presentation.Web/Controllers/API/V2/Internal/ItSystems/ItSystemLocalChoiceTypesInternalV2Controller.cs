@@ -10,6 +10,7 @@ using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
+using Presentation.Web.Models.API.V2.Internal.Response;
 using Presentation.Web.Models.API.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 
@@ -31,7 +32,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
 
         [HttpGet]
         [Route("business-types")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegularOptionResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<LocalRegularOptionResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -46,7 +47,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
 
         [HttpGet]
         [Route("business-types/{optionId}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RegularOptionResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -55,13 +56,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
             if (!ModelState.IsValid) return BadRequest();
 
             return _businessTypeService.GetByOrganizationUuidAndOptionId(organizationUuid, optionId)
-                .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
+                .Select(_responseMapper.OptionEntityToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
 
         [HttpPost]
         [Route("business-types/")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegularOptionResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -71,10 +72,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
 
             var updateParameters = _writeModelMapper.ToLocalOptionCreateParameters(dto);
 
-            return Ok();
-            //return _businessTypeService.CreateLocalOption(organizationUuid, updateParameters)
-            //    .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
-            //    .Match(Ok, FromOperationError);
+            return _businessTypeService.CreateLocalOption(organizationUuid, updateParameters)
+                .Select(_responseMapper.LocalOptionEntityToLocalRegularOptionDTO<ItSystem, BusinessType, LocalBusinessType>)
+                .Match(Ok, FromOperationError);
         }
 
     }
