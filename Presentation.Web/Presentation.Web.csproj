@@ -420,6 +420,7 @@
     <Compile Include="Models\API\V2\Internal\Request\Notifications\NotificationSentResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\ColumnConfigurationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\ContactPersonRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Organizations\CustomizedUINodeRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\DataProtectionAdvisorRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\DataResponsibleRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\OrganizationGridConfigurationRequestDTO.cs" />
@@ -429,6 +430,7 @@
     <Compile Include="Models\API\V2\Internal\Request\OrganizationUnit\ChangeOrganizationUnitRegistrationV2RequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\OrganizationUnit\ChangePaymentRegistrationV2RequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\OrganizationUnit\TransferOrganizationUnitRegistrationV2RequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Organizations\UIModuleCustomizationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\User\MutateRightRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\User\MutateUserRightsRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItContract\LocalItContractRolesResponseDTO.cs" />
@@ -441,6 +443,7 @@
     <Compile Include="Models\API\V2\Internal\Response\ItSystem\ItSystemSearchResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\ColumnConfigurationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\ContactPersonResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\Organizations\CustomizedUINodeResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\DataProtectionAdvisorResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\DataResponsibleResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationGridConfigurationResponseDTO.cs" />
@@ -448,6 +451,7 @@
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationMasterDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationMasterDataRoleResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationPermissionsResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\Organizations\UIModuleCustomizationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\OrganizationUnitRoleAssignmentResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\OrganizationUnitRolesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\OrganizationRegistrationUnitResponseDTO.cs" />

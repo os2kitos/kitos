@@ -3,6 +3,7 @@ using System.Net;
 using Core.ApplicationServices.Organizations;
 using System.Web.Http;
 using Core.ApplicationServices.Organizations.Write;
+using Core.ApplicationServices.UIConfiguration;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
@@ -22,13 +23,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         private readonly IOrganizationWriteService _organizationWriteService;
         private readonly IOrganizationResponseMapper _organizationResponseMapper;
         private readonly IOrganizationWriteModelMapper _organizationWriteModelMapper;
+        private readonly IUIModuleCustomizationService _uiModuleCustomizationService;
 
-        public OrganizationsInternalV2Controller(IOrganizationService organizationService, IOrganizationResponseMapper organizationResponseMapper, IOrganizationWriteModelMapper organizationWriteModelMapper, IOrganizationWriteService organizationWriteService)
+        public OrganizationsInternalV2Controller(IOrganizationService organizationService, IOrganizationResponseMapper organizationResponseMapper, IOrganizationWriteModelMapper organizationWriteModelMapper, IOrganizationWriteService organizationWriteService, IUIModuleCustomizationService uiModuleCustomizationService)
         {
             _organizationService = organizationService;
             _organizationResponseMapper = organizationResponseMapper;
             _organizationWriteModelMapper = organizationWriteModelMapper;
             _organizationWriteService = organizationWriteService;
+            _uiModuleCustomizationService = uiModuleCustomizationService;
         }
 
         [Route("permissions")]
@@ -43,13 +46,50 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 .Match(Ok, FromOperationError);
         }
 
+        [Route("ui-customization/{moduleName}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UIModuleCustomizationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult GetUIModuleCustomization([NonEmptyGuid] Guid organizationUuid, [FromUri] string moduleName)
+        {
+            return _uiModuleCustomizationService.GetModuleCustomizationByOrganizationUuid(organizationUuid, moduleName)
+             .Select(_organizationResponseMapper.ToUIModuleCustomizationResponseDTO)
+             .Match(Ok, FromOperationError);
+        }
+
+        [Route("ui-customization/{moduleName}")]
+        [HttpPut]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UIModuleCustomizationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult PutUIModuleCustomization([NonEmptyGuid] Guid organizationUuid, [FromUri] string moduleName,
+            UIModuleCustomizationRequestDTO dto)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var updateParametersResult =
+                _organizationWriteModelMapper.ToUIModuleCustomizationParameters(organizationUuid, moduleName, dto);
+            if (updateParametersResult.Failed) return FromOperationError(updateParametersResult.Error);
+
+            var updateCustomizationErrorMaybe = _uiModuleCustomizationService.UpdateModule(updateParametersResult.Value);
+            
+            return updateCustomizationErrorMaybe.Match(
+                FromOperationError,
+                () => _uiModuleCustomizationService.GetModuleCustomizationByOrganizationUuid(organizationUuid, moduleName)
+                    .Select(_organizationResponseMapper.ToUIModuleCustomizationResponseDTO)
+                    .Match(Ok, FromOperationError));
+
+        }
+
         [HttpPatch]
         [Route("patch")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult UpdateOrganization([FromUri][NonEmptyGuid] Guid organizationUuid, OrganizationUpdateRequestDTO requestDto)
+        public IHttpActionResult PatchOrganization([FromUri][NonEmptyGuid] Guid organizationUuid, OrganizationUpdateRequestDTO requestDto)
         {
             if (!ModelState.IsValid) return BadRequest();
 
@@ -60,12 +100,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [HttpPatch]
-        [Route("masterData")]
+        [Route("master-data")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult UpdateOrganizationMasterData([FromUri] [NonEmptyGuid] Guid organizationUuid, OrganizationMasterDataRequestDTO requestDto)
+        public IHttpActionResult PatchOrganizationMasterData([FromUri] [NonEmptyGuid] Guid organizationUuid, OrganizationMasterDataRequestDTO requestDto)
         {
             if (!ModelState.IsValid) return BadRequest();
             
@@ -75,7 +115,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 .Match(Ok, FromOperationError);
         }
 
-        [Route("masterData")]
+        [Route("master-data")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -89,7 +129,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 .Match(Ok, FromOperationError);
         }
 
-        [Route("masterData/roles")]
+        [Route("master-data/roles")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataRolesResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -104,7 +144,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
         
         [HttpPatch]
-        [Route("masterData/roles")]
+        [Route("master-data/roles")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataRolesResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]

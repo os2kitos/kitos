@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.UIConfiguration;
 using Moq;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
@@ -20,6 +24,29 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             _organizationTypeMapper = new Mock<IOrganizationTypeMapper>();
             _sut = new OrganizationResponseMapper(_organizationTypeMapper.Object);
+        }
+
+        [Fact]
+        public void Can_Map_To_UI_Customization_DTO()
+        {
+            var customization = new UIModuleCustomization()
+            {
+                Id = A<int>(),
+                Module = A<string>(),
+                Nodes = PrepareTestNodes(5, A<string>())
+            };
+
+            var result = _sut.ToUIModuleCustomizationResponseDTO(customization);
+
+            Assert.Equal(customization.Module, result.Module);
+            Assert.Equal(customization.Nodes.Count, result.Nodes.Count());
+            foreach (var expectedNode in customization.Nodes)
+            {
+                var actual = result.Nodes.FirstOrDefault(nodeDto => nodeDto.Key == expectedNode.Key);
+
+                Assert.NotNull(actual);
+                Assert.Equal(expectedNode.Enabled, actual.Enabled);
+            }
         }
 
         [Fact]
@@ -146,5 +173,22 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected.Phone, actual.Phone);
             Assert.Equal(expected.Adress, actual.Address);
         }
-}
+
+        private List<CustomizedUINode> PrepareTestNodes(int numberOfElements = 1, string key = "", bool isEnabled = false)
+        {
+            var nodes = new List<CustomizedUINode>();
+            for (var i = 0; i < numberOfElements; i++)
+            {
+                key = string.IsNullOrEmpty(key) ? GenerateKey() : key;
+                nodes.Add(new CustomizedUINode { Key = key, Enabled = isEnabled });
+            }
+
+            return nodes;
+        }
+
+        private string GenerateKey()
+        {
+            return Regex.Replace(A<string>(), "[0-9-]", "a");
+        }
+    }
 }
