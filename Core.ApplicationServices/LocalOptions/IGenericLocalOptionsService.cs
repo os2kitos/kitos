@@ -11,7 +11,7 @@ namespace Core.ApplicationServices.LocalOptions
         where TOptionType : OptionEntity<TReferenceType>
     {
         Result<IEnumerable<TOptionType>, OperationError> GetByOrganizationUuid(Guid organizationUuid);
-        Result<TOptionType, OperationError> GetByOrganizationUuidAndOptionId(Guid organizationUuid, int roleId);
+        Result<TOptionType, OperationError> GetByOrganizationUuidAndOptionId(Guid organizationUuid, int optionId);
 
         Result<TOptionType, OperationError> CreateLocalOption(Guid organizationUuid,
             LocalOptionCreateParameters parameters);

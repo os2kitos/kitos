@@ -9,7 +9,6 @@ using Xunit;
 namespace Tests.Unit.Presentation.Web.Models.V2
 
 {
-
     public class TestOptionEntity : OptionEntity<TestReferenceType> { }
     public class TestReferenceType { }
     public class LocalOptionTypeResponseMapperTest: WithAutoFixture
@@ -23,7 +22,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                     Uuid = A<Guid>(),
                     Name = A<string>(),
                     Description = A<string>(),
-                    IsLocallyAvailable = A<bool>()
+                    IsLocallyAvailable = A<bool>(),
+                    IsObligatory = A<bool>()
                 }).ToList();
             var sut = new LocalOptionTypeResponseMapper();
 
@@ -35,6 +35,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(option.Name, actual.Name);
                 Assert.Equal(option.Description, actual.Description);
                 Assert.Equal(option.IsLocallyAvailable, actual.IsActive);
+                Assert.Equal(option.IsObligatory, actual.IsObligatory);
             });
         }
 
@@ -46,7 +47,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Uuid = A<Guid>(),
                 Name = A<string>(),
                 Description = A<string>(),
-                IsLocallyAvailable = A<bool>()
+                IsLocallyAvailable = A<bool>(),
+                IsObligatory = A<bool>()
             };
             var sut = new LocalOptionTypeResponseMapper();
 
@@ -55,6 +57,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected.Name, actual.Name);
             Assert.Equal(expected.Description, actual.Description);
             Assert.Equal(expected.IsLocallyAvailable, actual.IsActive);
+            Assert.Equal(expected.IsObligatory, actual.IsObligatory);
         }
     }
 }
