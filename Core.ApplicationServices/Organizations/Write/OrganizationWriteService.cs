@@ -45,7 +45,8 @@ public class OrganizationWriteService : IOrganizationWriteService{
     {
         using var transaction = _transactionManager.Begin();
         var result = GetOrganizationAndVerifyWriteAccess(organizationUuid)
-            .Bind(organization => PerformMasterDataUpdates(organization, parameters));
+            .Bind(organizationWithWriteAccess => WithModifyCvrAccessIfRequired(organizationWithWriteAccess, parameters))
+            .Bind(organizationWithConfirmedAccess => PerformMasterDataUpdates(organizationWithConfirmedAccess, parameters));
 
         if (result.Failed)
         {
@@ -69,8 +70,8 @@ public class OrganizationWriteService : IOrganizationWriteService{
     {
         using var transaction = _transactionManager.Begin();
         var result = GetOrganizationAndVerifyWriteAccess(organizationUuid)
-            .Bind(organization => WithModifyCvrAccessIfRequired(organization, parameters))
-            .Bind(organizationWithWriteAccess => PerformOrganizationUpdates(organizationWithWriteAccess, parameters));
+            .Bind(organizationWithWriteAccess => WithModifyCvrAccessIfRequired(organizationWithWriteAccess, parameters))
+            .Bind(organizationWithConfirmedAccess => PerformOrganizationUpdates(organizationWithConfirmedAccess, parameters));
 
         if (result.Failed)
         {
