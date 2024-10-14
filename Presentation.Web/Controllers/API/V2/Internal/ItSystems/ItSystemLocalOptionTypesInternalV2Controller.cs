@@ -23,10 +23,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
-        public ItSystemLocalOptionTypesInternalV2Controller(IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> businessTypeService, ILocalOptionTypeResponseMapper responseMapper)
+        public ItSystemLocalOptionTypesInternalV2Controller(IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> businessTypeService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper)
         {
             _businessTypeService = businessTypeService;
             _responseMapper = responseMapper;
+            _writeModelMapper = writeModelMapper;
         }
 
         [HttpGet]
