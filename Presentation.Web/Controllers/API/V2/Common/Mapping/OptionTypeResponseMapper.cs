@@ -12,7 +12,7 @@ public class OptionTypeResponseMapper : IOptionTypeResponseMapper
         return options.Select(ToRegularOptionDTO<TReference, TOption>);
     }
 
-    private RegularOptionResponseDTO ToRegularOptionDTO<TReference, TOption>(TOption option)
+    public RegularOptionResponseDTO ToRegularOptionDTO<TReference, TOption>(TOption option)
         where TOption : OptionEntity<TReference>
     {
         return new(option.Uuid, option.Name, option.Description);

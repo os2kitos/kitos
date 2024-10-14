@@ -41,5 +41,20 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
                 .Select(_responseMapper.ToRegularOptionDTOs<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
+
+        [HttpGet]
+        [Route("business-types/{optionId}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegularOptionResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetBusinessTypeByOptionId([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] int optionId)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            return _businessTypeService.GetByOrganizationUuidAndOptionId(organizationUuid, optionId)
+                .Select(_responseMapper.ToRegularOptionDTO<ItSystem, BusinessType>)
+                .Match(Ok, FromOperationError);
+        }
     }
 }

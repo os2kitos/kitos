@@ -8,5 +8,8 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
     {
         public IEnumerable<RegularOptionResponseDTO> ToRegularOptionDTOs<TReference, TOption>(IEnumerable<TOption> options)
             where TOption : OptionEntity<TReference>;
+
+        public RegularOptionResponseDTO ToRegularOptionDTO<TReference, TOption>(TOption option)
+            where TOption : OptionEntity<TReference>;
     }
 }
