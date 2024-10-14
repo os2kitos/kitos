@@ -326,12 +326,16 @@ namespace Presentation.Web.Ninject
 
             //Public messages
             kernel.Bind<IPublicMessagesService>().To<PublicMessagesService>().InCommandScope(Mode);
+
+            //Local option types
+            RegisterLocalOptionTypes(kernel);
         }
 
         private void RegisterMappers(IKernel kernel)
         {
             //Generic
             kernel.Bind<IEntityWithDeactivatedStatusMapper>().To<EntityWithDeactivatedStatusMapper>().InCommandScope(Mode);
+            kernel.Bind<IOptionTypeResponseMapper>().To<OptionTypeResponseMapper>().InCommandScope(Mode);
 
             //Systems
             kernel.Bind<IItSystemWriteModelMapper>().To<ItSystemWriteModelMapper>().InCommandScope(Mode);
@@ -381,8 +385,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationWriteModelMapper>().To<OrganizationWriteModelMapper>().InCommandScope(Mode);
             kernel.Bind<IOrganizationTypeMapper>().To<OrganizationTypeMapper>().InCommandScope(Mode);
 
-            //Local option types
-            RegisterLocalOptionTypes(kernel);
+            
         }
 
         private void RegisterSSO(IKernel kernel)

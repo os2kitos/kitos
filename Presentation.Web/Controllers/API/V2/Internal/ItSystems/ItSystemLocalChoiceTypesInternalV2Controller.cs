@@ -2,13 +2,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.LocalOptions;
-using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.LocalOptions;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
@@ -20,10 +19,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
     {
 
         private readonly IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> _businessTypeService;
+        private readonly IOptionTypeResponseMapper _responseMapper;
 
-        public ItSystemLocalChoiceTypesInternalV2Controller(IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> businessTypeService)
+        public ItSystemLocalChoiceTypesInternalV2Controller(IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> businessTypeService, IOptionTypeResponseMapper responseMapper)
         {
             _businessTypeService = businessTypeService;
+            _responseMapper = responseMapper;
         }
 
         [HttpGet]
@@ -37,20 +38,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
             if (!ModelState.IsValid) return BadRequest();
 
             return _businessTypeService.GetByOrganizationUuid(organizationUuid)
-                .Select(ToRegularOptionDTOS)
+                .Select(_responseMapper.ToRegularOptionDTOs<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
-        }
-
-        private IEnumerable<RegularOptionResponseDTO> ToRegularOptionDTOS<TOption>(IEnumerable<TOption> options)
-            where TOption : OptionEntity<ItSystem>
-        {
-            return options.Select(ToRegularOptionDTO);
-        }
-
-        private RegularOptionResponseDTO ToRegularOptionDTO<TOption>(TOption option)
-        where TOption: OptionEntity<ItSystem>
-        {
-            return new(option.Uuid, option.Name, option.Description);
         }
     }
 }
