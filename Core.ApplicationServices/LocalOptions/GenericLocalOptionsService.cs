@@ -1,17 +1,17 @@
 ﻿using System;
-using Core.DomainModel;
-using Core.DomainServices;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.LocalOptions;
+using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Generic;
-using Core.ApplicationServices.Model.LocalOptions;
 
-namespace Core.ApplicationServices.LocalOptions.Base
+namespace Core.ApplicationServices.LocalOptions
 {
     public class GenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType> : IGenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType>
     where TLocalOptionType : LocalOptionEntity<TOptionType>, new ()

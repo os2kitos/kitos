@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.LocalOptions.Base;
+using Core.ApplicationServices.LocalOptions;
 using Core.ApplicationServices.Model.LocalOptions;
 using Core.DomainModel;
 using Core.DomainModel.Events;
