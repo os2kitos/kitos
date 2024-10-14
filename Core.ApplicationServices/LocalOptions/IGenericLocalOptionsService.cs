@@ -6,19 +6,19 @@ using Core.DomainModel;
 
 namespace Core.ApplicationServices.LocalOptions
 {
-    public interface IGenericLocalOptionsService<TLocalModelType, TDomainModelType, TOptionType>
-        where TLocalModelType : LocalOptionEntity<TOptionType>, new()
-        where TOptionType : OptionEntity<TDomainModelType>
+    public interface IGenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType>
+        where TLocalOptionType : LocalOptionEntity<TOptionType>, new()
+        where TOptionType : OptionEntity<TReferenceType>
     {
         Result<IEnumerable<TOptionType>, OperationError> GetByOrganizationUuid(Guid organizationUuid);
         Result<TOptionType, OperationError> GetByOrganizationUuidAndOptionId(Guid organizationUuid, int roleId);
 
-        Result<TLocalModelType, OperationError> CreateLocalOption(Guid organizationUuid,
+        Result<TOptionType, OperationError> CreateLocalOption(Guid organizationUuid,
             LocalOptionCreateParameters parameters);
 
-        Result<TLocalModelType, OperationError> PatchLocalOption(Guid organizationUuid, int optionId,
+        Result<TLocalOptionType, OperationError> PatchLocalOption(Guid organizationUuid, int optionId,
             LocalOptionUpdateParameters parameters);
 
-        Result<TLocalModelType, OperationError> DeleteLocalOption(Guid organizationUuid, int optionId);
+        Result<TLocalOptionType, OperationError> DeleteLocalOption(Guid organizationUuid, int optionId);
     }
 }

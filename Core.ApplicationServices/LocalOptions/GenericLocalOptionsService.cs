@@ -73,7 +73,7 @@ namespace Core.ApplicationServices.LocalOptions
             return option;
         }
 
-        public Result<TLocalOptionType, OperationError> CreateLocalOption(Guid organizationUuid, LocalOptionCreateParameters parameters)
+        public Result<TOptionType, OperationError> CreateLocalOption(Guid organizationUuid, LocalOptionCreateParameters parameters)
         {
             return ResolveOrganizationIdAndValidateCreate(organizationUuid)
                 .Bind(organizationId =>
@@ -86,17 +86,17 @@ namespace Core.ApplicationServices.LocalOptions
                             _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(existingLocalOption));
                             _localOptionRepository.Save();
 
-                            return Result<TLocalOptionType, OperationError>.Success(existingLocalOption);
+                            return GetByOrganizationUuidAndOptionId(organizationUuid, existingLocalOption.OptionId);
                         }, () =>
                         {
-                            var entity = new TLocalOptionType();
-                            entity.SetupNewLocalOption(organizationId, parameters.OptionId);
+                            var newLocalOption = new TLocalOptionType();
+                            newLocalOption.SetupNewLocalOption(organizationId, parameters.OptionId);
 
-                            _localOptionRepository.Insert(entity);
-                            _domainEvents.Raise(new EntityCreatedEvent<TLocalOptionType>(entity));
+                            _localOptionRepository.Insert(newLocalOption);
+                            _domainEvents.Raise(new EntityCreatedEvent<TLocalOptionType>(newLocalOption));
                             _localOptionRepository.Save();
 
-                            return Result<TLocalOptionType, OperationError>.Success(entity);
+                            return GetByOrganizationUuidAndOptionId(organizationUuid, newLocalOption.OptionId);
                         });
                 });
         }

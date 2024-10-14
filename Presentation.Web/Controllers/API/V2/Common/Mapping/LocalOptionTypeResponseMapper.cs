@@ -12,8 +12,7 @@ public class LocalOptionTypeResponseMapper : ILocalOptionTypeResponseMapper
         return options.Select(ToLocalRegularOptionDTO<TReference, TOption>);
     }
 
-    public LocalRegularOptionResponseDTO ToLocalRegularOptionDTO<TReference, TOption>(TOption option)
-        where TOption : OptionEntity<TReference>
+    public LocalRegularOptionResponseDTO ToLocalRegularOptionDTO<TReference, TOption>(TOption option) where TOption : OptionEntity<TReference>
     {
         return new(option.Uuid, option.Name, option.Description, option.IsLocallyAvailable);
     }

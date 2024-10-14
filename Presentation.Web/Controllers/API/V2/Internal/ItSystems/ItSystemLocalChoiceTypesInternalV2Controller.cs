@@ -56,7 +56,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
             if (!ModelState.IsValid) return BadRequest();
 
             return _businessTypeService.GetByOrganizationUuidAndOptionId(organizationUuid, optionId)
-                .Select(_responseMapper.OptionEntityToLocalRegularOptionDTO<ItSystem, BusinessType>)
+                .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
 
@@ -73,7 +73,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
             var updateParameters = _writeModelMapper.ToLocalOptionCreateParameters(dto);
 
             return _businessTypeService.CreateLocalOption(organizationUuid, updateParameters)
-                .Select(_responseMapper.LocalOptionEntityToLocalRegularOptionDTO<ItSystem, BusinessType, LocalBusinessType>)
+                .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
 
