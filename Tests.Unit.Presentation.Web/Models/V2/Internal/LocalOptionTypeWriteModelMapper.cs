@@ -11,7 +11,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
     public class LocalOptionTypeWriteModelMapperTest: WithAutoFixture
     {
         [Fact]
-        public void LocalOptionCreateParameters_Should_Map_To_LocalRegularOptionCreateRequestDTO()
+        public void Can_Map_Create_Dto()
         {
             var dto = new LocalRegularOptionCreateRequestDTO
             {

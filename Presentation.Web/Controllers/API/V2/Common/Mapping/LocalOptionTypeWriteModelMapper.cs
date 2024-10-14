@@ -8,7 +8,10 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
     {
         public LocalOptionCreateParameters ToLocalOptionCreateParameters(LocalRegularOptionCreateRequestDTO dto)
         {
-            throw new System.NotImplementedException();
+            return new()
+            {
+                OptionId = dto.OptionId,
+            };
         }
 
         public LocalOptionTypeWriteModelMapper(ICurrentHttpRequest currentHttpRequest) : base(currentHttpRequest)
