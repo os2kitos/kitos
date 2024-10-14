@@ -4,6 +4,9 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Newtonsoft.Json;
+using Presentation.Web.Models.API.V2.Internal.Request.Options;
+using Presentation.Web.Models.API.V2.Internal.Response;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Extensions;
 using Tests.Integration.Presentation.Web.Tools.Internal.ItSystem;
@@ -15,6 +18,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
     public class ItSystemLocalOptionTypesInternalV2ApiTest: WithAutoFixture
     {
         private const int CvrLengthLimit = 10;
+        private const string BusinessTypes = "business-types";
 
         [Fact]
         public async Task Can_Get_Local_Business_Types()
@@ -22,7 +26,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
             Assert.NotNull(organization);
 
-            var response = await ItSystemInternalV2Helper.GetLocalOptionTypes(organization.Uuid, "business-types");
+            using var response = await ItSystemInternalV2Helper.GetLocalOptionTypes(organization.Uuid, BusinessTypes);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -34,7 +38,20 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.NotNull(organization);
             var optionId = 1;
 
-            var response = await ItSystemInternalV2Helper.GetLocalOptionTypeByOptionId(organization.Uuid, "business-types", optionId);
+            using var response = await ItSystemInternalV2Helper.GetLocalOptionTypeByOptionId(organization.Uuid, BusinessTypes, optionId);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Create_Local_Option_Type()
+        {
+            var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            Assert.NotNull(organization);
+            var optionId = A<int>();
+            var dto = new LocalRegularOptionCreateRequestDTO() { OptionId = optionId };
+
+            using var response = await ItSystemInternalV2Helper.CreateLocalOptionType(organization.Uuid, BusinessTypes, dto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
