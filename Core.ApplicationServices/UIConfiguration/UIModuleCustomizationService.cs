@@ -36,7 +36,7 @@ namespace Core.ApplicationServices.UIConfiguration
         }
 
 
-        public Result<UIModuleCustomization, OperationError> GetModuleConfigurationForOrganization(int organizationId, string module)
+        public Result<UIModuleCustomization, OperationError> GetModuleCustomizationForOrganization(int organizationId, string module)
         {
             if (string.IsNullOrEmpty(module))
                 throw new ArgumentNullException("Module parameter is null");
@@ -49,6 +49,14 @@ namespace Core.ApplicationServices.UIConfiguration
                     )
                 );
         }
+
+        public Result<UIModuleCustomization, OperationError> GetModuleCustomizationByOrganizationUuid(Guid organizationUuid, string module)
+        {
+            return _identityResolver.ResolveDbId<Organization>(organizationUuid)
+                .Match(dbId => GetModuleCustomizationForOrganization(dbId, module),
+                    () => new OperationError($"Unable to resolve organization id for organization UUID: {organizationUuid}", OperationFailure.NotFound));
+        }
+
 
         public Maybe<OperationError> UpdateModule(UIModuleCustomizationParameters parameters)
         {

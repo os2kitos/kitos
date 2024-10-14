@@ -1,6 +1,6 @@
 ﻿using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models.API.V1.Organizations;
+using Core.DomainModel.UIConfiguration;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 
@@ -15,4 +15,5 @@ public interface IOrganizationResponseMapper
 
     OrganizationPermissionsResponseDTO ToPermissionsDTO(OrganizationPermissionsResult permissions);
 
+    UIModuleCustomizationResponseDTO ToUIModuleCustomizationResponseDTO(UIModuleCustomization uiModuleCustomization);
 }

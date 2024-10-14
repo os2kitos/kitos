@@ -1,5 +1,8 @@
-﻿using Core.ApplicationServices.Model.Organizations;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel.Organization;
+using Core.DomainModel.UIConfiguration;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using ContactPerson = Core.DomainModel.ContactPerson;
@@ -98,6 +101,29 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
                 Modify = permissions.Modify,
                 Delete = permissions.Delete,
                 ModifyCvr = permissions.ModifyCvr
+            };
+        }
+
+        public UIModuleCustomizationResponseDTO ToUIModuleCustomizationResponseDTO(UIModuleCustomization uiModuleCustomization)
+        {
+            return new()
+            {
+                Module = uiModuleCustomization.Module,
+                Nodes = ToCustomizedUINodeDTOs(uiModuleCustomization.Nodes)
+            };
+        }
+
+        private IEnumerable<CustomizedUINodeResponseDTO> ToCustomizedUINodeDTOs(ICollection<CustomizedUINode> nodes)
+        {
+            return nodes.Select(ToCustomizedUINodeDTO);
+        }
+
+        private CustomizedUINodeResponseDTO ToCustomizedUINodeDTO(CustomizedUINode node)
+        {
+            return new()
+            {
+                Key = node.Key,
+                Enabled = node.Enabled
             };
         }
     }

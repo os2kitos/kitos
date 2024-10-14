@@ -1,10 +1,14 @@
 ﻿using System;
+using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Organizations.Write;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.UiCustomization;
+using Core.DomainModel.Organization;
+using Core.DomainServices.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 
@@ -12,6 +16,13 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping;
 
 public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationWriteModelMapper
 {
+    private readonly IEntityIdentityResolver _identityResolver;
+
+    public OrganizationWriteModelMapper(ICurrentHttpRequest currentHttpRequest,
+        IEntityIdentityResolver identityResolver) : base(currentHttpRequest)
+    {
+        _identityResolver = identityResolver;
+    }
     public OrganizationMasterDataUpdateParameters ToMasterDataUpdateParameters(OrganizationMasterDataRequestDTO dto)
     {
         var rule = CreateChangeRule<OrganizationMasterDataRequestDTO>(false);
@@ -67,6 +78,21 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
                 ? (dto.Name.FromNullable() ?? Maybe<string>.None).AsChangedValue()
                 : OptionalValueChange<Maybe<string>>.None
         };
+    }
+
+    public Result<UIModuleCustomizationParameters, OperationError> ToUIModuleCustomizationParameters(Guid organizationUuid, string moduleName,
+        UIModuleCustomizationRequestDTO dto)
+    { 
+        var orgDbIdMaybe = _identityResolver.ResolveDbId<Organization>(organizationUuid);
+        if (!orgDbIdMaybe.HasValue) return new OperationError(OperationFailure.NotFound);
+
+        var nodes = dto.Nodes.Select(ToCustomUINodeParameters);
+        return new UIModuleCustomizationParameters(orgDbIdMaybe.Value, moduleName, nodes);
+    }
+
+    private CustomUINodeParameters ToCustomUINodeParameters(CustomizedUINodeRequestDTO node)
+    {
+        return new CustomUINodeParameters(node.Key, node.Enabled);
     }
 
     private static Maybe<ContactPersonUpdateParameters> ToContactPersonUpdateParameters(ContactPersonRequestDTO dto)
