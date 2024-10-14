@@ -11,20 +11,19 @@ using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
 using Presentation.Web.Models.API.V2.Internal.Response;
-using Presentation.Web.Models.API.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
 {
     [RoutePrefix("api/v2/internal/it-systems/{organizationUuid}/local-choice-types")]
-    public class ItSystemLocalChoiceTypesInternalV2Controller: InternalApiV2Controller
+    public class ItSystemLocalOptionTypesInternalV2Controller: InternalApiV2Controller
     {
 
         private readonly IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> _businessTypeService;
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
-        public ItSystemLocalChoiceTypesInternalV2Controller(IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> businessTypeService, ILocalOptionTypeResponseMapper responseMapper)
+        public ItSystemLocalOptionTypesInternalV2Controller(IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> businessTypeService, ILocalOptionTypeResponseMapper responseMapper)
         {
             _businessTypeService = businessTypeService;
             _responseMapper = responseMapper;

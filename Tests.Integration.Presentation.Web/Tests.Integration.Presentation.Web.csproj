@@ -139,7 +139,7 @@
     <Compile Include="Interfaces\V2\RightsHolderItInterfaceApiV2Test.cs" />
     <Compile Include="Internal\Messages\PublicMessagesApiV2Test.cs" />
     <Compile Include="ItSystem\V2\BaseItSystemsApiV2Test.cs" />
-    <Compile Include="ItSystem\V2\ItSystemLocalChoiceTypesInternalV2ApiTest.cs" />
+    <Compile Include="ItSystem\V2\ItSystemLocalOptionTypesInternalV2ApiTest.cs" />
     <Compile Include="ItSystem\V2\ItSystemsInternalApiV2Test.cs" />
     <Compile Include="ItSystem\V2\ItSystemsApiV2RightsHoldersTest.cs" />
     <Compile Include="LocalAdminArea\ExcelImportTest.cs" />

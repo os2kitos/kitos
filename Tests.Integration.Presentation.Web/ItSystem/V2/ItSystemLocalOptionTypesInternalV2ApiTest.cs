@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem.V2
 {
-    public class ItSystemLocalChoiceTypesInternalV2ApiTest: WithAutoFixture
+    public class ItSystemLocalOptionTypesInternalV2ApiTest: WithAutoFixture
     {
         private const int CvrLengthLimit = 10;
 
