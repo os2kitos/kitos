@@ -1,6 +1,6 @@
 ﻿using Core.DomainServices.Model.StsOrganization;
 
-namespace Presentation.Web.Models.API.V1.Organizations
+namespace Presentation.Web.Models.API.V2.Internal.Response.Organizations
 {
     public class StsOrganizationAccessStatusResponseDTO
     {

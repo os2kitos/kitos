@@ -13,7 +13,7 @@ using Core.DomainModel.Tracking;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model.StsOrganization;
 using Presentation.Web.Models.API.V1;
-using Presentation.Web.Models.API.V1.Organizations;
+using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
@@ -135,8 +135,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
             const int levels = 2;
-            var connectionUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection");
-            var getUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/snapshot?levels={levels}");
+            var connectionUrl = TestEnvironment.CreateUrl($"{GetBaseConnectionString(targetOrgUuid)}/connection");
+            var getUrl = TestEnvironment.CreateUrl($"{GetBaseConnectionString(targetOrgUuid)}/snapshot?levels={levels}");
             using var getResponse = await HttpApi.GetWithCookieAsync(getUrl, cookie);
             var expectedStructureAfterDisconnect = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationOrgUnitDTO>();
             if (purge)
@@ -858,14 +858,14 @@ namespace Tests.Integration.Presentation.Web.Organizations
         private static async Task<HttpResponseMessage> SendGetSnapshotAsync(int levels, Guid targetOrgUuid, Cookie cookie)
         {
             var url = TestEnvironment.CreateUrl(
-                $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/snapshot?levels={levels}");
+                $"{GetBaseConnectionString(targetOrgUuid)}/snapshot?levels={levels}");
             return await HttpApi.GetWithCookieAsync(url, cookie);
         }
 
         private static async Task<HttpResponseMessage> SendGetConnectionStatusAsync(Guid targetOrgUuid, Cookie cookie)
         {
             var url = TestEnvironment.CreateUrl(
-                $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection-status");
+                $"{GetBaseConnectionString(targetOrgUuid)}/connection-status");
             return await HttpApi.GetWithCookieAsync(url, cookie);
         }
 
@@ -873,7 +873,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         {
             var postUrl =
                 TestEnvironment.CreateUrl(
-                    $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection");
+                    $"{GetBaseConnectionString(targetOrgUuid)}/connection");
             return await HttpApi.PostWithCookieAsync(postUrl, cookie, new ConnectToStsOrganizationRequestDTO
             {
                 SynchronizationDepth = levels,
@@ -885,7 +885,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         {
             var getUrl =
                 TestEnvironment.CreateUrl(
-                    $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection/update?synchronizationDepth={levels}");
+                    $"{GetBaseConnectionString(targetOrgUuid)}/connection/update?synchronizationDepth={levels}");
             return await HttpApi.GetWithCookieAsync(getUrl, cookie);
         }
 
@@ -893,7 +893,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         {
             var postUrl =
                 TestEnvironment.CreateUrl(
-                    $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection");
+                    $"{GetBaseConnectionString(targetOrgUuid)}/connection");
             return await HttpApi.PutWithCookieAsync(postUrl, cookie, new ConnectToStsOrganizationRequestDTO
             {
                 SynchronizationDepth = levels,
@@ -903,7 +903,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
         private static async Task<HttpResponseMessage> SendDeleteSubscriptionAsync(Guid targetOrgUuid, Cookie cookie)
         {
-            var postUrl = TestEnvironment.CreateUrl($"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection/subscription");
+            var postUrl = TestEnvironment.CreateUrl($"{GetBaseConnectionString(targetOrgUuid)}/connection/subscription");
             return await HttpApi.DeleteWithCookieAsync(postUrl, cookie);
         }
 
@@ -911,8 +911,13 @@ namespace Tests.Integration.Presentation.Web.Organizations
         {
             var postUrl =
                 TestEnvironment.CreateUrl(
-                    $"api/v1/organizations/{targetOrgUuid:D}/sts-organization-synchronization/connection/change-log?numberOfChangeLogs={numberOfChangeLogs}");
+                    $"{GetBaseConnectionString(targetOrgUuid)}/connection/change-log?numberOfChangeLogs={numberOfChangeLogs}");
             return await HttpApi.GetWithCookieAsync(postUrl, cookie);
+        }
+
+        private static string GetBaseConnectionString(Guid targetOrgUuid)
+        {
+            return $"api/v2/internal/organization/{targetOrgUuid:D}/sts-organization-synchronization";
         }
     }
 }
