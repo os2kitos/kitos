@@ -39,7 +39,7 @@ namespace Core.ApplicationServices.LocalOptions
 
         public Result<IEnumerable<TOptionType>, OperationError> GetByOrganizationUuid(Guid organizationUuid)
         {
-            var globalOptions = GetOptionsAsQueryable()
+            var globalOptions = GetGlobalOptionsAsQueryable()
                 .ToList();
             
             var localOptions = GetLocalOptionsByOrganizationUuid(organizationUuid)
@@ -49,22 +49,18 @@ namespace Core.ApplicationServices.LocalOptions
         }
 
         private IEnumerable<TOptionType> IncludeLocalChangesToGlobalOptions(IEnumerable<TOptionType> globalOptions, IDictionary<int, TLocalOptionType> localOptions)
-        {
-            var returnList = new List<TOptionType>();
-
-            foreach (var optionToAdd in globalOptions)
-            {
-                var localOptionExists = localOptions.TryGetValue(optionToAdd.Id, out var localOption);
-                if (localOptionExists) optionToAdd.UpdateLocalOptionValues(localOption);
-
-                returnList.Add(optionToAdd);
-            }
-            return returnList;
+        { 
+            return globalOptions.Select(optionToAdd =>
+              {
+                  var localOptionExists = localOptions.TryGetValue(optionToAdd.Id, out var localOption);
+                  if (localOptionExists) optionToAdd.UpdateLocalOptionValues(localOption);
+                  return optionToAdd;
+              });
         }
 
         public Result<TOptionType, OperationError> GetByOrganizationUuidAndOptionId(Guid organizationUuid, int optionId)
         {
-            var option = GetOptionsAsQueryable().FirstOrDefault(x => x.Id == optionId);
+            var option = GetGlobalOptionsAsQueryable().FirstOrDefault(x => x.Id == optionId);
 
             if (option == null)
                 return new OperationError($"No option with Id: {optionId} found", OperationFailure.NotFound);
@@ -190,7 +186,7 @@ namespace Core.ApplicationServices.LocalOptions
                 .ByOrganizationUuid(organizationUuid);
         }
 
-        private IEnumerable<TOptionType> GetOptionsAsQueryable()
+        private IEnumerable<TOptionType> GetGlobalOptionsAsQueryable()
         {
             return _optionsRepository
                 .AsQueryable();
