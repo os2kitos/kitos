@@ -335,7 +335,7 @@ namespace Presentation.Web.Ninject
         {
             //Generic
             kernel.Bind<IEntityWithDeactivatedStatusMapper>().To<EntityWithDeactivatedStatusMapper>().InCommandScope(Mode);
-            kernel.Bind<IOptionTypeResponseMapper>().To<OptionTypeResponseMapper>().InCommandScope(Mode);
+            kernel.Bind<ILocalOptionTypeResponseMapper>().To<LocalOptionTypeResponseMapper>().InCommandScope(Mode);
 
             //Systems
             kernel.Bind<IItSystemWriteModelMapper>().To<ItSystemWriteModelMapper>().InCommandScope(Mode);

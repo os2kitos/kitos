@@ -355,11 +355,13 @@
   <ItemGroup>
     <Compile Include="Controllers\API\V1\Auth\AuthorizeController.cs" />
     <Compile Include="Controllers\API\V1\ExtendedApiController.cs" />
-    <Compile Include="Controllers\API\V2\Common\Mapping\IOptionTypeResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\ILocalOptionTypeWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\ILocalOptionTypeResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\IOrganizationResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\IOrganizationTypeMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\IOrganizationWriteModelMapper.cs" />
-    <Compile Include="Controllers\API\V2\Common\Mapping\OptionTypeResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\LocalOptionTypeResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\LocalOptionTypeWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationTypeMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationWriteModelMapper.cs" />
@@ -421,6 +423,7 @@
     <Compile Include="Models\API\V2\Internal\Request\Notifications\BaseNotificationPropertiesWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\IHasBaseWriteProperties.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\NotificationSentResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Options\LocalRegularOptionCreateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\ColumnConfigurationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\ContactPersonRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\DataProtectionAdvisorRequestDTO.cs" />
@@ -437,6 +440,7 @@
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationV2ResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageRelationMigrationV2ResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\LocalRegularOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Notifications\NotificationResourcePermissionsDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageSearchResultResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageSystemContextResponseDTO.cs" />

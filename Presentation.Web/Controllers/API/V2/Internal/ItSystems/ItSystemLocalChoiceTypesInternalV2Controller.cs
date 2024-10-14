@@ -9,6 +9,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models.API.V2.Internal.Request.Options;
 using Presentation.Web.Models.API.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 
@@ -19,9 +20,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
     {
 
         private readonly IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> _businessTypeService;
-        private readonly IOptionTypeResponseMapper _responseMapper;
+        private readonly ILocalOptionTypeResponseMapper _responseMapper;
+        private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
-        public ItSystemLocalChoiceTypesInternalV2Controller(IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> businessTypeService, IOptionTypeResponseMapper responseMapper)
+        public ItSystemLocalChoiceTypesInternalV2Controller(IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> businessTypeService, ILocalOptionTypeResponseMapper responseMapper)
         {
             _businessTypeService = businessTypeService;
             _responseMapper = responseMapper;
@@ -38,7 +40,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
             if (!ModelState.IsValid) return BadRequest();
 
             return _businessTypeService.GetByOrganizationUuid(organizationUuid)
-                .Select(_responseMapper.ToRegularOptionDTOs<ItSystem, BusinessType>)
+                .Select(_responseMapper.ToLocalRegularOptionDTOs<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
 
@@ -53,10 +55,27 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
             if (!ModelState.IsValid) return BadRequest();
 
             return _businessTypeService.GetByOrganizationUuidAndOptionId(organizationUuid, optionId)
-                .Select(_responseMapper.ToRegularOptionDTO<ItSystem, BusinessType>)
+                .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
 
-        
+        [HttpPost]
+        [Route("business-types/")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegularOptionResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult CreateBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid, LocalRegularOptionCreateRequestDTO dto)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var updateParameters = _writeModelMapper.ToLocalOptionCreateParameters(dto);
+
+            return Ok();
+            //return _businessTypeService.CreateLocalOption(organizationUuid, updateParameters)
+            //    .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
+            //    .Match(Ok, FromOperationError);
+        }
+
     }
 }
