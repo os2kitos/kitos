@@ -44,7 +44,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
 
         [HttpGet]
         [Route("business-types/{optionId}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegularOptionResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RegularOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -56,5 +56,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
                 .Select(_responseMapper.ToRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
+
+        
     }
 }
