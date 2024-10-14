@@ -45,6 +45,33 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
         }
 
         [Fact]
+        public void Get_By_Org_Uuid_Returns_Global_Options_If_No_Local_Changes()
+        {
+            var orgUuid = A<Guid>();
+            var expectedGlobal = Enumerable.Range(1, 1)
+                .Select(i => new TestOptionEntity()
+                {
+                    Id = i,
+                    IsEnabled = true,
+                }).ToList();
+            var expectedLocal = new List<TestLocalOptionEntity>();
+            _optionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedGlobal.AsQueryable());
+            _localOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedLocal.AsQueryable());
+
+            var result = _sut.GetByOrganizationUuid(orgUuid);
+
+             Assert.True(result.Ok);
+            var options = result.Value;
+            foreach (var option in options)
+            {
+                var expectedName = expectedGlobal.First(o => o.Id == option.Id).Name;
+                Assert.Equal(expectedName, option.Name);
+                var expectedDescription = expectedGlobal.First(o => o.Id == option.Id).Description;
+                Assert.Equal(expectedDescription, option.Description);
+            }
+        }
+
+        [Fact]
         public void Can_Get_Options_By_Organization_Uuid()
         {
             var orgUuid = A<Guid>();
