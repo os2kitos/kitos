@@ -27,20 +27,20 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
 
         [HttpGet]
         [Route("snapshot")]
-        public IHttpActionResult GetSnapshotFromStsOrganization(Guid organizationId, int? levels = null)
+        public IHttpActionResult GetSnapshotFromStsOrganization(Guid organizationUuid, int? levels = null)
         {
             return _stsOrganizationSynchronizationService
-                .GetStsOrganizationalHierarchy(organizationId, levels.FromNullableValueType())
+                .GetStsOrganizationalHierarchy(organizationUuid, levels.FromNullableValueType())
                 .Select(MapOrganizationUnitDTO)
                 .Match(Ok, FromOperationError);
         }
 
         [HttpGet]
         [Route("connection-status")]
-        public IHttpActionResult GetSynchronizationStatus(Guid organizationId)
+        public IHttpActionResult GetSynchronizationStatus(Guid organizationUuid)
         {
             return _stsOrganizationSynchronizationService
-                .GetSynchronizationDetails(organizationId)
+                .GetSynchronizationDetails(organizationUuid)
                 .Select(details => new StsOrganizationSynchronizationDetailsResponseDTO
                 {
                     Connected = details.Connected,
@@ -62,7 +62,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
 
         [HttpPost]
         [Route("connection")]
-        public IHttpActionResult CreateConnection(Guid organizationId, [FromBody] ConnectToStsOrganizationRequestDTO request)
+        public IHttpActionResult CreateConnection(Guid organizationUuid, [FromBody] ConnectToStsOrganizationRequestDTO request)
         {
             if (!ModelState.IsValid)
             {
@@ -75,13 +75,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
             }
 
             return _stsOrganizationSynchronizationService
-                .Connect(organizationId, (request?.SynchronizationDepth).FromNullableValueType(), request.SubscribeToUpdates.GetValueOrDefault(false))
+                .Connect(organizationUuid, (request?.SynchronizationDepth).FromNullableValueType(), request.SubscribeToUpdates.GetValueOrDefault(false))
                 .Match(FromOperationError, Ok);
         }
 
         [HttpDelete]
         [Route("connection")]
-        public IHttpActionResult Disconnect(Guid organizationId, [FromBody] DisconnectFromStsOrganizationRequestDTO request)
+        public IHttpActionResult Disconnect(Guid organizationUuid, [FromBody] DisconnectFromStsOrganizationRequestDTO request)
         {
             if (request == null)
             {
@@ -89,22 +89,22 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
             }
 
             return _stsOrganizationSynchronizationService
-                .Disconnect(organizationId, request.PurgeUnusedExternalUnits)
+                .Disconnect(organizationUuid, request.PurgeUnusedExternalUnits)
                 .Match(FromOperationError, Ok);
         }
 
         [HttpDelete]
         [Route("connection/subscription")]
-        public IHttpActionResult DeleteSubscription(Guid organizationId)
+        public IHttpActionResult DeleteSubscription(Guid organizationUuid)
         {
             return _stsOrganizationSynchronizationService
-                .UnsubscribeFromAutomaticUpdates(organizationId)
+                .UnsubscribeFromAutomaticUpdates(organizationUuid)
                 .Match(FromOperationError, Ok);
         }
 
         [HttpGet]
         [Route("connection/update")]
-        public IHttpActionResult GetUpdateConsequences(Guid organizationId, int? synchronizationDepth = null)
+        public IHttpActionResult GetUpdateConsequences(Guid organizationUuid, int? synchronizationDepth = null)
         {
             if (synchronizationDepth is < 1)
             {
@@ -112,14 +112,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
             }
 
             return _stsOrganizationSynchronizationService
-                .GetConnectionExternalHierarchyUpdateConsequences(organizationId, synchronizationDepth.FromNullableValueType())
+                .GetConnectionExternalHierarchyUpdateConsequences(organizationUuid, synchronizationDepth.FromNullableValueType())
                 .Select(MapUpdateConsequencesResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
         [HttpPut]
         [Route("connection")]
-        public IHttpActionResult UpdateConnection(Guid organizationId, [FromBody] ConnectToStsOrganizationRequestDTO request)
+        public IHttpActionResult UpdateConnection(Guid organizationUuid, [FromBody] ConnectToStsOrganizationRequestDTO request)
         {
             if (!ModelState.IsValid)
             {
@@ -132,15 +132,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
             }
 
             return _stsOrganizationSynchronizationService
-                .UpdateConnection(organizationId, (request?.SynchronizationDepth).FromNullableValueType(), request.SubscribeToUpdates.GetValueOrDefault(false))
+                .UpdateConnection(organizationUuid, (request?.SynchronizationDepth).FromNullableValueType(), request.SubscribeToUpdates.GetValueOrDefault(false))
                 .Match(FromOperationError, Ok);
         }
 
         [HttpGet]
         [Route("connection/change-log")]
-        public IHttpActionResult GetChangeLogs(Guid organizationId, int numberOfChangeLogs)
+        public IHttpActionResult GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs)
         {
-            return _stsOrganizationSynchronizationService.GetChangeLogs(organizationId, numberOfChangeLogs)
+            return _stsOrganizationSynchronizationService.GetChangeLogs(organizationUuid, numberOfChangeLogs)
                 .Select(MapChangeLogResponseDtos)
                 .Match(Ok, FromOperationError);
         }
