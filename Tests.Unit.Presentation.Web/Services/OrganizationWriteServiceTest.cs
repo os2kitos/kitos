@@ -378,7 +378,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Name = OptionalValueChange<Maybe<string>>.With(A<string>())
             };
 
-            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+            var result = _sut.PatchOrganization(org.Uuid, updateParams);
 
             Assert.True(result.Ok);
             var value = result.Value;
@@ -400,7 +400,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Name = OptionalValueChange<Maybe<string>>.With(A<string>())
             };
 
-            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+            var result = _sut.PatchOrganization(org.Uuid, updateParams);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
@@ -420,7 +420,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Name = OptionalValueChange<Maybe<string>>.With(A<string>())
             };
 
-            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+            var result = _sut.PatchOrganization(org.Uuid, updateParams);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
@@ -440,7 +440,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Name = OptionalValueChange<Maybe<string>>.With(A<string>())
             };
 
-            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+            var result = _sut.PatchOrganization(org.Uuid, updateParams);
 
             Assert.True(result.Ok);
             Assert.Equal(updateParams.Name.NewValue, result.Value.Name);
@@ -459,7 +459,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Name = OptionalValueChange<Maybe<string>>.With(A<string>())
             };
 
-            var result = _sut.UpdateOrganization(org.Uuid, updateParams);
+            var result = _sut.PatchOrganization(org.Uuid, updateParams);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);

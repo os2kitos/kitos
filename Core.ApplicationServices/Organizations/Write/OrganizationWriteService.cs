@@ -66,7 +66,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
             .Bind(WithWriteAccess);
     }
 
-    public Result<Organization, OperationError> UpdateOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
+    public Result<Organization, OperationError> PatchOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
     {
         using var transaction = _transactionManager.Begin();
         var result = GetOrganizationAndVerifyWriteAccess(organizationUuid)
