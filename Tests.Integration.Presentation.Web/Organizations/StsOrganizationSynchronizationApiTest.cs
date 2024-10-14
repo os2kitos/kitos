@@ -70,7 +70,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var root = await response.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationOrgUnitDTO>();
+            var root = await response.ReadResponseBodyAsAsync<StsOrganizationOrgUnitDTO>();
             Assert.Equal(levels, CountMaxLevels(root));
             AssertOrgTree(root, new HashSet<Guid>());
         }
@@ -91,7 +91,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var root = await response.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationSynchronizationDetailsResponseDTO>();
+            var root = await response.ReadResponseBodyAsAsync<StsOrganizationSynchronizationDetailsResponseDTO>();
             Assert.Equal(expectConnected, root.AccessStatus.AccessGranted);
             Assert.Equal(expectedError, root.AccessStatus.Error);
         }
@@ -106,7 +106,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var targetOrgUuid = await CreateOrgWithCvr(AuthorizedCvr);
             const int levels = 2;
             using var getResponse = await SendGetSnapshotAsync(levels, targetOrgUuid, cookie).WithExpectedResponseCode(HttpStatusCode.OK);
-            var expectedImport = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationOrgUnitDTO>();
+            var expectedImport = await getResponse.ReadResponseBodyAsAsync<StsOrganizationOrgUnitDTO>();
 
             //Act
             using var response = await SendPostCreateConnectionAsync(targetOrgUuid, cookie, levels, subscribe);
@@ -138,7 +138,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var connectionUrl = TestEnvironment.CreateUrl($"{GetBaseConnectionString(targetOrgUuid)}/connection");
             var getUrl = TestEnvironment.CreateUrl($"{GetBaseConnectionString(targetOrgUuid)}/snapshot?levels={levels}");
             using var getResponse = await HttpApi.GetWithCookieAsync(getUrl, cookie);
-            var expectedStructureAfterDisconnect = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationOrgUnitDTO>();
+            var expectedStructureAfterDisconnect = await getResponse.ReadResponseBodyAsAsync<StsOrganizationOrgUnitDTO>();
             if (purge)
             {
                 //We expect all of the external sub units to have been removed
@@ -184,7 +184,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
-            var consequences = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var consequences = await getResponse.ReadResponseBodyAsAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.Empty(consequences.Consequences);
         }
 
@@ -203,7 +203,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
-            var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var consequences = await consequencesResponse.ReadResponseBodyAsAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
             Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Added, c.Category));
         }
@@ -223,7 +223,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
-            var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var consequences = await consequencesResponse.ReadResponseBodyAsAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
             Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Deleted, c.Category));
         }
@@ -259,7 +259,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
-            var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var consequences = await consequencesResponse.ReadResponseBodyAsAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
             Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Renamed, c.Category));
             Assert.Equal(consequences.Consequences.Select(x => x.Uuid).OrderBy(x => x), uuidsOfRenamedUnits.OrderBy(x => x));
@@ -295,7 +295,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
-            var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var consequences = await consequencesResponse.ReadResponseBodyAsAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
             Assert.All(consequences.Consequences, c => Assert.Equal(ConnectionUpdateOrganizationUnitChangeType.Moved, c.Category));
         }
@@ -337,7 +337,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, consequencesResponse.StatusCode);
-            var consequences = await consequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var consequences = await consequencesResponse.ReadResponseBodyAsAsync<ConnectionUpdateConsequencesResponseDTO>();
             Assert.NotEmpty(consequences.Consequences);
             var conversion = Assert.Single(consequences.Consequences.Where(x => x.Category == ConnectionUpdateOrganizationUnitChangeType.Converted));
             Assert.Equal(expectedConvertedUnit, conversion.Uuid);
@@ -355,7 +355,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             using var consequencesBeforePutResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, consequencesBeforePutResponse.StatusCode);
-            var consequencesBeforePut = await consequencesBeforePutResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var consequencesBeforePut = await consequencesBeforePutResponse.ReadResponseBodyAsAsync<ConnectionUpdateConsequencesResponseDTO>();
             var expectedAdded = consequencesBeforePut.Consequences.ToList().Where(x => x.Category == ConnectionUpdateOrganizationUnitChangeType.Added).Select(x => x.Uuid).ToHashSet();
             Assert.NotEmpty(expectedAdded);
 
@@ -536,7 +536,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Assert
             Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
             using var getResponse = await SendGetConnectionStatusAsync(targetOrgUuid, cookie).WithExpectedResponseCode(HttpStatusCode.OK);
-            var dto = await getResponse.ReadResponseBodyAsKitosApiResponseAsync<StsOrganizationSynchronizationDetailsResponseDTO>();
+            var dto = await getResponse.ReadResponseBodyAsAsync<StsOrganizationSynchronizationDetailsResponseDTO>();
             Assert.Equal(!initiallySubscribe, dto.SubscribesToUpdates);
         }
 
@@ -662,7 +662,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Addition consequences
             using var additionConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, secondRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, additionConsequencesResponse.StatusCode);
-            var additionConsequencesBody = await additionConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var additionConsequencesBody = await additionConsequencesResponse.ReadResponseBodyAsAsync<ConnectionUpdateConsequencesResponseDTO>();
             var additionConsequences = additionConsequencesBody.Consequences.ToList();
 
             //Update consequences in order to log addition consequences
@@ -712,7 +712,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             using var otherConsequencesResponse = await SendGetUpdateConsequencesAsync(targetOrgUuid, firstRequestLevels, cookie);
             Assert.Equal(HttpStatusCode.OK, otherConsequencesResponse.StatusCode);
-            var otherConsequencesBody = await otherConsequencesResponse.ReadResponseBodyAsKitosApiResponseAsync<ConnectionUpdateConsequencesResponseDTO>();
+            var otherConsequencesBody = await otherConsequencesResponse.ReadResponseBodyAsAsync<ConnectionUpdateConsequencesResponseDTO>();
             var otherConsequences = otherConsequencesBody.Consequences.ToList();
 
             //Log deletion, renaming, conversion and relocation changes
@@ -724,7 +724,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, logsResponse.StatusCode);
-            var deserializedLogs = await logsResponse.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<StsOrganizationChangeLogResponseDTO>>();
+            var deserializedLogs = await logsResponse.ReadResponseBodyAsAsync<IEnumerable<StsOrganizationChangeLogResponseDTO>>();
             var logsList = deserializedLogs.OrderBy(x => x.LogTime).ToList();
 
             //2 updates + create
@@ -917,7 +917,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
         private static string GetBaseConnectionString(Guid targetOrgUuid)
         {
-            return $"api/v2/internal/organization/{targetOrgUuid:D}/sts-organization-synchronization";
+            return $"api/v2/internal/organizations/{targetOrgUuid:D}/sts-organization-synchronization";
         }
     }
 }
