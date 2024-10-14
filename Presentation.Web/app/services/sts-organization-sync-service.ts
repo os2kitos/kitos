@@ -30,7 +30,7 @@
         }
 
         private getBasePath(organizationUuid: string) {
-            return `api/v1/organizations/${organizationUuid}/sts-organization-synchronization`;
+            return `api/v2/internal/organizations/${organizationUuid}/sts-organization-synchronization`;
         }
 
         private getStatusCacheKey(organizationUuid: string) {
