@@ -1,12 +1,17 @@
 ﻿
 
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Generic;
 using Newtonsoft.Json;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
 using Presentation.Web.Models.API.V2.Internal.Response;
+using Presentation.Web.Models.API.V2.Response.Options;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Extensions;
 using Tests.Integration.Presentation.Web.Tools.Internal.ItSystem;
@@ -56,5 +61,21 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
+        [Fact]
+        public async Task Can_Patch_Local_Option_Type()
+        {
+            var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            Assert.NotNull(organization);
+            var optionId = 1;
+
+            var dto = new LocalRegularOptionUpdateRequestDTO() { Description = A<string>() };
+
+            using var response = await ItSystemInternalV2Helper.PatchLocalOptionType(organization.Uuid, optionId, BusinessTypes, dto);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var content = await response.Content.ReadAsStringAsync();
+            var responseDto = JsonConvert.DeserializeObject<LocalRegularOptionResponseDTO>(content);
+            Assert.Equal(dto.Description, responseDto.Description);
+        }
     }
 }

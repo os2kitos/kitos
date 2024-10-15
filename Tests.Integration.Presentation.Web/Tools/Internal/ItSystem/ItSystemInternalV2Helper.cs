@@ -30,5 +30,12 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystem
             return await HttpApi.PostWithCookieAsync(
                 TestEnvironment.CreateUrl($"api/v2/internal/it-systems/{organizationUuid}/local-choice-types/{choiceTypeName}"), cookie, dto);
         }
+
+        public static async Task<HttpResponseMessage> PatchLocalOptionType(Guid organizationUuid, int optionId, string choiceTypeName, LocalRegularOptionUpdateRequestDTO dto)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(
+                TestEnvironment.CreateUrl($"api/v2/internal/it-systems/{organizationUuid}/local-choice-types/{choiceTypeName}/{optionId}"), cookie, dto);
+        }
     }
 }
