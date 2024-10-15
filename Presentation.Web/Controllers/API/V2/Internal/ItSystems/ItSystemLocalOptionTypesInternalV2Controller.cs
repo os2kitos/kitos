@@ -40,9 +40,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            return _businessTypeService.GetByOrganizationUuid(organizationUuid)
-                .Select(_responseMapper.ToLocalRegularOptionDTOs<ItSystem, BusinessType>)
-                .Match(Ok, FromOperationError);
+            var businessTypes = _businessTypeService.GetByOrganizationUuid(organizationUuid);
+            return Ok(_responseMapper.ToLocalRegularOptionDTOs<ItSystem, BusinessType>(businessTypes));
         }
 
         [HttpGet]

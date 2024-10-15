@@ -37,7 +37,7 @@ namespace Core.ApplicationServices.LocalOptions
         }
 
 
-        public Result<IEnumerable<TOptionType>, OperationError> GetByOrganizationUuid(Guid organizationUuid)
+        public IEnumerable<TOptionType> GetByOrganizationUuid(Guid organizationUuid)
         {
             var globalOptions = GetGlobalOptionsAsQueryable()
                 .ToList();
@@ -45,7 +45,7 @@ namespace Core.ApplicationServices.LocalOptions
             var localOptions = GetLocalOptionsByOrganizationUuid(organizationUuid)
                 .ToDictionary(x => x.OptionId);
 
-            return Result<IEnumerable<TOptionType>, OperationError>.Success(IncludeLocalChangesToGlobalOptions(globalOptions, localOptions));
+            return IncludeLocalChangesToGlobalOptions(globalOptions, localOptions);
         }
 
         private IEnumerable<TOptionType> IncludeLocalChangesToGlobalOptions(IEnumerable<TOptionType> globalOptions, IDictionary<int, TLocalOptionType> localOptions)

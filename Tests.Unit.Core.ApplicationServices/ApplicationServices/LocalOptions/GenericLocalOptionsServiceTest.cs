@@ -59,10 +59,8 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             _optionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedGlobal.AsQueryable());
             _localOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedLocal.AsQueryable());
 
-            var result = _sut.GetByOrganizationUuid(orgUuid);
+            var options = _sut.GetByOrganizationUuid(orgUuid);
 
-             Assert.True(result.Ok);
-            var options = result.Value;
             foreach (var option in options)
             {
                 var expectedName = expectedGlobal.First(o => o.Id == option.Id).Name;
@@ -80,10 +78,8 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             var expectedLocal = SetupOptionRepositories(orgUuid);
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
 
-            var result = _sut.GetByOrganizationUuid(orgUuid);
+            var options = _sut.GetByOrganizationUuid(orgUuid);
 
-            Assert.True(result.Ok);
-            var options = result.Value;
             foreach (var option in options)
             {
                 Assert.True(option.IsLocallyAvailable);

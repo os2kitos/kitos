@@ -10,7 +10,7 @@ namespace Core.ApplicationServices.LocalOptions
         where TLocalOptionType : LocalOptionEntity<TOptionType>, new()
         where TOptionType : OptionEntity<TReferenceType>
     {
-        Result<IEnumerable<TOptionType>, OperationError> GetByOrganizationUuid(Guid organizationUuid);
+        IEnumerable<TOptionType> GetByOrganizationUuid(Guid organizationUuid);
         Result<TOptionType, OperationError> GetByOrganizationUuidAndOptionUuid(Guid organizationUuid, Guid globalOptionUuid);
 
         Result<TOptionType, OperationError> CreateLocalOption(Guid organizationUuid,
