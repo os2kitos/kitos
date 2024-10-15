@@ -35,8 +35,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             using var response = await ItSystemInternalV2Helper.GetLocalOptionTypes(organization.Uuid, BusinessTypesUrlSuffix);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var content = await response.Content.ReadAsStringAsync();
-            var responseDtos = JsonConvert.DeserializeObject<IEnumerable<LocalRegularOptionResponseDTO>>(content);
+            var responseDtos = await response.ReadResponseBodyAsAsync<IEnumerable<LocalRegularOptionResponseDTO>>();
             Assert.NotNull(responseDtos);
             var expectedIncludedOption = responseDtos.First(dto => dto.Uuid == globalOption.Uuid);
             Assert.NotNull(expectedIncludedOption);
@@ -53,8 +52,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             using var response = await ItSystemInternalV2Helper.GetLocalOptionTypeByOptionId(organization.Uuid, BusinessTypesUrlSuffix, globalOption.Uuid);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var content = await response.Content.ReadAsStringAsync();
-            var responseDto = JsonConvert.DeserializeObject<LocalRegularOptionResponseDTO>(content);
+            var responseDto = await response.ReadResponseBodyAsAsync<LocalRegularOptionResponseDTO>();
             Assert.NotNull(responseDto);
             Assert.Equal(globalOption.Uuid, responseDto.Uuid);
         }
@@ -70,8 +68,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             using var response = await ItSystemInternalV2Helper.CreateLocalOptionType(organization.Uuid, BusinessTypesUrlSuffix, dto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var content = await response.Content.ReadAsStringAsync();
-            var responseDto = JsonConvert.DeserializeObject<LocalRegularOptionResponseDTO>(content);
+            var responseDto = await response.ReadResponseBodyAsAsync<LocalRegularOptionResponseDTO>();
             Assert.NotNull(responseDto);
             Assert.Equal(globalOption.Uuid, responseDto.Uuid);
         }
@@ -89,8 +86,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             using var response = await ItSystemInternalV2Helper.PatchLocalOptionType(organization.Uuid, globalOption.Uuid, BusinessTypesUrlSuffix, dto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var content = await response.Content.ReadAsStringAsync();
-            var responseDto = JsonConvert.DeserializeObject<LocalRegularOptionResponseDTO>(content);
+            var responseDto = await response.ReadResponseBodyAsAsync<LocalRegularOptionResponseDTO>();
             Assert.Equal(dto.Description, responseDto.Description);
         }
 
@@ -110,8 +106,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             using var response = await ItSystemInternalV2Helper.DeleteLocalOptionType(organization.Uuid, globalOption.Uuid, BusinessTypesUrlSuffix);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var content = await response.Content.ReadAsStringAsync();
-            var responseDto = JsonConvert.DeserializeObject<LocalRegularOptionResponseDTO>(content);
+            var responseDto = await response.ReadResponseBodyAsAsync<LocalRegularOptionResponseDTO>();
 
             Assert.False(responseDto.IsActive);
         }
