@@ -59,7 +59,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             _optionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedGlobal.AsQueryable());
             _localOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedLocal.AsQueryable());
 
-            var options = _sut.GetByOrganizationUuid(orgUuid);
+            var options = _sut.GetLocalOptions(orgUuid);
 
             foreach (var option in options)
             {
@@ -78,7 +78,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             var expectedLocal = SetupOptionRepositories(orgUuid);
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
 
-            var options = _sut.GetByOrganizationUuid(orgUuid);
+            var options = _sut.GetLocalOptions(orgUuid);
 
             foreach (var option in options)
             {
@@ -96,7 +96,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             var optionId = A<int>();
             SetupResolveGlobalOptionUuid(globalOptionUuid, optionId);
             var expectedLocal = SetupOptionRepositories(orgUuid, optionId);
-            var result = _sut.GetByOrganizationUuidAndOptionUuid(orgUuid, globalOptionUuid);
+            var result = _sut.GetLocalOption(orgUuid, globalOptionUuid);
             
             Assert.True(result.Ok);
             var option = result.Value;

@@ -37,12 +37,12 @@ namespace Core.ApplicationServices.LocalOptions
         }
 
 
-        public IEnumerable<TOptionType> GetByOrganizationUuid(Guid organizationUuid)
+        public IEnumerable<TOptionType> GetLocalOptions(Guid organizationUuid)
         {
             var globalOptions = GetGlobalOptionsAsQueryable()
                 .ToList();
             
-            var localOptions = GetLocalOptionsByOrganizationUuid(organizationUuid)
+            var localOptions = GetLocalOptionsFromAsQueryable(organizationUuid)
                 .ToDictionary(x => x.OptionId);
 
             return IncludeLocalChangesToGlobalOptions(globalOptions, localOptions);
@@ -58,13 +58,13 @@ namespace Core.ApplicationServices.LocalOptions
               });
         }
 
-        public Result<TOptionType, OperationError> GetByOrganizationUuidAndOptionUuid(Guid organizationUuid, Guid globalOptionUuid)
+        public Result<TOptionType, OperationError> GetLocalOption(Guid organizationUuid, Guid globalOptionUuid)
         {
             return ResolveGlobalOptionId(globalOptionUuid)
                 .Bind(GetGlobalOptionById)
                 .Bind(option =>
                 {
-                    var localOption = GetLocalOptionsByOrganizationUuid(organizationUuid)
+                    var localOption = GetLocalOptionsFromAsQueryable(organizationUuid)
                         .FirstOrDefault(x => x.OptionId == option.Id);
 
                     option.UpdateLocalOptionValues(localOption);
@@ -86,7 +86,7 @@ namespace Core.ApplicationServices.LocalOptions
             return ResolveOrganizationIdAndValidateCreate(organizationUuid)
                 .Bind(organizationId =>
                 {
-                    return GetLocalOptionByOrganizationUuidAndGlobalOptionUuid(organizationUuid, parameters.OptionUuid)
+                    return GetLocalOptionMaybe(organizationUuid, parameters.OptionUuid)
                         .Match(existingLocalOption =>
                         {
                             existingLocalOption.Activate();
@@ -94,7 +94,7 @@ namespace Core.ApplicationServices.LocalOptions
                             _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(existingLocalOption));
                             _localOptionRepository.Save();
 
-                            return GetByOrganizationUuidAndOptionUuid(organizationUuid, parameters.OptionUuid);
+                            return GetLocalOption(organizationUuid, parameters.OptionUuid);
                         }, () =>
                         {
                             var globalOptionUuid = parameters.OptionUuid;
@@ -108,14 +108,14 @@ namespace Core.ApplicationServices.LocalOptions
                             _domainEvents.Raise(new EntityCreatedEvent<TLocalOptionType>(newLocalOption));
                             _localOptionRepository.Save();
 
-                            return GetByOrganizationUuidAndOptionUuid(organizationUuid, globalOptionUuid);
+                            return GetLocalOption(organizationUuid, globalOptionUuid);
                         });
                 });
         }
 
         public Result<TOptionType, OperationError> PatchLocalOption(Guid organizationUuid, Guid globalOptionUuid, LocalOptionUpdateParameters parameters)
         {
-            return GetLocalOptionByOrganizationUuidAndGlobalOptionUuid(organizationUuid, globalOptionUuid)
+            return GetLocalOptionMaybe(organizationUuid, globalOptionUuid)
                 .Match(localOption => ValidateModify(localOption)
                     .Bind(
                         localOptionWithModifyRights =>
@@ -125,7 +125,7 @@ namespace Core.ApplicationServices.LocalOptions
                             _domainEvents.Raise(new EntityCreatedEvent<TLocalOptionType>(localOptionWithModifyRights));
                             _localOptionRepository.Update(localOptionWithModifyRights);
                             _localOptionRepository.Save();
-                            return GetByOrganizationUuidAndOptionUuid(organizationUuid, globalOptionUuid);
+                            return GetLocalOption(organizationUuid, globalOptionUuid);
                         }),
                     () =>
                     ResolveOrganizationIdAndValidateCreate(organizationUuid)
@@ -142,7 +142,7 @@ namespace Core.ApplicationServices.LocalOptions
                             _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(newLocalOption));
                             _localOptionRepository.Insert(newLocalOption);
                             _localOptionRepository.Save();
-                            return GetByOrganizationUuidAndOptionUuid(organizationUuid, globalOptionUuid);
+                            return GetLocalOption(organizationUuid, globalOptionUuid);
                         })
                 );
         }
@@ -156,7 +156,7 @@ namespace Core.ApplicationServices.LocalOptions
 
         public Result<TOptionType, OperationError> DeleteLocalOption(Guid organizationUuid, Guid globalOptionUuid)
         {
-            return GetLocalOptionByOrganizationUuidAndGlobalOptionUuid(organizationUuid, globalOptionUuid)
+            return GetLocalOptionMaybe(organizationUuid, globalOptionUuid)
                 .Match(localOption => _authorizationContext.AllowDelete(localOption)
                     ? Result<TLocalOptionType, OperationError>.Success(localOption)
                     : new OperationError($"User not allowed to delete local option with global option uuid: {globalOptionUuid}",
@@ -169,7 +169,7 @@ namespace Core.ApplicationServices.LocalOptions
                     _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(localOption));
 
                     _localOptionRepository.Save();
-                    return GetByOrganizationUuidAndOptionUuid(organizationUuid, globalOptionUuid);
+                    return GetLocalOption(organizationUuid, globalOptionUuid);
                 });
         }
 
@@ -193,17 +193,17 @@ namespace Core.ApplicationServices.LocalOptions
 
 
 
-        private Maybe<TLocalOptionType> GetLocalOptionByOrganizationUuidAndGlobalOptionUuid(Guid organizationUuid, Guid globalOptionUuid)
+        private Maybe<TLocalOptionType> GetLocalOptionMaybe(Guid organizationUuid, Guid globalOptionUuid)
         {
             var optionIdResult = ResolveGlobalOptionId(globalOptionUuid);
             if (optionIdResult.Failed) return Maybe<TLocalOptionType>.None;
 
-            var localOption = GetLocalOptionsByOrganizationUuid(organizationUuid)
+            var localOption = GetLocalOptionsFromAsQueryable(organizationUuid)
                 .FirstOrDefault(x => x.OptionId == optionIdResult.Value);
             return localOption ?? Maybe<TLocalOptionType>.None;
         }
 
-        private IEnumerable<TLocalOptionType> GetLocalOptionsByOrganizationUuid(Guid organizationUuid)
+        private IEnumerable<TLocalOptionType> GetLocalOptionsFromAsQueryable(Guid organizationUuid)
         {
             return _localOptionRepository
                 .AsQueryable()

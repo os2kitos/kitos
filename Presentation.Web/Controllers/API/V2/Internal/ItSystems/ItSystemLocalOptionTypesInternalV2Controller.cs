@@ -40,7 +40,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var businessTypes = _businessTypeService.GetByOrganizationUuid(organizationUuid);
+            var businessTypes = _businessTypeService.GetLocalOptions(organizationUuid);
             return Ok(_responseMapper.ToLocalRegularOptionDTOs<ItSystem, BusinessType>(businessTypes));
         }
 
@@ -54,7 +54,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            return _businessTypeService.GetByOrganizationUuidAndOptionUuid(organizationUuid, optionUuid)
+            return _businessTypeService.GetLocalOption(organizationUuid, optionUuid)
                 .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
