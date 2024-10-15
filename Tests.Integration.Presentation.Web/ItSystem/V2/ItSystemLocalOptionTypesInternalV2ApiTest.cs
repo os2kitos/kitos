@@ -23,7 +23,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
     public class ItSystemLocalOptionTypesInternalV2ApiTest: WithAutoFixture
     {
         private const int CvrLengthLimit = 10;
-        private const string BusinessTypes = "business-types";
+        private const string BusinessTypesUrlSuffix = "business-types";
 
         [Fact]
         public async Task Can_Get_Local_Business_Types()
@@ -31,7 +31,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
             Assert.NotNull(organization);
 
-            using var response = await ItSystemInternalV2Helper.GetLocalOptionTypes(organization.Uuid, BusinessTypes);
+            using var response = await ItSystemInternalV2Helper.GetLocalOptionTypes(organization.Uuid, BusinessTypesUrlSuffix);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -43,7 +43,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.NotNull(organization);
             var optionId = 1;
 
-            using var response = await ItSystemInternalV2Helper.GetLocalOptionTypeByOptionId(organization.Uuid, BusinessTypes, optionId);
+            using var response = await ItSystemInternalV2Helper.GetLocalOptionTypeByOptionId(organization.Uuid, BusinessTypesUrlSuffix, optionId);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -56,7 +56,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var optionId = A<int>();
             var dto = new LocalRegularOptionCreateRequestDTO() { OptionId = optionId };
 
-            using var response = await ItSystemInternalV2Helper.CreateLocalOptionType(organization.Uuid, BusinessTypes, dto);
+            using var response = await ItSystemInternalV2Helper.CreateLocalOptionType(organization.Uuid, BusinessTypesUrlSuffix, dto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
@@ -70,12 +70,31 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             var dto = new LocalRegularOptionUpdateRequestDTO() { Description = A<string>() };
 
-            using var response = await ItSystemInternalV2Helper.PatchLocalOptionType(organization.Uuid, optionId, BusinessTypes, dto);
+            using var response = await ItSystemInternalV2Helper.PatchLocalOptionType(organization.Uuid, optionId, BusinessTypesUrlSuffix, dto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<LocalRegularOptionResponseDTO>(content);
             Assert.Equal(dto.Description, responseDto.Description);
+        }
+
+        [Fact]
+        public async Task Can_Delete_Local_Option_Type()
+        {
+            var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            Assert.NotNull(organization);
+            var optionId = 1;
+            var createDto = new LocalRegularOptionCreateRequestDTO() { OptionId = optionId };
+            using var createResponse = await ItSystemInternalV2Helper.CreateLocalOptionType(organization.Uuid, BusinessTypesUrlSuffix, createDto);
+            Assert.Equal(HttpStatusCode.OK, createResponse.StatusCode);
+
+            using var response = await ItSystemInternalV2Helper.DeleteLocalOptionType(organization.Uuid, optionId, BusinessTypesUrlSuffix);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var content = await response.Content.ReadAsStringAsync();
+            var responseDto = JsonConvert.DeserializeObject<LocalRegularOptionResponseDTO>(content);
+
+            Assert.False(responseDto.IsActive);
         }
     }
 }

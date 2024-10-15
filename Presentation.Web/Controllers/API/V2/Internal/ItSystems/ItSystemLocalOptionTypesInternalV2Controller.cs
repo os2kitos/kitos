@@ -95,5 +95,21 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
                 .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
+
+        [HttpDelete]
+        [Route("business-types/{optionId}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid,
+            [FromUri] int optionId)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            return _businessTypeService.DeleteLocalOption(organizationUuid, optionId)
+                .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
+                .Match(Ok, FromOperationError);
+        }
     }
 }
