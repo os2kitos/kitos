@@ -5,5 +5,6 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping;
 
 public interface ILocalOptionTypeWriteModelMapper
 {
-    public LocalOptionCreateParameters ToLocalOptionCreateParameters(LocalRegularOptionCreateRequestDTO dto);
+    LocalOptionCreateParameters ToLocalOptionCreateParameters(LocalRegularOptionCreateRequestDTO dto);
+    LocalOptionUpdateParameters ToLocalOptionUpdateParameters(LocalRegularOptionUpdateRequestDTO dto);
 }

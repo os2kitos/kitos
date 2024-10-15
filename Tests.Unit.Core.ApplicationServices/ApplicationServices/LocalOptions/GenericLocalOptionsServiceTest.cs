@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.LocalOptions;
 using Core.ApplicationServices.Model.LocalOptions;
 using Core.DomainModel;
@@ -179,17 +180,18 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             var optionId = A<int>();
             var parameters = new LocalOptionUpdateParameters()
             {
-                Description = A<string>()
+                Description = Maybe<string>.Some(A<string>()).AsChangedValue()
             };
+            var descriptionText = parameters.Description.NewValue.Value;
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
             _authorizationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
-            SetupLocalOptionsRepositoryReturnsNoneThenOne(optionId, orgUuid, parameters.Description);
+            SetupLocalOptionsRepositoryReturnsNoneThenOne(optionId, orgUuid, descriptionText);
             SetupGlobalOptionsRepositoryReturnsOneOption(optionId);
 
             var result = _sut.PatchLocalOption(orgUuid, optionId, parameters);
 
             Assert.True(result.Ok);
-            Assert.Equal(parameters.Description, result.Value.Description);
+            Assert.Equal(descriptionText, result.Value.Description);
             _localOptionsRepository.Verify(_ => _.Insert(It.IsAny<TestLocalOptionEntity>()));
             _localOptionsRepository.Verify(_ => _.Save());
         }
@@ -211,7 +213,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             var optionId = A<int>();
             var parameters = new LocalOptionUpdateParameters()
             {
-                Description = A<string>()
+                Description = Maybe<string>.Some(A<string>()).AsChangedValue()
             };
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
             _authorizationContext.Setup(_ => _.AllowModify(It.IsAny<TestLocalOptionEntity>())).Returns(true);
@@ -221,7 +223,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             var result = _sut.PatchLocalOption(orgUuid, optionId, parameters);
 
             Assert.True(result.Ok);
-            Assert.Equal(parameters.Description, result.Value.Description);
+            Assert.Equal(parameters.Description.NewValue.Value, result.Value.Description);
             _localOptionsRepository.Verify(_ => _.Update(It.IsAny<TestLocalOptionEntity>()));
             _localOptionsRepository.Verify(_ => _.Save());
         }
@@ -258,7 +260,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             var optionId = A<int>();
             var parameters = new LocalOptionUpdateParameters()
             {
-                Description = A<string>()
+                Description = Maybe<string>.Some(A<string>()).AsChangedValue()
             };
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
             if (optionExists)

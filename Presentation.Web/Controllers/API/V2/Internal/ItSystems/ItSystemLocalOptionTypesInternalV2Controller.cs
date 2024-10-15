@@ -70,9 +70,28 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var updateParameters = _writeModelMapper.ToLocalOptionCreateParameters(dto);
+            var createParameters = _writeModelMapper.ToLocalOptionCreateParameters(dto);
 
-            return _businessTypeService.CreateLocalOption(organizationUuid, updateParameters)
+            return _businessTypeService.CreateLocalOption(organizationUuid, createParameters)
+                .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpPost]
+        [Route("business-types/{optionId}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PatchBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid,
+            [FromUri] int optionId, 
+            LocalRegularOptionUpdateRequestDTO dto)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var updateParameters = _writeModelMapper.ToLocalOptionUpdateParameters(dto);
+
+            return _businessTypeService.PatchLocalOption(organizationUuid, optionId, updateParameters)
                 .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
