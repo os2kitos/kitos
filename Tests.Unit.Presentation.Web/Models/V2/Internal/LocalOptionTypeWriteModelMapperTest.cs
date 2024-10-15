@@ -41,7 +41,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
         {
             var dto = new LocalRegularOptionUpdateRequestDTO()
             {
-                IsActive = A<bool>(),
                 Description = A<string>()
             };
             _httpRequest.Setup(x =>
@@ -51,7 +50,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
             var parameters = _sut.ToLocalOptionUpdateParameters(dto);
 
             Assert.Equal(dto.Description, parameters.Description.NewValue.Value);
-            Assert.Equal(dto.IsActive, parameters.IsActive.NewValue.Value);
         }
     }
 }

@@ -5,7 +5,6 @@ namespace Core.ApplicationServices.Model.LocalOptions
 {
     public class LocalOptionUpdateParameters
     {
-        public OptionalValueChange<Maybe<bool>> IsActive { get; set; }
         public OptionalValueChange<Maybe<string>> Description { get; set; }
     }
 }

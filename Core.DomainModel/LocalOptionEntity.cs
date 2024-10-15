@@ -25,11 +25,6 @@ namespace Core.DomainModel
             Activate();
         }
 
-        public void UpdateIsActive(Maybe<bool> isActive)
-        {
-            if (isActive.HasValue) IsActive = isActive.Value;
-        }
-
         public void Activate()
         {
             IsActive = true;

@@ -214,7 +214,6 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             var parameters = new LocalOptionUpdateParameters()
             {
                 Description = Maybe<string>.Some(A<string>()).AsChangedValue(),
-                IsActive = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
             };
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
             _authorizationContext.Setup(_ => _.AllowModify(It.IsAny<TestLocalOptionEntity>())).Returns(true);

@@ -24,9 +24,6 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 
             return new()
             {
-                IsActive = rule.MustUpdate(x => x.IsActive)
-                    ? (dto.IsActive.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
-                    : OptionalValueChange<Maybe<bool>>.None,
                 Description = rule.MustUpdate(x => x.Description)
                     ? (dto.Description.FromNullable() ?? Maybe<string>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<string>>.None,

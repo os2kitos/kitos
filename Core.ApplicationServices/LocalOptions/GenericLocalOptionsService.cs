@@ -113,7 +113,6 @@ namespace Core.ApplicationServices.LocalOptions
                     }
 
                     if (parameters.Description.HasChange) localOption.UpdateDescription(parameters.Description.NewValue);
-                    if (parameters.IsActive.HasChange) localOption.UpdateIsActive(parameters.IsActive.NewValue);
                     _domainEvents.Raise(new EntityCreatedEvent<TLocalOptionType>(localOption));
                     _localOptionRepository.Update(localOption);
                     _localOptionRepository.Save();
