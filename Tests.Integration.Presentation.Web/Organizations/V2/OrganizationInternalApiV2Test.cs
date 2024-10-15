@@ -75,7 +75,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             var response = await OrganizationInternalV2Helper.GetUIModuleCustomization(organization.Uuid, moduleName);
 
-            AssertUICustomizationResponse(dto, response);
+            await AssertUICustomizationResponse(dto, response);
 
         }
 
@@ -92,7 +92,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             var response = await OrganizationInternalV2Helper.PutUIModuleCustomization(organization.Uuid, moduleName, dto, cookie);
 
-            AssertUICustomizationResponse(dto, response);
+            await AssertUICustomizationResponse(dto, response);
         }
 
         [Fact]
