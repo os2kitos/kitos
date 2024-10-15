@@ -41,11 +41,12 @@ public class OrganizationWriteService : IOrganizationWriteService{
         _dataProtectionAdvisorRepository = dataProtectionAdvisorRepository;
     }
 
-    public Result<Organization, OperationError> UpdateMasterData(Guid organizationUuid, OrganizationMasterDataUpdateParameters parameters)
+    public Result<Organization, OperationError> PatchMasterData(Guid organizationUuid, OrganizationMasterDataUpdateParameters parameters)
     {
         using var transaction = _transactionManager.Begin();
         var result = GetOrganizationAndVerifyWriteAccess(organizationUuid)
-            .Bind(organization => PerformMasterDataUpdates(organization, parameters));
+            .Bind(organizationWithWriteAccess => WithModifyCvrAccessIfRequired(organizationWithWriteAccess, parameters))
+            .Bind(organizationWithConfirmedAccess => PerformMasterDataUpdates(organizationWithConfirmedAccess, parameters));
 
         if (result.Failed)
         {
@@ -65,12 +66,12 @@ public class OrganizationWriteService : IOrganizationWriteService{
             .Bind(WithWriteAccess);
     }
 
-    public Result<Organization, OperationError> UpdateOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
+    public Result<Organization, OperationError> PatchOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
     {
         using var transaction = _transactionManager.Begin();
         var result = GetOrganizationAndVerifyWriteAccess(organizationUuid)
-            .Bind(organization => WithModifyCvrAccessIfRequired(organization, parameters))
-            .Bind(organizationWithWriteAccess => PerformOrganizationUpdates(organizationWithWriteAccess, parameters));
+            .Bind(organizationWithWriteAccess => WithModifyCvrAccessIfRequired(organizationWithWriteAccess, parameters))
+            .Bind(organizationWithConfirmedAccess => PerformOrganizationUpdates(organizationWithConfirmedAccess, parameters));
 
         if (result.Failed)
         {
@@ -92,7 +93,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
     }
 
     private Result<Organization, OperationError> WithModifyCvrAccessIfRequired(Organization organization,
-        OrganizationUpdateParameters parameters)
+        OrganizationCvrUpdateParameter parameters)
     {
         if (!parameters.Cvr.HasChange) return organization;
         return _organizationService.CanActiveUserModifyCvr(organization.Uuid)
@@ -163,7 +164,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
         };
     }
 
-    public Result<OrganizationMasterDataRoles, OperationError> UpsertOrganizationMasterDataRoles(Guid organizationUuid,
+    public Result<OrganizationMasterDataRoles, OperationError> PatchOrganizationMasterDataRoles(Guid organizationUuid,
         OrganizationMasterDataRolesUpdateParameters updateParameters)
     {
         using var transaction = _transactionManager.Begin();
