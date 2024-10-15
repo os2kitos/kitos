@@ -15,7 +15,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
 {
-    [RoutePrefix("api/v2/internal/it-systems/{organizationUuid}/local-choice-types")]
+    [RoutePrefix("api/v2/internal/it-systems/{organizationUuid}/local-option-types")]
     public class ItSystemLocalOptionTypesInternalV2Controller: InternalApiV2Controller
     {
 
