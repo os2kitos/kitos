@@ -16,7 +16,7 @@ namespace Core.ApplicationServices.LocalOptions
         Result<TOptionType, OperationError> CreateLocalOption(Guid organizationUuid,
             LocalOptionCreateParameters parameters);
 
-        Result<TLocalOptionType, OperationError> PatchLocalOption(Guid organizationUuid, int optionId,
+        Result<TOptionType, OperationError> PatchLocalOption(Guid organizationUuid, int optionId,
             LocalOptionUpdateParameters parameters);
 
         Result<TLocalOptionType, OperationError> DeleteLocalOption(Guid organizationUuid, int optionId);

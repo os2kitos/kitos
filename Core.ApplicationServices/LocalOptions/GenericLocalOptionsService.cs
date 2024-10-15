@@ -101,7 +101,7 @@ namespace Core.ApplicationServices.LocalOptions
                 });
         }
 
-        public Result<TLocalOptionType, OperationError> PatchLocalOption(Guid organizationUuid, int optionId, LocalOptionUpdateParameters parameters)
+        public Result<TOptionType, OperationError> PatchLocalOption(Guid organizationUuid, int optionId, LocalOptionUpdateParameters parameters)
         {
             return GetLocalOptionByOrganizationUuidAndOptionId(organizationUuid, optionId)
                 .Match(localOption =>
@@ -113,9 +113,10 @@ namespace Core.ApplicationServices.LocalOptions
                     }
 
                     localOption.UpdateLocalOption(parameters.Description);
+                    _domainEvents.Raise(new EntityCreatedEvent<TLocalOptionType>(localOption));
                     _localOptionRepository.Update(localOption);
                     _localOptionRepository.Save();
-                    return Result<TLocalOptionType, OperationError>.Success(localOption);
+                    return GetByOrganizationUuidAndOptionId(organizationUuid, optionId);
                 }, () =>
                 {
                     var orgIdResult = ResolveOrganizationIdAndValidateCreate(organizationUuid);
@@ -123,15 +124,15 @@ namespace Core.ApplicationServices.LocalOptions
                         return orgIdResult.Error;
                     var orgId = orgIdResult.Value;
 
-                    var entity = new TLocalOptionType();
+                    var newLocalOption = new TLocalOptionType();
 
-                    entity.SetupNewLocalOption(orgId, optionId);
-                    entity.UpdateLocalOption(parameters.Description);
+                    newLocalOption.SetupNewLocalOption(orgId, optionId);
+                    newLocalOption.UpdateLocalOption(parameters.Description);
 
-                    _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(entity));
-                    _localOptionRepository.Insert(entity);
+                    _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(newLocalOption));
+                    _localOptionRepository.Insert(newLocalOption);
                     _localOptionRepository.Save();
-                    return Result<TLocalOptionType, OperationError>.Success(entity);
+                    return GetByOrganizationUuidAndOptionId(organizationUuid, optionId);
                 });
         }
 

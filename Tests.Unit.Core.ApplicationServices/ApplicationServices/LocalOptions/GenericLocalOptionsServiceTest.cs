@@ -116,11 +116,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             {
                 OptionId = optionId
             };
-            var existingLocalOptionsList = new List<TestLocalOptionEntity>()
-                { new() { OptionId = optionId, Organization = new Organization() { Uuid = orgUuid }, IsActive = true} };
-            _localOptionsRepository.SetupSequence(_ => _.AsQueryable())
-                .Returns(new List<TestLocalOptionEntity>().AsQueryable())
-                .Returns(existingLocalOptionsList.AsQueryable());
+            SetupLocalOptionsRepositoryReturnsNoneThenOne(optionId, orgUuid, A<string>());
             SetupCommonMocksForSuccessfulCreate(orgUuid, orgDbId, optionId);
 
             var result = _sut.CreateLocalOption(orgUuid, parameters);
@@ -142,7 +138,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
                 { new() { OptionId = optionId, Organization = new Organization() { Uuid = orgUuid }, IsActive = false} };
             _localOptionsRepository.SetupSequence(_ => _.AsQueryable())
                 .Returns(existingLocalOptionsList.AsQueryable())
-                .Returns(existingLocalOptionsList.AsQueryable()); ;
+                .Returns(existingLocalOptionsList.AsQueryable());
             SetupCommonMocksForSuccessfulCreate(orgUuid, orgDbId, optionId);
 
             var result = _sut.CreateLocalOption(orgUuid, parameters);
@@ -154,16 +150,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
         {
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
             _authorizationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
-
-            var existingGlobalOptions = new List<TestOptionEntity>()
-            {
-                new ()
-                {
-                    Id = optionId,
-                    IsEnabled = true
-                }
-            };
-            _optionsRepository.Setup(_ => _.AsQueryable()).Returns(existingGlobalOptions.AsQueryable());
+            SetupGlobalOptionsRepositoryReturnsOneOption(optionId);
         }
 
         [Fact]
@@ -196,7 +183,8 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             };
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
             _authorizationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
-
+            SetupLocalOptionsRepositoryReturnsNoneThenOne(optionId, orgUuid, parameters.Description);
+            SetupGlobalOptionsRepositoryReturnsOneOption(optionId);
 
             var result = _sut.PatchLocalOption(orgUuid, optionId, parameters);
 
@@ -204,6 +192,15 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             Assert.Equal(parameters.Description, result.Value.Description);
             _localOptionsRepository.Verify(_ => _.Insert(It.IsAny<TestLocalOptionEntity>()));
             _localOptionsRepository.Verify(_ => _.Save());
+        }
+
+        private void SetupLocalOptionsRepositoryReturnsNoneThenOne(int optionId, Guid orgUuid, string description)
+        {
+            var existingLocalOptionsList = new List<TestLocalOptionEntity>()
+                { new() { OptionId = optionId, Organization = new Organization() { Uuid = orgUuid }, IsActive = true, Description = description} };
+            _localOptionsRepository.SetupSequence(_ => _.AsQueryable())
+                .Returns(new List<TestLocalOptionEntity>().AsQueryable())
+                .Returns(existingLocalOptionsList.AsQueryable());
         }
 
         [Fact]
@@ -218,7 +215,8 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             };
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
             _authorizationContext.Setup(_ => _.AllowModify(It.IsAny<TestLocalOptionEntity>())).Returns(true);
-            SetupLocalRepositoryReturnsOneOption(optionId, orgUuid);
+            SetupLocalOptionsRepositoryReturnsOneOptionTwice(optionId, orgUuid);
+            SetupGlobalOptionsRepositoryReturnsOneOption(optionId);
 
             var result = _sut.PatchLocalOption(orgUuid, optionId, parameters);
 
@@ -226,6 +224,28 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             Assert.Equal(parameters.Description, result.Value.Description);
             _localOptionsRepository.Verify(_ => _.Update(It.IsAny<TestLocalOptionEntity>()));
             _localOptionsRepository.Verify(_ => _.Save());
+        }
+
+        private void SetupGlobalOptionsRepositoryReturnsOneOption(int optionId)
+        {
+            var existingGlobalOptions = new List<TestOptionEntity>()
+            {
+                new ()
+                {
+                    Id = optionId,
+                    IsEnabled = true
+                }
+            };
+            _optionsRepository.Setup(_ => _.AsQueryable()).Returns(existingGlobalOptions.AsQueryable());
+        }
+
+        private void SetupLocalOptionsRepositoryReturnsOneOptionTwice(int optionId, Guid orgUuid)
+        {
+            var existingLocalOptionsList = new List<TestLocalOptionEntity>()
+                { new() { OptionId = optionId, Organization = new Organization() { Uuid = orgUuid }, IsActive = false} };
+            _localOptionsRepository.SetupSequence(_ => _.AsQueryable())
+                .Returns(existingLocalOptionsList.AsQueryable())
+                .Returns(existingLocalOptionsList.AsQueryable());
         }
 
         [Theory]

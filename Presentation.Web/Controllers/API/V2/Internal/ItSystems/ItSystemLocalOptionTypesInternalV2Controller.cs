@@ -76,6 +76,5 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
                 .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
-
     }
 }
