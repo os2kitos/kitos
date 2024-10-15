@@ -2,7 +2,7 @@
 
 namespace Presentation.Web.Models.API.V2.Internal.Request.User
 {
-    public class CopyRightRequestDTO
+    public class MutateRightRequestDTO
     {
         public Guid UserUuid { get; set; }
         public int RoleId { get; set; }

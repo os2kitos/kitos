@@ -9,12 +9,14 @@ namespace Core.ApplicationServices.Organizations.Write
 {
     public interface IOrganizationWriteService
     {
-        Result<Organization, OperationError> UpdateMasterData(Guid organizationUuid,
+        Result<Organization, OperationError> PatchMasterData(Guid organizationUuid,
             OrganizationMasterDataUpdateParameters parameters);
 
-        Result<OrganizationMasterDataRoles, OperationError> UpsertOrganizationMasterDataRoles(Guid organizationUuid, OrganizationMasterDataRolesUpdateParameters updateParameters);
+        Result<OrganizationMasterDataRoles, OperationError> PatchOrganizationMasterDataRoles(Guid organizationUuid, OrganizationMasterDataRolesUpdateParameters updateParameters);
         
-        public Result<OrganizationMasterDataRoles, OperationError>
-            GetOrCreateOrganizationMasterDataRoles(Guid organizationUuid);
+        Result<OrganizationMasterDataRoles, OperationError> GetOrCreateOrganizationMasterDataRoles(Guid organizationUuid);
+
+        Result<Organization, OperationError> PatchOrganization(Guid organizationUuid,
+            OrganizationUpdateParameters parameters);
     }
 }

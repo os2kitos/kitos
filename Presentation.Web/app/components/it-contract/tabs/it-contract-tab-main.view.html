@@ -43,7 +43,7 @@
                         </div>
 
                         <!-- Contract template -->
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isContractTemplateEnabled">
                             <select2-option data-id="contract-template"
                                             data-label="Kontraktskabelon"
                                             data-placeholder="Vælg kontraktskabelon"
@@ -57,7 +57,7 @@
                         </div>
 
                         <!--Criticality type-->
-                        <div class="form-group">
+                        <div class="form-group" ng-if="isCritialityEnabled">
                             <label for="criticality" class="control-label small">Kritikalitet</label>
                             <single-select-select2 id="criticality"
                                                    data-placeholder="Vælg kritikalitet"

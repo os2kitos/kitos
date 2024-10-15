@@ -83,10 +83,18 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
         }
 
         public static async Task<HttpResponseMessage> CopyRoles(Guid organizationUuid, Guid fromUser, Guid toUser,
-            CopyUserRightsRequestDTO request)
+            MutateUserRightsRequestDTO request)
         {
             var requestCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"{ControllerPrefix(organizationUuid)}/{fromUser}/copy-roles/{toUser}");
+            return await HttpApi.PostWithCookieAsync(url, requestCookie, request);
+        }
+
+        public static async Task<HttpResponseMessage> TransferRoles(Guid organizationUuid, Guid fromUser, Guid toUser,
+            MutateUserRightsRequestDTO request)
+        {
+            var requestCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"{ControllerPrefix(organizationUuid)}/{fromUser}/transfer-roles/{toUser}");
             return await HttpApi.PostWithCookieAsync(url, requestCookie, request);
         }
 

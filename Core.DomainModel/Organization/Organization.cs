@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.Extensions;
@@ -516,6 +517,30 @@ namespace Core.DomainModel.Organization
                 .AsReadOnly();
         }
 
+        public void UpdateAddress(Maybe<string> address)
+        {
+            Adress = address.HasValue ? address.Value : null;
+        }
+
+        public void UpdateCvr(Maybe<string> cvr)
+        {
+            Cvr = cvr.HasValue ? cvr.Value : null;
+        }
+
+        public void UpdateEmail(Maybe<string> email)
+        {
+            Email = email.HasValue ? email.Value : null;
+        }
+
+        public void UpdatePhone(Maybe<string> phone)
+        {
+            Phone = phone.HasValue ? phone.Value : null;
+        }
+
+        public void UpdateName(Maybe<string> name)
+        {
+            Name = name.HasValue ? name.Value : null;
+        }
         /// <summary>
         /// Replaces the current root organization unit with a new one and relocates the current root hierarchy below the new root
         /// </summary>

@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.API.V1.UI_Configuration
         public HttpResponseMessage Get(int organizationId, string module)
         {
             return _uiModuleCustomizationServiceService
-                .GetModuleConfigurationForOrganization(organizationId, module)
+                .GetModuleCustomizationForOrganization(organizationId, module)
                 .Select(ToDto)
                 .Match(Ok, FromOperationError);
         }

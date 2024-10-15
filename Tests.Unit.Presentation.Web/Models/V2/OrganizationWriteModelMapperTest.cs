@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Web.Http.Results;
+using System.Text.RegularExpressions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
+using Core.DomainModel.Organization;
+using Core.DomainServices.Generic;
 using Moq;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Tests.Toolkit.Extensions;
+using Tests.Unit.Presentation.Web.Extensions;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
@@ -16,19 +20,37 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     {
         private readonly OrganizationWriteModelMapper _sut;
         private readonly Mock<ICurrentHttpRequest> _httpRequest;
+        private readonly Mock<IEntityIdentityResolver> _identityResolver;
 
         public OrganizationWriteModelMapperTest()
         {
             _httpRequest = new Mock<ICurrentHttpRequest>();
+            _identityResolver = new Mock<IEntityIdentityResolver>();
             _httpRequest.Setup(x => 
                 x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
                 .Returns(GetAllInputPropertyNames<OrganizationMasterDataRequestDTO>());
-            _sut = new OrganizationWriteModelMapper(_httpRequest.Object);
+            _sut = new OrganizationWriteModelMapper(_httpRequest.Object, _identityResolver.Object);
+        }
+
+        [Fact]
+        public void Can_Map_Organization_Update_Params()
+        {
+            ExpectHttpRequestPropertyNames<OrganizationUpdateRequestDTO>();
+            var dto = new OrganizationUpdateRequestDTO()
+            {
+                Cvr = A<string>().AsCvr(),
+                Name = A<string>()
+            };
+
+            var result = _sut.ToOrganizationUpdateParameters(dto);
+            AssertParamHasValidChange(result.Cvr, dto.Cvr);
+            AssertParamHasValidChange(result.Name, dto.Name);
         }
 
         [Fact]
         public void Can_Map_Master_Data_Update_Params()
         {
+            ExpectHttpRequestPropertyNames<OrganizationMasterDataRequestDTO>();
             var dto = new OrganizationMasterDataRequestDTO()
             {
                 Address = A<string>(),
@@ -46,8 +68,71 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Fact]
+        public void Can_Map_UI_Module_Customization_Params()
+        {
+            var orgUuid = A<Guid>();
+            var expectedDbId = A<int>();
+            var moduleName = A<string>();
+            var dto = new UIModuleCustomizationRequestDTO()
+            {
+                Nodes = PrepareTestNodes(5, A<string>())
+            };
+            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(expectedDbId);
+
+            var result = _sut.ToUIModuleCustomizationParameters(orgUuid, moduleName, dto);
+
+            Assert.True(result.Ok);
+            var parameters = result.Value;
+            Assert.Equal(moduleName, parameters.Module);
+            Assert.Equal(expectedDbId, parameters.OrganizationId);
+            Assert.Equal(dto.Nodes.Count(), parameters.Nodes.Count());
+            foreach (var expectedNode in dto.Nodes)
+            {
+                var actual = parameters.Nodes.FirstOrDefault(nodeDto => nodeDto.Key == expectedNode.Key);
+
+                Assert.NotNull(actual);
+                Assert.Equal(expectedNode.Enabled, actual.Enabled);
+            }
+        }
+
+        [Fact]
+        public void Map_UI_Module_Customization_Params_Returns_Not_Found_If_Cannot_Resolve_Org_Id()
+        {
+            var orgUuid = A<Guid>();
+            var moduleName = A<string>();
+            var dto = new UIModuleCustomizationRequestDTO()
+            {
+                Nodes = PrepareTestNodes(5, A<string>())
+            };
+            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(Maybe<int>.None);
+
+            var result = _sut.ToUIModuleCustomizationParameters(orgUuid, moduleName, dto);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        private List<CustomizedUINodeRequestDTO> PrepareTestNodes(int numberOfElements = 1, string key = "", bool isEnabled = false)
+        {
+            var nodes = new List<CustomizedUINodeRequestDTO>();
+            for (var i = 0; i < numberOfElements; i++)
+            {
+                key = string.IsNullOrEmpty(key) ? GenerateKey() : key;
+                nodes.Add(new CustomizedUINodeRequestDTO { Key = key, Enabled = isEnabled });
+            }
+
+            return nodes;
+        }
+
+        private string GenerateKey()
+        {
+            return Regex.Replace(A<string>(), "[0-9-]", "a");
+        }
+
+        [Fact]
         public void Can_Map_Master_Data_Roles()
         {
+            ExpectHttpRequestPropertyNames<OrganizationMasterDataRolesRequestDTO>();
             var orgUuid = A<Guid>();
             var dto = new OrganizationMasterDataRolesRequestDTO()
             {
@@ -100,6 +185,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             Assert.True(parameter.HasChange && parameter.NewValue.HasValue);
             Assert.Equal(expected, parameter.NewValue.Value);
+        }
+
+        private void ExpectHttpRequestPropertyNames<T>()
+        {
+            _httpRequest.Setup(x =>
+                    x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
+                .Returns(GetAllInputPropertyNames<T>());
         }
     }
 }

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -13,6 +16,7 @@ using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Extensions;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.Internal.Organizations;
+using Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Organizations.V2
@@ -47,11 +51,56 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
+        public async Task Get_UI_Customization_Returns_Not_Found_If_None_Added()
+        {
+            var moduleName = "ItSystemUsages";
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+
+            var response = await OrganizationInternalV2Helper.GetUIModuleCustomization(organization.Uuid, moduleName);
+            
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Get_UI_Customization()
+        {
+            var moduleName = "ItSystemUsages";
+            var (cookie, organization) = await CreateUiCustomizationPrerequisitesAsync();
+            var dto = new UIModuleCustomizationRequestDTO()
+            {
+                Nodes = GetNodeDTOs(5),
+            };
+            var putResponse = await OrganizationInternalV2Helper.PutUIModuleCustomization(organization.Uuid, moduleName, dto, cookie);
+            Assert.Equal(HttpStatusCode.OK, putResponse.StatusCode);
+
+            var response = await OrganizationInternalV2Helper.GetUIModuleCustomization(organization.Uuid, moduleName);
+
+            AssertUICustomizationResponse(dto, response);
+
+        }
+
+        [Fact]
+        public async Task Can_Put_UI_Customization()
+        {
+            var moduleName = "ItSystemUsages";
+            var (cookie, organization) = await CreateUiCustomizationPrerequisitesAsync();
+
+            var dto = new UIModuleCustomizationRequestDTO()
+            {
+                Nodes = GetNodeDTOs(5),
+            };
+
+            var response = await OrganizationInternalV2Helper.PutUIModuleCustomization(organization.Uuid, moduleName, dto, cookie);
+
+            AssertUICustomizationResponse(dto, response);
+        }
+
+        [Fact]
         public async Task Can_Get_Master_Data()
         {
             var organization = await CreateTestOrganization();
 
-            var response =
+            using var response =
                 await OrganizationInternalV2Helper.GetOrganizationMasterData(organization.Uuid);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -65,7 +114,6 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         [Fact]
         public async Task Can_Patch_Organization_Master_Data_With_Values()
         {
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
             var patchDto = new OrganizationMasterDataRequestDTO
             {
                 Address = A<string>(),
@@ -76,7 +124,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             var organizationToPatch = await CreateTestOrganization();
 
-            var response =
+            using var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterData(organizationToPatch.Uuid, patchDto);
             
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -93,7 +141,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             var organizationToPatch = await CreateTestOrganization();
 
-            var response =
+            using var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterData(organizationToPatch.Uuid, patchDto);
             
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -126,7 +174,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(contactPersonDto.Name, upsertResponseDto.ContactPerson.Name);
             Assert.Equal(organization.Uuid, upsertResponseDto.OrganizationUuid);
 
-            var response = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(organization.Uuid);
+            using var response = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(organization.Uuid);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
@@ -140,7 +188,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var organization = await CreateTestOrganization();
 
-            var response = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(organization.Uuid);
+            using var response = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(organization.Uuid);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
@@ -181,7 +229,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                    DataProtectionAdvisor = dataProtectionAdvisorDto
             };
 
-            var response =
+            using var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, requestDto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -225,7 +273,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                     throw new ArgumentOutOfRangeException(nameof(roleType), roleType, null);
             }
 
-            var response =
+            using var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, request);
             
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -254,7 +302,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var organization = await CreateTestOrganization();
             var requestDto = new OrganizationMasterDataRolesRequestDTO();
 
-            var response =
+            using var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, requestDto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -262,6 +310,40 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
             Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
             await GetMasterDataRolesAndAssertNotNull(organization.Uuid);
+        }
+
+        [Fact]
+        public async Task Can_Update_Organization()
+        {
+            var organization = await CreateTestOrganization();
+            var requestDto = new OrganizationUpdateRequestDTO()
+            {
+                Cvr = GetCvr(),
+                Name = A<string>()
+            };
+
+            using var response = await OrganizationInternalV2Helper.PatchOrganization(organization.Uuid, requestDto);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var updatedOrganization = await OrganizationHelper.GetOrganizationAsync(organization.Id, cookie);
+            Assert.Equal(requestDto.Cvr, updatedOrganization.Cvr);
+            Assert.Equal(requestDto.Name, updatedOrganization.Name);
+        }
+
+        [Fact]
+        public async Task Update_Organization_Returns_Bad_Request_If_Invalid_Uuid()
+        {
+            var invalidUuid = new Guid();
+            var requestDto = new OrganizationUpdateRequestDTO()
+            {
+                Cvr = GetCvr(),
+                Name = A<string>()
+            };
+
+            using var response = await OrganizationInternalV2Helper.PatchOrganization(invalidUuid, requestDto);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         private async Task GetMasterDataRolesAndAssertNotNull(Guid orgUuid)
@@ -315,6 +397,50 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         private string GetCvr()
         {
             return A<string>().Truncate(CvrMaxLength);
+        }
+
+        private async Task<(Cookie loginCookie, OrganizationDTO organization)> CreateUiCustomizationPrerequisitesAsync()
+        {
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (_, _, loginCookie) =
+                await HttpApi.CreateUserAndLogin(UIConfigurationHelper.CreateEmail(), OrganizationRole.LocalAdmin, organization.Id);
+            return (loginCookie, organization);
+        }
+
+        private async Task AssertUICustomizationResponse(UIModuleCustomizationRequestDTO expected, HttpResponseMessage response)
+        {
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var content = await response.Content.ReadAsStringAsync();
+            var responseDto = JsonConvert.DeserializeObject<UIModuleCustomizationResponseDTO>(content);
+            var expectedNodes = expected.Nodes.ToList();
+            var actualNodes = responseDto.Nodes.ToList();
+            Assert.Equal(expectedNodes.Count, actualNodes.Count);
+            foreach (var expectedNode in expectedNodes)
+            {
+                var actual = actualNodes.FirstOrDefault(nodeDto => nodeDto.Key == expectedNode.Key);
+
+                Assert.NotNull(actual);
+                Assert.Equal(expectedNode.Enabled, actual.Enabled);
+            }
+        }
+
+        private IList<CustomizedUINodeRequestDTO> GetNodeDTOs(int numberOfNodes)
+        {
+            var nodes = new List<CustomizedUINodeRequestDTO>();
+            for (var i = 0; i < numberOfNodes; i++)
+            {
+                nodes.Add(new CustomizedUINodeRequestDTO()
+                {
+                    Key = GenerateKey(),
+                    Enabled = A<bool>(),
+                });
+            }
+            return nodes;
+        }
+
+        private string GenerateKey()
+        {
+            return Regex.Replace(A<string>(), "[0-9-]", "a");
         }
     }
 }
