@@ -103,35 +103,39 @@ namespace Core.ApplicationServices.LocalOptions
         public Result<TOptionType, OperationError> PatchLocalOption(Guid organizationUuid, int optionId, LocalOptionUpdateParameters parameters)
         {
             return GetLocalOptionByOrganizationUuidAndOptionId(organizationUuid, optionId)
-                .Match(localOption =>
-                {
-                    if (!_authorizationContext.AllowModify(localOption))
-                    {
-                        return new OperationError($"User not allowed to modify option with id: {optionId}",
-                            OperationFailure.Forbidden);
-                    }
+                .Match(localOption => ValidateModify(localOption)
+                    .Bind(
+                        localOptionWithModifyRights =>
+                        {
+                            if (parameters.Description.HasChange) localOptionWithModifyRights.UpdateDescription(parameters.Description.NewValue);
 
-                    if (parameters.Description.HasChange) localOption.UpdateDescription(parameters.Description.NewValue);
+                            _domainEvents.Raise(new EntityCreatedEvent<TLocalOptionType>(localOptionWithModifyRights));
+                            _localOptionRepository.Update(localOptionWithModifyRights);
+                            _localOptionRepository.Save();
+                            return GetByOrganizationUuidAndOptionId(organizationUuid, optionId);
+                        }),
+                    () =>
+                    ResolveOrganizationIdAndValidateCreate(organizationUuid)
+                        .Bind(orgId =>
+                        {
+                            var newLocalOption = new TLocalOptionType();
+                            newLocalOption.SetupNewLocalOption(orgId, optionId);
+                            if (parameters.Description.HasChange)
+                                newLocalOption.UpdateDescription(parameters.Description.NewValue);
 
-                    _domainEvents.Raise(new EntityCreatedEvent<TLocalOptionType>(localOption));
-                    _localOptionRepository.Update(localOption);
-                    _localOptionRepository.Save();
-                    return GetByOrganizationUuidAndOptionId(organizationUuid, optionId);
-                }, () =>
-                {
-                    var orgIdResult = ResolveOrganizationIdAndValidateCreate(organizationUuid);
-                    if (orgIdResult.Failed) return orgIdResult.Error;
-                    var orgId = orgIdResult.Value;
+                            _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(newLocalOption));
+                            _localOptionRepository.Insert(newLocalOption);
+                            _localOptionRepository.Save();
+                            return GetByOrganizationUuidAndOptionId(organizationUuid, optionId);
+                        })
+                );
+        }
 
-                    var newLocalOption = new TLocalOptionType();
-                    newLocalOption.SetupNewLocalOption(orgId, optionId);
-                    if (parameters.Description.HasChange) newLocalOption.UpdateDescription(parameters.Description.NewValue);
-
-                    _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(newLocalOption));
-                    _localOptionRepository.Insert(newLocalOption);
-                    _localOptionRepository.Save();
-                    return GetByOrganizationUuidAndOptionId(organizationUuid, optionId);
-                });
+        private Result<TLocalOptionType, OperationError> ValidateModify(TLocalOptionType localOption)
+        {
+            return _authorizationContext.AllowModify(localOption)
+                ? localOption
+                : new OperationError($"User not allowed to modify local option with id: {localOption.Id}", OperationFailure.Forbidden);
         }
 
         public Result<TOptionType, OperationError> DeleteLocalOption(Guid organizationUuid, int optionId)
