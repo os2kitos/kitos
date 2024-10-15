@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetBusinessTypes([NonEmptyGuid][FromUri] Guid organizationUuid)
+        public IHttpActionResult GetLocalBusinessTypes([NonEmptyGuid][FromUri] Guid organizationUuid)
         {
             if (!ModelState.IsValid) return BadRequest();
 
@@ -51,7 +51,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetBusinessTypeByOptionId([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] int optionId)
+        public IHttpActionResult GetLocalBusinessTypeByOptionId([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] int optionId)
         {
             if (!ModelState.IsValid) return BadRequest();
 
@@ -66,7 +66,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult CreateBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid, LocalRegularOptionCreateRequestDTO dto)
+        public IHttpActionResult CreateLocalBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid, LocalRegularOptionCreateRequestDTO dto)
         {
             if (!ModelState.IsValid) return BadRequest();
 
@@ -83,7 +83,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PatchBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid,
+        public IHttpActionResult PatchLocalBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid,
             [FromUri] int optionId, 
             LocalRegularOptionUpdateRequestDTO dto)
         {
@@ -102,7 +102,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult DeleteBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid,
+        public IHttpActionResult DeleteLocalBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid,
             [FromUri] int optionId)
         {
             if (!ModelState.IsValid) return BadRequest();
