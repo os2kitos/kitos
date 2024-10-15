@@ -100,6 +100,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
             Assert.NotNull(organization);
             var globalOption = SetupCreateGlobalBusinessType();
+            var dto = new LocalRegularOptionCreateRequestDTO() { OptionId = globalOption.Id };
+            using var createResponse = await ItSystemInternalV2Helper.CreateLocalOptionType(organization.Uuid, BusinessTypesUrlSuffix, dto);
+            Assert.Equal(HttpStatusCode.OK, createResponse.StatusCode);
 
             using var response = await ItSystemInternalV2Helper.DeleteLocalOptionType(organization.Uuid, globalOption.Id, BusinessTypesUrlSuffix);
 
