@@ -112,8 +112,8 @@ namespace Core.ApplicationServices.LocalOptions
                             OperationFailure.Forbidden);
                     }
 
-
-                    localOption.UpdateLocalOption(parameters.Description.NewValue.Value);
+                    if (parameters.Description.HasChange) localOption.UpdateDescription(parameters.Description.NewValue);
+                    if (parameters.IsActive.HasChange) localOption.UpdateIsActive(parameters.IsActive.NewValue);
                     _domainEvents.Raise(new EntityCreatedEvent<TLocalOptionType>(localOption));
                     _localOptionRepository.Update(localOption);
                     _localOptionRepository.Save();
@@ -128,7 +128,8 @@ namespace Core.ApplicationServices.LocalOptions
                     var newLocalOption = new TLocalOptionType();
 
                     newLocalOption.SetupNewLocalOption(orgId, optionId);
-                    newLocalOption.UpdateLocalOption(parameters.Description.NewValue.Value);
+                    if (parameters.Description.HasChange) newLocalOption.UpdateDescription(parameters.Description.NewValue);
+
 
                     _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(newLocalOption));
                     _localOptionRepository.Insert(newLocalOption);

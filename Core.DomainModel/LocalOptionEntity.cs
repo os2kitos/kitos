@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Abstractions.Types;
 
 namespace Core.DomainModel
 {
@@ -24,6 +25,11 @@ namespace Core.DomainModel
             Activate();
         }
 
+        public void UpdateIsActive(Maybe<bool> isActive)
+        {
+            if (isActive.HasValue) IsActive = isActive.Value;
+        }
+
         public void Activate()
         {
             IsActive = true;
@@ -34,9 +40,9 @@ namespace Core.DomainModel
             IsActive = false;
         }
 
-        public void UpdateLocalOption(string description)
+        public void UpdateDescription(Maybe<string> description)
         {
-            Description = description;
+            if (description.HasValue) Description = description.Value;
         }
     }
 }
