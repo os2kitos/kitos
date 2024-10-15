@@ -9,6 +9,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json;
+using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
 using Presentation.Web.Models.API.V2.Internal.Response;
 using Tests.Integration.Presentation.Web.Tools;
@@ -27,10 +28,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         [Fact]
         public async Task Can_Get_Local_Business_Types()
         {
-            var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
-            Assert.NotNull(organization);
+            var organization = await CreateOrganization();
             var globalOption = SetupCreateGlobalBusinessType();
-
 
             using var response = await ItSystemInternalV2Helper.GetLocalOptionTypes(organization.Uuid, BusinessTypesUrlSuffix);
 
@@ -45,7 +44,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         [Fact]
         public async Task Can_Get_Local_Business_Type_By_Option_Id()
         {
-            var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var organization = await CreateOrganization();
             Assert.NotNull(organization);
             var globalOption = SetupCreateGlobalBusinessType();
 
@@ -60,7 +59,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         [Fact]
         public async Task Can_Create_Local_Business_Type()
         {
-            var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var organization = await CreateOrganization();
             Assert.NotNull(organization);
             var globalOption = SetupCreateGlobalBusinessType();
             var dto = new LocalRegularOptionCreateRequestDTO() { OptionUuid = globalOption.Uuid };
@@ -77,7 +76,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         [Fact]
         public async Task Can_Patch_Local_Business_Type()
         {
-            var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var organization = await CreateOrganization();
             Assert.NotNull(organization);
             var globalOption = SetupCreateGlobalBusinessType();
 
@@ -93,7 +92,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         [Fact]
         public async Task Can_Delete_Local_Business_Type()
         {
-            var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var organization = await CreateOrganization();
             Assert.NotNull(organization);
             var globalOption = SetupCreateGlobalBusinessType();
             var dto = new LocalRegularOptionCreateRequestDTO() { OptionUuid = globalOption.Uuid };
@@ -109,6 +108,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var responseDto = await response.ReadResponseBodyAsAsync<LocalRegularOptionResponseDTO>();
 
             Assert.False(responseDto.IsActive);
+        }
+
+        private async Task<OrganizationDTO> CreateOrganization()
+        {
+            var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            Assert.NotNull(organization);
+            return organization;
         }
 
         private BusinessType SetupCreateGlobalBusinessType()
