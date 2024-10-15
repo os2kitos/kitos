@@ -17,7 +17,8 @@
             private readonly genericApiWrapper: Services.Generic.ApiWrapper,
             private readonly inMemoryCacheService: Kitos.Shared.Caching.IInMemoryCacheService,
             private readonly $q: ng.IQService,
-            private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory) {
+            private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
+            private readonly $http: ng.IHttpService) {
         }
 
         getConnectionUpdateConsequences(organizationUuid: string, synchronizationDepth: number | null): ng.IPromise<Models.Api.Organization.ConnectionUpdateConsequencesResponseDTO> {
@@ -26,7 +27,7 @@
                 query = `?synchronizationDepth=${synchronizationDepth}`;
             }
             return this.genericApiWrapper
-                .getDataFromUrl<Models.Api.Organization.ConnectionUpdateConsequencesResponseDTO>(`${this.getBasePath(organizationUuid)}/connection/update${query}`);
+                .getRawDataFromUrl<Models.Api.Organization.ConnectionUpdateConsequencesResponseDTO>(`${this.getBasePath(organizationUuid)}/connection/update${query}`);
         }
 
         private getBasePath(organizationUuid: string) {
@@ -53,7 +54,7 @@
                 return this.$q.resolve(result);
             }
             return this.genericApiWrapper
-                .getDataFromUrl<Models.Api.Organization.StsOrganizationOrgUnitDTO>(`${this.getBasePath(organizationUuid)}/snapshot`)
+                .getRawDataFromUrl<Models.Api.Organization.StsOrganizationOrgUnitDTO>(`${this.getBasePath(organizationUuid)}/snapshot`)
                 .then(root => {
                     this.inMemoryCacheService.setEntry(cacheKey, root, Kitos.Shared.Time.Offset.compute(Kitos.Shared.Time.TimeUnit.Minutes, 10));
                     return root;
@@ -67,7 +68,7 @@
                 return this.$q.resolve(result);
             }
             return this.genericApiWrapper
-                .getDataFromUrl<Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO>(`${this.getBasePath(organizationUuid)}/connection-status`)
+                .getRawDataFromUrl<Models.Api.Organization.StsOrganizationSynchronizationStatusResponseDTO>(`${this.getBasePath(organizationUuid)}/connection-status`)
                 .then(connectionStatus => {
                     this.inMemoryCacheService.setEntry(cacheKey, connectionStatus, Kitos.Shared.Time.Offset.compute(Kitos.Shared.Time.TimeUnit.Minutes, 1));
                     return connectionStatus;
@@ -120,7 +121,7 @@
         }
 
         getConnectionChangeLogs(organizationUuid: string, numberOfLogs: number): ng.IPromise<Array<Models.Api.Organization.ConnectionChangeLogDTO>> {
-            return this.genericApiWrapper.getDataFromUrl<Array<Models.Api.Organization.ConnectionChangeLogDTO>>(`${this.getBasePath(organizationUuid)}/connection/change-log?numberOfChangeLogs=${numberOfLogs}`);
+            return this.genericApiWrapper.getRawDataFromUrl<Array<Models.Api.Organization.ConnectionChangeLogDTO>>(`${this.getBasePath(organizationUuid)}/connection/change-log?numberOfChangeLogs=${numberOfLogs}`);
         }
     }
 
