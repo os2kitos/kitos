@@ -118,7 +118,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             {
                 OptionUuid = optionUuid
             };
-            SetupLocalOptionsRepositoryReturnsNoneThenOne(optionId, orgUuid, A<string>(), optionUuid);
+            SetupLocalOptionsRepositoryReturnsNoneThenOne(optionId, orgUuid, A<string>());
             SetupCommonMocksForSuccessfulCreate(orgUuid, orgDbId, optionId, optionUuid);
             SetupResolveGlobalOptionUuid(optionUuid, optionId);
 
@@ -192,7 +192,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             var descriptionText = parameters.Description.NewValue.Value;
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
             _authorizationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
-            SetupLocalOptionsRepositoryReturnsNoneThenOne(optionId, orgUuid, descriptionText, optionUuid);
+            SetupLocalOptionsRepositoryReturnsNoneThenOne(optionId, orgUuid, descriptionText);
             SetupGlobalOptionsRepositoryReturnsOneOption(optionId, optionUuid);
             SetupResolveGlobalOptionUuid(optionUuid, optionId);
 
@@ -204,7 +204,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             _localOptionsRepository.Verify(_ => _.Save());
         }
 
-        private void SetupLocalOptionsRepositoryReturnsNoneThenOne(int optionId, Guid orgUuid, string description, Guid optionUuid)
+        private void SetupLocalOptionsRepositoryReturnsNoneThenOne(int optionId, Guid orgUuid, string description)
         {
             var existingLocalOptionsList = new List<TestLocalOptionEntity>()
                 { new() { OptionId = optionId, Organization = new Organization() { Uuid = orgUuid }, IsActive = true, Description = description} };
