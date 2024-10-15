@@ -285,12 +285,13 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             var optionId = A<int>();
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
             _authorizationContext.Setup(_ => _.AllowDelete(It.IsAny<TestLocalOptionEntity>())).Returns(true);
-            SetupLocalRepositoryReturnsOneOption(optionId, orgUuid);
+            SetupLocalOptionsRepositoryReturnsOneOptionTwice(optionId, orgUuid);
+            SetupGlobalOptionsRepositoryReturnsOneOption(optionId);
 
             var result = _sut.DeleteLocalOption(orgUuid, optionId);
 
             Assert.True(result.Ok);
-            Assert.False(result.Value.IsActive);
+            Assert.False(result.Value.IsLocallyAvailable);
             _localOptionsRepository.Verify(_ => _.Save());
         }
 

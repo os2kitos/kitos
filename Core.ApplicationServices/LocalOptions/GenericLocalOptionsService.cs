@@ -136,7 +136,7 @@ namespace Core.ApplicationServices.LocalOptions
                 });
         }
 
-        public Result<TLocalOptionType, OperationError> DeleteLocalOption(Guid organizationUuid, int optionId)
+        public Result<TOptionType, OperationError> DeleteLocalOption(Guid organizationUuid, int optionId)
         {
             return GetLocalOptionByOrganizationUuidAndOptionId(organizationUuid, optionId)
                 .Match(localOption => _authorizationContext.AllowDelete(localOption)
@@ -151,7 +151,7 @@ namespace Core.ApplicationServices.LocalOptions
                     _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(localOption));
 
                     _localOptionRepository.Save();
-                    return Result<TLocalOptionType, OperationError>.Success(localOption);
+                    return GetByOrganizationUuidAndOptionId(organizationUuid, optionId);
                 });
         }
 
