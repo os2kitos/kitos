@@ -3,8 +3,8 @@ using Core.ApplicationServices.Model.Shared;
 
 namespace Core.ApplicationServices.Model.Organizations.Write
 {
-    public class OrganizationUpdateParameters: OrganizationCvrUpdateParameter
+    public class OrganizationCvrUpdateParameter
     {
-        public OptionalValueChange<Maybe<string>> Name { get; set; }
+        public OptionalValueChange<Maybe<string>> Cvr { get; set; }
     }
 }
