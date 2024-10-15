@@ -11,14 +11,14 @@ namespace Core.ApplicationServices.LocalOptions
         where TOptionType : OptionEntity<TReferenceType>
     {
         Result<IEnumerable<TOptionType>, OperationError> GetByOrganizationUuid(Guid organizationUuid);
-        Result<TOptionType, OperationError> GetByOrganizationUuidAndOptionId(Guid organizationUuid, int optionId);
+        Result<TOptionType, OperationError> GetByOrganizationUuidAndOptionUuid(Guid organizationUuid, Guid globalOptionUuid);
 
         Result<TOptionType, OperationError> CreateLocalOption(Guid organizationUuid,
             LocalOptionCreateParameters parameters);
 
-        Result<TOptionType, OperationError> PatchLocalOption(Guid organizationUuid, int optionId,
+        Result<TOptionType, OperationError> PatchLocalOption(Guid organizationUuid, Guid globalOptionUuid,
             LocalOptionUpdateParameters parameters);
 
-        Result<TOptionType, OperationError> DeleteLocalOption(Guid organizationUuid, int optionId);
+        Result<TOptionType, OperationError> DeleteLocalOption(Guid organizationUuid, Guid globalOptionUuid);
     }
 }

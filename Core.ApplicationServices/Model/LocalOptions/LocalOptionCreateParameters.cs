@@ -1,7 +1,9 @@
-﻿namespace Core.ApplicationServices.Model.LocalOptions
+﻿using System;
+
+namespace Core.ApplicationServices.Model.LocalOptions
 {
     public class LocalOptionCreateParameters
     {
-        public int OptionId { get; set; }
+        public Guid OptionUuid { get; set; }
     }
 }

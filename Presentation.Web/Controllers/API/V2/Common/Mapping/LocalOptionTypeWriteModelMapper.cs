@@ -14,7 +14,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         {
             return new()
             {
-                OptionId = dto.OptionId,
+                OptionUuid = dto.OptionUuid,
             };
         }
 

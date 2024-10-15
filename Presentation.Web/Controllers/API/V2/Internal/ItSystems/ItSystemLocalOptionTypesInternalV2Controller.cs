@@ -46,16 +46,16 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         }
 
         [HttpGet]
-        [Route("business-types/{optionId}")]
+        [Route("business-types/{optionUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetLocalBusinessTypeByOptionId([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] int optionId)
+        public IHttpActionResult GetLocalBusinessTypeByOptionId([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] Guid optionUuid)
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            return _businessTypeService.GetByOrganizationUuidAndOptionId(organizationUuid, optionId)
+            return _businessTypeService.GetByOrganizationUuidAndOptionUuid(organizationUuid, optionUuid)
                 .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
@@ -78,36 +78,36 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         }
 
         [HttpPatch]
-        [Route("business-types/{optionId}")]
+        [Route("business-types/{optionUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult PatchLocalBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid,
-            [FromUri] int optionId, 
+            [FromUri] Guid optionUuid,
             LocalRegularOptionUpdateRequestDTO dto)
         {
             if (!ModelState.IsValid) return BadRequest();
 
             var updateParameters = _writeModelMapper.ToLocalOptionUpdateParameters(dto);
 
-            return _businessTypeService.PatchLocalOption(organizationUuid, optionId, updateParameters)
+            return _businessTypeService.PatchLocalOption(organizationUuid, optionUuid, updateParameters)
                 .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
 
         [HttpDelete]
-        [Route("business-types/{optionId}")]
+        [Route("business-types/{optionUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult DeleteLocalBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid,
-            [FromUri] int optionId)
+            [FromUri] Guid optionUuid)
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            return _businessTypeService.DeleteLocalOption(organizationUuid, optionId)
+            return _businessTypeService.DeleteLocalOption(organizationUuid, optionUuid)
                 .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }

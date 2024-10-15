@@ -17,11 +17,11 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystem
                 TestEnvironment.CreateUrl($"api/v2/internal/it-systems/{organizationUuid}/local-option-types/{choiceTypeName}"), cookie);
         }
 
-        public static async Task<HttpResponseMessage> GetLocalOptionTypeByOptionId(Guid organizationUuid, string choiceTypeName, int optionId)
+        public static async Task<HttpResponseMessage> GetLocalOptionTypeByOptionId(Guid organizationUuid, string choiceTypeName, Guid optionUuid)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.GetWithCookieAsync(
-                TestEnvironment.CreateUrl($"api/v2/internal/it-systems/{organizationUuid}/local-option-types/{choiceTypeName}/{optionId}"), cookie);
+                TestEnvironment.CreateUrl($"api/v2/internal/it-systems/{organizationUuid}/local-option-types/{choiceTypeName}/{optionUuid}"), cookie);
         }
 
         public static async Task<HttpResponseMessage> CreateLocalOptionType(Guid organizationUuid, string choiceTypeName, LocalRegularOptionCreateRequestDTO dto)
@@ -31,18 +31,18 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystem
                 TestEnvironment.CreateUrl($"api/v2/internal/it-systems/{organizationUuid}/local-option-types/{choiceTypeName}"), cookie, dto);
         }
 
-        public static async Task<HttpResponseMessage> PatchLocalOptionType(Guid organizationUuid, int optionId, string choiceTypeName, LocalRegularOptionUpdateRequestDTO dto)
+        public static async Task<HttpResponseMessage> PatchLocalOptionType(Guid organizationUuid, Guid optionUuid, string choiceTypeName, LocalRegularOptionUpdateRequestDTO dto)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.PatchWithCookieAsync(
-                TestEnvironment.CreateUrl($"api/v2/internal/it-systems/{organizationUuid}/local-option-types/{choiceTypeName}/{optionId}"), cookie, dto);
+                TestEnvironment.CreateUrl($"api/v2/internal/it-systems/{organizationUuid}/local-option-types/{choiceTypeName}/{optionUuid}"), cookie, dto);
         }
 
-        public static async Task<HttpResponseMessage> DeleteLocalOptionType(Guid organizationUuid, int optionId, string choiceTypeName)
+        public static async Task<HttpResponseMessage> DeleteLocalOptionType(Guid organizationUuid, Guid optionUuid, string choiceTypeName)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.DeleteWithCookieAsync(
-                TestEnvironment.CreateUrl($"api/v2/internal/it-systems/{organizationUuid}/local-option-types/{choiceTypeName}/{optionId}"), cookie);
+                TestEnvironment.CreateUrl($"api/v2/internal/it-systems/{organizationUuid}/local-option-types/{choiceTypeName}/{optionUuid}"), cookie);
         }
     }
 }

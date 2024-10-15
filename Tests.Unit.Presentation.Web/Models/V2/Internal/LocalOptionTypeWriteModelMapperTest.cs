@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Linq;
 using Moq;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
@@ -25,7 +26,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
         {
             var dto = new LocalRegularOptionCreateRequestDTO
             {
-                OptionId = A<int>()
+                OptionUuid = A<Guid>()
             };
             _httpRequest.Setup(x =>
                     x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
@@ -33,7 +34,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
 
             var parameters = _sut.ToLocalOptionCreateParameters(dto);
 
-            Assert.Equal(dto.OptionId, parameters.OptionId);
+            Assert.Equal(dto.OptionUuid, parameters.OptionUuid);
         }
 
         [Fact]
