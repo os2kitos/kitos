@@ -77,7 +77,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
                 .Match(Ok, FromOperationError);
         }
 
-        [HttpPost]
+        [HttpPatch]
         [Route("business-types/{optionId}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
