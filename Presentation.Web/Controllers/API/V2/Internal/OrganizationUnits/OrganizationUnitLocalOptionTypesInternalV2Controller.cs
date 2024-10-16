@@ -9,6 +9,8 @@ using System.Net;
 using System.Web.Http;
 using System;
 using Presentation.Web.Models.API.V2.Internal.Response.LocalOptions;
+using Core.DomainModel.ItSystem;
+using Presentation.Web.Models.API.V2.Internal.Response;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 {
@@ -39,6 +41,22 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 
             var organizationUnitRoles = _localOrganizationUnitService.GetLocalOptions(organizationUuid);
             return Ok(_responseMapper.ToLocalRoleOptionDTOs<OrganizationUnitRight, OrganizationUnitRole>(organizationUnitRoles));
+        }
+
+        [HttpGet]
+        [Route("organization-unit-roles/{optionUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRoleOptionResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetLocalBusinessTypeByOptionId([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] Guid optionUuid)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            return _localOrganizationUnitService.GetLocalOption(organizationUuid, optionUuid)
+                .Select(_responseMapper.ToLocalRoleOptionDTO<OrganizationUnitRight, OrganizationUnitRole>)
+                .Match(Ok, FromOperationError);
         }
     }
 }

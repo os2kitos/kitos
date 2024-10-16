@@ -39,6 +39,22 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(globalOption.HasWriteAccess, actualOptionDto.WriteAccess);
         }
 
+        [Fact]
+        public async Task Can_Get_Local_Organization_Unit_Role_By_Option_Id()
+        {
+            var organization = await CreateOrganization();
+            Assert.NotNull(organization);
+            var globalOption = SetupCreateGlobalOrganizationUnitRole();
+
+            using var response = await LocalOptionTypeV2Helper.GetLocalOptionType(organization.Uuid, OrganizationUnitRolesUrlSuffix, globalOption.Uuid, OrganizationUnitsApiPrefix);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseDto = await response.ReadResponseBodyAsAsync<LocalRoleOptionResponseDTO>();
+            Assert.NotNull(responseDto);
+            Assert.Equal(globalOption.Uuid, responseDto.Uuid);
+            Assert.Equal(globalOption.HasWriteAccess, responseDto.WriteAccess);
+        }
+
         private async Task<OrganizationDTO> CreateOrganization()
         {
             var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
