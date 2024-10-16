@@ -139,6 +139,7 @@
     <Compile Include="Interfaces\V2\RightsHolderItInterfaceApiV2Test.cs" />
     <Compile Include="Internal\Messages\PublicMessagesApiV2Test.cs" />
     <Compile Include="ItSystem\V2\BaseItSystemsApiV2Test.cs" />
+    <Compile Include="ItSystem\V2\ItSystemLocalOptionTypesInternalV2ApiTest.cs" />
     <Compile Include="ItSystem\V2\ItSystemsInternalApiV2Test.cs" />
     <Compile Include="ItSystem\V2\ItSystemsApiV2RightsHoldersTest.cs" />
     <Compile Include="LocalAdminArea\ExcelImportTest.cs" />
@@ -157,6 +158,7 @@
     <Compile Include="Tools\Extensions\StringExtensions.cs" />
     <Compile Include="Tools\Internal\DPR\DataProcessingRegistrationInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\ItSystemUsage\ItSystemUsageMigrationV2Helper.cs" />
+    <Compile Include="Tools\Internal\ItSystem\ItSystemInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\Notifications\NotificationV2Helper.cs" />
     <Compile Include="Tools\Internal\Organizations\OrganizationInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\Organizations\OrganizationUnitRegistrationV2Helper.cs" />

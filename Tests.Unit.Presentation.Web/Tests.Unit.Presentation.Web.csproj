@@ -305,6 +305,7 @@
     <Compile Include="Models\V2\DataProcessingRegistrationWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationResponseMapperTest.cs" />
     <Compile Include="Models\V2\ExternalReferenceResponseMapperTest.cs" />
+    <Compile Include="Models\V2\Internal\LocalOptionTypeWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\Internal\UserResponseMapperTest.cs" />
     <Compile Include="Models\V2\Internal\UserWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItContractResponseMapperTest.cs" />
@@ -318,6 +319,7 @@
     <Compile Include="Models\V2\ItSystemWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\NotificationResponseMapperTest.cs" />
     <Compile Include="Models\V2\NotificationWriteModelMapperTest.cs" />
+    <Compile Include="Models\V2\LocalOptionTypeResponseMapperTest.cs" />
     <Compile Include="Models\V2\OrganizationResponseMapperTest.cs" />
     <Compile Include="Models\V2\OrganizationTypeMapperTest.cs" />
     <Compile Include="Models\V2\OrganizationUnitWriteModelMapperTest.cs" />

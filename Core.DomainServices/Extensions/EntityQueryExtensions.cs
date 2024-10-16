@@ -16,6 +16,12 @@ namespace Core.DomainServices.Extensions
         {
             return new QueryByOrganizationId<T>(organizationId).Apply(result);
         }
+        public static IQueryable<T> ByOrganizationUuid<T>(this IQueryable<T> result, Guid organizationUuid) where T :
+            class,
+            IOwnedByOrganization
+        {
+            return new QueryByOrganizationUuid<T>(organizationUuid).Apply(result);
+        }
 
         public static IQueryable<T> ByOrganizationId<T>(this IQueryable<T> result, int organizationId, OrganizationDataReadAccessLevel accessLevel) where T :
             class,

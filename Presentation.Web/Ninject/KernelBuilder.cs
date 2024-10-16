@@ -135,6 +135,7 @@ using Infrastructure.STS.OrganizationSystem.DomainServices;
 using Kombit.InfrastructureSamples.Token;
 using Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Users.Mapping;
+using Core.ApplicationServices.LocalOptions;
 
 namespace Presentation.Web.Ninject
 {
@@ -325,12 +326,17 @@ namespace Presentation.Web.Ninject
 
             //Public messages
             kernel.Bind<IPublicMessagesService>().To<PublicMessagesService>().InCommandScope(Mode);
+
+            //Local option types
+            RegisterLocalOptionTypes(kernel);
         }
 
         private void RegisterMappers(IKernel kernel)
         {
             //Generic
             kernel.Bind<IEntityWithDeactivatedStatusMapper>().To<EntityWithDeactivatedStatusMapper>().InCommandScope(Mode);
+            kernel.Bind<ILocalOptionTypeResponseMapper>().To<LocalOptionTypeResponseMapper>().InCommandScope(Mode);
+            kernel.Bind<ILocalOptionTypeWriteModelMapper>().To<LocalOptionTypeWriteModelMapper>().InCommandScope(Mode);
 
             //Systems
             kernel.Bind<IItSystemWriteModelMapper>().To<ItSystemWriteModelMapper>().InCommandScope(Mode);
@@ -379,6 +385,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationResponseMapper>().To<OrganizationResponseMapper>().InCommandScope(Mode);
             kernel.Bind<IOrganizationWriteModelMapper>().To<OrganizationWriteModelMapper>().InCommandScope(Mode);
             kernel.Bind<IOrganizationTypeMapper>().To<OrganizationTypeMapper>().InCommandScope(Mode);
+
+            
         }
 
         private void RegisterSSO(IKernel kernel)
@@ -484,6 +492,12 @@ namespace Presentation.Web.Ninject
                 .Where(tType => tType.IsImplementationOfGenericType(typeof(ICommandHandler<,>)))
                 .ToList()
                 .ForEach(tHandlerInterface => kernel.Bind(tHandlerInterface).To<THandler>().InCommandScope(Mode));
+        }
+
+        private void RegisterLocalOptionTypes(IKernel kernel)
+        {
+            kernel.Bind<IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType>>()
+                .To<GenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType>>().InCommandScope(Mode);
         }
 
         private void RegisterOptions(IKernel kernel)

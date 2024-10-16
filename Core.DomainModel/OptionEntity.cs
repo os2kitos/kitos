@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 
 namespace Core.DomainModel
 {
@@ -55,5 +56,32 @@ namespace Core.DomainModel
         public bool IsEnabled { get; set; }
         public int Priority { get; set; }
         public Guid Uuid { get; set; }
+
+        public void UpdateLocalOptionValues<TLocal>(LocalOptionEntity<TLocal>? localOption)
+        {
+            if (localOption == null)
+            {
+                ResetLocalOptionValues();
+                return;
+            }
+            UpdateIsLocallyAvailable(localOption.IsActive);
+            UpdateDescription(localOption.Description);
+        }
+
+        private void UpdateIsLocallyAvailable(bool isActive)
+        {
+            if (IsObligatory && !isActive) return;
+            if (IsEnabled) IsLocallyAvailable = isActive;
+        }
+
+        private void UpdateDescription(string description)
+        {
+           if (!string.IsNullOrEmpty(description)) Description = description;
+        }
+
+        private void ResetLocalOptionValues()
+        {
+            IsLocallyAvailable = false;
+        }
     }
 }

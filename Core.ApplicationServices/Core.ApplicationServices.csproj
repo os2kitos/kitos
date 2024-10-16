@@ -81,6 +81,8 @@
     <Compile Include="Interface\Write\IItInterfaceWriteService.cs" />
     <Compile Include="Interface\Write\ItInterfaceWriteService.cs" />
     <Compile Include="Authorization\ResourceCollectionPermissionsResult.cs" />
+    <Compile Include="LocalOptions\GenericLocalOptionsService.cs" />
+    <Compile Include="LocalOptions\IGenericLocalOptionsService.cs" />
     <Compile Include="Model\Authentication\Commands\ValidateUserCredentialsCommand.cs" />
     <Compile Include="Authentication\IAuthenticationContext.cs" />
     <Compile Include="Authentication\IAuthenticationContextFactory.cs" />
@@ -172,6 +174,8 @@
     <Compile Include="Model\Interface\ItInterfacePermissions.cs" />
     <Compile Include="Model\Interface\ItInterfaceWriteModel.cs" />
     <Compile Include="Model\Interface\ItInterfaceWriteModelParametersBase.cs" />
+    <Compile Include="Model\LocalOptions\LocalOptionCreateParameters.cs" />
+    <Compile Include="Model\LocalOptions\LocalOptionUpdateParameters.cs" />
     <Compile Include="Model\Messages\WritePublicMessagesParams.cs" />
     <Compile Include="Model\Messages\PublicMessages.cs" />
     <Compile Include="Model\Notification\EmailRecipientModel.cs" />
@@ -403,6 +407,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="LocalOptions\Base\" />
     <Folder Include="Model\TaskRefs\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
