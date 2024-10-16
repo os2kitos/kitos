@@ -1,14 +1,14 @@
-﻿using Core.ApplicationServices.LocalOptions;
+﻿using System;
+using System.Web.Http;
+using Core.ApplicationServices.LocalOptions;
+using Core.DomainModel;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
-using System.Web.Http;
-using System;
-using Core.DomainModel;
 
-namespace Presentation.Web.Controllers.API.V2.Internal
+namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes
 {
-    public class LocalRegularOptionTypesInternalV2Controller<TLocalOptionType, TReferenceType, TOptionType> : InternalApiV2Controller 
+    public class BaseLocalRegularOptionTypesInternalV2Controller<TLocalOptionType, TReferenceType, TOptionType> : InternalApiV2Controller 
         where TLocalOptionType : LocalOptionEntity<TOptionType>, new()
         where TOptionType : OptionEntity<TReferenceType>
     {
@@ -16,7 +16,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
-        public LocalRegularOptionTypesInternalV2Controller(
+        public BaseLocalRegularOptionTypesInternalV2Controller(
             IGenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType> localOptionTypeService, 
             ILocalOptionTypeResponseMapper responseMapper,
             ILocalOptionTypeWriteModelMapper writeModelMapper)
@@ -25,7 +25,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal
             _responseMapper = responseMapper;
             _writeModelMapper = writeModelMapper;
         }
-
         
         protected IHttpActionResult GetAll([NonEmptyGuid][FromUri] Guid organizationUuid)
         {

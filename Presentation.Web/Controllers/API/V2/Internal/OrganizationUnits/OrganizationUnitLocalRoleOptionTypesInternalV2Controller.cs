@@ -8,19 +8,20 @@ using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
 using System;
+using Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes;
 using Presentation.Web.Models.API.V2.Internal.Response.LocalOptions;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 {
     [RoutePrefix("api/v2/internal/organization-units/{organizationUuid}/local-option-types")]
-    public class OrganizationUnitLocalOptionTypesInternalV2Controller: LocalRoleOptionTypesInternalV2Controller<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole>
+    public class OrganizationUnitLocalRoleOptionTypesInternalV2Controller: BaseLocalRoleOptionTypesInternalV2Controller<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole>
     {
         private readonly IGenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole> _localOrganizationUnitRoleOptionTypeService;
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
-        public OrganizationUnitLocalOptionTypesInternalV2Controller(IGenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole> localRoleOptionTypeService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper) : base(localRoleOptionTypeService, responseMapper, writeModelMapper)
+        public OrganizationUnitLocalRoleOptionTypesInternalV2Controller(IGenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole> localRoleOptionTypeService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper) : base(localRoleOptionTypeService, responseMapper, writeModelMapper)
         {
         }
 

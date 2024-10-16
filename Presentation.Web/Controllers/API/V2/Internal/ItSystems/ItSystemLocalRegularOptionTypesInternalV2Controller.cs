@@ -6,6 +6,7 @@ using Core.ApplicationServices.LocalOptions;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
 using Presentation.Web.Models.API.V2.Internal.Response;
@@ -14,7 +15,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
 {
     [RoutePrefix("api/v2/internal/it-systems/{organizationUuid}/local-option-types")]
-    public class ItSystemLocalOptionTypesInternalV2Controller: LocalRegularOptionTypesInternalV2Controller<LocalBusinessType, ItSystem, BusinessType>
+    public class ItSystemLocalOptionTypesInternalV2Controller: BaseLocalRegularOptionTypesInternalV2Controller<LocalBusinessType, ItSystem, BusinessType>
     {
         private readonly IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> _localBusinessTypeService;
         private readonly ILocalOptionTypeResponseMapper _responseMapper;

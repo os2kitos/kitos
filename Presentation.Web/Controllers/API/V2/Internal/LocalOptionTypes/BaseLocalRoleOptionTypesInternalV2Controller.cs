@@ -6,9 +6,9 @@ using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
 
-namespace Presentation.Web.Controllers.API.V2.Internal
+namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes
 {
-    public class LocalRoleOptionTypesInternalV2Controller<TLocalOptionType, TReferenceType, TOptionType> : InternalApiV2Controller
+    public class BaseLocalRoleOptionTypesInternalV2Controller<TLocalOptionType, TReferenceType, TOptionType> : InternalApiV2Controller
         where TLocalOptionType : LocalOptionEntity<TOptionType>, new()
         where TOptionType : OptionEntity<TReferenceType>, IRoleEntity
     {
@@ -16,7 +16,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
-        public LocalRoleOptionTypesInternalV2Controller(IGenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType> localRoleOptionTypeService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper)
+        public BaseLocalRoleOptionTypesInternalV2Controller(IGenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType> localRoleOptionTypeService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper)
         {
             _localRoleOptionTypeService = localRoleOptionTypeService;
             _responseMapper = responseMapper;
@@ -27,8 +27,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var organizationUnitRoles = _localRoleOptionTypeService.GetLocalOptions(organizationUuid);
-            return Ok(_responseMapper.ToLocalRoleOptionDTOs<TReferenceType, TOptionType>(organizationUnitRoles));
+            var roleOptions = _localRoleOptionTypeService.GetLocalOptions(organizationUuid);
+            return Ok(_responseMapper.ToLocalRoleOptionDTOs<TReferenceType, TOptionType>(roleOptions));
         }
 
         public IHttpActionResult GetSingle([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] Guid optionUuid)
