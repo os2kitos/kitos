@@ -15,5 +15,8 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 
         public IEnumerable<LocalRoleOptionResponseDTO> ToLocalRoleOptionDTOs<TReference, TOption>(IEnumerable<TOption> options)
             where TOption : OptionEntity<TReference>, IRoleEntity;
+
+        public LocalRoleOptionResponseDTO ToLocalRoleOptionDTO<TReference, TOption>(TOption option)
+            where TOption : OptionEntity<TReference>, IRoleEntity;
     }
 }

@@ -20,6 +20,11 @@ public class LocalOptionTypeResponseMapper : ILocalOptionTypeResponseMapper
 
     public IEnumerable<LocalRoleOptionResponseDTO> ToLocalRoleOptionDTOs<TReference, TOption>(IEnumerable<TOption> options) where TOption : OptionEntity<TReference>, IRoleEntity
     {
-        throw new System.NotImplementedException();
+        return options.Select(ToLocalRoleOptionDTO<TReference, TOption>);
+    }
+
+    public LocalRoleOptionResponseDTO ToLocalRoleOptionDTO<TReference, TOption>(TOption option) where TOption : OptionEntity<TReference>, IRoleEntity
+    {
+        return new(option.Uuid, option.Name, option.Description, option.IsLocallyAvailable, option.IsObligatory, option.HasWriteAccess);
     }
 }
