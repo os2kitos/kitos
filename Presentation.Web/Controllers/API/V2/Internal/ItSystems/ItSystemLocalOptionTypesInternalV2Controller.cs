@@ -19,13 +19,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
     public class ItSystemLocalOptionTypesInternalV2Controller: InternalApiV2Controller
     {
 
-        private readonly IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> _businessTypeService;
+        private readonly IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> _localBusinessTypeService;
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
-        public ItSystemLocalOptionTypesInternalV2Controller(IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> businessTypeService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper)
+        public ItSystemLocalOptionTypesInternalV2Controller(IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> localBusinessTypeService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper)
         {
-            _businessTypeService = businessTypeService;
+            _localBusinessTypeService = localBusinessTypeService;
             _responseMapper = responseMapper;
             _writeModelMapper = writeModelMapper;
         }
@@ -42,7 +42,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            var businessTypes = _businessTypeService.GetLocalOptions(organizationUuid);
+            var businessTypes = _localBusinessTypeService.GetLocalOptions(organizationUuid);
             return Ok(_responseMapper.ToLocalRegularOptionDTOs<ItSystem, BusinessType>(businessTypes));
         }
 
@@ -57,7 +57,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            return _businessTypeService.GetLocalOption(organizationUuid, optionUuid)
+            return _localBusinessTypeService.GetLocalOption(organizationUuid, optionUuid)
                 .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
@@ -75,7 +75,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
 
             var createParameters = _writeModelMapper.ToLocalOptionCreateParameters(dto);
 
-            return _businessTypeService.CreateLocalOption(organizationUuid, createParameters)
+            return _localBusinessTypeService.CreateLocalOption(organizationUuid, createParameters)
                 .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
@@ -95,7 +95,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
 
             var updateParameters = _writeModelMapper.ToLocalOptionUpdateParameters(dto);
 
-            return _businessTypeService.PatchLocalOption(organizationUuid, optionUuid, updateParameters)
+            return _localBusinessTypeService.PatchLocalOption(organizationUuid, optionUuid, updateParameters)
                 .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
@@ -112,7 +112,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         {
             if (!ModelState.IsValid) return BadRequest();
 
-            return _businessTypeService.DeleteLocalOption(organizationUuid, optionUuid)
+            return _localBusinessTypeService.DeleteLocalOption(organizationUuid, optionUuid)
                 .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }

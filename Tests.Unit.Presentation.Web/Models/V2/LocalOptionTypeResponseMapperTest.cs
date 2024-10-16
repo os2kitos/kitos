@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using Core.DomainModel;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Models.API.V2.Internal.Response;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -13,6 +14,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     public class TestReferenceType { }
     public class LocalOptionTypeResponseMapperTest: WithAutoFixture
     {
+        private LocalOptionTypeResponseMapper _sut;
+
+        public LocalOptionTypeResponseMapperTest()
+        {
+            _sut = new LocalOptionTypeResponseMapper();
+        }
+
         [Fact]
         public void Can_Map_Regular_Option_Type_DTOs()
         {
@@ -25,17 +33,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                     IsLocallyAvailable = A<bool>(),
                     IsObligatory = A<bool>()
                 }).ToList();
-            var sut = new LocalOptionTypeResponseMapper();
 
-            var dtos = sut.ToLocalRegularOptionDTOs<TestReferenceType, TestOptionEntity>(expected);
+            var dtos = _sut.ToLocalRegularOptionDTOs<TestReferenceType, TestOptionEntity>(expected);
 
             expected.ForEach(option =>
             {
                 var actual = dtos.First(dto => dto.Uuid == option.Uuid);
-                Assert.Equal(option.Name, actual.Name);
-                Assert.Equal(option.Description, actual.Description);
-                Assert.Equal(option.IsLocallyAvailable, actual.IsActive);
-                Assert.Equal(option.IsObligatory, actual.IsObligatory);
+                AssertRegularOptionTypeDTO(option, actual);
             });
         }
 
@@ -50,10 +54,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 IsLocallyAvailable = A<bool>(),
                 IsObligatory = A<bool>()
             };
-            var sut = new LocalOptionTypeResponseMapper();
 
-            var actual = sut.ToLocalRegularOptionDTO<TestReferenceType, TestOptionEntity>(expected);
+            var actual = _sut.ToLocalRegularOptionDTO<TestReferenceType, TestOptionEntity>(expected);
 
+            AssertRegularOptionTypeDTO(expected, actual);
+        }
+
+        private void AssertRegularOptionTypeDTO(TestOptionEntity expected, LocalRegularOptionResponseDTO actual)
+        {
             Assert.Equal(expected.Name, actual.Name);
             Assert.Equal(expected.Description, actual.Description);
             Assert.Equal(expected.IsLocallyAvailable, actual.IsActive);
