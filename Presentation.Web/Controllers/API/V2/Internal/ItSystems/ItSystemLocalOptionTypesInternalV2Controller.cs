@@ -29,7 +29,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
             _responseMapper = responseMapper;
             _writeModelMapper = writeModelMapper;
         }
-
+        
+        #region BusinessTypes
         [HttpGet]
         [Route("business-types")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<LocalRegularOptionResponseDTO>))]
@@ -115,5 +116,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
                 .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
                 .Match(Ok, FromOperationError);
         }
+        #endregion BusinessTypes
     }
 }
