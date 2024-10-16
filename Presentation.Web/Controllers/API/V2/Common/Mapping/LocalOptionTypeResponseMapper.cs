@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.DomainModel;
 using Presentation.Web.Models.API.V2.Internal.Response;
+using Presentation.Web.Models.API.V2.Internal.Response.LocalOptions;
 
 namespace Presentation.Web.Controllers.API.V2.Common.Mapping;
 
@@ -15,5 +16,10 @@ public class LocalOptionTypeResponseMapper : ILocalOptionTypeResponseMapper
     public LocalRegularOptionResponseDTO ToLocalRegularOptionDTO<TReference, TOption>(TOption option) where TOption : OptionEntity<TReference>
     {
         return new(option.Uuid, option.Name, option.Description, option.IsLocallyAvailable, option.IsObligatory);
+    }
+
+    public IEnumerable<LocalRoleOptionResponseDTO> ToLocalRoleOptionDTOs<TReference, TOption>(IEnumerable<TOption> options) where TOption : OptionEntity<TReference>, IRoleEntity
+    {
+        throw new System.NotImplementedException();
     }
 }

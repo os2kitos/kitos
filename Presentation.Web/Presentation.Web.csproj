@@ -399,6 +399,7 @@
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\OrganizationUnitOriginMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\OrganizationUnitResponseModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\OrganizationUnitWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitLocalRoleOptionTypeInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitRegistrationInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitsInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\Sts\StsOrganizationSynchronizationInternalV2Controller.cs" />
@@ -445,7 +446,8 @@
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationV2ResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageRelationMigrationV2ResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Internal\Response\LocalRegularOptionResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\LocalOptions\LocalRegularOptionResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\LocalOptions\LocalRoleOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Notifications\NotificationResourcePermissionsDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageSearchResultResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageSystemContextResponseDTO.cs" />
