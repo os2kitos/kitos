@@ -425,7 +425,7 @@
     <Compile Include="Models\API\V2\Internal\Request\Notifications\BaseNotificationPropertiesWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\IHasBaseWriteProperties.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\NotificationSentResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Internal\Request\Options\LocalRegularOptionCreateRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Options\LocalOptionCreateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Options\LocalRegularOptionUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\ColumnConfigurationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\ContactPersonRequestDTO.cs" />

@@ -63,7 +63,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var organization = await CreateOrganization();
             Assert.NotNull(organization);
             var globalOption = SetupCreateGlobalBusinessType();
-            var dto = new LocalRegularOptionCreateRequestDTO() { OptionUuid = globalOption.Uuid };
+            var dto = new LocalOptionCreateRequestDTO() { OptionUuid = globalOption.Uuid };
 
             using var response = await LocalOptionTypeV2Helper.CreateLocalOptionType(organization.Uuid, BusinessTypesUrlSuffix, dto, ItSystemsApiPrefix);
 
@@ -96,7 +96,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var organization = await CreateOrganization();
             Assert.NotNull(organization);
             var globalOption = SetupCreateGlobalBusinessType();
-            var dto = new LocalRegularOptionCreateRequestDTO() { OptionUuid = globalOption.Uuid };
+            var dto = new LocalOptionCreateRequestDTO() { OptionUuid = globalOption.Uuid };
             using var createLocalOptionResponse = await LocalOptionTypeV2Helper.CreateLocalOptionType(organization.Uuid, BusinessTypesUrlSuffix, dto, ItSystemsApiPrefix);
             Assert.Equal(HttpStatusCode.OK, createLocalOptionResponse.StatusCode);
             var createContent = await createLocalOptionResponse.Content.ReadAsStringAsync();

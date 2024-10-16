@@ -10,7 +10,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 {
     public class LocalOptionTypeWriteModelMapper : WriteModelMapperBase, ILocalOptionTypeWriteModelMapper
     {
-        public LocalOptionCreateParameters ToLocalOptionCreateParameters(LocalRegularOptionCreateRequestDTO dto)
+        public LocalOptionCreateParameters ToLocalOptionCreateParameters(LocalOptionCreateRequestDTO dto)
         {
             return new()
             {

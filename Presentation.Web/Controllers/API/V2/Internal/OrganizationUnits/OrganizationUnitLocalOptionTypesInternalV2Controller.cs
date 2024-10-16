@@ -11,6 +11,7 @@ using System;
 using Presentation.Web.Models.API.V2.Internal.Response.LocalOptions;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Models.API.V2.Internal.Response;
+using Presentation.Web.Models.API.V2.Internal.Request.Options;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 {
@@ -50,11 +51,29 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetLocalBusinessTypeByOptionId([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] Guid optionUuid)
+        public IHttpActionResult GetLocalOrganizationUnitRole([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] Guid optionUuid)
         {
             if (!ModelState.IsValid) return BadRequest();
 
             return _localOrganizationUnitService.GetLocalOption(organizationUuid, optionUuid)
+                .Select(_responseMapper.ToLocalRoleOptionDTO<OrganizationUnitRight, OrganizationUnitRole>)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpPost]
+        [Route("organization-unit-roles")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRoleOptionResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult CreateLocalBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid, LocalOptionCreateRequestDTO dto)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var createParameters = _writeModelMapper.ToLocalOptionCreateParameters(dto);
+
+            return _localOrganizationUnitService.CreateLocalOption(organizationUuid, createParameters)
                 .Select(_responseMapper.ToLocalRoleOptionDTO<OrganizationUnitRight, OrganizationUnitRole>)
                 .Match(Ok, FromOperationError);
         }

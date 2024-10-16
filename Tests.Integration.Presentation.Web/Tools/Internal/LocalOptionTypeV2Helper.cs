@@ -24,7 +24,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal
                 TestEnvironment.CreateUrl($"{apiPrefix}/{organizationUuid}/{LocalOptionTypesSuffix}/{choiceTypeName}/{optionUuid}"), cookie);
         }
 
-        public static async Task<HttpResponseMessage> CreateLocalOptionType(Guid organizationUuid, string choiceTypeName, LocalRegularOptionCreateRequestDTO dto, string apiPrefix)
+        public static async Task<HttpResponseMessage> CreateLocalOptionType(Guid organizationUuid, string choiceTypeName, LocalOptionCreateRequestDTO dto, string apiPrefix)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.PostWithCookieAsync(

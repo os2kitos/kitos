@@ -13,6 +13,9 @@ using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Internal;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using Newtonsoft.Json;
+using Presentation.Web.Models.API.V2.Internal.Request.Options;
+using Presentation.Web.Models.API.V2.Internal.Response;
 
 namespace Tests.Integration.Presentation.Web.Organizations.V2
 {
@@ -54,6 +57,24 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(globalOption.Uuid, responseDto.Uuid);
             Assert.Equal(globalOption.HasWriteAccess, responseDto.WriteAccess);
         }
+
+        [Fact]
+        public async Task Can_Create_Local_Organization_Unit_Role()
+        {
+            var organization = await CreateOrganization();
+            Assert.NotNull(organization);
+            var globalOption = SetupCreateGlobalOrganizationUnitRole();
+            var dto = new LocalOptionCreateRequestDTO() { OptionUuid = globalOption.Uuid };
+
+            using var response = await LocalOptionTypeV2Helper.CreateLocalOptionType(organization.Uuid, OrganizationUnitRolesUrlSuffix, dto, OrganizationUnitsApiPrefix);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseDto = await response.ReadResponseBodyAsAsync<LocalRoleOptionResponseDTO>();
+            Assert.NotNull(responseDto);
+            Assert.Equal(globalOption.Uuid, responseDto.Uuid);
+            Assert.Equal(globalOption.HasWriteAccess, responseDto.WriteAccess);
+        }
+
 
         private async Task<OrganizationDTO> CreateOrganization()
         {
