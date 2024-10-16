@@ -1,5 +1,4 @@
-﻿using Core.DomainModel.ItSystem;
-using Core.DomainModel.Organization;
+﻿using Core.DomainModel.Organization;
 using Core.DomainModel;
 using Presentation.Web.Models.API.V1;
 using System;
@@ -13,7 +12,6 @@ using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Internal;
 using Tests.Toolkit.Patterns;
 using Xunit;
-using Newtonsoft.Json;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
 using Presentation.Web.Models.API.V2.Internal.Response;
 
@@ -73,6 +71,22 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.NotNull(responseDto);
             Assert.Equal(globalOption.Uuid, responseDto.Uuid);
             Assert.Equal(globalOption.HasWriteAccess, responseDto.WriteAccess);
+        }
+
+        [Fact]
+        public async Task Can_Patch_Local_Business_Type()
+        {
+            var organization = await CreateOrganization();
+            Assert.NotNull(organization);
+            var globalOption = SetupCreateGlobalOrganizationUnitRole();
+
+            var dto = new LocalRegularOptionUpdateRequestDTO() { Description = A<string>() };
+
+            using var response = await LocalOptionTypeV2Helper.PatchLocalOptionType(organization.Uuid, globalOption.Uuid, OrganizationUnitRolesUrlSuffix, dto, OrganizationUnitsApiPrefix);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseDto = await response.ReadResponseBodyAsAsync<LocalRegularOptionResponseDTO>();
+            Assert.Equal(dto.Description, responseDto.Description);
         }
 
 

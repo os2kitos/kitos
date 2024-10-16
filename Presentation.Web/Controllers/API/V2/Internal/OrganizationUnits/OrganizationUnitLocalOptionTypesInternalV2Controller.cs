@@ -77,5 +77,25 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
                 .Select(_responseMapper.ToLocalRoleOptionDTO<OrganizationUnitRight, OrganizationUnitRole>)
                 .Match(Ok, FromOperationError);
         }
+
+        [HttpPatch]
+        [Route("organization-unit-roles/{optionUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult PatchLocalBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid,
+            [FromUri] Guid optionUuid,
+            LocalRegularOptionUpdateRequestDTO dto)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var updateParameters = _writeModelMapper.ToLocalOptionUpdateParameters(dto);
+
+            return _localOrganizationUnitService.PatchLocalOption(organizationUuid, optionUuid, updateParameters)
+                .Select(_responseMapper.ToLocalRoleOptionDTO<OrganizationUnitRight, OrganizationUnitRole>)
+                .Match(Ok, FromOperationError);
+        }
     }
 }
