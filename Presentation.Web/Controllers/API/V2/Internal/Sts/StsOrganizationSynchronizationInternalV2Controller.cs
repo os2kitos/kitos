@@ -9,6 +9,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using Swashbuckle.Swagger.Annotations;
+using System.Net;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Sts
 {
@@ -25,6 +27,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
 
         [HttpGet]
         [Route("snapshot")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(StsOrganizationOrgUnitDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetSnapshotFromStsOrganization(Guid organizationUuid, int? levels = null)
         {
             return _stsOrganizationSynchronizationService
@@ -35,6 +41,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
 
         [HttpGet]
         [Route("connection-status")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(StsOrganizationSynchronizationDetailsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetSynchronizationStatus(Guid organizationUuid)
         {
             return _stsOrganizationSynchronizationService
@@ -60,6 +70,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
 
         [HttpPost]
         [Route("connection")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult CreateConnection(Guid organizationUuid, [FromBody] ConnectToStsOrganizationRequestDTO request)
         {
             if (!ModelState.IsValid)
@@ -79,6 +93,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
 
         [HttpDelete]
         [Route("connection")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult Disconnect(Guid organizationUuid, [FromBody] DisconnectFromStsOrganizationRequestDTO request)
         {
             if (request == null)
@@ -93,6 +111,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
 
         [HttpDelete]
         [Route("connection/subscription")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult DeleteSubscription(Guid organizationUuid)
         {
             return _stsOrganizationSynchronizationService
@@ -102,6 +124,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
 
         [HttpGet]
         [Route("connection/update")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ConnectionUpdateConsequencesResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetUpdateConsequences(Guid organizationUuid, int? synchronizationDepth = null)
         {
             if (synchronizationDepth is < 1)
@@ -117,6 +143,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
 
         [HttpPut]
         [Route("connection")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult UpdateConnection(Guid organizationUuid, [FromBody] ConnectToStsOrganizationRequestDTO request)
         {
             if (!ModelState.IsValid)
@@ -136,6 +166,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
 
         [HttpGet]
         [Route("connection/change-log")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(StsOrganizationChangeLogResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetChangeLogs(Guid organizationUuid, int numberOfChangeLogs)
         {
             return _stsOrganizationSynchronizationService.GetChangeLogs(organizationUuid, numberOfChangeLogs)
