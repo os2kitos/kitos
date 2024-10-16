@@ -35,9 +35,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var responseDtos = await response.ReadResponseBodyAsAsync<IEnumerable<LocalRoleOptionResponseDTO>>();
             Assert.NotNull(responseDtos);
             var actualOptionDto = responseDtos.First(dto => dto.Uuid == globalOption.Uuid);
-            Assert.NotNull(actualOptionDto);
-            Assert.Equal(globalOption.Name, actualOptionDto.Name);
-            Assert.Equal(globalOption.HasWriteAccess, actualOptionDto.WriteAccess);
+            AssertOrganizationUnitRoleOptionDto(globalOption, actualOptionDto);
         }
 
         [Fact]
@@ -51,9 +49,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDto = await response.ReadResponseBodyAsAsync<LocalRoleOptionResponseDTO>();
-            Assert.NotNull(responseDto);
-            Assert.Equal(globalOption.Uuid, responseDto.Uuid);
-            Assert.Equal(globalOption.HasWriteAccess, responseDto.WriteAccess);
+            AssertOrganizationUnitRoleOptionDto(globalOption, responseDto);
         }
 
         [Fact]
@@ -68,9 +64,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDto = await response.ReadResponseBodyAsAsync<LocalRoleOptionResponseDTO>();
-            Assert.NotNull(responseDto);
-            Assert.Equal(globalOption.Uuid, responseDto.Uuid);
-            Assert.Equal(globalOption.HasWriteAccess, responseDto.WriteAccess);
+            AssertOrganizationUnitRoleOptionDto(globalOption, responseDto);
         }
 
         [Fact]
@@ -87,7 +81,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDto = await response.ReadResponseBodyAsAsync<LocalRoleOptionResponseDTO>();
             Assert.Equal(dto.Description, responseDto.Description);
-            Assert.Equal(globalOption.HasWriteAccess, responseDto.WriteAccess);
+            AssertOrganizationUnitRoleOptionDto(globalOption, responseDto, true);
         }
 
         [Fact]
@@ -135,6 +129,17 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                 repository.Save();
             });
             return globalOption;
+        }
+        private void AssertOrganizationUnitRoleOptionDto(OrganizationUnitRole expected,
+            LocalRoleOptionResponseDTO actual, bool skipDescription = false)
+        {
+            Assert.NotNull(actual);
+            Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(expected.Uuid, actual.Uuid);
+            Assert.Equal(expected.IsLocallyAvailable, actual.IsActive);
+            Assert.Equal(expected.IsObligatory, actual.IsObligatory);
+            Assert.Equal(expected.HasWriteAccess, actual.WriteAccess);
+            if (!skipDescription) Assert.Equal(expected.Description, actual.Description);
         }
     }
 }
