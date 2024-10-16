@@ -14,17 +14,15 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
 {
     [RoutePrefix("api/v2/internal/it-systems/{organizationUuid}/local-option-types")]
-    public class ItSystemLocalOptionTypesInternalV2Controller: InternalApiV2Controller
+    public class ItSystemLocalOptionTypesInternalV2Controller: LocalRegularOptionTypesInternalV2Controller<LocalBusinessType, ItSystem, BusinessType>
     {
         private readonly IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> _localBusinessTypeService;
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
-        public ItSystemLocalOptionTypesInternalV2Controller(IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> localBusinessTypeService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper)
+        public ItSystemLocalOptionTypesInternalV2Controller(IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> localBusinessTypeService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper) 
+            : base(localBusinessTypeService, responseMapper, writeModelMapper)
         {
-            _localBusinessTypeService = localBusinessTypeService;
-            _responseMapper = responseMapper;
-            _writeModelMapper = writeModelMapper;
         }
         
         #region BusinessTypes
@@ -37,10 +35,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetLocalBusinessTypes([NonEmptyGuid][FromUri] Guid organizationUuid)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
-            var businessTypes = _localBusinessTypeService.GetLocalOptions(organizationUuid);
-            return Ok(_responseMapper.ToLocalRegularOptionDTOs<ItSystem, BusinessType>(businessTypes));
+            return GetAll(organizationUuid);
         }
 
         [HttpGet]
@@ -52,11 +47,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetLocalBusinessTypeByOptionId([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] Guid optionUuid)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
-            return _localBusinessTypeService.GetLocalOption(organizationUuid, optionUuid)
-                .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
-                .Match(Ok, FromOperationError);
+            return GetSingle(organizationUuid, optionUuid);
         }
 
         [HttpPost]
@@ -68,13 +59,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult CreateLocalBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid, LocalOptionCreateRequestDTO dto)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
-            var createParameters = _writeModelMapper.ToLocalOptionCreateParameters(dto);
-
-            return _localBusinessTypeService.CreateLocalOption(organizationUuid, createParameters)
-                .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
-                .Match(Ok, FromOperationError);
+            return Create(organizationUuid, dto);
         }
 
         [HttpPatch]
@@ -88,13 +73,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
             [FromUri] Guid optionUuid,
             LocalRegularOptionUpdateRequestDTO dto)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
-            var updateParameters = _writeModelMapper.ToLocalOptionUpdateParameters(dto);
-
-            return _localBusinessTypeService.PatchLocalOption(organizationUuid, optionUuid, updateParameters)
-                .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
-                .Match(Ok, FromOperationError);
+            return Patch(organizationUuid, optionUuid, dto);
         }
 
         [HttpDelete]
@@ -107,11 +86,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         public IHttpActionResult DeleteLocalBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid,
             [FromUri] Guid optionUuid)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
-            return _localBusinessTypeService.DeleteLocalOption(organizationUuid, optionUuid)
-                .Select(_responseMapper.ToLocalRegularOptionDTO<ItSystem, BusinessType>)
-                .Match(Ok, FromOperationError);
+            return Delete(organizationUuid, optionUuid);
         }
         #endregion BusinessTypes
     }

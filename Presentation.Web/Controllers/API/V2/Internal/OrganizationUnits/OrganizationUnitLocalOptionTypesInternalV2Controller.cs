@@ -9,8 +9,6 @@ using System.Net;
 using System.Web.Http;
 using System;
 using Presentation.Web.Models.API.V2.Internal.Response.LocalOptions;
-using Core.DomainModel.ItSystem;
-using Presentation.Web.Models.API.V2.Internal.Response;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
