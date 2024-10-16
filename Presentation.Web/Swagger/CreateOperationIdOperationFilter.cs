@@ -35,7 +35,8 @@ namespace Presentation.Web.Swagger
                     //Match similar names regardless of casing
                     .Where(x => x.Name.Equals(methodInfo.Name, StringComparison.OrdinalIgnoreCase))
                     //Order by declaring order
-                    .OrderBy(m => m.MetadataToken)
+                    .OrderBy(m => m.Name)
+                    .ThenBy(m => string.Join(",", m.GetParameters().Select(p => p.ParameterType.FullName)))
                     .ToList();
 
                 var indexOfCurrentAction = publicMethodsWithSameName.IndexOf(methodInfo);
