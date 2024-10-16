@@ -19,6 +19,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
+        public OrganizationUnitLocalOptionTypesInternalV2Controller(IGenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole> localOrganizationUnitService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper)
+        {
+            _localOrganizationUnitService = localOrganizationUnitService;
+            _responseMapper = responseMapper;
+            _writeModelMapper = writeModelMapper;
+        }
+
         [HttpGet]
         [Route("organization-unit-roles")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<LocalRoleOptionResponseDTO>))]
