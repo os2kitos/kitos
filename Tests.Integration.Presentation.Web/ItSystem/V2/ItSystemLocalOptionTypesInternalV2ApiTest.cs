@@ -14,6 +14,7 @@ using Presentation.Web.Models.API.V2.Internal.Request.Options;
 using Presentation.Web.Models.API.V2.Internal.Response;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Extensions;
+using Tests.Integration.Presentation.Web.Tools.Internal;
 using Tests.Integration.Presentation.Web.Tools.Internal.ItSystem;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -24,6 +25,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
     {
         private const int CvrLengthLimit = 10;
         private const string BusinessTypesUrlSuffix = "business-types";
+        private const string ItSystemsApiPrefix = "api/v2/internal/it-systems";
 
         [Fact]
         public async Task Can_Get_Local_Business_Types()
@@ -31,7 +33,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var organization = await CreateOrganization();
             var globalOption = SetupCreateGlobalBusinessType();
 
-            using var response = await ItSystemInternalV2Helper.GetLocalOptionTypes(organization.Uuid, BusinessTypesUrlSuffix);
+            using var response = await LocalOptionTypeV2Helper.GetLocalOptionTypes(organization.Uuid, BusinessTypesUrlSuffix, ItSystemsApiPrefix);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDtos = await response.ReadResponseBodyAsAsync<IEnumerable<LocalRegularOptionResponseDTO>>();
@@ -48,7 +50,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.NotNull(organization);
             var globalOption = SetupCreateGlobalBusinessType();
 
-            using var response = await ItSystemInternalV2Helper.GetLocalOptionTypeByOptionId(organization.Uuid, BusinessTypesUrlSuffix, globalOption.Uuid);
+            using var response = await LocalOptionTypeV2Helper.GetLocalOptionType(organization.Uuid, BusinessTypesUrlSuffix, globalOption.Uuid, ItSystemsApiPrefix);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDto = await response.ReadResponseBodyAsAsync<LocalRegularOptionResponseDTO>();
@@ -64,7 +66,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var globalOption = SetupCreateGlobalBusinessType();
             var dto = new LocalRegularOptionCreateRequestDTO() { OptionUuid = globalOption.Uuid };
 
-            using var response = await ItSystemInternalV2Helper.CreateLocalOptionType(organization.Uuid, BusinessTypesUrlSuffix, dto);
+            using var response = await LocalOptionTypeV2Helper.CreateLocalOptionType(organization.Uuid, BusinessTypesUrlSuffix, dto, ItSystemsApiPrefix);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDto = await response.ReadResponseBodyAsAsync<LocalRegularOptionResponseDTO>();
@@ -82,7 +84,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             var dto = new LocalRegularOptionUpdateRequestDTO() { Description = A<string>() };
 
-            using var response = await ItSystemInternalV2Helper.PatchLocalOptionType(organization.Uuid, globalOption.Uuid, BusinessTypesUrlSuffix, dto);
+            using var response = await LocalOptionTypeV2Helper.PatchLocalOptionType(organization.Uuid, globalOption.Uuid, BusinessTypesUrlSuffix, dto, ItSystemsApiPrefix);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDto = await response.ReadResponseBodyAsAsync<LocalRegularOptionResponseDTO>();
@@ -96,13 +98,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.NotNull(organization);
             var globalOption = SetupCreateGlobalBusinessType();
             var dto = new LocalRegularOptionCreateRequestDTO() { OptionUuid = globalOption.Uuid };
-            using var createLocalOptionResponse = await ItSystemInternalV2Helper.CreateLocalOptionType(organization.Uuid, BusinessTypesUrlSuffix, dto);
+            using var createLocalOptionResponse = await LocalOptionTypeV2Helper.CreateLocalOptionType(organization.Uuid, BusinessTypesUrlSuffix, dto, ItSystemsApiPrefix);
             Assert.Equal(HttpStatusCode.OK, createLocalOptionResponse.StatusCode);
             var createContent = await createLocalOptionResponse.Content.ReadAsStringAsync();
             var createResponseDto = JsonConvert.DeserializeObject<LocalRegularOptionResponseDTO>(createContent);
             Assert.Equal(globalOption.Uuid, createResponseDto.Uuid);
 
-            using var response = await ItSystemInternalV2Helper.DeleteLocalOptionType(organization.Uuid, globalOption.Uuid, BusinessTypesUrlSuffix);
+            using var response = await LocalOptionTypeV2Helper.DeleteLocalOptionType(organization.Uuid, globalOption.Uuid, BusinessTypesUrlSuffix, ItSystemsApiPrefix);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDto = await response.ReadResponseBodyAsAsync<LocalRegularOptionResponseDTO>();

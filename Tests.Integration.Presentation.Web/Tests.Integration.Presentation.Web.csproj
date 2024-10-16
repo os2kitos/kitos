@@ -159,7 +159,6 @@
     <Compile Include="Tools\Extensions\StringExtensions.cs" />
     <Compile Include="Tools\Internal\DPR\DataProcessingRegistrationInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\ItSystemUsage\ItSystemUsageMigrationV2Helper.cs" />
-    <Compile Include="Tools\Internal\ItSystem\ItSystemInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\LocalOptionTypeV2Helper.cs" />
     <Compile Include="Tools\Internal\Notifications\NotificationV2Helper.cs" />
     <Compile Include="Tools\Internal\Organizations\OrganizationInternalV2Helper.cs" />
@@ -311,7 +310,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Tools\Internal\ItSystem\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
