@@ -14,17 +14,14 @@ using Presentation.Web.Models.API.V2.Internal.Request.Options;
 namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 {
     [RoutePrefix("api/v2/internal/organization-units/{organizationUuid}/local-option-types")]
-    public class OrganizationUnitLocalOptionTypesInternalV2Controller: InternalApiV2Controller
+    public class OrganizationUnitLocalOptionTypesInternalV2Controller: LocalRoleOptionTypesInternalV2Controller<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole>
     {
-        private readonly IGenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole> _localOrganizationUnitService;
+        private readonly IGenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole> _localOrganizationUnitRoleOptionTypeService;
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
-        public OrganizationUnitLocalOptionTypesInternalV2Controller(IGenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole> localOrganizationUnitService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper)
+        public OrganizationUnitLocalOptionTypesInternalV2Controller(IGenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole> localRoleOptionTypeService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper) : base(localRoleOptionTypeService, responseMapper, writeModelMapper)
         {
-            _localOrganizationUnitService = localOrganizationUnitService;
-            _responseMapper = responseMapper;
-            _writeModelMapper = writeModelMapper;
         }
 
         [HttpGet]
@@ -36,10 +33,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetLocalOrganizationUnitRoles([NonEmptyGuid][FromUri] Guid organizationUuid)
         {
-            if (!ModelState.IsValid) return BadRequest();
+            return GetAll(organizationUuid);
 
-            var organizationUnitRoles = _localOrganizationUnitService.GetLocalOptions(organizationUuid);
-            return Ok(_responseMapper.ToLocalRoleOptionDTOs<OrganizationUnitRight, OrganizationUnitRole>(organizationUnitRoles));
         }
 
         [HttpGet]
@@ -51,11 +46,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetLocalOrganizationUnitRole([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] Guid optionUuid)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
-            return _localOrganizationUnitService.GetLocalOption(organizationUuid, optionUuid)
-                .Select(_responseMapper.ToLocalRoleOptionDTO<OrganizationUnitRight, OrganizationUnitRole>)
-                .Match(Ok, FromOperationError);
+            return GetSingle(organizationUuid, optionUuid);
         }
 
         [HttpPost]
@@ -67,13 +58,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult CreateLocalOrganizationUnitRole([NonEmptyGuid][FromUri] Guid organizationUuid, LocalOptionCreateRequestDTO dto)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
-            var createParameters = _writeModelMapper.ToLocalOptionCreateParameters(dto);
-
-            return _localOrganizationUnitService.CreateLocalOption(organizationUuid, createParameters)
-                .Select(_responseMapper.ToLocalRoleOptionDTO<OrganizationUnitRight, OrganizationUnitRole>)
-                .Match(Ok, FromOperationError);
+            return Create(organizationUuid, dto);
         }
 
         [HttpPatch]
@@ -87,13 +72,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
             [FromUri] Guid optionUuid,
             LocalRegularOptionUpdateRequestDTO dto)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
-            var updateParameters = _writeModelMapper.ToLocalOptionUpdateParameters(dto);
-
-            return _localOrganizationUnitService.PatchLocalOption(organizationUuid, optionUuid, updateParameters)
-                .Select(_responseMapper.ToLocalRoleOptionDTO<OrganizationUnitRight, OrganizationUnitRole>)
-                .Match(Ok, FromOperationError);
+            return Patch(organizationUuid, optionUuid, dto);
         }
 
         [HttpDelete]
@@ -106,11 +85,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         public IHttpActionResult DeleteLocalOrganizationUnitRole([NonEmptyGuid][FromUri] Guid organizationUuid,
             [FromUri] Guid optionUuid)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
-            return _localOrganizationUnitService.DeleteLocalOption(organizationUuid, optionUuid)
-                .Select(_responseMapper.ToLocalRoleOptionDTO<OrganizationUnitRight, OrganizationUnitRole>)
-                .Match(Ok, FromOperationError);
+            return Delete(organizationUuid, optionUuid);
         }
     }
 }
