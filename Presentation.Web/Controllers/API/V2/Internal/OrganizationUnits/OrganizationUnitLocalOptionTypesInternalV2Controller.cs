@@ -67,7 +67,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult CreateLocalBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid, LocalOptionCreateRequestDTO dto)
+        public IHttpActionResult CreateLocalOrganizationUnitRole([NonEmptyGuid][FromUri] Guid organizationUuid, LocalOptionCreateRequestDTO dto)
         {
             if (!ModelState.IsValid) return BadRequest();
 
@@ -80,12 +80,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 
         [HttpPatch]
         [Route("organization-unit-roles/{optionUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRoleOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PatchLocalBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid,
+        public IHttpActionResult PatchLocalOrganizationUnitRole([NonEmptyGuid][FromUri] Guid organizationUuid,
             [FromUri] Guid optionUuid,
             LocalRegularOptionUpdateRequestDTO dto)
         {
@@ -94,6 +94,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
             var updateParameters = _writeModelMapper.ToLocalOptionUpdateParameters(dto);
 
             return _localOrganizationUnitService.PatchLocalOption(organizationUuid, optionUuid, updateParameters)
+                .Select(_responseMapper.ToLocalRoleOptionDTO<OrganizationUnitRight, OrganizationUnitRole>)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpDelete]
+        [Route("organization-unit-roles/{optionUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRoleOptionResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult DeleteLocalOrganizationUnitRole([NonEmptyGuid][FromUri] Guid organizationUuid,
+            [FromUri] Guid optionUuid)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            return _localOrganizationUnitService.DeleteLocalOption(organizationUuid, optionUuid)
                 .Select(_responseMapper.ToLocalRoleOptionDTO<OrganizationUnitRight, OrganizationUnitRole>)
                 .Match(Ok, FromOperationError);
         }

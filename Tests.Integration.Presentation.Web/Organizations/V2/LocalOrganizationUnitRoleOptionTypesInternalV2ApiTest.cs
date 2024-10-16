@@ -13,7 +13,7 @@ using Tests.Integration.Presentation.Web.Tools.Internal;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
-using Presentation.Web.Models.API.V2.Internal.Response;
+using Newtonsoft.Json;
 
 namespace Tests.Integration.Presentation.Web.Organizations.V2
 {
@@ -74,7 +74,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
-        public async Task Can_Patch_Local_Business_Type()
+        public async Task Can_Patch_Local_Organization_Unit_Role()
         {
             var organization = await CreateOrganization();
             Assert.NotNull(organization);
@@ -85,8 +85,30 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             using var response = await LocalOptionTypeV2Helper.PatchLocalOptionType(organization.Uuid, globalOption.Uuid, OrganizationUnitRolesUrlSuffix, dto, OrganizationUnitsApiPrefix);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var responseDto = await response.ReadResponseBodyAsAsync<LocalRegularOptionResponseDTO>();
+            var responseDto = await response.ReadResponseBodyAsAsync<LocalRoleOptionResponseDTO>();
             Assert.Equal(dto.Description, responseDto.Description);
+            Assert.Equal(globalOption.HasWriteAccess, responseDto.WriteAccess);
+        }
+
+        [Fact]
+        public async Task Can_Delete_Local_Organization_Unit_Role()
+        {
+            var organization = await CreateOrganization();
+            Assert.NotNull(organization);
+            var globalOption = SetupCreateGlobalOrganizationUnitRole();
+            var dto = new LocalOptionCreateRequestDTO() { OptionUuid = globalOption.Uuid };
+            using var createLocalOptionResponse = await LocalOptionTypeV2Helper.CreateLocalOptionType(organization.Uuid, OrganizationUnitRolesUrlSuffix, dto, OrganizationUnitsApiPrefix);
+            Assert.Equal(HttpStatusCode.OK, createLocalOptionResponse.StatusCode);
+            var createContent = await createLocalOptionResponse.Content.ReadAsStringAsync();
+            var createResponseDto = JsonConvert.DeserializeObject<LocalRoleOptionResponseDTO>(createContent);
+            Assert.Equal(globalOption.Uuid, createResponseDto.Uuid);
+
+            using var response = await LocalOptionTypeV2Helper.DeleteLocalOptionType(organization.Uuid, globalOption.Uuid, OrganizationUnitRolesUrlSuffix, OrganizationUnitsApiPrefix);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseDto = await response.ReadResponseBodyAsAsync<LocalRoleOptionResponseDTO>();
+
+            Assert.False(responseDto.IsActive);
         }
 
 
