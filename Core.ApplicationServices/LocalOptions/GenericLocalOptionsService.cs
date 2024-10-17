@@ -178,9 +178,8 @@ namespace Core.ApplicationServices.LocalOptions
         private Result<TLocalOptionType, OperationError> CreateAndGetLocalOption(Guid organizationUuid,
             Guid globalOptionUuid)
         {
-            var updatedGlobalOptionResult = CreateLocalOption(organizationUuid,
-                new LocalOptionCreateParameters() { OptionUuid = globalOptionUuid });
-            return updatedGlobalOptionResult
+            return CreateLocalOption(organizationUuid,
+                new LocalOptionCreateParameters() { OptionUuid = globalOptionUuid })
                 .Bind(_ =>
                 {
                     var localOptionMaybe = GetLocalOptionMaybe(organizationUuid, globalOptionUuid);
