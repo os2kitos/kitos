@@ -4,7 +4,6 @@ using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.LocalOptions;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes;
@@ -19,7 +18,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
     public class ItSystemLocalBusinessTypesInternalV2Controller: BaseLocalRegularOptionTypesInternalV2Controller<LocalBusinessType, ItSystem, BusinessType>
     {
         private readonly IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> _localBusinessTypeService;
-        private readonly IGenericLocalOptionsService<LocalArchiveType, ItSystemUsage, ArchiveType> _localArchiveTypeService;
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
