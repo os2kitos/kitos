@@ -498,6 +498,8 @@ namespace Presentation.Web.Ninject
         {
             kernel.Bind<IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType>>()
                 .To<GenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType>>().InCommandScope(Mode);
+            kernel.Bind<IGenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole>>()
+                .To<GenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole>>().InCommandScope(Mode);
         }
 
         private void RegisterOptions(IKernel kernel)

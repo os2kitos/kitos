@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel;
 using Presentation.Web.Models.API.V2.Internal.Response;
+using Presentation.Web.Models.API.V2.Internal.Response.LocalOptions;
 
 namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 {
@@ -11,5 +12,11 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 
         public LocalRegularOptionResponseDTO ToLocalRegularOptionDTO<TReference, TOption>(TOption option)
             where TOption : OptionEntity<TReference>;
+
+        public IEnumerable<LocalRoleOptionResponseDTO> ToLocalRoleOptionDTOs<TReference, TOption>(IEnumerable<TOption> options)
+            where TOption : OptionEntity<TReference>, IRoleEntity;
+
+        public LocalRoleOptionResponseDTO ToLocalRoleOptionDTO<TReference, TOption>(TOption option)
+            where TOption : OptionEntity<TReference>, IRoleEntity;
     }
 }

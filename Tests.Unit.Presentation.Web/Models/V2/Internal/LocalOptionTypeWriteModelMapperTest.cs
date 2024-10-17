@@ -24,13 +24,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
         [Fact]
         public void Can_Map_Create_Dto()
         {
-            var dto = new LocalRegularOptionCreateRequestDTO
+            var dto = new LocalOptionCreateRequestDTO
             {
                 OptionUuid = A<Guid>()
             };
             _httpRequest.Setup(x =>
                     x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
-                .Returns(GetAllInputPropertyNames<LocalRegularOptionCreateRequestDTO>());
+                .Returns(GetAllInputPropertyNames<LocalOptionCreateRequestDTO>());
 
             var parameters = _sut.ToLocalOptionCreateParameters(dto);
 

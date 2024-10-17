@@ -42,7 +42,7 @@ namespace Core.ApplicationServices.LocalOptions
             var globalOptions = GetGlobalOptionsAsQueryable()
                 .ToList();
             
-            var localOptions = GetLocalOptionsFromAsQueryable(organizationUuid)
+            var localOptions = GetLocalOptionsAsQueryable(organizationUuid)
                 .ToDictionary(x => x.OptionId);
 
             return IncludeLocalChangesToGlobalOptions(globalOptions, localOptions);
@@ -64,7 +64,7 @@ namespace Core.ApplicationServices.LocalOptions
                 .Bind(GetGlobalOptionById)
                 .Bind(option =>
                 {
-                    var localOption = GetLocalOptionsFromAsQueryable(organizationUuid)
+                    var localOption = GetLocalOptionsAsQueryable(organizationUuid)
                         .FirstOrDefault(x => x.OptionId == option.Id);
 
                     option.UpdateLocalOptionValues(localOption);
@@ -198,12 +198,12 @@ namespace Core.ApplicationServices.LocalOptions
             var optionIdResult = ResolveGlobalOptionId(globalOptionUuid);
             if (optionIdResult.Failed) return Maybe<TLocalOptionType>.None;
 
-            var localOption = GetLocalOptionsFromAsQueryable(organizationUuid)
+            var localOption = GetLocalOptionsAsQueryable(organizationUuid)
                 .FirstOrDefault(x => x.OptionId == optionIdResult.Value);
             return localOption ?? Maybe<TLocalOptionType>.None;
         }
 
-        private IEnumerable<TLocalOptionType> GetLocalOptionsFromAsQueryable(Guid organizationUuid)
+        private IEnumerable<TLocalOptionType> GetLocalOptionsAsQueryable(Guid organizationUuid)
         {
             return _localOptionRepository
                 .AsQueryable()
