@@ -1,18 +1,17 @@
-﻿using Core.ApplicationServices.LocalOptions;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Web.Http;
+using Core.ApplicationServices.LocalOptions;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.Organization;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
-using Swashbuckle.Swagger.Annotations;
-using System.Collections.Generic;
-using System.Net;
-using System.Web.Http;
-using System;
-using Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes;
-using Presentation.Web.Models.API.V2.Internal.Response.LocalOptions;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
+using Presentation.Web.Models.API.V2.Internal.Response.LocalOptions;
+using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
+namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.OrganizationUnits
 {
     [RoutePrefix("api/v2/internal/organization-units/{organizationUuid}/local-option-types/organization-unit-roles")]
     public class OrganizationUnitLocalRoleOptionTypesInternalV2Controller: BaseLocalRoleOptionTypesInternalV2Controller<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole>

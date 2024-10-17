@@ -6,13 +6,12 @@ using Core.ApplicationServices.LocalOptions;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
-using Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
 using Presentation.Web.Models.API.V2.Internal.Response;
 using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
+namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.ItSystems
 {
     [RoutePrefix("api/v2/internal/it-systems/{organizationUuid}/local-option-types/business-types")]
     public class ItSystemLocalBusinessTypesInternalV2Controller: BaseLocalRegularOptionTypesInternalV2Controller<LocalBusinessType, ItSystem, BusinessType>

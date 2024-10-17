@@ -7,18 +7,17 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
-using Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
 using Presentation.Web.Models.API.V2.Internal.Response;
 using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
+namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.ItSystems
 {
     [RoutePrefix("api/v2/internal/it-systems/{organizationUuid}/local-option-types/archive-types")]
     public class ItSystemLocalArchiveTypesInternalV2Controller : BaseLocalRegularOptionTypesInternalV2Controller<LocalArchiveType, ItSystemUsage, ArchiveType>
     {
-        private readonly IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> _localBusinessTypeService;
+        private readonly IGenericLocalOptionsService<LocalArchiveType, ItSystemUsage, ArchiveType> _localBusinessTypeService;
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
