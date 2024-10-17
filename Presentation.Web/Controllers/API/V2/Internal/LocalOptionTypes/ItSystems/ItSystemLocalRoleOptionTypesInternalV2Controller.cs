@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.ItSystem
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetLocalOrganizationUnitRole([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] Guid optionUuid)
+        public IHttpActionResult GetLocalItSystemRole([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] Guid optionUuid)
         {
             return GetSingle(organizationUuid, optionUuid);
         }
@@ -55,7 +55,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.ItSystem
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult CreateLocalOrganizationUnitRole([NonEmptyGuid][FromUri] Guid organizationUuid, LocalOptionCreateRequestDTO dto)
+        public IHttpActionResult CreateLocalItSystemRole([NonEmptyGuid][FromUri] Guid organizationUuid, LocalOptionCreateRequestDTO dto)
         {
             return Create(organizationUuid, dto);
         }
@@ -67,7 +67,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.ItSystem
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PatchLocalOrganizationUnitRole([NonEmptyGuid][FromUri] Guid organizationUuid,
+        public IHttpActionResult PatchLocalItSystemRole([NonEmptyGuid][FromUri] Guid organizationUuid,
             [FromUri] Guid optionUuid,
             LocalRegularOptionUpdateRequestDTO dto)
         {
@@ -81,7 +81,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.ItSystem
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeleteLocalOrganizationUnitRole([NonEmptyGuid][FromUri] Guid organizationUuid,
+        public IHttpActionResult DeleteLocalItSystemRole([NonEmptyGuid][FromUri] Guid organizationUuid,
             [FromUri] Guid optionUuid)
         {
             return Delete(organizationUuid, optionUuid);
