@@ -17,7 +17,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.ItSystem
     [RoutePrefix("api/v2/internal/it-systems/{organizationUuid}/local-option-types/archive-types")]
     public class ItSystemLocalArchiveTypesInternalV2Controller : BaseLocalRegularOptionTypesInternalV2Controller<LocalArchiveType, ItSystemUsage, ArchiveType>
     {
-        private readonly IGenericLocalOptionsService<LocalArchiveType, ItSystemUsage, ArchiveType> _localBusinessTypeService;
+        private readonly IGenericLocalOptionsService<LocalArchiveType, ItSystemUsage, ArchiveType> _localArchiveTypeService;
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 

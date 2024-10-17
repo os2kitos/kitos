@@ -16,7 +16,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.ItSystem
     [RoutePrefix("api/v2/internal/it-systems/{organizationUuid}/local-option-types/it-systems-roles")]
     public class ItSystemLocalRoleOptionTypesInternalV2Controller : BaseLocalRoleOptionTypesInternalV2Controller<LocalItSystemRole, ItSystemRight, ItSystemRole>
     {
-        private readonly IGenericLocalOptionsService<LocalItSystemRole, ItSystemRight, ItSystemRole> _localOrganizationUnitRoleOptionTypeService;
+        private readonly IGenericLocalOptionsService<LocalItSystemRole, ItSystemRight, ItSystemRole> _localItSystemRoleOptionTypeService;
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
