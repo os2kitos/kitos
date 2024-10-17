@@ -357,6 +357,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
                 .Returns(new List<TestLocalOptionEntity>().AsQueryable())
                 .Returns(new List<TestLocalOptionEntity>().AsQueryable())
                 .Returns(createdLocalOptionList.AsQueryable())
+                .Returns(createdLocalOptionList.AsQueryable())
                 .Returns(createdLocalOptionList.AsQueryable());
             SetupResolveGlobalOptionUuid(optionUuid, optionId);
             var expectedGlobal = Enumerable.Range(1, 1)
