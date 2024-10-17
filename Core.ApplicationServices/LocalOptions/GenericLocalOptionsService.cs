@@ -204,7 +204,7 @@ namespace Core.ApplicationServices.LocalOptions
 
             localOption.Deactivate();
             _localOptionRepository.Insert(localOption);
-            _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(localOption));
+            _domainEvents.Raise(new EntityCreatedEvent<TLocalOptionType>(localOption));
 
             _localOptionRepository.Save();
             return updatedGlobalOption;
