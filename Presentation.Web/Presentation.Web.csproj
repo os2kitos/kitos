@@ -386,6 +386,7 @@
     <Compile Include="Controllers\API\V2\Internal\ItContracts\ItContractInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystems\ItSystemLocalRegularOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystems\ItSystemInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\ItSystems\ItSystemLocalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\ItSystemUsageInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\ItSystemUsageMigrationV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\Mapping\IItSystemUsageMigrationResponseMapper.cs" />
