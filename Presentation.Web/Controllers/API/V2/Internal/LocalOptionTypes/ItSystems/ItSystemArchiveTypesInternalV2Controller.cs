@@ -21,8 +21,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.ItSystem
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
-        public ItSystemLocalArchiveTypesInternalV2Controller(IGenericLocalOptionsService<LocalArchiveType, ItSystemUsage, ArchiveType> localBusinessTypeService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper)
-            : base(localBusinessTypeService, responseMapper, writeModelMapper)
+        public ItSystemLocalArchiveTypesInternalV2Controller(IGenericLocalOptionsService<LocalArchiveType, ItSystemUsage, ArchiveType> localArchiveTypeService, ILocalOptionTypeResponseMapper responseMapper, ILocalOptionTypeWriteModelMapper writeModelMapper)
+            : base(localArchiveTypeService, responseMapper, writeModelMapper)
         {
         }
 
