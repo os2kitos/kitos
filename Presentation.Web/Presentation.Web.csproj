@@ -389,6 +389,7 @@
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItSystems\ItSystemArchiveTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItSystems\ItSystemDataTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItSystems\ItSystemFrequencyRelationTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItSystems\ItSystemInterfaceTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItSystems\ItSystemLocalBusinessTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystems\ItSystemInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItSystems\ItSystemLocalRoleOptionTypesInternalV2Controller.cs" />
