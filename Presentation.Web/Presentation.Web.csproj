@@ -399,6 +399,7 @@
     <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\Mapping\ItSystemUsageMigrationResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\BaseLocalRegularOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\BaseLocalRoleOptionTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItSystems\ItSystemSensitivePersonalDataTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\Mapping\InternalDtoModelV2MappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemUsageV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Internal\Organizations\OrganizationGridInternalV2Controller.cs" />
