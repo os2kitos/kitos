@@ -15,7 +15,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
 {
-    [RoutePrefix("api/v2/internal/it-systems/{organizationUuid}/local-option-types")]
+    [RoutePrefix("api/v2/internal/it-systems/{organizationUuid}/local-option-types/business-types")]
     public class ItSystemLocalBusinessTypesInternalV2Controller: BaseLocalRegularOptionTypesInternalV2Controller<LocalBusinessType, ItSystem, BusinessType>
     {
         private readonly IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType> _localBusinessTypeService;
@@ -29,7 +29,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         }
         
         [HttpGet]
-        [Route("business-types")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<LocalRegularOptionResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -41,7 +41,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         }
 
         [HttpGet]
-        [Route("business-types/{optionUuid}")]
+        [Route("{optionUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -53,7 +53,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         }
 
         [HttpPost]
-        [Route("business-types")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -65,7 +65,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         }
 
         [HttpPatch]
-        [Route("business-types/{optionUuid}")]
+        [Route("{optionUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -79,7 +79,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystems
         }
 
         [HttpDelete]
-        [Route("business-types/{optionUuid}")]
+        [Route("{optionUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(LocalRegularOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
