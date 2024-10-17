@@ -384,9 +384,9 @@
     <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\SystemDeletionConflictMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\DataProcessingRegistrations\DataProcessingRegistrationInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\ItContractInternalV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\Internal\ItSystems\ItSystemLocalBusinessTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItSystems\ItSystemLocalBusinessTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystems\ItSystemInternalV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\Internal\ItSystems\ItSystemLocalRoleOptionTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItSystems\ItSystemLocalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\ItSystemUsageInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\ItSystemUsageMigrationV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItSystemUsages\Mapping\IItSystemUsageMigrationResponseMapper.cs" />
@@ -402,7 +402,7 @@
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\OrganizationUnitOriginMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\OrganizationUnitResponseModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\Mapping\OrganizationUnitWriteModelMapper.cs" />
-    <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitLocalRoleOptionTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\OrganizationUnits\OrganizationUnitLocalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitRegistrationInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\OrganizationUnits\OrganizationUnitsInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\Sts\StsOrganizationSynchronizationInternalV2Controller.cs" />
