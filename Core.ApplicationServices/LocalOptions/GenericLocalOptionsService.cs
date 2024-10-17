@@ -156,7 +156,10 @@ namespace Core.ApplicationServices.LocalOptions
 
         public Result<TOptionType, OperationError> DeleteLocalOption(Guid organizationUuid, Guid globalOptionUuid)
         {
-            return GetLocalOptionMaybe(organizationUuid, globalOptionUuid)
+            var existingLocalOptionMaybe = GetLocalOptionMaybe(organizationUuid, globalOptionUuid);
+            if (existingLocalOptionMaybe.IsNone) return CreateAndDeactivateLocalOption(organizationUuid, globalOptionUuid);
+            
+            return existingLocalOptionMaybe
                 .Match(localOption => _authorizationContext.AllowDelete(localOption)
                     ? Result<TLocalOptionType, OperationError>.Success(localOption)
                     : new OperationError($"User not allowed to delete local option with global option uuid: {globalOptionUuid}",
@@ -171,6 +174,40 @@ namespace Core.ApplicationServices.LocalOptions
                     _localOptionRepository.Save();
                     return GetLocalOption(organizationUuid, globalOptionUuid);
                 });
+        }
+
+        private Result<TOptionType, OperationError> DeactivateLocalOption(TLocalOptionType localOption, Guid organizationUuid,
+            Guid globalOptionUuid)
+        {
+            localOption.Deactivate();
+            _localOptionRepository.Update(localOption);
+            _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(localOption));
+
+            _localOptionRepository.Save();
+            return GetLocalOption(organizationUuid, globalOptionUuid);
+        }
+
+        private Result<TOptionType, OperationError> CreateAndDeactivateLocalOption(Guid organizationUuid,
+            Guid globalOptionUuid)
+        {
+            var updatedGlobalOption = CreateLocalOption(organizationUuid,
+                new LocalOptionCreateParameters() { OptionUuid = globalOptionUuid });
+            if (updatedGlobalOption.Failed) return updatedGlobalOption.Error;
+
+            var localOptionMaybe = GetLocalOptionMaybe(organizationUuid, globalOptionUuid);
+            if (localOptionMaybe.IsNone)
+                return new OperationError(
+                    $"Local option in organization with uuid: {organizationUuid} with global option uuid: {globalOptionUuid} was not found",
+                    OperationFailure.NotFound);
+
+            var localOption = localOptionMaybe.Value;
+
+            localOption.Deactivate();
+            _localOptionRepository.Insert(localOption);
+            _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(localOption));
+
+            _localOptionRepository.Save();
+            return updatedGlobalOption;
         }
 
         private Result<int, OperationError> ResolveOrganizationId(Guid organizationUuid)
@@ -198,7 +235,8 @@ namespace Core.ApplicationServices.LocalOptions
             var optionIdResult = ResolveGlobalOptionId(globalOptionUuid);
             if (optionIdResult.Failed) return Maybe<TLocalOptionType>.None;
 
-            var localOption = GetLocalOptionsAsQueryable(organizationUuid)
+            var debug = GetLocalOptionsAsQueryable(organizationUuid);
+            var localOption = debug
                 .FirstOrDefault(x => x.OptionId == optionIdResult.Value);
             return localOption ?? Maybe<TLocalOptionType>.None;
         }

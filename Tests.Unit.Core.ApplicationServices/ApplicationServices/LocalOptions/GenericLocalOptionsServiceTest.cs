@@ -332,23 +332,48 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
         }
 
         [Fact]
-        public void Delete_Returns_Not_Found_If_No_Option()
+        public void Delete_Creates_Before_Deactivating_If_No_Local_Option_Found()
         {
             var orgUuid = A<Guid>();
             var orgDbId = A<int>();
             var optionId = A<int>();
             var optionUuid = A<Guid>();
-            _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
+            _identityResolver.SetupSequence(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
+            _identityResolver.SetupSequence(_ => _.ResolveDbId<TestOptionEntity>(optionUuid))
+                .Returns(optionId)
+                .Returns(optionId)
+                .Returns(optionId);
             _authorizationContext.Setup(_ => _.AllowDelete(It.IsAny<TestLocalOptionEntity>())).Returns(true);
-            _localOptionsRepository.Setup(_ => _.AsQueryable())
-                .Returns(new List<TestLocalOptionEntity>().AsQueryable());
+            _authorizationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(true);
+            var createdLocalOptionList = new List<TestLocalOptionEntity>()
+            {
+                new ()
+                {
+                    OptionId = optionId, 
+                    Organization = new Organization(){ Uuid = orgUuid }
+                }
+            };
+            _localOptionsRepository.SetupSequence(_ => _.AsQueryable())
+                .Returns(new List<TestLocalOptionEntity>().AsQueryable())
+                .Returns(new List<TestLocalOptionEntity>().AsQueryable())
+                .Returns(createdLocalOptionList.AsQueryable())
+                .Returns(createdLocalOptionList.AsQueryable());
             SetupResolveGlobalOptionUuid(optionUuid, optionId);
+            var expectedGlobal = Enumerable.Range(1, 1)
+                .Select(i => new TestOptionEntity()
+                {
+                    Id = optionId,
+                    IsEnabled = true,
+                    Uuid = optionUuid
+                }).ToList();
+            _optionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedGlobal.AsQueryable());
+
 
             var result = _sut.DeleteLocalOption(orgUuid, optionUuid);
 
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
-
+            Assert.True(result.Ok);
+            Assert.False(result.Value.IsLocallyAvailable);
+            _localOptionsRepository.Verify(_ => _.Insert(It.IsAny<TestLocalOptionEntity>()));
         }
 
         private void SetupLocalRepositoryReturnsOneOption(int optionId, Guid orgUuid)
