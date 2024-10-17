@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.LocalOptions;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
