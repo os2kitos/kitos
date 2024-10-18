@@ -516,7 +516,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IGenericLocalOptionsService<LocalArchiveLocation, ItSystemUsage, ArchiveLocation>>()
                 .To<GenericLocalOptionsService<LocalArchiveLocation, ItSystemUsage, ArchiveLocation>>().InCommandScope(Mode);
 
-            
             kernel.Bind<IGenericLocalOptionsService<LocalArchiveTestLocation, ItSystemUsage, ArchiveTestLocation>>()
                 .To<GenericLocalOptionsService<LocalArchiveTestLocation, ItSystemUsage, ArchiveTestLocation>>().InCommandScope(Mode);
 
@@ -537,6 +536,14 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<IGenericLocalOptionsService<LocalRegisterType, ItSystemUsage, RegisterType>>()
                 .To<GenericLocalOptionsService<LocalRegisterType, ItSystemUsage, RegisterType>>().InCommandScope(Mode);
+        }
+
+        private void RegisterLocalOptionService<TLocalOptionType, TReferenceType, TOptionType>(IKernel kernel)
+        where TLocalOptionType : LocalOptionEntity<TOptionType>, new()
+            where TOptionType : OptionEntity<TReferenceType>
+        {
+            kernel.Bind<IGenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType>>()
+                .To<GenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType>>().InCommandScope(Mode);
         }
 
         private void RegisterOptions(IKernel kernel)
