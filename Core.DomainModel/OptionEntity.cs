@@ -61,11 +61,16 @@ namespace Core.DomainModel
         {
             if (localOption == null)
             {
-                ResetLocalOptionValues();
+                ResetLocalOptionAvailability();
                 return;
             }
             UpdateIsLocallyAvailable(localOption.IsActive);
             UpdateDescription(localOption.Description);
+        }
+
+        public void ResetLocalOptionAvailability()
+        {
+            IsLocallyAvailable = false;
         }
 
         private void UpdateIsLocallyAvailable(bool isActive)
@@ -77,11 +82,6 @@ namespace Core.DomainModel
         private void UpdateDescription(string description)
         {
            if (!string.IsNullOrEmpty(description)) Description = description;
-        }
-
-        private void ResetLocalOptionValues()
-        {
-            IsLocallyAvailable = false;
         }
     }
 }
