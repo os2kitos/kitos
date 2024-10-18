@@ -534,15 +534,6 @@ namespace Presentation.Web.Ninject
             RegisterLocalOptionService<LocalRegisterType, ItSystemUsage, RegisterType>(kernel);
         }
 
-
-        private void RegisterLocalOptionService<TLocalOptionType, TReferenceType, TOptionType>(IKernel kernel)
-        where TLocalOptionType : LocalOptionEntity<TOptionType>, new()
-            where TOptionType : OptionEntity<TReferenceType>
-        {
-            kernel.Bind<IGenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType>>()
-                .To<GenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType>>().InCommandScope(Mode);
-        }
-
         private void RegisterLocalOptionService<TLocalOptionType, TReferenceType, TOptionType>(IKernel kernel)
             where TLocalOptionType : LocalOptionEntity<TOptionType>, new()
             where TOptionType : OptionEntity<TReferenceType>
