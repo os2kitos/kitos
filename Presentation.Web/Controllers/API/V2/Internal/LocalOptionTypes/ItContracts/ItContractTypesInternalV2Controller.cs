@@ -4,7 +4,6 @@ using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.LocalOptions;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
@@ -12,7 +11,7 @@ using Presentation.Web.Models.API.V2.Internal.Request.Options;
 using Presentation.Web.Models.API.V2.Internal.Response;
 using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.ItSystems
+namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.ItContracts
 {
     [RoutePrefix("api/v2/internal/it-contracts/{organizationUuid}/local-option-types/it-contract-types")]
     public class ItContractLocalContractTypesInternalV2Controller : BaseLocalRegularOptionTypesInternalV2Controller<LocalItContractType, ItContract, ItContractType>
