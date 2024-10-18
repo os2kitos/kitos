@@ -504,39 +504,19 @@ namespace Presentation.Web.Ninject
 
         private void RegisterLocalItSystemOptionTypes(IKernel kernel)
         {
-            kernel.Bind<IGenericLocalOptionsService<LocalItSystemRole, ItSystemRight, ItSystemRole>>()
-                .To<GenericLocalOptionsService<LocalItSystemRole, ItSystemRight, ItSystemRole>>().InCommandScope(Mode);
-
-            kernel.Bind<IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType>>()
-                .To<GenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType>>().InCommandScope(Mode);
-
-            kernel.Bind<IGenericLocalOptionsService<LocalArchiveType, ItSystemUsage, ArchiveType>>()
-                .To<GenericLocalOptionsService<LocalArchiveType, ItSystemUsage, ArchiveType>>().InCommandScope(Mode);
-
-            kernel.Bind<IGenericLocalOptionsService<LocalArchiveLocation, ItSystemUsage, ArchiveLocation>>()
-                .To<GenericLocalOptionsService<LocalArchiveLocation, ItSystemUsage, ArchiveLocation>>().InCommandScope(Mode);
-
-            kernel.Bind<IGenericLocalOptionsService<LocalArchiveTestLocation, ItSystemUsage, ArchiveTestLocation>>()
-                .To<GenericLocalOptionsService<LocalArchiveTestLocation, ItSystemUsage, ArchiveTestLocation>>().InCommandScope(Mode);
-
-            kernel.Bind<IGenericLocalOptionsService<LocalDataType, DataRow, DataType>>()
-                .To<GenericLocalOptionsService<LocalDataType, DataRow, DataType>>().InCommandScope(Mode);
-
-            kernel.Bind<IGenericLocalOptionsService<LocalRelationFrequencyType, SystemRelation, RelationFrequencyType>>()
-                .To<GenericLocalOptionsService<LocalRelationFrequencyType, SystemRelation, RelationFrequencyType>>().InCommandScope(Mode);
-
-            kernel.Bind<IGenericLocalOptionsService<LocalInterfaceType, ItInterface, InterfaceType>>()
-                .To<GenericLocalOptionsService<LocalInterfaceType, ItInterface, InterfaceType>>().InCommandScope(Mode);
-
-            kernel.Bind<IGenericLocalOptionsService<LocalSensitivePersonalDataType, ItSystem, SensitivePersonalDataType>>()
-                .To<GenericLocalOptionsService<LocalSensitivePersonalDataType, ItSystem, SensitivePersonalDataType>>().InCommandScope(Mode);
-
-            kernel.Bind<IGenericLocalOptionsService<LocalItSystemCategories, ItSystemUsage, ItSystemCategories>>()
-                .To<GenericLocalOptionsService<LocalItSystemCategories, ItSystemUsage, ItSystemCategories>>().InCommandScope(Mode);
-
-            kernel.Bind<IGenericLocalOptionsService<LocalRegisterType, ItSystemUsage, RegisterType>>()
-                .To<GenericLocalOptionsService<LocalRegisterType, ItSystemUsage, RegisterType>>().InCommandScope(Mode);
+            RegisterLocalOptionService<LocalItSystemRole, ItSystemRight, ItSystemRole>(kernel);
+            RegisterLocalOptionService<LocalBusinessType, ItSystem, BusinessType>(kernel);
+            RegisterLocalOptionService<LocalArchiveType, ItSystemUsage, ArchiveType>(kernel);
+            RegisterLocalOptionService<LocalArchiveLocation, ItSystemUsage, ArchiveLocation>(kernel);
+            RegisterLocalOptionService<LocalArchiveTestLocation, ItSystemUsage, ArchiveTestLocation>(kernel);
+            RegisterLocalOptionService<LocalDataType, DataRow, DataType>(kernel);
+            RegisterLocalOptionService<LocalRelationFrequencyType, SystemRelation, RelationFrequencyType>(kernel);
+            RegisterLocalOptionService<LocalInterfaceType, ItInterface, InterfaceType>(kernel);
+            RegisterLocalOptionService<LocalSensitivePersonalDataType, ItSystem, SensitivePersonalDataType>(kernel);
+            RegisterLocalOptionService<LocalItSystemCategories, ItSystemUsage, ItSystemCategories>(kernel);
+            RegisterLocalOptionService<LocalRegisterType, ItSystemUsage, RegisterType>(kernel);
         }
+
 
         private void RegisterLocalOptionService<TLocalOptionType, TReferenceType, TOptionType>(IKernel kernel)
         where TLocalOptionType : LocalOptionEntity<TOptionType>, new()
