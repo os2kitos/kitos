@@ -389,6 +389,7 @@
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItContracts\ItContractLocalPaymentFrequencyTypesInternvalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItContracts\ItContractLocalPriceRegulationTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItContracts\ItContractLocalProcurementStrategyTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItContracts\ItContractLocalTerminationDeadlineTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItContracts\ItContractPaymentModelTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItContracts\ItContractPurchaseFormTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItContracts\ItContractTemplateTypesInternalV2Controller.cs" />
