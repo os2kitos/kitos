@@ -44,7 +44,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.ItContra
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetLocalTAgreementElementTypeByOptionId([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] Guid optionUuid)
+        public IHttpActionResult GetLocalAgreementElementTypeByOptionId([NonEmptyGuid][FromUri] Guid organizationUuid, [FromUri] Guid optionUuid)
         {
             return GetSingle(organizationUuid, optionUuid);
         }
