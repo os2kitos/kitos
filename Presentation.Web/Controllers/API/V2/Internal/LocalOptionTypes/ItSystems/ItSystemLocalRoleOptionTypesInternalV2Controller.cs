@@ -31,7 +31,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.ItSystem
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetLocalOrganizationUnitRoles([NonEmptyGuid][FromUri] Guid organizationUuid)
+        public IHttpActionResult GetLocalItSystemRoles([NonEmptyGuid][FromUri] Guid organizationUuid)
         {
             return GetAll(organizationUuid);
         }

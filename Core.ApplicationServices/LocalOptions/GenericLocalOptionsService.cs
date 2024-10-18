@@ -42,7 +42,7 @@ namespace Core.ApplicationServices.LocalOptions
             var globalOptions = GetGlobalOptionsAsQueryable()
                 .ToList();
             
-            var localOptions = GetLocalOptionsAsQueryable(organizationUuid)
+           var localOptions = GetLocalOptionsAsQueryable(organizationUuid)
                 .ToDictionary(x => x.OptionId);
 
             return IncludeLocalChangesToGlobalOptions(globalOptions, localOptions);
@@ -52,6 +52,7 @@ namespace Core.ApplicationServices.LocalOptions
         { 
             return globalOptions.Select(optionToAdd =>
               {
+                  optionToAdd.ResetLocalOptionAvailability();
                   var localOptionExists = localOptions.TryGetValue(optionToAdd.Id, out var localOption);
                   if (localOptionExists) optionToAdd.UpdateLocalOptionValues(localOption);
                   return optionToAdd;
@@ -64,6 +65,7 @@ namespace Core.ApplicationServices.LocalOptions
                 .Bind(GetGlobalOptionById)
                 .Bind(option =>
                 {
+                    option.ResetLocalOptionAvailability();
                     var localOption = GetLocalOptionsAsQueryable(organizationUuid)
                         .FirstOrDefault(x => x.OptionId == option.Id);
 
@@ -157,19 +159,37 @@ namespace Core.ApplicationServices.LocalOptions
         public Result<TOptionType, OperationError> DeleteLocalOption(Guid organizationUuid, Guid globalOptionUuid)
         {
             return GetLocalOptionMaybe(organizationUuid, globalOptionUuid)
-                .Match(localOption => _authorizationContext.AllowDelete(localOption)
-                    ? Result<TLocalOptionType, OperationError>.Success(localOption)
-                    : new OperationError($"User not allowed to delete local option with global option uuid: {globalOptionUuid}",
-                        OperationFailure.Forbidden),
-                    () => new OperationError($"Local option in organization with uuid: {organizationUuid} with global option uuid: {globalOptionUuid} was not found", OperationFailure.NotFound))
+                .Match(Result<TLocalOptionType, OperationError>.Success,
+                    () => CreateAndGetLocalOption(organizationUuid, globalOptionUuid))
                 .Bind(localOption =>
                 {
+                    if (!_authorizationContext.AllowDelete(localOption))
+                        return new OperationError(
+                            $"User not allowed to delete local option {localOption.Id} with global option uuid: {globalOptionUuid}",
+                            OperationFailure.Forbidden);
+
                     localOption.Deactivate();
                     _localOptionRepository.Update(localOption);
                     _domainEvents.Raise(new EntityUpdatedEvent<TLocalOptionType>(localOption));
 
                     _localOptionRepository.Save();
                     return GetLocalOption(organizationUuid, globalOptionUuid);
+                });
+        }
+
+        private Result<TLocalOptionType, OperationError> CreateAndGetLocalOption(Guid organizationUuid,
+            Guid globalOptionUuid)
+        {
+            return CreateLocalOption(organizationUuid,
+                new LocalOptionCreateParameters() { OptionUuid = globalOptionUuid })
+                .Bind(_ =>
+                {
+                    var localOptionMaybe = GetLocalOptionMaybe(organizationUuid, globalOptionUuid);
+                    if (localOptionMaybe.IsNone)
+                        return new OperationError(
+                            $"Local option in organization with uuid: {organizationUuid} with global option uuid: {globalOptionUuid} was not found",
+                            OperationFailure.NotFound);
+                    return Result<TLocalOptionType, OperationError>.Success(localOptionMaybe.Value);
                 });
         }
 
@@ -204,7 +224,7 @@ namespace Core.ApplicationServices.LocalOptions
         }
 
         private IEnumerable<TLocalOptionType> GetLocalOptionsAsQueryable(Guid organizationUuid)
-        {
+        { 
             return _localOptionRepository
                 .AsQueryable()
                 .ByOrganizationUuid(organizationUuid);
