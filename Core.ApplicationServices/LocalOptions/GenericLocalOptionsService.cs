@@ -52,6 +52,7 @@ namespace Core.ApplicationServices.LocalOptions
         { 
             return globalOptions.Select(optionToAdd =>
               {
+                  optionToAdd.ResetLocalOptionAvailability();
                   var localOptionExists = localOptions.TryGetValue(optionToAdd.Id, out var localOption);
                   if (localOptionExists) optionToAdd.UpdateLocalOptionValues(localOption);
                   return optionToAdd;
@@ -64,6 +65,7 @@ namespace Core.ApplicationServices.LocalOptions
                 .Bind(GetGlobalOptionById)
                 .Bind(option =>
                 {
+                    option.ResetLocalOptionAvailability();
                     var localOption = GetLocalOptionsAsQueryable(organizationUuid)
                         .FirstOrDefault(x => x.OptionId == option.Id);
 
