@@ -496,10 +496,34 @@ namespace Presentation.Web.Ninject
 
         private void RegisterLocalOptionTypes(IKernel kernel)
         {
-            kernel.Bind<IGenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType>>()
-                .To<GenericLocalOptionsService<LocalBusinessType, ItSystem, BusinessType>>().InCommandScope(Mode);
+            RegisterLocalItSystemOptionTypes(kernel);
+
             kernel.Bind<IGenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole>>()
                 .To<GenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole>>().InCommandScope(Mode);
+        }
+
+        private void RegisterLocalItSystemOptionTypes(IKernel kernel)
+        {
+            RegisterLocalOptionService<LocalItSystemRole, ItSystemRight, ItSystemRole>(kernel);
+            RegisterLocalOptionService<LocalBusinessType, ItSystem, BusinessType>(kernel);
+            RegisterLocalOptionService<LocalArchiveType, ItSystemUsage, ArchiveType>(kernel);
+            RegisterLocalOptionService<LocalArchiveLocation, ItSystemUsage, ArchiveLocation>(kernel);
+            RegisterLocalOptionService<LocalArchiveTestLocation, ItSystemUsage, ArchiveTestLocation>(kernel);
+            RegisterLocalOptionService<LocalDataType, DataRow, DataType>(kernel);
+            RegisterLocalOptionService<LocalRelationFrequencyType, SystemRelation, RelationFrequencyType>(kernel);
+            RegisterLocalOptionService<LocalInterfaceType, ItInterface, InterfaceType>(kernel);
+            RegisterLocalOptionService<LocalSensitivePersonalDataType, ItSystem, SensitivePersonalDataType>(kernel);
+            RegisterLocalOptionService<LocalItSystemCategories, ItSystemUsage, ItSystemCategories>(kernel);
+            RegisterLocalOptionService<LocalRegisterType, ItSystemUsage, RegisterType>(kernel);
+        }
+
+
+        private void RegisterLocalOptionService<TLocalOptionType, TReferenceType, TOptionType>(IKernel kernel)
+        where TLocalOptionType : LocalOptionEntity<TOptionType>, new()
+            where TOptionType : OptionEntity<TReferenceType>
+        {
+            kernel.Bind<IGenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType>>()
+                .To<GenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType>>().InCommandScope(Mode);
         }
 
         private void RegisterOptions(IKernel kernel)
