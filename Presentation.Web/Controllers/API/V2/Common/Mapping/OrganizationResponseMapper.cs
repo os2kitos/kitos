@@ -109,7 +109,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
             return new()
             {
                 Module = uiModuleCustomization.Module,
-                Nodes = ToCustomizedUINodeDTOs(uiModuleCustomization.Nodes)
+                Nodes = ToCustomizedUINodeDTOs(uiModuleCustomization.Nodes).ToList()
             };
         }
 
