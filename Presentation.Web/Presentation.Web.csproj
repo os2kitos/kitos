@@ -384,6 +384,11 @@
     <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\SystemDeletionConflictMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\DataProcessingRegistrations\DataProcessingRegistrationInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\ItContractInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\DataProcessingRegistrations\DprLocalCountryOptionTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\DataProcessingRegistrations\DprLocalDataResponsibleTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\DataProcessingRegistrations\DprLocalOversightOptionTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\DataProcessingRegistrations\DprLocalRoleOptionTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\DataProcessingRegistrations\DprLocalBasisForTransferTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItContracts\ItContractCriticalityTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItContracts\ItContractLocalAgreementElementTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItContracts\ItContractLocalOptionExtendTypesInternalV2Controller.cs" />

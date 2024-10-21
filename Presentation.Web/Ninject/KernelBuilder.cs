@@ -497,6 +497,7 @@ namespace Presentation.Web.Ninject
         private void RegisterLocalOptionTypes(IKernel kernel)
         {
             RegisterLocalItSystemOptionTypes(kernel);
+            RegisterLocalDprOptionTypes(kernel);
             RegisterLocalItContractOptionTypes(kernel);
 
             kernel.Bind<IGenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole>>()
@@ -532,6 +533,15 @@ namespace Presentation.Web.Ninject
             RegisterLocalOptionService<LocalSensitivePersonalDataType, ItSystem, SensitivePersonalDataType>(kernel);
             RegisterLocalOptionService<LocalItSystemCategories, ItSystemUsage, ItSystemCategories>(kernel);
             RegisterLocalOptionService<LocalRegisterType, ItSystemUsage, RegisterType>(kernel);
+        }
+
+        private void RegisterLocalDprOptionTypes(IKernel kernel)
+        {
+            RegisterLocalOptionService<LocalDataProcessingRegistrationRole, DataProcessingRegistrationRight, DataProcessingRegistrationRole>(kernel);
+            RegisterLocalOptionService<LocalDataProcessingBasisForTransferOption, DataProcessingRegistration, DataProcessingBasisForTransferOption>(kernel);
+            RegisterLocalOptionService<LocalDataProcessingOversightOption, DataProcessingRegistration, DataProcessingOversightOption>(kernel);
+            RegisterLocalOptionService<LocalDataProcessingDataResponsibleOption, DataProcessingRegistration, DataProcessingDataResponsibleOption>(kernel);
+            RegisterLocalOptionService<LocalDataProcessingCountryOption, DataProcessingRegistration, DataProcessingCountryOption>(kernel);
         }
 
         private void RegisterLocalOptionService<TLocalOptionType, TReferenceType, TOptionType>(IKernel kernel)
