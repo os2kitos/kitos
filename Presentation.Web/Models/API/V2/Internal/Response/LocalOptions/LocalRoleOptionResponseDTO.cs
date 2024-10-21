@@ -6,8 +6,8 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.LocalOptions
     {
         public bool WriteAccess { get; set; }
 
-        public LocalRoleOptionResponseDTO(Guid uuid, string name, string description, bool isActive, bool isObligatory, bool writeAccess) 
-            : base(uuid, name, description, isActive, isObligatory)
+        public LocalRoleOptionResponseDTO(Guid uuid, string name, string description, bool isLocallyAvailable, bool isObligatory, bool writeAccess) 
+            : base(uuid, name, description, isLocallyAvailable, isObligatory)
         {
             WriteAccess = writeAccess;
         }
