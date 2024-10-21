@@ -16,7 +16,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.LocalOptionTypes.DataProc
     [RoutePrefix("api/v2/internal/data-processing/{organizationUuid}/local-option-types/dpr-roles")]
     public class DprLocalRoleOptionTypesInternalV2Controller : BaseLocalRoleOptionTypesInternalV2Controller<LocalDataProcessingRegistrationRole, DataProcessingRegistrationRight, DataProcessingRegistrationRole>
     {
-        private readonly IGenericLocalOptionsService<LocalDataProcessingRegistrationRole, DataProcessingRegistrationRight, DataProcessingRegistrationRole> _localItSystemRoleOptionTypeService;
+        private readonly IGenericLocalOptionsService<LocalDataProcessingRegistrationRole, DataProcessingRegistrationRight, DataProcessingRegistrationRole> _localDprRoleOptionTypeService;
         private readonly ILocalOptionTypeResponseMapper _responseMapper;
         private readonly ILocalOptionTypeWriteModelMapper _writeModelMapper;
 
