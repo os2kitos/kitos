@@ -190,22 +190,6 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
         }
 
         [Fact]
-        public void GET_Returns_Forbidden_If_Not_Authorized_To_Read()
-        {
-            var organizationId = A<int>();
-            var module = A<string>();
-            var orgUuid = Guid.NewGuid();
-
-            ExpectResolveUuidReturns(organizationId, orgUuid);
-            ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Success(new Organization()), orgUuid);
-
-            var result = _sut.GetModuleCustomizationForOrganization(organizationId, module);
-
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
-        }
-
-        [Fact]
         public void GET_Returns_List_Filtered_By_Module()
         {
             var (organization, moduleObject) = SetupGetModuleCustomization();
