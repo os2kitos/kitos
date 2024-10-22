@@ -112,7 +112,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             Assert.Equal(expected.Name, actual.Name);
             Assert.Equal(expected.Description, actual.Description);
-            Assert.Equal(expected.IsLocallyAvailable, actual.IsActive);
+            Assert.Equal(expected.IsLocallyAvailable, actual.IsLocallyAvailable);
+            Assert.Equal(expected.IsObligatory || expected.IsLocallyAvailable, actual.IsActive);
             Assert.Equal(expected.IsObligatory, actual.IsObligatory);
         }
 
