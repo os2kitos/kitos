@@ -7,6 +7,7 @@ using Core.DomainModel.Constants;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.UIConfiguration;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -655,6 +656,20 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(numberOfLogs, result.Value.Count());
+        }
+
+        [Fact]
+        public void Get_Module_Customization_Sets_Up_New_If_None_Found()
+        {
+            var module = "someModule";
+
+            var result = _sut.GetUiModuleCustomization(module);
+
+            Assert.True(result.HasValue);
+            var customization = result.Value;
+            Assert.Equal(module, customization.Module);
+            Assert.Equal(_sut.Uuid, customization.Organization.Uuid);
+
         }
 
         private OrganizationUnit CreateOrganizationUnit()

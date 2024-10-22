@@ -164,9 +164,14 @@ namespace Core.DomainModel.Organization
             if (module == null)
                 throw new ArgumentNullException(nameof(module));
 
-            return UIModuleCustomizations
-                .SingleOrDefault(config => config.Module == module)
-                .FromNullable();
+            var moduleCustomization = UIModuleCustomizations
+                .SingleOrDefault(config => config.Module == module);
+            if (moduleCustomization != null) return moduleCustomization.FromNullable();
+
+            moduleCustomization = new UIModuleCustomization() { Organization = this, Module = module };
+            UIModuleCustomizations.Add(moduleCustomization);
+
+            return moduleCustomization.FromNullable();
         }
 
         public Result<UIModuleCustomization, OperationError> ModifyModuleCustomization(string module, IEnumerable<CustomizedUINode> nodes)
