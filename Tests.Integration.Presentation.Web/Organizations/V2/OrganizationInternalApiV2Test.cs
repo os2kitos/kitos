@@ -51,14 +51,18 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
-        public async Task Get_UI_Customization_Returns_Not_Found_If_None_Added()
+        public async Task Get_UI_Customization_Returns_New_Empty_Customization_If_None_Exists()
         {
             var moduleName = "ItSystemUsages";
             var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
 
             var response = await OrganizationInternalV2Helper.GetUIModuleCustomization(organization.Uuid, moduleName);
-            
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var dto = await response.ReadResponseBodyAsAsync<UIModuleCustomizationResponseDTO>();
+            Assert.NotNull(dto);
+            Assert.Empty(dto.Nodes);
+            Assert.Equal(moduleName, dto.Module);
         }
 
         [Fact]
