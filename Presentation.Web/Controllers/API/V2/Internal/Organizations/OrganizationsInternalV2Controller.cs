@@ -34,6 +34,18 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             _uiModuleCustomizationService = uiModuleCustomizationService;
         }
 
+        [Route("ui-root-config")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationUIRootConfigResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult GetUIRootConfig([NonEmptyGuid] Guid organizationUuid)
+        {
+            return _organizationService.GetUIRootConfig(organizationUuid)
+                .Select(_organizationResponseMapper.ToUIRootConfigDTO)
+                .Match(Ok, FromOperationError);
+        }
+
         [Route("permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationPermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]

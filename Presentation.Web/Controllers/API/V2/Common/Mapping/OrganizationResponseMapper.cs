@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Model.Organizations;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.UIConfiguration;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
@@ -18,6 +19,16 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         public OrganizationResponseMapper(IOrganizationTypeMapper organizationTypeMapper)
         {
             _organizationTypeMapper = organizationTypeMapper;
+        }
+
+        public OrganizationUIRootConfigResponseDTO ToUIRootConfigDTO(Config config)
+        {
+            return new()
+            {
+                ShowDataProcessing = config.ShowDataProcessing,
+                ShowItSystemModule = config.ShowItSystemModule,
+                ShowItContractModule = config.ShowItContractModule
+            };
         }
 
         public OrganizationResponseDTO ToOrganizationDTO(Organization organization)
