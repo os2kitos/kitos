@@ -14,6 +14,7 @@ using Xunit;
 using Core.DomainModel.Events;
 using Core.DomainServices.Generic;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
+using Core.ApplicationServices.Model.UiCustomization;
 using Core.DomainModel;
 using Core.DomainServices;
 using Tests.Unit.Presentation.Web.Extensions;
@@ -54,6 +55,26 @@ namespace Tests.Unit.Presentation.Web.Services
                 _contactPersonRepository.Object,
                 _dataResponsibleRepository.Object,
                 _dataProtectionAdvisorRepository.Object);
+        }
+
+        [Fact]
+        public void Can_Patch_UI_Root_Config()
+        {
+            var orgUuid = A<Guid>();
+            var updateParameters = new UIRootConfigUpdateParameters()
+            {
+                ShowItSystemModule = Maybe<OptionalValueChange<bool>>.Some(A<bool>().AsChangedValue()),
+                ShowDataProcessing = Maybe<OptionalValueChange<bool>>.Some(A<bool>().AsChangedValue()),
+                ShowItContractModule = Maybe<OptionalValueChange<bool>>.Some(A<bool>().AsChangedValue())
+            };
+
+            var result = _sut.PatchUIRootConfig(orgUuid, updateParameters);
+
+            Assert.True(result.Ok);
+            var uiRootConfig = result.Value;
+            Assert.Equal(updateParameters.ShowDataProcessing.Value.NewValue, uiRootConfig.ShowDataProcessing);
+            Assert.Equal(updateParameters.ShowItSystemModule.Value.NewValue, uiRootConfig.ShowItSystemModule);
+            Assert.Equal(updateParameters.ShowItContractModule.Value.NewValue, uiRootConfig.ShowItContractModule);
         }
 
         [Fact]

@@ -72,7 +72,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
         using var transaction = _transactionManager.Begin();
         var result = GetOrganizationAndVerifyWriteAccess(organizationUuid)
             .Bind(organizationWithWriteAccess => WithModifyCvrAccessIfRequired(organizationWithWriteAccess, parameters))
-            .Bind(organizationWithConfirmedAccess => PerformOrganizationUpdates(organizationWithConfirmedAccess, parameters));
+            .Bind(organizationWithConfirmedAccess => PerformBasicOrganizationUpdates(organizationWithConfirmedAccess, parameters));
 
         if (result.Failed)
         {
@@ -89,10 +89,12 @@ public class OrganizationWriteService : IOrganizationWriteService{
 
     public Result<Config, OperationError> PatchUIRootConfig(Guid organizationUuid, UIRootConfigUpdateParameters updateParameters)
     {
-        throw new NotImplementedException();
+        var organizationResult = _organizationService.GetOrganization(organizationUuid);
+        if (organizationResult.Failed) return organizationResult.Error;
+        //todo get write access, perform updates using method from org itself, return updated org
     }
 
-    private Result<Organization, OperationError> PerformOrganizationUpdates(Organization organization, OrganizationUpdateParameters parameters)
+    private Result<Organization, OperationError> PerformBasicOrganizationUpdates(Organization organization, OrganizationUpdateParameters parameters)
     {
         return organization.WithOptionalUpdate(parameters.Cvr, (org, cvr) => org.UpdateCvr(cvr))
             .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)));
