@@ -41,7 +41,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(config.ShowItContractModule, dto.ShowItContractModule);
             Assert.Equal(config.ShowDataProcessing, dto.ShowDataProcessing);
             Assert.Equal(config.ShowItSystemModule, dto.ShowItSystemModule);
-
         }
 
         [Fact]

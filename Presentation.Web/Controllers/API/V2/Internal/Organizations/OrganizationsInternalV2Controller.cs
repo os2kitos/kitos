@@ -35,7 +35,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [Route("ui-root-config")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationUIRootConfigResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UIRootConfigResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]

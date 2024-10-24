@@ -111,7 +111,6 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(expected.Id, value.Id);
             Assert.Equal(expected.ShowItSystemModule, value.ShowItSystemModule);
             Assert.Equal(expected.ShowDataProcessing, value.ShowDataProcessing);
-
         }
 
         [Fact]

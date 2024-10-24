@@ -21,7 +21,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
             _organizationTypeMapper = organizationTypeMapper;
         }
 
-        public OrganizationUIRootConfigResponseDTO ToUIRootConfigDTO(Config config)
+        public UIRootConfigResponseDTO ToUIRootConfigDTO(Config config)
         {
             return new()
             {

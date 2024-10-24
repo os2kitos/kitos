@@ -9,7 +9,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping;
 
 public interface IOrganizationResponseMapper
 {
-    OrganizationUIRootConfigResponseDTO ToUIRootConfigDTO(Config config);
+    UIRootConfigResponseDTO ToUIRootConfigDTO(Config config);
 
     OrganizationResponseDTO ToOrganizationDTO(Organization organization);
     OrganizationMasterDataRolesResponseDTO ToRolesDTO(OrganizationMasterDataRoles roles);

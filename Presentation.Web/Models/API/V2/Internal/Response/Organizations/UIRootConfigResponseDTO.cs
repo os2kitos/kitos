@@ -2,5 +2,8 @@
 {
     public class UIRootConfigResponseDTO
     {
+        public bool ShowItContractModule { get; set; }
+        public bool ShowDataProcessing { get; set; }
+        public bool ShowItSystemModule { get; set; }
     }
 }
