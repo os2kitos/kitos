@@ -377,8 +377,6 @@
     <Compile Include="System\Write\ItSystemWriteService.cs" />
     <Compile Include="Tracking\ITrackingService.cs" />
     <Compile Include="Tracking\TrackingService.cs" />
-    <Compile Include="UIConfiguration\IUIRootConfigService.cs" />
-    <Compile Include="UIConfiguration\UIRootConfigService.cs" />
     <Compile Include="Users\Handlers\RemoveUserFromKitosCommandHandler.cs" />
     <Compile Include="UIConfiguration\IUIModuleCustomizationService.cs" />
     <Compile Include="UIConfiguration\UIModuleCustomizationService.cs" />
