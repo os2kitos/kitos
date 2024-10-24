@@ -433,11 +433,6 @@ namespace Core.ApplicationServices.Organizations
                     error => error);
         }
 
-        public Result<Config, OperationError> PatchUIRootConfig(Guid organizationUuid, UIRootConfigUpdateParameters updateParameters)
-        {
-            throw new NotImplementedException();
-        }
-
         public GridPermissions GetGridPermissions(int orgId)
         {
             return new GridPermissions

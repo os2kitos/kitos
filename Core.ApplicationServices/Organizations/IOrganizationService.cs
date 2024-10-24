@@ -57,6 +57,5 @@ namespace Core.ApplicationServices.Organizations
         public Maybe<DataProtectionAdvisor> GetDataProtectionAdvisor(int organizationId);
 
         Result<Config, OperationError> GetUIRootConfig(Guid organizationUuid);
-        Result<Config, OperationError> PatchUIRootConfig(Guid organizationUuid, UIRootConfigUpdateParameters updateParameters);
     }
 }

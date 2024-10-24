@@ -5,6 +5,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Model.Organizations.Write;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
+using Core.ApplicationServices.Model.UiCustomization;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
@@ -84,6 +85,11 @@ public class OrganizationWriteService : IOrganizationWriteService{
         transaction.Commit();
         return result;
 
+    }
+
+    public Result<Config, OperationError> PatchUIRootConfig(Guid organizationUuid, UIRootConfigUpdateParameters updateParameters)
+    {
+        throw new NotImplementedException();
     }
 
     private Result<Organization, OperationError> PerformOrganizationUpdates(Organization organization, OrganizationUpdateParameters parameters)
