@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
+using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -7,6 +7,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.UI_Configuration;
+using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration;
 using Tests.Toolkit.Patterns;
@@ -49,16 +50,17 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
         }
 
         [Fact]
-        public async Task Get_Returns_NotFound_If_Config_Doesnt_Exist()
+        public async Task Get_Returns_Empty_Config_If_Config_Doesnt_Exist()
         {
             //Arrange
             var module = A<string>();
 
             //Act
-            using var response = await UIConfigurationHelper.SendGetRequestAsync(TestEnvironment.DefaultOrganizationId, module);
+            var data = await UIConfigurationHelper.GetCustomizationByModuleAsync(TestEnvironment.DefaultOrganizationId, module);
 
             //Assert
-            Assert.Equal(HttpStatusCode.NotFound ,response.StatusCode);
+            Assert.NotNull(data);
+            Assert.Empty(data.Nodes);
         }
 
         [Fact]

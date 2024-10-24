@@ -166,7 +166,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Sts
 
         [HttpGet]
         [Route("connection/change-log")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(StsOrganizationChangeLogResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<StsOrganizationChangeLogResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
