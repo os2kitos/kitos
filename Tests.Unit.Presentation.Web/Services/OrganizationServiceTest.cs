@@ -114,6 +114,52 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
+        public void Get_UI_Root_Config_Returns_Not_Found_If_No_Org()
+        {
+            var orgUuid = A<Guid>();
+            var org = new Organization()
+            {
+                Uuid = orgUuid,
+                Config = new Config()
+                {
+                    Id = A<int>(),
+                    ShowItSystemModule = A<bool>(),
+                    ShowDataProcessing = A<bool>()
+                }
+            };
+            _repositoryMock.Setup(_ => _.GetByUuid(orgUuid)).Returns(Maybe<Organization>.None);
+            _authorizationContext.Setup(_ => _.AllowReads(org)).Returns(true);
+
+            var uiRootConfig = _sut.GetUIRootConfig(orgUuid);
+
+            Assert.True(uiRootConfig.Failed);
+            Assert.Equal(OperationFailure.NotFound, uiRootConfig.Error.FailureType);
+        }
+
+        [Fact]
+        public void Get_UI_Root_Config_Returns_Forbidden_If_No_Read_Access()
+        {
+            var orgUuid = A<Guid>();
+            var org = new Organization()
+            {
+                Uuid = orgUuid,
+                Config = new Config()
+                {
+                    Id = A<int>(),
+                    ShowItSystemModule = A<bool>(),
+                    ShowDataProcessing = A<bool>()
+                }
+            };
+            _repositoryMock.Setup(_ => _.GetByUuid(orgUuid)).Returns(org);
+            _authorizationContext.Setup(_ => _.AllowReads(org)).Returns(false);
+
+            var uiRootConfig = _sut.GetUIRootConfig(orgUuid);
+
+            Assert.True(uiRootConfig.Failed);
+            Assert.Equal(OperationFailure.Forbidden, uiRootConfig.Error.FailureType);
+        }
+
+        [Fact]
         public void CanCreateOrganizationOfType_With_Null_Org_Throws()
         {
             Assert.Throws<ArgumentNullException>(() => _sut.CanChangeOrganizationType(null, A<OrganizationTypeKeys>()));
