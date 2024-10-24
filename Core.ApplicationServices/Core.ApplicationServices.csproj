@@ -248,6 +248,7 @@
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
     <Compile Include="Model\UiCustomization\CustomUINodeParameters.cs" />
     <Compile Include="Model\UiCustomization\UIModuleCustomizationParameters.cs" />
+    <Compile Include="Model\UiCustomization\UIRootConfigUpdateParameters.cs" />
     <Compile Include="Model\Users\UserAdministrationPermissions.cs" />
     <Compile Include="Model\Users\UserCollectionPermissionsResult.cs" />
     <Compile Include="Model\Users\UserRightsAssignments.cs" />
@@ -376,6 +377,8 @@
     <Compile Include="System\Write\ItSystemWriteService.cs" />
     <Compile Include="Tracking\ITrackingService.cs" />
     <Compile Include="Tracking\TrackingService.cs" />
+    <Compile Include="UIConfiguration\IUIRootConfigService.cs" />
+    <Compile Include="UIConfiguration\UIRootConfigService.cs" />
     <Compile Include="Users\Handlers\RemoveUserFromKitosCommandHandler.cs" />
     <Compile Include="UIConfiguration\IUIModuleCustomizationService.cs" />
     <Compile Include="UIConfiguration\UIModuleCustomizationService.cs" />
