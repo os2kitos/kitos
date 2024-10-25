@@ -17,5 +17,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         
         Result<UIModuleCustomizationParameters, OperationError> ToUIModuleCustomizationParameters(Guid organizationUuid, string moduleName,
             UIModuleCustomizationRequestDTO dto);
+
+        UIRootConfigUpdateParameters ToUIRootConfigUpdateParameters(UIRootConfigUpdateRequestDTO dto);
     }
 }

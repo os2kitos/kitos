@@ -10,6 +10,7 @@ using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Elasticsearch.Net;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
@@ -42,6 +43,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         public IHttpActionResult GetUIRootConfig([NonEmptyGuid] Guid organizationUuid)
         {
             return _organizationService.GetUIRootConfig(organizationUuid)
+                .Select(_organizationResponseMapper.ToUIRootConfigDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("ui-root-config")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UIRootConfigResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult PatchUIRootConfig([NonEmptyGuid] Guid organizationUuid, UIRootConfigUpdateRequestDTO dto)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+
+            var updateParameters = _organizationWriteModelMapper.ToUIRootConfigUpdateParameters(dto);
+
+            return _organizationWriteService.PatchUIRootConfig(organizationUuid, updateParameters)
                 .Select(_organizationResponseMapper.ToUIRootConfigDTO)
                 .Match(Ok, FromOperationError);
         }
