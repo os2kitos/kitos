@@ -1,21 +1,16 @@
 ﻿using Core.ApplicationServices.Authorization;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web;
 using Core.DomainServices.Generic;
 using System.IO;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel.Organization;
-using System.Net;
 using Core.ApplicationServices.Model.Excel;
 
 namespace Core.ApplicationServices.Excel
 {
-    public class ExcelApplicationService
+    public class ExcelApplicationService : IExcelApplicationService
     {
         private readonly IExcelService _excelService;
         private readonly IAuthorizationContext _authorizationContext;
