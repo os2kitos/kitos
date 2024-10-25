@@ -89,10 +89,8 @@ public class OrganizationWriteService : IOrganizationWriteService{
 
     public Result<Config, OperationError> PatchUIRootConfig(Guid organizationUuid, UIRootConfigUpdateParameters updateParameters)
     {
-        var organizationResult = _organizationService.GetOrganization(organizationUuid);
-        if (organizationResult.Failed) return organizationResult.Error;
-
-        return WithWriteAccess(organizationResult.Value)
+        return _organizationService.GetOrganization(organizationUuid)
+            .Bind(WithWriteAccess)
             .Bind(organization => PerformUIRootConfigUpdates(organization, updateParameters)
                     .Bind(updatedOrganization =>
                     {
