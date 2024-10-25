@@ -60,24 +60,57 @@ namespace Tests.Unit.Presentation.Web.Services
         [Fact]
         public void Can_Patch_UI_Root_Config()
         {
-            var orgUuid = A<Guid>();
-            var org = new Organization() { Uuid = orgUuid, Config = Config.Default(new User())};
-            var updateParameters = new UIRootConfigUpdateParameters()
-            {
-                ShowItSystemModule = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
-                ShowDataProcessing = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
-                ShowItContractModule = Maybe<bool>.Some(A<bool>()).AsChangedValue()
-            };
-            _organizationService.Setup(_ => _.GetOrganization(orgUuid, null)).Returns(org);
+            var (org, updateParameters) = SetupPatchUIRootConfigTest();
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
 
-            var result = _sut.PatchUIRootConfig(orgUuid, updateParameters);
+            var result = _sut.PatchUIRootConfig(org.Uuid, updateParameters);
 
             Assert.True(result.Ok);
             var uiRootConfig = result.Value;
             Assert.Equal(updateParameters.ShowDataProcessing.NewValue.Value, uiRootConfig.ShowDataProcessing);
             Assert.Equal(updateParameters.ShowItSystemModule.NewValue.Value, uiRootConfig.ShowItSystemModule);
             Assert.Equal(updateParameters.ShowItContractModule.NewValue.Value, uiRootConfig.ShowItContractModule);
+        }
+
+        [Fact]
+        public void Patch_UI_Root_Config_Returns_Not_Found_If_No_Org()
+        {
+            var (org, updateParameters) = SetupPatchUIRootConfigTest();
+
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(new OperationError(OperationFailure.NotFound));
+            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
+
+            var result = _sut.PatchUIRootConfig(org.Uuid, updateParameters);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Patch_UI_Root_Config_Returns_Forbidden_If_Missing_Write_Access()
+        {
+            var (org, updateParameters) = SetupPatchUIRootConfigTest();
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
+            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(false);
+
+            var result = _sut.PatchUIRootConfig(org.Uuid, updateParameters);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        private (Organization, UIRootConfigUpdateParameters) SetupPatchUIRootConfigTest()
+        {
+            var orgUuid = A<Guid>();
+            var org = new Organization() { Uuid = orgUuid, Config = Config.Default(new User()) };
+            var updateParameters = new UIRootConfigUpdateParameters()
+            {
+                ShowItSystemModule = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
+                ShowDataProcessing = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
+                ShowItContractModule = Maybe<bool>.Some(A<bool>()).AsChangedValue()
+            };
+            return (org, updateParameters);
         }
 
         [Fact]
