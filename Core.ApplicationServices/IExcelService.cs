@@ -10,7 +10,7 @@ namespace Core.ApplicationServices
         Stream ExportUsers(Stream stream, int organizationId);
         void ImportOrganizationUnits(Stream stream, int organizationId);
         void ImportUsers(Stream stream, int organizationId);
-        void ExportItContracts(Stream stream, int organizationId);
+        Stream ExportItContracts(Stream stream, int organizationId);
         void ImportItContracts(Stream stream, int organizationId);
     }
 

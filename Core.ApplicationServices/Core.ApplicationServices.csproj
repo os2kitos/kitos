@@ -74,6 +74,8 @@
     <Compile Include="Authorization\CommandPermissionResult.cs" />
     <Compile Include="Contract\ReadModels\GridLocalItContractRolesService.cs" />
     <Compile Include="Contract\ReadModels\IGridLocalItContractRolesService.cs" />
+    <Compile Include="Excel\ExcelApplicationService.cs" />
+    <Compile Include="Excel\IExcelApplicationService.cs" />
     <Compile Include="Generic\EntityTreeUuidCollector.cs" />
     <Compile Include="Generic\ExtendedExtendedEntityIdentityResolverService.cs" />
     <Compile Include="Generic\IEntityIdMapper.cs" />
@@ -160,6 +162,7 @@
     <Compile Include="Model\Contracts\Write\ItContractSupplierModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractTerminationParameters.cs" />
     <Compile Include="Model\EventHandler\ValidateUserCredentialsCommandHandler.cs" />
+    <Compile Include="Model\Excel\ExcelExportModel.cs" />
     <Compile Include="Model\GDPR\DataProcessingRegistrationPermissions.cs" />
     <Compile Include="Model\GDPR\Write\SubDataProcessorParameter.cs" />
     <Compile Include="Model\GDPR\Write\SubDataProcessor\SubDataProcessorDetailsParameters.cs" />

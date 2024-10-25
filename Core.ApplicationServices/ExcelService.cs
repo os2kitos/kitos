@@ -107,14 +107,14 @@ namespace Core.ApplicationServices
             }
         }
 
-        public void ExportItContracts(Stream stream, int organizationId)
+        public Stream ExportItContracts(Stream stream, int organizationId)
         {
             var contracts = _itContractRepository.Get(x => x.OrganizationId == organizationId);
 
             var set = new DataSet();
             set.Tables.Add(GetItContractTable(contracts));
 
-            _excelHandler.Export(set, stream);
+            return _excelHandler.Export(set, stream);
         }
 
         public void ImportItContracts(Stream stream, int organizationId)
