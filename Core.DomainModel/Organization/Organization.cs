@@ -548,20 +548,23 @@ namespace Core.DomainModel.Organization
 
         public void UpdateShowDataProcessing(Maybe<bool> showDataProcessing)
         {
-            this.Config ??= Config.Default(this.ObjectOwner);
-            this.Config.ShowDataProcessing = showDataProcessing.HasValue && showDataProcessing.Value;
+            CreateConfigIfNullAndUpdateProperty(showDataProcessing, config => config.ShowDataProcessing = showDataProcessing.Value);
         }
 
         public void UpdateShowITContracts(Maybe<bool> showITContracts)
         {
-            this.Config ??= Config.Default(this.ObjectOwner);
-            this.Config.ShowItContractModule = showITContracts.HasValue && showITContracts.Value;
+            CreateConfigIfNullAndUpdateProperty(showITContracts, config => config.ShowItContractModule = showITContracts.Value);
         }
 
         public void UpdateShowITSystems(Maybe<bool> showITSystems)
         {
+            CreateConfigIfNullAndUpdateProperty(showITSystems, config => config.ShowItSystemModule = showITSystems.Value);
+        }
+
+        private void CreateConfigIfNullAndUpdateProperty(Maybe<bool> maybeValue, Action<Config> updateAction)
+        {
             this.Config ??= Config.Default(this.ObjectOwner);
-            this.Config.ShowItSystemModule = showITSystems.HasValue && showITSystems.Value;
+            if (maybeValue.HasValue) updateAction(this.Config);
         }
 
         /// <summary>
