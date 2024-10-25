@@ -71,6 +71,7 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(updateParameters.ShowDataProcessing.NewValue.Value, uiRootConfig.ShowDataProcessing);
             Assert.Equal(updateParameters.ShowItSystemModule.NewValue.Value, uiRootConfig.ShowItSystemModule);
             Assert.Equal(updateParameters.ShowItContractModule.NewValue.Value, uiRootConfig.ShowItContractModule);
+            _organizationRepository.Verify(_ => _.Update(It.IsAny<Organization>()));
         }
 
         [Fact]
