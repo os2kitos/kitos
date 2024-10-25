@@ -12,9 +12,11 @@ using System.Web.Http;
 using System.Web.Http.Results;
 using Core.ApplicationServices.Excel;
 using Presentation.Web.Models.API.V2.Internal.Response.Excel;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Excel
 {
+    [RoutePrefix("api/v2/internal/organizations/{organizationUuid}/local-admin/excel")]
     public class ExcelInternalV2Controller : InternalApiV2Controller
     {
         private readonly IExcelService _excelService;
@@ -30,12 +32,22 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         #region Excel Users
 
         [HttpGet]
+        [Route("users")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetUsers(Guid organizationUuid, bool? exportUsers)
         {
             return _excelApplicationService.GetUsers(organizationUuid, exportUsers)
                 .Match(result => GetResponseMessage(result.MemoryStream, result.FileName), FromOperationError);
         }
 
+        [HttpPost]
+        [Route("users")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
         public async Task<IHttpActionResult> PostUsers(Guid organizationUuid, bool? importUsers)
         {
             var result = _excelApplicationService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
@@ -65,12 +77,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
 
         #region Excel OrganizationUnits
 
+        [HttpGet]
+        [Route("units")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetOrgUnits(Guid organizationUuid, bool? exportOrgUnits)
         {
             return _excelApplicationService.GetUsers(organizationUuid, exportOrgUnits)
                 .Match(result => GetResponseMessage(result.MemoryStream, result.FileName), FromOperationError);
         }
 
+        [HttpPost]
+        [Route("units")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
         public async Task<IHttpActionResult> PostOrgUnits(Guid organizationUuid, bool? importOrgUnits)
         {
             var result = _excelApplicationService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
@@ -101,12 +124,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
 
         #region Excel IT Contracts
 
+        [HttpGet]
+        [Route("contracts")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetContracts(Guid organizationUuid, bool? exportContracts)
         {
             return _excelApplicationService.GetUsers(organizationUuid, exportContracts)
                 .Match(result => GetResponseMessage(result.MemoryStream, result.FileName), FromOperationError);
         }
 
+        [HttpPost]
+        [Route("contracts")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
         public async Task<IHttpActionResult> PostContracts(Guid organizationUuid, bool? importContracts)
         {
             var result = _excelApplicationService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
