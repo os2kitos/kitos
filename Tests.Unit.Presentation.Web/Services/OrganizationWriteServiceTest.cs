@@ -61,20 +61,23 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Can_Patch_UI_Root_Config()
         {
             var orgUuid = A<Guid>();
+            var org = new Organization() { Uuid = orgUuid, Config = Config.Default(new User())};
             var updateParameters = new UIRootConfigUpdateParameters()
             {
-                ShowItSystemModule = Maybe<OptionalValueChange<bool>>.Some(A<bool>().AsChangedValue()),
-                ShowDataProcessing = Maybe<OptionalValueChange<bool>>.Some(A<bool>().AsChangedValue()),
-                ShowItContractModule = Maybe<OptionalValueChange<bool>>.Some(A<bool>().AsChangedValue())
+                ShowItSystemModule = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
+                ShowDataProcessing = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
+                ShowItContractModule = Maybe<bool>.Some(A<bool>()).AsChangedValue()
             };
+            _organizationService.Setup(_ => _.GetOrganization(orgUuid, null)).Returns(org);
+            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
 
             var result = _sut.PatchUIRootConfig(orgUuid, updateParameters);
 
             Assert.True(result.Ok);
             var uiRootConfig = result.Value;
-            Assert.Equal(updateParameters.ShowDataProcessing.Value.NewValue, uiRootConfig.ShowDataProcessing);
-            Assert.Equal(updateParameters.ShowItSystemModule.Value.NewValue, uiRootConfig.ShowItSystemModule);
-            Assert.Equal(updateParameters.ShowItContractModule.Value.NewValue, uiRootConfig.ShowItContractModule);
+            Assert.Equal(updateParameters.ShowDataProcessing.NewValue.Value, uiRootConfig.ShowDataProcessing);
+            Assert.Equal(updateParameters.ShowItSystemModule.NewValue.Value, uiRootConfig.ShowItSystemModule);
+            Assert.Equal(updateParameters.ShowItContractModule.NewValue.Value, uiRootConfig.ShowItContractModule);
         }
 
         [Fact]

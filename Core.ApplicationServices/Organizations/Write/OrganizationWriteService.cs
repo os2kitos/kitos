@@ -22,20 +22,20 @@ public class OrganizationWriteService : IOrganizationWriteService{
     private readonly IDomainEvents _domainEvents;
     private readonly IOrganizationService _organizationService;
     private readonly IAuthorizationContext _authorizationContext;
-    private readonly IOrganizationRepository _repository;
+    private readonly IOrganizationRepository _organizationRepository;
     private readonly IEntityIdentityResolver _identityResolver;
     private readonly IGenericRepository<ContactPerson> _contactPersonRepository;
     private readonly IGenericRepository<DataResponsible> _dataResponsibleRepository;
     private readonly IGenericRepository<DataProtectionAdvisor> _dataProtectionAdvisorRepository;
 
 
-    public OrganizationWriteService(ITransactionManager transactionManager, IDomainEvents domainEvents, IOrganizationService organizationService, IAuthorizationContext authorizationContext, IOrganizationRepository repository, IEntityIdentityResolver identityResolver, IGenericRepository<ContactPerson> contactPersonRepository, IGenericRepository<DataResponsible> dataResponsibleRepository, IGenericRepository<DataProtectionAdvisor> dataProtectionAdvisorRepository)
+    public OrganizationWriteService(ITransactionManager transactionManager, IDomainEvents domainEvents, IOrganizationService organizationService, IAuthorizationContext authorizationContext, IOrganizationRepository organizationRepository, IEntityIdentityResolver identityResolver, IGenericRepository<ContactPerson> contactPersonRepository, IGenericRepository<DataResponsible> dataResponsibleRepository, IGenericRepository<DataProtectionAdvisor> dataProtectionAdvisorRepository)
     {
         _transactionManager = transactionManager;
         _domainEvents = domainEvents;
         _organizationService = organizationService;
         _authorizationContext = authorizationContext;
-        _repository = repository;
+        _organizationRepository = organizationRepository;
         _identityResolver = identityResolver;
         _contactPersonRepository = contactPersonRepository;
         _dataResponsibleRepository = dataResponsibleRepository;
@@ -56,7 +56,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
         }
 
         _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
-        _repository.Update(result.Value);
+        _organizationRepository.Update(result.Value);
         transaction.Commit();
         return result;
     }
@@ -81,7 +81,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
         }
 
         _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
-        _repository.Update(result.Value);
+        _organizationRepository.Update(result.Value);
         transaction.Commit();
         return result;
 
@@ -91,7 +91,29 @@ public class OrganizationWriteService : IOrganizationWriteService{
     {
         var organizationResult = _organizationService.GetOrganization(organizationUuid);
         if (organizationResult.Failed) return organizationResult.Error;
-        //todo get write access, perform updates using method from org itself, return updated org
+
+        return WithWriteAccess(organizationResult.Value)
+            .Bind(organization => PerformUIRootConfigUpdates(organization, updateParameters)
+                    .Bind(updatedOrganization =>
+                    {
+                        _organizationRepository.Update(updatedOrganization);
+                        return Result<Config, OperationError>.Success(updatedOrganization.Config);
+                    }));
+    }
+
+    private Result<Organization, OperationError> PerformUIRootConfigUpdates(Organization organization,
+        UIRootConfigUpdateParameters parameters)
+    {
+        return organization.WithOptionalUpdate(
+                parameters.ShowDataProcessing,
+                (org, showDataProcessing) => org.UpdateShowDataProcessing(showDataProcessing))
+            .Bind(org => org.WithOptionalUpdate(
+                    parameters.ShowItContractModule,
+                    (org, showItContractModule) => org.UpdateShowITContracts(showItContractModule))
+                .Bind(org => org.WithOptionalUpdate(
+                    parameters.ShowItSystemModule,
+                    (org, showItSystemModule) => org.UpdateShowITSystems(showItSystemModule))
+            ));
     }
 
     private Result<Organization, OperationError> PerformBasicOrganizationUpdates(Organization organization, OrganizationUpdateParameters parameters)

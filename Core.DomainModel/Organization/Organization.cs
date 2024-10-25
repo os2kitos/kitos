@@ -545,6 +545,25 @@ namespace Core.DomainModel.Organization
         {
             Name = name.HasValue ? name.Value : null;
         }
+
+        public void UpdateShowDataProcessing(Maybe<bool> showDataProcessing)
+        {
+            this.Config ??= Config.Default(this.ObjectOwner);
+            this.Config.ShowDataProcessing = showDataProcessing.HasValue && showDataProcessing.Value;
+        }
+
+        public void UpdateShowITContracts(Maybe<bool> showITContracts)
+        {
+            this.Config ??= Config.Default(this.ObjectOwner);
+            this.Config.ShowItContractModule = showITContracts.HasValue && showITContracts.Value;
+        }
+
+        public void UpdateShowITSystems(Maybe<bool> showITSystems)
+        {
+            this.Config ??= Config.Default(this.ObjectOwner);
+            this.Config.ShowItSystemModule = showITSystems.HasValue && showITSystems.Value;
+        }
+
         /// <summary>
         /// Replaces the current root organization unit with a new one and relocates the current root hierarchy below the new root
         /// </summary>
