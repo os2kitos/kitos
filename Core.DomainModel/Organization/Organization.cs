@@ -548,20 +548,20 @@ namespace Core.DomainModel.Organization
 
         public void UpdateShowDataProcessing(Maybe<bool> showDataProcessing)
         {
-            CreateConfigIfNullAndUpdateProperty(showDataProcessing, config => config.ShowDataProcessing = showDataProcessing.Value);
+            HandleConfigPropertyUpdate(showDataProcessing, config => config.ShowDataProcessing = showDataProcessing.Value);
         }
 
         public void UpdateShowITContracts(Maybe<bool> showITContracts)
         {
-            CreateConfigIfNullAndUpdateProperty(showITContracts, config => config.ShowItContractModule = showITContracts.Value);
+            HandleConfigPropertyUpdate(showITContracts, config => config.ShowItContractModule = showITContracts.Value);
         }
 
         public void UpdateShowITSystems(Maybe<bool> showITSystems)
         {
-            CreateConfigIfNullAndUpdateProperty(showITSystems, config => config.ShowItSystemModule = showITSystems.Value);
+            HandleConfigPropertyUpdate(showITSystems, config => config.ShowItSystemModule = showITSystems.Value);
         }
 
-        private void CreateConfigIfNullAndUpdateProperty(Maybe<bool> maybeValue, Action<Config> updateAction)
+        private void HandleConfigPropertyUpdate(Maybe<bool> maybeValue, Action<Config> updateAction)
         {
             this.Config ??= Config.Default(this.ObjectOwner);
             if (maybeValue.HasValue) updateAction(this.Config);
