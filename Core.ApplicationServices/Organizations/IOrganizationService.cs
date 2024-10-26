@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
-using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Organizations;
+using Core.ApplicationServices.Model.UiCustomization;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
@@ -55,5 +55,7 @@ namespace Core.ApplicationServices.Organizations
         public Maybe<DataResponsible> GetDataResponsible(int organizationId);
         public Maybe<ContactPerson> GetContactPerson(int organizationId);
         public Maybe<DataProtectionAdvisor> GetDataProtectionAdvisor(int organizationId);
+
+        Result<Config, OperationError> GetUIRootConfig(Guid organizationUuid);
     }
 }

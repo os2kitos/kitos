@@ -16,6 +16,19 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
         private const string MasterDataSuffix = "master-data";
         private const string RolesSuffix = "roles";
         private const string UiCustomizationSuffix = "ui-customization";
+        private const string UIRootConfigSuffix = "ui-root-config";
+
+        public static async Task<HttpResponseMessage> GetOrganizationUIRootConfig(Guid organizationUuid)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/{UIRootConfigSuffix}"), cookie);
+        }
+
+        public static async Task<HttpResponseMessage> PatchOrganizationUIRootConfig(Guid organizationUuid, UIRootConfigUpdateRequestDTO dto)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/{UIRootConfigSuffix}"), cookie, dto);
+        }
 
         public static async Task<HttpResponseMessage> GetOrganizationMasterData(Guid organizationUuid)
         {

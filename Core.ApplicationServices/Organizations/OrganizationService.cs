@@ -6,7 +6,6 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Organizations;
-using Core.ApplicationServices.Organizations.Write;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
@@ -424,6 +423,15 @@ namespace Core.ApplicationServices.Organizations
             return _dataProtectionAdvisorRepository.AsQueryable()
                 .FirstOrNone(dpa => dpa.OrganizationId.Equals(organizationId));
         }
+
+        public Result<Config, OperationError> GetUIRootConfig(Guid organizationUuid)
+        {
+            return GetOrganization(organizationUuid)
+                .Match(organization =>
+                    Result<Config, OperationError>.Success(organization.Config),
+                    error => error);
+        }
+
         public GridPermissions GetGridPermissions(int orgId)
         {
             return new GridPermissions

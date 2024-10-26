@@ -17,7 +17,7 @@ using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
+namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomization
 {
     public class UIModuleCustomizationServiceTest : WithAutoFixture
     {
@@ -227,7 +227,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
-        private (Organization, UIModuleCustomization) SetupGetModuleCustomization()
+        private (Organization, global::Core.DomainModel.UIConfiguration.UIModuleCustomization) SetupGetModuleCustomization()
         {
             var organizationId = A<int>();
             var orgUuid = new Guid();
@@ -239,7 +239,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             {
                 Id = organizationId,
                 Uuid = orgUuid,
-                UIModuleCustomizations = new List<UIModuleCustomization>()
+                UIModuleCustomizations = new List<global::Core.DomainModel.UIConfiguration.UIModuleCustomization>()
                 {
                     moduleObject1,
                     moduleObject2
@@ -250,9 +250,9 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
             return (organization, moduleObject1);
         }
 
-        private UIModuleCustomization PrepareTestUiModuleCustomization(int orgId = 0, string module = "", int numberOfElements = 1, string key = "", bool isEnabled = false)
+        private global::Core.DomainModel.UIConfiguration.UIModuleCustomization PrepareTestUiModuleCustomization(int orgId = 0, string module = "", int numberOfElements = 1, string key = "", bool isEnabled = false)
         {
-            return new UIModuleCustomization
+            return new global::Core.DomainModel.UIConfiguration.UIModuleCustomization
             {
                 OrganizationId = orgId,
                 Module = module,

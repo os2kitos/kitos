@@ -27,6 +27,23 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Fact]
+        public void Can_Map_To_UI_Root_Config_DTO()
+        {
+            var config = new Config()
+            {
+                ShowItContractModule = A<bool>(),
+                ShowDataProcessing = A<bool>(),
+                ShowItSystemModule = A<bool>()
+            };
+
+            var dto = _sut.ToUIRootConfigDTO(config);
+
+            Assert.Equal(config.ShowItContractModule, dto.ShowItContractModule);
+            Assert.Equal(config.ShowDataProcessing, dto.ShowDataProcessing);
+            Assert.Equal(config.ShowItSystemModule, dto.ShowItSystemModule);
+        }
+
+        [Fact]
         public void Can_Map_To_UI_Customization_DTO()
         {
             var customization = new UIModuleCustomization()
