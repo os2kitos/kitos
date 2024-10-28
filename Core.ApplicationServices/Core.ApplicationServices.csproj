@@ -249,6 +249,7 @@
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
     <Compile Include="Model\UiCustomization\CustomUINodeParameters.cs" />
     <Compile Include="Model\UiCustomization\UIModuleCustomizationParameters.cs" />
+    <Compile Include="Model\UiCustomization\UIRootConfigUpdateParameters.cs" />
     <Compile Include="Model\Users\UserAdministrationPermissions.cs" />
     <Compile Include="Model\Users\UserCollectionPermissionsResult.cs" />
     <Compile Include="Model\Users\UserRightsAssignments.cs" />

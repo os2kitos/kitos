@@ -7,7 +7,6 @@ using Core.DomainModel.Constants;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainModel.UIConfiguration;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
