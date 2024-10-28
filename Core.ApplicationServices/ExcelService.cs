@@ -516,14 +516,12 @@ namespace Core.ApplicationServices
 
         private Result<int, OperationError> ResolveOrganizationId(Guid organizationUuid)
         {
-            var organizationId = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
-            if (organizationId.IsNone)
-            {
-                return new OperationError($"Organization with uuid: '{organizationUuid}' was not found",
-                    OperationFailure.NotFound);
-            }
-
-            return organizationId.Value;
+            return _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid)
+                .Match(
+                    Result<int, OperationError>.Success, 
+                    () => new OperationError($"Organization with uuid: '{organizationUuid}' was not found",
+                        OperationFailure.NotFound)
+                    );
         }
 
         private bool AllowAccess(int organizationId)

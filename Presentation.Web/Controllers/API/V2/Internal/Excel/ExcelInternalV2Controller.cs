@@ -55,12 +55,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
                 return FromOperationError(result.Error);
 
             var organizationId = result.Value;
-            // check if the request contains multipart/form-data.
-            if (!Request.Content.IsMimeMultipartContent())
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+
+            ValidateRequestContainsMultipartFormData();
 
             // read multipart form data
-            var stream = await ReadMultipartRequestAsync();
+            using var stream = await ReadMultipartRequestAsync();
 
             try
             {
@@ -102,12 +101,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
 
             var organizationId = result.Value;
 
-            // check if the request contains multipart/form-data.
-            if (!Request.Content.IsMimeMultipartContent())
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            ValidateRequestContainsMultipartFormData();
 
             // read multipart form data
-            var stream = await ReadMultipartRequestAsync();
+            using var stream = await ReadMultipartRequestAsync();
 
             try
             {
@@ -149,12 +146,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
 
             var organizationId = result.Value;
 
-            // check if the request contains multipart/form-data.
-            if (!Request.Content.IsMimeMultipartContent())
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            ValidateRequestContainsMultipartFormData();
 
             // read multipart form data
-            var stream = await ReadMultipartRequestAsync();
+            using var stream = await ReadMultipartRequestAsync();
 
             try
             {
@@ -223,6 +218,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
             var stream = new MemoryStream(buffer);
             stream.Seek(0, SeekOrigin.Begin);
             return stream;
+        }
+
+        private void ValidateRequestContainsMultipartFormData()
+        {
+            // check if the request contains multipart/form-data.
+            if (!Request.Content.IsMimeMultipartContent())
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
         }
 
         #endregion
