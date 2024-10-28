@@ -1,3 +1,4 @@
+using Core.Abstractions.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +13,8 @@ namespace Core.ApplicationServices
         void ImportUsers(Stream stream, int organizationId);
         Stream ExportItContracts(Stream stream, int organizationId);
         void ImportItContracts(Stream stream, int organizationId);
+
+        Result<int, OperationError> ResolveOrganizationIdAndValidateAccess(Guid organizationUuid);
     }
 
     public class ExcelImportException : Exception

@@ -10,9 +10,10 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Results;
-using Core.ApplicationServices.Excel;
 using Presentation.Web.Models.API.V2.Internal.Response.Excel;
 using Swashbuckle.Swagger.Annotations;
+using Core.ApplicationServices.Model.Excel;
+using Core.Abstractions.Types;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Excel
 {
@@ -20,13 +21,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
     public class ExcelInternalV2Controller : InternalApiV2Controller
     {
         private readonly IExcelService _excelService;
-        private readonly IExcelApplicationService _excelApplicationService;
+        private readonly string _mapPath = HttpContext.Current.Server.MapPath("~/Content/excel/");
 
-        public ExcelInternalV2Controller(IExcelService excelService,
-            IExcelApplicationService excelApplicationService)
+        public ExcelInternalV2Controller(IExcelService excelService)
         {
             _excelService = excelService;
-            _excelApplicationService = excelApplicationService;
         }
 
         #region Excel Users
@@ -38,7 +37,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetUsers(Guid organizationUuid, bool? exportUsers)
         {
-            return _excelApplicationService.GetUsers(organizationUuid, exportUsers)
+            return GetExcelFile(organizationUuid, _excelService.ExportUsers)
                 .Match(result => GetResponseMessage(result.MemoryStream, result.FileName), FromOperationError);
         }
 
@@ -50,7 +49,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         [SwaggerResponse(HttpStatusCode.Conflict)]
         public async Task<IHttpActionResult> PostUsers(Guid organizationUuid, bool? importUsers)
         {
-            var result = _excelApplicationService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
+            var result = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
             if (result.Failed)
                 return FromOperationError(result.Error);
 
@@ -84,7 +83,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetOrgUnits(Guid organizationUuid, bool? exportOrgUnits)
         {
-            return _excelApplicationService.GetUsers(organizationUuid, exportOrgUnits)
+            return GetExcelFile(organizationUuid, _excelService.ExportOrganizationUnits)
                 .Match(result => GetResponseMessage(result.MemoryStream, result.FileName), FromOperationError);
         }
 
@@ -96,7 +95,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         [SwaggerResponse(HttpStatusCode.Conflict)]
         public async Task<IHttpActionResult> PostOrgUnits(Guid organizationUuid, bool? importOrgUnits)
         {
-            var result = _excelApplicationService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
+            var result = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
             if (result.Failed)
                 return FromOperationError(result.Error);
 
@@ -131,7 +130,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetContracts(Guid organizationUuid, bool? exportContracts)
         {
-            return _excelApplicationService.GetUsers(organizationUuid, exportContracts)
+            return GetExcelFile(organizationUuid, _excelService.ExportItContracts)
                 .Match(result => GetResponseMessage(result.MemoryStream, result.FileName), FromOperationError);
         }
 
@@ -143,7 +142,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         [SwaggerResponse(HttpStatusCode.Conflict)]
         public async Task<IHttpActionResult> PostContracts(Guid organizationUuid, bool? importContracts)
         {
-            var result = _excelApplicationService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
+            var result = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
             if (result.Failed)
                 return FromOperationError(result.Error);
 
@@ -170,6 +169,24 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         #endregion
 
         #region Helpers
+
+        private delegate Stream ExportDelegate(Stream stream, int organizationId);
+        private Result<ExcelExportModel, OperationError> GetExcelFile(Guid organizationUuid,
+            ExportDelegate exportMethod)
+        {
+            var organizationIdResult = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
+            if (organizationIdResult.Failed)
+                return organizationIdResult.Error;
+
+            const string filename = "OS2KITOS Organisationsenheder.xlsx";
+            var stream = new MemoryStream();
+            using (var file = File.OpenRead(_mapPath + filename))
+                file.CopyTo(stream);
+
+            exportMethod(stream, organizationIdResult.Value);
+            stream.Seek(0, SeekOrigin.Begin);
+            return new ExcelExportModel(stream, filename);
+        }
 
         private static IHttpActionResult GetResponseMessage(Stream stream, string filename)
         {

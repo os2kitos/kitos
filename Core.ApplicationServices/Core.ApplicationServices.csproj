@@ -74,8 +74,6 @@
     <Compile Include="Authorization\CommandPermissionResult.cs" />
     <Compile Include="Contract\ReadModels\GridLocalItContractRolesService.cs" />
     <Compile Include="Contract\ReadModels\IGridLocalItContractRolesService.cs" />
-    <Compile Include="Excel\ExcelApplicationService.cs" />
-    <Compile Include="Excel\IExcelApplicationService.cs" />
     <Compile Include="Generic\EntityTreeUuidCollector.cs" />
     <Compile Include="Generic\ExtendedExtendedEntityIdentityResolverService.cs" />
     <Compile Include="Generic\IEntityIdMapper.cs" />

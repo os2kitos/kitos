@@ -118,7 +118,6 @@ using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using System.Linq;
 using Core.ApplicationServices.Messages;
 using Core.Abstractions.Caching;
-using Core.ApplicationServices.Excel;
 using Core.ApplicationServices.Interface.Write;
 using Core.ApplicationServices.Users.Handlers;
 using Core.DomainModel.Commands;
@@ -240,7 +239,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IReadModelUpdate<ItContract, ItContractOverviewReadModel>>().To<ItContractOverviewReadModelUpdate>().InCommandScope(Mode);
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
             kernel.Bind<IExcelService>().To<ExcelService>().InCommandScope(Mode);
-            kernel.Bind<IExcelApplicationService>().To<ExcelApplicationService>().InCommandScope(Mode);
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InCommandScope(Mode).Intercept().With(new LogInterceptor());
             kernel.Bind<IItSystemUsageMigrationService>().To<ItSystemUsageMigrationService>().InCommandScope(Mode);
             kernel.Bind<IReferenceService>().To<ReferenceService>().InCommandScope(Mode);
