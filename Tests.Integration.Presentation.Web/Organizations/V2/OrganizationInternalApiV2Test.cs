@@ -51,6 +51,40 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
+        public async Task Can_Get_Default_UI_Root_Config_For_New_Org()
+        {
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+
+            var response = await OrganizationInternalV2Helper.GetOrganizationUIRootConfig(organization.Uuid);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseDto = await response.ReadResponseBodyAsAsync<UIRootConfigResponseDTO>();
+            Assert.True(responseDto.ShowItContractModule);
+            Assert.True(responseDto.ShowDataProcessing);
+            Assert.True(responseDto.ShowItSystemModule);
+        }
+
+        [Fact]
+        public async Task Can_Patch_UI_Root_Config()
+        {
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var dto = new UIRootConfigUpdateRequestDTO()
+            {
+                ShowDataProcessing = A<bool>(),
+                ShowItContractModule = A<bool>(),
+                ShowItSystemModule = A<bool>()
+            };
+
+            var response = await OrganizationInternalV2Helper.PatchOrganizationUIRootConfig(organization.Uuid, dto);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseDto = await response.ReadResponseBodyAsAsync<UIRootConfigResponseDTO>();
+            Assert.Equal(dto.ShowItContractModule, responseDto.ShowItContractModule);
+            Assert.Equal(dto.ShowDataProcessing, responseDto.ShowDataProcessing);
+            Assert.Equal(dto.ShowItSystemModule, responseDto.ShowItSystemModule);
+        }
+
+        [Fact]
         public async Task Get_UI_Customization_Returns_New_Empty_Customization_If_None_Exists()
         {
             var moduleName = "ItSystemUsages";

@@ -90,6 +90,25 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
         return new UIModuleCustomizationParameters(orgDbIdMaybe.Value, moduleName, nodes);
     }
 
+    public UIRootConfigUpdateParameters ToUIRootConfigUpdateParameters(UIRootConfigUpdateRequestDTO dto)
+    {
+        var rule = CreateChangeRule<UIRootConfigUpdateRequestDTO>(false);
+
+        return new()
+        {
+            ShowItSystemModule = rule.MustUpdate(x => x.ShowItSystemModule)
+                ? (dto.ShowItSystemModule.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<bool>>.None,
+            ShowItContractModule = rule.MustUpdate(x => x.ShowItContractModule)
+                ? (dto.ShowItContractModule.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<bool>>.None,
+
+            ShowDataProcessing = rule.MustUpdate(x => x.ShowDataProcessing)
+                ? (dto.ShowDataProcessing.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<bool>>.None,
+        };
+    }
+
     private CustomUINodeParameters ToCustomUINodeParameters(CustomizedUINodeRequestDTO node)
     {
         return new CustomUINodeParameters(node.Key, node.Enabled);

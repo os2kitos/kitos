@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.ConstrainedExecution;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.Extensions;
@@ -165,7 +164,7 @@ namespace Core.DomainModel.Organization
                 throw new ArgumentNullException(nameof(module));
 
             var moduleCustomization = UIModuleCustomizations
-                .SingleOrDefault(config => config.Module == module);
+                .SingleOrDefault(customization => customization.Module == module);
             if (moduleCustomization != null) return moduleCustomization.FromNullable();
 
             moduleCustomization = new UIModuleCustomization() { Organization = this, Module = module };
@@ -546,6 +545,28 @@ namespace Core.DomainModel.Organization
         {
             Name = name.HasValue ? name.Value : null;
         }
+
+        public void UpdateShowDataProcessing(Maybe<bool> showDataProcessing)
+        {
+            HandleConfigPropertyUpdate(showDataProcessing, config => config.ShowDataProcessing = showDataProcessing.Value);
+        }
+
+        public void UpdateShowITContracts(Maybe<bool> showITContracts)
+        {
+            HandleConfigPropertyUpdate(showITContracts, config => config.ShowItContractModule = showITContracts.Value);
+        }
+
+        public void UpdateShowITSystems(Maybe<bool> showITSystems)
+        {
+            HandleConfigPropertyUpdate(showITSystems, config => config.ShowItSystemModule = showITSystems.Value);
+        }
+
+        private void HandleConfigPropertyUpdate(Maybe<bool> maybeValue, Action<Config> updateAction)
+        {
+            this.Config ??= Config.Default(this.ObjectOwner);
+            if (maybeValue.HasValue) updateAction(this.Config);
+        }
+
         /// <summary>
         /// Replaces the current root organization unit with a new one and relocates the current root hierarchy below the new root
         /// </summary>

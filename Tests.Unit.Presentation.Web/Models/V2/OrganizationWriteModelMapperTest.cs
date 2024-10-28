@@ -33,6 +33,24 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Fact]
+        public void Can_Map_UI_Root_Config_Update_Params()
+        {
+            ExpectHttpRequestPropertyNames<UIRootConfigUpdateRequestDTO>();
+            var dto = new UIRootConfigUpdateRequestDTO()
+            {
+                ShowItSystemModule = A<bool>(),
+                ShowDataProcessing = A<bool>(),
+                ShowItContractModule = A<bool>()
+            };
+
+            var result = _sut.ToUIRootConfigUpdateParameters(dto);
+
+            Assert.Equal(dto.ShowItSystemModule, result.ShowItSystemModule.NewValue.Value);
+            Assert.Equal(dto.ShowDataProcessing, result.ShowDataProcessing.NewValue.Value);
+            Assert.Equal(dto.ShowItContractModule, result.ShowItContractModule.NewValue.Value);
+        }
+
+        [Fact]
         public void Can_Map_Organization_Update_Params()
         {
             ExpectHttpRequestPropertyNames<OrganizationUpdateRequestDTO>();
