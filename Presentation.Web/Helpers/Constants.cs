@@ -19,5 +19,13 @@
             public const string MissingXsrfHeaderError = "Manglende xsrf header";
             public const string XsrfValidationFailedError = "XSRF validering fejlede";
         }
+
+        public static class Excel
+        {
+            public const string UnitFileName = "OS2KITOS Organisationsenheder.xlsx";
+            public const string UserFileName = "OS2KITOS Brugere.xlsx";
+            public const string ContractsFileName = "OS2KITOS IT Kontrakter.xlsx";
+            public const string ExcelFilePath = "~/Content/excel/";
+        }
     }
 }

@@ -9,6 +9,7 @@ using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
 
@@ -19,7 +20,7 @@ namespace Presentation.Web.Controllers.API.V1
     {
         private readonly IExcelService _excelService;
         private readonly IAuthorizationContext _authorizationContext;
-        private readonly string _mapPath = HttpContext.Current.Server.MapPath("~/Content/excel/");
+        private readonly string _mapPath = HttpContext.Current.Server.MapPath(Constants.Excel.ExcelFilePath);
 
         public ExcelController(IExcelService excelService, IAuthorizationContext authorizationContext) 
         {
@@ -35,7 +36,7 @@ namespace Presentation.Web.Controllers.API.V1
             {
                 return Forbidden();
             }
-            const string filename = "OS2KITOS Brugere.xlsx";
+            const string filename = Constants.Excel.UserFileName;
             var stream = new MemoryStream();
             using (var file = File.OpenRead(_mapPath + filename))
                 file.CopyTo(stream);
@@ -79,7 +80,7 @@ namespace Presentation.Web.Controllers.API.V1
             {
                 return Forbidden();
             }
-            const string filename = "OS2KITOS Organisationsenheder.xlsx";
+            const string filename = Constants.Excel.UnitFileName;
             var stream = new MemoryStream();
             using (var file = File.OpenRead(_mapPath + filename))
                 file.CopyTo(stream);
@@ -123,7 +124,7 @@ namespace Presentation.Web.Controllers.API.V1
             {
                 return Forbidden();
             }
-            const string filename = "OS2KITOS IT Kontrakter.xlsx";
+            const string filename = Constants.Excel.ContractsFileName;
             var stream = new MemoryStream();
             using (var file = File.OpenRead(_mapPath + filename))
                 file.CopyTo(stream);
