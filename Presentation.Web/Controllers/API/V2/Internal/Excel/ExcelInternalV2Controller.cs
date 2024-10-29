@@ -15,6 +15,8 @@ using Swashbuckle.Swagger.Annotations;
 using Core.ApplicationServices.Model.Excel;
 using Core.Abstractions.Types;
 using Presentation.Web.Helpers;
+using System.Net.Mime;
+using Presentation.Web.Attributes;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Excel
 {
@@ -48,6 +50,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerConsumes("multipart/form-data")]
         public async Task<IHttpActionResult> PostUsers(Guid organizationUuid, bool? importUsers, [FromBody] object body)
         {
             var result = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
@@ -93,6 +96,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerConsumes("multipart/form-data")]
         public async Task<IHttpActionResult> PostOrgUnits(Guid organizationUuid, bool? importOrgUnits, [FromBody] object body)
         {
             var result = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
@@ -138,6 +142,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerConsumes("multipart/form-data")]
         public async Task<IHttpActionResult> PostContracts(Guid organizationUuid, bool? importContracts, [FromBody] object body)
         {
             var result = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
