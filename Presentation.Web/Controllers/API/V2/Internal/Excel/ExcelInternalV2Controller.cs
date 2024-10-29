@@ -48,7 +48,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public async Task<IHttpActionResult> PostUsers(Guid organizationUuid, bool? importUsers)
+        public async Task<IHttpActionResult> PostUsers(Guid organizationUuid, bool? importUsers, [FromBody] object body)
         {
             var result = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
             if (result.Failed)
@@ -93,7 +93,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public async Task<IHttpActionResult> PostOrgUnits(Guid organizationUuid, bool? importOrgUnits)
+        public async Task<IHttpActionResult> PostOrgUnits(Guid organizationUuid, bool? importOrgUnits, [FromBody] object body)
         {
             var result = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
             if (result.Failed)
@@ -138,7 +138,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public async Task<IHttpActionResult> PostContracts(Guid organizationUuid, bool? importContracts)
+        public async Task<IHttpActionResult> PostContracts(Guid organizationUuid, bool? importContracts, [FromBody] object body)
         {
             var result = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
             if (result.Failed)
