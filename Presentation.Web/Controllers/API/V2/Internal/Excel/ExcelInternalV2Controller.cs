@@ -15,11 +15,15 @@ using Swashbuckle.Swagger.Annotations;
 using Core.ApplicationServices.Model.Excel;
 using Core.Abstractions.Types;
 using Presentation.Web.Helpers;
+using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Extensions;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Excel
 {
+    [Authorize]
     [RoutePrefix("api/v2/internal/organizations/{organizationUuid}/local-admin/excel")]
-    public class ExcelInternalV2Controller : InternalApiV2Controller
+    [InternalApi]
+    public class ExcelInternalV2Controller : ApiController
     {
         private readonly IExcelService _excelService;
         private readonly string _mapPath = HttpContext.Current.Server.MapPath(Constants.Excel.ExcelFilePath);
@@ -225,6 +229,34 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Excel
             // check if the request contains multipart/form-data.
             if (!Request.Content.IsMimeMultipartContent())
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+        }
+
+
+        protected IHttpActionResult FromOperationFailure(OperationFailure failure)
+        {
+            return FromOperationError(failure);
+        }
+
+        protected IHttpActionResult FromOperationError(OperationError failure)
+        {
+            var statusCode = failure.FailureType.ToHttpStatusCode();
+
+            return ResponseMessage(new HttpResponseMessage(statusCode) { Content = new StringContent(failure.Message.GetValueOrFallback(statusCode.ToString("G"))) });
+        }
+
+        protected IHttpActionResult NoContent()
+        {
+            return StatusCode(HttpStatusCode.NoContent);
+        }
+
+        /// <summary>
+        /// Convenience wrapper for <see cref="NoContent()"/>
+        /// </summary>
+        /// <param name="ignored"></param>
+        /// <returns></returns>
+        protected IHttpActionResult NoContent(object ignored)
+        {
+            return NoContent();
         }
 
         #endregion

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -12,10 +13,12 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V1
 {
     [InternalApi]
+    [RoutePrefix("api/local-admin/excel")]
     public class ExcelController : BaseApiController
     {
         private readonly IExcelService _excelService;
@@ -30,34 +33,79 @@ namespace Presentation.Web.Controllers.API.V1
 
         #region Excel Users
 
+        [HttpGet]
+        [Route("users-by-id")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetUsers(int organizationId, bool? exportUsers)
         {
             if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
-            const string filename = Constants.Excel.UserFileName;
-            var stream = new MemoryStream();
-            using (var file = File.OpenRead(_mapPath + filename))
-                file.CopyTo(stream);
 
-            _excelService.ExportUsers(stream, organizationId);
-            stream.Seek(0, SeekOrigin.Begin);
-            return GetResponseMessage(stream, filename);
+            return GetUsersExcel(organizationId);
         }
 
+        [HttpGet]
+        [Route("users-by-uuid")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetUsersByUuid(Guid organizationUuid, bool? exportUsers)
+        {
+            var organizationIdResult = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
+            if (organizationIdResult.Failed)
+                return FromOperationError(organizationIdResult.Error.FailureType);
+
+            return GetUsersExcel(organizationIdResult.Value);
+        }
+
+        private HttpResponseMessage GetUsersExcel(int organizationId)
+        {
+            return GetExcelFile(organizationId, Constants.Excel.UserFileName, _excelService.ExportUsers);
+        }
+
+        [HttpPost]
+        [Route("users-by-id")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
         public async Task<HttpResponseMessage> PostUsers(int organizationId, bool? importUsers)
         {
             if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
-            // check if the request contains multipart/form-data.
-            if (!Request.Content.IsMimeMultipartContent())
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+
+            return await PostUsersExcel(organizationId, importUsers);
+        }
+
+        [HttpPost]
+        [Route("users-by-uuid")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public async Task<HttpResponseMessage> PostUsersByUuid(Guid organizationUuid, bool? importUsers)
+        {
+            var result = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
+            if (result.Failed)
+                return FromOperationError(result.Error);
+
+            var organizationId = result.Value;
+
+            return await PostUsersExcel(organizationId, importUsers);
+        }
+
+        private async Task<HttpResponseMessage> PostUsersExcel(int organizationId, bool? importUsers)
+        {
+            ValidateRequestContainsMultipartFormData();
 
             // read multipart form data
-            var stream = await ReadMultipartRequestAsync();
+            using var stream = await ReadMultipartRequestAsync();
 
             try
             {
@@ -74,34 +122,73 @@ namespace Presentation.Web.Controllers.API.V1
 
         #region Excel OrganizationUnits
 
+        [HttpGet]
+        [Route("units-by-id")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetOrgUnits(int organizationId, bool? exportOrgUnits)
         {
-            if (!AllowAccess(organizationId))
-            {
-                return Forbidden();
-            }
-            const string filename = Constants.Excel.UnitFileName;
-            var stream = new MemoryStream();
-            using (var file = File.OpenRead(_mapPath + filename))
-                file.CopyTo(stream);
-
-            _excelService.ExportOrganizationUnits(stream, organizationId);
-            stream.Seek(0, SeekOrigin.Begin);
-            return GetResponseMessage(stream, filename);
+            return GetOrgUnitsExcel(organizationId);
         }
 
+        [HttpGet]
+        [Route("units-by-uuid")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetOrgUnitsByUuid(Guid organizationUuid, bool? exportOrgUnits)
+        {
+            var organizationIdResult = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
+            if (organizationIdResult.Failed)
+                return FromOperationError(organizationIdResult.Error.FailureType);
+
+            return GetOrgUnitsExcel(organizationIdResult.Value);
+        }
+
+        private HttpResponseMessage GetOrgUnitsExcel(int organizationId)
+        {
+            return GetExcelFile(organizationId, Constants.Excel.UnitFileName, _excelService.ExportOrganizationUnits);
+        }
+
+        [HttpPost]
+        [Route("units-by-id")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
         public async Task<HttpResponseMessage> PostOrgUnits(int organizationId, bool? importOrgUnits)
         {
             if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
-            // check if the request contains multipart/form-data.
-            if (!Request.Content.IsMimeMultipartContent())
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+            return await PostOrgUnitsExcel(organizationId, importOrgUnits);
+        }
+
+        [HttpPost]
+        [Route("units-by-uuid")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public async Task<HttpResponseMessage> PostOrgUnitsByUuid(Guid organizationUuid, bool? importOrgUnits)
+        {
+            var result = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
+            if (result.Failed)
+                return FromOperationError(result.Error);
+            var organizationId = result.Value;
+
+            return await PostOrgUnitsExcel(organizationId, importOrgUnits);
+        }
+
+        private async Task<HttpResponseMessage> PostOrgUnitsExcel(int organizationId, bool? importOrgUnits)
+        {
+            
+            ValidateRequestContainsMultipartFormData();
 
             // read multipart form data
-            var stream = await ReadMultipartRequestAsync();
+            using var stream = await ReadMultipartRequestAsync();
 
             try
             {
@@ -118,33 +205,77 @@ namespace Presentation.Web.Controllers.API.V1
 
         #region Excel IT Contracts
 
+        [HttpGet]
+        [Route("contracts-by-id")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetContracts(int organizationId, bool? exportContracts)
         {
             if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
-            const string filename = Constants.Excel.ContractsFileName;
-            var stream = new MemoryStream();
-            using (var file = File.OpenRead(_mapPath + filename))
-                file.CopyTo(stream);
 
-            _excelService.ExportItContracts(stream, organizationId);
-            return GetResponseMessage(stream, filename);
+            return GetContractsExcel(organizationId);
         }
 
+        [HttpGet]
+        [Route("contracts-by-uuid")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetContractsByUuid(Guid organizationUuid, bool? exportContracts)
+        {
+            var organizationIdResult = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
+            if (organizationIdResult.Failed)
+                return FromOperationError(organizationIdResult.Error.FailureType);
+
+            return GetContractsExcel(organizationIdResult.Value);
+        }
+
+        private HttpResponseMessage GetContractsExcel(int organizationId)
+        {
+            return GetExcelFile(organizationId, Constants.Excel.ContractsFileName, _excelService.ExportOrganizationUnits);
+        }
+
+        [HttpPost]
+        [Route("contracts-by-id")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
         public async Task<HttpResponseMessage> PostContracts(int organizationId, bool? importContracts)
         {
             if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
-            // check if the request contains multipart/form-data.
-            if (!Request.Content.IsMimeMultipartContent())
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
+
+            return await PostContractsExcel(organizationId, importContracts);
+        }
+
+        [HttpPost]
+        [Route("contracts-by-uuid")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public async Task<HttpResponseMessage> PostContractsByUuid(Guid organizationUuid, bool? importContracts)
+        {
+            var organizationIdResult = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
+            if (organizationIdResult.Failed)
+                return FromOperationError(organizationIdResult.Error.FailureType);
+
+            return await PostContractsExcel(organizationIdResult.Value, importContracts);
+        }
+
+        private async Task<HttpResponseMessage> PostContractsExcel(int organizationId, bool? importContracts)
+        {
+            ValidateRequestContainsMultipartFormData();
 
             // read multipart form data
-            var stream = await ReadMultipartRequestAsync();
+            using var stream = await ReadMultipartRequestAsync();
 
             try
             {
@@ -160,6 +291,19 @@ namespace Presentation.Web.Controllers.API.V1
         #endregion
 
         #region Helpers
+
+        private delegate Stream ExportDelegate(Stream stream, int organizationId);
+        private HttpResponseMessage GetExcelFile(int organizationId, string fileName,
+            ExportDelegate exportMethod)
+        {
+            var stream = new MemoryStream();
+            using (var file = File.OpenRead(_mapPath + fileName))
+                file.CopyTo(stream);
+
+            exportMethod(stream, organizationId);
+            stream.Seek(0, SeekOrigin.Begin);
+            return GetResponseMessage(stream, fileName);
+        }
 
         private static HttpResponseMessage GetResponseMessage(Stream stream, string filename)
         {
@@ -177,6 +321,13 @@ namespace Presentation.Web.Controllers.API.V1
         private IEnumerable<ExcelImportErrorDTO> GetErrorMessages(ExcelImportException e)
         {
             return Map<IEnumerable<ExcelImportError>, IEnumerable<ExcelImportErrorDTO>>(e.Errors);
+        }
+
+        private void ValidateRequestContainsMultipartFormData()
+        {
+            // check if the request contains multipart/form-data.
+            if (!Request.Content.IsMimeMultipartContent())
+                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
         }
 
         private async Task<MemoryStream> ReadMultipartRequestAsync()
