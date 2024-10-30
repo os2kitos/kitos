@@ -34,7 +34,7 @@ namespace Presentation.Web.Controllers.API.V1.UI_Configuration
             return _uiModuleCustomizationServiceService
                 .GetModuleCustomizationForOrganization(organizationId, module)
                 .Select(ToDto)
-                .Match(Ok, FromOperationError);
+                .Match(dto => dto.Nodes.Any() ? Ok(dto) : NotFound(), FromOperationError);
         }
 
         [HttpPut]

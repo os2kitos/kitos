@@ -7,7 +7,6 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.UI_Configuration;
-using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration;
 using Tests.Toolkit.Patterns;
@@ -36,9 +35,10 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
             //Act
             var uiModuleCustomization = await UIConfigurationHelper.CreateUIModuleAndSaveAsync(organization.Id, module, cookie);
             
-            var data = await UIConfigurationHelper.GetCustomizationByModuleAsync(organization.Id, module);
+            var response = await UIConfigurationHelper.GetCustomizationByModuleAsync(organization.Id, module);
 
             //Assert
+            var data = await response.ReadResponseBodyAsKitosApiResponseAsync<UIModuleCustomizationDTO>();
             Assert.NotNull(data);
             Assert.Single(data.Nodes);
             Assert.Single(uiModuleCustomization.Nodes);
@@ -50,17 +50,16 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
         }
 
         [Fact]
-        public async Task Get_Returns_Empty_Config_If_Config_Doesnt_Exist()
+        public async Task Get_Returns_Not_Found_If_Config_Doesnt_Exist()
         {
             //Arrange
             var module = A<string>();
 
             //Act
-            var data = await UIConfigurationHelper.GetCustomizationByModuleAsync(TestEnvironment.DefaultOrganizationId, module);
+            var response = await UIConfigurationHelper.GetCustomizationByModuleAsync(TestEnvironment.DefaultOrganizationId, module);
 
             //Assert
-            Assert.NotNull(data);
-            Assert.Empty(data.Nodes);
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Fact]
@@ -95,10 +94,12 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
             Assert.Equal(HttpStatusCode.NoContent, secondPutResponse.StatusCode);
 
             var response = await UIConfigurationHelper.GetCustomizationByModuleAsync(organization.Id, module);
-            Assert.Equal(singleUiCustomization.Nodes.Count(), response.Nodes.Count());
-            Assert.Single(response.Nodes);
+            var data = await response.ReadResponseBodyAsKitosApiResponseAsync<UIModuleCustomizationDTO>();
+
+            Assert.Equal(singleUiCustomization.Nodes.Count(), data.Nodes.Count());
+            Assert.Single(data.Nodes);
             
-            var responseNode = response.Nodes.FirstOrDefault();
+            var responseNode = data.Nodes.FirstOrDefault();
             var singleUiNode = singleUiCustomization.Nodes.FirstOrDefault();
 
             AssertDtosAreNotNullAndEqual(singleUiNode, responseNode);
@@ -123,9 +124,11 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
             Assert.Equal(HttpStatusCode.NoContent, secondPutResponse.StatusCode);
 
             var response = await UIConfigurationHelper.GetCustomizationByModuleAsync(organization.Id, module);
-            Assert.Equal(uiCustomizations.Nodes.Count(), response.Nodes.Count());
+            var data = await response.ReadResponseBodyAsKitosApiResponseAsync<UIModuleCustomizationDTO>();
 
-            Assert.True(response.Nodes.All(x => !x.Enabled));
+            Assert.Equal(uiCustomizations.Nodes.Count(), data.Nodes.Count());
+
+            Assert.True(data.Nodes.All(x => !x.Enabled));
         }
 
         [Fact]

@@ -20,11 +20,9 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration
             return await HttpApi.PutWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/organizations/{organizationId}/ui-config/modules/{module}"), optionalLogin, body);
         }
 
-        public static async Task<UIModuleCustomizationDTO> GetCustomizationByModuleAsync(int organizationId, string module)
+        public static async Task<HttpResponseMessage> GetCustomizationByModuleAsync(int organizationId, string module)
         {
-            using var response = await SendGetRequestAsync(organizationId, module);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            return await response.ReadResponseBodyAsKitosApiResponseAsync<UIModuleCustomizationDTO>();
+            return await SendGetRequestAsync(organizationId, module);
         }
 
         public static async Task<UIModuleCustomizationDTO> CreateUIModuleAndSaveAsync(int organizationId, string module,
