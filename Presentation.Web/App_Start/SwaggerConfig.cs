@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Web.Http;
 using Ninject.Infrastructure.Language;
 using Presentation.Web;
-using Presentation.Web.App_Start;
 using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.Application.RuntimeEnv;
@@ -86,7 +85,6 @@ namespace Presentation.Web
                     c.DocumentFilter(() => new FilterByApiVersionFilter(doc => int.Parse(doc.info.version), path => path.IsExternalApiPath() ? ApiVersions.V2 : ApiVersions.V1));
                     c.DocumentFilter(() => new RemoveUnneededMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
                     c.DocumentFilter<OnlyIncludeReadModelSchemasInSwaggerDocumentFilter>();
-                    c.OperationFilter<AddConsumesContentTypeOperationFilter>();
 
                     var environment = KitosEnvironmentConfiguration.FromConfiguration().Environment;
 

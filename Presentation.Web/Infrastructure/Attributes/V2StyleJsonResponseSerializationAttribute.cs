@@ -15,7 +15,7 @@ namespace Presentation.Web.Infrastructure.Attributes
             {
                 return;
             }
-            if (actionExecutedContext.Response.Content is ObjectContent { Formatter: JsonMediaTypeFormatter, Value: { } value })
+            if (actionExecutedContext.Response is { Content: ObjectContent { Formatter: JsonMediaTypeFormatter, Value: { } value } })
             {
                 //Take a copy of the existing (global) media type formatter and extend that with the StringEnumConverter
                 var updatedMediaTypeFormatter = V2JsonSerializationConfig.JsonMediaTypeFormatter;

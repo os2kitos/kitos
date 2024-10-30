@@ -39,6 +39,8 @@ namespace Presentation.Web
 
             // Add merge-patch+json as accepted media type
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/merge-patch+json"));
+            // Add multipart/form-data as accepted media type
+            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("multipart/form-data"));
 
             //Configure the V2 json formatter (uses string enum serialization to align with exposed docs)
             V2JsonSerializationConfig.Configure(GlobalConfiguration.Configuration.Formatters.JsonFormatter);

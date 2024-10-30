@@ -353,8 +353,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App_Start\AddConsumesContentTypeOperationFilter.cs" />
-    <Compile Include="Attributes\SwaggerConsumesAttribute.cs" />
     <Compile Include="Controllers\API\V1\Auth\AuthorizeController.cs" />
     <Compile Include="Controllers\API\V1\ExtendedApiController.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\ILocalOptionTypeWriteModelMapper.cs" />
