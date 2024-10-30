@@ -38,7 +38,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetUsers(int organizationId, bool? exportUsers)
+        public HttpResponseMessage GetUsers(int organizationId)
         {
             if (!AllowAccess(organizationId))
             {
@@ -53,7 +53,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetUsersByUuid(Guid organizationUuid, bool? exportUsers)
+        public HttpResponseMessage GetUsersByUuid(Guid organizationUuid)
         {
             var organizationIdResult = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
             if (organizationIdResult.Failed)
@@ -73,14 +73,14 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public async Task<HttpResponseMessage> PostUsers(int organizationId, bool? importUsers)
+        public async Task<HttpResponseMessage> PostUsers(int organizationId)
         {
             if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
 
-            return await PostUsersExcel(organizationId, importUsers);
+            return await PostUsersExcel(organizationId);
         }
 
         [HttpPost]
@@ -89,7 +89,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public async Task<HttpResponseMessage> PostUsersByUuid(Guid organizationUuid, bool? importUsers)
+        public async Task<HttpResponseMessage> PostUsersByUuid(Guid organizationUuid)
         {
             var result = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
             if (result.Failed)
@@ -97,10 +97,10 @@ namespace Presentation.Web.Controllers.API.V1
 
             var organizationId = result.Value;
 
-            return await PostUsersExcel(organizationId, importUsers);
+            return await PostUsersExcel(organizationId);
         }
 
-        private async Task<HttpResponseMessage> PostUsersExcel(int organizationId, bool? importUsers)
+        private async Task<HttpResponseMessage> PostUsersExcel(int organizationId)
         {
             ValidateRequestContainsMultipartFormData();
 
@@ -127,7 +127,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetOrgUnits(int organizationId, bool? exportOrgUnits)
+        public HttpResponseMessage GetOrgUnits(int organizationId)
         {
             return GetOrgUnitsExcel(organizationId);
         }
@@ -137,7 +137,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetOrgUnitsByUuid(Guid organizationUuid, bool? exportOrgUnits)
+        public HttpResponseMessage GetOrgUnitsByUuid(Guid organizationUuid)
         {
             var organizationIdResult = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
             if (organizationIdResult.Failed)
@@ -157,13 +157,13 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public async Task<HttpResponseMessage> PostOrgUnits(int organizationId, bool? importOrgUnits)
+        public async Task<HttpResponseMessage> PostOrgUnits(int organizationId)
         {
             if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
-            return await PostOrgUnitsExcel(organizationId, importOrgUnits);
+            return await PostOrgUnitsExcel(organizationId);
         }
 
         [HttpPost]
@@ -172,17 +172,17 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public async Task<HttpResponseMessage> PostOrgUnitsByUuid(Guid organizationUuid, bool? importOrgUnits)
+        public async Task<HttpResponseMessage> PostOrgUnitsByUuid(Guid organizationUuid)
         {
             var result = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
             if (result.Failed)
                 return FromOperationError(result.Error);
             var organizationId = result.Value;
 
-            return await PostOrgUnitsExcel(organizationId, importOrgUnits);
+            return await PostOrgUnitsExcel(organizationId);
         }
 
-        private async Task<HttpResponseMessage> PostOrgUnitsExcel(int organizationId, bool? importOrgUnits)
+        private async Task<HttpResponseMessage> PostOrgUnitsExcel(int organizationId)
         {
             
             ValidateRequestContainsMultipartFormData();
@@ -210,7 +210,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetContracts(int organizationId, bool? exportContracts)
+        public HttpResponseMessage GetContracts(int organizationId)
         {
             if (!AllowAccess(organizationId))
             {
@@ -225,7 +225,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetContractsByUuid(Guid organizationUuid, bool? exportContracts)
+        public HttpResponseMessage GetContractsByUuid(Guid organizationUuid)
         {
             var organizationIdResult = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
             if (organizationIdResult.Failed)
@@ -245,14 +245,14 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public async Task<HttpResponseMessage> PostContracts(int organizationId, bool? importContracts)
+        public async Task<HttpResponseMessage> PostContracts(int organizationId)
         {
             if (!AllowAccess(organizationId))
             {
                 return Forbidden();
             }
 
-            return await PostContractsExcel(organizationId, importContracts);
+            return await PostContractsExcel(organizationId);
         }
 
         [HttpPost]
@@ -261,16 +261,16 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public async Task<HttpResponseMessage> PostContractsByUuid(Guid organizationUuid, bool? importContracts)
+        public async Task<HttpResponseMessage> PostContractsByUuid(Guid organizationUuid)
         {
             var organizationIdResult = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
             if (organizationIdResult.Failed)
                 return FromOperationError(organizationIdResult.Error.FailureType);
 
-            return await PostContractsExcel(organizationIdResult.Value, importContracts);
+            return await PostContractsExcel(organizationIdResult.Value);
         }
 
-        private async Task<HttpResponseMessage> PostContractsExcel(int organizationId, bool? importContracts)
+        private async Task<HttpResponseMessage> PostContractsExcel(int organizationId)
         {
             ValidateRequestContainsMultipartFormData();
 
