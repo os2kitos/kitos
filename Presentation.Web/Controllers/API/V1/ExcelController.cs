@@ -45,7 +45,7 @@ namespace Presentation.Web.Controllers.API.V1
                 return Forbidden();
             }
 
-            return GetUsersExcel(organizationId);
+            return GetUsersExcelFile(organizationId);
         }
 
         [HttpGet]
@@ -55,14 +55,11 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetUsersByUuid(Guid organizationUuid)
         {
-            var organizationIdResult = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
-            if (organizationIdResult.Failed)
-                return FromOperationError(organizationIdResult.Error.FailureType);
-
-            return GetUsersExcel(organizationIdResult.Value);
+            return _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid)
+                .Match(GetUsersExcelFile, FromOperationError);
         }
 
-        private HttpResponseMessage GetUsersExcel(int organizationId)
+        private HttpResponseMessage GetUsersExcelFile(int organizationId)
         {
             return GetExcelFile(organizationId, Constants.Excel.UserFileName, _excelService.ExportUsers);
         }
@@ -129,7 +126,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetOrgUnits(int organizationId)
         {
-            return GetOrgUnitsExcel(organizationId);
+            return GetOrgUnitsExcelFile(organizationId);
         }
 
         [HttpGet]
@@ -139,14 +136,11 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetOrgUnitsByUuid(Guid organizationUuid)
         {
-            var organizationIdResult = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
-            if (organizationIdResult.Failed)
-                return FromOperationError(organizationIdResult.Error.FailureType);
-
-            return GetOrgUnitsExcel(organizationIdResult.Value);
+            return _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid)
+                .Match(GetOrgUnitsExcelFile, FromOperationError);
         }
 
-        private HttpResponseMessage GetOrgUnitsExcel(int organizationId)
+        private HttpResponseMessage GetOrgUnitsExcelFile(int organizationId)
         {
             return GetExcelFile(organizationId, Constants.Excel.UnitFileName, _excelService.ExportOrganizationUnits);
         }
@@ -217,7 +211,7 @@ namespace Presentation.Web.Controllers.API.V1
                 return Forbidden();
             }
 
-            return GetContractsExcel(organizationId);
+            return GetContractsExcelFile(organizationId);
         }
 
         [HttpGet]
@@ -227,14 +221,11 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetContractsByUuid(Guid organizationUuid)
         {
-            var organizationIdResult = _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid);
-            if (organizationIdResult.Failed)
-                return FromOperationError(organizationIdResult.Error.FailureType);
-
-            return GetContractsExcel(organizationIdResult.Value);
+            return _excelService.ResolveOrganizationIdAndValidateAccess(organizationUuid)
+                .Match(GetContractsExcelFile, FromOperationError);
         }
 
-        private HttpResponseMessage GetContractsExcel(int organizationId)
+        private HttpResponseMessage GetContractsExcelFile(int organizationId)
         {
             return GetExcelFile(organizationId, Constants.Excel.ContractsFileName, _excelService.ExportOrganizationUnits);
         }
