@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Presentation.Web.Models.API.V2.Internal.Request.Organizations
 {
-    public class OrganizationCreateRequestDTO
+    public class OrganizationCreateRequestDTO : OrganizationBaseRequestDTO
     {
     }
 }
