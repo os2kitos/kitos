@@ -16,6 +16,8 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
 {
     public class ExcelImportTest : WithAutoFixture
     {
+
+        private readonly string excelApiPrefix = "api/local-admin/excel/contracts-by-id";
         [Fact]
         public async Task Can_Import_Contracts_From_Excel()
         {
@@ -28,7 +30,7 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             };
 
             //Act
-            using var response = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"/api/excel?organizationId={organizationDto.Id}&importContracts"), loginCookie, content);
+            using var response = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"{excelApiPrefix}?organizationId={organizationDto.Id}"), loginCookie, content);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -52,7 +54,7 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             };
 
             //Act
-            using var response = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"/api/excel?organizationId={organizationDto.Id}&importContracts"), loginCookie, content);
+            using var response = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"{excelApiPrefix}?organizationId={organizationDto.Id}"), loginCookie, content);
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
