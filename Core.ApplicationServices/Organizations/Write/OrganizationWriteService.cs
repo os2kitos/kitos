@@ -67,6 +67,11 @@ public class OrganizationWriteService : IOrganizationWriteService{
             .Bind(WithWriteAccess);
     }
 
+    public Result<Organization, OperationError> CreateOrganization(OrganizationCreateParameters parameters)
+    {
+        return new OperationError(OperationFailure.NotFound);
+    }
+
     public Result<Organization, OperationError> PatchOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
     {
         using var transaction = _transactionManager.Begin();
