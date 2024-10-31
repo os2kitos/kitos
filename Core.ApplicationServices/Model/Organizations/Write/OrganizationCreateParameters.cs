@@ -1,6 +1,7 @@
 ﻿namespace Core.ApplicationServices.Model.Organizations.Write
 {
-    public class OrganizationCreateParameters
+    public class OrganizationCreateParameters : OrganizationBaseParameters
     {
+       
     }
 }
