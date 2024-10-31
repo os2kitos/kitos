@@ -110,7 +110,17 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 () => _uiModuleCustomizationService.GetModuleCustomizationByOrganizationUuid(organizationUuid, moduleName)
                     .Select(_organizationResponseMapper.ToUIModuleCustomizationResponseDTO)
                     .Match(Ok, FromOperationError));
+        }
 
+        [Route("create")]
+        [HttpPost]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult CreateOrganization([FromBody] OrganizationCreateRequestDTO request)
+        {
+            return Ok();
         }
 
         [HttpPatch]
