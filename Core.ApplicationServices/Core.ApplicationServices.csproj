@@ -160,7 +160,6 @@
     <Compile Include="Model\Contracts\Write\ItContractSupplierModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractTerminationParameters.cs" />
     <Compile Include="Model\EventHandler\ValidateUserCredentialsCommandHandler.cs" />
-    <Compile Include="Model\Excel\ExcelExportModel.cs" />
     <Compile Include="Model\GDPR\DataProcessingRegistrationPermissions.cs" />
     <Compile Include="Model\GDPR\Write\SubDataProcessorParameter.cs" />
     <Compile Include="Model\GDPR\Write\SubDataProcessor\SubDataProcessorDetailsParameters.cs" />

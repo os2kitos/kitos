@@ -128,7 +128,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 .Select(_organizationResponseMapper.ToOrganizationDTO)
                 .Match(Ok, FromOperationError);
         }
-
+            
         [HttpPatch]
         [Route("master-data")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataResponseDTO))]
