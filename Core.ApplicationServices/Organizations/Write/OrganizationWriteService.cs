@@ -69,7 +69,12 @@ public class OrganizationWriteService : IOrganizationWriteService{
 
     public Result<Organization, OperationError> CreateOrganization(OrganizationCreateParameters parameters)
     {
-        return new OperationError(OperationFailure.NotFound);
+        var organization = new Organization
+        {
+            Name = parameters.Name.NewValue,
+            TypeId = parameters.TypeId.NewValue
+        };
+        return organization;
     }
 
     public Result<Organization, OperationError> PatchOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)

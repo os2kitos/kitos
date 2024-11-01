@@ -574,6 +574,20 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(OperationFailure.Forbidden, rolesResult.Error);
         }
 
+        [Fact]
+        public void Can_Create_Organization()
+        {
+            var parameters = A<OrganizationCreateParameters>();
+            var result = _sut.CreateOrganization(parameters);
+
+            Assert.True(result.Ok);
+            var organization = result.Value;
+            Assert.Equal(organization.Name, parameters.Name.NewValue);
+            Assert.Equal(parameters.TypeId.NewValue, organization.TypeId);
+            //Assert.Equal(parameters.Cvr.NewValue, organization.Cvr);
+            //Assert.Equal(parameters.ForeignCvr.NewValue, organization.ForeignCvr);
+        }
+
         private OrganizationMasterDataRolesUpdateParameters SetupUpdateMasterDataRoles(int orgId,
             ContactPerson cp = null, DataResponsible dr = null, DataProtectionAdvisor dpa = null)
         {
