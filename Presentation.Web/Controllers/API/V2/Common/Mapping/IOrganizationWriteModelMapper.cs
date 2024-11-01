@@ -14,6 +14,8 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
             OrganizationMasterDataRolesRequestDTO dto);
 
         OrganizationUpdateParameters ToOrganizationUpdateParameters(OrganizationUpdateRequestDTO dto);
+
+        OrganizationCreateParameters ToOrganizationCreateParameters(OrganizationCreateRequestDTO dto);
         
         Result<UIModuleCustomizationParameters, OperationError> ToUIModuleCustomizationParameters(Guid organizationUuid, string moduleName,
             UIModuleCustomizationRequestDTO dto);

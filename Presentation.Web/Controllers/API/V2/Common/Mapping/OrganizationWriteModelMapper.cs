@@ -71,13 +71,28 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
 
         return new()
         {
+            Cvr = rule.MustUpdate(x => x.Cvr) ? (dto.Cvr ?? Maybe<string>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<string>>.None,
+            Name = rule.MustUpdate(x => x.Name)? (dto.Name ?? Maybe<string>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<string>>.None
+        };
+    }
+
+    public OrganizationCreateParameters ToOrganizationCreateParameters(OrganizationCreateRequestDTO dto)
+    {
+        var rule = CreateChangeRule<OrganizationCreateRequestDTO>(false);
+        return new()
+        {
+            Name = dto.Name.AsChangedValue(),
+            TypeId = dto.TypeId.AsChangedValue(),
             Cvr = rule.MustUpdate(x => x.Cvr)
                 ? (dto.Cvr.FromNullable() ?? Maybe<string>.None).AsChangedValue()
                 : OptionalValueChange<Maybe<string>>.None,
-            Name = rule.MustUpdate(x => x.Name)
-                ? (dto.Name.FromNullable() ?? Maybe<string>.None).AsChangedValue()
+            ForeignCvr = rule.MustUpdate(x => x.ForeignCvr)
+                ? (dto.ForeignCvr.FromNullable() ?? Maybe<string>.None).AsChangedValue()
                 : OptionalValueChange<Maybe<string>>.None
         };
+
     }
 
     public Result<UIModuleCustomizationParameters, OperationError> ToUIModuleCustomizationParameters(Guid organizationUuid, string moduleName,

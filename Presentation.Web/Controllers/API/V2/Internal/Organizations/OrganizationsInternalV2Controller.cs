@@ -120,7 +120,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult CreateOrganization([FromBody] OrganizationCreateRequestDTO request)
         {
-            return Ok();
+            var parameters = _organizationWriteModelMapper.ToOrganizationCreateParameters(request);
+
+            return _organizationWriteService.CreateOrganization(parameters)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
