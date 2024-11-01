@@ -75,15 +75,13 @@ public class OrganizationWriteService : IOrganizationWriteService{
             Name = parameters.Name,
             TypeId = parameters.TypeId
         };
-        var updateParameters = new OrganizationUpdateParameters
+        var updatedOrganization = PerformBasicOrganizationUpdates(organization, GetUpdateParametersFromCreateParameters(parameters));
+        if (updatedOrganization.Failed)
         {
-            Cvr = parameters.Cvr,
-            ForeignCvr = parameters.ForeignCvr,
-            Name = OptionalValueChange<Maybe<string>>.None,
-            TypeId = OptionalValueChange<int>.None,
-        };
-        var updatedOrganization = PerformBasicOrganizationUpdates(organization, updateParameters);
-        return updatedOrganization;
+            return updatedOrganization.Error;
+        }
+        var createResult = _organizationService.CreateNewOrganization(updatedOrganization.Value);
+        return createResult.Match(Result<Organization, OperationError>.Success, failure => new OperationError(failure));
     }
 
     public Result<Organization, OperationError> PatchOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
@@ -130,6 +128,17 @@ public class OrganizationWriteService : IOrganizationWriteService{
                     parameters.ShowItSystemModule,
                     (org, showItSystemModule) => org.UpdateShowITSystems(showItSystemModule))
             ));
+    }
+
+    private OrganizationUpdateParameters GetUpdateParametersFromCreateParameters(OrganizationCreateParameters createParameters)
+    {
+        return new OrganizationUpdateParameters
+        {
+            Cvr = createParameters.Cvr,
+            ForeignCvr = createParameters.ForeignCvr,
+            Name = OptionalValueChange<Maybe<string>>.None,
+            TypeId = OptionalValueChange<int>.None,
+        };
     }
 
     private Result<Organization, OperationError> PerformBasicOrganizationUpdates(Organization organization, OrganizationUpdateParameters parameters)

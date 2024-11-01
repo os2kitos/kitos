@@ -576,6 +576,10 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Can_Create_Organization()
         {
             var parameters = A<OrganizationCreateParameters>();
+            _organizationService
+                .Setup(service => service.CreateNewOrganization(It.IsAny<Organization>()))
+                .Returns(Result<Organization, OperationFailure>.Success);
+
             var result = _sut.CreateOrganization(parameters);
 
             Assert.True(result.Ok);
