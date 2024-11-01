@@ -1,14 +1,12 @@
 ﻿
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.GlobalOptions;
+using Core.ApplicationServices.Model.GlobalOptions;
 using Core.DomainModel;
 using Core.DomainServices;
-using Core.DomainServices.Authorization;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -21,12 +19,12 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
     {
         private readonly GenericGlobalOptionsService<TestOptionEntity, TestReferenceType> _sut;
         private readonly Mock<IGenericRepository<TestOptionEntity>> _globalOptionsRepository;
-        private readonly Mock<IAuthorizationContext> _authorizationContext;
+        private readonly Mock<IOrganizationalUserContext> _activeUserContext;
         public GenericGlobalOptionsServiceTest()
         {
             _globalOptionsRepository = new Mock<IGenericRepository<TestOptionEntity>>();
-            _authorizationContext = new Mock<IAuthorizationContext>();
-            _sut = new GenericGlobalOptionsService<TestOptionEntity, TestReferenceType>(_globalOptionsRepository.Object, _authorizationContext.Object);
+            _activeUserContext = new Mock<IOrganizationalUserContext>();
+            _sut = new GenericGlobalOptionsService<TestOptionEntity, TestReferenceType>(_globalOptionsRepository.Object, _activeUserContext.Object);
         }
 
         [Fact]
@@ -44,7 +42,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
                 }
             };
             _globalOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expected.AsQueryable());
-            _authorizationContext.Setup(_ => _.GetReadAccessLevel<TestOptionEntity>()).Returns(EntityReadAccessLevel.All);
+            _activeUserContext.Setup(_ => _.IsGlobalAdmin()).Returns(true);
             var result = _sut.GetGlobalOptions();
 
             Assert.True(result.Ok);
@@ -55,12 +53,39 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         [Fact]
         public void Get_Returns_Forbidden_If_Cannot_Read_All()
         {
-            _authorizationContext.Setup(_ => _.GetReadAccessLevel<TestOptionEntity>()).Returns(EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations);
+            _activeUserContext.Setup(_ => _.IsGlobalAdmin()).Returns(false);
 
             var result = _sut.GetGlobalOptions();
 
             Assert.False(result.Ok);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_Create_New_Option()
+        {
+            _activeUserContext.Setup(_ => _.IsGlobalAdmin()).Returns(true);
+            var parameters = new GlobalOptionCreateParameters()
+            {
+                Description = A<string>(),
+                Name = A<string>(),
+                IsObligatory = A<bool>()
+            };
+
+            var result = _sut.CreateGlobalOption(parameters);
+
+            Assert.True(result.Ok);
+            var option = result.Value;
+
+            Assert.Equal(parameters.Description, option.Description);
+            Assert.Equal(parameters.Name, option.Name);
+            Assert.Equal(parameters.IsObligatory, option.IsObligatory);
+            Assert.False(option.IsEnabled);
+        }
+
+        [Fact]
+        public void Create_Returns_Forbidden_If_Not_Allowed()
+        {
 
         }
     }
