@@ -5,6 +5,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Model.Organizations.Write;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.UiCustomization;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -71,10 +72,18 @@ public class OrganizationWriteService : IOrganizationWriteService{
     {
         var organization = new Organization
         {
-            Name = parameters.Name.NewValue,
-            TypeId = parameters.TypeId.NewValue
+            Name = parameters.Name,
+            TypeId = parameters.TypeId
         };
-        return organization;
+        var updateParameters = new OrganizationUpdateParameters
+        {
+            Cvr = parameters.Cvr,
+            ForeignCvr = parameters.ForeignCvr,
+            Name = OptionalValueChange<Maybe<string>>.None,
+            TypeId = OptionalValueChange<int>.None,
+        };
+        var updatedOrganization = PerformBasicOrganizationUpdates(organization, updateParameters);
+        return updatedOrganization;
     }
 
     public Result<Organization, OperationError> PatchOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
@@ -89,7 +98,6 @@ public class OrganizationWriteService : IOrganizationWriteService{
             transaction.Rollback();
             return result;
         }
-
         _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
         _organizationRepository.Update(result.Value);
         transaction.Commit();
@@ -127,7 +135,9 @@ public class OrganizationWriteService : IOrganizationWriteService{
     private Result<Organization, OperationError> PerformBasicOrganizationUpdates(Organization organization, OrganizationUpdateParameters parameters)
     {
         return organization.WithOptionalUpdate(parameters.Cvr, (org, cvr) => org.UpdateCvr(cvr))
-            .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)));
+            .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)))
+            .Bind(org => org.WithOptionalUpdate(parameters.ForeignCvr, (org, foreignCvr) => org.UpdateForeignCvr(foreignCvr))
+            .Bind(org => org.WithOptionalUpdate(parameters.TypeId, (org, typeId) => org.UpdateTypeId(typeId))));
     }
 
     private Result<Organization, OperationError> WithModifyCvrAccessIfRequired(Organization organization,

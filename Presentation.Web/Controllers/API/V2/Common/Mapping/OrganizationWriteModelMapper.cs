@@ -75,8 +75,7 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
                 : OptionalValueChange<Maybe<string>>.None,
             Name = rule.MustUpdate(x => x.Name)? (dto.Name.FromNullable()).AsChangedValue()
                 : OptionalValueChange<Maybe<string>>.None,
-            TypeId = rule.MustUpdate(x => x.TypeId) ? (dto.TypeId.FromNullable()).AsChangedValue()
-                : OptionalValueChange<Maybe<int>>.None,
+            TypeId = rule.MustUpdate(x => x.TypeId) ? (dto.TypeId).AsChangedValue() : OptionalValueChange<int>.None,
             ForeignCvr = rule.MustUpdate(x => x.ForeignCvr) ? (dto.ForeignCvr.FromNullable()).AsChangedValue() : OptionalValueChange<Maybe<string>>.None,
         };
     }
@@ -86,8 +85,8 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
         var rule = CreateChangeRule<OrganizationCreateRequestDTO>(false);
         return new()
         {
-            Name = dto.Name.AsChangedValue(),
-            TypeId = dto.TypeId.AsChangedValue(),
+            Name = dto.Name,
+            TypeId = dto.TypeId,
             Cvr = rule.MustUpdate(x => x.Cvr)
                 ? (dto.Cvr.FromNullable() ?? Maybe<string>.None).AsChangedValue()
                 : OptionalValueChange<Maybe<string>>.None,

@@ -430,11 +430,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
             _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
-            var updateParams = new OrganizationUpdateParameters()
-            {
-                Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
-                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
-            };
+            var updateParams = A<OrganizationUpdateParameters>();
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
 
@@ -442,6 +438,8 @@ namespace Tests.Unit.Presentation.Web.Services
             var value = result.Value;
             Assert.Equal(updateParams.Cvr.NewValue, value.Cvr);
             Assert.Equal(updateParams.Name.NewValue, value.Name);
+            Assert.Equal(updateParams.ForeignCvr.NewValue, value.ForeignCvr);
+            Assert.Equal(updateParams.TypeId.NewValue, value.TypeId);
         }
 
         [Fact]
@@ -582,10 +580,10 @@ namespace Tests.Unit.Presentation.Web.Services
 
             Assert.True(result.Ok);
             var organization = result.Value;
-            Assert.Equal(organization.Name, parameters.Name.NewValue);
-            Assert.Equal(parameters.TypeId.NewValue, organization.TypeId);
-            //Assert.Equal(parameters.Cvr.NewValue, organization.Cvr);
-            //Assert.Equal(parameters.ForeignCvr.NewValue, organization.ForeignCvr);
+            Assert.Equal(organization.Name, parameters.Name);
+            Assert.Equal(parameters.TypeId, organization.TypeId);
+            Assert.Equal(parameters.Cvr.NewValue, organization.Cvr);
+            Assert.Equal(parameters.ForeignCvr.NewValue, organization.ForeignCvr);
         }
 
         private OrganizationMasterDataRolesUpdateParameters SetupUpdateMasterDataRoles(int orgId,

@@ -7,7 +7,7 @@ namespace Core.ApplicationServices.Model.Organizations.Write
     {
         public OptionalValueChange<Maybe<string>> Name { get; set; }
 
-        public OptionalValueChange<Maybe<int>> TypeId { get; set; }
+        public OptionalValueChange<int> TypeId { get; set; }
 
         public OptionalValueChange<Maybe<string>> ForeignCvr { get; set; }
     }

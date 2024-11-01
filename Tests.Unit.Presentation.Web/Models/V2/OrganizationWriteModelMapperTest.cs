@@ -58,7 +58,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var result = _sut.ToOrganizationUpdateParameters(dto);
             AssertParamHasValidChange(result.Cvr, dto.Cvr);
             AssertParamHasValidChange(result.Name, dto.Name);
-            AssertParamHasValidChange(result.TypeId, dto.TypeId);
+            Assert.Equal(result.TypeId.NewValue, dto.TypeId);
             AssertParamHasValidChange(result.ForeignCvr, dto.ForeignCvr);
         }
 
@@ -70,8 +70,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var result = _sut.ToOrganizationCreateParameters(dto);
             AssertParamHasValidChange(result.Cvr, dto.Cvr);
             AssertParamHasValidChange(result.ForeignCvr, dto.ForeignCvr);
-            Assert.Equal(result.Name.NewValue, dto.Name);
-            Assert.Equal(result.TypeId.NewValue, dto.TypeId);
+            Assert.Equal(result.Name, dto.Name);
+            Assert.Equal(result.TypeId, dto.TypeId);
         }
 
         [Fact]

@@ -5,8 +5,8 @@ namespace Core.ApplicationServices.Model.Organizations.Write
 {
     public class OrganizationCreateParameters
     {
-        public OptionalValueChange<string> Name { get; set; }
-        public OptionalValueChange<int> TypeId { get; set; }
+        public string Name { get; set; }
+        public int TypeId { get; set; }
         public OptionalValueChange<Maybe<string>> Cvr { get; set; }
         public OptionalValueChange<Maybe<string>> ForeignCvr { get; set; }
     }
