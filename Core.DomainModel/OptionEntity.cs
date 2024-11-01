@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using Core.Abstractions.Types;
 
 namespace Core.DomainModel
 {
@@ -82,6 +83,26 @@ namespace Core.DomainModel
         private void UpdateDescription(string description)
         {
            if (!string.IsNullOrEmpty(description)) Description = description;
+        }
+
+        public void UpdateDescription(Maybe<string> description)
+        {
+            Description = description.HasValue ? description.Value : null;
+        }
+
+        public void UpdateName(Maybe<string> name)
+        {
+            Name = name.HasValue ? name.Value : null;
+        }
+
+        public void UpdateIsObligatory(Maybe<bool> isObligatory)
+        {
+            IsObligatory = isObligatory.HasValue && isObligatory.Value;
+        }
+
+        public void UpdateIsEnabled(Maybe<bool> isEnabled)
+        {
+            IsEnabled = isEnabled.HasValue && isEnabled.Value;
         }
     }
 }
