@@ -227,7 +227,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         private HttpResponseMessage GetContractsExcelFile(int organizationId)
         {
-            return GetExcelFile(organizationId, Constants.Excel.ContractsFileName, _excelService.ExportOrganizationUnits);
+            return GetExcelFile(organizationId, Constants.Excel.ContractsFileName, _excelService.ExportItContracts);
         }
 
         [HttpPost]
