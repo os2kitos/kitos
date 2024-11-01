@@ -32,6 +32,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IGenericRepository<ContactPerson>> _contactPersonRepository;
         private readonly Mock<IGenericRepository<DataResponsible>> _dataResponsibleRepository;
         private readonly Mock<IGenericRepository<DataProtectionAdvisor>> _dataProtectionAdvisorRepository;
+        private readonly Mock<IGenericRepository<OrganizationType>> _organizationTypeRepository;
         private readonly OrganizationWriteService _sut;
 
 
@@ -46,6 +47,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _contactPersonRepository = new Mock<IGenericRepository<ContactPerson>>();
             _dataResponsibleRepository = new Mock<IGenericRepository<DataResponsible>>();
             _dataProtectionAdvisorRepository = new Mock<IGenericRepository<DataProtectionAdvisor>>();
+            _organizationTypeRepository = new Mock<IGenericRepository<OrganizationType>>();
             _sut = new OrganizationWriteService(_transactionManager.Object,
                 _domainEvents.Object,
                 _organizationService.Object,
@@ -54,7 +56,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 _identityResolver.Object,
                 _contactPersonRepository.Object,
                 _dataResponsibleRepository.Object,
-                _dataProtectionAdvisorRepository.Object);
+                _dataProtectionAdvisorRepository.Object,
+                _organizationTypeRepository.Object);
         }
 
         [Fact]

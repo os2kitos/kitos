@@ -28,9 +28,10 @@ public class OrganizationWriteService : IOrganizationWriteService{
     private readonly IGenericRepository<ContactPerson> _contactPersonRepository;
     private readonly IGenericRepository<DataResponsible> _dataResponsibleRepository;
     private readonly IGenericRepository<DataProtectionAdvisor> _dataProtectionAdvisorRepository;
+    private readonly IGenericRepository<OrganizationType> _organizationTypeRepository;
 
 
-    public OrganizationWriteService(ITransactionManager transactionManager, IDomainEvents domainEvents, IOrganizationService organizationService, IAuthorizationContext authorizationContext, IOrganizationRepository organizationRepository, IEntityIdentityResolver identityResolver, IGenericRepository<ContactPerson> contactPersonRepository, IGenericRepository<DataResponsible> dataResponsibleRepository, IGenericRepository<DataProtectionAdvisor> dataProtectionAdvisorRepository)
+    public OrganizationWriteService(ITransactionManager transactionManager, IDomainEvents domainEvents, IOrganizationService organizationService, IAuthorizationContext authorizationContext, IOrganizationRepository organizationRepository, IEntityIdentityResolver identityResolver, IGenericRepository<ContactPerson> contactPersonRepository, IGenericRepository<DataResponsible> dataResponsibleRepository, IGenericRepository<DataProtectionAdvisor> dataProtectionAdvisorRepository, IGenericRepository<OrganizationType> organizationTypeRepository)
     {
         _transactionManager = transactionManager;
         _domainEvents = domainEvents;
@@ -41,6 +42,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
         _contactPersonRepository = contactPersonRepository;
         _dataResponsibleRepository = dataResponsibleRepository;
         _dataProtectionAdvisorRepository = dataProtectionAdvisorRepository;
+        _organizationTypeRepository = organizationTypeRepository;
     }
 
     public Result<Organization, OperationError> PatchMasterData(Guid organizationUuid, OrganizationMasterDataUpdateParameters parameters)
@@ -96,7 +98,6 @@ public class OrganizationWriteService : IOrganizationWriteService{
         _organizationRepository.Update(result.Value);
         transaction.Commit();
         return result;
-
     }
 
     public Result<Config, OperationError> PatchUIRootConfig(Guid organizationUuid, UIRootConfigUpdateParameters updateParameters)
@@ -131,7 +132,14 @@ public class OrganizationWriteService : IOrganizationWriteService{
         return organization.WithOptionalUpdate(parameters.Cvr, (org, cvr) => org.UpdateCvr(cvr))
             .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)))
             .Bind(org => org.WithOptionalUpdate(parameters.ForeignCvr, (org, foreignCvr) => org.UpdateForeignCvr(foreignCvr))
-            .Bind(org => org.WithOptionalUpdate(parameters.TypeId, (org, typeId) => org.UpdateTypeId(typeId))));
+            .Bind(org => org.WithOptionalUpdate(parameters.TypeId, (org, typeId) => UpdateOrganizationType(org, typeId))));
+    }
+
+    private Result<Organization, OperationError> UpdateOrganizationType(Organization organization, int typeId)
+    {
+        var organizationType = _organizationTypeRepository.GetByKey(organization.Id);
+        organization.UpdateType(organizationType);
+        return organization;
     }
 
     private Result<Organization, OperationError> WithModifyCvrAccessIfRequired(Organization organization,

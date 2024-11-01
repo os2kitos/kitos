@@ -551,9 +551,10 @@ namespace Core.DomainModel.Organization
             ForeignCvr = foreignCvr.HasValue ? foreignCvr.Value : null;
         }
 
-        public void UpdateTypeId(int typeId)
+        public void UpdateType(OrganizationType type)
         {
-            TypeId = typeId;
+            Type = type;
+            TypeId = type.Id;
         }
 
         public void UpdateShowDataProcessing(Maybe<bool> showDataProcessing)
