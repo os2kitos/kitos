@@ -572,7 +572,7 @@ namespace Tests.Unit.Presentation.Web.Services
         [Fact]
         public void Can_Create_Organization()
         {
-            var parameters = A<OrganizationCreateParameters>();
+            var parameters = A<OrganizationUpdateParameters>();
             _organizationService
                 .Setup(service => service.CreateNewOrganization(It.IsAny<Organization>()))
                 .Returns(Result<Organization, OperationFailure>.Success);
@@ -581,8 +581,8 @@ namespace Tests.Unit.Presentation.Web.Services
 
             Assert.True(result.Ok);
             var organization = result.Value;
-            Assert.Equal(organization.Name, parameters.Name);
-            Assert.Equal(parameters.TypeId, organization.TypeId);
+            Assert.Equal(organization.Name, parameters.Name.NewValue);
+            Assert.Equal(parameters.TypeId.NewValue, organization.TypeId);
             Assert.Equal(parameters.Cvr.NewValue, organization.Cvr);
             Assert.Equal(parameters.ForeignCvr.NewValue, organization.ForeignCvr);
         }

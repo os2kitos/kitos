@@ -70,8 +70,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var result = _sut.ToOrganizationCreateParameters(dto);
             AssertParamHasValidChange(result.Cvr, dto.Cvr);
             AssertParamHasValidChange(result.ForeignCvr, dto.ForeignCvr);
-            Assert.Equal(result.Name, dto.Name);
-            Assert.Equal(result.TypeId, dto.TypeId);
+            AssertParamHasValidChange(result.Name, dto.Name);
+            Assert.Equal(result.TypeId.NewValue, dto.TypeId);
         }
 
         [Fact]

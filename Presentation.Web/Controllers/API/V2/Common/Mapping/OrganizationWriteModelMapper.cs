@@ -67,34 +67,27 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
 
     public OrganizationUpdateParameters ToOrganizationUpdateParameters(OrganizationUpdateRequestDTO dto)
     {
-        var rule = CreateChangeRule<OrganizationUpdateRequestDTO>(false);
+        return MapParameters(dto, false);
+    }
+
+    public OrganizationUpdateParameters ToOrganizationCreateParameters(OrganizationCreateRequestDTO dto)
+    {
+        return MapParameters(dto, true);
+    }
+
+    private OrganizationUpdateParameters MapParameters(OrganizationBaseRequestDTO dto, Boolean enforceChanges)
+    {
+        var rule = CreateChangeRule<OrganizationBaseRequestDTO>(enforceChanges);
 
         return new()
         {
             Cvr = rule.MustUpdate(x => x.Cvr) ? (dto.Cvr.FromNullable()).AsChangedValue()
                 : OptionalValueChange<Maybe<string>>.None,
-            Name = rule.MustUpdate(x => x.Name)? (dto.Name.FromNullable()).AsChangedValue()
+            Name = rule.MustUpdate(x => x.Name) ? (dto.Name.FromNullable()).AsChangedValue()
                 : OptionalValueChange<Maybe<string>>.None,
-            TypeId = rule.MustUpdate(x => x.TypeId) ? (dto.TypeId).AsChangedValue() : OptionalValueChange<int>.None,
+            TypeId = rule.MustUpdate(x => x.TypeId) ? dto.TypeId.AsChangedValue() : OptionalValueChange<int>.None,
             ForeignCvr = rule.MustUpdate(x => x.ForeignCvr) ? (dto.ForeignCvr.FromNullable()).AsChangedValue() : OptionalValueChange<Maybe<string>>.None,
         };
-    }
-
-    public OrganizationCreateParameters ToOrganizationCreateParameters(OrganizationCreateRequestDTO dto)
-    {
-        var rule = CreateChangeRule<OrganizationCreateRequestDTO>(false);
-        return new()
-        {
-            Name = dto.Name,
-            TypeId = dto.TypeId,
-            Cvr = rule.MustUpdate(x => x.Cvr)
-                ? (dto.Cvr.FromNullable() ?? Maybe<string>.None).AsChangedValue()
-                : OptionalValueChange<Maybe<string>>.None,
-            ForeignCvr = rule.MustUpdate(x => x.ForeignCvr)
-                ? (dto.ForeignCvr.FromNullable() ?? Maybe<string>.None).AsChangedValue()
-                : OptionalValueChange<Maybe<string>>.None
-        };
-
     }
 
     public Result<UIModuleCustomizationParameters, OperationError> ToUIModuleCustomizationParameters(Guid organizationUuid, string moduleName,

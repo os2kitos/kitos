@@ -354,11 +354,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         public async Task Can_Update_Organization()
         {
             var organization = await CreateTestOrganization();
-            var requestDto = new OrganizationUpdateRequestDTO()
-            {
-                Cvr = GetCvr(),
-                Name = A<string>()
-            };
+            var requestDto = A<OrganizationUpdateRequestDTO>();
 
             using var response = await OrganizationInternalV2Helper.PatchOrganization(organization.Uuid, requestDto);
 
@@ -367,6 +363,8 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var updatedOrganization = await OrganizationHelper.GetOrganizationAsync(organization.Id, cookie);
             Assert.Equal(requestDto.Cvr, updatedOrganization.Cvr);
             Assert.Equal(requestDto.Name, updatedOrganization.Name);
+            Assert.Equal(requestDto.TypeId, updatedOrganization.TypeId);
+            Assert.Equal(requestDto.ForeignCvr, updatedOrganization.ForeignCvr);
         }
 
         [Fact]

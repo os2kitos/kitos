@@ -18,7 +18,7 @@ namespace Core.ApplicationServices.Organizations.Write
         
         Result<OrganizationMasterDataRoles, OperationError> GetOrCreateOrganizationMasterDataRoles(Guid organizationUuid);
 
-        Result<Organization, OperationError> CreateOrganization(OrganizationCreateParameters parameters);
+        Result<Organization, OperationError> CreateOrganization(OrganizationUpdateParameters parameters);
 
         Result<Organization, OperationError> PatchOrganization(Guid organizationUuid,
             OrganizationUpdateParameters parameters);

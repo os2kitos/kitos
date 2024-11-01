@@ -68,14 +68,10 @@ public class OrganizationWriteService : IOrganizationWriteService{
             .Bind(WithWriteAccess);
     }
 
-    public Result<Organization, OperationError> CreateOrganization(OrganizationCreateParameters parameters)
+    public Result<Organization, OperationError> CreateOrganization(OrganizationUpdateParameters parameters)
     {
-        var organization = new Organization
-        {
-            Name = parameters.Name,
-            TypeId = parameters.TypeId
-        };
-        var updatedOrganization = PerformBasicOrganizationUpdates(organization, GetUpdateParametersFromCreateParameters(parameters));
+        var organization = new Organization();
+        var updatedOrganization = PerformBasicOrganizationUpdates(organization, parameters);
         if (updatedOrganization.Failed)
         {
             return updatedOrganization.Error;
@@ -130,18 +126,7 @@ public class OrganizationWriteService : IOrganizationWriteService{
             ));
     }
 
-    private OrganizationUpdateParameters GetUpdateParametersFromCreateParameters(OrganizationCreateParameters createParameters)
-    {
-        return new OrganizationUpdateParameters
-        {
-            Cvr = createParameters.Cvr,
-            ForeignCvr = createParameters.ForeignCvr,
-            Name = OptionalValueChange<Maybe<string>>.None,
-            TypeId = OptionalValueChange<int>.None,
-        };
-    }
-
-    private Result<Organization, OperationError> PerformBasicOrganizationUpdates(Organization organization, OrganizationUpdateParameters parameters)
+    private Result<Organization, OperationError> PerformBasicOrganizationUpdates(Organization organization, OrganizationBaseParameters parameters)
     {
         return organization.WithOptionalUpdate(parameters.Cvr, (org, cvr) => org.UpdateCvr(cvr))
             .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)))
