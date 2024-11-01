@@ -7,6 +7,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GlobalOptions;
 using Core.ApplicationServices.Model.GlobalOptions;
+using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;
@@ -117,6 +118,31 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             Assert.Equal(parameters.Name.NewValue.Value, option.Name);
             Assert.Equal(parameters.IsObligatory.NewValue.Value, option.IsObligatory);
             Assert.Equal(parameters.IsEnabled.NewValue.Value, option.IsEnabled);
+        }
+
+        [Fact]
+        public void Patch_Option_Does_Nothing_If_No_Value_Changes()
+        {
+            SetupIsGlobalAdmin();
+            var optionUuid = A<Guid>();
+            var existing = SetupRepositoryReturnsOneOption(optionUuid).FirstOrDefault();
+            Assert.NotNull(existing);
+            var parameters = new GlobalOptionUpdateParameters()
+            {
+                IsEnabled = OptionalValueChange<Maybe<bool>>.None,
+                IsObligatory = OptionalValueChange<Maybe<bool>>.None,
+                Name = OptionalValueChange<Maybe<string>>.None,
+                Description = OptionalValueChange<Maybe<string>>.None,
+            };
+
+            var result = _sut.PatchGlobalOption(optionUuid, parameters);
+
+            Assert.True(result.Ok);
+            var option = result.Value;
+            Assert.Equal(existing.Description, option.Description);
+            Assert.Equal(existing.Name, option.Name);
+            Assert.Equal(existing.IsObligatory, option.IsObligatory);
+            Assert.Equal(existing.IsEnabled, option.IsEnabled);
         }
 
         private List<TestOptionEntity> SetupRepositoryReturnsOneOption(Guid uuid)
