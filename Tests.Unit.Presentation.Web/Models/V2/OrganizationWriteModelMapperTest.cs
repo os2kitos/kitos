@@ -66,6 +66,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Fact]
+        public void Can_Map_Organization_Create_Params()
+        {
+            ExpectHttpRequestPropertyNames<OrganizationCreateRequestDTO>();
+            var dto = A<OrganizationCreateRequestDTO>();
+            var result = _sut.ToOrganizationCreateParameters(dto);
+            Assert.Equal(dto.Name, result.Name.NewValue);
+            Assert.Equal(dto.TypeId, result.TypeId.NewValue);
+            Assert.Equal(dto.Cvr, result.Cvr.NewValue);
+            Assert.Equal(dto.ForeignCvr, result.ForeignCvr.NewValue);
+
+        }
+
+        [Fact]
         public void Can_Map_Master_Data_Update_Params()
         {
             ExpectHttpRequestPropertyNames<OrganizationMasterDataRequestDTO>();
