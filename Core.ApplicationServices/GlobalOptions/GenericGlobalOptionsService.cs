@@ -61,7 +61,7 @@ public class GenericGlobalOptionsService<TOptionType, TReferenceType> : IGeneric
 
     public Result<TOptionType, OperationError> PatchGlobalOption(Guid optionUuid, GlobalOptionUpdateParameters updateParameters)
     {
-        return WithGlobalAdminRights("User is not allowed to patch global options")
+        return WithGlobalAdminRights($"User is not allowed to patch global option with uuid {optionUuid}")
             .Match(error => error,
                 () =>
                 {

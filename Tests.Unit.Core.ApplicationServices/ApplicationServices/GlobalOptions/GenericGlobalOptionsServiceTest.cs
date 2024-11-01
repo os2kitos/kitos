@@ -145,6 +145,46 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             Assert.Equal(existing.IsEnabled, option.IsEnabled);
         }
 
+        [Fact]
+        public void Patch_Returns_Forbidden_If_Not_Allowed()
+        {
+            SetupIsNotGlobalAdmin();
+            var optionUuid = A<Guid>();
+            SetupRepositoryReturnsOneOption(optionUuid);
+            var parameters = new GlobalOptionUpdateParameters()
+            {
+                IsEnabled = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
+                IsObligatory = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
+                Name = Maybe<string>.Some(A<string>()).AsChangedValue(),
+                Description = Maybe<string>.Some(A<string>()).AsChangedValue(),
+            };
+
+            var result = _sut.PatchGlobalOption(optionUuid, parameters);
+
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Patch_Returns_Not_Found_If_No_Existing_Option()
+        {
+            SetupIsGlobalAdmin();
+            var optionUuid = A<Guid>();
+            _globalOptionsRepository.Setup(_ => _.AsQueryable()).Returns(new List<TestOptionEntity>().AsQueryable());
+            var parameters = new GlobalOptionUpdateParameters()
+            {
+                IsEnabled = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
+                IsObligatory = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
+                Name = Maybe<string>.Some(A<string>()).AsChangedValue(),
+                Description = Maybe<string>.Some(A<string>()).AsChangedValue(),
+            };
+
+            var result = _sut.PatchGlobalOption(optionUuid, parameters);
+
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
         private List<TestOptionEntity> SetupRepositoryReturnsOneOption(Guid uuid)
         {
             var expected = new List<TestOptionEntity>
