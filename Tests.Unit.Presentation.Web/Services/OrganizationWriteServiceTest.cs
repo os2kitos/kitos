@@ -490,11 +490,8 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
             _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
-            var updateParams = new OrganizationUpdateParameters()
-            {
-                Cvr = OptionalValueChange<Maybe<string>>.None,
-                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
-            };
+            var updateParams = A<OrganizationUpdateParameters>();
+            updateParams.Cvr = OptionalValueChange<Maybe<string>>.None;
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
 
