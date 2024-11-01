@@ -366,6 +366,7 @@
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationTypeMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\OrganizationUnits\OrganizationUnitRoleTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\BaseGlobalRegularOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\GridLocalItContractRolesV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\CommandPermissionsResponseMapper.cs" />
@@ -419,6 +420,8 @@
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\BaseLocalRegularOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\BaseLocalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItSystems\ItSystemSensitivePersonalDataTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Mapping\GlobalOptionTypeResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Mapping\IGlobalOptionTypeResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Mapping\InternalDtoModelV2MappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemUsageV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Internal\Organizations\OrganizationGridInternalV2Controller.cs" />
@@ -472,6 +475,7 @@
     <Compile Include="Models\API\V2\Internal\Request\Organizations\UIModuleCustomizationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\User\MutateRightRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\User\MutateUserRightsRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\GlobalOptions\GlobalRegularOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItContract\LocalItContractRolesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationV2ResponseDTO.cs" />
