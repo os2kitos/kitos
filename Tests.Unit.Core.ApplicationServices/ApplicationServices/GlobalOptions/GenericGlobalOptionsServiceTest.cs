@@ -42,7 +42,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
                 }
             };
             _globalOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expected.AsQueryable());
-            _activeUserContext.Setup(_ => _.IsGlobalAdmin()).Returns(true);
+            SetupIsGlobalAdmin();
             var result = _sut.GetGlobalOptions();
 
             Assert.True(result.Ok);
@@ -53,8 +53,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         [Fact]
         public void Get_Returns_Forbidden_If_Cannot_Read_All()
         {
-            _activeUserContext.Setup(_ => _.IsGlobalAdmin()).Returns(false);
-
+            SetupIsNotGlobalAdmin();
             var result = _sut.GetGlobalOptions();
 
             Assert.False(result.Ok);
@@ -64,7 +63,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         [Fact]
         public void Can_Create_New_Option()
         {
-            _activeUserContext.Setup(_ => _.IsGlobalAdmin()).Returns(true);
+            SetupIsGlobalAdmin();
             var parameters = new GlobalOptionCreateParameters()
             {
                 Description = A<string>(),
@@ -86,7 +85,28 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         [Fact]
         public void Create_Returns_Forbidden_If_Not_Allowed()
         {
+            SetupIsNotGlobalAdmin();
+            var parameters = new GlobalOptionCreateParameters()
+            {
+                Description = A<string>(),
+                Name = A<string>(),
+                IsObligatory = A<bool>()
+            };
 
+            var result = _sut.CreateGlobalOption(parameters);
+
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        private void SetupIsGlobalAdmin()
+        {
+            _activeUserContext.Setup(_ => _.IsGlobalAdmin()).Returns(true);
+        }
+
+        private void SetupIsNotGlobalAdmin()
+        {
+            _activeUserContext.Setup(_ => _.IsGlobalAdmin()).Returns(false);
         }
     }
 }
