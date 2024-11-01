@@ -8,7 +8,6 @@ using Core.ApplicationServices.Model.GlobalOptions;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;
-using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 
 namespace Core.ApplicationServices.GlobalOptions;
@@ -63,23 +62,27 @@ public class GenericGlobalOptionsService<TOptionType, TReferenceType> : IGeneric
     {
         return WithGlobalAdminRights($"User is not allowed to patch global option with uuid {optionUuid}")
             .Match(error => error,
-                () =>
-                {
-                    var existingOption = _globalOptionsRepository.AsQueryable().ByUuid(optionUuid);
-                    if (existingOption == null)
-                        return new OperationError($"Unable to find global option with uuid {optionUuid}",
-                            OperationFailure.NotFound);
+                () => GetOption(optionUuid)
+                        .Bind(existingOption => PerformGlobalOptionUpdates(existingOption, updateParameters)
+                                .Bind(updatedOption =>
+                                {
+                                    _globalOptionsRepository.Update(updatedOption);
+                                    _globalOptionsRepository.Save();
+                                    _domainEvents.Raise(new EntityUpdatedEvent<TOptionType>(updatedOption));
 
-                    return PerformGlobalOptionUpdates(existingOption, updateParameters)
-                        .Bind(updatedOption =>
-                        {
-                            _globalOptionsRepository.Update(updatedOption);
-                            _globalOptionsRepository.Save();
-                            _domainEvents.Raise(new EntityUpdatedEvent<TOptionType>(updatedOption));
+                                    return Result<TOptionType, OperationError>.Success(updatedOption);
+                                })
+                        )
+                );
+    }
 
-                            return Result<TOptionType, OperationError>.Success(updatedOption);
-                        });
-                });
+    private Result<TOptionType, OperationError> GetOption(Guid optionUuid)
+    {
+        var existingOption = _globalOptionsRepository.AsQueryable().ByUuid(optionUuid);
+        return (existingOption != null)
+            ? Result<TOptionType, OperationError>.Success(existingOption)
+            : new OperationError($"Unable to find global option with uuid {optionUuid}",
+                OperationFailure.NotFound);
     }
 
     private Result<TOptionType, OperationError> PerformGlobalOptionUpdates(TOptionType option, GlobalOptionUpdateParameters parameters)
