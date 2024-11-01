@@ -6,6 +6,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GlobalOptions;
 using Core.ApplicationServices.Model.GlobalOptions;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainServices;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -20,11 +21,13 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         private readonly GenericGlobalOptionsService<TestOptionEntity, TestReferenceType> _sut;
         private readonly Mock<IGenericRepository<TestOptionEntity>> _globalOptionsRepository;
         private readonly Mock<IOrganizationalUserContext> _activeUserContext;
+        private readonly Mock<IDomainEvents> _domainEvents;
         public GenericGlobalOptionsServiceTest()
         {
             _globalOptionsRepository = new Mock<IGenericRepository<TestOptionEntity>>();
             _activeUserContext = new Mock<IOrganizationalUserContext>();
-            _sut = new GenericGlobalOptionsService<TestOptionEntity, TestReferenceType>(_globalOptionsRepository.Object, _activeUserContext.Object);
+            _domainEvents = new Mock<IDomainEvents>();
+            _sut = new GenericGlobalOptionsService<TestOptionEntity, TestReferenceType>(_globalOptionsRepository.Object, _activeUserContext.Object, _domainEvents.Object);
         }
 
         [Fact]
@@ -80,6 +83,8 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             Assert.Equal(parameters.Name, option.Name);
             Assert.Equal(parameters.IsObligatory, option.IsObligatory);
             Assert.False(option.IsEnabled);
+            _globalOptionsRepository.Verify(_ => _.Insert(option));
+            _globalOptionsRepository.Verify(_ => _.Save());
         }
 
         [Fact]
