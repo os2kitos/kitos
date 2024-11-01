@@ -71,10 +71,13 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
 
         return new()
         {
-            Cvr = rule.MustUpdate(x => x.Cvr) ? (dto.Cvr ?? Maybe<string>.None).AsChangedValue()
+            Cvr = rule.MustUpdate(x => x.Cvr) ? (dto.Cvr.FromNullable()).AsChangedValue()
                 : OptionalValueChange<Maybe<string>>.None,
-            Name = rule.MustUpdate(x => x.Name)? (dto.Name ?? Maybe<string>.None).AsChangedValue()
-                : OptionalValueChange<Maybe<string>>.None
+            Name = rule.MustUpdate(x => x.Name)? (dto.Name.FromNullable()).AsChangedValue()
+                : OptionalValueChange<Maybe<string>>.None,
+            TypeId = rule.MustUpdate(x => x.TypeId) ? (dto.TypeId.FromNullable()).AsChangedValue()
+                : OptionalValueChange<Maybe<int>>.None,
+            ForeignCvr = rule.MustUpdate(x => x.ForeignCvr) ? (dto.ForeignCvr.FromNullable()).AsChangedValue() : OptionalValueChange<Maybe<string>>.None,
         };
     }
 

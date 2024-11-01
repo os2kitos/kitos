@@ -54,15 +54,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_Organization_Update_Params()
         {
             ExpectHttpRequestPropertyNames<OrganizationUpdateRequestDTO>();
-            var dto = new OrganizationUpdateRequestDTO()
-            {
-                Cvr = A<string>().AsCvr(),
-                Name = A<string>()
-            };
-
+            var dto = A<OrganizationUpdateRequestDTO>();
             var result = _sut.ToOrganizationUpdateParameters(dto);
             AssertParamHasValidChange(result.Cvr, dto.Cvr);
             AssertParamHasValidChange(result.Name, dto.Name);
+            AssertParamHasValidChange(result.TypeId, dto.TypeId);
+            AssertParamHasValidChange(result.ForeignCvr, dto.ForeignCvr);
         }
 
         [Fact]
@@ -71,11 +68,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             ExpectHttpRequestPropertyNames<OrganizationCreateRequestDTO>();
             var dto = A<OrganizationCreateRequestDTO>();
             var result = _sut.ToOrganizationCreateParameters(dto);
-            Assert.Equal(dto.Name, result.Name.NewValue);
-            Assert.Equal(dto.TypeId, result.TypeId.NewValue);
-            Assert.Equal(dto.Cvr, result.Cvr.NewValue);
-            Assert.Equal(dto.ForeignCvr, result.ForeignCvr.NewValue);
-
+            AssertParamHasValidChange(result.Cvr, dto.Cvr);
+            AssertParamHasValidChange(result.ForeignCvr, dto.ForeignCvr);
+            Assert.Equal(result.Name.NewValue, dto.Name);
+            Assert.Equal(result.TypeId.NewValue, dto.TypeId);
         }
 
         [Fact]
@@ -212,7 +208,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertParamHasValidChange(dpaResult.Value.Address, dpaDto.Address);
         }
 
-        private void AssertParamHasValidChange(OptionalValueChange<Maybe<string>> parameter, string expected)
+        private void AssertParamHasValidChange<T>(OptionalValueChange<Maybe<T>> parameter, T expected)
         {
             Assert.True(parameter.HasChange && parameter.NewValue.HasValue);
             Assert.Equal(expected, parameter.NewValue.Value);
