@@ -12,11 +12,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
     public class TestReferenceType { }
     public class GlobalOptionTypeResponseMapperTest: WithAutoFixture
     {
+        private readonly GlobalOptionTypeResponseMapper _sut;
+
+        public GlobalOptionTypeResponseMapperTest()
+        {
+            _sut = new GlobalOptionTypeResponseMapper();
+        }
 
         [Fact]
         public void Can_Map_Single_Regular_Option_DTO()
         {
-            var sut = new GlobalOptionTypeResponseMapper();
             var expected = new TestRegularOptionEntity()
             {
                 Uuid = A<Guid>(),
@@ -26,7 +31,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
                 IsObligatory = A<bool>()
             };
 
-            var dto = sut.ToGlobalRegularOptionDTO<TestRegularOptionEntity, TestReferenceType>(expected);
+            var dto = _sut.ToGlobalRegularOptionDTO<TestRegularOptionEntity, TestReferenceType>(expected);
 
             AssertRegularOptionTypeDTO(expected, dto);
         }
@@ -34,7 +39,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
         [Fact]
         public void Can_Map_Regular_Option_Type_DTOs()
         {
-            var sut = new GlobalOptionTypeResponseMapper();
             var expected = Enumerable.Range(1, 5)
                 .Select(_ => new TestRegularOptionEntity()
                 {
@@ -45,7 +49,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
                     IsObligatory = A<bool>()
                 }).ToList();
 
-            var dtos = sut.ToGlobalRegularOptionDTOs<TestRegularOptionEntity, TestReferenceType>(expected);
+            var dtos = _sut.ToGlobalRegularOptionDTOs<TestRegularOptionEntity, TestReferenceType>(expected);
 
             expected.ForEach(expectedOption =>
             {
@@ -61,6 +65,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
             Assert.Equal(expected.IsObligatory, actual.IsObligatory);
             Assert.Equal(expected.IsEnabled, actual.IsEnabled);
             Assert.Equal(expected.Uuid, actual.Uuid);
+            Assert.Equal(expected.Priority, actual.Priority);
         }
     }
 }

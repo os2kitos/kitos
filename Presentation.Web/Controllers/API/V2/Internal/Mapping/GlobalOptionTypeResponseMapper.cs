@@ -21,6 +21,7 @@ public class GlobalOptionTypeResponseMapper : IGlobalOptionTypeResponseMapper
             Name = option.Name,
             IsEnabled = option.IsEnabled,
             Uuid = option.Uuid,
+            Priority = option.Priority
         };
     }
 }
