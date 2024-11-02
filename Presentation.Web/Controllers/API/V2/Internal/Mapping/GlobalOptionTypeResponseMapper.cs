@@ -9,10 +9,10 @@ public class GlobalOptionTypeResponseMapper : IGlobalOptionTypeResponseMapper
 {
     public IEnumerable<GlobalRegularOptionResponseDTO> ToGlobalRegularOptionDTOs<TOption, TReference>(IEnumerable<TOption> options) where TOption : OptionEntity<TReference>
     {
-        return options.Select(ToGlobalRegularOptionResponseDto<TOption, TReference>);
+        return options.Select(ToGlobalRegularOptionDTO<TOption, TReference>);
     }
 
-    private GlobalRegularOptionResponseDTO ToGlobalRegularOptionResponseDto<TOption, TReference>(TOption option) where TOption : OptionEntity<TReference>
+    public GlobalRegularOptionResponseDTO ToGlobalRegularOptionDTO<TOption, TReference>(TOption option) where TOption : OptionEntity<TReference>
     {
         return new()
         {

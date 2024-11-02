@@ -12,6 +12,25 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
     public class TestReferenceType { }
     public class GlobalOptionTypeResponseMapperTest: WithAutoFixture
     {
+
+        [Fact]
+        public void Can_Map_Single_Regular_Option_DTO()
+        {
+            var sut = new GlobalOptionTypeResponseMapper();
+            var expected = new TestRegularOptionEntity()
+            {
+                Uuid = A<Guid>(),
+                Name = A<string>(),
+                Description = A<string>(),
+                IsEnabled = A<bool>(),
+                IsObligatory = A<bool>()
+            };
+
+            var dto = sut.ToGlobalRegularOptionDTO<TestRegularOptionEntity, TestReferenceType>(expected);
+
+            AssertRegularOptionTypeDTO(expected, dto);
+        }
+
         [Fact]
         public void Can_Map_Regular_Option_Type_DTOs()
         {

@@ -7,6 +7,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Mapping
 {
     public interface IGlobalOptionTypeResponseMapper
     {
+        GlobalRegularOptionResponseDTO ToGlobalRegularOptionDTO<TOption, TReference>(TOption option)
+            where TOption : OptionEntity<TReference>;
 
         public IEnumerable<GlobalRegularOptionResponseDTO> ToGlobalRegularOptionDTOs<TOption, TReference>(IEnumerable<TOption> options)
             where TOption : OptionEntity<TReference>;

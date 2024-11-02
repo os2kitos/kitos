@@ -35,9 +35,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.GlobalOptionTypes
             if (!ModelState.IsValid) return BadRequest();
 
             var createParameters = _writeModelMapper.ToGlobalOptionCreateParameters(dto);
-            return BadRequest();
-            // return _globalOptionsService.CreateGlobalOption(createParameters)
-            //todo expose single response mapper method
+            return _globalOptionsService.CreateGlobalOption(createParameters)
+                .Select(_responseMapper.ToGlobalRegularOptionDTO<TOptionType, TReferenceType>)
+                .Match(Ok, FromOperationError);
         }
     }
 }
