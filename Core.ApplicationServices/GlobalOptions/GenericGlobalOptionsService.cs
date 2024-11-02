@@ -49,6 +49,7 @@ public class GenericGlobalOptionsService<TOptionType, TReferenceType> : IGeneric
                         Description = createParameters.Description,
                         IsObligatory = createParameters.IsObligatory,
                         IsEnabled = false,
+                        Priority = GetNextOptionPriority()
                     };
                     _globalOptionsRepository.Insert(globalOption);
                     _globalOptionsRepository.Save();
@@ -56,6 +57,12 @@ public class GenericGlobalOptionsService<TOptionType, TReferenceType> : IGeneric
 
                     return Result<TOptionType, OperationError>.Success(globalOption);
                 });
+    }
+
+    private int GetNextOptionPriority()
+    {
+        var options = _globalOptionsRepository.AsQueryable();
+        return options.Any() ? options.Max(x => x.Priority) + 1 : 1;
     }
 
     public Result<TOptionType, OperationError> PatchGlobalOption(Guid optionUuid, GlobalOptionUpdateParameters updateParameters)

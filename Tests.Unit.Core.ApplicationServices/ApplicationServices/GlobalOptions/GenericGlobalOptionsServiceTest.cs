@@ -59,6 +59,9 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         public void Can_Create_New_Option()
         {
             SetupIsGlobalAdmin();
+            var existingOptions = SetupRepositoryReturnsOneOption(A<Guid>());
+            Assert.NotNull(existingOptions);
+            Assert.Equal(1, existingOptions.Count);
             var parameters = new GlobalOptionCreateParameters()
             {
                 Description = A<string>(),
@@ -74,6 +77,8 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             Assert.Equal(parameters.Description, option.Description);
             Assert.Equal(parameters.Name, option.Name);
             Assert.Equal(parameters.IsObligatory, option.IsObligatory);
+            Assert.NotNull(option.Uuid);
+            Assert.Equal(existingOptions.First().Priority + 1, option.Priority);
             Assert.False(option.IsEnabled);
             _globalOptionsRepository.Verify(_ => _.Insert(option));
             _globalOptionsRepository.Verify(_ => _.Save());
@@ -196,7 +201,8 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
                     Id = A<int>(),
                     IsEnabled = A<bool>(),
                     IsObligatory = A<bool>(),
-                    Name = A<string>()
+                    Name = A<string>(),
+                    Priority = A<int>()
                 }
             };
             _globalOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expected.AsQueryable());
