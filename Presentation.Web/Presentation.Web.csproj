@@ -369,6 +369,7 @@
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\OrganizationUnits\OrganizationUnitRoleTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\BaseGlobalRegularOptionTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalBusinessTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\GridLocalItContractRolesV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\CommandPermissionsResponseMapper.cs" />
@@ -460,6 +461,7 @@
     <Compile Include="Models\API\V2\Internal\Request\Notifications\IHasBaseWriteProperties.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\NotificationSentResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Options\GlobalOptionCreateRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Options\GlobalOptionUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Options\LocalOptionCreateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Options\LocalRegularOptionUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\ColumnConfigurationRequestDTO.cs" />

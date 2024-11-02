@@ -1,9 +1,6 @@
 ﻿
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
-using System.Web;
-using System;
 using System.Linq;
-using Tests.Toolkit.Patterns;
 using Xunit;
 using Moq;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
@@ -35,13 +32,33 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
             };
             _httpRequest.Setup(x =>
                     x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
-                .Returns(GetAllInputPropertyNames<LocalOptionCreateRequestDTO>());
+                .Returns(GetAllInputPropertyNames<GlobalOptionCreateRequestDTO>());
 
             var parameters = _sut.ToGlobalOptionCreateParameters(dto);
 
             Assert.Equal(dto.Name, parameters.Name);
             Assert.Equal(dto.Description, parameters.Description);
             Assert.Equal(dto.IsObligatory, parameters.IsObligatory);
+        }
+
+        [Fact]
+        public void Can_Map_Update_Dto()
+        {
+            var dto = new GlobalOptionUpdateRequestDTO()
+            {
+                Description = A<string>(),
+                IsObligatory = A<bool>(),
+                IsEnabled = A<bool>(),
+                Name = A<string>(),
+            };
+            _httpRequest.Setup(x =>
+                    x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
+                .Returns(GetAllInputPropertyNames<GlobalOptionUpdateRequestDTO>());
+
+            var parameters = _sut.ToGlobalOptionUpdateParameters(dto);
+
+            Assert.Equal(dto.Description, parameters.Description.NewValue.Value);
+
         }
     }
 }

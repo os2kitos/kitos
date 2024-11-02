@@ -8,6 +8,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
     public interface IGlobalOptionTypeWriteModelMapper
     {
         GlobalOptionCreateParameters ToGlobalOptionCreateParameters(GlobalOptionCreateRequestDTO dto);
+        GlobalOptionUpdateParameters ToGlobalOptionUpdateParameters(GlobalOptionUpdateRequestDTO dto);
 
     }
 }
