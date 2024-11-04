@@ -53,8 +53,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.GlobalOptionTypes.ItSyste
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PatchLocalBusinessType([NonEmptyGuid][FromUri] Guid organizationUuid,
-            [FromUri] Guid optionUuid,
+        public IHttpActionResult PatchGlobalBusinessType([NonEmptyGuid][FromUri] Guid optionUuid,
             GlobalOptionUpdateRequestDTO dto)
         {
             return Patch(optionUuid, dto);

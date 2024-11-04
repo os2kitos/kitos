@@ -25,5 +25,12 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal
             return await HttpApi.PostWithCookieAsync(
                 TestEnvironment.CreateUrl($"{apiPrefix}/{GlobalOptionTypesSuffix}/{choiceTypeName}"), cookie, dto);
         }
+
+        public static async Task<HttpResponseMessage> PatchGlobalOptionType(Guid optionUuid, string choiceTypeName, GlobalOptionUpdateRequestDTO dto, string apiPrefix)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(
+                TestEnvironment.CreateUrl($"{apiPrefix}/{GlobalOptionTypesSuffix}/{choiceTypeName}/{optionUuid}"), cookie, dto);
+        }
     }
 }

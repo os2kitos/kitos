@@ -1,6 +1,4 @@
-﻿using Core.DomainModel.Organization;
-using Core.DomainModel;
-using Presentation.Web.Models.API.V1;
+﻿
 using Presentation.Web.Models.API.V2.Internal.Response;
 using System.Collections.Generic;
 using System.Net;
@@ -55,6 +53,30 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
             Assert.NotNull(responseDto);
             Assert.Equal(dto.Name, responseDto.Name);
             Assert.False(responseDto.IsEnabled);
+        }
+
+        [Fact]
+        public async Task Can_Patch_Global_Business_Type()
+        {
+            var globalOption = SetupCreateGlobalBusinessTypeInDatabase();
+
+            var dto = new GlobalOptionUpdateRequestDTO()
+            {
+                Description = A<string>(),
+                IsObligatory = A<bool>(),
+                IsEnabled = A<bool>(),
+                Name = A<string>()
+            };
+
+            using var response = await GlobalOptionTypeV2Helper.PatchGlobalOptionType(globalOption.Uuid, BusinessTypesUrlSuffix, dto, ItSystemsApiPrefix);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseDto = await response.ReadResponseBodyAsAsync<GlobalRegularOptionResponseDTO>();
+            Assert.Equal(dto.Description, responseDto.Description);
+            Assert.Equal(dto.Name, responseDto.Name);
+            Assert.Equal(dto.IsObligatory, responseDto.IsObligatory);
+            Assert.Equal(dto.IsEnabled, responseDto.IsEnabled);
+            Assert.Equal(globalOption.Uuid, responseDto.Uuid);
         }
 
         private BusinessType SetupCreateGlobalBusinessTypeInDatabase()
