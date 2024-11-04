@@ -12,7 +12,6 @@ using Tests.Integration.Presentation.Web.Tools.Internal.Users;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using System;
-using AutoFixture;
 using Presentation.Web.Models.API.V2.Internal.Request.User;
 
 namespace Tests.Integration.Presentation.Web.Users.V2
@@ -105,7 +104,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         public async Task Receive_Error_If_Try_To_Copy_Roles_From_User_To_Itself()
         {
             var organization = await CreateOrganizationAsync();
-            var user = await CreateUserAsync(organization.Uuid)
+            var user = await CreateUserAsync(organization.Uuid);
             var response = await UsersV2Helper.CopyRoles(organization.Uuid, user.Uuid, user.Uuid,
                 A<MutateUserRightsRequestDTO>());
 
