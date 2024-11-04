@@ -14,16 +14,16 @@ public class GlobalOptionTypeResponseMapper : IGlobalOptionTypeResponseMapper
 
     public GlobalRoleOptionResponseDTO ToGlobalRoleOptionDTO<TOption, TReference>(TOption option) where TOption : OptionEntity<TReference>, IRoleEntity
     {
-        return new()
-        {
-            Description = option.Description,
-            Name = option.Name,
-            Uuid = option.Uuid,
-            IsObligatory = option.IsObligatory,
-            IsEnabled = option.IsEnabled,
-            Priority = option.Priority,
-            WriteAccess = option.HasWriteAccess
-        };
+        return new(
+            option.Uuid,
+            option.Name,
+            option.Description,
+            option.IsEnabled,
+            option.IsObligatory,
+            option.Priority,
+            option.HasWriteAccess
+        );
+
     }
 
     public IEnumerable<GlobalRoleOptionResponseDTO> ToGlobalRoleOptionDTOs<TOption, TReference>(IEnumerable<TOption> options) where TOption : OptionEntity<TReference>, IRoleEntity
@@ -33,14 +33,13 @@ public class GlobalOptionTypeResponseMapper : IGlobalOptionTypeResponseMapper
 
     public GlobalRegularOptionResponseDTO ToGlobalRegularOptionDTO<TOption, TReference>(TOption option) where TOption : OptionEntity<TReference>
     {
-        return new()
-        {
-            Description = option.Description,
-            IsObligatory = option.IsObligatory,
-            Name = option.Name,
-            IsEnabled = option.IsEnabled,
-            Uuid = option.Uuid,
-            Priority = option.Priority
-        };
+        return new(
+            option.Uuid,
+            option.Name,
+            option.Description,
+            option.IsEnabled,
+            option.IsObligatory,
+            option.Priority
+            );
     }
 }
