@@ -42,12 +42,12 @@ public class GlobalRegularOptionsService<TOptionType, TReferenceType> :
     public Result<TOptionType, OperationError> PatchGlobalOption(Guid optionUuid, GlobalRegularOptionUpdateParameters updateParameters)
     {
         return GetOptionWithGlobalAdminRights(optionUuid)
-            .Bind(existingOption => PerformGlobalOptionUpdates(existingOption, updateParameters)
+            .Bind(existingOption => PerformGlobalRegularOptionUpdates(existingOption, updateParameters)
                     .Bind(updatedOption => Result<TOptionType, OperationError>.Success(Patch(updatedOption)))
             );
     }
 
-    private Result<TOptionType, OperationError> PerformGlobalOptionUpdates(TOptionType option, GlobalRegularOptionUpdateParameters parameters)
+    private Result<TOptionType, OperationError> PerformGlobalRegularOptionUpdates(TOptionType option, GlobalRegularOptionUpdateParameters parameters)
     {
         return option
             .WithOptionalUpdate(parameters.Description, (opt, description) => opt.UpdateDescription(description))

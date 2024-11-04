@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GlobalOptions;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -36,7 +37,21 @@ public class GlobalRoleOptionsService<TOptionType, TReferenceType> :
 
     public Result<TOptionType, OperationError> PatchGlobalOption(Guid optionUuid, GlobalRoleOptionUpdateParameters updateParameters)
     {
-        throw new NotImplementedException();
+        return GetOptionWithGlobalAdminRights(optionUuid)
+            .Bind(existingOption => PerformGlobalRoleOptionUpdates(existingOption, updateParameters)
+                .Bind(updatedOption => Result<TOptionType, OperationError>.Success(Patch(updatedOption)))
+            );
+    }
+
+    private Result<TOptionType, OperationError> PerformGlobalRoleOptionUpdates(TOptionType option, GlobalRoleOptionUpdateParameters parameters)
+    {
+        return option
+            .WithOptionalUpdate(parameters.Description, (opt, description) => opt.UpdateDescription(description))
+            .Bind(opt => opt.WithOptionalUpdate(parameters.Name, (opt, name) => opt.UpdateName(name)))
+            .Bind(opt => opt.WithOptionalUpdate(parameters.IsObligatory, (opt, isObligatory) => opt.UpdateIsObligatory(isObligatory)))
+            .Bind(opt => opt.WithOptionalUpdate(parameters.IsEnabled, (opt, isEnabled) => opt.UpdateIsEnabled(isEnabled)))
+            .Bind(opt => opt.WithOptionalUpdate(parameters.WriteAccess, (opt, writeAccess) => opt.HasWriteAccess = writeAccess.HasValue && writeAccess.Value));
+        ;
     }
 
     public GlobalRoleOptionsService(IGenericRepository<TOptionType> globalOptionsRepository, IOrganizationalUserContext activeUserContext, IDomainEvents domainEvents) : base(globalOptionsRepository, activeUserContext, domainEvents)
