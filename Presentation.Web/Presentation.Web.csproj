@@ -369,6 +369,7 @@
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\OrganizationUnits\OrganizationUnitRoleTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\BaseGlobalRegularOptionTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\BaseGlobalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalBusinessTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\GridLocalItContractRolesV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemV2QueryHandler.cs" />
@@ -481,6 +482,7 @@
     <Compile Include="Models\API\V2\Internal\Request\User\MutateRightRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\User\MutateUserRightsRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\GlobalOptions\GlobalRegularOptionResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\GlobalOptions\GlobalRoleOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItContract\LocalItContractRolesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationV2ResponseDTO.cs" />

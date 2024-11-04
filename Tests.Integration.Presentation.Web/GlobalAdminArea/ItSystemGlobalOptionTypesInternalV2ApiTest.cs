@@ -3,7 +3,6 @@ using Presentation.Web.Models.API.V2.Internal.Response;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Tests.Integration.Presentation.Web.Tools.Extensions;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Internal;
 using Tests.Toolkit.Patterns;

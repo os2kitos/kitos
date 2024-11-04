@@ -12,6 +12,25 @@ public class GlobalOptionTypeResponseMapper : IGlobalOptionTypeResponseMapper
         return options.Select(ToGlobalRegularOptionDTO<TOption, TReference>);
     }
 
+    public GlobalRoleOptionResponseDTO ToGlobalRoleOptionDTO<TOption, TReference>(TOption option) where TOption : OptionEntity<TReference>, IRoleEntity
+    {
+        return new()
+        {
+            Description = option.Description,
+            Name = option.Name,
+            Uuid = option.Uuid,
+            IsObligatory = option.IsObligatory,
+            IsEnabled = option.IsEnabled,
+            Priority = option.Priority,
+            WriteAccess = option.HasWriteAccess
+        };
+    }
+
+    public IEnumerable<GlobalRoleOptionResponseDTO> ToGlobalRoleOptionDTOs<TOption, TReference>(IEnumerable<TOption> options) where TOption : OptionEntity<TReference>, IRoleEntity
+    {
+        return options.Select(ToGlobalRoleOptionDTO<TOption, TReference>);
+    }
+
     public GlobalRegularOptionResponseDTO ToGlobalRegularOptionDTO<TOption, TReference>(TOption option) where TOption : OptionEntity<TReference>
     {
         return new()
