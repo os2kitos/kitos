@@ -8,9 +8,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Request.Organizations
 {
     public class OrganizationBaseRequestDTO
     {
-        [Required]
         public string Name { get; set; }
-        [Required]
         [Range(1, 4)]
         public int TypeId { get; set; }
         [MaxLength(10)]
