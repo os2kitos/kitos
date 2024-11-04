@@ -34,53 +34,24 @@ public class GlobalRegularOptionsService<TOptionType, TReferenceType> :
 
     public Result<TOptionType, OperationError> CreateGlobalOption(GlobalRegularOptionCreateParameters createParameters)
     {
-        return WithGlobalAdminRights("User is not allowed to create global options")
-            .Match(error => error,
-                () =>
-                {
-                    var globalOption = new TOptionType()
-                    {
-                        Name = createParameters.Name,
-                        Description = createParameters.Description,
-                        IsObligatory = createParameters.IsObligatory,
-                        IsEnabled = false,
-                        Priority = GetNextOptionPriority()
-                    };
-                    _globalOptionsRepository.Insert(globalOption);
-                    _globalOptionsRepository.Save();
-                    _domainEvents.Raise(new EntityCreatedEvent<TOptionType>(globalOption));
+        var newOption = new TOptionType()
+        {
+            Name = createParameters.Name,
+            Description = createParameters.Description,
+            IsObligatory = createParameters.IsObligatory,
+            IsEnabled = false,
+            Priority = GetNextOptionPriority()
+        };
 
-                    return Result<TOptionType, OperationError>.Success(globalOption);
-                });
+        return Create(newOption);
     }
 
     public Result<TOptionType, OperationError> PatchGlobalOption(Guid optionUuid, GlobalRegularOptionUpdateParameters updateParameters)
     {
         return GetOptionWithGlobalAdminRights(optionUuid)
             .Bind(existingOption => PerformGlobalOptionUpdates(existingOption, updateParameters)
-                    .Bind(updatedOption =>
-                    {
-                        _globalOptionsRepository.Update(updatedOption);
-                        _globalOptionsRepository.Save();
-                        _domainEvents.Raise(new EntityUpdatedEvent<TOptionType>(updatedOption));
-
-                        return Result<TOptionType, OperationError>.Success(updatedOption);
-                    })
+                    .Bind(updatedOption => Result<TOptionType, OperationError>.Success(Patch(updatedOption)))
             );
-    }
-
-    private Result<TOptionType, OperationError> GetOptionWithGlobalAdminRights(Guid optionUuid)
-    {
-        return WithGlobalAdminRights($"User is not allowed to patch global option with uuid {optionUuid}")
-            .Match(error => error,
-                () =>
-                {
-                    var existingOption = _globalOptionsRepository.AsQueryable().ByUuid(optionUuid);
-                    return (existingOption != null)
-                        ? Result<TOptionType, OperationError>.Success(existingOption)
-                        : new OperationError($"Unable to find global option with uuid {optionUuid}",
-                            OperationFailure.NotFound);
-                });
     }
 
     private Result<TOptionType, OperationError> PerformGlobalOptionUpdates(TOptionType option, GlobalRegularOptionUpdateParameters parameters)
