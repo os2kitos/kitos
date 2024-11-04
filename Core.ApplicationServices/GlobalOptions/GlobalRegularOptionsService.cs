@@ -46,13 +46,4 @@ public class GlobalRegularOptionsService<TOptionType, TReferenceType> :
                     .Bind(updatedOption => Result<TOptionType, OperationError>.Success(Patch(updatedOption)))
             );
     }
-
-    private Result<TOptionType, OperationError> PerformGlobalRegularOptionUpdates(TOptionType option, GlobalRegularOptionUpdateParameters parameters)
-    {
-        return option
-            .WithOptionalUpdate(parameters.Description, (opt, description) => opt.UpdateDescription(description))
-            .Bind(opt => opt.WithOptionalUpdate(parameters.Name, (opt, name) => opt.UpdateName(name)))
-            .Bind(opt => opt.WithOptionalUpdate(parameters.IsObligatory, (opt, isObligatory) => opt.UpdateIsObligatory(isObligatory)))
-            .Bind(opt => opt.WithOptionalUpdate(parameters.IsEnabled, (opt, isEnabled) => opt.UpdateIsEnabled(isEnabled)));
-    }
 }

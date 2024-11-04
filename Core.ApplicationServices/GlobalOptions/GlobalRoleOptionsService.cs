@@ -45,11 +45,7 @@ public class GlobalRoleOptionsService<TOptionType, TReferenceType> :
 
     private Result<TOptionType, OperationError> PerformGlobalRoleOptionUpdates(TOptionType option, GlobalRoleOptionUpdateParameters parameters)
     {
-        return option
-            .WithOptionalUpdate(parameters.Description, (opt, description) => opt.UpdateDescription(description))
-            .Bind(opt => opt.WithOptionalUpdate(parameters.Name, (opt, name) => opt.UpdateName(name)))
-            .Bind(opt => opt.WithOptionalUpdate(parameters.IsObligatory, (opt, isObligatory) => opt.UpdateIsObligatory(isObligatory)))
-            .Bind(opt => opt.WithOptionalUpdate(parameters.IsEnabled, (opt, isEnabled) => opt.UpdateIsEnabled(isEnabled)))
+        return PerformGlobalRegularOptionUpdates(option, parameters)
             .Bind(opt => opt.WithOptionalUpdate(parameters.WriteAccess, (opt, writeAccess) => opt.HasWriteAccess = writeAccess.HasValue && writeAccess.Value));
         ;
     }

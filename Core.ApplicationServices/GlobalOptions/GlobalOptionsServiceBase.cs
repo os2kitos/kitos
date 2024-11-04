@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GlobalOptions;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -86,6 +87,15 @@ namespace Core.ApplicationServices.GlobalOptions
                                     OperationFailure.NotFound);
                         });
             }
+
+        protected Result<TOptionType, OperationError> PerformGlobalRegularOptionUpdates(TOptionType option, GlobalRegularOptionUpdateParameters parameters)
+        {
+            return option
+                .WithOptionalUpdate(parameters.Description, (opt, description) => opt.UpdateDescription(description))
+                .Bind(opt => opt.WithOptionalUpdate(parameters.Name, (opt, name) => opt.UpdateName(name)))
+                .Bind(opt => opt.WithOptionalUpdate(parameters.IsObligatory, (opt, isObligatory) => opt.UpdateIsObligatory(isObligatory)))
+                .Bind(opt => opt.WithOptionalUpdate(parameters.IsEnabled, (opt, isEnabled) => opt.UpdateIsEnabled(isEnabled)));
+        }
     }
     
 
