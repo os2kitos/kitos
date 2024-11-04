@@ -7,7 +7,7 @@ using Core.DomainModel;
 namespace Core.ApplicationServices.GlobalOptions
 {
     public interface IGlobalRegularOptionsService<TOptionType, TReferenceType>
-        where TOptionType : OptionEntity<TReferenceType>
+        where TOptionType : OptionEntity<TReferenceType>, new()
     {
 
         Result<IEnumerable<TOptionType>, OperationError> GetGlobalOptions();

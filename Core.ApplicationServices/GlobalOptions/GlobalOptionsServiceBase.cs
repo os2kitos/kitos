@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -24,7 +25,18 @@ namespace Core.ApplicationServices.GlobalOptions
                 _domainEvents = domainEvents;
             }
 
-            protected int GetNextOptionPriority()
+            protected Result<IEnumerable<TOptionType>, OperationError> Get()
+            {
+                return WithGlobalAdminRights("User is not allowed to read global options")
+                    .Match(error => error,
+                        () =>
+                        {
+                            var globalOptions = _globalOptionsRepository.AsQueryable().ToList();
+                            return Result<IEnumerable<TOptionType>, OperationError>.Success(globalOptions);
+                        });
+            }
+
+        protected int GetNextOptionPriority()
             {
                 var options = _globalOptionsRepository.AsQueryable();
                 return options.Any() ? options.Max(x => x.Priority) + 1 : 1;

@@ -80,7 +80,9 @@
     <Compile Include="Generic\IEntityTreeUuidCollector.cs" />
     <Compile Include="GlobalOptions\GlobalOptionsServiceBase.cs" />
     <Compile Include="GlobalOptions\GlobalRegularOptionsService.cs" />
+    <Compile Include="GlobalOptions\GlobalRoleOptionsService.cs" />
     <Compile Include="GlobalOptions\IGlobalRegularOptionsService.cs" />
+    <Compile Include="GlobalOptions\IGlobalRoleOptionsService.cs" />
     <Compile Include="Interface\Write\IItInterfaceWriteService.cs" />
     <Compile Include="Interface\Write\ItInterfaceWriteService.cs" />
     <Compile Include="Authorization\ResourceCollectionPermissionsResult.cs" />

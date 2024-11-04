@@ -8,7 +8,6 @@ using Core.ApplicationServices.Model.GlobalOptions;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;
-using Core.DomainServices.Extensions;
 
 namespace Core.ApplicationServices.GlobalOptions;
 
@@ -23,13 +22,7 @@ public class GlobalRegularOptionsService<TOptionType, TReferenceType> :
 
     public Result<IEnumerable<TOptionType>, OperationError> GetGlobalOptions()
     {
-        return WithGlobalAdminRights("User is not allowed to read global options")
-            .Match(error => error,
-                () =>
-                {
-                    var globalOptions = _globalOptionsRepository.AsQueryable().ToList();
-                    return Result<IEnumerable<TOptionType>, OperationError>.Success(globalOptions);
-                });
+        return Get();
     }
 
     public Result<TOptionType, OperationError> CreateGlobalOption(GlobalRegularOptionCreateParameters createParameters)
