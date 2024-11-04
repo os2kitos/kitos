@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Presentation.Web.Models.API.V2.Types.Organization;
+using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.Web.Models.API.V2.Internal.Request.Organizations
 {
@@ -12,11 +13,10 @@ namespace Presentation.Web.Models.API.V2.Internal.Request.Organizations
         }
 
         [Required]
-        [Range(1, 4)]
-        public new int TypeId
+        public new OrganizationType Type
         {
-            get => base.TypeId;
-            set => base.TypeId = value;
+            get => base.Type;
+            set => base.Type = value;
         }
     }
 }
