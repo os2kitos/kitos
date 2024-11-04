@@ -431,7 +431,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
             _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
-            var updateParams = A<OrganizationUpdateParameters>();
+            var updateParams = A<OrganizationBaseParameters>();
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
 
@@ -451,7 +451,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
             _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(false);
-            var updateParams = new OrganizationUpdateParameters()
+            var updateParams = new OrganizationBaseParameters()
             {
                 Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
                 Name = OptionalValueChange<Maybe<string>>.With(A<string>())
@@ -471,7 +471,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
             _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(false);
-            var updateParams = new OrganizationUpdateParameters()
+            var updateParams = new OrganizationBaseParameters()
             {
                 Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
                 Name = OptionalValueChange<Maybe<string>>.With(A<string>())
@@ -491,7 +491,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
             _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
-            var updateParams = A<OrganizationUpdateParameters>();
+            var updateParams = A<OrganizationBaseParameters>();
             updateParams.Cvr = OptionalValueChange<Maybe<string>>.None;
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
@@ -507,7 +507,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var org = CreateOrganization();
             _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound));
             _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
-            var updateParams = new OrganizationUpdateParameters()
+            var updateParams = new OrganizationBaseParameters()
             {
                 Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
                 Name = OptionalValueChange<Maybe<string>>.With(A<string>())
@@ -573,7 +573,7 @@ namespace Tests.Unit.Presentation.Web.Services
         [Fact]
         public void Can_Create_Organization()
         {
-            var parameters = A<OrganizationUpdateParameters>();
+            var parameters = A<OrganizationBaseParameters>();
             _organizationService
                 .Setup(service => service.CreateNewOrganization(It.IsAny<Organization>()))
                 .Returns(Result<Organization, OperationFailure>.Success);

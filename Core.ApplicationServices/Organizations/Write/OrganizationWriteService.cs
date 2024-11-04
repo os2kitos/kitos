@@ -68,7 +68,7 @@ public class OrganizationWriteService : IOrganizationWriteService {
             .Bind(WithWriteAccess);
     }
 
-    public Result<Organization, OperationError> CreateOrganization(OrganizationUpdateParameters parameters)
+    public Result<Organization, OperationError> CreateOrganization(OrganizationBaseParameters parameters)
     {
         var organization = new Organization();
         var updatedOrganization = PerformBasicOrganizationUpdates(organization, parameters);
@@ -80,7 +80,7 @@ public class OrganizationWriteService : IOrganizationWriteService {
         return createResult.Match(Result<Organization, OperationError>.Success, failure => new OperationError(failure));
     }
 
-    public Result<Organization, OperationError> PatchOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
+    public Result<Organization, OperationError> PatchOrganization(Guid organizationUuid, OrganizationBaseParameters parameters)
     {
         using var transaction = _transactionManager.Begin();
         var result = GetOrganizationAndVerifyWriteAccess(organizationUuid)

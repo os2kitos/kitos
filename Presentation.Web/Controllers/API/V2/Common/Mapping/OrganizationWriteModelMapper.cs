@@ -65,17 +65,17 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
         };
     }
 
-    public OrganizationUpdateParameters ToOrganizationUpdateParameters(OrganizationUpdateRequestDTO dto)
+    public OrganizationBaseParameters ToOrganizationUpdateParameters(OrganizationUpdateRequestDTO dto)
     {
         return MapParameters(dto, false);
     }
 
-    public OrganizationUpdateParameters ToOrganizationCreateParameters(OrganizationCreateRequestDTO dto)
+    public OrganizationBaseParameters ToOrganizationCreateParameters(OrganizationCreateRequestDTO dto)
     {
         return MapParameters(dto, true);
     }
 
-    private OrganizationUpdateParameters MapParameters(OrganizationBaseRequestDTO dto, Boolean enforceChanges)
+    private OrganizationBaseParameters MapParameters(OrganizationBaseRequestDTO dto, Boolean enforceChanges)
     {
         var rule = CreateChangeRule<OrganizationBaseRequestDTO>(enforceChanges);
 
