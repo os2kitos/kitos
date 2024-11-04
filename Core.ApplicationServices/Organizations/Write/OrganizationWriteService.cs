@@ -28,10 +28,9 @@ public class OrganizationWriteService : IOrganizationWriteService {
     private readonly IGenericRepository<ContactPerson> _contactPersonRepository;
     private readonly IGenericRepository<DataResponsible> _dataResponsibleRepository;
     private readonly IGenericRepository<DataProtectionAdvisor> _dataProtectionAdvisorRepository;
-    private readonly IGenericRepository<OrganizationType> _organizationTypeRepository;
 
 
-    public OrganizationWriteService(ITransactionManager transactionManager, IDomainEvents domainEvents, IOrganizationService organizationService, IAuthorizationContext authorizationContext, IOrganizationRepository organizationRepository, IEntityIdentityResolver identityResolver, IGenericRepository<ContactPerson> contactPersonRepository, IGenericRepository<DataResponsible> dataResponsibleRepository, IGenericRepository<DataProtectionAdvisor> dataProtectionAdvisorRepository, IGenericRepository<OrganizationType> organizationTypeRepository)
+    public OrganizationWriteService(ITransactionManager transactionManager, IDomainEvents domainEvents, IOrganizationService organizationService, IAuthorizationContext authorizationContext, IOrganizationRepository organizationRepository, IEntityIdentityResolver identityResolver, IGenericRepository<ContactPerson> contactPersonRepository, IGenericRepository<DataResponsible> dataResponsibleRepository, IGenericRepository<DataProtectionAdvisor> dataProtectionAdvisorRepository)
     {
         _transactionManager = transactionManager;
         _domainEvents = domainEvents;
@@ -42,7 +41,6 @@ public class OrganizationWriteService : IOrganizationWriteService {
         _contactPersonRepository = contactPersonRepository;
         _dataResponsibleRepository = dataResponsibleRepository;
         _dataProtectionAdvisorRepository = dataProtectionAdvisorRepository;
-        _organizationTypeRepository = organizationTypeRepository;
     }
 
     public Result<Organization, OperationError> PatchMasterData(Guid organizationUuid, OrganizationMasterDataUpdateParameters parameters)
@@ -130,19 +128,9 @@ public class OrganizationWriteService : IOrganizationWriteService {
     private Result<Organization, OperationError> PerformBasicOrganizationUpdates(Organization organization, OrganizationBaseParameters parameters)
     {
         return organization.WithOptionalUpdate(parameters.Cvr, (org, cvr) => org.UpdateCvr(cvr))
-            .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)));
-            //.Bind(org => org.WithOptionalUpdate(parameters.ForeignCvr, (org, foreignCvr) => org.UpdateForeignCvr(foreignCvr)));
-            //.Bind(org => org.WithOptionalUpdate(parameters.TypeId, (org, typeId) => UpdateOrganizationType(org, typeId))));
-    }
-
-    private Result<Organization, OperationError> UpdateOrganizationType(Organization organization, int typeId)
-    {
-        var organizationType = _organizationTypeRepository.GetByKey(typeId).FromNullable();
-        return organizationType.Match(orgType => { 
-            organization.UpdateType(orgType); 
-            return Result<Organization, OperationError>.Success(organization); 
-        },
-        () => new OperationError(OperationFailure.NotFound));
+            .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)))
+            .Bind(org => org.WithOptionalUpdate(parameters.ForeignCvr, (org, foreignCvr) => org.UpdateForeignCvr(foreignCvr))
+            .Bind(org => org.WithOptionalUpdate(parameters.TypeId, (org, typeId) => org.UpdateType(typeId))));
     }
 
     private Result<Organization, OperationError> WithModifyCvrAccessIfRequired(Organization organization,

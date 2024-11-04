@@ -32,7 +32,6 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IGenericRepository<ContactPerson>> _contactPersonRepository;
         private readonly Mock<IGenericRepository<DataResponsible>> _dataResponsibleRepository;
         private readonly Mock<IGenericRepository<DataProtectionAdvisor>> _dataProtectionAdvisorRepository;
-        private readonly Mock<IGenericRepository<OrganizationType>> _organizationTypeRepository;
         private readonly OrganizationWriteService _sut;
 
 
@@ -47,7 +46,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _contactPersonRepository = new Mock<IGenericRepository<ContactPerson>>();
             _dataResponsibleRepository = new Mock<IGenericRepository<DataResponsible>>();
             _dataProtectionAdvisorRepository = new Mock<IGenericRepository<DataProtectionAdvisor>>();
-            _organizationTypeRepository = new Mock<IGenericRepository<OrganizationType>>();
+            
             _sut = new OrganizationWriteService(_transactionManager.Object,
                 _domainEvents.Object,
                 _organizationService.Object,
@@ -56,8 +55,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 _identityResolver.Object,
                 _contactPersonRepository.Object,
                 _dataResponsibleRepository.Object,
-                _dataProtectionAdvisorRepository.Object,
-                _organizationTypeRepository.Object);
+                _dataProtectionAdvisorRepository.Object);
         }
 
         [Fact]
@@ -434,8 +432,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
             _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
             var updateParams = A<OrganizationUpdateParameters>();
-            var orgType = new OrganizationType { Id = updateParams.TypeId.NewValue };
-            _organizationTypeRepository.Setup(x => x.GetByKey(updateParams.TypeId.NewValue)).Returns(orgType);
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
 
@@ -497,7 +493,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
             var updateParams = A<OrganizationUpdateParameters>();
             updateParams.Cvr = OptionalValueChange<Maybe<string>>.None;
-            _organizationTypeRepository.Setup(x => x.GetByKey(updateParams.TypeId.NewValue)).Returns(new OrganizationType { Id = updateParams.TypeId.NewValue});
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
 
@@ -582,8 +577,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationService
                 .Setup(service => service.CreateNewOrganization(It.IsAny<Organization>()))
                 .Returns(Result<Organization, OperationFailure>.Success);
-            var orgType = new OrganizationType { Id = parameters.TypeId.NewValue };
-            _organizationTypeRepository.Setup(x => x.GetByKey(parameters.TypeId.NewValue)).Returns(orgType);
 
             var result = _sut.CreateOrganization(parameters);
 

@@ -13,6 +13,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Request.Organizations
         [Required]
         [Range(1, 4)]
         public int TypeId { get; set; }
+        [MaxLength(10)]
         public string Cvr {  get; set; }
         public string ForeignCvr { get; set; }
     }
