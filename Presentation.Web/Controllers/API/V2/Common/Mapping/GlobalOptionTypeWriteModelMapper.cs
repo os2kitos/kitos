@@ -27,21 +27,10 @@ public class GlobalOptionTypeWriteModelMapper : WriteModelMapperBase, IGlobalOpt
 
         return new()
         {
-            IsEnabled = rule.MustUpdate(x => x.IsEnabled)
-                ? (dto.IsEnabled.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
-                : OptionalValueChange<Maybe<bool>>.None,
-
-            Name = rule.MustUpdate(x => x.Name)
-                ? (dto.Name.FromNullable() ?? Maybe<string>.None).AsChangedValue()
-                : OptionalValueChange<Maybe<string>>.None,
-
-            IsObligatory = rule.MustUpdate(x => x.IsObligatory)
-                ? (dto.IsObligatory.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
-                : OptionalValueChange<Maybe<bool>>.None,
-
-            Description = rule.MustUpdate(x => x.Description)
-                ? (dto.Description.FromNullable() ?? Maybe<string>.None).AsChangedValue()
-                : OptionalValueChange<Maybe<string>>.None
+            IsEnabled = GetOptionalValueChange(() => rule.MustUpdate(x => x.IsEnabled), dto.IsEnabled.FromNullable()),
+            Name = GetOptionalValueChange(() => rule.MustUpdate(x => x.Name), dto.Name.FromNullable()),
+            IsObligatory = GetOptionalValueChange(() => rule.MustUpdate(x => x.IsObligatory), dto.IsObligatory.FromNullable()),
+            Description = GetOptionalValueChange(() => rule.MustUpdate(x => x.Description), dto.Description.FromNullable()),
         };
     }
 
@@ -62,25 +51,11 @@ public class GlobalOptionTypeWriteModelMapper : WriteModelMapperBase, IGlobalOpt
 
         return new()
         {
-            IsEnabled = rule.MustUpdate(x => x.IsEnabled)
-                ? (dto.IsEnabled.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
-                : OptionalValueChange<Maybe<bool>>.None,
-
-            Name = rule.MustUpdate(x => x.Name)
-                ? (dto.Name.FromNullable() ?? Maybe<string>.None).AsChangedValue()
-                : OptionalValueChange<Maybe<string>>.None,
-
-            IsObligatory = rule.MustUpdate(x => x.IsObligatory)
-                ? (dto.IsObligatory.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
-                : OptionalValueChange<Maybe<bool>>.None,
-
-            Description = rule.MustUpdate(x => x.Description)
-                ? (dto.Description.FromNullable() ?? Maybe<string>.None).AsChangedValue()
-                : OptionalValueChange<Maybe<string>>.None,
-
-            WriteAccess = rule.MustUpdate(x => x.WriteAccess)
-                ? (dto.WriteAccess.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
-                : OptionalValueChange<Maybe<bool>>.None,
+            IsEnabled = GetOptionalValueChange(() => rule.MustUpdate(x => x.IsEnabled), dto.IsEnabled.FromNullable()),
+            Name = GetOptionalValueChange(() => rule.MustUpdate(x => x.Name), dto.Name.FromNullable()),
+            IsObligatory = GetOptionalValueChange(() => rule.MustUpdate(x => x.IsObligatory), dto.IsObligatory.FromNullable()),
+            Description = GetOptionalValueChange(() => rule.MustUpdate(x => x.Description), dto.Description.FromNullable()),
+            WriteAccess = GetOptionalValueChange(() => rule.MustUpdate(x => x.WriteAccess), dto.WriteAccess.FromNullable()),
         };
     }
 

@@ -1,5 +1,4 @@
 ﻿
-using Presentation.Web.Models.API.V2.Internal.Response;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
@@ -15,7 +14,7 @@ using Presentation.Web.Models.API.V2.Internal.Response.GlobalOptions;
 
 namespace Tests.Integration.Presentation.Web.GlobalAdminArea
 {
-    public class ItSystemGlobalRegularOptionTypesInternalV2ApiTest: WithAutoFixture
+    public class ItSystemGlobalBusinessTypesInternalV2ApiTest: WithAutoFixture
     {
         private const string BusinessTypesUrlSuffix = "business-types";
         private const string ItSystemsApiPrefix = "api/v2/internal/it-systems";
