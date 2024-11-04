@@ -43,7 +43,7 @@ namespace Core.ApplicationServices.GlobalOptions
                 return options.Any() ? options.Max(x => x.Priority) + 1 : 1;
             }
 
-            protected Maybe<OperationError> WithGlobalAdminRights(string errorMessage)
+            private Maybe<OperationError> WithGlobalAdminRights(string errorMessage)
             {
                 var isGlobalAdmin = _activeUserContext.IsGlobalAdmin();
                 return isGlobalAdmin
@@ -76,7 +76,7 @@ namespace Core.ApplicationServices.GlobalOptions
 
         protected Result<TOptionType, OperationError> GetOptionWithGlobalAdminRights(Guid optionUuid)
             {
-                return WithGlobalAdminRights($"User is not allowed to patch global option with uuid {optionUuid}")
+                return WithGlobalAdminRights($"User is not allowed to access global option with uuid {optionUuid}")
                     .Match(error => error,
                         () =>
                         {
