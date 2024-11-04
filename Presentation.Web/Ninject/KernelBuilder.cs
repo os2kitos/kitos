@@ -515,8 +515,8 @@ namespace Presentation.Web.Ninject
 
         private void RegisterGlobalOptionTypes(IKernel kernel)
         {
-            RegisterGlobalOptionService<BusinessType, ItSystem>(kernel);
-            RegisterGlobalOptionService<ItSystemRole, ItSystemRight>(kernel);
+            RegisterGlobalRegularOptionService<BusinessType, ItSystem>(kernel);
+            RegisterGlobalRoleOptionService<ItSystemRole, ItSystemRight>(kernel);
         }
 
         private void RegisterLocalItContractOptionTypes(IKernel kernel)
@@ -567,11 +567,18 @@ namespace Presentation.Web.Ninject
                 .To<GenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType>>().InCommandScope(Mode);
         }
 
-        private void RegisterGlobalOptionService<TOptionType, TReferenceType>(IKernel kernel)
+        private void RegisterGlobalRegularOptionService<TOptionType, TReferenceType>(IKernel kernel)
             where TOptionType : OptionEntity<TReferenceType>, new()
         {
             kernel.Bind<IGlobalRegularOptionsService<TOptionType, TReferenceType>>()
                 .To<GlobalRegularOptionsService<TOptionType, TReferenceType>>().InCommandScope(Mode);
+        }
+
+        private void RegisterGlobalRoleOptionService<TOptionType, TReferenceType>(IKernel kernel)
+            where TOptionType : OptionEntity<TReferenceType>, IRoleEntity, new()
+        {
+            kernel.Bind<IGlobalRoleOptionsService<TOptionType, TReferenceType>>()
+                .To<GlobalRoleOptionsService<TOptionType, TReferenceType>>().InCommandScope(Mode);
         }
 
         private void RegisterOptions(IKernel kernel)

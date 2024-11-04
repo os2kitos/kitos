@@ -46,8 +46,7 @@ public class GlobalRoleOptionsService<TOptionType, TReferenceType> :
     private Result<TOptionType, OperationError> PerformGlobalRoleOptionUpdates(TOptionType option, GlobalRoleOptionUpdateParameters parameters)
     {
         return PerformGlobalRegularOptionUpdates(option, parameters)
-            .Bind(opt => opt.WithOptionalUpdate(parameters.WriteAccess, (opt, writeAccess) => opt.HasWriteAccess = writeAccess.HasValue && writeAccess.Value));
-        ;
+            .Bind(opt => opt.WithOptionalUpdate(parameters.WriteAccess, (opt, writeAccess) => opt.HasWriteAccess = writeAccess.HasValue && writeAccess.Value)); ;
     }
 
     public GlobalRoleOptionsService(IGenericRepository<TOptionType> globalOptionsRepository, IOrganizationalUserContext activeUserContext, IDomainEvents domainEvents) : base(globalOptionsRepository, activeUserContext, domainEvents)

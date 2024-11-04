@@ -17,7 +17,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.GlobalOptionTypes.ItSyste
     [RoutePrefix("api/v2/internal/it-systems/global-option-types/it-systems-roles")]
     public class ItSystemGlobalRoleOptionTypesInternalV2Controller: BaseGlobalRoleOptionTypesInternalV2Controller<ItSystemRole, ItSystemRight>
     {
-        public ItSystemGlobalRoleOptionTypesInternalV2Controller(IGlobalRegularOptionsService<ItSystemRole, ItSystemRight> globalRegularOptionsService, IGlobalOptionTypeResponseMapper responseMapper, IGlobalOptionTypeWriteModelMapper writeModelMapper) : base(globalRegularOptionsService, responseMapper, writeModelMapper)
+        public ItSystemGlobalRoleOptionTypesInternalV2Controller(IGlobalRoleOptionsService<ItSystemRole, ItSystemRight> globalRoleOptionsService, IGlobalOptionTypeResponseMapper responseMapper, IGlobalOptionTypeWriteModelMapper writeModelMapper) : base(globalRoleOptionsService, responseMapper, writeModelMapper)
         {
         }
 
