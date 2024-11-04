@@ -105,8 +105,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         public async Task Receive_Error_If_Try_To_Copy_Roles_From_User_To_Itself()
         {
             var organization = await CreateOrganizationAsync();
-            var user = await CreateUserAsync(organization.Uuid);
-
+            var user = await CreateUserAsync(organization.Uuid)
             var response = await UsersV2Helper.CopyRoles(organization.Uuid, user.Uuid, user.Uuid,
                 A<MutateUserRightsRequestDTO>());
 
