@@ -6,7 +6,7 @@ using Core.DomainModel;
 
 namespace Core.ApplicationServices.GlobalOptions
 {
-    public interface IGenericGlobalOptionsService<TOptionType, TReferenceType>
+    public interface IGlobalRegularOptionsService<TOptionType, TReferenceType>
         where TOptionType : OptionEntity<TReferenceType>
     {
 

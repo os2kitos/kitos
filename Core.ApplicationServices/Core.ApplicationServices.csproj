@@ -78,8 +78,9 @@
     <Compile Include="Generic\ExtendedExtendedEntityIdentityResolverService.cs" />
     <Compile Include="Generic\IEntityIdMapper.cs" />
     <Compile Include="Generic\IEntityTreeUuidCollector.cs" />
-    <Compile Include="GlobalOptions\GenericGlobalOptionsService.cs" />
-    <Compile Include="GlobalOptions\IGenericGlobalOptionsService.cs" />
+    <Compile Include="GlobalOptions\GlobalOptionsServiceBase.cs" />
+    <Compile Include="GlobalOptions\GlobalRegularOptionsService.cs" />
+    <Compile Include="GlobalOptions\IGlobalRegularOptionsService.cs" />
     <Compile Include="Interface\Write\IItInterfaceWriteService.cs" />
     <Compile Include="Interface\Write\ItInterfaceWriteService.cs" />
     <Compile Include="Authorization\ResourceCollectionPermissionsResult.cs" />

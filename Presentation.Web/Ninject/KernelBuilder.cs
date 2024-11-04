@@ -570,8 +570,8 @@ namespace Presentation.Web.Ninject
         private void RegisterGlobalOptionService<TOptionType, TReferenceType>(IKernel kernel)
             where TOptionType : OptionEntity<TReferenceType>, new()
         {
-            kernel.Bind<IGenericGlobalOptionsService<TOptionType, TReferenceType>>()
-                .To<GenericGlobalOptionsService<TOptionType, TReferenceType>>().InCommandScope(Mode);
+            kernel.Bind<IGlobalRegularOptionsService<TOptionType, TReferenceType>>()
+                .To<GlobalRegularOptionsService<TOptionType, TReferenceType>>().InCommandScope(Mode);
         }
 
         private void RegisterOptions(IKernel kernel)

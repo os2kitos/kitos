@@ -12,20 +12,15 @@ using Core.DomainServices.Extensions;
 
 namespace Core.ApplicationServices.GlobalOptions;
 
-public class GenericGlobalOptionsService<TOptionType, TReferenceType> : IGenericGlobalOptionsService<TOptionType, TReferenceType> 
+public class GlobalRegularOptionsService<TOptionType, TReferenceType> : 
+    GlobalOptionsServiceBase<TOptionType, TReferenceType>,
+    IGlobalRegularOptionsService<TOptionType, TReferenceType> 
     where TOptionType : OptionEntity<TReferenceType>, new()
 {
-    private readonly IGenericRepository<TOptionType> _globalOptionsRepository;
-    private readonly IOrganizationalUserContext _activeUserContext;
-    private readonly IDomainEvents _domainEvents;
 
+    public GlobalRegularOptionsService(IGenericRepository<TOptionType> globalOptionsRepository, IOrganizationalUserContext activeUserContext, IDomainEvents domainEvents) : base(globalOptionsRepository, activeUserContext, domainEvents)
+    {}
 
-    public GenericGlobalOptionsService(IGenericRepository<TOptionType> globalOptionsRepository, IOrganizationalUserContext activeUserContext, IDomainEvents domainEvents)
-    {
-        _globalOptionsRepository = globalOptionsRepository;
-        _activeUserContext = activeUserContext;
-        _domainEvents = domainEvents;
-    }
     public Result<IEnumerable<TOptionType>, OperationError> GetGlobalOptions()
     {
         return WithGlobalAdminRights("User is not allowed to read global options")
@@ -57,12 +52,6 @@ public class GenericGlobalOptionsService<TOptionType, TReferenceType> : IGeneric
 
                     return Result<TOptionType, OperationError>.Success(globalOption);
                 });
-    }
-
-    private int GetNextOptionPriority()
-    {
-        var options = _globalOptionsRepository.AsQueryable();
-        return options.Any() ? options.Max(x => x.Priority) + 1 : 1;
     }
 
     public Result<TOptionType, OperationError> PatchGlobalOption(Guid optionUuid, GlobalRegularOptionUpdateParameters updateParameters)
@@ -101,14 +90,5 @@ public class GenericGlobalOptionsService<TOptionType, TReferenceType> : IGeneric
             .Bind(opt => opt.WithOptionalUpdate(parameters.Name, (opt, name) => opt.UpdateName(name)))
             .Bind(opt => opt.WithOptionalUpdate(parameters.IsObligatory, (opt, isObligatory) => opt.UpdateIsObligatory(isObligatory)))
             .Bind(opt => opt.WithOptionalUpdate(parameters.IsEnabled, (opt, isEnabled) => opt.UpdateIsEnabled(isEnabled)));
-    }
-
-
-    private Maybe<OperationError> WithGlobalAdminRights(string errorMessage)
-    {
-        var isGlobalAdmin = _activeUserContext.IsGlobalAdmin();
-        return isGlobalAdmin 
-            ? Maybe<OperationError>.None 
-            : new OperationError(errorMessage, OperationFailure.Forbidden);
     }
 }

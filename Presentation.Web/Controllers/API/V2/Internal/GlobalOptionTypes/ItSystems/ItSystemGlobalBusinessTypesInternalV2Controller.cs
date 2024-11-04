@@ -18,7 +18,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.GlobalOptionTypes.ItSyste
 
     public class ItSystemGlobalBusinessTypesInternalV2Controller: BaseGlobalRegularOptionTypesInternalV2Controller<ItSystem, BusinessType>
     {
-        public ItSystemGlobalBusinessTypesInternalV2Controller(IGenericGlobalOptionsService<BusinessType, ItSystem> globalOptionsService, IGlobalOptionTypeResponseMapper responseMapper, IGlobalOptionTypeWriteModelMapper writeModelMapper) : base(globalOptionsService, responseMapper, writeModelMapper)
+        public ItSystemGlobalBusinessTypesInternalV2Controller(IGlobalRegularOptionsService<BusinessType, ItSystem> globalRegularOptionsService, IGlobalOptionTypeResponseMapper responseMapper, IGlobalOptionTypeWriteModelMapper writeModelMapper) : base(globalRegularOptionsService, responseMapper, writeModelMapper)
         {
         }
 

@@ -19,18 +19,18 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
 {
     public class TestOptionEntity : OptionEntity<TestReferenceType> { }
     public class TestReferenceType { }
-    public class GenericGlobalOptionsServiceTest: WithAutoFixture
+    public class GlobalRegularOptionsServiceTest: WithAutoFixture
     {
-        private readonly GenericGlobalOptionsService<TestOptionEntity, TestReferenceType> _sut;
+        private readonly GlobalRegularOptionsService<TestOptionEntity, TestReferenceType> _sut;
         private readonly Mock<IGenericRepository<TestOptionEntity>> _globalOptionsRepository;
         private readonly Mock<IOrganizationalUserContext> _activeUserContext;
         private readonly Mock<IDomainEvents> _domainEvents;
-        public GenericGlobalOptionsServiceTest()
+        public GlobalRegularOptionsServiceTest()
         {
             _globalOptionsRepository = new Mock<IGenericRepository<TestOptionEntity>>();
             _activeUserContext = new Mock<IOrganizationalUserContext>();
             _domainEvents = new Mock<IDomainEvents>();
-            _sut = new GenericGlobalOptionsService<TestOptionEntity, TestReferenceType>(_globalOptionsRepository.Object, _activeUserContext.Object, _domainEvents.Object);
+            _sut = new GlobalRegularOptionsService<TestOptionEntity, TestReferenceType>(_globalOptionsRepository.Object, _activeUserContext.Object, _domainEvents.Object);
         }
 
         [Fact]
