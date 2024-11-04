@@ -1,6 +1,8 @@
 ﻿
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GlobalOptions;
+using Core.ApplicationServices.Model.GlobalOptions;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;
@@ -43,6 +45,55 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             Assert.True(result.Ok);
             var options = result.Value;
             Assert.Equivalent(expected, options);
+        }
+
+        [Fact]
+        public void Can_Create_New_Option()
+        {
+            SetupIsGlobalAdmin();
+            var existingOptions = SetupRepositoryReturnsOneOption(A<Guid>());
+            Assert.NotNull(existingOptions);
+            Assert.Single(existingOptions);
+            var parameters = new GlobalRoleOptionCreateParameters()
+            {
+                Description = A<string>(),
+                Name = A<string>(),
+                IsObligatory = A<bool>(),
+                WriteAccess = A<bool>()
+            };
+
+            var result = _sut.CreateGlobalOption(parameters);
+
+            Assert.True(result.Ok);
+            var option = result.Value;
+
+            Assert.Equal(parameters.Description, option.Description);
+            Assert.Equal(parameters.Name, option.Name);
+            Assert.Equal(parameters.IsObligatory, option.IsObligatory);
+            Assert.Equal(parameters.WriteAccess, option.HasWriteAccess);
+            Assert.NotNull(option.Uuid);
+            Assert.Equal(existingOptions.First().Priority + 1, option.Priority);
+            Assert.False(option.IsEnabled);
+            _globalOptionsRepository.Verify(_ => _.Insert(option));
+            _globalOptionsRepository.Verify(_ => _.Save());
+        }
+
+        [Fact]
+        public void Create_Returns_Forbidden_If_Not_Allowed()
+        {
+            SetupIsNotGlobalAdmin();
+            var parameters = new GlobalRoleOptionCreateParameters()
+            {
+                Description = A<string>(),
+                Name = A<string>(),
+                IsObligatory = A<bool>(),
+                WriteAccess = A<bool>()
+            };
+
+            var result = _sut.CreateGlobalOption(parameters);
+
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         private List<TestRoleOptionEntity> SetupRepositoryReturnsOneOption(Guid uuid)
