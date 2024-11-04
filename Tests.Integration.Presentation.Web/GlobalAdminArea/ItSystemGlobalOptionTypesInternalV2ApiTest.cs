@@ -13,6 +13,8 @@ using Xunit;
 using Core.DomainModel.ItSystem;
 using System;
 using System.Linq;
+using Presentation.Web.Models.API.V2.Internal.Request.Options;
+using Presentation.Web.Models.API.V2.Internal.Response.GlobalOptions;
 
 namespace Tests.Integration.Presentation.Web.GlobalAdminArea
 {
@@ -22,7 +24,7 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
         private const string ItSystemsApiPrefix = "api/v2/internal/it-systems";
 
         [Fact]
-        public async Task Can_Get_global_Business_Types()
+        public async Task Can_Get_Global_Business_Types()
         {
             var expectedGlobalOption = SetupCreateGlobalBusinessTypeInDatabase();
 
@@ -33,7 +35,26 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
             Assert.NotNull(responseDtos);
             var actualIncludedOption = responseDtos.First(dto => dto.Uuid == expectedGlobalOption.Uuid);
             Assert.NotNull(actualIncludedOption);
-            Assert.Equal(expectedGlobalOption.Name, actualIncludedOption.Name);
+            Assert.Equal(expectedGlobalOption.Uuid, actualIncludedOption.Uuid);
+        }
+
+        [Fact]
+        public async Task Can_Create_Global_Business_Type()
+        {
+            var dto = new GlobalOptionCreateRequestDTO()
+            {
+                Name = A<string>(),
+                Description = A<string>(),
+                IsObligatory = A<bool>()
+            };
+
+            using var response = await GlobalOptionTypeV2Helper.CreateGlobalOptionType(BusinessTypesUrlSuffix, dto, ItSystemsApiPrefix);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var responseDto = await response.ReadResponseBodyAsAsync<GlobalRegularOptionResponseDTO>();
+            Assert.NotNull(responseDto);
+            Assert.Equal(dto.Name, responseDto.Name);
+            Assert.False(responseDto.IsEnabled);
         }
 
         private BusinessType SetupCreateGlobalBusinessTypeInDatabase()
