@@ -4,13 +4,14 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GlobalOptions;
 using Core.ApplicationServices.Model.Shared;
 using Presentation.Web.Infrastructure.Model.Request;
+using Presentation.Web.Models.API.V2.Internal.Request;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
 
 namespace Presentation.Web.Controllers.API.V2.Common.Mapping;
 
 public class GlobalOptionTypeWriteModelMapper : WriteModelMapperBase, IGlobalOptionTypeWriteModelMapper
 {
-    public GlobalOptionCreateParameters ToGlobalOptionCreateParameters(GlobalOptionCreateRequestDTO dto)
+    public GlobalRegularOptionCreateParameters ToGlobalRegularOptionCreateParameters(GlobalRegularOptionCreateRequestDTO dto)
     {
         return new()
         {
@@ -20,9 +21,9 @@ public class GlobalOptionTypeWriteModelMapper : WriteModelMapperBase, IGlobalOpt
         };
     }
 
-    public GlobalOptionUpdateParameters ToGlobalOptionUpdateParameters(GlobalOptionUpdateRequestDTO dto)
+    public GlobalRegularOptionUpdateParameters ToGlobalRegularOptionUpdateParameters(GlobalRegularOptionUpdateRequestDTO dto)
     {
-        var rule = CreateChangeRule<GlobalOptionUpdateRequestDTO>(false);
+        var rule = CreateChangeRule<GlobalRegularOptionUpdateRequestDTO>(false);
 
         return new()
         {
@@ -41,6 +42,45 @@ public class GlobalOptionTypeWriteModelMapper : WriteModelMapperBase, IGlobalOpt
             Description = rule.MustUpdate(x => x.Description)
                 ? (dto.Description.FromNullable() ?? Maybe<string>.None).AsChangedValue()
                 : OptionalValueChange<Maybe<string>>.None
+        };
+    }
+
+    public GlobalRoleOptionCreateParameters ToGlobalRoleOptionCreateParameters(GlobalRoleOptionCreateRequestDTO dto)
+    {
+        return new()
+        {
+            Description = dto.Description,
+            IsObligatory = dto.IsObligatory,
+            Name = dto.Name,
+            WriteAccess = dto.WriteAccess
+        };
+    }
+
+    public GlobalRoleOptionUpdateParameters ToGlobalRoleOptionUpdateParameters(GlobalRoleOptionUpdateRequestDTO dto)
+    {
+        var rule = CreateChangeRule<GlobalRoleOptionUpdateRequestDTO>(false);
+
+        return new()
+        {
+            IsEnabled = rule.MustUpdate(x => x.IsEnabled)
+                ? (dto.IsEnabled.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<bool>>.None,
+
+            Name = rule.MustUpdate(x => x.Name)
+                ? (dto.Name.FromNullable() ?? Maybe<string>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<string>>.None,
+
+            IsObligatory = rule.MustUpdate(x => x.IsObligatory)
+                ? (dto.IsObligatory.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<bool>>.None,
+
+            Description = rule.MustUpdate(x => x.Description)
+                ? (dto.Description.FromNullable() ?? Maybe<string>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<string>>.None,
+
+            WriteAccess = rule.MustUpdate(x => x.WriteAccess)
+                ? (dto.WriteAccess.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<bool>>.None,
         };
     }
 

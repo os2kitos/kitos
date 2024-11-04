@@ -4,7 +4,7 @@ using Core.ApplicationServices.Model.Shared;
 
 namespace Core.ApplicationServices.Model.GlobalOptions
 {
-    public class GlobalOptionUpdateParameters
+    public class GlobalRegularOptionUpdateParameters
     {
         public OptionalValueChange<Maybe<bool>> IsEnabled { get; set; }
         public OptionalValueChange<Maybe<string>> Name { get; set; }

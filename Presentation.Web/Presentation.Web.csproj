@@ -371,6 +371,7 @@
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\BaseGlobalRegularOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\BaseGlobalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalBusinessTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\GridLocalItContractRolesV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\CommandPermissionsResponseMapper.cs" />
@@ -458,11 +459,13 @@
     <Compile Include="Models\API\V2\Internal\Common\NamedEntityV2DTO.cs" />
     <Compile Include="Models\API\V2\Internal\Common\NamedEntityWithEnabledStatusV2DTO.cs" />
     <Compile Include="Models\API\V2\Internal\Common\NamedEntityWithUserFullNameV2DTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\GlobalRoleOptionUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\BaseNotificationPropertiesWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\IHasBaseWriteProperties.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\NotificationSentResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Internal\Request\Options\GlobalOptionCreateRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Internal\Request\Options\GlobalOptionUpdateRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Options\GlobalRegularOptionCreateRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Options\GlobalRegularOptionUpdateRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Options\GlobalRoleOptionCreateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Options\LocalOptionCreateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Options\LocalRegularOptionUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\ColumnConfigurationRequestDTO.cs" />

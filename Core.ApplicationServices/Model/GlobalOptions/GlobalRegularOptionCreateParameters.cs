@@ -1,8 +1,6 @@
-﻿
-
-namespace Presentation.Web.Models.API.V2.Internal.Request.Options
+﻿namespace Core.ApplicationServices.Model.GlobalOptions
 {
-    public class GlobalOptionCreateRequestDTO
+    public class GlobalRegularOptionCreateParameters
     {
         public string Name { get; set; }
         public bool IsObligatory { get; set; }

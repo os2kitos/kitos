@@ -1,60 +1,58 @@
-﻿
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Web.Http;
 using Core.ApplicationServices.GlobalOptions;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models.API.V2.Internal.Request;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
-using Swashbuckle.Swagger.Annotations;
-using System.Collections.Generic;
-using System.Net;
-using System.Web.Http;
-using System;
 using Presentation.Web.Models.API.V2.Internal.Response.GlobalOptions;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.GlobalOptionTypes.ItSystems
 {
-    [RoutePrefix("api/v2/internal/it-systems/global-option-types/business-types")]
-
-    public class ItSystemGlobalBusinessTypesInternalV2Controller: BaseGlobalRegularOptionTypesInternalV2Controller<ItSystem, BusinessType>
+    public class ItSystemGlobalRoleOptionTypesInternalV2Controller: BaseGlobalRoleOptionTypesInternalV2Controller<ItSystemRole, ItSystemRight>
     {
-        public ItSystemGlobalBusinessTypesInternalV2Controller(IGenericGlobalOptionsService<BusinessType, ItSystem> globalOptionsService, IGlobalOptionTypeResponseMapper responseMapper, IGlobalOptionTypeWriteModelMapper writeModelMapper) : base(globalOptionsService, responseMapper, writeModelMapper)
+        public ItSystemGlobalRoleOptionTypesInternalV2Controller(IGenericGlobalOptionsService<ItSystemRole, ItSystemRight> globalOptionsService, IGlobalOptionTypeResponseMapper responseMapper, IGlobalOptionTypeWriteModelMapper writeModelMapper) : base(globalOptionsService, responseMapper, writeModelMapper)
         {
         }
 
         [HttpGet]
         [Route]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<GlobalRegularOptionResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<GlobalRoleOptionResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetBusinessTypes()
+        public IHttpActionResult GetItSystemRoles()
         {
             return GetAll();
         }
 
         [HttpPost]
         [Route]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GlobalRegularOptionResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GlobalRoleOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult CreateBusinessType(GlobalRegularOptionCreateRequestDTO dto)
+        public IHttpActionResult CreateItSystemRole(GlobalRoleOptionCreateRequestDTO dto)
         {
             return Create(dto);
         }
 
         [HttpPatch]
         [Route("{optionUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GlobalRegularOptionResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(GlobalRoleOptionResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PatchGlobalBusinessType([NonEmptyGuid][FromUri] Guid optionUuid,
-            GlobalRegularOptionUpdateRequestDTO dto)
+        public IHttpActionResult PatchGlobalBItSystemRole([NonEmptyGuid][FromUri] Guid optionUuid,
+            GlobalRoleOptionUpdateRequestDTO dto)
         {
             return Patch(optionUuid, dto);
         }

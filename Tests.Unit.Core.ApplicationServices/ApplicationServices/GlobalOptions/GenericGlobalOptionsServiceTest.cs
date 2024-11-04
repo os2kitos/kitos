@@ -62,7 +62,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             var existingOptions = SetupRepositoryReturnsOneOption(A<Guid>());
             Assert.NotNull(existingOptions);
             Assert.Equal(1, existingOptions.Count);
-            var parameters = new GlobalOptionCreateParameters()
+            var parameters = new GlobalRegularOptionCreateParameters()
             {
                 Description = A<string>(),
                 Name = A<string>(),
@@ -88,7 +88,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         public void Create_Returns_Forbidden_If_Not_Allowed()
         {
             SetupIsNotGlobalAdmin();
-            var parameters = new GlobalOptionCreateParameters()
+            var parameters = new GlobalRegularOptionCreateParameters()
             {
                 Description = A<string>(),
                 Name = A<string>(),
@@ -107,7 +107,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             SetupIsGlobalAdmin();
             var optionUuid = A<Guid>();
             SetupRepositoryReturnsOneOption(optionUuid);
-            var parameters = new GlobalOptionUpdateParameters()
+            var parameters = new GlobalRegularOptionUpdateParameters()
             {
                 IsEnabled = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
                 IsObligatory = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
@@ -132,7 +132,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             var optionUuid = A<Guid>();
             var existing = SetupRepositoryReturnsOneOption(optionUuid).FirstOrDefault();
             Assert.NotNull(existing);
-            var parameters = new GlobalOptionUpdateParameters()
+            var parameters = new GlobalRegularOptionUpdateParameters()
             {
                 IsEnabled = OptionalValueChange<Maybe<bool>>.None,
                 IsObligatory = OptionalValueChange<Maybe<bool>>.None,
@@ -156,7 +156,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             SetupIsNotGlobalAdmin();
             var optionUuid = A<Guid>();
             SetupRepositoryReturnsOneOption(optionUuid);
-            var parameters = new GlobalOptionUpdateParameters()
+            var parameters = new GlobalRegularOptionUpdateParameters()
             {
                 IsEnabled = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
                 IsObligatory = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
@@ -176,7 +176,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             SetupIsGlobalAdmin();
             var optionUuid = A<Guid>();
             _globalOptionsRepository.Setup(_ => _.AsQueryable()).Returns(new List<TestOptionEntity>().AsQueryable());
-            var parameters = new GlobalOptionUpdateParameters()
+            var parameters = new GlobalRegularOptionUpdateParameters()
             {
                 IsEnabled = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
                 IsObligatory = Maybe<bool>.Some(A<bool>()).AsChangedValue(),

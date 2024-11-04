@@ -516,6 +516,7 @@ namespace Presentation.Web.Ninject
         private void RegisterGlobalOptionTypes(IKernel kernel)
         {
             RegisterGlobalOptionService<BusinessType, ItSystem>(kernel);
+            RegisterGlobalOptionService<ItSystemRole, ItSystemRight>(kernel);
         }
 
         private void RegisterLocalItContractOptionTypes(IKernel kernel)

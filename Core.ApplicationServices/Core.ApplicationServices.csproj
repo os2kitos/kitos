@@ -171,8 +171,10 @@
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDataParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDate.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationRoles.cs" />
-    <Compile Include="Model\GlobalOptions\GlobalOptionCreateParameters.cs" />
-    <Compile Include="Model\GlobalOptions\GlobalOptionUpdateParameters.cs" />
+    <Compile Include="Model\GlobalOptions\GlobalRegularOptionCreateParameters.cs" />
+    <Compile Include="Model\GlobalOptions\GlobalRegularOptionUpdateParameters.cs" />
+    <Compile Include="Model\GlobalOptions\GlobalRoleOptionCreateParameters.cs" />
+    <Compile Include="Model\GlobalOptions\GlobalRoleOptionUpdateParameters.cs" />
     <Compile Include="Model\Interface\ItInterfaceDataWriteModel.cs" />
     <Compile Include="Model\Interface\ItInterfaceDeletionConflict.cs" />
     <Compile Include="Model\Interface\ItInterfacePermissions.cs" />

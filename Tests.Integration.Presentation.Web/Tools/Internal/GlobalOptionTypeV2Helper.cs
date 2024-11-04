@@ -19,14 +19,14 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal
                 TestEnvironment.CreateUrl($"{apiPrefix}/{GlobalOptionTypesSuffix}/{choiceTypeName}"), cookie);
         }
 
-        public static async Task<HttpResponseMessage> CreateGlobalOptionType(string choiceTypeName, GlobalOptionCreateRequestDTO dto, string apiPrefix)
+        public static async Task<HttpResponseMessage> CreateGlobalOptionType(string choiceTypeName, GlobalRegularOptionCreateRequestDTO dto, string apiPrefix)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.PostWithCookieAsync(
                 TestEnvironment.CreateUrl($"{apiPrefix}/{GlobalOptionTypesSuffix}/{choiceTypeName}"), cookie, dto);
         }
 
-        public static async Task<HttpResponseMessage> PatchGlobalOptionType(Guid optionUuid, string choiceTypeName, GlobalOptionUpdateRequestDTO dto, string apiPrefix)
+        public static async Task<HttpResponseMessage> PatchGlobalOptionType(Guid optionUuid, string choiceTypeName, GlobalRegularOptionUpdateRequestDTO dto, string apiPrefix)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.PatchWithCookieAsync(

@@ -38,7 +38,7 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
         [Fact]
         public async Task Can_Create_Global_Business_Type()
         {
-            var dto = new GlobalOptionCreateRequestDTO()
+            var dto = new GlobalRegularOptionCreateRequestDTO()
             {
                 Name = A<string>(),
                 Description = A<string>(),
@@ -59,7 +59,7 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
         {
             var globalOption = SetupCreateGlobalBusinessTypeInDatabase();
 
-            var dto = new GlobalOptionUpdateRequestDTO()
+            var dto = new GlobalRegularOptionUpdateRequestDTO()
             {
                 Description = A<string>(),
                 IsObligatory = A<bool>(),

@@ -11,8 +11,8 @@ namespace Core.ApplicationServices.GlobalOptions
     {
 
         Result<IEnumerable<TOptionType>, OperationError> GetGlobalOptions();
-        Result<TOptionType, OperationError> CreateGlobalOption(GlobalOptionCreateParameters createParameters);
+        Result<TOptionType, OperationError> CreateGlobalOption(GlobalRegularOptionCreateParameters createParameters);
 
-        Result<TOptionType, OperationError> PatchGlobalOption(Guid optionUuid, GlobalOptionUpdateParameters updateParameters);
+        Result<TOptionType, OperationError> PatchGlobalOption(Guid optionUuid, GlobalRegularOptionUpdateParameters updateParameters);
     }
 }

@@ -37,7 +37,7 @@ public class GenericGlobalOptionsService<TOptionType, TReferenceType> : IGeneric
                 });
     }
 
-    public Result<TOptionType, OperationError> CreateGlobalOption(GlobalOptionCreateParameters createParameters)
+    public Result<TOptionType, OperationError> CreateGlobalOption(GlobalRegularOptionCreateParameters createParameters)
     {
         return WithGlobalAdminRights("User is not allowed to create global options")
             .Match(error => error,
@@ -65,7 +65,7 @@ public class GenericGlobalOptionsService<TOptionType, TReferenceType> : IGeneric
         return options.Any() ? options.Max(x => x.Priority) + 1 : 1;
     }
 
-    public Result<TOptionType, OperationError> PatchGlobalOption(Guid optionUuid, GlobalOptionUpdateParameters updateParameters)
+    public Result<TOptionType, OperationError> PatchGlobalOption(Guid optionUuid, GlobalRegularOptionUpdateParameters updateParameters)
     {
         return GetOptionWithGlobalAdminRights(optionUuid)
             .Bind(existingOption => PerformGlobalOptionUpdates(existingOption, updateParameters)
@@ -94,7 +94,7 @@ public class GenericGlobalOptionsService<TOptionType, TReferenceType> : IGeneric
                 });
     }
 
-    private Result<TOptionType, OperationError> PerformGlobalOptionUpdates(TOptionType option, GlobalOptionUpdateParameters parameters)
+    private Result<TOptionType, OperationError> PerformGlobalOptionUpdates(TOptionType option, GlobalRegularOptionUpdateParameters parameters)
     {
         return option
             .WithOptionalUpdate(parameters.Description, (opt, description) => opt.UpdateDescription(description))
