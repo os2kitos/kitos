@@ -20,7 +20,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
     public class TestRoleRefType {}
     public class GlobalRoleOptionsServiceTest: WithAutoFixture
     {
-        private readonly GlobalRegularOptionsService<TestRoleOptionEntity, TestRoleRefType> _sut;
+        private readonly GlobalRoleOptionsService<TestRoleOptionEntity, TestRoleRefType> _sut;
         private readonly Mock<IGenericRepository<TestRoleOptionEntity>> _globalOptionsRepository;
         private readonly Mock<IOrganizationalUserContext> _activeUserContext;
         private readonly Mock<IDomainEvents> _domainEvents;
@@ -30,7 +30,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             _globalOptionsRepository = new Mock<IGenericRepository<TestRoleOptionEntity>>();
             _activeUserContext = new Mock<IOrganizationalUserContext>();
             _domainEvents = new Mock<IDomainEvents>();
-            _sut = new GlobalRegularOptionsService<TestRoleOptionEntity, TestRoleRefType>(_globalOptionsRepository.Object, _activeUserContext.Object, _domainEvents.Object);
+            _sut = new GlobalRoleOptionsService<TestRoleOptionEntity, TestRoleRefType>(_globalOptionsRepository.Object, _activeUserContext.Object, _domainEvents.Object);
         }
 
         [Fact]
