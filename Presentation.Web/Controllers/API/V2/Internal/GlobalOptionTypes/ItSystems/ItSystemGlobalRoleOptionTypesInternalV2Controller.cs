@@ -14,6 +14,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.GlobalOptionTypes.ItSystems
 {
+    [RoutePrefix("api/v2/internal/it-systems/global-option-types/it-systems-roles")]
     public class ItSystemGlobalRoleOptionTypesInternalV2Controller: BaseGlobalRoleOptionTypesInternalV2Controller<ItSystemRole, ItSystemRight>
     {
         public ItSystemGlobalRoleOptionTypesInternalV2Controller(IGenericGlobalOptionsService<ItSystemRole, ItSystemRight> globalOptionsService, IGlobalOptionTypeResponseMapper responseMapper, IGlobalOptionTypeWriteModelMapper writeModelMapper) : base(globalOptionsService, responseMapper, writeModelMapper)
