@@ -1,11 +1,11 @@
 ﻿using System;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Model.Organizations.Write;
 using Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.UiCustomization;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -17,7 +17,7 @@ using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Organizations.Write;
 
-public class OrganizationWriteService : IOrganizationWriteService{
+public class OrganizationWriteService : IOrganizationWriteService {
         
     private readonly ITransactionManager _transactionManager;               
     private readonly IDomainEvents _domainEvents;
@@ -130,16 +130,19 @@ public class OrganizationWriteService : IOrganizationWriteService{
     private Result<Organization, OperationError> PerformBasicOrganizationUpdates(Organization organization, OrganizationBaseParameters parameters)
     {
         return organization.WithOptionalUpdate(parameters.Cvr, (org, cvr) => org.UpdateCvr(cvr))
-            .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)))
-            .Bind(org => org.WithOptionalUpdate(parameters.ForeignCvr, (org, foreignCvr) => org.UpdateForeignCvr(foreignCvr))
-            .Bind(org => org.WithOptionalUpdate(parameters.TypeId, (org, typeId) => UpdateOrganizationType(org, typeId))));
+            .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)));
+            //.Bind(org => org.WithOptionalUpdate(parameters.ForeignCvr, (org, foreignCvr) => org.UpdateForeignCvr(foreignCvr)));
+            //.Bind(org => org.WithOptionalUpdate(parameters.TypeId, (org, typeId) => UpdateOrganizationType(org, typeId))));
     }
 
     private Result<Organization, OperationError> UpdateOrganizationType(Organization organization, int typeId)
     {
-        var organizationType = _organizationTypeRepository.GetByKey(organization.Id);
-        organization.UpdateType(organizationType);
-        return organization;
+        var organizationType = _organizationTypeRepository.GetByKey(typeId).FromNullable();
+        return organizationType.Match(orgType => { 
+            organization.UpdateType(orgType); 
+            return Result<Organization, OperationError>.Success(organization); 
+        },
+        () => new OperationError(OperationFailure.NotFound));
     }
 
     private Result<Organization, OperationError> WithModifyCvrAccessIfRequired(Organization organization,
