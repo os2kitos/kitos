@@ -368,6 +368,36 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
+        public async Task Can_Create_Organization()
+        {
+            var requestDto = A<OrganizationCreateRequestDTO>();
+
+            using var response = await OrganizationInternalV2Helper.CreateOrganization(requestDto);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var organization = await response.ReadResponseBodyAsAsync<OrganizationResponseDTO>();
+           
+            Assert.Equal(organization.Name, requestDto.Name);
+            Assert.Equal(organization.Cvr, requestDto.Cvr);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        public async Task Can_Only_Create_Organization_As_Global_Admin(OrganizationRole role)
+        {
+            var cookie = await HttpApi.GetCookieAsync(role);
+            var requestDto = A<OrganizationCreateRequestDTO>();
+
+            using var response = await OrganizationInternalV2Helper.CreateOrganization(requestDto, cookie);
+
+            var responseIsOk = response.StatusCode == HttpStatusCode.OK;
+            var isGlobalAdmin = role == OrganizationRole.GlobalAdmin;
+            Assert.Equal(responseIsOk, isGlobalAdmin);
+        }
+
+        [Fact]
         public async Task Update_Organization_Returns_Bad_Request_If_Invalid_Uuid()
         {
             var invalidUuid = new Guid();
