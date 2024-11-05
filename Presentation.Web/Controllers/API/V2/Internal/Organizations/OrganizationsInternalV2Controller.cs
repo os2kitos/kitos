@@ -123,6 +123,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             var parameters = _organizationWriteModelMapper.ToOrganizationCreateParameters(request);
 
             return _organizationWriteService.CreateOrganization(parameters)
+                .Select(_organizationResponseMapper.ToOrganizationDTO)
                 .Match(Ok, FromOperationError);
         }
 
