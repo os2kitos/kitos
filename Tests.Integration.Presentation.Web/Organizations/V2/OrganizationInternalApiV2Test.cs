@@ -377,8 +377,9 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var organization = await response.ReadResponseBodyAsAsync<OrganizationResponseDTO>();
            
-            Assert.Equal(organization.Name, requestDto.Name);
-            Assert.Equal(organization.Cvr, requestDto.Cvr);
+            Assert.Equal(requestDto.Name, organization.Name);
+            Assert.Equal(requestDto.Cvr, organization.Cvr);
+            Assert.Equal(requestDto.Type, organization.OrganizationType);
         }
 
         [Theory]
@@ -394,7 +395,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             var responseIsOk = response.StatusCode == HttpStatusCode.OK;
             var isGlobalAdmin = role == OrganizationRole.GlobalAdmin;
-            Assert.Equal(responseIsOk, isGlobalAdmin);
+            Assert.Equal(isGlobalAdmin, responseIsOk);
         }
 
         [Fact]
