@@ -71,14 +71,20 @@ public class OrganizationWriteService : IOrganizationWriteService {
     public Result<Organization, OperationError> CreateOrganization(OrganizationBaseParameters parameters)
     {
         var organization = new Organization();
-        var updatedOrganization = PerformBasicOrganizationUpdates(organization, parameters);
-        if (updatedOrganization.Failed)
+        var updateResult = PerformBasicOrganizationUpdates(organization, parameters);
+        if (updateResult.Failed)
         {
-            return updatedOrganization.Error;
+            return updateResult.Error;
         }
-        var createResult = _organizationService.CreateNewOrganization(updatedOrganization.Value);
-        _domainEvents.Raise(new EntityCreatedEvent<Organization>(updatedOrganization.Value));
-        return createResult.Match(Result<Organization, OperationError>.Success, failure => new OperationError(failure));
+        var newOrg = updateResult.Value;
+        var createResult = _organizationService.CreateNewOrganization(newOrg);
+        if (createResult.Failed)
+        {
+            return new OperationError(createResult.Error);
+        }
+        var createdOrg = createResult.Value;
+        _domainEvents.Raise(new EntityCreatedEvent<Organization>(createdOrg));
+        return createdOrg;
     }
 
     public Result<Organization, OperationError> PatchOrganization(Guid organizationUuid, OrganizationBaseParameters parameters)
