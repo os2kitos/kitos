@@ -11,6 +11,8 @@ using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Elasticsearch.Net;
+using System.Web.Http.Results;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
@@ -112,19 +114,18 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                     .Match(Ok, FromOperationError));
         }
 
-        [Route("create")]
         [HttpPost]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
+        [Route("create")]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(IdentityNamePairResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult CreateOrganization([FromBody] OrganizationCreateRequestDTO request)
         {
             var parameters = _organizationWriteModelMapper.ToOrganizationCreateParameters(request);
-
             return _organizationWriteService.CreateOrganization(parameters)
-                .Select(_organizationResponseMapper.ToOrganizationDTO)
-                .Match(Ok, FromOperationError);
+                .Select(org => new IdentityNamePairResponseDTO(org.Uuid, org.Name))
+                .Match(MapOrgCreatedResponse, FromOperationError);
         }
 
         [HttpPatch]
@@ -201,6 +202,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             return _organizationWriteService.PatchOrganizationMasterDataRoles(organizationUuid, updateParameters)
                 .Select(_organizationResponseMapper.ToRolesDTO)
                 .Match(Ok, FromOperationError);
+        }
+
+        private CreatedNegotiatedContentResult<IdentityNamePairResponseDTO> MapOrgCreatedResponse(IdentityNamePairResponseDTO dto)
+        {
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }
     }
 }

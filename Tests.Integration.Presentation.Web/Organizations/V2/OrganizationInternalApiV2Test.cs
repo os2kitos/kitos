@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Extensions;
@@ -374,11 +375,10 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             using var response = await OrganizationInternalV2Helper.CreateOrganization(requestDto);
 
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var organization = await response.ReadResponseBodyAsAsync<OrganizationResponseDTO>();
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            var organization = await response.ReadResponseBodyAsAsync<IdentityNamePairResponseDTO>();
            
             Assert.Equal(requestDto.Name, organization.Name);
-            Assert.Equal(requestDto.Cvr, organization.Cvr);
         }
 
         [Theory]
@@ -392,9 +392,9 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             using var response = await OrganizationInternalV2Helper.CreateOrganization(requestDto, cookie);
 
-            var responseIsOk = response.StatusCode == HttpStatusCode.OK;
+            var wasAllowed = response.StatusCode == HttpStatusCode.Created;
             var isGlobalAdmin = role == OrganizationRole.GlobalAdmin;
-            Assert.Equal(isGlobalAdmin, responseIsOk);
+            Assert.Equal(isGlobalAdmin, wasAllowed);
         }
 
         [Fact]
