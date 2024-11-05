@@ -227,7 +227,13 @@ namespace Presentation.Web.Controllers.API.V1
 
         private HttpResponseMessage GetContractsExcelFile(int organizationId)
         {
-            return GetExcelFile(organizationId, Constants.Excel.ContractsFileName, _excelService.ExportItContracts);
+            var fileName = Constants.Excel.ContractsFileName;
+            var stream = new MemoryStream();
+            using (var file = File.OpenRead(_mapPath + fileName))
+                file.CopyTo(stream);
+
+            _excelService.ExportItContracts(stream, organizationId);
+            return GetResponseMessage(stream, fileName);
         }
 
         [HttpPost]
