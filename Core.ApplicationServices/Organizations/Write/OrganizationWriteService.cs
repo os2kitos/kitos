@@ -77,6 +77,7 @@ public class OrganizationWriteService : IOrganizationWriteService {
             return updatedOrganization.Error;
         }
         var createResult = _organizationService.CreateNewOrganization(updatedOrganization.Value);
+        _domainEvents.Raise(new EntityCreatedEvent<Organization>(updatedOrganization.Value));
         return createResult.Match(Result<Organization, OperationError>.Success, failure => new OperationError(failure));
     }
 
@@ -92,8 +93,8 @@ public class OrganizationWriteService : IOrganizationWriteService {
             transaction.Rollback();
             return result;
         }
-        _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
         _organizationRepository.Update(result.Value);
+        _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
         transaction.Commit();
         return result;
     }
