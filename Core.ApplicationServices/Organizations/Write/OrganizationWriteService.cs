@@ -77,6 +77,7 @@ public class OrganizationWriteService : IOrganizationWriteService {
             return updateResult.Error;
         }
         var newOrg = updateResult.Value;
+        newOrg.AccessModifier = AccessModifier.Public;
         var createResult = _organizationService.CreateNewOrganization(newOrg);
         if (createResult.Failed)
         {
