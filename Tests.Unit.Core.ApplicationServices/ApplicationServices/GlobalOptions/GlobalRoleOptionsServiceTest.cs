@@ -56,13 +56,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             var existingOptions = SetupRepositoryReturnsOneOption(A<Guid>());
             Assert.NotNull(existingOptions);
             Assert.Single(existingOptions);
-            var parameters = new GlobalRoleOptionCreateParameters()
-            {
-                Description = A<string>(),
-                Name = A<string>(),
-                IsObligatory = A<bool>(),
-                WriteAccess = A<bool>()
-            };
+            var parameters = A<GlobalRoleOptionCreateParameters>();
 
             var result = _sut.CreateGlobalOption(parameters);
 
@@ -73,7 +67,6 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             Assert.Equal(parameters.Name, option.Name);
             Assert.Equal(parameters.IsObligatory, option.IsObligatory);
             Assert.Equal(parameters.WriteAccess, option.HasWriteAccess);
-            Assert.NotNull(option.Uuid);
             Assert.Equal(existingOptions.First().Priority + 1, option.Priority);
             Assert.False(option.IsEnabled);
             _globalOptionsRepository.Verify(_ => _.Insert(option));
@@ -84,13 +77,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         public void Create_Returns_Forbidden_If_Not_Allowed()
         {
             SetupIsNotGlobalAdmin();
-            var parameters = new GlobalRoleOptionCreateParameters()
-            {
-                Description = A<string>(),
-                Name = A<string>(),
-                IsObligatory = A<bool>(),
-                WriteAccess = A<bool>()
-            };
+            var parameters = A<GlobalRoleOptionCreateParameters>();
 
             var result = _sut.CreateGlobalOption(parameters);
 
@@ -104,14 +91,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             SetupIsGlobalAdmin();
             var optionUuid = A<Guid>();
             SetupRepositoryReturnsOneOption(optionUuid);
-            var parameters = new GlobalRoleOptionUpdateParameters()
-            {
-                IsEnabled = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
-                IsObligatory = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
-                Name = Maybe<string>.Some(A<string>()).AsChangedValue(),
-                Description = Maybe<string>.Some(A<string>()).AsChangedValue(),
-                WriteAccess = Maybe<bool>.Some(A<bool>()).AsChangedValue()
-            };
+            var parameters = A<GlobalRoleOptionUpdateParameters>();
 
             var result = _sut.PatchGlobalOption(optionUuid, parameters);
 
@@ -131,14 +111,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             var optionUuid = A<Guid>();
             var existing = SetupRepositoryReturnsOneOption(optionUuid).FirstOrDefault();
             Assert.NotNull(existing);
-            var parameters = new GlobalRoleOptionUpdateParameters()
-            {
-                IsEnabled = OptionalValueChange<Maybe<bool>>.None,
-                IsObligatory = OptionalValueChange<Maybe<bool>>.None,
-                Name = OptionalValueChange<Maybe<string>>.None,
-                Description = OptionalValueChange<Maybe<string>>.None,
-                WriteAccess = Maybe<bool>.Some(A<bool>()).AsChangedValue()
-            };
+            var parameters = A<GlobalRoleOptionUpdateParameters>();
 
             var result = _sut.PatchGlobalOption(optionUuid, parameters);
 
@@ -157,36 +130,21 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             SetupIsNotGlobalAdmin();
             var optionUuid = A<Guid>();
             SetupRepositoryReturnsOneOption(optionUuid);
-            var parameters = new GlobalRoleOptionUpdateParameters()
-            {
-                IsEnabled = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
-                IsObligatory = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
-                Name = Maybe<string>.Some(A<string>()).AsChangedValue(),
-                Description = Maybe<string>.Some(A<string>()).AsChangedValue(),
-                WriteAccess = Maybe<bool>.Some(A<bool>()).AsChangedValue()
-
-            };
+            var parameters = A<GlobalRoleOptionUpdateParameters>();
 
             var result = _sut.PatchGlobalOption(optionUuid, parameters);
 
             Assert.False(result.Ok);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
-
+        
         [Fact]
         public void Patch_Returns_Not_Found_If_No_Existing_Option()
         {
             SetupIsGlobalAdmin();
             var optionUuid = A<Guid>();
             _globalOptionsRepository.Setup(_ => _.AsQueryable()).Returns(new List<TestRoleOptionEntity>().AsQueryable());
-            var parameters = new GlobalRoleOptionUpdateParameters()
-            {
-                IsEnabled = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
-                IsObligatory = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
-                Name = Maybe<string>.Some(A<string>()).AsChangedValue(),
-                Description = Maybe<string>.Some(A<string>()).AsChangedValue(),
-                WriteAccess = Maybe<bool>.Some(A<bool>()).AsChangedValue()
-            };
+            var parameters = A<GlobalRoleOptionUpdateParameters>();
 
             var result = _sut.PatchGlobalOption(optionUuid, parameters);
 
