@@ -78,6 +78,11 @@
     <Compile Include="Generic\ExtendedExtendedEntityIdentityResolverService.cs" />
     <Compile Include="Generic\IEntityIdMapper.cs" />
     <Compile Include="Generic\IEntityTreeUuidCollector.cs" />
+    <Compile Include="GlobalOptions\GlobalOptionsServiceBase.cs" />
+    <Compile Include="GlobalOptions\GlobalRegularOptionsService.cs" />
+    <Compile Include="GlobalOptions\GlobalRoleOptionsService.cs" />
+    <Compile Include="GlobalOptions\IGlobalRegularOptionsService.cs" />
+    <Compile Include="GlobalOptions\IGlobalRoleOptionsService.cs" />
     <Compile Include="Interface\Write\IItInterfaceWriteService.cs" />
     <Compile Include="Interface\Write\ItInterfaceWriteService.cs" />
     <Compile Include="Authorization\ResourceCollectionPermissionsResult.cs" />
@@ -169,6 +174,10 @@
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDataParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDate.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationRoles.cs" />
+    <Compile Include="Model\GlobalOptions\GlobalRegularOptionCreateParameters.cs" />
+    <Compile Include="Model\GlobalOptions\GlobalRegularOptionUpdateParameters.cs" />
+    <Compile Include="Model\GlobalOptions\GlobalRoleOptionCreateParameters.cs" />
+    <Compile Include="Model\GlobalOptions\GlobalRoleOptionUpdateParameters.cs" />
     <Compile Include="Model\Interface\ItInterfaceDataWriteModel.cs" />
     <Compile Include="Model\Interface\ItInterfaceDeletionConflict.cs" />
     <Compile Include="Model\Interface\ItInterfacePermissions.cs" />

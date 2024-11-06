@@ -180,6 +180,13 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
             return new UpdatedExternalReferenceProperties(reference.Title, reference.DocumentId, reference.Url, reference.MasterReference);
         }
 
+        protected OptionalValueChange<Maybe<T>> GetOptionalValueChange<T>(Func<bool> shouldUpdate, Maybe<T> dtoField)
+        {
+            return shouldUpdate()
+                ? (dtoField ?? Maybe<T>.None).AsChangedValue()
+                : OptionalValueChange<Maybe<T>>.None;
+        }
+
         private static UpdatedExternalReferenceProperties MapUpdateReference(UpdateExternalReferenceDataWriteRequestDTO reference)
         {
             var updateProperties = MapCommonReference(reference);

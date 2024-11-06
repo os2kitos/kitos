@@ -305,6 +305,8 @@
     <Compile Include="Models\V2\DataProcessingRegistrationWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationResponseMapperTest.cs" />
     <Compile Include="Models\V2\ExternalReferenceResponseMapperTest.cs" />
+    <Compile Include="Models\V2\Internal\GlobalOptionTypeResponseMapperTest.cs" />
+    <Compile Include="Models\V2\Internal\GlobalOptionTypeWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\Internal\LocalOptionTypeWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\Internal\UserResponseMapperTest.cs" />
     <Compile Include="Models\V2\Internal\UserWriteModelMapperTest.cs" />
