@@ -115,7 +115,7 @@ namespace Core.ApplicationServices.LocalOptions
                 });
         }
 
-        public Result<TOptionType, OperationError> PatchLocalOption(Guid organizationUuid, Guid globalOptionUuid, LocalOptionUpdateParameters parameters)
+        public Result<TOptionType, OperationError> PatchLocalOption(Guid organizationUuid, Guid globalOptionUuid, LocalOptionUpdateParameters parameters) 
         {
             return GetLocalOptionMaybe(organizationUuid, globalOptionUuid)
                 .Match(localOption => ValidateModify(localOption)

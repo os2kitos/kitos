@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Extensions;
@@ -354,11 +355,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         public async Task Can_Update_Organization()
         {
             var organization = await CreateTestOrganization();
-            var requestDto = new OrganizationUpdateRequestDTO()
-            {
-                Cvr = GetCvr(),
-                Name = A<string>()
-            };
+            var requestDto = A<OrganizationUpdateRequestDTO>();
 
             using var response = await OrganizationInternalV2Helper.PatchOrganization(organization.Uuid, requestDto);
 
@@ -367,6 +364,37 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var updatedOrganization = await OrganizationHelper.GetOrganizationAsync(organization.Id, cookie);
             Assert.Equal(requestDto.Cvr, updatedOrganization.Cvr);
             Assert.Equal(requestDto.Name, updatedOrganization.Name);
+            Assert.Equal((int)requestDto.Type, updatedOrganization.TypeId);
+            Assert.Equal(requestDto.ForeignCvr, updatedOrganization.ForeignCvr);
+        }
+
+        [Fact]
+        public async Task Can_Create_Organization()
+        {
+            var requestDto = A<OrganizationCreateRequestDTO>();
+
+            using var response = await OrganizationInternalV2Helper.CreateOrganization(requestDto);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            var organization = await response.ReadResponseBodyAsAsync<IdentityNamePairResponseDTO>();
+           
+            Assert.Equal(requestDto.Name, organization.Name);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        public async Task Can_Only_Create_Organization_As_Global_Admin(OrganizationRole role)
+        {
+            var cookie = await HttpApi.GetCookieAsync(role);
+            var requestDto = A<OrganizationCreateRequestDTO>();
+
+            using var response = await OrganizationInternalV2Helper.CreateOrganization(requestDto, cookie);
+
+            var wasAllowed = response.StatusCode == HttpStatusCode.Created;
+            var isGlobalAdmin = role == OrganizationRole.GlobalAdmin;
+            Assert.Equal(isGlobalAdmin, wasAllowed);
         }
 
         [Fact]
