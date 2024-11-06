@@ -11,13 +11,15 @@ using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Elasticsearch.Net;
+using System.Web.Http.Results;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
     /// <summary>
     /// Internal API for the organizations in KITOS
     /// </summary>
-    [RoutePrefix("api/v2/internal/organizations/{organizationUuid}")]
+    [RoutePrefix("api/v2/internal/organizations")]
     public class OrganizationsInternalV2Controller : InternalApiV2Controller
     {
         private readonly IOrganizationService _organizationService;
@@ -35,7 +37,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             _uiModuleCustomizationService = uiModuleCustomizationService;
         }
 
-        [Route("ui-root-config")]
+        [Route("{organizationUuid}/ui-root-config")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UIRootConfigResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -48,7 +50,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
 
         [HttpPatch]
-        [Route("ui-root-config")]
+        [Route("{organizationUuid}/ui-root-config")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UIRootConfigResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -64,7 +66,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 .Match(Ok, FromOperationError);
         }
 
-        [Route("permissions")]
+        [Route("{organizationUuid}/permissions")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationPermissionsResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -76,7 +78,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 .Match(Ok, FromOperationError);
         }
 
-        [Route("ui-customization/{moduleName}")]
+        [Route("{organizationUuid}/ui-customization/{moduleName}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UIModuleCustomizationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -88,7 +90,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
              .Match(Ok, FromOperationError);
         }
 
-        [Route("ui-customization/{moduleName}")]
+        [Route("{organizationUuid}/ui-customization/{moduleName}")]
         [HttpPut]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UIModuleCustomizationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -110,11 +112,24 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 () => _uiModuleCustomizationService.GetModuleCustomizationByOrganizationUuid(organizationUuid, moduleName)
                     .Select(_organizationResponseMapper.ToUIModuleCustomizationResponseDTO)
                     .Match(Ok, FromOperationError));
+        }
 
+        [HttpPost]
+        [Route("create")]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(IdentityNamePairResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult CreateOrganization([FromBody] OrganizationCreateRequestDTO request)
+        {
+            var parameters = _organizationWriteModelMapper.ToOrganizationCreateParameters(request);
+            return _organizationWriteService.CreateOrganization(parameters)
+                .Select(org => new IdentityNamePairResponseDTO(org.Uuid, org.Name))
+                .Match(MapOrgCreatedResponse, FromOperationError);
         }
 
         [HttpPatch]
-        [Route("patch")]
+        [Route("{organizationUuid}/patch")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -130,7 +145,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
             
         [HttpPatch]
-        [Route("master-data")]
+        [Route("{organizationUuid}/master-data")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -145,7 +160,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 .Match(Ok, FromOperationError);
         }
 
-        [Route("master-data")]
+        [Route("{organizationUuid}/master-data")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -159,7 +174,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
                 .Match(Ok, FromOperationError);
         }
 
-        [Route("master-data/roles")]
+        [Route("{organizationUuid}/master-data/roles")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataRolesResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -174,7 +189,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
         
         [HttpPatch]
-        [Route("master-data/roles")]
+        [Route("{organizationUuid}/master-data/roles")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationMasterDataRolesResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -187,6 +202,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             return _organizationWriteService.PatchOrganizationMasterDataRoles(organizationUuid, updateParameters)
                 .Select(_organizationResponseMapper.ToRolesDTO)
                 .Match(Ok, FromOperationError);
+        }
+
+        private CreatedNegotiatedContentResult<IdentityNamePairResponseDTO> MapOrgCreatedResponse(IdentityNamePairResponseDTO dto)
+        {
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }
     }
 }

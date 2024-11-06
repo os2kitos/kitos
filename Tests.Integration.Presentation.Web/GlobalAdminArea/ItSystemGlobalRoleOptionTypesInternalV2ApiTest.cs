@@ -37,13 +37,7 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
         [Fact]
         public async Task Can_Create_Global_Business_Type()
         {
-            var dto = new GlobalRoleOptionCreateRequestDTO()
-            {
-                Name = A<string>(),
-                Description = A<string>(),
-                IsObligatory = A<bool>(),
-                WriteAccess = A<bool>()
-            };
+            var dto = A<GlobalRoleOptionCreateRequestDTO>();
 
             using var response = await GlobalOptionTypeV2Helper.CreateGlobalOptionType(RolesUrlSuffix, dto, ItSystemsApiPrefix);
 
@@ -60,14 +54,7 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
         {
             var globalOption = SetupCreateGlobalItSystemRoleInDatabase();
 
-            var dto = new GlobalRoleOptionUpdateRequestDTO()
-            {
-                Description = A<string>(),
-                IsObligatory = A<bool>(),
-                IsEnabled = A<bool>(),
-                Name = A<string>(),
-                WriteAccess = A<bool>()
-            };
+            var dto = A<GlobalRoleOptionUpdateRequestDTO>();
 
             using var response = await GlobalOptionTypeV2Helper.PatchGlobalOptionType(globalOption.Uuid, RolesUrlSuffix, dto, ItSystemsApiPrefix);
 

@@ -37,12 +37,7 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
         [Fact]
         public async Task Can_Create_Global_Business_Type()
         {
-            var dto = new GlobalRegularOptionCreateRequestDTO()
-            {
-                Name = A<string>(),
-                Description = A<string>(),
-                IsObligatory = A<bool>()
-            };
+            var dto = A<GlobalRegularOptionCreateRequestDTO>();
 
             using var response = await GlobalOptionTypeV2Helper.CreateGlobalOptionType(BusinessTypesUrlSuffix, dto, ItSystemsApiPrefix);
 
@@ -58,13 +53,7 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
         {
             var globalOption = SetupCreateGlobalBusinessTypeInDatabase();
 
-            var dto = new GlobalRegularOptionUpdateRequestDTO()
-            {
-                Description = A<string>(),
-                IsObligatory = A<bool>(),
-                IsEnabled = A<bool>(),
-                Name = A<string>()
-            };
+            var dto = A<GlobalRegularOptionUpdateRequestDTO>();
 
             using var response = await GlobalOptionTypeV2Helper.PatchGlobalOptionType(globalOption.Uuid, BusinessTypesUrlSuffix, dto, ItSystemsApiPrefix);
 

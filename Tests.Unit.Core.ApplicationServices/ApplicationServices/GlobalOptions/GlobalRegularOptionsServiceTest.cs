@@ -61,13 +61,8 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             SetupIsGlobalAdmin();
             var existingOptions = SetupRepositoryReturnsOneOption(A<Guid>());
             Assert.NotNull(existingOptions);
-            Assert.Equal(1, existingOptions.Count);
-            var parameters = new GlobalRegularOptionCreateParameters()
-            {
-                Description = A<string>(),
-                Name = A<string>(),
-                IsObligatory = A<bool>()
-            };
+            Assert.Single(existingOptions);
+            var parameters = A<GlobalRegularOptionCreateParameters>();
 
             var result = _sut.CreateGlobalOption(parameters);
 
@@ -77,7 +72,6 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             Assert.Equal(parameters.Description, option.Description);
             Assert.Equal(parameters.Name, option.Name);
             Assert.Equal(parameters.IsObligatory, option.IsObligatory);
-            Assert.NotNull(option.Uuid);
             Assert.Equal(existingOptions.First().Priority + 1, option.Priority);
             Assert.False(option.IsEnabled);
             _globalOptionsRepository.Verify(_ => _.Insert(option));
@@ -88,12 +82,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         public void Create_Returns_Forbidden_If_Not_Allowed()
         {
             SetupIsNotGlobalAdmin();
-            var parameters = new GlobalRegularOptionCreateParameters()
-            {
-                Description = A<string>(),
-                Name = A<string>(),
-                IsObligatory = A<bool>()
-            };
+            var parameters = A<GlobalRegularOptionCreateParameters>();
 
             var result = _sut.CreateGlobalOption(parameters);
 
@@ -106,13 +95,39 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         {
             SetupIsGlobalAdmin();
             var optionUuid = A<Guid>();
-            SetupRepositoryReturnsOneOption(optionUuid);
+            var expected = new List<TestOptionEntity>
+            {
+                new()
+                {
+                    Uuid = optionUuid,
+                    Description = A<string>(),
+                    Id = A<int>(),
+                    IsEnabled = A<bool>(),
+                    IsObligatory = A<bool>(),
+                    Name = A<string>(),
+                    Priority = 1
+                },
+                new()
+                {
+                    Uuid = A<Guid>(),
+                    Description = A<string>(),
+                    Id = A<int>(),
+                    IsEnabled = A<bool>(),
+                    IsObligatory = A<bool>(),
+                    Name = A<string>(),
+                    Priority = 2
+                }
+            };
+            _globalOptionsRepository.SetupSequence(_ => _.AsQueryable())
+                .Returns(expected.AsQueryable())
+                .Returns(expected.AsQueryable());
             var parameters = new GlobalRegularOptionUpdateParameters()
             {
                 IsEnabled = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
                 IsObligatory = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
                 Name = Maybe<string>.Some(A<string>()).AsChangedValue(),
                 Description = Maybe<string>.Some(A<string>()).AsChangedValue(),
+                Priority = Maybe<int>.Some(2).AsChangedValue()
             };
 
             var result = _sut.PatchGlobalOption(optionUuid, parameters);
@@ -123,6 +138,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             Assert.Equal(parameters.Name.NewValue.Value, option.Name);
             Assert.Equal(parameters.IsObligatory.NewValue.Value, option.IsObligatory);
             Assert.Equal(parameters.IsEnabled.NewValue.Value, option.IsEnabled);
+            Assert.Equal(parameters.Priority.NewValue.Value, option.Priority);
         }
 
         [Fact]
@@ -138,6 +154,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
                 IsObligatory = OptionalValueChange<Maybe<bool>>.None,
                 Name = OptionalValueChange<Maybe<string>>.None,
                 Description = OptionalValueChange<Maybe<string>>.None,
+                Priority = OptionalValueChange<Maybe<int>>.None
             };
 
             var result = _sut.PatchGlobalOption(optionUuid, parameters);
@@ -156,13 +173,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             SetupIsNotGlobalAdmin();
             var optionUuid = A<Guid>();
             SetupRepositoryReturnsOneOption(optionUuid);
-            var parameters = new GlobalRegularOptionUpdateParameters()
-            {
-                IsEnabled = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
-                IsObligatory = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
-                Name = Maybe<string>.Some(A<string>()).AsChangedValue(),
-                Description = Maybe<string>.Some(A<string>()).AsChangedValue(),
-            };
+            var parameters = A<GlobalRegularOptionUpdateParameters>();
 
             var result = _sut.PatchGlobalOption(optionUuid, parameters);
 
@@ -176,13 +187,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             SetupIsGlobalAdmin();
             var optionUuid = A<Guid>();
             _globalOptionsRepository.Setup(_ => _.AsQueryable()).Returns(new List<TestOptionEntity>().AsQueryable());
-            var parameters = new GlobalRegularOptionUpdateParameters()
-            {
-                IsEnabled = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
-                IsObligatory = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
-                Name = Maybe<string>.Some(A<string>()).AsChangedValue(),
-                Description = Maybe<string>.Some(A<string>()).AsChangedValue(),
-            };
+            var parameters = A<GlobalRegularOptionUpdateParameters>();
 
             var result = _sut.PatchGlobalOption(optionUuid, parameters);
 
@@ -202,7 +207,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
                     IsEnabled = A<bool>(),
                     IsObligatory = A<bool>(),
                     Name = A<string>(),
-                    Priority = A<int>()
+                    Priority = 1
                 }
             };
             _globalOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expected.AsQueryable());

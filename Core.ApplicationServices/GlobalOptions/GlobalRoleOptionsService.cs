@@ -39,14 +39,14 @@ public class GlobalRoleOptionsService<TOptionType, TReferenceType> :
     {
         return GetOptionWithGlobalAdminRights(optionUuid)
             .Bind(existingOption => PerformGlobalRoleOptionUpdates(existingOption, updateParameters)
-                .Bind(updatedOption => Result<TOptionType, OperationError>.Success(Patch(updatedOption)))
+                .Bind(updatedOption => PerformGlobalOptionPriorityUpdates(updatedOption, updateParameters))
             );
     }
 
     private Result<TOptionType, OperationError> PerformGlobalRoleOptionUpdates(TOptionType option, GlobalRoleOptionUpdateParameters parameters)
     {
         return PerformGlobalRegularOptionUpdates(option, parameters)
-            .Bind(opt => opt.WithOptionalUpdate(parameters.WriteAccess, (opt, writeAccess) => opt.HasWriteAccess = writeAccess.HasValue && writeAccess.Value)); ;
+            .Bind(opt => opt.WithOptionalUpdate(parameters.WriteAccess, (opt, writeAccess) => opt.HasWriteAccess = writeAccess.HasValue && writeAccess.Value));
     }
 
     public GlobalRoleOptionsService(IGenericRepository<TOptionType> globalOptionsRepository, IOrganizationalUserContext activeUserContext, IDomainEvents domainEvents) : base(globalOptionsRepository, activeUserContext, domainEvents)

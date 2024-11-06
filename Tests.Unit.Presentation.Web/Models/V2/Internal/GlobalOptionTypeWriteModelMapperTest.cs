@@ -24,12 +24,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
         [Fact]
         public void Can_Map_Regular_Create_Dto()
         {
-            var dto = new GlobalRegularOptionCreateRequestDTO()
-            {
-                Name = A<string>(),
-                Description = A<string>(),
-                IsObligatory = A<bool>(),
-            };
+            var dto = A<GlobalRegularOptionCreateRequestDTO>();
 
             var parameters = _sut.ToGlobalRegularOptionCreateParameters(dto);
 
@@ -41,13 +36,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
         [Fact]
         public void Can_Map_Regular_Update_Dto()
         {
-            var dto = new GlobalRegularOptionUpdateRequestDTO()
-            {
-                Description = A<string>(),
-                IsObligatory = A<bool>(),
-                IsEnabled = A<bool>(),
-                Name = A<string>(),
-            };
+            var dto = A<GlobalRegularOptionUpdateRequestDTO>();
             _httpRequest.Setup(x =>
                     x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
                 .Returns(GetAllInputPropertyNames<GlobalRegularOptionUpdateRequestDTO>());
@@ -58,18 +47,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
             Assert.Equal(dto.IsObligatory, parameters.IsObligatory.NewValue.Value);
             Assert.Equal(dto.IsEnabled, parameters.IsEnabled.NewValue.Value);
             Assert.Equal(dto.Name, parameters.Name.NewValue.Value);
+            Assert.Equal(dto.Priority, parameters.Priority.NewValue.Value);
         }
 
         [Fact]
         public void Can_Map_Role_Create_Dto()
         {
-            var dto = new GlobalRoleOptionCreateRequestDTO()
-            {
-                Name = A<string>(),
-                Description = A<string>(),
-                IsObligatory = A<bool>(),
-                WriteAccess = A<bool>()
-            };
+            var dto = A<GlobalRoleOptionCreateRequestDTO>();
 
             var parameters = _sut.ToGlobalRoleOptionCreateParameters(dto);
 
@@ -82,14 +66,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
         [Fact]
         public void Can_Map_Role_Update_Dto()
         {
-            var dto = new GlobalRoleOptionUpdateRequestDTO()
-            {
-                Description = A<string>(),
-                IsObligatory = A<bool>(),
-                IsEnabled = A<bool>(),
-                Name = A<string>(),
-                WriteAccess = A<bool>()
-            };
+            var dto = A<GlobalRoleOptionUpdateRequestDTO>();
             _httpRequest.Setup(x =>
                     x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
                 .Returns(GetAllInputPropertyNames<GlobalRoleOptionUpdateRequestDTO>());
@@ -101,6 +78,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
             Assert.Equal(dto.IsEnabled, parameters.IsEnabled.NewValue.Value);
             Assert.Equal(dto.Name, parameters.Name.NewValue.Value);
             Assert.Equal(dto.WriteAccess, parameters.WriteAccess.NewValue.Value);
+            Assert.Equal(dto.Priority, parameters.Priority.NewValue.Value);
         }
     }
 }

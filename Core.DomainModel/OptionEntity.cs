@@ -103,5 +103,16 @@ namespace Core.DomainModel
         {
             IsEnabled = isEnabled.HasValue && isEnabled.Value;
         }
+
+        public void IncreasePriority()
+        {
+            Priority++;
+        }
+
+        public void DecreasePriority()
+        {
+            Priority--;
+        }
+
     }
 }

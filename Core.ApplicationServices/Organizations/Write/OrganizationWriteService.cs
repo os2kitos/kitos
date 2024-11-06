@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
@@ -16,7 +17,7 @@ using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Organizations.Write;
 
-public class OrganizationWriteService : IOrganizationWriteService{
+public class OrganizationWriteService : IOrganizationWriteService {
         
     private readonly ITransactionManager _transactionManager;               
     private readonly IDomainEvents _domainEvents;
@@ -67,7 +68,27 @@ public class OrganizationWriteService : IOrganizationWriteService{
             .Bind(WithWriteAccess);
     }
 
-    public Result<Organization, OperationError> PatchOrganization(Guid organizationUuid, OrganizationUpdateParameters parameters)
+    public Result<Organization, OperationError> CreateOrganization(OrganizationBaseParameters parameters)
+    {
+        var organization = new Organization();
+        var updateResult = PerformBasicOrganizationUpdates(organization, parameters);
+        if (updateResult.Failed)
+        {
+            return updateResult.Error;
+        }
+        var newOrg = updateResult.Value;
+        newOrg.AccessModifier = AccessModifier.Public;
+        var createResult = _organizationService.CreateNewOrganization(newOrg);
+        if (createResult.Failed)
+        {
+            return new OperationError(createResult.Error);
+        }
+        var createdOrg = createResult.Value;
+        _domainEvents.Raise(new EntityCreatedEvent<Organization>(createdOrg));
+        return createdOrg;
+    }
+
+    public Result<Organization, OperationError> PatchOrganization(Guid organizationUuid, OrganizationBaseParameters parameters)
     {
         using var transaction = _transactionManager.Begin();
         var result = GetOrganizationAndVerifyWriteAccess(organizationUuid)
@@ -79,12 +100,10 @@ public class OrganizationWriteService : IOrganizationWriteService{
             transaction.Rollback();
             return result;
         }
-
-        _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
         _organizationRepository.Update(result.Value);
+        _domainEvents.Raise(new EntityUpdatedEvent<Organization>(result.Value));
         transaction.Commit();
         return result;
-
     }
 
     public Result<Config, OperationError> PatchUIRootConfig(Guid organizationUuid, UIRootConfigUpdateParameters updateParameters)
@@ -114,10 +133,12 @@ public class OrganizationWriteService : IOrganizationWriteService{
             ));
     }
 
-    private Result<Organization, OperationError> PerformBasicOrganizationUpdates(Organization organization, OrganizationUpdateParameters parameters)
+    private Result<Organization, OperationError> PerformBasicOrganizationUpdates(Organization organization, OrganizationBaseParameters parameters)
     {
         return organization.WithOptionalUpdate(parameters.Cvr, (org, cvr) => org.UpdateCvr(cvr))
-            .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)));
+            .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)))
+            .Bind(org => org.WithOptionalUpdate(parameters.ForeignCvr, (org, foreignCvr) => org.UpdateForeignCvr(foreignCvr))
+            .Bind(org => org.WithOptionalUpdate(parameters.TypeId, (org, typeId) => org.UpdateType(typeId))));
     }
 
     private Result<Organization, OperationError> WithModifyCvrAccessIfRequired(Organization organization,

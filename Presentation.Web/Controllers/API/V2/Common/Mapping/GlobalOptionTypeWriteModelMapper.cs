@@ -1,8 +1,5 @@
 ﻿using Core.Abstractions.Extensions;
-using Core.Abstractions.Types;
-using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GlobalOptions;
-using Core.ApplicationServices.Model.Shared;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Internal.Request;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
@@ -31,6 +28,7 @@ public class GlobalOptionTypeWriteModelMapper : WriteModelMapperBase, IGlobalOpt
             Name = GetOptionalValueChange(() => rule.MustUpdate(x => x.Name), dto.Name.FromNullable()),
             IsObligatory = GetOptionalValueChange(() => rule.MustUpdate(x => x.IsObligatory), dto.IsObligatory.FromNullable()),
             Description = GetOptionalValueChange(() => rule.MustUpdate(x => x.Description), dto.Description.FromNullable()),
+            Priority = GetOptionalValueChange(() => rule.MustUpdate(x => x.Priority), dto.Priority.FromNullable()),
         };
     }
 
@@ -56,6 +54,7 @@ public class GlobalOptionTypeWriteModelMapper : WriteModelMapperBase, IGlobalOpt
             IsObligatory = GetOptionalValueChange(() => rule.MustUpdate(x => x.IsObligatory), dto.IsObligatory.FromNullable()),
             Description = GetOptionalValueChange(() => rule.MustUpdate(x => x.Description), dto.Description.FromNullable()),
             WriteAccess = GetOptionalValueChange(() => rule.MustUpdate(x => x.WriteAccess), dto.WriteAccess.FromNullable()),
+            Priority = GetOptionalValueChange(() => rule.MustUpdate(x => x.Priority), dto.Priority.FromNullable()),
         };
     }
 
