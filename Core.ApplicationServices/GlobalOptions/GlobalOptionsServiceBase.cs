@@ -6,7 +6,6 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GlobalOptions;
-using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;
@@ -39,7 +38,7 @@ namespace Core.ApplicationServices.GlobalOptions
                         });
             }
 
-        protected int GetNextOptionPriority()
+            protected int GetNextOptionPriority()
             {
                 var options = _globalOptionsRepository.AsQueryable();
                 return options.Any() ? options.Max(x => x.Priority) + 1 : 1;
@@ -67,7 +66,7 @@ namespace Core.ApplicationServices.GlobalOptions
                         });
             }
 
-            protected TOptionType Patch(TOptionType updatedOption)
+            private TOptionType Patch(TOptionType updatedOption)
             {
                 _globalOptionsRepository.Update(updatedOption);
                 _globalOptionsRepository.Save();
@@ -76,18 +75,7 @@ namespace Core.ApplicationServices.GlobalOptions
                 return updatedOption;
             }
 
-            protected TOptionType Patch(TOptionType updatedOption, TOptionType affectedOption)
-            {
-                _globalOptionsRepository.Update(updatedOption);
-                _globalOptionsRepository.Update(affectedOption);
-                _globalOptionsRepository.Save();
-                _domainEvents.Raise(new EntityUpdatedEvent<TOptionType>(updatedOption));
-                _domainEvents.Raise(new EntityUpdatedEvent<TOptionType>(affectedOption));
-
-                return updatedOption;
-            }
-
-        protected Result<TOptionType, OperationError> GetOptionWithGlobalAdminRights(Guid optionUuid)
+            protected Result<TOptionType, OperationError> GetOptionWithGlobalAdminRights(Guid optionUuid)
             {
                 return WithGlobalAdminRights($"User is not allowed to access global option with uuid {optionUuid}")
                     .Match(error => error,
@@ -101,54 +89,52 @@ namespace Core.ApplicationServices.GlobalOptions
                         });
             }
 
-        protected Result<TOptionType, OperationError> PerformGlobalRegularOptionUpdates(TOptionType option, GlobalRegularOptionUpdateParameters parameters)
-        {
-            return option
-                .WithOptionalUpdate(parameters.Description, (opt, description) => opt.UpdateDescription(description))
-                .Bind(opt => opt.WithOptionalUpdate(parameters.Name, (opt, name) => opt.UpdateName(name)))
-                .Bind(opt => opt.WithOptionalUpdate(parameters.IsObligatory, (opt, isObligatory) => opt.UpdateIsObligatory(isObligatory)))
-                .Bind(opt => opt.WithOptionalUpdate(parameters.IsEnabled, (opt, isEnabled) => opt.UpdateIsEnabled(isEnabled)));
-        }
-
-        protected Result<TOptionType, OperationError> PerformGlobalOptionPriorityUpdates(TOptionType updatedOption,
-            GlobalRegularOptionUpdateParameters updateParameters)
-        {
-            if (ShouldNotUpdatePriority(updateParameters))
-                return Patch(updatedOption);
-
-            var newPriority = updateParameters.Priority.NewValue.Value;
-            return GetOptionToMove(newPriority).Match(optionToMove =>
+            protected Result<TOptionType, OperationError> PerformGlobalRegularOptionUpdates(TOptionType option, GlobalRegularOptionUpdateParameters parameters)
             {
-                var existingPriority = updatedOption.Priority;
-                if (newPriority > existingPriority)
+                return option
+                    .WithOptionalUpdate(parameters.Description, (opt, description) => opt.UpdateDescription(description))
+                    .Bind(opt => opt.WithOptionalUpdate(parameters.Name, (opt, name) => opt.UpdateName(name)))
+                    .Bind(opt => opt.WithOptionalUpdate(parameters.IsObligatory, (opt, isObligatory) => opt.UpdateIsObligatory(isObligatory)))
+                    .Bind(opt => opt.WithOptionalUpdate(parameters.IsEnabled, (opt, isEnabled) => opt.UpdateIsEnabled(isEnabled)));
+            }
+
+            protected Result<TOptionType, OperationError> PerformGlobalOptionPriorityUpdates(TOptionType updatedOption,
+                GlobalRegularOptionUpdateParameters updateParameters)
+            {
+                if (ShouldNotUpdatePriority(updateParameters))
+                    return Patch(updatedOption);
+
+                var newPriority = updateParameters.Priority.NewValue.Value;
+                return GetOptionToMove(newPriority).Match(optionToMove =>
                 {
-                    updatedOption.IncreasePriority();
-                    optionToMove.DecreasePriority();
-                }
-                else
-                {
-                    updatedOption.DecreasePriority();
-                    optionToMove.IncreasePriority();
-                }
+                    var existingPriority = updatedOption.Priority;
+                    if (newPriority > existingPriority)
+                    {
+                        updatedOption.IncreasePriority();
+                        optionToMove.DecreasePriority();
+                    }
+                    else
+                    {
+                        updatedOption.DecreasePriority();
+                        optionToMove.IncreasePriority();
+                    }
 
-                Patch(optionToMove);
-                return Patch(updatedOption);
-            },
-                () => Patch(updatedOption));
-        }
+                    Patch(optionToMove);
+                    return Patch(updatedOption);
+                },
+                    () => Patch(updatedOption));
+            }
 
-        private Maybe<TOptionType> GetOptionToMove(int newPriority)
-        {
-            return _globalOptionsRepository.AsQueryable().FirstOrDefault(o => o.Priority == newPriority).FromNullable();
-        }
+            private Maybe<TOptionType> GetOptionToMove(int newPriority)
+            {
+                return _globalOptionsRepository.AsQueryable().FirstOrDefault(o => o.Priority == newPriority).FromNullable();
+            }
 
-        private bool ShouldNotUpdatePriority(GlobalRegularOptionUpdateParameters updateParameters)
-        {
-            return !updateParameters.Priority.HasChange 
-                   || !updateParameters.Priority.NewValue.HasValue
-                   || updateParameters.Priority.NewValue.Value < 1;
-        }
+            private bool ShouldNotUpdatePriority(GlobalRegularOptionUpdateParameters updateParameters)
+            {
+                return !updateParameters.Priority.HasChange 
+                       || !updateParameters.Priority.NewValue.HasValue
+                       || updateParameters.Priority.NewValue.Value < 1;
+            }
     }
-    
-
 }

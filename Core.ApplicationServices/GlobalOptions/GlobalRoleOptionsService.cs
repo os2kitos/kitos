@@ -39,7 +39,7 @@ public class GlobalRoleOptionsService<TOptionType, TReferenceType> :
     {
         return GetOptionWithGlobalAdminRights(optionUuid)
             .Bind(existingOption => PerformGlobalRoleOptionUpdates(existingOption, updateParameters)
-                .Bind(updatedOption => Result<TOptionType, OperationError>.Success(Patch(updatedOption)))
+                .Bind(updatedOption => PerformGlobalOptionPriorityUpdates(updatedOption, updateParameters))
             );
     }
 
