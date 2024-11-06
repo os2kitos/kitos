@@ -106,7 +106,32 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         {
             SetupIsGlobalAdmin();
             var optionUuid = A<Guid>();
-            SetupRepositoryReturnsOneOption(optionUuid);
+            var expected = new List<TestOptionEntity>
+            {
+                new()
+                {
+                    Uuid = optionUuid,
+                    Description = A<string>(),
+                    Id = A<int>(),
+                    IsEnabled = A<bool>(),
+                    IsObligatory = A<bool>(),
+                    Name = A<string>(),
+                    Priority = 1
+                },
+                new()
+                {
+                    Uuid = A<Guid>(),
+                    Description = A<string>(),
+                    Id = A<int>(),
+                    IsEnabled = A<bool>(),
+                    IsObligatory = A<bool>(),
+                    Name = A<string>(),
+                    Priority = 2
+                }
+            };
+            _globalOptionsRepository.SetupSequence(_ => _.AsQueryable())
+                .Returns(expected.AsQueryable())
+                .Returns(expected.AsQueryable());
             var parameters = new GlobalRegularOptionUpdateParameters()
             {
                 IsEnabled = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
