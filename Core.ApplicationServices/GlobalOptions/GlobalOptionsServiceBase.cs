@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GlobalOptions;
+using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;
@@ -106,6 +108,45 @@ namespace Core.ApplicationServices.GlobalOptions
                 .Bind(opt => opt.WithOptionalUpdate(parameters.Name, (opt, name) => opt.UpdateName(name)))
                 .Bind(opt => opt.WithOptionalUpdate(parameters.IsObligatory, (opt, isObligatory) => opt.UpdateIsObligatory(isObligatory)))
                 .Bind(opt => opt.WithOptionalUpdate(parameters.IsEnabled, (opt, isEnabled) => opt.UpdateIsEnabled(isEnabled)));
+        }
+
+        protected Result<TOptionType, OperationError> PerformGlobalOptionPriorityUpdates(TOptionType updatedOption,
+            GlobalRegularOptionUpdateParameters updateParameters)
+        {
+            if (ShouldNotUpdatePriority(updateParameters))
+                return Patch(updatedOption);
+
+            var newPriority = updateParameters.Priority.NewValue.Value;
+            return GetOptionToMove(newPriority).Match(optionToMove =>
+            {
+                var existingPriority = updatedOption.Priority;
+                if (newPriority > existingPriority)
+                {
+                    updatedOption.IncreasePriority();
+                    optionToMove.DecreasePriority();
+                }
+                else
+                {
+                    updatedOption.DecreasePriority();
+                    optionToMove.IncreasePriority();
+                }
+
+                Patch(optionToMove);
+                return Patch(updatedOption);
+            },
+                () => Patch(updatedOption));
+        }
+
+        private Maybe<TOptionType> GetOptionToMove(int newPriority)
+        {
+            return _globalOptionsRepository.AsQueryable().FirstOrDefault(o => o.Priority == newPriority).FromNullable();
+        }
+
+        private bool ShouldNotUpdatePriority(GlobalRegularOptionUpdateParameters updateParameters)
+        {
+            return !updateParameters.Priority.HasChange 
+                   || !updateParameters.Priority.NewValue.HasValue
+                   || updateParameters.Priority.NewValue.Value < 1;
         }
     }
     
