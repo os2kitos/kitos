@@ -113,6 +113,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
                 IsObligatory = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
                 Name = Maybe<string>.Some(A<string>()).AsChangedValue(),
                 Description = Maybe<string>.Some(A<string>()).AsChangedValue(),
+                Priority = Maybe<int>.Some(2).AsChangedValue()
             };
 
             var result = _sut.PatchGlobalOption(optionUuid, parameters);
@@ -123,6 +124,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             Assert.Equal(parameters.Name.NewValue.Value, option.Name);
             Assert.Equal(parameters.IsObligatory.NewValue.Value, option.IsObligatory);
             Assert.Equal(parameters.IsEnabled.NewValue.Value, option.IsEnabled);
+            Assert.Equal(parameters.Priority.NewValue.Value, option.Priority);
         }
 
         [Fact]
@@ -138,6 +140,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
                 IsObligatory = OptionalValueChange<Maybe<bool>>.None,
                 Name = OptionalValueChange<Maybe<string>>.None,
                 Description = OptionalValueChange<Maybe<string>>.None,
+                Priority = OptionalValueChange<Maybe<int>>.None
             };
 
             var result = _sut.PatchGlobalOption(optionUuid, parameters);
@@ -202,7 +205,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
                     IsEnabled = A<bool>(),
                     IsObligatory = A<bool>(),
                     Name = A<string>(),
-                    Priority = A<int>()
+                    Priority = 1
                 }
             };
             _globalOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expected.AsQueryable());

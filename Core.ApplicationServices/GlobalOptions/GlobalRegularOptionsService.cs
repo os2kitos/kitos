@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GlobalOptions;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;
+using dk.nita.saml20.Schema.Core;
 
 namespace Core.ApplicationServices.GlobalOptions;
 
@@ -43,7 +43,28 @@ public class GlobalRegularOptionsService<TOptionType, TReferenceType> :
     {
         return GetOptionWithGlobalAdminRights(optionUuid)
             .Bind(existingOption => PerformGlobalRegularOptionUpdates(existingOption, updateParameters)
-                    .Bind(updatedOption => Result<TOptionType, OperationError>.Success(Patch(updatedOption)))
+                    .Bind(updatedOption =>
+                    {
+                        if (!updateParameters.Priority.HasChange || !updateParameters.Priority.NewValue.HasValue) return Result<TOptionType, OperationError>.Success(Patch(updatedOption));
+
+                        var newPriority = updateParameters.Priority.NewValue.Value;
+                        var existingPriority = updatedOption.Priority;
+                        var optionToMove = _globalOptionsRepository.AsQueryable().FirstOrDefault(o => o.Priority == newPriority);
+                        if (optionToMove == null) return Result<TOptionType, OperationError>.Success(Patch(updatedOption));
+
+                        if (newPriority > existingPriority)
+                        {
+                            updatedOption.IncreasePriority();
+                            optionToMove.DecreasePriority();
+                        }
+                        else
+                        {
+                            updatedOption.DecreasePriority();
+                            optionToMove.IncreasePriority();
+                        }
+
+                        return Result<TOptionType, OperationError>.Success(Patch(updatedOption, optionToMove));
+                    })
             );
     }
 }

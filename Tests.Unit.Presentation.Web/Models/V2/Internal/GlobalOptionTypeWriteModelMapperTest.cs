@@ -58,6 +58,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
             Assert.Equal(dto.IsObligatory, parameters.IsObligatory.NewValue.Value);
             Assert.Equal(dto.IsEnabled, parameters.IsEnabled.NewValue.Value);
             Assert.Equal(dto.Name, parameters.Name.NewValue.Value);
+            Assert.Equal(dto.Priority, parameters.Priority.NewValue.Value);
         }
 
         [Fact]
@@ -101,6 +102,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
             Assert.Equal(dto.IsEnabled, parameters.IsEnabled.NewValue.Value);
             Assert.Equal(dto.Name, parameters.Name.NewValue.Value);
             Assert.Equal(dto.WriteAccess, parameters.WriteAccess.NewValue.Value);
+            Assert.Equal(dto.Priority, parameters.Priority.NewValue.Value);
         }
     }
 }

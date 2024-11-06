@@ -67,11 +67,22 @@ namespace Core.ApplicationServices.GlobalOptions
 
             protected TOptionType Patch(TOptionType updatedOption)
             {
-            _globalOptionsRepository.Update(updatedOption);
-            _globalOptionsRepository.Save();
-            _domainEvents.Raise(new EntityUpdatedEvent<TOptionType>(updatedOption));
+                _globalOptionsRepository.Update(updatedOption);
+                _globalOptionsRepository.Save();
+                _domainEvents.Raise(new EntityUpdatedEvent<TOptionType>(updatedOption));
 
-            return updatedOption;
+                return updatedOption;
+            }
+
+            protected TOptionType Patch(TOptionType updatedOption, TOptionType affectedOption)
+            {
+                _globalOptionsRepository.Update(updatedOption);
+                _globalOptionsRepository.Update(affectedOption);
+                _globalOptionsRepository.Save();
+                _domainEvents.Raise(new EntityUpdatedEvent<TOptionType>(updatedOption));
+                _domainEvents.Raise(new EntityUpdatedEvent<TOptionType>(affectedOption));
+
+                return updatedOption;
             }
 
         protected Result<TOptionType, OperationError> GetOptionWithGlobalAdminRights(Guid optionUuid)
