@@ -65,18 +65,28 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
         };
     }
 
-    public OrganizationUpdateParameters ToOrganizationUpdateParameters(OrganizationUpdateRequestDTO dto)
+    public OrganizationBaseParameters ToOrganizationUpdateParameters(OrganizationUpdateRequestDTO dto)
     {
-        var rule = CreateChangeRule<OrganizationUpdateRequestDTO>(false);
+        return MapParameters(dto, false);
+    }
+
+    public OrganizationBaseParameters ToOrganizationCreateParameters(OrganizationCreateRequestDTO dto)
+    {
+        return MapParameters(dto, true);
+    }
+
+    private OrganizationBaseParameters MapParameters(OrganizationBaseRequestDTO dto, Boolean enforceChanges)
+    {
+        var rule = CreateChangeRule<OrganizationBaseRequestDTO>(enforceChanges);
 
         return new()
         {
-            Cvr = rule.MustUpdate(x => x.Cvr)
-                ? (dto.Cvr.FromNullable() ?? Maybe<string>.None).AsChangedValue()
+            Cvr = rule.MustUpdate(x => x.Cvr) ? (dto.Cvr.FromNullable()).AsChangedValue()
                 : OptionalValueChange<Maybe<string>>.None,
-            Name = rule.MustUpdate(x => x.Name)
-                ? (dto.Name.FromNullable() ?? Maybe<string>.None).AsChangedValue()
-                : OptionalValueChange<Maybe<string>>.None
+            Name = rule.MustUpdate(x => x.Name) ? (dto.Name.FromNullable()).AsChangedValue()
+                : OptionalValueChange<Maybe<string>>.None,
+            TypeId = rule.MustUpdate(x => x.Type) ? ((int)dto.Type).AsChangedValue() : OptionalValueChange<int>.None,
+            ForeignCvr = rule.MustUpdate(x => x.ForeignCvr) ? (dto.ForeignCvr.FromNullable()).AsChangedValue() : OptionalValueChange<Maybe<string>>.None,
         };
     }
 

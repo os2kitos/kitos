@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
@@ -40,6 +37,13 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/patch"), cookie, dto);
+        }
+
+        public static async Task<HttpResponseMessage> CreateOrganization(OrganizationCreateRequestDTO dto, Cookie cookie = null)
+        {
+            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"{ApiPrefix}/create");
+            return await HttpApi.PostWithCookieAsync(url, requestCookie, dto);
         }
 
         public static async Task<HttpResponseMessage> PatchOrganizationMasterData(Guid organizationUuid,

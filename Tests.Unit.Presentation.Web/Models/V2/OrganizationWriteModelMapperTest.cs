@@ -54,15 +54,24 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_Organization_Update_Params()
         {
             ExpectHttpRequestPropertyNames<OrganizationUpdateRequestDTO>();
-            var dto = new OrganizationUpdateRequestDTO()
-            {
-                Cvr = A<string>().AsCvr(),
-                Name = A<string>()
-            };
-
+            var dto = A<OrganizationUpdateRequestDTO>();
             var result = _sut.ToOrganizationUpdateParameters(dto);
             AssertParamHasValidChange(result.Cvr, dto.Cvr);
             AssertParamHasValidChange(result.Name, dto.Name);
+            Assert.Equal(result.TypeId.NewValue, (int)dto.Type);
+            AssertParamHasValidChange(result.ForeignCvr, dto.ForeignCvr);
+        }
+
+        [Fact]
+        public void Can_Map_Organization_Create_Params()
+        {
+            ExpectHttpRequestPropertyNames<OrganizationCreateRequestDTO>();
+            var dto = A<OrganizationCreateRequestDTO>();
+            var result = _sut.ToOrganizationCreateParameters(dto);
+            AssertParamHasValidChange(result.Cvr, dto.Cvr);
+            AssertParamHasValidChange(result.ForeignCvr, dto.ForeignCvr);
+            AssertParamHasValidChange(result.Name, dto.Name);
+            Assert.Equal(result.TypeId.NewValue, (int)dto.Type);
         }
 
         [Fact]
@@ -199,7 +208,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertParamHasValidChange(dpaResult.Value.Address, dpaDto.Address);
         }
 
-        private void AssertParamHasValidChange(OptionalValueChange<Maybe<string>> parameter, string expected)
+        private void AssertParamHasValidChange<T>(OptionalValueChange<Maybe<T>> parameter, T expected)
         {
             Assert.True(parameter.HasChange && parameter.NewValue.HasValue);
             Assert.Equal(expected, parameter.NewValue.Value);
