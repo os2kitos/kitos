@@ -1,10 +1,8 @@
 ﻿
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GlobalOptions;
 using Core.ApplicationServices.Model.GlobalOptions;
-using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;

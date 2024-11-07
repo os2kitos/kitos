@@ -377,10 +377,10 @@
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalDataTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalFrequencyTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalInterfaceTypesInternalV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalItSystemCategoriessInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalItSystemCategoriesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalRegisterTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalRoleOptionTypesInternalV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalSensitivePersonalDatasInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalSensitivePersonalDataTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\GridLocalItContractRolesV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\CommandPermissionsResponseMapper.cs" />

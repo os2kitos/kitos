@@ -17,9 +17,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.GlobalOptionTypes.ItSyste
 {
     [RoutePrefix("api/v2/internal/it-systems/global-option-types/sensitive-personal-data-types")]
 
-    public class ItSystemGlobalSensitivePersonalDatasInternalV2Controller: BaseGlobalRegularOptionTypesInternalV2Controller<ItSystem, SensitivePersonalDataType>
+    public class ItSystemGlobalSensitivePersonalDataTypesInternalV2Controller: BaseGlobalRegularOptionTypesInternalV2Controller<ItSystem, SensitivePersonalDataType>
     {
-        public ItSystemGlobalSensitivePersonalDatasInternalV2Controller(IGlobalRegularOptionsService<SensitivePersonalDataType, ItSystem> globalRegularOptionsService, IGlobalOptionTypeResponseMapper responseMapper, IGlobalOptionTypeWriteModelMapper writeModelMapper) : base(globalRegularOptionsService, responseMapper, writeModelMapper)
+        public ItSystemGlobalSensitivePersonalDataTypesInternalV2Controller(IGlobalRegularOptionsService<SensitivePersonalDataType, ItSystem> globalRegularOptionsService, IGlobalOptionTypeResponseMapper responseMapper, IGlobalOptionTypeWriteModelMapper writeModelMapper) : base(globalRegularOptionsService, responseMapper, writeModelMapper)
         {
         }
 

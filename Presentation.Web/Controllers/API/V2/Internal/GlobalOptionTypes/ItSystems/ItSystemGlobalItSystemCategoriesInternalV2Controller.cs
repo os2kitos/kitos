@@ -18,9 +18,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.GlobalOptionTypes.ItSyste
 {
     [RoutePrefix("api/v2/internal/it-systems/global-option-types/it-system-categories")]
 
-    public class ItSystemGlobalItSystemCategoriessInternalV2Controller: BaseGlobalRegularOptionTypesInternalV2Controller<ItSystemUsage, ItSystemCategories>
+    public class ItSystemGlobalItSystemCategoriesInternalV2Controller: BaseGlobalRegularOptionTypesInternalV2Controller<ItSystemUsage, ItSystemCategories>
     {
-        public ItSystemGlobalItSystemCategoriessInternalV2Controller(IGlobalRegularOptionsService<ItSystemCategories, ItSystemUsage> globalRegularOptionsService, IGlobalOptionTypeResponseMapper responseMapper, IGlobalOptionTypeWriteModelMapper writeModelMapper) : base(globalRegularOptionsService, responseMapper, writeModelMapper)
+        public ItSystemGlobalItSystemCategoriesInternalV2Controller(IGlobalRegularOptionsService<ItSystemCategories, ItSystemUsage> globalRegularOptionsService, IGlobalOptionTypeResponseMapper responseMapper, IGlobalOptionTypeWriteModelMapper writeModelMapper) : base(globalRegularOptionsService, responseMapper, writeModelMapper)
         {
         }
 
