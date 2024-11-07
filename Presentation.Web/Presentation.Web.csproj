@@ -390,6 +390,8 @@
     <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\SystemDeletionConflictMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\DataProcessingRegistrations\DataProcessingRegistrationInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\ItContractInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\KLE\KLEInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\KLE\Mapping\KLEUpdateStatusChoiceMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\DataProcessingRegistrations\DprLocalCountryOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\DataProcessingRegistrations\DprLocalDataResponsibleTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\DataProcessingRegistrations\DprLocalOversightOptionTypesInternalV2Controller.cs" />
@@ -492,6 +494,9 @@
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationV2ResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageRelationMigrationV2ResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\KLE\KLEStatusResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\KLE\KLEUpdateResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\KLE\KLEUpdateStatusChoice.cs" />
     <Compile Include="Models\API\V2\Internal\Response\LocalOptions\LocalRegularOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\LocalOptions\LocalRoleOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Notifications\NotificationResourcePermissionsDTO.cs" />
