@@ -18,8 +18,10 @@ namespace Core.ApplicationServices.Organizations.Write
         
         Result<OrganizationMasterDataRoles, OperationError> GetOrCreateOrganizationMasterDataRoles(Guid organizationUuid);
 
+        Result<Organization, OperationError> CreateOrganization(OrganizationBaseParameters parameters);
+
         Result<Organization, OperationError> PatchOrganization(Guid organizationUuid,
-            OrganizationUpdateParameters parameters);
+            OrganizationBaseParameters parameters);
 
         Result<Config, OperationError> PatchUIRootConfig(Guid organizationUuid, UIRootConfigUpdateParameters updateParameters);
 

@@ -355,6 +355,8 @@
   <ItemGroup>
     <Compile Include="Controllers\API\V1\Auth\AuthorizeController.cs" />
     <Compile Include="Controllers\API\V1\ExtendedApiController.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\GlobalOptionTypeWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\Common\Mapping\IGlobalOptionTypeWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\ILocalOptionTypeWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\ILocalOptionTypeResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\IOrganizationResponseMapper.cs" />
@@ -366,6 +368,10 @@
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationTypeMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\OrganizationUnits\OrganizationUnitRoleTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\BaseGlobalRegularOptionTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\BaseGlobalRoleOptionTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalBusinessTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\GridLocalItContractRolesV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\CommandPermissionsResponseMapper.cs" />
@@ -384,6 +390,8 @@
     <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\SystemDeletionConflictMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\DataProcessingRegistrations\DataProcessingRegistrationInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\ItContractInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\KLE\KLEInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\KLE\Mapping\KLEUpdateStatusChoiceMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\DataProcessingRegistrations\DprLocalCountryOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\DataProcessingRegistrations\DprLocalDataResponsibleTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\DataProcessingRegistrations\DprLocalOversightOptionTypesInternalV2Controller.cs" />
@@ -419,6 +427,8 @@
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\BaseLocalRegularOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\BaseLocalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItSystems\ItSystemSensitivePersonalDataTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Mapping\GlobalOptionTypeResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Mapping\IGlobalOptionTypeResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Mapping\InternalDtoModelV2MappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemUsageV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Internal\Organizations\OrganizationGridInternalV2Controller.cs" />
@@ -451,9 +461,13 @@
     <Compile Include="Models\API\V2\Internal\Common\NamedEntityV2DTO.cs" />
     <Compile Include="Models\API\V2\Internal\Common\NamedEntityWithEnabledStatusV2DTO.cs" />
     <Compile Include="Models\API\V2\Internal\Common\NamedEntityWithUserFullNameV2DTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\GlobalRoleOptionUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\BaseNotificationPropertiesWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\IHasBaseWriteProperties.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\NotificationSentResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Options\GlobalRegularOptionCreateRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Options\GlobalRegularOptionUpdateRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Options\GlobalRoleOptionCreateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Options\LocalOptionCreateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Options\LocalRegularOptionUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\ColumnConfigurationRequestDTO.cs" />
@@ -461,6 +475,8 @@
     <Compile Include="Models\API\V2\Internal\Request\Organizations\CustomizedUINodeRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\DataProtectionAdvisorRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\DataResponsibleRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Organizations\OrganizationBaseRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\Organizations\OrganizationCreateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\OrganizationGridConfigurationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\OrganizationMasterDataRoleRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\OrganizationMasterDataRolesRequestDTO.cs" />
@@ -472,10 +488,15 @@
     <Compile Include="Models\API\V2\Internal\Request\Organizations\UIModuleCustomizationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\User\MutateRightRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\User\MutateUserRightsRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\GlobalOptions\GlobalRegularOptionResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\GlobalOptions\GlobalRoleOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItContract\LocalItContractRolesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationV2ResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageRelationMigrationV2ResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\KLE\KLEStatusResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\KLE\KLEUpdateResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\KLE\KLEUpdateStatusChoice.cs" />
     <Compile Include="Models\API\V2\Internal\Response\LocalOptions\LocalRegularOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\LocalOptions\LocalRoleOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Notifications\NotificationResourcePermissionsDTO.cs" />

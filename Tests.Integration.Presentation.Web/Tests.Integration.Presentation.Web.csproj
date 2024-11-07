@@ -134,6 +134,8 @@
     <Compile Include="Contract\V2\ItContractsInternalApiV2Test.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
     <Compile Include="GDPR\V2\DataProcessingRegistrationInternalAPIV2Test.cs" />
+    <Compile Include="GlobalAdminArea\ItSystemGlobalBusinessTypesInternalV2ApiTest.cs" />
+    <Compile Include="GlobalAdminArea\ItSystemGlobalRoleOptionTypesInternalV2ApiTest.cs" />
     <Compile Include="Headers\V2EnumSerializationTest.cs" />
     <Compile Include="Interfaces\V2\BaseItInterfaceApiV2Test.cs" />
     <Compile Include="Interfaces\V2\RightsHolderItInterfaceApiV2Test.cs" />
@@ -158,6 +160,7 @@
     </Compile>
     <Compile Include="Tools\Extensions\StringExtensions.cs" />
     <Compile Include="Tools\Internal\DPR\DataProcessingRegistrationInternalV2Helper.cs" />
+    <Compile Include="Tools\Internal\GlobalOptionTypeV2Helper.cs" />
     <Compile Include="Tools\Internal\ItSystemUsage\ItSystemUsageMigrationV2Helper.cs" />
     <Compile Include="Tools\Internal\LocalOptionTypeV2Helper.cs" />
     <Compile Include="Tools\Internal\Notifications\NotificationV2Helper.cs" />

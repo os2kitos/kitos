@@ -1,4 +1,6 @@
-﻿namespace Presentation.Web.Helpers
+﻿using System.CodeDom;
+
+namespace Presentation.Web.Helpers
 {
     public static class Constants
     {
@@ -26,6 +28,44 @@
             public const string UserFileName = "OS2KITOS Brugere.xlsx";
             public const string ContractsFileName = "OS2KITOS IT Kontrakter.xlsx";
             public const string ExcelFilePath = "~/Content/excel/";
+        }
+
+        public static class KLE
+        {
+            public const string FileNameStar = "kle-updates.csv";
+            public const string DispositionType = "attachment";
+            public const string MediaTypeHeaderValue = "text/csv";
+
+
+            public static class Type
+            {
+                public const string Column = "Type";
+                public const string ColumnName = "KLE Type";
+            }
+            public static class TaskKey
+            {
+                public const string Column = "TaskKey";
+                public const string ColumnName = "Task Key";
+            }
+
+            public static class Description
+            {
+                public const string Column = "Description";
+                public const string ColumnName = "Beskrivelse";
+            }
+
+            public static class Change
+            {
+                public const string Column = "Change";
+                public const string ColumnName = "Ændring";
+            }
+
+            public static class ChangeDetails
+            {
+                public const string Column = "ChangeDescription";
+                public const string ColumnName = "Ændringsbeskrivelse";
+            }
+
         }
     }
 }

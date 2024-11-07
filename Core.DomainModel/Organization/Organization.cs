@@ -546,6 +546,16 @@ namespace Core.DomainModel.Organization
             Name = name.HasValue ? name.Value : null;
         }
 
+        public void UpdateForeignCvr(Maybe<string> foreignCvr)
+        {
+            ForeignCvr = foreignCvr.HasValue ? foreignCvr.Value : null;
+        }
+
+        public void UpdateType(int typeId)
+        {
+            TypeId = typeId;
+        }
+
         public void UpdateShowDataProcessing(Maybe<bool> showDataProcessing)
         {
             HandleConfigPropertyUpdate(showDataProcessing, config => config.ShowDataProcessing = showDataProcessing.Value);
