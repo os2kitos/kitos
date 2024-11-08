@@ -1,10 +1,8 @@
 ﻿
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GlobalOptions;
 using Core.ApplicationServices.Model.GlobalOptions;
-using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;
@@ -68,7 +66,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             Assert.Equal(parameters.IsObligatory, option.IsObligatory);
             Assert.Equal(parameters.WriteAccess, option.HasWriteAccess);
             Assert.Equal(existingOptions.First().Priority + 1, option.Priority);
-            Assert.True(option.IsLocallyAvailable);
+            Assert.False(option.IsLocallyAvailable);
             Assert.False(option.IsEnabled);
             _globalOptionsRepository.Verify(_ => _.Insert(option));
             _globalOptionsRepository.Verify(_ => _.Save());
