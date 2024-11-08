@@ -336,7 +336,7 @@ namespace Core.ApplicationServices.Organizations
         }
 
         public Maybe<OperationError> RemoveOrganization(Guid uuid, bool enforceDeletion)
-        {
+        {   
             using var transaction = _transactionManager.Begin();
             var organizationWhichCanBeDeleted = GetOrganization(uuid).Bind(WithDeletionAccess);
 

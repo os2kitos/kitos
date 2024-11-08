@@ -1,4 +1,6 @@
-﻿namespace Presentation.Web.Models.API.V2.Internal.Request.Organizations
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Presentation.Web.Models.API.V2.Internal.Request.Organizations
 {
     public class DataProtectionAdvisorRequestDTO: OrganizationMasterDataRoleRequestDTO
     {
