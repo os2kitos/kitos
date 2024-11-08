@@ -73,7 +73,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
             Assert.Equal(parameters.Name, option.Name);
             Assert.Equal(parameters.IsObligatory, option.IsObligatory);
             Assert.Equal(existingOptions.First().Priority + 1, option.Priority);
-            Assert.True(option.IsLocallyAvailable);
+            Assert.False(option.IsLocallyAvailable);
             Assert.False(option.IsEnabled);
             _globalOptionsRepository.Verify(_ => _.Insert(option));
             _globalOptionsRepository.Verify(_ => _.Save());

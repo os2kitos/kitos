@@ -950,7 +950,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             var user1 = await CreateUser(organization);
             var user2 = await CreateUser(organization);
-            var role = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().First());
+            var role = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().First(r => r.IsObligatory && r.IsEnabled));
             var roles = new List<RoleAssignmentRequestDTO>
             {
                 new()
@@ -986,7 +986,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             var user1 = await CreateUser(organization);
             var user2 = await CreateUser(organization);
-            var role = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().First());
+            var role = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().First(r => r.IsObligatory && r.IsEnabled));
 
             var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
@@ -1026,8 +1026,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             var user1 = await CreateUser(organization);
             var user2 = await CreateUser(organization);
-            var role1 = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().RandomItem());
-            var role2 = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().RandomItem());
+            var role1 = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().Where(r => r.IsObligatory && r.IsEnabled).RandomItem());
+            var role2 = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().Where(r => r.IsObligatory && r.IsEnabled).RandomItem());
 
             var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
@@ -1061,8 +1061,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             var user1 = await CreateUser(organization);
             var user2 = await CreateUser(organization);
-            var role1 = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().RandomItem());
-            var role2 = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().RandomItem());
+            var role1 = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().Where(r => r.IsObligatory && r.IsEnabled).RandomItem());
+            var role2 = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().Where(r => r.IsObligatory && r.IsEnabled).RandomItem());
 
             var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
@@ -2183,7 +2183,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             var user1 = await CreateUser(organization);
             var user2 = await CreateUser(organization);
-            var rawRoles = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole[]>(x => x.AsQueryable().AsEnumerable().RandomItems(2).ToArray());
+            var rawRoles = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole[]>(x => x.AsQueryable().AsEnumerable().Where(r => r.IsObligatory && r.IsEnabled).RandomItems(2).ToArray());
             var role1 = rawRoles.First();
             var role2 = rawRoles.Last();
             var roles = new List<RoleAssignmentRequestDTO>
@@ -2333,7 +2333,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var externalReferences = CreateExternalReferenceDataDTOs<ExternalReferenceDataWriteRequestDTO>();
 
             var userToGainRole = await CreateUser(organization);
-            var role = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().First());
+            var role = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().First(r => r.IsObligatory && r.IsEnabled));
             var roles = CreateRoleAssignmentRequestDTOs(role.Uuid, userToGainRole.Uuid);
 
             var gdpr = await CreateGDPRInputAsync(organization);
