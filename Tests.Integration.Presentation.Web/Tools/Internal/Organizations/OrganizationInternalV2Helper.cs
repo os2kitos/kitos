@@ -77,5 +77,19 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
             cookie ??= await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.PutWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/{UiCustomizationSuffix}/{moduleName}"), cookie, dto);
         }
+
+        public static async Task<HttpResponseMessage> GetRemovalConflicts(Guid organizationUuid, OrganizationRole role = OrganizationRole.GlobalAdmin)
+        {
+            var cookie = await HttpApi.GetCookieAsync(role);
+            var url = TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/conflicts");
+            return await HttpApi.GetWithCookieAsync(url, cookie);
+        }
+
+        public static async Task<HttpResponseMessage> DeleteOrganization(Guid organizationUuid, bool enforceDeletion, OrganizationRole role = OrganizationRole.GlobalAdmin)
+        {
+            var cookie = await HttpApi.GetCookieAsync(role);
+            var url = TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/delete?enforceDeletion={enforceDeletion}");
+            return await HttpApi.DeleteWithCookieAsync(url, cookie);
+        }
     }
 }

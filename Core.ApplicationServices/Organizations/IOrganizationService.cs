@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Organizations;
-using Core.ApplicationServices.Model.UiCustomization;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
