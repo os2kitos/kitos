@@ -75,7 +75,8 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
                 Uuid = A<Guid>(),
                 Id = A<int>(),
                 Name = A<string>(),
-                IsObligatory = false,
+                IsObligatory = true,
+                IsLocallyAvailable = true,
                 HasWriteAccess = A<bool>()
             };
             DatabaseAccess.MutateEntitySet<ItSystemRole>(repository =>
