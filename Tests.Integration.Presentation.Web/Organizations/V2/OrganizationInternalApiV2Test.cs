@@ -8,9 +8,13 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json;
+using Presentation.Web.Controllers.API.V1;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
+using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Request.System.Regular;
+using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Tests.Integration.Presentation.Web.Tools;
@@ -397,6 +401,49 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(isGlobalAdmin, wasAllowed);
         }
 
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        public async Task Can_Only_Delete_Organization_As_Global_Admin(OrganizationRole role)
+        {
+            var orgToDelete = await CreateTestOrganization();
+
+            using var response = await OrganizationInternalV2Helper.DeleteOrganization(orgToDelete.Uuid, true, role);
+
+            var wasAllowed = response.StatusCode == HttpStatusCode.NoContent;
+            var isGlobalAdmin = role == OrganizationRole.GlobalAdmin;
+            Assert.Equal(isGlobalAdmin, wasAllowed);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task Can_Only_Delete_Organization_With_Conflicts_When_Enforcing(bool enforceDeletion)
+        {
+            var orgToDelete = await CreateTestOrganization();
+            await CreateConflictsForOrg(orgToDelete.Uuid);
+
+            using var response = await OrganizationInternalV2Helper.DeleteOrganization(orgToDelete.Uuid, enforceDeletion);
+
+            var wasAllowed = response.StatusCode == HttpStatusCode.NoContent;
+            Assert.Equal(enforceDeletion, wasAllowed);
+        }
+
+        [Fact]
+        public async Task Can_Get_Conflicts()
+        {
+            var org = await CreateTestOrganization();
+            await CreateConflictsForOrg(org.Uuid);
+
+            using var response = await OrganizationInternalV2Helper.GetRemovalConflicts(org.Uuid);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var body = await response.ReadResponseBodyAsAsync<OrganizationRemovalConflictsResponseDTO>();
+            Assert.NotNull(body);
+            Assert.Single(body.ContractsInOtherOrganizationsWhereOrgIsSupplier);
+        }
+
         [Fact]
         public async Task Update_Organization_Returns_Bad_Request_If_Invalid_Uuid()
         {
@@ -410,6 +457,24 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             using var response = await OrganizationInternalV2Helper.PatchOrganization(invalidUuid, requestDto);
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        private async Task CreateConflictsForOrg(Guid organizationUuid)
+        {
+            var otherOrganization = await CreateTestOrganization();
+            var token = (await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin)).Token;
+
+            //Create contract in another organization
+            var contractRequest = new CreateNewContractRequestDTO { OrganizationUuid = otherOrganization.Uuid, Name = A<string>() };
+            var contractResponse = await ItContractV2Helper.SendPostContractAsync(token, contractRequest);
+            Assert.Equal(HttpStatusCode.Created, contractResponse.StatusCode);
+            var contract = await contractResponse.ReadResponseBodyAsAsync<ItContractResponseDTO>();
+
+            //Set the original organization to be deleted as the supplier for the contract
+            var patchRequest =  new ContractSupplierDataWriteRequestDTO { OrganizationUuid = organizationUuid};
+            var patchResponse = await ItContractV2Helper.SendPatchContractSupplierAsync(token, contract.Uuid, patchRequest);
+            Assert.Equal(HttpStatusCode.OK, patchResponse.StatusCode);
+
         }
 
         private async Task GetMasterDataRolesAndAssertNotNull(Guid orgUuid)
