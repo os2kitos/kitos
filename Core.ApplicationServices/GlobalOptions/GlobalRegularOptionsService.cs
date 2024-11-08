@@ -31,7 +31,7 @@ public class GlobalRegularOptionsService<TOptionType, TReferenceType> :
             Description = createParameters.Description,
             IsObligatory = createParameters.IsObligatory,
             IsEnabled = false,
-            IsLocallyAvailable = true,
+            IsLocallyAvailable = false,
             Priority = GetNextOptionPriority()
         };
 
