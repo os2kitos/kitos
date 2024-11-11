@@ -261,7 +261,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             return new()
             {
                 SystemName = system.Name,
-                OrganizationNames = system.Usages.Select(usage => usage.Organization.Name).ToList(),
+                OrganizationNames = system.Usages.Select(usage => usage.Organization).Where(org => org.Id != system.OrganizationId).Select(org => org.Name).ToList(),
             };
         }
 
@@ -271,17 +271,19 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
             {
                 ExposedInterfaceName = itInterface.Name,
                 ExposingSystemName = itInterface.ExhibitedBy.ItSystem.Name,
-                OrganizationName = itInterface.Organization.Name,
+                OrganizationName = itInterface.ExhibitedBy.ItSystem.Organization.Name,
             };
         }
 
-        private MultipleConflictsResponseDTO MapToMultipleConflictDTO<T>(IHasName mainEntity, IEnumerable<T> subEntities)
-            where T : IHasName, IOwnedByOrganization
+        private MultipleConflictsResponseDTO MapToMultipleConflictDTO<T, U>(U mainEntity, IEnumerable<T> subEntities)
+            where T: IHasName, IOwnedByOrganization
+            where U : IHasName, IOwnedByOrganization
+
         {
             return new()
             {
                 MainEntityName = mainEntity.Name,
-                Conflicts = subEntities.Select(MapToSimpleConflict).ToList(),
+                Conflicts = subEntities.Where(subEntity => subEntity.OrganizationId != mainEntity.OrganizationId).Select(MapToSimpleConflict).ToList(),
             };
         }
 
