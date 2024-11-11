@@ -10,6 +10,7 @@ using Tests.Toolkit.Patterns;
 using Xunit;
 using Core.DomainModel.Organization;
 using System.Collections.Generic;
+using AutoFixture;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
@@ -349,6 +350,31 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             //Assert
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Delete_User(bool isScopedToOrganization)
+        {
+            //Arrange
+            var userUuid = A<Guid>();
+            var orgUuid = isScopedToOrganization ? A<Guid>() : Maybe<Guid>.None;
+            int? orgId = null;
+
+            if (isScopedToOrganization)
+            {
+                orgId = A<int>();
+                ExpectResolveIdReturns(orgUuid.Value, orgId);
+            }
+
+            _userServiceMock.Setup(x => x.DeleteUser(userUuid, orgId)).Returns(Maybe<OperationError>.None);
+
+            //Act
+            var result = _sut.DeleteUser(userUuid, orgUuid);
+
+            //Assert
+            Assert.True(result.IsNone);
         }
 
         private void ExpectAssignRolesReturn(IEnumerable<OrganizationRole> roles, User user, Organization org)

@@ -158,10 +158,54 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         [Fact]
         public async Task Can_Delete_User()
         {
+            //Arrange
             var organization = await CreateOrganizationAsync();
-            var user = await UsersV2Helper.CreateUser(organization.Uuid, CreateCreateUserRequest());
+            var organization2 = await CreateOrganizationAsync();
+            var userRequest = CreateCreateUserRequest();
+            var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
+            var userUpdateRequest = new 
+            {
+                Roles = new List<OrganizationRoleChoice> { OrganizationRoleChoice.User }
+            };
+            var userInOrg2 = await UsersV2Helper.UpdateUser(organization2.Uuid, user.Uuid, userUpdateRequest);
 
+            Assert.Equal(user.Uuid, userInOrg2.Uuid);
+
+            //Act
             _ = await UsersV2Helper.DeleteUserAndVerifyStatusCode(organization.Uuid, user.Uuid);
+
+            //Assert
+            var userInOrg2AfterDeletion = await UsersV2Helper.GetUserByEmail(organization2.Uuid, user.Email);
+            Assert.Equal(userInOrg2.Uuid, userInOrg2AfterDeletion.Uuid);
+
+            var deletedUser = await UsersV2Helper.GetUserByEmail(organization.Uuid, user.Email);
+            Assert.False(deletedUser.IsPartOfCurrentOrganization);
+        }
+
+        [Fact]
+        public async Task Can_Delete_User_In_All_Orgs()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var organization2 = await CreateOrganizationAsync();
+            var userRequest = CreateCreateUserRequest();
+            var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
+            var userUpdateRequest = new 
+            {
+                Roles = new List<OrganizationRoleChoice> { OrganizationRoleChoice.User }
+            };
+            var userInOrg2 = await UsersV2Helper.UpdateUser(organization2.Uuid, user.Uuid, userUpdateRequest);
+
+            Assert.Equal(user.Uuid, userInOrg2.Uuid);
+
+            //Act
+            await UsersV2Helper.DeleteUserGlobally(user.Uuid);
+
+            //Assert
+            var userOrg1 = await UsersV2Helper.GetUserByEmail(organization.Uuid, user.Email);
+            Assert.Null(userOrg1);
+            var userOrg2 = await UsersV2Helper.GetUserByEmail(organization2.Uuid, user.Email);
+            Assert.Null(userOrg2);
         }
 
         [Fact]
@@ -181,6 +225,22 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var invalidUserUuid = new Guid();
 
             _ = await UsersV2Helper.DeleteUserAndVerifyStatusCode(organization.Uuid, invalidUserUuid, null, HttpStatusCode.NotFound);
+        }
+
+        [Fact]
+        public async Task Can_Get_Any_User()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var userRequest = CreateCreateUserRequest();
+            var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest); 
+
+            //Act
+            var users = await UsersV2Helper.GetUsers(user.Email);
+
+            //Assert
+            var responseUser = Assert.Single(users);
+            Assert.Equal(user.Uuid, responseUser.Uuid);
         }
 
         private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
@@ -248,8 +308,8 @@ namespace Tests.Integration.Presentation.Web.Users.V2
                 DefaultUserStartPreference = A<DefaultUserStartPreferenceChoice>(),
                 HasApiAccess = A<bool>(),
                 HasStakeHolderAccess = A<bool>(),
-                SendMail = A<bool>(),
-                Roles = A<IEnumerable<OrganizationRoleChoice>>()
+                Roles = A<IEnumerable<OrganizationRoleChoice>>(),
+                SendMail = A<bool>()
             };
         }
     }

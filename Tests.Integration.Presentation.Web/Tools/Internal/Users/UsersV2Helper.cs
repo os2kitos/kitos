@@ -1,5 +1,6 @@
 ﻿using Core.DomainModel.Organization;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -7,6 +8,8 @@ using Presentation.Web.Models.API.V2.Internal.Request.User;
 using Presentation.Web.Models.API.V2.Request.User;
 using Xunit;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
+using Tests.Integration.Presentation.Web.Tools.External;
+using System.Linq;
 
 namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
 {
@@ -25,7 +28,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
         }
 
         public static async Task<UserResponseDTO> UpdateUser(Guid organizationUuid, Guid userUuid,
-            UpdateUserRequestDTO request, Cookie cookie = null)
+            object request, Cookie cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             using var response = await HttpApi.PatchWithCookieAsync(
@@ -58,6 +61,17 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return statusCode;
         }
 
+        public static async Task DeleteUserGlobally(Guid userUuid, Cookie cookie = null)
+        {
+            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl(
+                $"api/v2/internal/users/{userUuid}");
+            using var response = await HttpApi.DeleteWithCookieAsync(url,
+                requestCookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
         public static async Task<UserCollectionPermissionsResponseDTO> GetUserCollectionPermissions(Guid organizationUuid, Cookie cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -70,16 +84,41 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return await response.ReadResponseBodyAsAsync<UserCollectionPermissionsResponseDTO>();
         }
 
-        public static async Task<UserResponseDTO> GetUserByEmail(Guid organizationUuid, string email, Cookie cookie = null)
+        public static async Task<UserIsPartOfCurrentOrgResponseDTO> GetUserByEmail(Guid organizationUuid, string email, Cookie cookie = null)
         {
-            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            using var response = await HttpApi.GetWithCookieAsync(
-                TestEnvironment.CreateUrl(
-                    $"{ControllerPrefix(organizationUuid)}/find-any-by-email?email={email}"), requestCookie);
+            using var response = await SendGetUserByEmail(organizationUuid, email, cookie);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<UserResponseDTO>();
+            return await response.ReadResponseBodyAsAsync<UserIsPartOfCurrentOrgResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendGetUserByEmail(Guid organizationUuid, string email, Cookie cookie = null)
+        {
+            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.GetWithCookieAsync(
+                TestEnvironment.CreateUrl(
+                    $"{ControllerPrefix(organizationUuid)}/find-any-by-email?email={email}"), requestCookie);
+        }
+
+        public static async Task<IEnumerable<UserReferenceResponseDTO>> GetUsers(string email)
+        {
+            var requestCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var queryParameters = new List<KeyValuePair<string, string>>
+            {
+                new ("emailQuery", email)
+            };
+            
+            var query = string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"));
+
+            using var response = await HttpApi.GetWithCookieAsync(
+                TestEnvironment.CreateUrl(
+                    $"api/v2/internal/users?{query}"), requestCookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<IEnumerable<UserReferenceResponseDTO>>();
         }
 
         public static async Task<HttpResponseMessage> CopyRoles(Guid organizationUuid, Guid fromUser, Guid toUser,

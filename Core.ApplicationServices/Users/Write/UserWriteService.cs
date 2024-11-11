@@ -10,10 +10,6 @@ using Core.ApplicationServices.Model.Users.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Rights;
 using Core.DomainModel;
-using Core.DomainModel.GDPR;
-using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
@@ -140,6 +136,23 @@ namespace Core.ApplicationServices.Users.Write
             return CollectUsersAndMutateRoles(_userRightsService.TransferRights, organizationUuid, fromUserUuid, toUserUuid, parameters);
         }
 
+        public Maybe<OperationError> DeleteUser(Guid userUuid, Maybe<Guid> scopedToOrganizationUuid)
+        {
+            return scopedToOrganizationUuid
+                .Match(
+                orgUuid => ResolveOrganizationUuidToId(orgUuid)
+                    .Match(
+                        id => Result<int?, OperationError>.Success(id), 
+                        ex => ex
+                        ),
+                () => Result<int?, OperationError>.Success(null)
+                )
+                .Match(
+                    orgDbId => _userService.DeleteUser(userUuid, orgDbId),
+                    error => error
+                    );
+        }
+         
         private Maybe<OperationError> CollectUsersAndMutateRoles(Func<int, int, int, UserRightsChangeParameters, Maybe<OperationError>> mutateAction,
             Guid organizationUuid, Guid fromUserUuid,
             Guid toUserUuid,
@@ -166,24 +179,24 @@ namespace Core.ApplicationServices.Users.Write
 
         private Result<User, OperationError> PerformUpdates(User orgUser, Organization organization, UpdateUserParameters parameters)
         {
-            return orgUser.WithOptionalUpdate(parameters.FirstName, (user, firstName) => user.Name = firstName)
+            return orgUser.WithOptionalUpdate(parameters.FirstName, (user, firstName) => user.UpdateFirstName(user, firstName))
                 .Bind(user =>
-                    user.WithOptionalUpdate(parameters.LastName, (userToUpdate, lastName) => userToUpdate.LastName = lastName))
-                .Bind(user => user.WithOptionalUpdate(parameters.Email, UpdateEmail)
+                    user.WithOptionalUpdate(parameters.LastName, (userToUpdate, lastName) => userToUpdate.UpdateLastName(user, lastName)))
+                .Bind(user => user.WithOptionalUpdate(parameters.Email, (userToUpdate, email) => UpdateEmail(userToUpdate, email)))
                 .Bind(user => user.WithOptionalUpdate(parameters.PhoneNumber, (userToUpdate, phoneNumber) => userToUpdate.PhoneNumber = phoneNumber))
                 .Bind(user => user.WithOptionalUpdate(parameters.HasStakeHolderAccess, UpdateStakeholderAccess))
                 .Bind(user => user.WithOptionalUpdate(parameters.HasApiAccess,
                     (userToUpdate, hasApiAccess) => userToUpdate.HasApiAccess = hasApiAccess))
                 .Bind(user => user.WithOptionalUpdate(parameters.DefaultUserStartPreference,
                     (userToUpdate, defaultStartPreference) => userToUpdate.DefaultUserStartPreference = defaultStartPreference))
-                .Bind(user => user.WithOptionalUpdate(parameters.Roles, (userToUpdate, roles) => UpdateRoles(organization, userToUpdate, roles))));
+                .Bind(user => user.WithOptionalUpdate(parameters.Roles, (userToUpdate, roles) => UpdateRoles(organization, userToUpdate, roles)));
         }
 
         private Result<User, OperationError> UpdateStakeholderAccess(User user, bool stakeholderAccess)
         {
             if (stakeholderAccess &&
                 !_authorizationContext.HasPermission(
-                    new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))
+                    new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))    
             {
                 return new OperationError("You don't have permission to issue stakeholder access.", OperationFailure.Forbidden);
             }
@@ -198,8 +211,8 @@ namespace Core.ApplicationServices.Users.Write
             {
                 return new OperationError($"Email '{email}' is already in use.", OperationFailure.Conflict);
             }
-            user.Email = email;
-            return user;
+
+            return user.UpdateEmail(user, email);
         }
 
         private Result<User, OperationError> UpdateRoles(Organization organization, User user,

@@ -20,6 +20,7 @@ namespace Core.ApplicationServices
         Result<IQueryable<User>, OperationError> GetUsersWithCrossOrganizationPermissions();
         Result<IQueryable<User>, OperationError> GetUsersWithRoleAssignedInAnyOrganization(OrganizationRole role);
         Result<IQueryable<User>, OperationError> GetUsersInOrganization(Guid organizationUuid, params IDomainQuery<User>[] queries);
+        IQueryable<User> GetUsers(params IDomainQuery<User>[] queries);
         Result<User, OperationError> GetUserInOrganization(Guid organizationUuid, Guid userUuid);
         /// <summary>
         /// 
@@ -33,6 +34,5 @@ namespace Core.ApplicationServices
         bool IsEmailInUse(string email);
         Result<User, OperationError> GetUserByEmail(Guid organizationUuid, string email);
         Result<User, OperationError> GetUserByUuid(Guid userUuid);
-        Maybe<OperationError> DeleteUserByOrganizationUuid(Guid userUuid, Guid scopedToOrganizationUuid);
 }
 }

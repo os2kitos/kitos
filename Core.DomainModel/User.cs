@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
@@ -168,6 +169,38 @@ namespace Core.DomainModel
                 .Where(organizationRight => organizationRight.Organization.Uuid == organizationUuid)
                 .Select(organizationRight => organizationRight.Role)
                 .Distinct();
+        }
+
+
+
+        public Result<User, OperationError> UpdateEmail(User user, string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return new OperationError($"Email '{email}' is required", OperationFailure.BadInput);
+            }
+            user.Email = email;
+            return user;
+        }
+
+        public Result<User, OperationError> UpdateFirstName(User user, string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return new OperationError($"Name '{name}' is required", OperationFailure.BadInput);
+            }
+            user.Name = name;
+            return user;
+        }
+
+        public Result<User, OperationError> UpdateLastName(User user, string lastName)
+        {
+            if (string.IsNullOrWhiteSpace(lastName))
+            {
+                return new OperationError($"Last name '{lastName}' is required", OperationFailure.BadInput);
+            }
+            user.LastName = lastName;
+            return user;
         }
 
         #region Authentication

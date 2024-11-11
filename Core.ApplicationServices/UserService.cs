@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Security;
@@ -355,6 +354,14 @@ namespace Core.ApplicationServices
                 );
         }
 
+        public IQueryable<User> GetUsers(params IDomainQuery<User>[] queries)
+        {
+            var query = new IntersectionQuery<User>(queries);
+
+            return _repository.GetUsers()
+                .Transform(query.Apply);
+        }
+
         public Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries)
         {
             if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
@@ -381,13 +388,6 @@ namespace Core.ApplicationServices
         private bool AllowDelete(int? scopedToOrganizationId)
         {
             return _authorizationContext.HasPermission(new DeleteAnyUserPermission(scopedToOrganizationId.FromNullableValueType()));
-        }
-
-        public Maybe<OperationError> DeleteUserByOrganizationUuid(Guid userUuid, Guid scopedToOrganizationUuid)
-        {
-            return _identityResolver.ResolveDbId<Organization>(scopedToOrganizationUuid)
-                .Match(orgDbId => DeleteUser(userUuid, orgDbId),
-                    () => new OperationError(OperationFailure.NotFound));
         }
 
         public Maybe<OperationError> DeleteUser(Guid userUuid, int? scopedToOrganizationId = null)

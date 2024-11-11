@@ -2,7 +2,7 @@
 
 namespace Presentation.Web.Models.API.V2.Request.User
 {
-    public class CreateUserRequestDTO : BaseUserRequestDTO
+    public class CreateUserRequestDTO  : BaseUserRequestDTO
     {
         [Required]
         [EmailAddress]
