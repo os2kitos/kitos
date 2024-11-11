@@ -516,7 +516,17 @@ namespace Presentation.Web.Ninject
         private void RegisterGlobalOptionTypes(IKernel kernel)
         {
             RegisterGlobalRegularOptionService<BusinessType, ItSystem>(kernel);
+            RegisterGlobalRegularOptionService<ArchiveLocation, ItSystemUsage>(kernel);
             RegisterGlobalRoleOptionService<ItSystemRole, ItSystemRight>(kernel);
+            RegisterGlobalRegularOptionService<SensitivePersonalDataType, ItSystem>(kernel);
+            RegisterGlobalRegularOptionService<ItSystemRole, ItSystemRight>(kernel);
+            RegisterGlobalRegularOptionService<RegisterType, ItSystemUsage>(kernel);
+            RegisterGlobalRegularOptionService<ItSystemCategories, ItSystemUsage>(kernel);
+            RegisterGlobalRegularOptionService<InterfaceType, ItInterface>(kernel);
+            RegisterGlobalRegularOptionService<RelationFrequencyType, SystemRelation>(kernel);
+            RegisterGlobalRegularOptionService<DataType, DataRow>(kernel);
+            RegisterGlobalRegularOptionService<ArchiveType, ItSystemUsage>(kernel);
+            RegisterGlobalRegularOptionService<ArchiveTestLocation, ItSystemUsage>(kernel);
         }
 
         private void RegisterLocalItContractOptionTypes(IKernel kernel)

@@ -370,8 +370,17 @@
     <Compile Include="Controllers\API\V2\External\OrganizationUnits\OrganizationUnitRoleTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\BaseGlobalRegularOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\BaseGlobalRoleOptionTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalArchiveLocationsInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalArchiveTestLocationsInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalArchiveTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalBusinessTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalDataTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalFrequencyTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalInterfaceTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalItSystemCategoriesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalRegisterTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalRoleOptionTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalSensitivePersonalDataTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\GridLocalItContractRolesV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\CommandPermissionsResponseMapper.cs" />

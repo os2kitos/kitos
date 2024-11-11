@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.GlobalOptions;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;
-using dk.nita.saml20.Schema.Core;
 
 namespace Core.ApplicationServices.GlobalOptions;
 
