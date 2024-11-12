@@ -314,7 +314,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var userUuid = A<Guid>();
 
             var transaction = ExpectTransactionBeginReturns();
-            var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
+            var user = ExpectGenericRepositoryByUuidReturns(userId, userUuid);
             ExpectHasDeletePermissionReturns(true);
             ExpectIsGlobalReturns(true);
             _commandBusMock
@@ -345,7 +345,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var userId = A<int>();
             var userUuid = A<Guid>();
             var organizationId = A<int>();
-            var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
+            var user = ExpectGenericRepositoryByUuidReturns(userId, userUuid);
             var organization = ExpectOrgRepositoryByUuidReturns(organizationId);
             user.IsGlobalAdmin = isUserForDeletionGlobalAdmin;
             user.OrganizationRights = new List<OrganizationRight> { new() { OrganizationId = organizationId } };
@@ -388,7 +388,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var userId = A<int>();
             var userUuid = A<Guid>();
             var organizationId = A<int>();
-            var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
+            var user = ExpectGenericRepositoryByUuidReturns(userId, userUuid);
             user.IsGlobalAdmin = isUserForDeletionGlobalAdmin;
             user.OrganizationRights = new List<OrganizationRight> { new() { OrganizationId = organizationId } };
 
@@ -423,7 +423,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var userUuid = A<Guid>();
             var organizationId1 = A<int>();
             var organizationId2 = A<int>();
-            var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
+            var user = ExpectGenericRepositoryByUuidReturns(userId, userUuid);
 
             user.OrganizationRights = new List<OrganizationRight> { new() { OrganizationId = organizationId2 } };
             var transaction = ExpectTransactionBeginReturns();
@@ -447,7 +447,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var userId = A<int>();
             var userUuid = A<Guid>();
             var organizationId = A<int>();
-            var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
+            var user = ExpectGenericRepositoryByUuidReturns(userId, userUuid);
             user.Deleted = true;
             var transaction = ExpectTransactionBeginReturns();
             ExpectHasDeletePermissionReturns(organizationId, true);
@@ -468,7 +468,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var userId = A<int>();
             var userUuid = A<Guid>();
             var organizationId = A<int>();
-            var user = ExpectUserRepositoryByUuidReturns(userId, userUuid);
+            var user = ExpectGenericRepositoryByUuidReturns(userId, userUuid);
             user.OrganizationRights = new List<OrganizationRight> { new() { OrganizationId = organizationId } };
 
             ExpectHasDeletePermissionReturns(organizationId, false);
@@ -504,6 +504,36 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Equal(allowDelete,result.Value.AllowDelete);
         }
 
+        [Fact]
+        public void Can_Get_User_Organizations()
+        {
+            var userUuid = A<Guid>();
+
+            var user = new User
+            {
+                Uuid = userUuid,
+                OrganizationRights = new List<OrganizationRight>
+                {
+                    new()
+                    {
+                        Organization = new Organization
+                        {
+                            Id = A<int>(),
+                            Uuid = A<Guid>()
+                        }
+                    }
+
+                }
+            };
+            ExpectUserRepositoryByUuidReturns(user);
+            ExpectAuthorizationAllowReadsReturns(user, true);
+
+            var result = _sut.GetUserOrganizations(userUuid);
+
+            var org = Assert.Single(result.Value);
+            Assert.Equal(user.OrganizationRights.First().Organization.Uuid, org.Uuid);
+        }
+
         private void ExpectGetOrganizationAccessReturns(int organizationId, OrganizationDataReadAccessLevel organizationDataReadAccessLevel)
         {
             _authorizationContextMock.Setup(x => x.GetOrganizationReadAccessLevel(organizationId))
@@ -522,25 +552,35 @@ namespace Tests.Unit.Core.ApplicationServices
             return transaction;
         }
 
-        private User ExpectUserRepositoryByUuidReturns(int userId, Guid uuid)
+        private User ExpectGenericRepositoryByUuidReturns(int userId, Guid uuid)
         {
             var user = new User()
             {
                 Id = userId,
                 Uuid = uuid
             };
-            _userRepositoryMock.Setup(x => x.AsQueryable()).Returns(new List<User> { user }.AsQueryable);
+            ExpectGenericRepositoryByUuidReturns(user);
             return user;
         }
 
-        private void ExpectAuthorizationAllowDeleteReturns(IEntity entity, bool result)
+        private void ExpectGenericRepositoryByUuidReturns(User user)
         {
-            _authorizationContextMock.Setup(x => x.AllowDelete(entity)).Returns(result);
+            _userRepositoryMock.Setup(x => x.AsQueryable()).Returns(new List<User> { user }.AsQueryable());
+        }
+
+        private void ExpectUserRepositoryByUuidReturns(User user)
+        {
+            _repositoryMock.Setup(x => x.GetByUuid(user.Uuid)).Returns(user);
         }
 
         private void ExpectAuthorizationAllowModifyReturns(IEntity entity, bool result)
         {
             _authorizationContextMock.Setup(x => x.AllowModify(entity)).Returns(result);
+        }
+
+        private void ExpectAuthorizationAllowReadsReturns(IEntity entity, bool result)
+        {
+            _authorizationContextMock.Setup(x => x.AllowReads(entity)).Returns(result);
         }
 
         private Organization ExpectOrgRepositoryByUuidReturns(int organizationId)

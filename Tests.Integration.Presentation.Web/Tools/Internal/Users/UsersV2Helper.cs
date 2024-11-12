@@ -10,6 +10,7 @@ using Xunit;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
 using Tests.Integration.Presentation.Web.Tools.External;
 using System.Linq;
+using Presentation.Web.Models.API.V2.Response.Organization;
 
 namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
 {
@@ -114,11 +115,25 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
 
             using var response = await HttpApi.GetWithCookieAsync(
                 TestEnvironment.CreateUrl(
-                    $"api/v2/internal/users?{query}"), requestCookie);
+                    $"{GlobalUserControllerPrefix()}/search?{query}"), requestCookie);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<UserReferenceResponseDTO>>();
+        }
+
+        public static async Task<IEnumerable<OrganizationResponseDTO>> GetUserOrganization(Guid userUuid)
+        {
+            var requestCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            
+            using var response = await HttpApi.GetWithCookieAsync(
+                TestEnvironment.CreateUrl(
+                    $"{GlobalUserControllerPrefix()}/{userUuid}/organizations"), requestCookie);
+
+            var resp = await response.Content.ReadAsStringAsync();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<IEnumerable<OrganizationResponseDTO>>();
         }
 
         public static async Task<HttpResponseMessage> CopyRoles(Guid organizationUuid, Guid fromUser, Guid toUser,
@@ -140,6 +155,11 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
         private static string ControllerPrefix(Guid organizationUuid)
         {
             return $"api/v2/internal/organization/{organizationUuid}/users";
+        }
+
+        private static string GlobalUserControllerPrefix()
+        {
+            return $"api/v2/internal/users";
         }
 
 

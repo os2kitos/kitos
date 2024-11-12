@@ -243,6 +243,23 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             Assert.Equal(user.Uuid, responseUser.Uuid);
         }
 
+        [Fact]
+        public async Task Can_Get_User_Organizations()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var userRequest = CreateCreateUserRequest();
+            var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
+
+            //Act
+            var organizations = await UsersV2Helper.GetUserOrganization(user.Uuid);
+
+            //Assert
+            var responseOrg = Assert.Single(organizations);
+            Assert.Equal(organization.Uuid, responseOrg.Uuid);
+            Assert.Equal(organization.Name, responseOrg.Name);
+        }
+
         private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
         {
             Assert.Equal(request.Email, response.Email);
