@@ -20,5 +20,9 @@ namespace Core.ApplicationServices.Users.Write
         Maybe<OperationError> CopyUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid, UserRightsChangeParameters parameters);
         Maybe<OperationError> TransferUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid, UserRightsChangeParameters parameters);
         Maybe<OperationError> DeleteUser(Guid userUuid, Maybe<Guid> scopedToOrganizationUuid);
+
+        Result<User, OperationError> AddGlobalAdmin(Guid userUuid);
+
+        Maybe<OperationError> RemoveGlobalAdmin(Guid userUuid);
     }
 }

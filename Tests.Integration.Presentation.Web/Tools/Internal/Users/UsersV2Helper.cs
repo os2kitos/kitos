@@ -8,7 +8,6 @@ using Presentation.Web.Models.API.V2.Internal.Request.User;
 using Presentation.Web.Models.API.V2.Request.User;
 using Xunit;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
-using Tests.Integration.Presentation.Web.Tools.External;
 using System.Linq;
 using Presentation.Web.Models.API.V2.Response.Organization;
 
@@ -150,6 +149,29 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             var requestCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"{ControllerPrefix(organizationUuid)}/{fromUser}/transfer-roles/{toUser}");
             return await HttpApi.PostWithCookieAsync(url, requestCookie, request);
+        }
+
+        public static async Task<IEnumerable<UserReferenceResponseDTO>> GetGlobalAdmins()
+        {
+            var requestCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"{GlobalUserControllerPrefix()}/global-admins");
+            using var response = await HttpApi.GetWithCookieAsync(url, requestCookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<UserReferenceResponseDTO>>();
+        }
+
+        public static async Task<HttpResponseMessage> AddGlobalAdmin(Guid userUuid, OrganizationRole role = OrganizationRole.GlobalAdmin)
+        {
+            var cookie = await HttpApi.GetCookieAsync(role);
+            var url = TestEnvironment.CreateUrl($"{GlobalUserControllerPrefix()}/global-admins/{userUuid}");
+            return await HttpApi.PostWithCookieAsync(url, cookie, null);
+        }
+
+        public static async Task<HttpResponseMessage> RemoveGlobalAdmin(Guid userUuid, Cookie cookie = null)
+        {
+            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"{GlobalUserControllerPrefix()}/global-admins/{userUuid}");
+            return await HttpApi.DeleteWithCookieAsync(url, requestCookie, null);
         }
 
         private static string ControllerPrefix(Guid organizationUuid)

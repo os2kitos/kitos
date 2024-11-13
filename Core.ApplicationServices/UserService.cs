@@ -125,15 +125,15 @@ namespace Core.ApplicationServices
             return savedUser;
         }
 
-        public void UpdateUser(User user, bool sendMailOnUpdate, int orgId)
+        public void UpdateUser(User user, bool? sendMailOnUpdate, int? scopedToOrganizationId)
         {
             _userRepository.Update(user);
 
             _domainEvents.Raise(new EntityUpdatedEvent<User>(user));
 
-            if (sendMailOnUpdate)
+            if (sendMailOnUpdate.HasValue && sendMailOnUpdate.Value && scopedToOrganizationId.HasValue)
             {
-                IssueAdvisMail(user, false, orgId);
+                IssueAdvisMail(user, false, scopedToOrganizationId.Value);
             }
         }
 

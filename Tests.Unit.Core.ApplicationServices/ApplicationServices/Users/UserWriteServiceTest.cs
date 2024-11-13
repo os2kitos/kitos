@@ -10,16 +10,12 @@ using Tests.Toolkit.Patterns;
 using Xunit;
 using Core.DomainModel.Organization;
 using System.Collections.Generic;
-using AutoFixture;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Rights;
 using Core.DomainServices.Generic;
 using Core.ApplicationServices.Model.Users;
-using Core.DomainModel.GDPR;
-using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystem;
 
 namespace Tests.Unit.Core.ApplicationServices.Users
 {
@@ -34,6 +30,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IEntityIdentityResolver> _entityIdentityResolverMock;
         private readonly Mock<IUserRightsService> _userRightsServiceMock;
+        private readonly Mock<IOrganizationalUserContext> _organizationalUserContextMock;
 
         public UserWriteServiceTest()
         {
@@ -44,6 +41,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             _organizationServiceMock = new Mock<IOrganizationService>();
             _entityIdentityResolverMock = new Mock<IEntityIdentityResolver>();
             _userRightsServiceMock = new Mock<IUserRightsService>();
+            _organizationalUserContextMock = new Mock<IOrganizationalUserContext>();
 
 
             _sut = new UserWriteService(_userServiceMock.Object, 
@@ -52,7 +50,8 @@ namespace Tests.Unit.Core.ApplicationServices.Users
                 _authorizationContextMock.Object,
                 _organizationServiceMock.Object,
                 _entityIdentityResolverMock.Object,
-                _userRightsServiceMock.Object);
+                _userRightsServiceMock.Object,
+                _organizationalUserContextMock.Object);
         }
 
         [Fact]
@@ -377,6 +376,83 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             Assert.True(result.IsNone);
         }
 
+        [Fact]
+        public void Can_Add_Global_Admin()
+        {
+            var user = SetupUser();
+            user.IsGlobalAdmin = false;
+            ExpectGetUserByUuid(user.Uuid, user);
+            ExpectIsGlobalAdminReturns(true);
+            var transaction = ExpectTransactionBegins();
+
+            var result = _sut.AddGlobalAdmin(user.Uuid);
+
+            Assert.True(result.Ok);
+            transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
+            Assert.True(result.Value.IsGlobalAdmin);
+        }
+
+        [Fact]
+        public void Cannot_Add_Global_Admin_With_No_GlobalAdmin_Permission()
+        {
+            var user = SetupUser();
+            ExpectGetUserByUuid(user.Uuid, user);
+            ExpectIsGlobalAdminReturns(false);
+            ExpectTransactionBegins();
+
+            var result = _sut.AddGlobalAdmin(user.Uuid);
+
+            Assert.True(result.Failed);
+        }
+
+        [Fact] 
+        public void Can_Remove_Global_Admin()
+        {
+            var user = SetupUser();
+            user.IsGlobalAdmin = true;
+            ExpectGetUserByUuid(user.Uuid, user);
+            ExpectIsGlobalAdminReturns(true);
+            var transaction = ExpectTransactionBegins();
+
+            var result = _sut.RemoveGlobalAdmin(user.Uuid);
+
+            transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
+            Assert.True(result.IsNone);
+            Assert.False(user.IsGlobalAdmin);
+        }
+
+        [Fact]
+        public void Cannot_Remove_Global_Admin_With_No_GlobalAdmin_Permission()
+        {
+            var user = SetupUser();
+            ExpectGetUserByUuid(user.Uuid, user);
+            ExpectIsGlobalAdminReturns(false);
+            ExpectTransactionBegins();
+
+            var result = _sut.RemoveGlobalAdmin(user.Uuid);
+
+            Assert.True(result.HasValue);
+        }
+
+        [Fact]
+        public void Cannot_Remove_Yourself_As_Global_Admin()
+        {
+            var user = SetupUser();
+            ExpectGetUserByUuid(user.Uuid, user);
+            ExpectIsGlobalAdminReturns(true);
+            ExpectTransactionBegins();
+            _organizationalUserContextMock.Setup(x => x.UserId).Returns(user.Id);
+
+            var result = _sut.RemoveGlobalAdmin(user.Uuid);
+
+            Assert.True(result.HasValue);
+        }
+
+        private void ExpectIsGlobalAdminReturns(bool expected)
+        {
+            _organizationalUserContextMock.Setup(x => x.IsGlobalAdmin()).Returns(expected);
+        }
+
         private void ExpectAssignRolesReturn(IEnumerable<OrganizationRole> roles, User user, Organization org)
         {
             foreach (var role in roles)
@@ -409,7 +485,6 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         {
             _userServiceMock.Setup(x => x.GetUserByUuid(userUuid)).Returns(result);
         }
-
 
         private void ExpectModifyPermissionsForUserReturns(User user, bool result)
         {

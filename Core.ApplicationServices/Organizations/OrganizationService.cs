@@ -369,6 +369,7 @@ namespace Core.ApplicationServices.Organizations
             catch (Exception error)
             {
                 _logger.Error(error, "Failed while deleting organization with uuid: {uuid}", uuid);
+                transaction.Rollback();
                 return new OperationError("Exception during deletion", OperationFailure.UnknownError);
             }
             return Maybe<OperationError>.None;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
@@ -25,6 +26,7 @@ namespace Core.ApplicationServices.Users.Write
         private readonly IOrganizationService _organizationService;
         private readonly IEntityIdentityResolver _entityIdentityResolver;
         private readonly IUserRightsService _userRightsService;
+        private readonly IOrganizationalUserContext _organizationalUserContext;
 
         public UserWriteService(IUserService userService,
             IOrganizationRightsService organizationRightsService,
@@ -32,7 +34,8 @@ namespace Core.ApplicationServices.Users.Write
             IAuthorizationContext authorizationContext,
             IOrganizationService organizationService,
             IEntityIdentityResolver entityIdentityResolver,
-            IUserRightsService userRightsService)
+            IUserRightsService userRightsService,
+            IOrganizationalUserContext organizationalUserContext)
         {
             _userService = userService;
             _organizationRightsService = organizationRightsService;
@@ -41,6 +44,7 @@ namespace Core.ApplicationServices.Users.Write
             _organizationService = organizationService;
             _entityIdentityResolver = entityIdentityResolver;
             _userRightsService = userRightsService;
+            _organizationalUserContext = organizationalUserContext;
         }
 
         public Result<User, OperationError> Create(Guid organizationUuid, CreateUserParameters parameters)
@@ -142,7 +146,7 @@ namespace Core.ApplicationServices.Users.Write
                 .Match(
                 orgUuid => ResolveOrganizationUuidToId(orgUuid)
                     .Match(
-                        id => Result<int?, OperationError>.Success(id), 
+                        id => Result<int?, OperationError>.Success(id),
                         ex => ex
                         ),
                 () => Result<int?, OperationError>.Success(null)
@@ -152,7 +156,51 @@ namespace Core.ApplicationServices.Users.Write
                     error => error
                     );
         }
-         
+
+        public Result<User, OperationError> AddGlobalAdmin(Guid userUuid)
+        {
+            return SetUsersGlobalAdminStatus(userUuid, true);
+        }
+
+        public Maybe<OperationError> RemoveGlobalAdmin(Guid userUuid)
+        {
+            return SetUsersGlobalAdminStatus(userUuid, false)
+                .Match(_ => Maybe<OperationError>.None, Maybe<OperationError>.Some);
+        }
+
+        private Result<User, OperationError> SetUsersGlobalAdminStatus(Guid userUuid, bool status)
+        {
+            using var transaction = _transactionManager.Begin();
+            return _userService.GetUserByUuid(userUuid)
+                .Bind(user => UpdateGlobalAdminStatus(user, status))
+                .Match<Result<User, OperationError>>(
+                    user =>
+                    {
+                        transaction.Commit();
+                        _userService.UpdateUser(user, null, null);
+                        return user;
+                    }, 
+                    error =>
+                    {
+                        transaction.Rollback();
+                        return error;
+                    });
+        }
+
+        private Result<User, OperationError> UpdateGlobalAdminStatus(User user, bool requestedGlobalAdminStatus)
+        {
+            if (!_organizationalUserContext.IsGlobalAdmin())
+            {
+                return new OperationError("Only global admins can add or remove global admins", OperationFailure.Forbidden);
+            }
+            if (!requestedGlobalAdminStatus && _organizationalUserContext.UserId == user.Id)
+            {
+                return new OperationError("You can not remove yourself as global admin", OperationFailure.Forbidden);
+            }
+            user.IsGlobalAdmin = requestedGlobalAdminStatus;
+            return user;
+        }
+
         private Maybe<OperationError> CollectUsersAndMutateRoles(Func<int, int, int, UserRightsChangeParameters, Maybe<OperationError>> mutateAction,
             Guid organizationUuid, Guid fromUserUuid,
             Guid toUserUuid,
@@ -196,7 +244,7 @@ namespace Core.ApplicationServices.Users.Write
         {
             if (stakeholderAccess &&
                 !_authorizationContext.HasPermission(
-                    new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))    
+                    new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))
             {
                 return new OperationError("You don't have permission to issue stakeholder access.", OperationFailure.Forbidden);
             }

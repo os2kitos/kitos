@@ -13,6 +13,7 @@ using Tests.Toolkit.Patterns;
 using Xunit;
 using System;
 using Presentation.Web.Models.API.V2.Internal.Request.User;
+using Tests.Toolkit.Extensions;
 
 namespace Tests.Integration.Presentation.Web.Users.V2
 {
@@ -258,6 +259,59 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var responseOrg = Assert.Single(organizations);
             Assert.Equal(organization.Uuid, responseOrg.Uuid);
             Assert.Equal(organization.Name, responseOrg.Name);
+        }
+
+        [Fact]
+        public async Task Can_Get_Global_Admins()
+        {
+            var globalAdmins = await UsersV2Helper.GetGlobalAdmins();
+
+            Assert.NotEmpty(globalAdmins);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        public async Task Can_Only_Create_Global_Admin_As_Global_Admin(OrganizationRole role)
+        {
+            var org = await CreateOrganizationAsync();
+            var user = await CreateUserAsync(org.Uuid);
+
+            var response = await UsersV2Helper.AddGlobalAdmin(user.Uuid, role);
+
+            var isGlobalAdmin = role == OrganizationRole.GlobalAdmin;
+            var responseWasOk = response.StatusCode == HttpStatusCode.OK;
+            Assert.Equal(isGlobalAdmin, responseWasOk);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        public async Task Can_Only_Remove_Global_Admin_As_Global_Admin(OrganizationRole role)
+        {
+            var org = await CreateOrganizationAsync();
+            var user = await CreateUserAsync(org.Uuid);
+            await UsersV2Helper.AddGlobalAdmin(user.Uuid);
+            var cookie = await HttpApi.GetCookieAsync(role);
+
+            var response = await UsersV2Helper.RemoveGlobalAdmin(user.Uuid, cookie);
+
+            var isGlobalAdmin = role == OrganizationRole.GlobalAdmin;
+            var wasAllowed = response.StatusCode == HttpStatusCode.NoContent;
+            Assert.Equal(isGlobalAdmin, wasAllowed);
+        }
+
+        [Fact]
+        public async Task Cannot_Remove_Yourself_As_Global_Admin()
+        {
+            var (userId, _, cookie) = await HttpApi.CreateUserAndLogin(A<string>(), OrganizationRole.GlobalAdmin);
+            var userUuid = DatabaseAccess.GetEntityUuid<User>(userId);
+
+            var response = await UsersV2Helper.RemoveGlobalAdmin(userUuid, cookie);
+
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
         private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
