@@ -5,6 +5,7 @@ using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.DomainModel.Qa.References;
 using Presentation.Web.Models.API.V2.Internal.Response.QA;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.QA
 {
@@ -20,6 +21,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.QA
 
         [HttpGet]
         [Route("status")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(BrokenExternalReferencesReportStatusResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetStatus()
         {
             return _brokenExternalReferencesReportService
@@ -36,6 +41,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.QA
 
         [HttpPost]
         [Route("trigger")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult Trigger()
         {
             return _brokenExternalReferencesReportService
@@ -49,6 +58,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.QA
 
         [HttpGet]
         [Route("current/csv")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetCurrentCsvReport()
         {
             return _brokenExternalReferencesReportService
