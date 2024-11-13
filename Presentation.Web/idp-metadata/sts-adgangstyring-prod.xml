@@ -1,17 +1,5 @@
-<EntityDescriptor ID="_483e9288-a0b7-40bf-99cd-861d5a7f5680" entityID="https://saml.n2adgangsstyring.stoettesystemerne.dk/runtime" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+<EntityDescriptor ID="_083d6da3-4cfb-4c63-b5ab-92f1a53db797" entityID="https://saml.adgangsstyring.stoettesystemerne.dk" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
   <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-    <KeyDescriptor use="encryption">
-      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
-        <X509Data>
-          <X509Certificate>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</X509Certificate>
-        </X509Data>
-      </KeyInfo>
-      <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc" />
-      <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes256-cbc" />
-      <EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes128-gcm" />
-      <EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes192-gcm" />
-      <EncryptionMethod Algorithm="http://www.w3.org/2009/xmlenc11#aes256-gcm" />
-    </KeyDescriptor>
     <KeyDescriptor use="signing">
       <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
         <X509Data>
@@ -19,46 +7,33 @@
         </X509Data>
       </KeyInfo>
     </KeyDescriptor>
-    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://n2adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" ResponseLocation="https://n2adgangsstyring.stoettesystemerne.dk/runtime/saml2/signoff.idp" />
-    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://n2adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" ResponseLocation="https://n2adgangsstyring.stoettesystemerne.dk/runtime/saml2/signoff.idp" />
-    <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</NameIDFormat>
-    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://n2adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" />
-    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://n2adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" />
-    <Attribute Name="https://data.gov.dk/model/core/specVersion" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="SpecVer" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/bootstrapToken" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="bootstrapToken" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/privilegesIntermediate" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Privileges" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/concept/core/nsis/loa" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="NsisLevelOfAssurance" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/concept/core/nsis/ial" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="IdentityAssuranceLevel" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/concept/core/nsis/aal" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="AuthenticationAssuranceLevel" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/fullName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="FullName" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/firstName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="FirstName" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/lastName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="LastName" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/alias" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Alias" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/email" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Email" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/cprNumber" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Cpr" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/age" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Age" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/cprUuid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="CprUUID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/dateOfBirth" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="DateOfBirth" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/person/pid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Pid" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/professional/uuid/persistent" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="ProfessionalPersistentUUID" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/professional/rid" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Rid" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/professional/cvr" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="Cvr" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/professional/orgName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="OrganizationName" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/professional/productionUnit" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="ProductionUnit" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/professional/seNumber" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="SeNumber" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
-    <Attribute Name="https://data.gov.dk/model/core/eid/professional/authorizedToRepresent" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="AuthorizedToRepresent" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
+    <KeyDescriptor use="encryption">
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <X509Data>
+          <X509Certificate>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</X509Certificate>
+        </X509Data>
+      </KeyInfo>
+    </KeyDescriptor>
+    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" ResponseLocation="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/signoff.idp" />
+    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" ResponseLocation="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/signoff.idp" />
+    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/services/signoff/saml2/soap" ResponseLocation="https://adgangsstyring.stoettesystemerne.dk/runtime/services/signoff/saml2/soap" />
+    <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
+    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" />
+    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" />
+    <Attribute Name="dk:gov:saml:attribute:KombitSpecVer" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Specification Version" xmlns="urn:oasis:names:tc:SAML:2.0:assertion">
+      <AttributeValue>1.0</AttributeValue>
+    </Attribute>
+    <Attribute Name="dk:gov:saml:attribute:AssuranceLevel" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Assurance Level" xmlns="urn:oasis:names:tc:SAML:2.0:assertion">
+      <AttributeValue>2</AttributeValue>
+      <AttributeValue>3</AttributeValue>
+    </Attribute>
+    <Attribute Name="dk:gov:saml:attribute:SpecVer" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Specification Version" xmlns="urn:oasis:names:tc:SAML:2.0:assertion">
+      <AttributeValue>DK-SAML-2.0</AttributeValue>
+    </Attribute>
+    <Attribute Name="dk:gov:saml:attribute:CvrNumberIdentifier" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="CVR Number Identifier" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
+    <Attribute Name="dk:gov:saml:attribute:Privileges_intermediate" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Privileges" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
   </IDPSSODescriptor>
-  <Organization>
-    <OrganizationName xml:lang="da">Safewhere</OrganizationName>
-    <OrganizationDisplayName xml:lang="da">Safewhere</OrganizationDisplayName>
-    <OrganizationURL xml:lang="da">https://safewhere.com/</OrganizationURL>
-  </Organization>
-  <ContactPerson contactType="technical">
-    <Company>Safewhere</Company>
-    <EmailAddress>support@safewhere.com</EmailAddress>
-    <TelephoneNumber>+4582131145</TelephoneNumber>
-  </ContactPerson>
   <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-    <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://n2adgangsstyring.stoettesystemerne.dk/runtime/services/attributeservice/saml2/soap" />
+    <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/services/attributeservice/saml2/soap" />
   </AttributeAuthorityDescriptor>
 </EntityDescriptor>
