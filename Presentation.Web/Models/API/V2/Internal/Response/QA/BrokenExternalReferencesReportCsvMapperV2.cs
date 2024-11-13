@@ -1,34 +1,35 @@
 ﻿using System.Linq;
-using System.Net.Http;
+using System.Web.Http;
+using System.Web.Http.Results;
 using Core.DomainModel.Qa.References;
 using Presentation.Web.Models.Application.Csv;
 
-namespace Presentation.Web.Models.API.V1.Qa
+namespace Presentation.Web.Models.API.V2.Internal.Response.QA
 {
-    public class BrokenExternalReferencesReportCsvMapper
+    public class BrokenExternalReferencesReportCsvMapperV2
     {
         private const string UnknownValueString = "Ukendt";
         private static readonly string EmptyValueString = string.Empty;
 
-        public static HttpResponseMessage CreateReportCsvResponse(BrokenExternalReferencesReport report)
+        public static IHttpActionResult CreateReportCsvResponse(BrokenExternalReferencesReport report)
         {
             var csvResponseBuilder = new CsvResponseBuilder<IBrokenLink>();
 
             csvResponseBuilder =
                 csvResponseBuilder
                     .WithFileName(MapFileName(report))
-                    .WithColumn(BrokenExternalReferencesReportColumns.Origin, MapBrokenLinkOriginType)
-                    .WithColumn(BrokenExternalReferencesReportColumns.OriginObjectName, MapBrokenLinkOriginName)
-                    .WithColumn(BrokenExternalReferencesReportColumns.RefName, MapReferenceName)
-                    .WithColumn(BrokenExternalReferencesReportColumns.ErrorCategory, MapErrorCategory)
-                    .WithColumn(BrokenExternalReferencesReportColumns.ErrorCode, MapErrorCode)
-                    .WithColumn(BrokenExternalReferencesReportColumns.Url, link => link.ValueOfCheckedUrl);
+                    .WithColumn(BrokenExternalReferencesReportColumnsV2.Origin, MapBrokenLinkOriginType)
+                    .WithColumn(BrokenExternalReferencesReportColumnsV2.OriginObjectName, MapBrokenLinkOriginName)
+                    .WithColumn(BrokenExternalReferencesReportColumnsV2.RefName, MapReferenceName)
+                    .WithColumn(BrokenExternalReferencesReportColumnsV2.ErrorCategory, MapErrorCategory)
+                    .WithColumn(BrokenExternalReferencesReportColumnsV2.ErrorCode, MapErrorCode)
+                    .WithColumn(BrokenExternalReferencesReportColumnsV2.Url, link => link.ValueOfCheckedUrl);
 
             csvResponseBuilder = report
                 .GetBrokenLinks()
                 .Aggregate(csvResponseBuilder, (builder, brokenLink) => builder.WithRow(brokenLink));
 
-            return csvResponseBuilder.Build();
+            return new ResponseMessageResult(csvResponseBuilder.Build());
         }
 
         private static string MapFileName(BrokenExternalReferencesReport report)

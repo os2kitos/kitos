@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Presentation.Web.Models.API.V1.Qa
+namespace Presentation.Web.Models.API.V2.Internal.Response.QA
 {
-    public class BrokenExternalReferencesReportStatusDTO
+    public class BrokenExternalReferencesReportStatusResponseDTO
     {
         public bool Available { get; set; }
         public DateTime? CreatedDate { get; set; }

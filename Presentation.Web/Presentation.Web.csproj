@@ -368,6 +368,7 @@
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationTypeMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\OrganizationUnits\OrganizationUnitRoleTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\QA\BrokenExternalReferencesReportInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\BaseGlobalRegularOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\BaseGlobalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalArchiveLocationsInternalV2Controller.cs" />
@@ -498,6 +499,9 @@
     <Compile Include="Models\API\V2\Internal\Request\Organizations\UIModuleCustomizationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\User\MutateRightRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\User\MutateUserRightsRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\QA\BrokenExternalReferencesReportColumnsV2.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\QA\BrokenExternalReferencesReportCsvMapperV2.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\QA\BrokenExternalReferencesReportStatusResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\GlobalOptions\GlobalRegularOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\GlobalOptions\GlobalRoleOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItContract\LocalItContractRolesResponseDTO.cs" />
@@ -977,7 +981,6 @@
     <Compile Include="Controllers\API\V2\External\ItSystems\ItSystemBusinessTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageOptionsController.cs" />
     <Compile Include="Controllers\API\V1\OData\BaseOdataController.cs" />
-    <Compile Include="Controllers\API\V1\BrokenExternalReferencesReportController.cs" />
     <Compile Include="Controllers\API\V1\DataProcessingRegistrationController.cs" />
     <Compile Include="Controllers\API\V1\OData\DataProcessingRegistrationReadModelsController.cs" />
     <Compile Include="Controllers\API\V1\GDPRExportReportController.cs" />
@@ -1097,9 +1100,6 @@
     <Compile Include="Infrastructure\Tracelistener\SilentLogger.cs" />
     <Compile Include="Models\API\V1\ItSystem\SystemDeleteConflict.cs" />
     <Compile Include="Models\API\V1\NamedEntityWithExpirationStatusDTO.cs" />
-    <Compile Include="Models\API\V1\Qa\BrokenExternalReferencesReportColumns.cs" />
-    <Compile Include="Models\API\V1\Qa\BrokenExternalReferencesReportCsvMapper.cs" />
-    <Compile Include="Models\API\V1\Qa\BrokenExternalReferencesReportStatusDTO.cs" />
     <Compile Include="Models\API\V1\References\ReferenceDTO.cs" />
     <Compile Include="Models\API\V1\ShallowOrganizationDTO.cs" />
     <Compile Include="Models\API\V1\Shared\OptionWithDescriptionDTO.cs" />
