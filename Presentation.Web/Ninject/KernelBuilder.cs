@@ -130,6 +130,7 @@ using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
 using Core.ApplicationServices.Generic;
 using Core.ApplicationServices.GlobalOptions;
+using Core.ApplicationServices.HelpTexts;
 using Core.ApplicationServices.Organizations.Write;
 using Core.ApplicationServices.Users.Write;
 using Infrastructure.STS.OrganizationSystem.DomainServices;
@@ -334,6 +335,10 @@ namespace Presentation.Web.Ninject
 
             //Global option types
             RegisterGlobalOptionTypes(kernel);
+
+            //Help Texts
+            kernel.Bind<IHelpTextService>().To<HelpTextService>().InCommandScope(Mode);
+            kernel.Bind<IHelpTextApplicationService>().To<HelpTextApplicationService>().InCommandScope(Mode);
         }
 
         private void RegisterMappers(IKernel kernel)
@@ -395,6 +400,10 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IGlobalOptionTypeWriteModelMapper>().To<GlobalOptionTypeWriteModelMapper>()
                 .InCommandScope(Mode);
             kernel.Bind<IGlobalOptionTypeResponseMapper>().To<GlobalOptionTypeResponseMapper>().InCommandScope(Mode);
+
+            //Help texts
+            kernel.Bind<IHelpTextResponseMapper>().To<HelpTextResponseMapper>().InCommandScope(Mode);
+            kernel.Bind<IHelpTextWriteModelMapper>().To<HelpTextWriteModelMapper>().InCommandScope(Mode);
 
         }
 

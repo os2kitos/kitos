@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using System.Web.Http;
 using Core.ApplicationServices.GlobalOptions;
 using Core.DomainModel;

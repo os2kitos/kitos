@@ -1,5 +1,4 @@
-﻿
-using Core.ApplicationServices.GlobalOptions;
+﻿using Core.ApplicationServices.GlobalOptions;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;

@@ -382,6 +382,7 @@
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalRegisterTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\ItSystems\ItSystemGlobalSensitivePersonalDataTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\HelpTextsInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ItContracts\GridLocalItContractRolesV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\CommandPermissionsResponseMapper.cs" />
@@ -438,7 +439,11 @@
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\BaseLocalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\LocalOptionTypes\ItSystems\ItSystemSensitivePersonalDataTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\Mapping\GlobalOptionTypeResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Mapping\HelpTextResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Mapping\HelpTextWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Mapping\IGlobalOptionTypeResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Mapping\IHelpTextResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Mapping\IHelpTextWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Mapping\InternalDtoModelV2MappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\Common\Helpers\ItSystemUsageV2QueryHandler.cs" />
     <Compile Include="Controllers\API\V2\Internal\Organizations\OrganizationGridInternalV2Controller.cs" />
@@ -473,6 +478,8 @@
     <Compile Include="Models\API\V2\Internal\Common\NamedEntityWithEnabledStatusV2DTO.cs" />
     <Compile Include="Models\API\V2\Internal\Common\NamedEntityWithUserFullNameV2DTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\GlobalRoleOptionUpdateRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\HelpTextCreateRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Request\HelpTextUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\BaseNotificationPropertiesWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\IHasBaseWriteProperties.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Notifications\NotificationSentResponseDTO.cs" />
@@ -504,6 +511,7 @@
     <Compile Include="Models\API\V2\Internal\Response\QA\BrokenExternalReferencesReportStatusResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\GlobalOptions\GlobalRegularOptionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\GlobalOptions\GlobalRoleOptionResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\HelpTextResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItContract\LocalItContractRolesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationPermissionsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItSystemUsage\ItSystemUsageMigrationV2ResponseDTO.cs" />

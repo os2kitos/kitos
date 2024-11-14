@@ -1,5 +1,3 @@
-
-    
 using Core.ApplicationServices.GlobalOptions;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;

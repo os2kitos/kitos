@@ -87,6 +87,8 @@
     <Compile Include="GDPR\IDataProcessingRegistrationSystemAssignmentService.cs" />
     <Compile Include="Generic\IEntityIdentityResolver.cs" />
     <Compile Include="Generic\IEntityResolver.cs" />
+    <Compile Include="HelpTextService.cs" />
+    <Compile Include="IHelpTextService.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />

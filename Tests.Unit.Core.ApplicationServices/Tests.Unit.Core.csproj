@@ -199,6 +199,7 @@
     <Compile Include="ApplicationServices\Handlers\RemoveUserFromKitosCommandHandler.cs" />
     <Compile Include="ApplicationServices\Handlers\ReportPendingFkOrganizationChangesToStakeHoldersHandlerTest.cs" />
     <Compile Include="ApplicationServices\Handlers\SendEmailToStakeholdersOnExternalOrganizationConnectionUpdatedHandlerTest.cs" />
+    <Compile Include="ApplicationServices\HelpTexts\HelpTextApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\Interface\ItInterfaceWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\LocalOptions\GenericLocalOptionsServiceTest.cs" />
@@ -235,6 +236,7 @@
     <Compile Include="BackgroundJobs\ScheduleFkOrgUpdatesBackgroundJobTest.cs" />
     <Compile Include="BackgroundJobs\ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveStateTest.cs" />
     <Compile Include="DomainServices\Contract\ItContractOverviewReadModelUpdateTest.cs" />
+    <Compile Include="DomainServices\HelpTextServiceTest.cs" />
     <Compile Include="DomainServices\Notification\UserNotificationServiceTest.cs" />
     <Compile Include="DomainServices\Contract\ContractDataProcessingRegistrationAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandlerTest.cs" />
