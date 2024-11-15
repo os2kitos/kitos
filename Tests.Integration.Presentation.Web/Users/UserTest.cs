@@ -25,14 +25,13 @@ namespace Tests.Integration.Presentation.Web.Users
         public async Task Can_Get_Users_And_Organizations_Where_User_Has_RightsholderAccess()
         {
             //Arrange
-            var (userId, userEmail, organization) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var (_, userEmail, organization) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
 
             //Act
             var result = await UserHelper.GetUsersWithRightsholderAccessAsync();
 
             //Assert
-            var userOrgDTO = Assert.Single(result.Where(x => x.Id == userId));
-            Assert.Equal(userEmail, userOrgDTO.Email);
+            var userOrgDTO = Assert.Single(result.Where(x => x.Email == userEmail));
             Assert.Equal(organization.Name, userOrgDTO.OrgName);
             Assert.True(userOrgDTO.ApiAccess);
         }
@@ -56,37 +55,34 @@ namespace Tests.Integration.Presentation.Web.Users
         public async Task Can_Get_Users_Where_User_Has_StakeHolder_Or_ApiAccess()
         {
             //Arrange
-            var (userId1, userEmail1, orgName1) = await CreateStakeHolderUserInNewOrganizationAsync(true, true);
-            var (userId2, userEmail2, orgName2) = await CreateStakeHolderUserInNewOrganizationAsync(false, true);
-            var (userId3, userEmail3, orgName3) = await CreateStakeHolderUserInNewOrganizationAsync(true, false);
-            var (userId4, userEmail4, orgName4) = await CreateStakeHolderUserInNewOrganizationAsync(false, false);
+            var (_, userEmail1, orgName1) = await CreateStakeHolderUserInNewOrganizationAsync(true, true);
+            var (_, userEmail2, orgName2) = await CreateStakeHolderUserInNewOrganizationAsync(false, true);
+            var (_, userEmail3, orgName3) = await CreateStakeHolderUserInNewOrganizationAsync(true, false);
+            var (_, userEmail4, orgName4) = await CreateStakeHolderUserInNewOrganizationAsync(false, false);
 
             //Act
             var result = await UserHelper.GetUsersWithCrossAccessAsync();
 
             //Assert
-            var userOrgDTO1 = Assert.Single(result.Where(x => x.Id == userId1));
-            Assert.Equal(userEmail1, userOrgDTO1.Email);
+            var userOrgDTO1 = Assert.Single(result.Where(x => x.Email == userEmail1));
             Assert.True(userOrgDTO1.StakeholderAccess);
             Assert.True(userOrgDTO1.ApiAccess);
             var orgWhereActive1 = Assert.Single(userOrgDTO1.OrganizationsWhereActive);
             Assert.Equal(orgName1, orgWhereActive1);
 
-            var userOrgDTO2 = Assert.Single(result.Where(x => x.Id == userId2));
-            Assert.Equal(userEmail2, userOrgDTO2.Email);
+            var userOrgDTO2 = Assert.Single(result.Where(x => x.Email == userEmail2));
             Assert.True(userOrgDTO2.StakeholderAccess);
             Assert.False(userOrgDTO2.ApiAccess);
             var orgWhereActive2 = Assert.Single(userOrgDTO2.OrganizationsWhereActive);
             Assert.Equal(orgName2, orgWhereActive2);
 
-            var userOrgDTO3 = Assert.Single(result.Where(x => x.Id == userId3));
-            Assert.Equal(userEmail3, userOrgDTO3.Email);
+            var userOrgDTO3 = Assert.Single(result.Where(x => x.Email == userEmail3));
             Assert.False(userOrgDTO3.StakeholderAccess);
             Assert.True(userOrgDTO3.ApiAccess);
             var orgWhereActive3 = Assert.Single(userOrgDTO3.OrganizationsWhereActive);
             Assert.Equal(orgName3, orgWhereActive3);
 
-            Assert.Empty(result.Where(x => x.Id == userId4));
+            Assert.Empty(result.Where(x => x.Email == userEmail4));
         }
 
         [Fact]
@@ -103,8 +99,7 @@ namespace Tests.Integration.Presentation.Web.Users
             var result = await UserHelper.GetUsersWithCrossAccessAsync();
 
             //Assert
-            var userOrgDTO = Assert.Single(result.Where(x => x.Id == userId));
-            Assert.Equal(email, userOrgDTO.Email);
+            var userOrgDTO = Assert.Single(result.Where(x => x.Email == email));
             Assert.True(userOrgDTO.StakeholderAccess);
             Assert.True(userOrgDTO.ApiAccess);
             var orgWhereActive = Assert.Single(userOrgDTO.OrganizationsWhereActive);
