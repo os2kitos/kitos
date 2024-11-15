@@ -172,7 +172,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var userUuid = A<Guid>();
             var user = SetupUser();
             user.Uuid = userUuid;
-            ExpectResolveIdReturns(orgUuid, Maybe<int>.Some(orgId));
+            ExpectResolveOrgUuidReturns(orgUuid, Maybe<int>.Some(orgId));
             ExpectGetUserInOrganizationReturns(orgUuid, userUuid, user);
             //Act
             var result = _sut.SendNotification(orgUuid, userUuid);
@@ -238,7 +238,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetUserByUuid(user.Uuid, user);
             ExpectModifyPermissionsForUserReturns(user, true);
             ExpectGetOrganizationReturns(organization.Uuid, organization);
-            ExpectResolveIdReturns(organization.Uuid, organization.Id);
+            ExpectResolveOrgUuidReturns(organization.Uuid, organization.Id);
             ExpectHasStakeHolderAccessReturns(true);
             ExpectAssignRolesReturn(updateParameters.Roles.NewValue, user, organization);
             ExpectRemoveRolesReturn(user.GetRolesInOrganization(organization.Uuid), user, organization);
@@ -268,7 +268,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var user = SetupUser();
             var organization = new Organization { Id = A<int>(), Uuid = A<Guid>() };
             var updateParameters = A<UpdateUserParameters>();
-            ExpectResolveIdReturns(organization.Uuid, A<int>());
+            ExpectResolveOrgUuidReturns(organization.Uuid, A<int>());
             ExpectGetOrganizationReturns(organization.Uuid, organization);
             ExpectGetUserByUuid(user.Uuid, user);
             ExpectModifyPermissionsForUserReturns(user, true);
@@ -296,7 +296,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var updateParameters = A<UserRightsChangeParameters>();
             ExpectGetUserInOrganizationReturns(org.Uuid, fromUser.Uuid, fromUser);
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
-            ExpectResolveIdReturns(org.Uuid, org.Id);
+            ExpectResolveOrgUuidReturns(org.Uuid, org.Id);
             ExpectModifyPermissionsForUserReturns(toUser, true);
             _organizationServiceMock.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
             _userRightsServiceMock.Setup(x => x.CopyRights(fromUser.Id, toUser.Id, org.Id, updateParameters))
@@ -321,7 +321,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetUserInOrganizationReturns(org.Uuid, fromUser.Uuid, fromUser);
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
             ExpectModifyPermissionsForUserReturns(toUser, true);
-            ExpectResolveIdReturns(org.Uuid, org.Id);
+            ExpectResolveOrgUuidReturns(org.Uuid, org.Id);
 
             //Act
             _ = _sut.TransferUserRights(org.Uuid, fromUser.Uuid, toUser.Uuid, updateParameters);
@@ -341,7 +341,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             ExpectGetUserInOrganizationReturns(org.Uuid, fromUser.Uuid, fromUser);
             ExpectGetUserInOrganizationReturns(org.Uuid, toUser.Uuid, toUser);
             ExpectModifyPermissionsForUserReturns(toUser, true);
-            ExpectResolveIdReturns(org.Uuid, Maybe<int>.None);
+            ExpectResolveOrgUuidReturns(org.Uuid, Maybe<int>.None);
 
             //Act
             var result = _sut.TransferUserRights(org.Uuid, fromUser.Uuid, toUser.Uuid, updateParameters);
@@ -364,7 +364,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             if (isScopedToOrganization)
             {
                 orgId = A<int>();
-                ExpectResolveIdReturns(orgUuid.Value, orgId);
+                ExpectResolveOrgUuidReturns(orgUuid.Value, orgId);
             }
 
             _userServiceMock.Setup(x => x.DeleteUser(userUuid, orgId)).Returns(Maybe<OperationError>.None);
@@ -448,6 +448,41 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             Assert.True(result.HasValue);
         }
 
+        [Fact]
+        public void Can_Add_Local_Admin()
+        {
+            var user = SetupUser();
+            var org = new Organization { Uuid = A<Guid>(), Id = A<int>() };
+            ExpectGetUserByUuid(user.Uuid, user);
+            ExpectResolveOrgUuidReturns(org.Uuid, org.Id);
+            _organizationRightsServiceMock.Setup(x => x.AssignRole(org.Id, user.Id, OrganizationRole.LocalAdmin)).Returns(new OrganizationRight());
+            var transaction = ExpectTransactionBegins();
+
+            var result = _sut.AddLocalAdmin(org.Uuid, user.Uuid);
+
+            Assert.True(result.Ok);
+            _organizationRightsServiceMock.Verify(x => x.AssignRole(org.Id, user.Id, OrganizationRole.LocalAdmin), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
+        }
+
+
+        [Fact]
+        public void Can_Remove_Local_Admin()
+        {
+            var user = SetupUser();
+            var org = new Organization { Uuid = A<Guid>(), Id = A<int>() };
+            ExpectGetUserByUuid(user.Uuid, user);
+            ExpectResolveOrgUuidReturns(org.Uuid, org.Id);
+            _organizationRightsServiceMock.Setup(x => x.RemoveRole(org.Id, user.Id, OrganizationRole.LocalAdmin)).Returns(new OrganizationRight());
+            var transaction = ExpectTransactionBegins();
+
+            var result = _sut.RemoveLocalAdmin(org.Uuid, user.Uuid);
+
+            Assert.True(result.IsNone);
+            _organizationRightsServiceMock.Verify(x => x.RemoveRole(org.Id, user.Id, OrganizationRole.LocalAdmin), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
+        }
+
         private void ExpectIsGlobalAdminReturns(bool expected)
         {
             _organizationalUserContextMock.Setup(x => x.IsGlobalAdmin()).Returns(expected);
@@ -471,7 +506,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             }
         }
 
-        private void ExpectResolveIdReturns(Guid orgUuid, Maybe<int> result)
+        private void ExpectResolveOrgUuidReturns(Guid orgUuid, Maybe<int> result)
         {
             _entityIdentityResolverMock.Setup(x => x.ResolveDbId<Organization>(orgUuid)).Returns(result);
         }

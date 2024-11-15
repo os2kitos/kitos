@@ -174,6 +174,29 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return await HttpApi.DeleteWithCookieAsync(url, requestCookie, null);
         }
 
+        public static async Task<IEnumerable<UserReferenceWithOrganizationResponseDTO>> GetLocalAdmins()
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"{GlobalUserControllerPrefix()}/local-admins");
+            using var response = await HttpApi.GetWithCookieAsync(url, cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<UserReferenceWithOrganizationResponseDTO>>();
+        }
+
+        public static async Task<HttpResponseMessage> AddLocalAdmin(Guid organizationUuid, Guid userUuid, OrganizationRole role = OrganizationRole.GlobalAdmin)
+        {
+            var cookie = await HttpApi.GetCookieAsync(role);
+            var url = TestEnvironment.CreateUrl($"{GlobalUserControllerPrefix()}/{organizationUuid}/local-admins/{userUuid}");
+            return await HttpApi.PostWithCookieAsync(url, cookie, null);
+        }
+
+        public static async Task<HttpResponseMessage> RemoveLocalAdmin(Guid organizationUuid, Guid userUuid, OrganizationRole role = OrganizationRole.GlobalAdmin)
+        {
+            var cookie = await HttpApi.GetCookieAsync(role);
+            var url = TestEnvironment.CreateUrl($"{GlobalUserControllerPrefix()}/{organizationUuid}/local-admins/{userUuid}");
+            return await HttpApi.DeleteWithCookieAsync(url, cookie, null);
+        }
+
         private static string ControllerPrefix(Guid organizationUuid)
         {
             return $"api/v2/internal/organization/{organizationUuid}/users";

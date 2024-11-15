@@ -18,6 +18,8 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using System.IdentityModel;
+using Presentation.Web.Models.API.V1.Users;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices.Rights;
 using Core.ApplicationServices.Model.RightsHolder;
@@ -145,7 +147,47 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
 
         }
 
+        [Route("local-admins")]
+        [HttpGet]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<UserReferenceWithOrganizationResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult GetAllLocalAdmins()
+        {
+            return _userService.GetUsersWithRoleAssignedInAnyOrganization(Core.DomainModel.Organization.OrganizationRole.LocalAdmin)
+                    .Select(users => users.SelectMany(InternalDtoModelV2MappingExtensions.MapUserToMultipleLocalAdminResponse).ToList())
+                    .Match(Ok, FromOperationError);
+        }
 
+        [Route("{organizationUuid}/local-admins/{userUuid}")]
+        [HttpPost]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UserReferenceWithOrganizationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult AddLocalAdmin([NonEmptyGuid][FromUri] Guid organizationUuid, [NonEmptyGuid][FromUri] Guid userUuid)
+        {
+            return _userWriteService.AddLocalAdmin(organizationUuid, userUuid)
+                    .Select(user => user.MapUserToSingleLocalAdminResponse(organizationUuid))
+                    .Match(Ok, FromOperationError);
+        }
+
+        [Route("{organizationUuid}/local-admins/{userUuid}")]
+        [HttpDelete]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult RemoveLocalAdmin([NonEmptyGuid][FromUri] Guid organizationUuid, [NonEmptyGuid][FromUri] Guid userUuid)
+        {
+            return _userWriteService.RemoveLocalAdmin(organizationUuid, userUuid)
+                    .Match(FromOperationError, NoContent);
+        }
+        
         [HttpGet]
         [Route("with-rightsholder-access")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<UserWithOrganizationResponseDTO>))]
