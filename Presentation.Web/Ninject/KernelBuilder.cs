@@ -524,6 +524,7 @@ namespace Presentation.Web.Ninject
 
         private void RegisterGlobalOptionTypes(IKernel kernel)
         {
+            //IT Systems
             RegisterGlobalRegularOptionService<BusinessType, ItSystem>(kernel);
             RegisterGlobalRegularOptionService<ArchiveLocation, ItSystemUsage>(kernel);
             RegisterGlobalRoleOptionService<ItSystemRole, ItSystemRight>(kernel);
@@ -536,6 +537,20 @@ namespace Presentation.Web.Ninject
             RegisterGlobalRegularOptionService<DataType, DataRow>(kernel);
             RegisterGlobalRegularOptionService<ArchiveType, ItSystemUsage>(kernel);
             RegisterGlobalRegularOptionService<ArchiveTestLocation, ItSystemUsage>(kernel);
+
+            //IT Contracts
+            RegisterGlobalRegularOptionService<OptionExtendType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<TerminationDeadlineType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<PurchaseFormType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<ProcurementStrategyType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<PriceRegulationType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<PaymentModelType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<PaymentFreqencyType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<ItContractType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<ItContractTemplateType, ItContract>(kernel);
+            RegisterGlobalRoleOptionService<ItContractRole, ItContractRight>(kernel);
+            RegisterGlobalRegularOptionService<CriticalityType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<AgreementElementType, ItContract>(kernel);
         }
 
         private void RegisterLocalItContractOptionTypes(IKernel kernel)
