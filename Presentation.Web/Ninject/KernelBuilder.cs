@@ -551,6 +551,13 @@ namespace Presentation.Web.Ninject
             RegisterGlobalRoleOptionService<ItContractRole, ItContractRight>(kernel);
             RegisterGlobalRegularOptionService<CriticalityType, ItContract>(kernel);
             RegisterGlobalRegularOptionService<AgreementElementType, ItContract>(kernel);
+
+            //DPR
+            RegisterGlobalRoleOptionService<DataProcessingRegistrationRole, DataProcessingRegistrationRight>(kernel);
+            RegisterGlobalRegularOptionService<DataProcessingCountryOption, DataProcessingRegistration>(kernel);
+            RegisterGlobalRegularOptionService<DataProcessingOversightOption, DataProcessingRegistration>(kernel);
+            RegisterGlobalRegularOptionService<DataProcessingDataResponsibleOption, DataProcessingRegistration>(kernel);
+            RegisterGlobalRegularOptionService<DataProcessingBasisForTransferOption, DataProcessingRegistration>(kernel);
         }
 
         private void RegisterLocalItContractOptionTypes(IKernel kernel)
