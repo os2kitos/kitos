@@ -35,6 +35,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithOptionalDependent(c => c.Organization)
                 .WillCascadeOnDelete(true);
 
+            HasOptional(o => o.ForeignCountryCode)
+                .WithMany(c => c.References)
+                .HasForeignKey(o => o.ForeignCountryCodeId);
+
             HasMany(x => x.DataResponsibles)
                 .WithOptional(dr => dr.Organization)
                 .WillCascadeOnDelete(true);

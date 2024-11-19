@@ -5,7 +5,6 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.UIConfiguration;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
-using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using ContactPerson = Core.DomainModel.ContactPerson;
 using Organization = Core.DomainModel.Organization.Organization;

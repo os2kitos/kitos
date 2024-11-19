@@ -67,6 +67,7 @@
     <Compile Include="Mapping\AdviceUserRelationMap.cs" />
     <Compile Include="Mapping\AttachedOptionMap.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
+    <Compile Include="Mapping\CountryCodeMap.cs" />
     <Compile Include="Mapping\CriticalityTypeMap.cs" />
     <Compile Include="Mapping\CustomizedUINodeMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationMap.cs" />
@@ -1066,6 +1067,10 @@
     <Compile Include="Migrations\202409031119418_Added Email On Dataprocessing Registration.Designer.cs">
       <DependentUpon>202409031119418_Added Email On Dataprocessing Registration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202411191141307_Add country code to organization.cs" />
+    <Compile Include="Migrations\202411191141307_Add country code to organization.designer.cs">
+      <DependentUpon>202411191141307_Add country code to organization.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
@@ -1102,6 +1107,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202409031119418_Added Email On Dataprocessing Registration.resx">
       <DependentUpon>202409031119418_Added Email On Dataprocessing Registration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202411191141307_Add country code to organization.resx">
+      <DependentUpon>202411191141307_Add country code to organization.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_DataRow.sql" />
     <EmbeddedResource Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.resx">

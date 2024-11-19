@@ -559,6 +559,9 @@ namespace Presentation.Web.Ninject
             RegisterGlobalRegularOptionService<DataProcessingDataResponsibleOption, DataProcessingRegistration>(kernel);
             RegisterGlobalRegularOptionService<DataProcessingBasisForTransferOption, DataProcessingRegistration>(kernel);
 
+            //Organization
+            RegisterGlobalRegularOptionService<CountryCode, Organization>(kernel);
+            
             //Organization unit
             RegisterGlobalRoleOptionService<OrganizationUnitRole, OrganizationUnitRight>(kernel);
         }
