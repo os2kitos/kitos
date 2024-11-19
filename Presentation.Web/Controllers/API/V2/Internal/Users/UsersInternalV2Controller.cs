@@ -151,7 +151,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
 
         [HttpGet]
         [Route("{userUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<UserResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(UserResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
