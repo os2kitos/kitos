@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Rights;
 using Core.DomainServices.Generic;
 using Core.ApplicationServices.Model.Users;
@@ -233,16 +234,19 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             //Arrange
             var user = SetupUser();
             var organization = new Organization {Id = A<int>(), Uuid = A<Guid>()};
-            var defaultUnit = new OrganizationUnit {Id = A<int>()};
+            var defaultUnit = new OrganizationUnit {Id = A<int>(), Uuid = A<Guid>()};
             var updateParameters = A<UpdateUserParameters>();
+            updateParameters.DefaultOrganizationUnitUuid = defaultUnit.Uuid.AsChangedValue();
             ExpectGetUserByUuid(user.Uuid, user);
             ExpectModifyPermissionsForUserReturns(user, true);
             ExpectGetOrganizationReturns(organization.Uuid, organization);
             ExpectResolveOrgUuidReturns(organization.Uuid, organization.Id);
+            ExpectResolveOrgUnitUuidReturns(defaultUnit.Uuid, defaultUnit.Id);
             ExpectHasStakeHolderAccessReturns(true);
             ExpectAssignRolesReturn(updateParameters.Roles.NewValue, user, organization);
             ExpectRemoveRolesReturn(user.GetRolesInOrganization(organization.Uuid), user, organization);
-            _organizationServiceMock.Setup(x => x.GetDefaultUnit(organization, user)).Returns(defaultUnit);
+            _organizationServiceMock.Setup(x => x.SetDefaultOrgUnit(user, organization.Id, defaultUnit.Id));
+
             var transaction = ExpectTransactionBegins();
 
             //Act
@@ -509,6 +513,10 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         private void ExpectResolveOrgUuidReturns(Guid orgUuid, Maybe<int> result)
         {
             _entityIdentityResolverMock.Setup(x => x.ResolveDbId<Organization>(orgUuid)).Returns(result);
+        }
+        private void ExpectResolveOrgUnitUuidReturns(Guid unitUuid, Maybe<int> result)
+        {
+            _entityIdentityResolverMock.Setup(x => x.ResolveDbId<OrganizationUnit>(unitUuid)).Returns(result);
         }
 
         private void ExpectGetUserInOrganizationReturns(Guid organizationUuid, Guid userUuid, Result<User, OperationError> result)

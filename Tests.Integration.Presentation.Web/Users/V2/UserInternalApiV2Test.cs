@@ -13,8 +13,9 @@ using Tests.Toolkit.Patterns;
 using Xunit;
 using System;
 using Presentation.Web.Models.API.V2.Internal.Request.User;
-using Tests.Toolkit.Extensions;
-using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
+using Tests.Integration.Presentation.Web.Tools.External;
+using Newtonsoft.Json.Linq;
 
 namespace Tests.Integration.Presentation.Web.Users.V2
 {
@@ -68,14 +69,23 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var user = await CreateUserAsync(organization.Uuid); ;
+            var (_, _, token)= await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.GlobalAdmin, organization.Id, true);
+            var user = await CreateUserAsync(organization.Uuid);
+            
+            var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid);
+            var parentUnit = Assert.Single(units);
+
+            var unitRequest = A<CreateOrganizationUnitRequestDTO>();
+            unitRequest.ParentUuid = parentUnit.Uuid;
+            var unit = await OrganizationUnitV2Helper.CreateUnitAsync(organization.Uuid, unitRequest);
 
             //Act
             var updateRequest = A<UpdateUserRequestDTO>();
+            updateRequest.DefaultOrganizationUnitUuid = unit.Uuid;
             var response = await UsersV2Helper.UpdateUser(organization.Uuid, user.Uuid, updateRequest);
 
             //Assert
-            AssertUserEqualsUpdateRequest(updateRequest, response);
+            AssertUserEqualsUpdateRequest(updateRequest, response, unit.Uuid);
         }
 
         private void AssertUserEqualsCreateRequest(CreateUserRequestDTO request, UserResponseDTO response)
@@ -392,11 +402,12 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             return (org, user);
         }
 
-        private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response)
+        private void AssertUserEqualsUpdateRequest(UpdateUserRequestDTO request, UserResponseDTO response, Guid unitUuid)
         {
             Assert.Equal(request.Email, response.Email);
             Assert.Equal(request.FirstName, response.FirstName);
             Assert.Equal(request.LastName, response.LastName);
+            Assert.Equal(unitUuid, response.DefaultOrganizationUnit.Uuid);
             
             AssertBaseUserRequestMatches(request, response);
         }

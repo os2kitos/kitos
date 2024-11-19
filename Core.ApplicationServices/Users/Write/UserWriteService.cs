@@ -106,7 +106,7 @@ namespace Core.ApplicationServices.Users.Write
 
         public Maybe<OperationError> SendNotification(Guid organizationUuid, Guid userUuid)
         {
-            var orgIdResult = ResolveOrganizationUuidToId(organizationUuid);
+            var orgIdResult = ResolveUuidToId<Organization>(organizationUuid);
             if (orgIdResult.Failed)
             {
                 return orgIdResult.Error;
@@ -144,7 +144,7 @@ namespace Core.ApplicationServices.Users.Write
         {
             return scopedToOrganizationUuid
                 .Match(
-                orgUuid => ResolveOrganizationUuidToId(orgUuid)
+                orgUuid => ResolveUuidToId<Organization>(orgUuid)
                     .Match(
                         id => Result<int?, OperationError>.Success(id),
                         ex => ex
@@ -185,7 +185,7 @@ namespace Core.ApplicationServices.Users.Write
             {
                 return user.Error;
             }
-            var orgId = ResolveOrganizationUuidToId(organizationUuid);
+            var orgId = ResolveUuidToId<Organization>(organizationUuid);
             if (orgId.Failed)
             {
                 return orgId.Error;
@@ -241,7 +241,7 @@ namespace Core.ApplicationServices.Users.Write
             Guid toUserUuid,
             UserRightsChangeParameters parameters)
         {
-            return ResolveOrganizationUuidToId(organizationUuid)
+            return ResolveUuidToId<Organization>(organizationUuid)
                 .Match(orgDbId =>
                     {
                         var fromUserResult = _userService.GetUserInOrganization(organizationUuid, fromUserUuid);
@@ -262,17 +262,18 @@ namespace Core.ApplicationServices.Users.Write
 
         private Result<User, OperationError> PerformUpdates(User orgUser, Organization organization, UpdateUserParameters parameters)
         {
-            return orgUser.WithOptionalUpdate(parameters.FirstName, (user, firstName) => user.UpdateFirstName(user, firstName))
+            return orgUser.WithOptionalUpdate(parameters.FirstName, (user, firstName) => user.UpdateFirstName(firstName))
                 .Bind(user =>
-                    user.WithOptionalUpdate(parameters.LastName, (userToUpdate, lastName) => userToUpdate.UpdateLastName(user, lastName)))
-                .Bind(user => user.WithOptionalUpdate(parameters.Email, (userToUpdate, email) => UpdateEmail(userToUpdate, email)))
+                    user.WithOptionalUpdate(parameters.LastName, (userToUpdate, lastName) => userToUpdate.UpdateLastName(lastName)))
+                .Bind(user => user.WithOptionalUpdate(parameters.Email, UpdateEmail))
                 .Bind(user => user.WithOptionalUpdate(parameters.PhoneNumber, (userToUpdate, phoneNumber) => userToUpdate.PhoneNumber = phoneNumber))
                 .Bind(user => user.WithOptionalUpdate(parameters.HasStakeHolderAccess, UpdateStakeholderAccess))
                 .Bind(user => user.WithOptionalUpdate(parameters.HasApiAccess,
                     (userToUpdate, hasApiAccess) => userToUpdate.HasApiAccess = hasApiAccess))
                 .Bind(user => user.WithOptionalUpdate(parameters.DefaultUserStartPreference,
                     (userToUpdate, defaultStartPreference) => userToUpdate.DefaultUserStartPreference = defaultStartPreference))
-                .Bind(user => user.WithOptionalUpdate(parameters.Roles, (userToUpdate, roles) => UpdateRoles(organization, userToUpdate, roles)));
+                .Bind(user => user.WithOptionalUpdate(parameters.Roles, (userToUpdate, roles) => UpdateRoles(organization, userToUpdate, roles)))
+                .Bind(user => user.WithOptionalUpdate(parameters.DefaultOrganizationUnitUuid, (userToUpdate, organizationUnitUuid) => UpdateOrganizationUnit(userToUpdate, organization.Uuid, organizationUnitUuid)));
         }
 
         private Result<User, OperationError> UpdateStakeholderAccess(User user, bool stakeholderAccess)
@@ -288,14 +289,24 @@ namespace Core.ApplicationServices.Users.Write
             return user;
         }
 
-        private Result<User, OperationError> UpdateEmail(User user, string email)
+        private Maybe<OperationError> UpdateEmail(User user, string email)
         {
-            if (_userService.IsEmailInUse(email))
-            {
-                return new OperationError($"Email '{email}' is already in use.", OperationFailure.Conflict);
-            }
+            return _userService.IsEmailInUse(email) 
+                ? new OperationError($"Email '{email}' is already in use.", OperationFailure.Conflict) 
+                : user.UpdateEmail(email);
+        }
 
-            return user.UpdateEmail(user, email);
+        private Maybe<OperationError> UpdateOrganizationUnit(User user, Guid orgUuid, Guid unitUuid)
+        {
+            return ResolveUuidToId<Organization>(orgUuid)
+                .Bind(orgId => ResolveUuidToId<OrganizationUnit>(unitUuid)
+                    .Select(unitId => (orgId, unitId)))
+                .Match(ids =>
+                {
+                    _organizationService.SetDefaultOrgUnit(user, ids.orgId, ids.unitId);
+                    return Maybe<OperationError>.None;
+                },
+                ex => ex);
         }
 
         private Result<User, OperationError> UpdateRoles(Organization organization, User user,
@@ -361,17 +372,17 @@ namespace Core.ApplicationServices.Users.Write
             return Maybe<OperationError>.None;
         }
 
-        private Result<int, OperationError> ResolveOrganizationUuidToId(Guid organizationUuid)
+        private Result<int, OperationError> ResolveUuidToId<T>(Guid organizationUuid) where T : class, IHasUuid, IHasId
         {
-            var orgIdResult
-                = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
-            if (orgIdResult.IsNone)
+            var idResult
+                = _entityIdentityResolver.ResolveDbId<T>(organizationUuid);
+            if (idResult.IsNone)
             {
-                return new OperationError($"Organization with uuid {organizationUuid} was not found",
+                return new OperationError($"{nameof(T)} with uuid {organizationUuid} was not found",
                     OperationFailure.NotFound);
             }
 
-            return orgIdResult.Value;
+            return idResult.Value;
         }
 
         private Maybe<OperationError> ValidateUserCanBeCreated(CreateUserParameters parameters)

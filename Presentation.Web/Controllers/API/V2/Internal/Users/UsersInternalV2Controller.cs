@@ -49,7 +49,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         public IHttpActionResult CreateUser([NonEmptyGuid] Guid organizationUuid, [FromBody] CreateUserRequestDTO parameters)
         {
             return _userWriteService.Create(organizationUuid, _writeModelMapper.FromPOST(parameters))
-                .Select(user => _userResponseModelMapper.ToUserResponseDTO(organizationUuid, user))
+                .Bind(user => _userResponseModelMapper.ToUserResponseDTO(organizationUuid, user))
                 .Match(MapUserCreatedResponse, FromOperationError);
         }
 
@@ -64,7 +64,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
             [FromBody] UpdateUserRequestDTO parameters)
         {
             return _userWriteService.Update(organizationUuid, userUuid, _writeModelMapper.FromPATCH(parameters))
-                .Select(user => _userResponseModelMapper.ToUserResponseDTO(organizationUuid, user))
+                .Bind(user => _userResponseModelMapper.ToUserResponseDTO(organizationUuid, user))
                 .Match(Ok, FromOperationError);
         }
 
@@ -147,6 +147,20 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
             return _userWriteService.DeleteUser(userUuid, organizationUuid)
                 .Match(FromOperationError,
                     Ok);
+        }
+
+        [HttpGet]
+        [Route("{userUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<UserResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult GetUserByUuid(Guid organizationUuid, Guid userUuid)
+        {
+            return _userService
+                .GetUserInOrganization(organizationUuid, userUuid)
+                .Select((user) => _userResponseModelMapper.ToUserResponseDTO(organizationUuid, user))
+                .Match(Ok, FromOperationError);
         }
 
         private CreatedNegotiatedContentResult<UserResponseDTO> MapUserCreatedResponse(UserResponseDTO dto)

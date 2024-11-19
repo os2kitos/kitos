@@ -18,8 +18,6 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Models.API.V2.Response.Organization;
-using System.IdentityModel;
-using Presentation.Web.Models.API.V1.Users;
 using Core.DomainModel.Organization;
 using Core.ApplicationServices.Rights;
 using Core.ApplicationServices.Model.RightsHolder;

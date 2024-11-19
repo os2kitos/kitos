@@ -6,6 +6,7 @@ namespace Presentation.Web.Models.API.V1
     public class UserDTO
     {
         public int Id { get; set; }
+        public Guid Uuid { get; set; }
         public string Name { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }

@@ -190,34 +190,37 @@ namespace Core.DomainModel
 
 
 
-        public Result<User, OperationError> UpdateEmail(User user, string email)
+        public Maybe<OperationError> UpdateEmail(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
             {
                 return new OperationError($"Email '{email}' is required", OperationFailure.BadInput);
             }
-            user.Email = email;
-            return user;
+            Email = email;
+
+            return Maybe<OperationError>.None;
         }
 
-        public Result<User, OperationError> UpdateFirstName(User user, string name)
+        public Maybe<OperationError> UpdateFirstName(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {
                 return new OperationError($"Name '{name}' is required", OperationFailure.BadInput);
             }
-            user.Name = name;
-            return user;
+            Name = name;
+
+            return Maybe<OperationError>.None;
         }
 
-        public Result<User, OperationError> UpdateLastName(User user, string lastName)
+        public Maybe<OperationError> UpdateLastName(string lastName)
         {
             if (string.IsNullOrWhiteSpace(lastName))
             {
                 return new OperationError($"Last name '{lastName}' is required", OperationFailure.BadInput);
             }
-            user.LastName = lastName;
-            return user;
+            LastName = lastName;
+
+            return Maybe<OperationError>.None;
         }
 
         #region Authentication

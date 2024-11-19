@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.Organization;
 
@@ -22,5 +23,6 @@ namespace Core.ApplicationServices.Model.Users.Write
         public OptionalValueChange<IEnumerable<OrganizationRole>> Roles { get; set; }
 
         public bool SendMailOnUpdate {get; set; }
+        public OptionalValueChange<Guid> DefaultOrganizationUnitUuid { get; set; }
     }
 }
