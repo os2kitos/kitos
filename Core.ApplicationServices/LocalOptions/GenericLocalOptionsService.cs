@@ -39,7 +39,7 @@ namespace Core.ApplicationServices.LocalOptions
 
         public IEnumerable<TOptionType> GetLocalOptions(Guid organizationUuid)
         {
-            var globalOptions = GetGlobalOptionsAsQueryable()
+            var globalOptions = GetEnabledGlobalOptionsAsQueryable()
                 .ToList();
             
            var localOptions = GetLocalOptionsAsQueryable(organizationUuid)
@@ -50,7 +50,8 @@ namespace Core.ApplicationServices.LocalOptions
 
         private IEnumerable<TOptionType> IncludeLocalChangesToGlobalOptions(IEnumerable<TOptionType> globalOptions, IDictionary<int, TLocalOptionType> localOptions)
         { 
-            return globalOptions.Select(optionToAdd =>
+            return globalOptions
+                .Select(optionToAdd =>
               {
                   optionToAdd.ResetLocalOptionAvailability();
                   var localOptionExists = localOptions.TryGetValue(optionToAdd.Id, out var localOption);
@@ -230,15 +231,16 @@ namespace Core.ApplicationServices.LocalOptions
                 .ByOrganizationUuid(organizationUuid);
         }
 
-        private IEnumerable<TOptionType> GetGlobalOptionsAsQueryable()
+        private IEnumerable<TOptionType> GetEnabledGlobalOptionsAsQueryable()
         {
             return _optionsRepository
-                .AsQueryable();
+                .AsQueryable()
+                .Where(x => x.IsEnabled);
         }
 
         private Result<TOptionType, OperationError> GetGlobalOptionById(int id)
         {
-            var option = GetGlobalOptionsAsQueryable().FirstOrDefault(x => x.Id == id);
+            var option = GetEnabledGlobalOptionsAsQueryable().FirstOrDefault(x => x.Id == id);
             return option != null
                 ? option
                 : new OperationError($"Global option with id {id} not found", OperationFailure.NotFound);

@@ -111,6 +111,18 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.False(responseDto.IsActive);
         }
 
+        [Fact]
+        public async Task Local_Option_Types_Do_Not_Include_Disabled_Option_Types()
+        {
+            var organization = await CreateOrganization();
+            var globalOption = SetupCreateGlobalBusinessType(false);
+
+            var response = await LocalOptionTypeV2Helper.GetLocalOptionTypes(organization.Uuid, BusinessTypesUrlSuffix, ItSystemsApiPrefix);
+            var localOptions = await response.ReadResponseBodyAsAsync<IEnumerable<LocalRegularOptionResponseDTO>>();
+
+            Assert.DoesNotContain(globalOption.Uuid, localOptions.Select(x => x.Uuid));
+        }
+
         private async Task<OrganizationDTO> CreateOrganization()
         {
             var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
@@ -118,14 +130,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             return organization;
         }
 
-        private BusinessType SetupCreateGlobalBusinessType()
+        private BusinessType SetupCreateGlobalBusinessType(bool isEnabled = true)
         {
             var globalOption = new BusinessType()
             {
                 Uuid = A<Guid>(),
                 Id = A<int>(),
                 Name = A<string>(),
-                IsObligatory = false
+                IsObligatory = false,
+                IsEnabled = isEnabled,
             };
             DatabaseAccess.MutateEntitySet<BusinessType>(repository =>
             {
