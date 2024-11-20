@@ -159,7 +159,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         {
             return _userService
                 .GetUserInOrganization(organizationUuid, userUuid)
-                .Select((user) => _userResponseModelMapper.ToUserResponseDTO(organizationUuid, user))
+                .Bind(user => _userResponseModelMapper.ToUserResponseDTO(organizationUuid, user))
                 .Match(Ok, FromOperationError);
         }
 
