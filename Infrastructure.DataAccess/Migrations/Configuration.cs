@@ -109,7 +109,7 @@ namespace Infrastructure.DataAccess.Migrations
 
                 AddOptions<RegisterType, ItSystemUsage>(context.RegisterTypes, globalAdmin, "TestRegisterType1", "TestRegisterType2");
 
-                AddOptions<CountryCode, Organization>(context.CountryCodes, globalAdmin, "DK", "SE", "UA");
+                AddOptions<CountryCode, Organization>(context.CountryCodes, globalAdmin, "NO", "SE", "UA");
                 context.SaveChanges();
 
                 #endregion

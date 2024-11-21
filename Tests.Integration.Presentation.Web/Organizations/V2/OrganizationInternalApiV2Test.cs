@@ -8,12 +8,10 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json;
-using Presentation.Web.Controllers.API.V1;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Models.API.V2.Request.Contract;
-using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
@@ -359,7 +357,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         public async Task Can_Update_Organization()
         {
             var organization = await CreateTestOrganization();
-            var requestDto = A<OrganizationUpdateRequestDTO>();
+            var requestDto = UpdateRequestDtoWithoutCountryCode();
 
             using var response = await OrganizationInternalV2Helper.PatchOrganization(organization.Uuid, requestDto);
 
@@ -369,13 +367,12 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(requestDto.Cvr, updatedOrganization.Cvr);
             Assert.Equal(requestDto.Name, updatedOrganization.Name);
             Assert.Equal((int)requestDto.Type, updatedOrganization.TypeId);
-            Assert.Equal(requestDto.ForeignCvr, updatedOrganization.ForeignCvr);
         }
 
         [Fact]
         public async Task Can_Create_Organization()
         {
-            var requestDto = A<OrganizationCreateRequestDTO>();
+            var requestDto = CreateRequestDtoWithoutCountryCode();
 
             using var response = await OrganizationInternalV2Helper.CreateOrganization(requestDto);
 
@@ -392,7 +389,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         public async Task Can_Only_Create_Organization_As_Global_Admin(OrganizationRole role)
         {
             var cookie = await HttpApi.GetCookieAsync(role);
-            var requestDto = A<OrganizationCreateRequestDTO>();
+            var requestDto = CreateRequestDtoWithoutCountryCode();
 
             using var response = await OrganizationInternalV2Helper.CreateOrganization(requestDto, cookie);
 
@@ -553,6 +550,20 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                 Assert.NotNull(actual);
                 Assert.Equal(expectedNode.Enabled, actual.Enabled);
             }
+        }
+
+        private OrganizationUpdateRequestDTO UpdateRequestDtoWithoutCountryCode()
+        {
+            var requestDto = A<OrganizationUpdateRequestDTO>();
+            requestDto.ForeignCountryCodeUuid = null;
+            return requestDto;
+        }
+
+        private OrganizationCreateRequestDTO CreateRequestDtoWithoutCountryCode()
+        {
+            var requestDto = A<OrganizationCreateRequestDTO>();
+            requestDto.ForeignCountryCodeUuid = null;
+            return requestDto;
         }
 
         private IList<CustomizedUINodeRequestDTO> GetNodeDTOs(int numberOfNodes)

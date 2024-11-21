@@ -46,6 +46,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
             return await HttpApi.PostWithCookieAsync(url, requestCookie, dto);
         }
 
+
         public static async Task<HttpResponseMessage> PatchOrganizationMasterData(Guid organizationUuid,
             OrganizationMasterDataRequestDTO dto)
         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -28,9 +29,10 @@ public class OrganizationWriteService : IOrganizationWriteService {
     private readonly IGenericRepository<ContactPerson> _contactPersonRepository;
     private readonly IGenericRepository<DataResponsible> _dataResponsibleRepository;
     private readonly IGenericRepository<DataProtectionAdvisor> _dataProtectionAdvisorRepository;
+    private readonly IGenericRepository<CountryCode> _countryCodeRepository;
 
 
-    public OrganizationWriteService(ITransactionManager transactionManager, IDomainEvents domainEvents, IOrganizationService organizationService, IAuthorizationContext authorizationContext, IOrganizationRepository organizationRepository, IEntityIdentityResolver identityResolver, IGenericRepository<ContactPerson> contactPersonRepository, IGenericRepository<DataResponsible> dataResponsibleRepository, IGenericRepository<DataProtectionAdvisor> dataProtectionAdvisorRepository)
+    public OrganizationWriteService(ITransactionManager transactionManager, IDomainEvents domainEvents, IOrganizationService organizationService, IAuthorizationContext authorizationContext, IOrganizationRepository organizationRepository, IEntityIdentityResolver identityResolver, IGenericRepository<ContactPerson> contactPersonRepository, IGenericRepository<DataResponsible> dataResponsibleRepository, IGenericRepository<DataProtectionAdvisor> dataProtectionAdvisorRepository, IGenericRepository<CountryCode> countryCodeRepository)
     {
         _transactionManager = transactionManager;
         _domainEvents = domainEvents;
@@ -41,6 +43,7 @@ public class OrganizationWriteService : IOrganizationWriteService {
         _contactPersonRepository = contactPersonRepository;
         _dataResponsibleRepository = dataResponsibleRepository;
         _dataProtectionAdvisorRepository = dataProtectionAdvisorRepository;
+        _countryCodeRepository = countryCodeRepository;
     }
 
     public Result<Organization, OperationError> PatchMasterData(Guid organizationUuid, OrganizationMasterDataUpdateParameters parameters)
@@ -137,8 +140,23 @@ public class OrganizationWriteService : IOrganizationWriteService {
     {
         return organization.WithOptionalUpdate(parameters.Cvr, (org, cvr) => org.UpdateCvr(cvr))
             .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)))
-            .Bind(org => org.WithOptionalUpdate(parameters.ForeignCvr, (org, foreignCvr) => org.UpdateForeignCvr(foreignCvr))
-            .Bind(org => org.WithOptionalUpdate(parameters.TypeId, (org, typeId) => org.UpdateType(typeId))));
+            .Bind(org => org.WithOptionalUpdate(parameters.ForeignCountryCodeUuid, PerformForeignCountryCodeUpdate))
+            .Bind(org => org.WithOptionalUpdate(parameters.TypeId, (org, typeId) => org.UpdateType(typeId)));
+    }
+
+    private Result<Organization, OperationError> PerformForeignCountryCodeUpdate(Organization organization,
+        Guid? countryCodeUuid)
+    {
+        if (countryCodeUuid == null)
+        {
+            organization.UpdateForeignCountryCode(null);
+            return organization;
+        }
+        var countryCode = _countryCodeRepository.AsQueryable().FirstOrDefault(cc => cc.Uuid == countryCodeUuid);
+        if (countryCode == null)
+            return new OperationError($"No country code found with uuid {countryCodeUuid}", OperationFailure.NotFound);
+        organization.UpdateForeignCountryCode(countryCode);
+        return organization;
     }
 
     private Result<Organization, OperationError> WithModifyCvrAccessIfRequired(Organization organization,

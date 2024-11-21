@@ -10,16 +10,13 @@ using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
-using Elasticsearch.Net;
 using System.Web.Http.Results;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Core.ApplicationServices.Model.Organizations;
 using System.Linq;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations.Conflicts;
 using Core.DomainModel.ItSystem;
-using Presentation.Web.Controllers.API.V1.Mapping;
 using Core.DomainModel;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations

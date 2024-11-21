@@ -70,6 +70,7 @@ namespace Core.DomainModel.Organization
         public string GetActiveCvr() => Cvr ?? ForeignCvr;
 
         public int? ForeignCountryCodeId { get; set; }
+        
         public virtual CountryCode ForeignCountryCode { get; set; }
 
         public AccessModifier AccessModifier { get; set; }
@@ -572,6 +573,12 @@ namespace Core.DomainModel.Organization
         public void UpdateShowITSystems(Maybe<bool> showITSystems)
         {
             HandleConfigPropertyUpdate(showITSystems, config => config.ShowItSystemModule = showITSystems.Value);
+        }
+
+        public void UpdateForeignCountryCode(CountryCode countryCode)
+        {
+            ForeignCountryCode = countryCode;
+            ForeignCountryCodeId = ForeignCountryCode?.Id;
         }
 
         private void HandleConfigPropertyUpdate(Maybe<bool> maybeValue, Action<Config> updateAction)

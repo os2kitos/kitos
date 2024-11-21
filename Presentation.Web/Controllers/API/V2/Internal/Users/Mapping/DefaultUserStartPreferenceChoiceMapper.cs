@@ -30,6 +30,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
         {
             switch (preference)
             {
+                case null:
                 case "index":
                     return DefaultUserStartPreferenceChoice.StartSite;
                 case "data-processing.overview":

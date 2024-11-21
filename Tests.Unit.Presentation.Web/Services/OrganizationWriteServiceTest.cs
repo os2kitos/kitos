@@ -8,6 +8,8 @@ using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Organizations.Write;
 using Xunit;
@@ -32,6 +34,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IGenericRepository<ContactPerson>> _contactPersonRepository;
         private readonly Mock<IGenericRepository<DataResponsible>> _dataResponsibleRepository;
         private readonly Mock<IGenericRepository<DataProtectionAdvisor>> _dataProtectionAdvisorRepository;
+        private readonly Mock<IGenericRepository<CountryCode>> _countryCodeRepository;
         private readonly OrganizationWriteService _sut;
 
 
@@ -46,7 +49,8 @@ namespace Tests.Unit.Presentation.Web.Services
             _contactPersonRepository = new Mock<IGenericRepository<ContactPerson>>();
             _dataResponsibleRepository = new Mock<IGenericRepository<DataResponsible>>();
             _dataProtectionAdvisorRepository = new Mock<IGenericRepository<DataProtectionAdvisor>>();
-            
+            _countryCodeRepository = new Mock<IGenericRepository<CountryCode>>();
+
             _sut = new OrganizationWriteService(_transactionManager.Object,
                 _domainEvents.Object,
                 _organizationService.Object,
@@ -55,7 +59,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 _identityResolver.Object,
                 _contactPersonRepository.Object,
                 _dataResponsibleRepository.Object,
-                _dataProtectionAdvisorRepository.Object);
+                _dataProtectionAdvisorRepository.Object,
+                _countryCodeRepository.Object);
         }
 
         [Fact]
@@ -424,7 +429,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void Can_Update_Organization_Name_And_Cvr()
+        public void Can_Update_Organization()
         {
             var org = CreateOrganization();
             _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
@@ -432,6 +437,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
             _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
             var updateParams = A<OrganizationBaseParameters>();
+            SetupRepositoryReturnsCountryCode(updateParams.ForeignCountryCodeUuid.NewValue);
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
 
@@ -439,7 +445,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var value = result.Value;
             Assert.Equal(updateParams.Cvr.NewValue, value.Cvr);
             Assert.Equal(updateParams.Name.NewValue, value.Name);
-            Assert.Equal(updateParams.ForeignCvr.NewValue, value.ForeignCvr);
+            Assert.Equal(updateParams.ForeignCountryCodeUuid.NewValue, value.ForeignCountryCode.Uuid);
             Assert.Equal(updateParams.TypeId.NewValue, value.TypeId);
         }
 
@@ -451,6 +457,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
             _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(false);
+            SetupRepositoryReturnsCountryCode();
             var updateParams = new OrganizationBaseParameters()
             {
                 Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
@@ -471,6 +478,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
             _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(false);
+            SetupRepositoryReturnsCountryCode();
             var updateParams = new OrganizationBaseParameters()
             {
                 Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
@@ -493,12 +501,31 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
             var updateParams = A<OrganizationBaseParameters>();
             updateParams.Cvr = OptionalValueChange<Maybe<string>>.None;
+            SetupRepositoryReturnsCountryCode(updateParams.ForeignCountryCodeUuid.NewValue);
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
 
             Assert.True(result.Ok);
             Assert.Equal(updateParams.Name.NewValue, result.Value.Name);
             Assert.Equal(org.Cvr, result.Value.Cvr);
+        }
+
+        [Fact]
+        public void Update_Organization_Returns_Not_Found_If_Requested_CountryCode_Not_Found()
+        {
+            var org = CreateOrganization();
+            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
+            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
+            var updateParams = A<OrganizationBaseParameters>();
+            _countryCodeRepository.Setup(_ => _.AsQueryable()).Returns(
+                new List<CountryCode>().AsQueryable());
+
+            var result = _sut.PatchOrganization(org.Uuid, updateParams);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         [Fact]
@@ -577,7 +604,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationService
                 .Setup(service => service.CreateNewOrganization(It.IsAny<Organization>()))
                 .Returns(Result<Organization, OperationFailure>.Success);
-
+            SetupRepositoryReturnsCountryCode(parameters.ForeignCountryCodeUuid.NewValue);
             var result = _sut.CreateOrganization(parameters);
 
             Assert.True(result.Ok);
@@ -585,7 +612,16 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(organization.Name, parameters.Name.NewValue);
             Assert.Equal(parameters.TypeId.NewValue, organization.TypeId);
             Assert.Equal(parameters.Cvr.NewValue, organization.Cvr);
-            Assert.Equal(parameters.ForeignCvr.NewValue, organization.ForeignCvr);
+            Assert.Equal(parameters.ForeignCountryCodeUuid.NewValue, organization.ForeignCountryCode.Uuid);
+        }
+        private void SetupRepositoryReturnsCountryCode(Guid? uuid = null)
+        {
+            var expectedCountryCode = new CountryCode()
+            {
+                Uuid = uuid ?? new Guid()
+            };
+            _countryCodeRepository.Setup(_ => _.AsQueryable()).Returns(
+                new List<CountryCode>() { expectedCountryCode }.AsQueryable());
         }
 
         private OrganizationMasterDataRolesUpdateParameters SetupUpdateMasterDataRoles(int orgId,
