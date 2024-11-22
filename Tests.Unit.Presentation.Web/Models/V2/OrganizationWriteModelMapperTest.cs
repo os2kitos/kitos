@@ -64,6 +64,36 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Fact]
+        public void Can_Map_Null_Country_Code_If_Requesting_Update()
+        {
+            var dto = new OrganizationUpdateRequestDTO()
+            {
+                UpdateForeignCountryCode = true,
+                ForeignCountryCodeUuid = null,
+            };
+
+            var result = _sut.ToOrganizationUpdateParameters(dto);
+            Assert.True(result.ForeignCountryCodeUuid.HasChange);
+            Assert.Null(result.ForeignCountryCodeUuid.NewValue);
+        }
+
+        [Fact]
+        public void Does_Not_Map_Null_Country_Code_If_Not_Requested()
+        {
+
+            //todo afte this check if the change in Org.cs is needed
+
+            var dto = new OrganizationUpdateRequestDTO()
+            {
+                UpdateForeignCountryCode = false,
+                ForeignCountryCodeUuid = null,
+            };
+
+            var result = _sut.ToOrganizationUpdateParameters(dto);
+            Assert.False(result.ForeignCountryCodeUuid.HasChange);
+        }
+
+        [Fact]
         public void Can_Map_Organization_Create_Params()
         {
             ExpectHttpRequestPropertyNames<OrganizationCreateRequestDTO>();

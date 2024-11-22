@@ -578,7 +578,7 @@ namespace Core.DomainModel.Organization
         public void UpdateForeignCountryCode(CountryCode countryCode)
         {
             ForeignCountryCode = countryCode;
-            ForeignCountryCodeId = ForeignCountryCode?.Id;
+            ForeignCountryCodeId = countryCode?.Id;
         }
 
         private void HandleConfigPropertyUpdate(Maybe<bool> maybeValue, Action<Config> updateAction)

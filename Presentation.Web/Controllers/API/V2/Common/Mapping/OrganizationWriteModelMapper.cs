@@ -75,19 +75,36 @@ public class OrganizationWriteModelMapper : WriteModelMapperBase, IOrganizationW
         return MapParameters(dto, true);
     }
 
-    private OrganizationBaseParameters MapParameters(OrganizationBaseRequestDTO dto, Boolean enforceChanges)
+    private OrganizationBaseParameters MapParameters(OrganizationBaseRequestDTO dto, bool enforceChanges)
     {
         var rule = CreateChangeRule<OrganizationBaseRequestDTO>(enforceChanges);
 
-        return new()
+        var parameters = new OrganizationBaseParameters()
         {
             Cvr = rule.MustUpdate(x => x.Cvr) ? (dto.Cvr.FromNullable()).AsChangedValue()
                 : OptionalValueChange<Maybe<string>>.None,
             Name = rule.MustUpdate(x => x.Name) ? (dto.Name.FromNullable()).AsChangedValue()
                 : OptionalValueChange<Maybe<string>>.None,
             TypeId = rule.MustUpdate(x => x.Type) ? ((int)dto.Type).AsChangedValue() : OptionalValueChange<int>.None,
-            ForeignCountryCodeUuid = rule.MustUpdate(x => x.ForeignCountryCodeUuid) ? dto.ForeignCountryCodeUuid.AsChangedValue() : OptionalValueChange<Guid?>.None,
         };
+
+        return WithForeignCountryCodeMapping(rule, dto, parameters);
+    }
+
+    private OrganizationBaseParameters WithForeignCountryCodeMapping(IPropertyUpdateRule<OrganizationBaseRequestDTO> rule, OrganizationBaseRequestDTO dto, OrganizationBaseParameters parameters)
+    {
+        if (dto is OrganizationUpdateRequestDTO updateDto)
+        {
+            parameters.ForeignCountryCodeUuid = updateDto.UpdateForeignCountryCode
+                ? dto.ForeignCountryCodeUuid.AsChangedValue()
+                : OptionalValueChange<Guid?>.None;
+            return parameters;
+        }
+
+        parameters.ForeignCountryCodeUuid = rule.MustUpdate(x => x.ForeignCountryCodeUuid)
+            ? dto.ForeignCountryCodeUuid.AsChangedValue()
+            : OptionalValueChange<Guid?>.None;
+        return parameters;
     }
 
     public Result<UIModuleCustomizationParameters, OperationError> ToUIModuleCustomizationParameters(Guid organizationUuid, string moduleName,
