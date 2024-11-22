@@ -181,6 +181,8 @@ namespace Presentation.Web
             CreateMap<User, UserDTO>()
                   .ForMember(dest => dest.DefaultOrganizationUnitId,
                       opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnitId : null))
+                  .ForMember(dest => dest.DefaultOrganizationUnitUuid,
+                      opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnit.Uuid : (Guid?)null))
                   .ForMember(dest => dest.DefaultOrganizationUnitName,
                       opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnit.Name : null))
                   .ReverseMap()

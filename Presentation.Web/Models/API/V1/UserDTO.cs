@@ -13,6 +13,7 @@ namespace Presentation.Web.Models.API.V1
         public string Email { get; set; }
         public string DefaultUserStartPreference { get; set; }
         public int? DefaultOrganizationUnitId { get; set; }
+        public Guid? DefaultOrganizationUnitUuid { get; set; }
         public string DefaultOrganizationUnitName { get; set; }
         public bool IsGlobalAdmin { get; set; }
         public List<OrganizationRightDTO> OrganizationRights { get; set; }
