@@ -6,6 +6,8 @@ namespace Presentation.Web.Models.API.V1
     public class OrganizationRightDTO
     {
         public int OrganizationId { get; set; }
+
+        public Guid OrganizationUuid { get; set; }
         public string OrganizationName { get; set; }
         public OrganizationRole Role { get; set; }
 

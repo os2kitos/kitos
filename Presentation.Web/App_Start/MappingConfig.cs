@@ -212,6 +212,7 @@ namespace Presentation.Web
                   .IgnoreDestinationEntityFields();
 
             CreateMap<OrganizationRight, OrganizationRightDTO>()
+                .ForMember(dest => dest.OrganizationUuid, opt => opt.MapFrom(src => src.Organization.Uuid))
                 .ReverseMap()
                 .IgnoreDestinationEntityFields();
 
