@@ -12,6 +12,7 @@ using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Rights;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 
@@ -27,6 +28,7 @@ namespace Core.ApplicationServices.Users.Write
         private readonly IEntityIdentityResolver _entityIdentityResolver;
         private readonly IUserRightsService _userRightsService;
         private readonly IOrganizationalUserContext _organizationalUserContext;
+        private readonly IUserRepository _userRepository;
 
         public UserWriteService(IUserService userService,
             IOrganizationRightsService organizationRightsService,
@@ -35,7 +37,8 @@ namespace Core.ApplicationServices.Users.Write
             IOrganizationService organizationService,
             IEntityIdentityResolver entityIdentityResolver,
             IUserRightsService userRightsService,
-            IOrganizationalUserContext organizationalUserContext)
+            IOrganizationalUserContext organizationalUserContext,
+            IUserRepository userRepository)
         {
             _userService = userService;
             _organizationRightsService = organizationRightsService;
@@ -45,6 +48,7 @@ namespace Core.ApplicationServices.Users.Write
             _entityIdentityResolver = entityIdentityResolver;
             _userRightsService = userRightsService;
             _organizationalUserContext = organizationalUserContext;
+            _userRepository = userRepository;
         }
 
         public Result<User, OperationError> Create(Guid organizationUuid, CreateUserParameters parameters)
@@ -175,6 +179,21 @@ namespace Core.ApplicationServices.Users.Write
         public Maybe<OperationError> RemoveLocalAdmin(Guid organizationUuid, Guid userUuid)
         {
             return ChangeLocalAdminStatus(organizationUuid, userUuid, (orgId, userId) => _organizationRightsService.RemoveRole(orgId, userId, OrganizationRole.LocalAdmin)).MatchFailure();
+        }
+
+        public void RequestPasswordReset(string email)
+        {
+            var userResult = _userRepository.GetByEmail(email).FromNullable();
+            if (userResult.IsNone)
+            {
+                return;
+            }
+            var user = userResult.Value;
+            if (!user.CanAuthenticate())
+            {
+                return;
+            }
+            _userService.IssuePasswordReset(user, null, null, true);
         }
 
         private Result<User, OperationError> ChangeLocalAdminStatus<T>(Guid organizationUuid, Guid userUuid, Func<int, int, Result<T, OperationFailure>> changeLocalAdminStatus)

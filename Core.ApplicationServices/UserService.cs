@@ -165,7 +165,7 @@ namespace Core.ApplicationServices
             _userRepository.Save();
         }
 
-        public PasswordResetRequest IssuePasswordReset(User user, string subject, string content)
+        public PasswordResetRequest IssuePasswordReset(User user, string subject, string content, bool newUI = false)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
@@ -175,7 +175,7 @@ namespace Core.ApplicationServices
             if (content == null)
             {
                 reset = GenerateResetRequest(user);
-                var resetLink = _baseUrl + "#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
+                var resetLink = _baseUrl + GetUrlRoute(newUI) + HttpUtility.UrlEncode(reset.Hash);
                 mailContent = "<p>Du har bedt om at få nulstillet dit password.</p>" +
                               "<p><a href='" + resetLink +
                               "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
@@ -241,6 +241,17 @@ namespace Core.ApplicationServices
                 });
         }
 
+        //Temporary solution for supporting links to both both the old and new UI. (27/11/2024)
+        private string GetUrlRoute(bool newUI)
+        {
+            if (newUI)
+            {
+                return "ui/reset-password/";
+            } else
+            {
+                return "#/reset-password/";
+            }
+        }
 
         private PasswordResetRequest GenerateResetRequest(User user)
         {

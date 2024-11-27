@@ -168,6 +168,7 @@
     <Compile Include="Tools\Internal\Notifications\NotificationV2Helper.cs" />
     <Compile Include="Tools\Internal\Organizations\OrganizationInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\Organizations\OrganizationUnitRegistrationV2Helper.cs" />
+    <Compile Include="Tools\Internal\Users\PasswordResetV2Helper.cs" />
     <Compile Include="Tools\Internal\Users\UsersV2Helper.cs" />
     <Compile Include="Tools\OrganizationGridTestHelper.cs" />
     <Compile Include="Users\OrganizationRightApiTest.cs" />
@@ -263,6 +264,7 @@
     <Compile Include="Users\UserPermissionsAPITest.cs" />
     <Compile Include="Users\UserRolesManagementApiTest.cs" />
     <Compile Include="Users\UserTest.cs" />
+    <Compile Include="Users\V2\PasswordResetInternalApiV2Test.cs" />
     <Compile Include="Users\V2\UserInternalApiV2Test.cs" />
   </ItemGroup>
   <ItemGroup>

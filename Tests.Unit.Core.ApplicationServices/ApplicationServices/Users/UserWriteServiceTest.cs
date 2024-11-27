@@ -17,6 +17,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Rights;
 using Core.DomainServices.Generic;
 using Core.ApplicationServices.Model.Users;
+using Core.DomainServices;
 
 namespace Tests.Unit.Core.ApplicationServices.Users
 {
@@ -32,6 +33,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         private readonly Mock<IEntityIdentityResolver> _entityIdentityResolverMock;
         private readonly Mock<IUserRightsService> _userRightsServiceMock;
         private readonly Mock<IOrganizationalUserContext> _organizationalUserContextMock;
+        private readonly Mock<IUserRepository> _userRepositoryMock;
 
         public UserWriteServiceTest()
         {
@@ -43,6 +45,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             _entityIdentityResolverMock = new Mock<IEntityIdentityResolver>();
             _userRightsServiceMock = new Mock<IUserRightsService>();
             _organizationalUserContextMock = new Mock<IOrganizationalUserContext>();
+            _userRepositoryMock = new Mock<IUserRepository>();
 
 
             _sut = new UserWriteService(_userServiceMock.Object, 
@@ -52,7 +55,8 @@ namespace Tests.Unit.Core.ApplicationServices.Users
                 _organizationServiceMock.Object,
                 _entityIdentityResolverMock.Object,
                 _userRightsServiceMock.Object,
-                _organizationalUserContextMock.Object);
+                _organizationalUserContextMock.Object,
+                _userRepositoryMock.Object);
         }
 
         [Fact]
@@ -485,6 +489,50 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             Assert.True(result.IsNone);
             _organizationRightsServiceMock.Verify(x => x.RemoveRole(org.Id, user.Id, OrganizationRole.LocalAdmin), Times.Once);
             transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
+        }
+
+        [Fact]
+        public void Can_Issue_Password_Reset()
+        {
+            var user = SetupUser();
+            ExpectGetUserByEmailReturns(user.Email, user);
+
+            _sut.RequestPasswordReset(user.Email);
+
+            _userServiceMock.Verify(x => x.IssuePasswordReset(user, null, null, true), Times.Once());
+        }
+
+        [Fact]
+        public void Can_Not_Issue_Password_Reset_If_Email_Doesnt_Exist()
+        {
+            var nonExistantMail = "test@mail.dk";
+            ExpectGetUserByEmailReturns(nonExistantMail, null);
+
+            _sut.RequestPasswordReset(nonExistantMail);
+
+            VerifyNoPasswordResetsHasBeenIssued();
+        }
+
+        [Fact]
+        public void Can_Not_Issue_Password_Reset_If_User_Cant_Authenticate()
+        {
+            var user = SetupUser();
+            user.Deleted = true; //Make user unable to authenticate
+            ExpectGetUserByEmailReturns(user.Email, user);
+
+            _sut.RequestPasswordReset(user.Email);
+
+            VerifyNoPasswordResetsHasBeenIssued();
+        }
+
+        private void VerifyNoPasswordResetsHasBeenIssued()
+        {
+            _userServiceMock.Verify(x => x.IssuePasswordReset(It.IsAny<User>(), null, null, true), Times.Never());
+        }
+
+        private void ExpectGetUserByEmailReturns(string email, User user)
+        {
+            _userRepositoryMock.Setup(x => x.GetByEmail(email)).Returns(user);
         }
 
         private void ExpectIsGlobalAdminReturns(bool expected)

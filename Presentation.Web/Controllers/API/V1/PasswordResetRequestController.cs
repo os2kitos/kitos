@@ -46,7 +46,7 @@ namespace Presentation.Web.Controllers.API.V1
                     return Ok();
                 }
 
-                _userService.IssuePasswordReset(user, null, null);
+                _userService.IssuePasswordReset(user, null, null, false);
 
                 return Ok();
             }
