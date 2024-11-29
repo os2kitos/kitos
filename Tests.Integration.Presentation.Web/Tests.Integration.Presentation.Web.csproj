@@ -140,6 +140,7 @@
     <Compile Include="HelpTexts\HelpTextsInternalApiV2Test.cs" />
     <Compile Include="Interfaces\V2\BaseItInterfaceApiV2Test.cs" />
     <Compile Include="Interfaces\V2\RightsHolderItInterfaceApiV2Test.cs" />
+    <Compile Include="Internal\GdprReport\GdprReportApiV2Test.cs" />
     <Compile Include="Internal\Messages\PublicMessagesApiV2Test.cs" />
     <Compile Include="ItSystem\V2\BaseItSystemsApiV2Test.cs" />
     <Compile Include="ItSystem\V2\ItSystemLocalOptionTypesInternalV2ApiTest.cs" />
@@ -162,6 +163,7 @@
     <Compile Include="Tools\Extensions\StringExtensions.cs" />
     <Compile Include="Tools\HelpTextsInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\DPR\DataProcessingRegistrationInternalV2Helper.cs" />
+    <Compile Include="Tools\Internal\GdprReportV2Helper.cs" />
     <Compile Include="Tools\Internal\GlobalOptionTypeV2Helper.cs" />
     <Compile Include="Tools\Internal\ItSystemUsage\ItSystemUsageMigrationV2Helper.cs" />
     <Compile Include="Tools\Internal\LocalOptionTypeV2Helper.cs" />
