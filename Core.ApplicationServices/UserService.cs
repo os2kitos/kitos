@@ -50,7 +50,7 @@ namespace Core.ApplicationServices
         private readonly ICommandBus _commandBus;
         private readonly IEntityIdentityResolver _identityResolver;
         private static readonly RNGCryptoServiceProvider rngCsp = new();
-        private const string KitosManualsLink = "https://info.kitos.dk/s/qZPox9byHBRsMi2";
+        private const string KitosManualsLink = "https://info.kitos.dk/s/YeFJqK6D2f2CQCR";
 
         public UserService(TimeSpan ttl,
             string baseUrl,
