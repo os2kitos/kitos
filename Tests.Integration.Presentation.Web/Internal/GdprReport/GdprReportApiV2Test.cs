@@ -34,7 +34,6 @@ namespace Tests.Integration.Presentation.Web.Internal.GdprReport
             var body = await response.ReadResponseBodyAsAsync<IEnumerable<GdprReportResponseDTO>>();
             Assert.NotEmpty(body);
             var report = body.FirstOrDefault();
-
             AssertGdprReportIsEqual(gdprWriteRequest, report);
         }
 
