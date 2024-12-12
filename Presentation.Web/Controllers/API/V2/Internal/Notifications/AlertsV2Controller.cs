@@ -59,7 +59,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications
                 Created = userAlert.Created,
                 Message = userAlert.NotificationMessage,
                 Name = userAlert.Name,
-                Uuid = userAlert.Uuid
+                Uuid = userAlert.Uuid,
+                EntityUuid = userAlert.GetRelatedEntityUuid()
+                
             };
         }
     }

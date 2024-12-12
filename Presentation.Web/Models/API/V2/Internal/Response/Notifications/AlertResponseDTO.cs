@@ -9,6 +9,9 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
         [Required]
         public Guid Uuid { get; set; }
 
+        [Required]
+        public Guid EntityUuid { get; set; }
+
         public string Name { get; set; }
 
         public AlertType AlertType { get; set; }

@@ -54,6 +54,11 @@ namespace Core.DomainModel.Notification
                 (IEntityWithUserNotification)DataProcessingRegistration;
         }
 
+        public Guid GetRelatedEntityUuid()
+        {
+            return GetOwner().Uuid;
+        }
+
         public int GetRelatedEntityId()
         {
             return ResolveRelatedEntityInfo()
