@@ -5,6 +5,7 @@ using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.Organization;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainServices.Model.Options;
@@ -45,7 +46,14 @@ namespace Core.ApplicationServices.OptionTypes
 
         public Result<IEnumerable<OptionDescriptor<TOption>>, OperationError> GetOptionTypes(Guid organizationUuid)
         {
-            return ResolveOrgId(organizationUuid).Select(_optionsTypeService.GetAvailableOptionsDetails);
+            return ResolveOrgId(organizationUuid)
+                    .Select(_optionsTypeService.GetAvailableOptionsDetails)
+                    .Select(SortOptionsByPriority);
+        }
+
+        private static IEnumerable<OptionDescriptor<TOption>> SortOptionsByPriority(IEnumerable<OptionDescriptor<TOption>> options)
+        {
+            return options.OrderByDescending(x => x.Option.Priority);
         }
 
         private Result<int, OperationError> ResolveOrgId(Guid organizationUuid)

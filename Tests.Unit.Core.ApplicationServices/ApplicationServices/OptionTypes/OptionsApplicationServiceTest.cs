@@ -58,7 +58,10 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             //Assert
             Assert.True(businessTypes.Ok);
             Assert.Equal(numberOfBusinessTypes, businessTypes.Value.Count());
-            Assert.Same(optionDescriptors, businessTypes.Value);
+
+            AssertSortedByPriority(businessTypes.Value);
+            VerifyOptionsMatch(optionDescriptors, businessTypes.Value);
+
         }
 
         [Fact]
@@ -211,8 +214,31 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             return new BusinessType
             {
                 Id = A<int>(),
-                Uuid = uuid ?? Guid.NewGuid()
+                Uuid = uuid ?? Guid.NewGuid(),
+                Priority = A<int>()
             };
         }
+
+        private static void AssertSortedByPriority(IEnumerable<OptionDescriptor<BusinessType>> sortedOptions)
+        {
+            var list = sortedOptions.ToList();
+            for (int i = 0; i < list.Count - 1; i++)
+            {
+                var currentPriority = list[i].Option.Priority;
+                var nextPriority = list[i + 1].Option.Priority;
+                Assert.True(currentPriority >= nextPriority);
+            }
+        }
+
+        private static void VerifyOptionsMatch(List<OptionDescriptor<BusinessType>> expectedOptions, IEnumerable<OptionDescriptor<BusinessType>> actualOptions)
+        {
+            foreach (var expected in expectedOptions)
+            {
+                var actual = actualOptions.SingleOrDefault(x => x.Option.Uuid == expected.Option.Uuid);
+                Assert.NotNull(actual);
+                Assert.Equal(expected.Description, actual.Description);
+            }
+        }
+
     }
 }
