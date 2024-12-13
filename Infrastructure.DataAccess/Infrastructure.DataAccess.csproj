@@ -1135,6 +1135,7 @@
       <DependentUpon>202303030830463_notification_uuid.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_ExternalReference.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_UserNotification.sql" />
     <Compile Include="Services\DatabaseTransaction.cs" />
     <Compile Include="Services\EntityFrameworkContextDatabaseControl.cs" />
     <Compile Include="Services\PocoTypeFromProxyResolver.cs" />
