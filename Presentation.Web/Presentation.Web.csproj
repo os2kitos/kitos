@@ -532,6 +532,7 @@
     <Compile Include="Models\API\V2\Internal\Request\User\MutateRightRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\User\MutateUserRightsRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\GdprReportResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\ItContract\AppliedProcurementPlanResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Notifications\AlertResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\PasswordResetResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\QA\BrokenExternalReferencesReportColumnsV2.cs" />

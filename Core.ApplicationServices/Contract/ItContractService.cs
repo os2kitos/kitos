@@ -10,10 +10,12 @@ using Core.ApplicationServices.References;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
@@ -44,6 +46,7 @@ namespace Core.ApplicationServices.Contract
         private readonly IOptionsService<ItContract, TerminationDeadlineType> _terminationDeadlineOptionsService;
         private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
         private readonly IOrganizationService _organizationService;
+        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
         public ItContractService(
             IItContractRepository repository,
@@ -62,8 +65,9 @@ namespace Core.ApplicationServices.Contract
             IOptionsService<ItContract, PaymentModelType> paymentModelOptionsService,
             IOptionsService<ItContract, PaymentFreqencyType> paymentFrequencyOptionsService,
             IOptionsService<ItContract, OptionExtendType> optionExtendOptionsService,
-            IOptionsService<ItContract, TerminationDeadlineType> terminationDeadlineOptionsService, 
-            IGenericRepository<EconomyStream> economyStreamRepository, IOrganizationService organizationService)
+            IOptionsService<ItContract, TerminationDeadlineType> terminationDeadlineOptionsService,
+            IGenericRepository<EconomyStream> economyStreamRepository, IOrganizationService organizationService,
+            IEntityIdentityResolver entityIdentityResolver)
         {
             _repository = repository;
             _referenceService = referenceService;
@@ -84,6 +88,7 @@ namespace Core.ApplicationServices.Contract
             _terminationDeadlineOptionsService = terminationDeadlineOptionsService;
             _economyStreamRepository = economyStreamRepository;
             _organizationService = organizationService;
+            _entityIdentityResolver = entityIdentityResolver;
         }
 
         public Result<ItContract, OperationError> Create(int organizationId, string name)
@@ -161,7 +166,7 @@ namespace Core.ApplicationServices.Contract
                 if (error.HasValue)
                     return error.Value;
             }
-            
+
             return Maybe<OperationError>.None;
         }
 
@@ -188,7 +193,7 @@ namespace Core.ApplicationServices.Contract
                     _economyStreamRepository.DeleteWithReferencePreload(economyStream);
                 }
                 _economyStreamRepository.Save();
-                
+
                 //Delete the contract
                 var deleteByContractId = _referenceService.DeleteByContractId(id);
                 if (deleteByContractId.Failed)
@@ -330,6 +335,13 @@ namespace Core.ApplicationServices.Contract
                     .Select(x => (x.ProcurementPlanYear.GetValueOrDefault(), x.ProcurementPlanQuarter.GetValueOrDefault()))
                     .ToList()
                 );
+        }
+
+        public Result<IEnumerable<(int year, int quarter)>, OperationError> GetAppliedProcurementPlansByUuid(
+            Guid organizationUuid)
+        {
+            return _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid)
+                .Match(GetAppliedProcurementPlans, () => new OperationError($"Could not find organization with uuid: {organizationUuid}", OperationFailure.NotFound));
         }
 
         public Maybe<OperationError> SetResponsibleUnit(int contractId, Guid targetUnitUuid)

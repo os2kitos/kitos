@@ -15,6 +15,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
@@ -38,6 +39,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IContractDataProcessingRegistrationAssignmentService> _contractDataProcessingRegistrationAssignmentService;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
+        private readonly Mock<IEntityIdentityResolver> _entityIdentityResolverMock;
 
         public ItContractServiceTest()
         {
@@ -60,6 +62,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var terminationDeadlineOptionsServiceMock = new Mock<IOptionsService<ItContract, TerminationDeadlineType>>();
             _economyStreamRepository = new Mock<IGenericRepository<EconomyStream>>();
             _organizationServiceMock = new Mock<IOrganizationService>();
+            _entityIdentityResolverMock = new Mock<IEntityIdentityResolver>();
 
             _sut = new ItContractService(
                 _contractRepository.Object,
@@ -80,7 +83,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 optionExtendOptionsServiceMock.Object,
                 terminationDeadlineOptionsServiceMock.Object,
                 _economyStreamRepository.Object,
-                _organizationServiceMock.Object);
+                _organizationServiceMock.Object,
+                _entityIdentityResolverMock.Object);
         }
 
         [Fact]

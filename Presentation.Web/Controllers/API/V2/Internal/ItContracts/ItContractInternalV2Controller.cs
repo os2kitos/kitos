@@ -20,6 +20,7 @@ using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Contract;
+using Presentation.Web.Models.API.V2.Internal.Response.ItContract;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 {
@@ -153,6 +154,25 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
                 .RemoveRole(contractUuid, request.ToUserRolePair())
                 .Select(_responseMapper.MapContractDTO)
                 .Match(Ok, FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("applied-procurement-plans/{organizationUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<AppliedProcurementPlanResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetAppliedProcurementPlans([NonEmptyGuid][FromUri] Guid organizationUuid)
+        {
+            return _itContractService.GetAppliedProcurementPlansByUuid(organizationUuid)
+                .Select(plans => plans.Select(MapAppliedProcurementPlansToDTO))
+                .Match(Ok, FromOperationError);
+        }
+
+        private static AppliedProcurementPlanResponseDTO MapAppliedProcurementPlansToDTO((int, int) procurementTuple)
+        {
+            return new AppliedProcurementPlanResponseDTO(procurementTuple.Item1, procurementTuple.Item2);
         }
     }
 }
