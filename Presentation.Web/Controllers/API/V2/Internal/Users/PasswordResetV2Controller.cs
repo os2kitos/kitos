@@ -1,25 +1,16 @@
 ﻿using Core.ApplicationServices;
 using Core.DomainModel;
-using Core.DomainServices;
-using Infrastructure.Services.Cryptography;
 using Presentation.Web.Infrastructure.Attributes;
-using Serilog.Core;
 using Swashbuckle.Swagger.Annotations;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Net;
-using System.Web;
 using System.Web.Http;
 using Core.Abstractions.Types;
-using AutoMapper;
 using Core.ApplicationServices.Users.Write;
 using Presentation.Web.Models.API.V2.Internal.Request;
 using Presentation.Web.Models.API.V2.Internal.Response;
 using Core.Abstractions.Extensions;
-using Presentation.Web.Controllers.API.V2.Common;
-using Presentation.Web.Models.API.V1;
+using Core.ApplicationServices.ScheduledJobs;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Users
 {
@@ -30,11 +21,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
     {
         private readonly IUserService _userService;
         private readonly IUserWriteService _userWriteService;
+        private readonly IHangfireApi _hangfire;
 
-        public PasswordResetInternalV2Controller(IUserService userService, IUserWriteService userWriteService)
+        public PasswordResetInternalV2Controller(IUserService userService, IUserWriteService userWriteService, IHangfireApi hangfire)
         {
             _userService = userService;
             _userWriteService = userWriteService;
+            _hangfire = hangfire;
         }
 
         [Route("create")]
@@ -42,15 +35,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         [SwaggerResponse(HttpStatusCode.NoContent)]
         public IHttpActionResult RequestPasswordReset([FromBody] RequestPasswordResetRequestDTO request)
         {
-            try
-            {
-                _userWriteService.RequestPasswordReset(request.Email);
-                return NoContent();
-            }
-            catch (Exception e)
-            {
-                return UnknownError();
-            }
+            _hangfire.Schedule(() => _userWriteService.RequestPasswordReset(request.Email, true));
+            return NoContent();
         }
 
         [Route("{requestId}")]

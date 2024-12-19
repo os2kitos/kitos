@@ -497,9 +497,9 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var user = SetupUser();
             ExpectGetUserByEmailReturns(user.Email, user);
 
-            _sut.RequestPasswordReset(user.Email);
+            _sut.RequestPasswordReset(user.Email, false);
 
-            _userServiceMock.Verify(x => x.IssuePasswordReset(user, null, null, true), Times.Once());
+            _userServiceMock.Verify(x => x.IssuePasswordReset(user, null, null, false), Times.Once());
         }
 
         [Fact]
@@ -508,7 +508,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var nonExistantMail = "test@mail.dk";
             ExpectGetUserByEmailReturns(nonExistantMail, null);
 
-            _sut.RequestPasswordReset(nonExistantMail);
+            _sut.RequestPasswordReset(nonExistantMail, false);
 
             VerifyNoPasswordResetsHasBeenIssued();
         }
@@ -520,7 +520,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             user.Deleted = true; //Make user unable to authenticate
             ExpectGetUserByEmailReturns(user.Email, user);
 
-            _sut.RequestPasswordReset(user.Email);
+            _sut.RequestPasswordReset(user.Email, false);
 
             VerifyNoPasswordResetsHasBeenIssued();
         }

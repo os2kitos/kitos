@@ -181,7 +181,7 @@ namespace Core.ApplicationServices.Users.Write
             return ChangeLocalAdminStatus(organizationUuid, userUuid, (orgId, userId) => _organizationRightsService.RemoveRole(orgId, userId, OrganizationRole.LocalAdmin)).MatchFailure();
         }
 
-        public void RequestPasswordReset(string email)
+        public void RequestPasswordReset(string email, bool newUi)
         {
             var userResult = _userRepository.GetByEmail(email).FromNullable();
             if (userResult.IsNone)
@@ -193,7 +193,7 @@ namespace Core.ApplicationServices.Users.Write
             {
                 return;
             }
-            _userService.IssuePasswordReset(user, null, null, true);
+            _userService.IssuePasswordReset(user, null, null, newUi);
         }
 
         private Result<User, OperationError> ChangeLocalAdminStatus<T>(Guid organizationUuid, Guid userUuid, Func<int, int, Result<T, OperationFailure>> changeLocalAdminStatus)
