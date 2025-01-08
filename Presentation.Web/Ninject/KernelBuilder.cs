@@ -238,7 +238,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IItContractService>().To<ItContractService>().InCommandScope(Mode);
             kernel.Bind<IItContractWriteService>().To<ItContractWriteService>().InCommandScope(Mode);
             kernel.Bind<IItContractOverviewReadModelsService>().To<ItContractOverviewReadModelsService>().InCommandScope(Mode);
-            kernel.Bind<IGridLocalItContractRolesService>().To<GridLocalItContractRolesService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<ItContract, ItContractOverviewReadModel>>().To<ItContractOverviewReadModelUpdate>().InCommandScope(Mode);
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
             kernel.Bind<IExcelService>().To<ExcelService>().InCommandScope(Mode);

@@ -72,8 +72,6 @@
     <Compile Include="Authentication\AuthenticationScope.cs" />
     <Compile Include="Authentication\ApplicationAuthenticationState.cs" />
     <Compile Include="Authorization\CommandPermissionResult.cs" />
-    <Compile Include="Contract\ReadModels\GridLocalItContractRolesService.cs" />
-    <Compile Include="Contract\ReadModels\IGridLocalItContractRolesService.cs" />
     <Compile Include="Generic\EntityTreeUuidCollector.cs" />
     <Compile Include="Generic\ExtendedExtendedEntityIdentityResolverService.cs" />
     <Compile Include="Generic\IEntityIdMapper.cs" />
