@@ -7,6 +7,7 @@ using Core.ApplicationServices.Model.GlobalOptions;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;
+using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.GlobalOptions;
 
@@ -50,7 +51,7 @@ public class GlobalRoleOptionsService<TOptionType, TReferenceType> :
             .Bind(opt => opt.WithOptionalUpdate(parameters.WriteAccess, (opt, writeAccess) => opt.HasWriteAccess = writeAccess.HasValue && writeAccess.Value));
     }
 
-    public GlobalRoleOptionsService(IGenericRepository<TOptionType> globalOptionsRepository, IOrganizationalUserContext activeUserContext, IDomainEvents domainEvents) : base(globalOptionsRepository, activeUserContext, domainEvents)
+    public GlobalRoleOptionsService(IGenericRepository<TOptionType> globalOptionsRepository, IOrganizationalUserContext activeUserContext, IDomainEvents domainEvents, ITransactionManager transactionManager) : base(globalOptionsRepository, activeUserContext, domainEvents, transactionManager)
     {
     }
 }

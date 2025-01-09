@@ -114,5 +114,10 @@ namespace Core.DomainModel
             Priority--;
         }
 
+        public void SetPriority(int newPriority)
+        {
+            Priority = newPriority;
+        }
+
     }
 }

@@ -6,6 +6,7 @@ using Core.ApplicationServices.Model.GlobalOptions;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;
+using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.GlobalOptions;
 
@@ -15,7 +16,7 @@ public class GlobalRegularOptionsService<TOptionType, TReferenceType> :
     where TOptionType : OptionEntity<TReferenceType>, new()
 {
 
-    public GlobalRegularOptionsService(IGenericRepository<TOptionType> globalOptionsRepository, IOrganizationalUserContext activeUserContext, IDomainEvents domainEvents) : base(globalOptionsRepository, activeUserContext, domainEvents)
+    public GlobalRegularOptionsService(IGenericRepository<TOptionType> globalOptionsRepository, IOrganizationalUserContext activeUserContext, IDomainEvents domainEvents, ITransactionManager transactionManager) : base(globalOptionsRepository, activeUserContext, domainEvents, transactionManager)
     {}
 
     public Result<IEnumerable<TOptionType>, OperationError> GetGlobalOptions()

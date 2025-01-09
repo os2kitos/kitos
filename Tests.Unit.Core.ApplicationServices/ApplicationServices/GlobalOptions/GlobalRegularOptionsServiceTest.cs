@@ -11,6 +11,7 @@ using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;
+using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -25,12 +26,14 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         private readonly Mock<IGenericRepository<TestOptionEntity>> _globalOptionsRepository;
         private readonly Mock<IOrganizationalUserContext> _activeUserContext;
         private readonly Mock<IDomainEvents> _domainEvents;
+        private readonly Mock<ITransactionManager> _transactionManager;
         public GlobalRegularOptionsServiceTest()
         {
             _globalOptionsRepository = new Mock<IGenericRepository<TestOptionEntity>>();
             _activeUserContext = new Mock<IOrganizationalUserContext>();
             _domainEvents = new Mock<IDomainEvents>();
-            _sut = new GlobalRegularOptionsService<TestOptionEntity, TestReferenceType>(_globalOptionsRepository.Object, _activeUserContext.Object, _domainEvents.Object);
+            _transactionManager = new Mock<ITransactionManager>();
+            _sut = new GlobalRegularOptionsService<TestOptionEntity, TestReferenceType>(_globalOptionsRepository.Object, _activeUserContext.Object, _domainEvents.Object, _transactionManager.Object);
         }
 
         [Fact]
@@ -95,6 +98,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         public void Can_Patch_Option()
         {
             SetupIsGlobalAdmin();
+            ExpectTransactionBegins();
             var optionUuid = A<Guid>();
             var expected = new List<TestOptionEntity>
             {
@@ -224,5 +228,13 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         {
             _activeUserContext.Setup(_ => _.IsGlobalAdmin()).Returns(false);
         }
+
+        private Mock<IDatabaseTransaction> ExpectTransactionBegins()
+        {
+            var transactionMock = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transactionMock.Object);
+            return transactionMock;
+        }
+
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
@@ -10,6 +9,7 @@ using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.GlobalOptions
 {
@@ -19,12 +19,14 @@ namespace Core.ApplicationServices.GlobalOptions
         protected readonly IGenericRepository<TOptionType> _globalOptionsRepository;
         protected readonly IOrganizationalUserContext _activeUserContext;
         protected readonly IDomainEvents _domainEvents;
+        private readonly ITransactionManager _transactionManager;
 
-        protected GlobalOptionsServiceBase(IGenericRepository<TOptionType> globalOptionsRepository, IOrganizationalUserContext activeUserContext, IDomainEvents domainEvents)
+        protected GlobalOptionsServiceBase(IGenericRepository<TOptionType> globalOptionsRepository, IOrganizationalUserContext activeUserContext, IDomainEvents domainEvents, ITransactionManager transactionManager)
         {
             _globalOptionsRepository = globalOptionsRepository;
             _activeUserContext = activeUserContext;
             _domainEvents = domainEvents;
+            _transactionManager = transactionManager;
         }
 
         protected Result<IEnumerable<TOptionType>, OperationError> Get()
@@ -101,39 +103,46 @@ namespace Core.ApplicationServices.GlobalOptions
         protected Result<TOptionType, OperationError> PerformGlobalOptionPriorityUpdates(TOptionType updatedOption,
             GlobalRegularOptionUpdateParameters updateParameters)
         {
-            if (ShouldNotUpdatePriority(updateParameters))
-                return Patch(updatedOption);
-
-            var newPriority = updateParameters.Priority.NewValue.Value;
-            return GetOptionToMove(newPriority).Match(optionToMove =>
+            var transaction = _transactionManager.Begin();
+            var existingPriority = updatedOption.Priority;
+            if (ShouldNotUpdatePriority(updateParameters, existingPriority))
             {
-                var existingPriority = updatedOption.Priority;
-                if (newPriority > existingPriority)
-                {
-                    updatedOption.IncreasePriority();
-                    optionToMove.DecreasePriority();
-                }
-                else
-                {
-                    updatedOption.DecreasePriority();
-                    optionToMove.IncreasePriority();
-                }
-
-                Patch(optionToMove);
                 return Patch(updatedOption);
-            },
-                () => Patch(updatedOption));
+            }
+            var newPriority = updateParameters.Priority.NewValue.Value;
+            if (newPriority > existingPriority)
+            {
+                var optionsThatNeedLowerPriority = GetOptionsWithPriorityInInterval(existingPriority + 1, newPriority);
+                foreach (var optionEntity in optionsThatNeedLowerPriority)
+                {
+                    optionEntity.DecreasePriority();
+                    Patch(optionEntity);
+                }
+            }
+            else
+            {
+                var optionsThatNeedHigherPriority = GetOptionsWithPriorityInInterval(newPriority, existingPriority - 1);
+                foreach (var optionEntity in optionsThatNeedHigherPriority)
+                {
+                    optionEntity.IncreasePriority();
+                    Patch(optionEntity);
+                }
+            }
+            updatedOption.SetPriority(newPriority);
+            transaction.Commit();
+            return Patch(updatedOption);
         }
 
-        private Maybe<TOptionType> GetOptionToMove(int newPriority)
+        private IQueryable<TOptionType> GetOptionsWithPriorityInInterval(int from, int to)
         {
-            return _globalOptionsRepository.AsQueryable().FirstOrDefault(o => o.Priority == newPriority).FromNullable();
+            return _globalOptionsRepository.AsQueryable().Where(p => from <= p.Priority && p.Priority <= to);
         }
 
-        private bool ShouldNotUpdatePriority(GlobalRegularOptionUpdateParameters updateParameters)
+        private static bool ShouldNotUpdatePriority(GlobalRegularOptionUpdateParameters updateParameters, int existingPriority)
         {
-            return !updateParameters.Priority.HasChange 
+            return !updateParameters.Priority.HasChange
                    || !updateParameters.Priority.NewValue.HasValue
+                   || updateParameters.Priority.NewValue.Value == existingPriority
                    || updateParameters.Priority.NewValue.Value < 1;
         }
     }

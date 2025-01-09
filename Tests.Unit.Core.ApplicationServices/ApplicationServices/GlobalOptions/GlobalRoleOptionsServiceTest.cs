@@ -10,6 +10,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Infrastructure.Services.DataAccess;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -26,13 +27,15 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         private readonly Mock<IGenericRepository<TestRoleOptionEntity>> _globalOptionsRepository;
         private readonly Mock<IOrganizationalUserContext> _activeUserContext;
         private readonly Mock<IDomainEvents> _domainEvents;
+        private readonly Mock<ITransactionManager> _transactionManager;
 
         public GlobalRoleOptionsServiceTest()
         {
             _globalOptionsRepository = new Mock<IGenericRepository<TestRoleOptionEntity>>();
             _activeUserContext = new Mock<IOrganizationalUserContext>();
             _domainEvents = new Mock<IDomainEvents>();
-            _sut = new GlobalRoleOptionsService<TestRoleOptionEntity, TestRoleRefType>(_globalOptionsRepository.Object, _activeUserContext.Object, _domainEvents.Object);
+            _transactionManager = new Mock<ITransactionManager>();
+            _sut = new GlobalRoleOptionsService<TestRoleOptionEntity, TestRoleRefType>(_globalOptionsRepository.Object, _activeUserContext.Object, _domainEvents.Object, _transactionManager.Object);
         }
 
         [Fact]
@@ -88,6 +91,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         public void Can_Patch_Option()
         {
             SetupIsGlobalAdmin();
+            ExpectTransactionBegins();
             var optionUuid = A<Guid>();
             SetupRepositoryReturnsOneOption(optionUuid);
             var parameters = A<GlobalRoleOptionUpdateParameters>();
@@ -107,6 +111,7 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         public void Patch_Option_Does_Nothing_If_No_Value_Changes()
         {
             SetupIsGlobalAdmin();
+            ExpectTransactionBegins();
             var optionUuid = A<Guid>();
             var existing = SetupRepositoryReturnsOneOption(optionUuid).FirstOrDefault();
             Assert.NotNull(existing);
@@ -179,6 +184,13 @@ namespace Tests.Unit.Core.ApplicationServices.GlobalOptions
         private void SetupIsNotGlobalAdmin()
         {
             _activeUserContext.Setup(_ => _.IsGlobalAdmin()).Returns(false);
+        }
+
+        private Mock<IDatabaseTransaction> ExpectTransactionBegins()
+        {
+            var transactionMock = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transactionMock.Object);
+            return transactionMock;
         }
     }
 }
