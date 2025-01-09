@@ -103,12 +103,12 @@ namespace Core.ApplicationServices.GlobalOptions
         protected Result<TOptionType, OperationError> PerformGlobalOptionPriorityUpdates(TOptionType updatedOption,
             GlobalRegularOptionUpdateParameters updateParameters)
         {
-            var transaction = _transactionManager.Begin();
             var existingPriority = updatedOption.Priority;
             if (ShouldNotUpdatePriority(updateParameters, existingPriority))
             {
                 return Patch(updatedOption);
             }
+            var transaction = _transactionManager.Begin();
             var newPriority = updateParameters.Priority.NewValue.Value;
             if (newPriority > existingPriority)
             {
