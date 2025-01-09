@@ -182,7 +182,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             //Act
             var result = _sut.SendNotification(orgUuid, userUuid);
 
-            _userServiceMock.Verify(x => x.IssueAdvisMail(user, false, orgId), Times.Once);
+            _userServiceMock.Verify(x => x.IssueAdvisMail(user, false, orgId, true), Times.Once);
             Assert.True(result.IsNone);
         }
 
@@ -497,9 +497,9 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var user = SetupUser();
             ExpectGetUserByEmailReturns(user.Email, user);
 
-            _sut.RequestPasswordReset(user.Email, false);
+            _sut.RequestPasswordReset(user.Email, true);
 
-            _userServiceMock.Verify(x => x.IssuePasswordReset(user, null, null, false), Times.Once());
+            _userServiceMock.Verify(x => x.IssuePasswordReset(user, null, null, true), Times.Once());
         }
 
         [Fact]
@@ -508,7 +508,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var nonExistantMail = "test@mail.dk";
             ExpectGetUserByEmailReturns(nonExistantMail, null);
 
-            _sut.RequestPasswordReset(nonExistantMail, false);
+            _sut.RequestPasswordReset(nonExistantMail, true);
 
             VerifyNoPasswordResetsHasBeenIssued();
         }
@@ -520,7 +520,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             user.Deleted = true; //Make user unable to authenticate
             ExpectGetUserByEmailReturns(user.Email, user);
 
-            _sut.RequestPasswordReset(user.Email, false);
+            _sut.RequestPasswordReset(user.Email, true);
 
             VerifyNoPasswordResetsHasBeenIssued();
         }
@@ -584,7 +584,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
 
         private void ExpectAddUserReturns(User user, bool sendMailOnCreation, int orgId)
         {
-            _userServiceMock.Setup(x => x.AddUser(user, sendMailOnCreation, orgId)).Returns(user);
+            _userServiceMock.Setup(x => x.AddUser(user, sendMailOnCreation, orgId, true)).Returns(user);
         }
         
         private void ExpectAddRoleReturns(OrganizationRole role, int organizationId, int userId, Result<OrganizationRight, OperationFailure> result)

@@ -96,7 +96,7 @@ namespace Core.ApplicationServices
             }
         }
 
-        public User AddUser(User user, bool sendMailOnCreation, int orgId)
+        public User AddUser(User user, bool sendMailOnCreation, int orgId, bool newUI)
         {
             // hash his salt and default password
             var utcNow = DateTime.UtcNow;
@@ -120,12 +120,12 @@ namespace Core.ApplicationServices
             _domainEvents.Raise(new EntityCreatedEvent<User>(savedUser));
 
             if (sendMailOnCreation)
-                IssueAdvisMail(savedUser, false, orgId);
+                IssueAdvisMail(savedUser, false, orgId, newUI);
 
             return savedUser;
         }
 
-        public void UpdateUser(User user, bool? sendMailOnUpdate, int? scopedToOrganizationId)
+        public void UpdateUser(User user, bool? sendMailOnUpdate, int? scopedToOrganizationId, bool newUI)
         {
             _userRepository.Update(user);
 
@@ -133,11 +133,11 @@ namespace Core.ApplicationServices
 
             if (sendMailOnUpdate.HasValue && sendMailOnUpdate.Value && scopedToOrganizationId.HasValue)
             {
-                IssueAdvisMail(user, false, scopedToOrganizationId.Value);
+                IssueAdvisMail(user, false, scopedToOrganizationId.Value, newUI);
             }
         }
 
-        public void IssueAdvisMail(User user, bool reminder, int orgId)
+        public void IssueAdvisMail(User user, bool reminder, int orgId, bool newUI)
         {
             if (user == null || _userRepository.GetByKey(user.Id) == null)
                 throw new ArgumentNullException(nameof(user));
@@ -145,7 +145,7 @@ namespace Core.ApplicationServices
             var org = _orgRepository.GetByKey(orgId);
 
             var reset = GenerateResetRequest(user);
-            var resetLink = _baseUrl + "#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
+            var resetLink = _baseUrl + GetUrlRoute(newUI) + HttpUtility.UrlEncode(reset.Hash);
 
             var subject = (reminder ? "Påmindelse: " : string.Empty) + "Oprettelse som ny bruger i KITOS " + _mailSuffix;
             var content = "<h2>Kære " + user.Name + "</h2>" +

@@ -63,7 +63,7 @@ namespace Core.ApplicationServices.Users.Write
                             using var transaction = _transactionManager.Begin();
 
 
-                            var user = _userService.AddUser(parameters.User, parameters.SendMailOnCreation, organization.Id);
+                            var user = _userService.AddUser(parameters.User, parameters.SendMailOnCreation, organization.Id, true);
 
                             var roleAssignmentError = AssignUserAdministrativeRoles(organization.Id, user.Id, parameters.Roles);
 
@@ -103,7 +103,7 @@ namespace Core.ApplicationServices.Users.Write
             }
 
             var user = updateUserResult.Value;
-            _userService.UpdateUser(user, parameters.SendMailOnUpdate, organization.Id);
+            _userService.UpdateUser(user, parameters.SendMailOnUpdate, organization.Id, true);
             transactionManager.Commit();
             return user;
         }
@@ -121,7 +121,7 @@ namespace Core.ApplicationServices.Users.Write
             {
                 return user.Error;
             }
-            _userService.IssueAdvisMail(user.Value, false, orgIdResult.Value);
+            _userService.IssueAdvisMail(user.Value, false, orgIdResult.Value, true);
             return Maybe<OperationError>.None;
         }
 
@@ -231,7 +231,7 @@ namespace Core.ApplicationServices.Users.Write
                     user =>
                     {
                         transaction.Commit();
-                        _userService.UpdateUser(user, null, null);
+                        _userService.UpdateUser(user, null, null, true);
                         return user;
                     },
                     error =>
