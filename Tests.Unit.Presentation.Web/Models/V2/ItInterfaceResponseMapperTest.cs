@@ -46,7 +46,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                     new() { Data = A<string>(), DataType = new DataType() { Name = A<string>() } }
                 };
                 itInterface.Interface = new InterfaceType() { Name = A<string>() };
-                itInterface.ExhibitedBy = new ItInterfaceExhibit() { ItSystem = new ItSystem() { Name = A<string>() } };
+                itInterface.ExhibitedBy = new ItInterfaceExhibit() { ItSystem = new ItSystem() { Name = A<string>(), BelongsTo = new Organization() { Name = A<string>(), Cvr = A<string>() } } };
                 itInterface.AccessModifier = A<AccessModifier>();
                 itInterface.ObjectOwner = new User() { Name = A<string>(), LastName = A<string>() };
                 itInterface.Created = A<DateTime>();
@@ -73,6 +73,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertIdentityReference(itInterface.Interface, responseDto.ItInterfaceType);
             AssertIdentityReference(itInterface.ExhibitedBy?.ItSystem, responseDto.ExposedBySystem);
             AssertOrganization(itInterface.Organization, responseDto.OrganizationContext);
+            if(!minimumData)
+                AssertOrganization(itInterface.GetRightsHolderOrganization(), responseDto.RightsHolder);
             AssertData(itInterface, responseDto);
 
         }

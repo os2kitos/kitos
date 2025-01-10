@@ -40,5 +40,10 @@ namespace Presentation.Web.Models.API.V2.Response.Interface
         /// </summary>
         [Required]
         public ShallowOrganizationResponseDTO OrganizationContext { get; set; }
+        /// <summary>
+        /// Organization that holds the rights to this it-interface
+        /// </summary>
+        [Required] 
+        public ShallowOrganizationResponseDTO RightsHolder { get; set; }
     }
 }
