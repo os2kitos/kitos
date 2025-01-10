@@ -74,6 +74,16 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(Organization.MaxNameLength)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName", 0);
 
+            Property(x => x.ItSystemCategoriesUuid)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemCategoriesUuid", 0);
+
+            Property(x => x.ItSystemCategoriesId)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemCategoriesId", 0);
+
+            Property(x => x.ItSystemCategoriesName)
+                .HasMaxLength(Organization.MaxNameLength)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemCategoriesName", 0);
+
             Property(x => x.LocalReferenceTitle)
                 .HasMaxLength(ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalReferenceTitle", 0);
@@ -123,6 +133,9 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.HostedAt)
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_HostedAt", 0);
+
+            Property(x => x.UserCount)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_UserCount");
 
             Property(x => x.ActiveAccordingToValidityPeriod)
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ActiveAccordingToValidityPeriod", 0);

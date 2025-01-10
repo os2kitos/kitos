@@ -86,6 +86,7 @@ namespace Core.DomainServices.SystemUsage
             destination.LinkToDirectoryName = source.LinkToDirectoryUrlName;
             destination.LinkToDirectoryUrl = source.LinkToDirectoryUrl;
             destination.HostedAt = source.HostedAt.GetValueOrDefault(HostedAt.UNDECIDED);
+            destination.UserCount = source.UserCount.GetValueOrDefault(UserCount.UNDECIDED);
             destination.LifeCycleStatus = source.LifeCycleStatus;
             destination.SystemPreviousName = source.ItSystem.PreviousName;
 
@@ -93,6 +94,7 @@ namespace Core.DomainServices.SystemUsage
             PatchRoleAssignments(source, destination);
             PatchOrganizationUnits(source, destination);
             PatchItSystemBusinessType(source, destination);
+            PatchItSystemCategories(source, destination);
             PatchItSystemRightsHolder(source, destination);
             PatchKLE(source, destination);
             PatchReference(source, destination);
@@ -408,6 +410,14 @@ namespace Core.DomainServices.SystemUsage
             destination.ItSystemBusinessTypeUuid = source.ItSystem.BusinessType?.Uuid;
             destination.ItSystemBusinessTypeName = GetNameOfItSystemOption(source.ItSystem, source.ItSystem.BusinessType, _businessTypeService);
         }
+        
+        private void PatchItSystemCategories(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.ItSystemCategoriesId = source.ItSystemCategories?.Id;
+            destination.ItSystemCategoriesUuid = source.ItSystemCategories?.Uuid;
+            destination.ItSystemCategoriesName = source.ItSystemCategories?.Name;
+        }
+
         private static void PatchItSystemRightsHolder(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.ItSystemRightsHolderId = source.ItSystem.BelongsTo?.Id;

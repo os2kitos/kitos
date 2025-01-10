@@ -1075,6 +1075,10 @@
     <Compile Include="Migrations\202412021334284_Add_UUID_To_UserNotification.Designer.cs">
       <DependentUpon>202412021334284_Add_UUID_To_UserNotification.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202501091001395_UsageCategoriesAndUserCount.cs" />
+    <Compile Include="Migrations\202501091001395_UsageCategoriesAndUserCount.Designer.cs">
+      <DependentUpon>202501091001395_UsageCategoriesAndUserCount.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
@@ -1117,6 +1121,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202412021334284_Add_UUID_To_UserNotification.resx">
       <DependentUpon>202412021334284_Add_UUID_To_UserNotification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202501091001395_UsageCategoriesAndUserCount.resx">
+      <DependentUpon>202501091001395_UsageCategoriesAndUserCount.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_DataRow.sql" />
     <EmbeddedResource Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.resx">

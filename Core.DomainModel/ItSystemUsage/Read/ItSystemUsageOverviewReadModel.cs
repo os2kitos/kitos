@@ -80,6 +80,9 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string ItSystemBusinessTypeName { get; set; }
         public int? ItSystemRightsHolderId { get; set; }
         public string ItSystemRightsHolderName { get; set; }
+        public int? ItSystemCategoriesId { get; set; }
+        public Guid? ItSystemCategoriesUuid { get; set; }
+        public string ItSystemCategoriesName { get; set; }
         public string ItSystemKLEIdsAsCsv { get; set; }
         public string ItSystemKLENamesAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewTaskRefReadModel> ItSystemTaskRefs { get; set; } // Adding TaskRefs as collection to enable indexed search
@@ -114,6 +117,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public virtual ICollection<ItSystemUsageOverviewDataProcessingRegistrationReadModel> DataProcessingRegistrations { get; set; }
         public string GeneralPurpose { get; set; }
         public HostedAt HostedAt { get; set; }
+        public UserCount UserCount { get; set; }
         public string DependsOnInterfacesNamesAsCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewInterfaceReadModel> DependsOnInterfaces { get; set; }
         public string IncomingRelatedItSystemUsagesNamesAsCsv { get; set; }
