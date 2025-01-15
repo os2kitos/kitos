@@ -141,6 +141,7 @@
     <Compile Include="Queries\QueryByChangedSinceGtEq.cs" />
     <Compile Include="Queries\QueryByEnabledEntitiesOnly.cs" />
     <Compile Include="Queries\QueryByOrganizationUuid.cs" />
+    <Compile Include="Queries\QueryByPublicAccessOrOrganizationUuid.cs" />
     <Compile Include="Queries\QueryByUuid.cs" />
     <Compile Include="Queries\QueryExceptEntitiesWithUuids.cs" />
     <Compile Include="Queries\SystemUsage\QueryByRelationToSystem.cs" />

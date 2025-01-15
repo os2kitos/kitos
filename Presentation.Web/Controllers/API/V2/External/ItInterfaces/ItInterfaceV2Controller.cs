@@ -401,6 +401,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             string interfaceId = null,
             [NonEmptyGuid] Guid? organizationUuid = null,
             CommonOrderByProperty? orderByProperty = null,
+            [NonEmptyGuid] Guid? availableInOrganizationUuid = null,
             [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
@@ -431,6 +432,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
             if (organizationUuid.HasValue)
                 refinements.Add(new QueryByOrganizationUuid<ItInterface>(organizationUuid.Value));
+
+            if (availableInOrganizationUuid.HasValue)
+                refinements.Add(new QueryByPublicAccessOrOrganizationUuid<ItInterface>(availableInOrganizationUuid.Value));
 
             return _itInterfaceService
                 .GetAvailableInterfaces(refinements.ToArray())
