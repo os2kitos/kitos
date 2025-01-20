@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
@@ -113,6 +114,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             var system = await PrepareItSystem(systemName, systemPreviousName, systemDescription, organizationId, organizationName, AccessModifier.Public);
             var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
+            var systemParentUsage = await ItSystemHelper.TakeIntoUseAsync(systemParent.Id, organizationId);
+
             var systemId = DatabaseAccess.GetEntityId<Core.DomainModel.ItSystem.ItSystem>(system.Uuid);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(systemId, organizationId);
 
@@ -316,6 +319,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(systemParent.Id, readModel.ParentItSystemId);
             Assert.Equal(systemParent.Uuid, readModel.ParentItSystemUuid);
             Assert.Equal(systemParentDisabled, readModel.ParentItSystemDisabled);
+            Assert.Equal(systemParentUsage.Uuid, readModel.ParentItSystemUsageUuid);
 
             // Role assignment
             var roleAssignment = Assert.Single(readModel.RoleAssignments);

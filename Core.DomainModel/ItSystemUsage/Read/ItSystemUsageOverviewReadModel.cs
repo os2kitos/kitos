@@ -67,6 +67,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public int? ParentItSystemId { get; set; }
         public Guid? ParentItSystemUuid { get; set; }
         public bool? ParentItSystemDisabled { get; set; }
+        public Guid? ParentItSystemUsageUuid { get; set; }
         public string Version { get; set; }
         public string LocalCallName { get; set; }
         public string LocalSystemId { get; set; }

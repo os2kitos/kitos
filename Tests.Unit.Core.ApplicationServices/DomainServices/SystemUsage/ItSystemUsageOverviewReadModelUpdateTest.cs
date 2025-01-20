@@ -155,11 +155,18 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Name = A<string>(),
                 IsAgreementConcluded = A<YesNoIrrelevantOption>()
             };
+            var organizationId = A<int>();
+            var parentItSystemUsage = new ItSystemUsage()
+            {
+                Uuid = A<Guid>(),
+                OrganizationId = organizationId
+            };
             var parentSystem = new ItSystem
             {
                 Id = A<int>(),
                 Name = A<string>(),
-                Disabled = A<bool>()
+                Disabled = A<bool>(),
+                Usages = new List<ItSystemUsage>(){ parentItSystemUsage },
             };
             var system = new ItSystem
             {
@@ -194,7 +201,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             var systemUsage = new ItSystemUsage
             {
                 Id = A<int>(),
-                OrganizationId = A<int>(),
+                OrganizationId = organizationId,
                 ItSystem = system,
                 ExpirationDate = DateTime.Now.AddDays(-1),
                 Version = A<string>(),
@@ -348,6 +355,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(parentSystem.Name, readModel.ParentItSystemName);
             Assert.Equal(parentSystem.Id, readModel.ParentItSystemId);
             Assert.Equal(parentSystem.Disabled, readModel.ParentItSystemDisabled);
+            Assert.Equal(system.Parent.Usages.FirstOrDefault()!.Uuid, readModel.ParentItSystemUsageUuid);
 
             //Assigned Roles
             var roleAssignment = Assert.Single(readModel.RoleAssignments);
@@ -507,6 +515,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //Assert
             Assert.Null(readModel.ParentItSystemName);
             Assert.Null(readModel.ParentItSystemId);
+            Assert.Null(readModel.ParentItSystemUsageUuid);
         }
 
         [Fact]
