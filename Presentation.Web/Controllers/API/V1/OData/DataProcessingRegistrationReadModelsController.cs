@@ -37,13 +37,13 @@ namespace Presentation.Web.Controllers.API.V1.OData
         {
             return GetOverviewReadModels(organizationId);
         }
-        
+
         /// <summary>
         /// V2 style OData endpoint suited for consumption by clients using UUID's for entity identity
         /// </summary>
         /// <param name="organizationUuid"></param>
         /// <returns></returns>
-        [EnableQuery]
+        [EnableQuery(MaxNodeCount = 300)]
         [SwaggerResponse(HttpStatusCode.OK, type: typeof(ODataListResponse<DataProcessingRegistrationReadModel>))]
         [ODataRoute("DataProcessingRegistrationReadModels")]
         public IHttpActionResult GetByUuid(Guid organizationUuid, Guid? responsibleOrganizationUnitUuid = null)

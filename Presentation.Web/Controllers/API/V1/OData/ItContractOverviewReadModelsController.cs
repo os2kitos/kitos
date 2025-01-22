@@ -40,7 +40,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         /// <param name="organizationUuid"></param>
         /// <param name="responsibleOrganizationUnitUuid"></param>
         /// <returns></returns>
-        [EnableQuery]
+        [EnableQuery(MaxNodeCount = 300)]
         [SwaggerResponse(HttpStatusCode.OK, type: typeof(ODataListResponse<ItContractOverviewReadModel>))]
         [ODataRoute("ItContractOverviewReadModels")]
         public IHttpActionResult GetByUuid(Guid organizationUuid, Guid? responsibleOrganizationUnitUuid = null)
