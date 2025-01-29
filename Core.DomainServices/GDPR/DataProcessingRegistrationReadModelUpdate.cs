@@ -65,6 +65,7 @@ namespace Core.DomainServices.GDPR
             PatchLatestOversightDate(source, destination);
             PatchIsOversightCompleted(source, destination);
             PatchOversightOptions(source, destination);
+            PatchLatestOversightRemark(source, destination);
         }
 
         private void PatchOversightOptions(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -93,7 +94,7 @@ namespace Core.DomainServices.GDPR
         private static void PatchDataProcessors(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.DataProcessorNamesAsCsv = string.Join(", ", source.DataProcessors.Select(x => x.Name));
-            destination.SubDataProcessorNamesAsCsv = string.Join(", ", source.AssignedSubDataProcessors.Select(x=>x.Organization).Select(x => x.Name));
+            destination.SubDataProcessorNamesAsCsv = string.Join(", ", source.AssignedSubDataProcessors.Select(x => x.Organization).Select(x => x.Name));
         }
 
         private static void PatchIsAgreementConcluded(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -213,15 +214,15 @@ namespace Core.DomainServices.GDPR
 
         private static void PatchLatestOversightDate(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            // Only show the lastes oversight date in the overview
-            if (source.OversightDates.Any())
-            {
-                destination.LatestOversightDate = source.OversightDates.OrderByDescending(x => x.OversightDate).Select(x => x.OversightDate).First();
-            }
-            else
-            {
-                destination.LatestOversightDate = null;
-            }
+            var latestOversight = source.GetLatestOversight();
+            destination.LatestOversightDate = latestOversight.Select(x => x.OversightDate).GetValueOrDefault();
+        }
+
+        private static void PatchLatestOversightRemark(DataProcessingRegistration source,
+            DataProcessingRegistrationReadModel destination)
+        {
+            var latestOversight = source.GetLatestOversight();
+            destination.LatestOversightRemark = latestOversight.Select(x => x.OversightRemark).GetValueOrDefault();
         }
 
         private static void PatchLastUpdateBy(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

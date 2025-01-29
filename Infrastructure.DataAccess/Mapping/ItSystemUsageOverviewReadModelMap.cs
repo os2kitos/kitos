@@ -140,6 +140,12 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.UserCount)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_UserCount");
 
+            Property(x => x.DPIAConducted)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_DPIAConducted");
+
+            Property(x => x.IsBusinessCritical)
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_IsBusinessCritical");
+
             Property(x => x.ActiveAccordingToValidityPeriod)
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ActiveAccordingToValidityPeriod", 0);
 

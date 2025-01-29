@@ -331,6 +331,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.PlannedRiskAssessmentDate, readModel.PlannedRiskAssessmentDate);
             Assert.Equal(systemUsage.ItSystem.PreviousName, readModel.SystemPreviousName);
             Assert.Equal(systemUsage.ItSystem.Description, readModel.SystemDescription);
+            Assert.Equal(systemUsage.DPIA, readModel.DPIAConducted);
+            Assert.Equal(systemUsage.isBusinessCritical, readModel.IsBusinessCritical);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);

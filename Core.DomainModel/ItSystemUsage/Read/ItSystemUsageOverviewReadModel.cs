@@ -129,5 +129,9 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public virtual ICollection<ItSystemUsageOverviewRelevantOrgUnitReadModel> RelevantOrganizationUnits { get; set; }
         public string AssociatedContractsNamesCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewItContractReadModel> AssociatedContracts { get; set; }
+
+        public DataOptions? DPIAConducted { get; set; }
+
+        public DataOptions? IsBusinessCritical { get; set; }
     }
 }

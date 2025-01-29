@@ -172,6 +172,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(systemName, readModel.SystemNamesAsCsv);
             Assert.Equal(itSystemDto.Uuid.ToString(), readModel.SystemUuidsAsCsv);
             Assert.Equal(oversightDate, readModel.LatestOversightDate);
+            Assert.Equal(oversightRemark, readModel.LatestOversightRemark);
             Assert.True(readModel.IsActive);
             Assert.True(readModel.ActiveAccordingToMainContract);
 

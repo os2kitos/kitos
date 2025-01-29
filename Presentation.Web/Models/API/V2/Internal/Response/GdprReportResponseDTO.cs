@@ -1,10 +1,7 @@
-﻿using Core.DomainModel.ItSystem.DataTypes;
-using Presentation.Web.Models.API.V2.Types.Shared;
+﻿using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Presentation.Web.Models.API.V2.Internal.Response
 {
@@ -24,10 +21,20 @@ namespace Presentation.Web.Models.API.V2.Internal.Response
         public DateTime? RiskAssessmentDate { get; set; }
         public DateTime? PlannedRiskAssessmentDate { get; set; }
         public RiskLevelChoice? PreRiskAssessment { get; set; } 
+        public string RiskAssessmentNotes { get; set; }
         public bool PersonalDataCpr { get; set; }
         public bool PersonalDataSocialProblems { get; set; }
         public bool PersonalDataSocialOtherPrivateMatters { get; set; }
         public YesNoDontKnowChoice? DPIA { get; set; }
+        public DateTime? DPIADate { get; set; }
         public HostingChoice? HostedAt { get; set; }
+        public string TechnicalSupervisionDocumentationUrlName { get; set; }
+        public string TechnicalSupervisionDocumentationUrl { get; set; }
+        public YesNoDontKnowChoice? UserSupervision { get; set; }
+        public string UserSupervisionDocumentationUrl { get; set; }
+        public string UserSupervisionDocumentationUrlName { get; set; }
+        public DateTime? NextDataRetentionEvaluationDate { get; set; }
+
+        public IEnumerable<string> InsecureCountriesSubjectToDataTransfer { get; set; }
     }
 }

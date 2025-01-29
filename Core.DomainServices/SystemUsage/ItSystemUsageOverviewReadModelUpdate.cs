@@ -89,6 +89,8 @@ namespace Core.DomainServices.SystemUsage
             destination.UserCount = source.UserCount.GetValueOrDefault(UserCount.UNDECIDED);
             destination.LifeCycleStatus = source.LifeCycleStatus;
             destination.SystemPreviousName = source.ItSystem.PreviousName;
+            destination.DPIAConducted = source.DPIA;
+            destination.IsBusinessCritical = source.isBusinessCritical;
 
             PatchParentSystemInformation(source, destination);
             PatchRoleAssignments(source, destination);

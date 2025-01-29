@@ -61,11 +61,20 @@ namespace Presentation.Web.Controllers.API.V2.Internal
                 RiskAssessmentDate = gdprReport.RiskAssessmentDate,
                 PlannedRiskAssessmentDate = gdprReport.PlannedRiskAssessmentDate,
                 PreRiskAssessment = gdprReport.PreRiskAssessment?.ToRiskLevelChoice(),
+                RiskAssessmentNotes = gdprReport.RiskAssessmentNotes,
                 PersonalDataCpr = gdprReport.PersonalDataCpr,
                 PersonalDataSocialProblems = gdprReport.PersonalDataSocialProblems,
                 PersonalDataSocialOtherPrivateMatters = gdprReport.PersonalDataSocialOtherPrivateMatters,
                 DPIA = gdprReport.DPIA?.ToYesNoDontKnowChoice(),
+                DPIADate = gdprReport.DPIADate,
                 HostedAt = gdprReport.HostedAt?.ToHostingChoice(),
+                TechnicalSupervisionDocumentationUrl = gdprReport.TechnicalSupervisionDocumentationUrl,
+                TechnicalSupervisionDocumentationUrlName = gdprReport.TechnicalSupervisionDocumentationUrlName,
+                UserSupervision = gdprReport.UserSupervision?.ToYesNoDontKnowChoice(),
+                UserSupervisionDocumentationUrl = gdprReport.UserSupervisionDocumentationUrl,
+                UserSupervisionDocumentationUrlName = gdprReport.TechnicalSupervisionDocumentationUrlName,
+                NextDataRetentionEvaluationDate = gdprReport.NextDataRetentionEvaluationDate,
+                InsecureCountriesSubjectToDataTransfer = gdprReport.InsecureCountriesSubjectToDataTransfer
             };
         }
     }

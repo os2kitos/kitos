@@ -20,10 +20,21 @@ namespace Core.DomainModel.ItSystemUsage.GDPR
         public DateTime? RiskAssessmentDate { get; set; }
         public DateTime? PlannedRiskAssessmentDate { get; set; }
         public RiskLevel? PreRiskAssessment { get; set; }
+        public string RiskAssessmentNotes { get; set; }
         public bool PersonalDataCpr { get; set; }
         public bool PersonalDataSocialProblems { get; set; }
         public bool PersonalDataSocialOtherPrivateMatters { get; set; }
         public DataOptions? DPIA { get; set; }
+        public DateTime? DPIADate { get; set; }
         public HostedAt? HostedAt { get; set; }
+        public string TechnicalSupervisionDocumentationUrlName { get; set; }
+        public string TechnicalSupervisionDocumentationUrl { get; set; }
+        public DataOptions? UserSupervision { get; set; }
+        public string UserSupervisionDocumentationUrl { get; set; }
+        public string UserSupervisionDocumentationUrlName { get; set; }
+        public DateTime? NextDataRetentionEvaluationDate { get; set; }
+        public IEnumerable<string> InsecureCountriesSubjectToDataTransfer { get; set; }
+
+
     }
 }

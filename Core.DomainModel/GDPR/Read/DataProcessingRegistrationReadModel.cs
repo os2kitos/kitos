@@ -49,6 +49,7 @@ namespace Core.DomainModel.GDPR.Read
         public DateTime? AgreementConcludedAt { get; set; }
 
         public DateTime? LatestOversightDate { get; set; }
+        public string LatestOversightRemark { get; set; }
 
         public string BasisForTransfer{ get; set; }
 
