@@ -73,6 +73,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
             [NonEmptyGuid] Guid? relatedToSystemUuid = null,
             [NonEmptyGuid] Guid? relatedToSystemUsageUuid = null,
             [NonEmptyGuid] Guid? relatedToContractUuid = null,
+            [NonEmptyGuid] Guid? systemUuid = null,
             string systemNameContent = null,
             DateTime? changedSinceGtEq = null,
             CommonOrderByProperty? orderByProperty = null,
@@ -82,7 +83,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _itSystemUsageService
-                .ExecuteItSystemUsagesQuery(organizationUuid, relatedToSystemUuid, relatedToSystemUsageUuid, relatedToContractUuid, null, systemNameContent, changedSinceGtEq, orderByProperty, paginationQuery)
+                .ExecuteItSystemUsagesQuery(organizationUuid, relatedToSystemUuid, relatedToSystemUsageUuid, relatedToContractUuid, systemUuid, systemNameContent, changedSinceGtEq, orderByProperty, paginationQuery)
                 .Select(Map)
                 .Transform(Ok);
         }
