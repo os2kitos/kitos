@@ -17,6 +17,10 @@
         /// <summary>
         /// Unknown in the organization
         /// </summary>
-        Unknown = 3
+        Unknown = 3,
+        /// <summary>
+        /// Data is kept, but selected or all documents are discarded
+        /// </summary>
+        PreserveDataCanDiscardDocuments = 4
     }
 }
