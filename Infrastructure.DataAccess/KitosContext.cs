@@ -166,6 +166,7 @@ namespace Infrastructure.DataAccess
         public DbSet<SubDataProcessor> SubDataProcessors { get; set; }
         public DbSet<ItSystemUsageOverviewRelevantOrgUnitReadModel> ItSystemUsageOverviewRelevantOrgUnitReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewItContractReadModel> ItSystemUsageOverviewItContractReadModels { get; set; }
+        public DbSet<CountryCode> CountryCodes { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -270,6 +271,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ExternalReferenceMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewRelevantOrgUnitReadModelMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewItContractReadModelMap());
+            modelBuilder.Configurations.Add(new CountryCodeMap());
         }
     }
 }

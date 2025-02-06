@@ -1,0 +1,5 @@
+﻿BEGIN
+    UPDATE [UserNotifications]
+    SET Uuid = NEWID()
+    WHERE Uuid = '00000000-0000-0000-0000-000000000000' OR Uuid IS NULL
+END

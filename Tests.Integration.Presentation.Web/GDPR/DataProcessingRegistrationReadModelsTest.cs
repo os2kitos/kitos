@@ -172,6 +172,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(systemName, readModel.SystemNamesAsCsv);
             Assert.Equal(itSystemDto.Uuid.ToString(), readModel.SystemUuidsAsCsv);
             Assert.Equal(oversightDate, readModel.LatestOversightDate);
+            Assert.Equal(oversightRemark, readModel.LatestOversightRemark);
             Assert.True(readModel.IsActive);
             Assert.True(readModel.ActiveAccordingToMainContract);
 
@@ -184,6 +185,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(role.Id, roleAssignment.RoleId);
             Assert.Equal(user.Id, roleAssignment.UserId);
             Assert.Equal(user.Name, roleAssignment.UserFullName);
+            Assert.Equal(user.Email, roleAssignment.Email);
 
             Console.Out.WriteLine("Role data verified");
 

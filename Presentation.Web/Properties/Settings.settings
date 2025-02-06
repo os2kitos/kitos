@@ -48,7 +48,7 @@
       <Value Profile="(Default)">0aa7a193f18d095f7e2ce09d892178c9682b7924</Value>
     </Setting>
     <Setting Name="OrgService6EntityId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://stoettesystemerne.dk/service/organisation/3</Value>
+      <Value Profile="(Default)">http://organisation.eksterntest-stoettesystemerne.dk/service/organisation/3</Value>
     </Setting>
     <Setting Name="StsVirksomhedPort" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://organisation.eksterntest-stoettesystemerne.dk/organisation/virksomhed/6</Value>
@@ -61,6 +61,15 @@
     </Setting>
     <Setting Name="StsOrganisationCertificateThumbprint" Type="System.String" Scope="Application">
       <Value Profile="(Default)">2c34be56b35d993160df525c36146336ea2b2801</Value>
+    </Setting>
+    <Setting Name="StsAdressePort" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://organisation.eksterntest-stoettesystemerne.dk/organisation/adresse/6</Value>
+    </Setting>
+    <Setting Name="StsBrugerPort" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://organisation.eksterntest-stoettesystemerne.dk/organisation/bruger/6</Value>
+    </Setting>
+    <Setting Name="StsPersonPort" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://organisation.eksterntest-stoettesystemerne.dk/organisation/person/6</Value>
     </Setting>
   </Settings>
 </SettingsFile>

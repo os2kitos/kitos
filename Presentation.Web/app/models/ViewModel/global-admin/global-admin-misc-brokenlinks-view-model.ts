@@ -21,7 +21,7 @@
                 available: apiResponse.available,
                 createdDate: BrokenLinksViewModelMapper.mapDate(apiResponse.createdDate),
                 brokenLinksCount: apiResponse.brokenLinksCount,
-                linkToCurrentReport: "api/v1/broken-external-references-report/current/csv"
+                linkToCurrentReport: "api/v2/internal/broken-external-references-report/current/csv"
             };
         }
     }

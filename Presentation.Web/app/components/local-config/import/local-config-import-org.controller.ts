@@ -12,7 +12,7 @@
     app.controller('local-config.import.ImportOrgCtrl', [
         '$scope', '$http', 'notify', 'user', 'featureToggleService',
         function ($scope, $http, notify, user) {
-            $scope.url = 'api/excel?organizationId=' + user.currentOrganizationId + '&exportOrgUnits';
+            $scope.url = 'api/local-admin/excel/units-by-id?organizationId=' + user.currentOrganizationId;
             $scope.title = 'organisationsenheder';
             $scope.currentOrganizationUuid = user.currentOrganizationUuid;
             $scope.showFkOrgSection = true;
@@ -26,7 +26,7 @@
                 if ($scope.file) {
                     formData.append('file', $scope.file, $scope.file.name);
                 }
-                $http.post('/api/excel?organizationId=' + user.currentOrganizationId + '&importOrgUnits', formData, {
+                $http.post('/api/local-admin/excel/units-by-id?organizationId=' + user.currentOrganizationId, formData, {
                     // angular.identity, a bit of Angular magic to parse our FormData object
                     transformRequest: angular.identity,
                     // IMPORTANT!!! You might think this should be set to 'multipart/form-data'

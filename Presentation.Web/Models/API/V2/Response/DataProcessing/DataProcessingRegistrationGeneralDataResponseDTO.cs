@@ -67,5 +67,9 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         /// Defines the master contract for this data processing registration (many contracts can point to a data processing registration but only one can be the master contract)
         /// </summary>
         public IdentityNamePairResponseDTO MainContract { get; set; }
+        /// <summary>
+        /// Defines the associated contracts with this data processing registration
+        /// </summary>
+        public IEnumerable<IdentityNamePairResponseDTO> AssociatedContracts { get; set; }
     }
 }

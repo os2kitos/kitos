@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
+using Core.ApplicationServices.Generic;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
@@ -45,6 +46,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> _roleAssignmentService;
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
         private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
+        private readonly IEntityTreeUuidCollector _entityTreeUuidCollector;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -61,7 +63,8 @@ namespace Core.ApplicationServices.Contract.Write
             IItSystemUsageService usageService,
             IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> roleAssignmentService,
             IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
-            IGenericRepository<EconomyStream> economyStreamRepository)
+            IGenericRepository<EconomyStream> economyStreamRepository,
+            IEntityTreeUuidCollector entityTreeUuidCollector)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -78,6 +81,7 @@ namespace Core.ApplicationServices.Contract.Write
             _roleAssignmentService = roleAssignmentService;
             _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
             _economyStreamRepository = economyStreamRepository;
+            _entityTreeUuidCollector = entityTreeUuidCollector;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -131,6 +135,80 @@ namespace Core.ApplicationServices.Contract.Write
             }
 
             return updateResult;
+        }
+
+        public Maybe<OperationError> Delete(Guid itContractUuid)
+        {
+            var dbId = _entityIdentityResolver.ResolveDbId<ItContract>(itContractUuid);
+
+            if (dbId.IsNone)
+                return new OperationError("Invalid contract uuid", OperationFailure.NotFound);
+
+            return _contractService
+                .Delete(dbId.Value)
+                .Match(_ => Maybe<OperationError>.None, failure => new OperationError("Failed deleting contract", failure));
+        }
+
+        public Result<ExternalReference, OperationError> AddExternalReference(Guid contractUuid, ExternalReferenceProperties externalReferenceProperties)
+        {
+            return GetContractAndAuthorizeAccess(contractUuid)
+                .Bind(usage => _referenceService.AddReference(usage.Id, ReferenceRootType.Contract, externalReferenceProperties));
+        }
+
+        public Result<ExternalReference, OperationError> UpdateExternalReference(Guid contractUuid, Guid externalReferenceUuid,
+            ExternalReferenceProperties externalReferenceProperties)
+        {
+            return GetContractAndAuthorizeAccess(contractUuid)
+                .Bind(usage => _referenceService.UpdateReference(usage.Id, ReferenceRootType.Contract, externalReferenceUuid, externalReferenceProperties));
+        }
+
+        public Result<ExternalReference, OperationError> DeleteExternalReference(Guid contractUuid, Guid externalReferenceUuid)
+        {
+            return GetContractAndAuthorizeAccess(contractUuid)
+                .Bind(_ =>
+                {
+                    var getIdResult = _entityIdentityResolver.ResolveDbId<ExternalReference>(externalReferenceUuid);
+                    if (getIdResult.IsNone)
+                        return new OperationError($"ExternalReference with uuid: {externalReferenceUuid} was not found", OperationFailure.NotFound);
+                    var externalReferenceId = getIdResult.Value;
+
+                    return _referenceService.DeleteByReferenceId(externalReferenceId)
+                        .Match(Result<ExternalReference, OperationError>.Success,
+                            operationFailure =>
+                                new OperationError($"Failed to remove the ExternalReference with uuid: {externalReferenceUuid}", operationFailure));
+                });
+        }
+
+        public Result<ItContract, OperationError> AddRole(Guid contractUuid, UserRolePair assignment)
+        {
+            return _contractService
+                .GetContract(contractUuid)
+                .Select(ExtractAssignedRoles)
+                .Bind<ItContractModificationParameters>(existingRoles =>
+                {
+                    if (existingRoles.Contains(assignment))
+                    {
+                        return new OperationError("Role assignment exists", OperationFailure.Conflict);
+                    }
+                    return CreateRoleAssignmentUpdate(existingRoles.Append(assignment));
+                })
+                .Bind(update => Update(contractUuid, update));
+        }
+
+        public Result<ItContract, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair assignment)
+        {
+            return _contractService
+                .GetContract(systemUsageUuid)
+                .Select(ExtractAssignedRoles)
+                .Bind<ItContractModificationParameters>(existingRoles =>
+                {
+                    if (!existingRoles.Contains(assignment))
+                    {
+                        return new OperationError("Assignment does not exist", OperationFailure.BadInput);
+                    }
+                    return CreateRoleAssignmentUpdate(existingRoles.Except(assignment.WrapAsEnumerable()));
+                })
+                .Bind(update => Update(systemUsageUuid, update));
         }
 
         private Result<ItContract, OperationError> WithWriteAccess(ItContract contract)
@@ -431,12 +509,12 @@ namespace Core.ApplicationServices.Contract.Write
                     return new OperationError($"Failed resolving agreement element with uuid:{uuid}. Message:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
                 }
 
-                var resultValue = result.Value;
-                if (resultValue.available == false && contract.AssociatedAgreementElementTypes.Any(x => x.AgreementElementType.Uuid == uuid) == false)
+                var (option, available) = result.Value;
+                if (available == false && contract.AssociatedAgreementElementTypes.Any(x => x.AgreementElementType.Uuid == uuid) == false)
                 {
                     return new OperationError($"Tried to add agreement element which is not available in the organization: {uuid}", OperationFailure.BadInput);
                 }
-                agreementElementTypes.Add(resultValue.option);
+                agreementElementTypes.Add(option);
             }
 
             var before = contract.AssociatedAgreementElementTypes.ToList();
@@ -540,6 +618,12 @@ namespace Core.ApplicationServices.Contract.Write
                 return Maybe<OperationError>.None;
             }
 
+            var contractAndChildrenUuids = _entityTreeUuidCollector.CollectSelfAndDescendantUuids(contract);
+            if (contractAndChildrenUuids.Contains(newParentUuid))
+            {
+                return new OperationError($"Failed to set parent with Uuid: {newParentUuid.Value} because it is identical to or a descendant of contract with Uuid: {contract.Uuid}", OperationFailure.BadInput);
+            }
+
             var getResult = _contractService.GetContract(newParentUuid.Value);
 
             if (getResult.Failed)
@@ -576,16 +660,24 @@ namespace Core.ApplicationServices.Contract.Write
             );
         }
 
-        public Maybe<OperationError> Delete(Guid itContractUuid)
+        private Result<ItContract, OperationError> GetContractAndAuthorizeAccess(Guid contractUuid)
         {
-            var dbId = _entityIdentityResolver.ResolveDbId<ItContract>(itContractUuid);
-
-            if (dbId.IsNone)
-                return new OperationError("Invalid contract uuid", OperationFailure.NotFound);
-
             return _contractService
-                .Delete(dbId.Value)
-                .Match(_ => Maybe<OperationError>.None, failure => new OperationError("Failed deleting contract", failure));
+                .GetContract(contractUuid)
+                .Bind(WithWriteAccess);
+        }
+
+        private static IReadOnlyList<UserRolePair> ExtractAssignedRoles(ItContract contract)
+        {
+            return contract.Rights.Select(right => new UserRolePair(right.User.Uuid, right.Role.Uuid)).ToList();
+        }
+
+        private static ItContractModificationParameters CreateRoleAssignmentUpdate(IEnumerable<UserRolePair> existingRoles)
+        {
+            return new ItContractModificationParameters
+            {
+                Roles = existingRoles.FromNullable()
+            };
         }
     }
 }

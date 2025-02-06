@@ -12,13 +12,13 @@ namespace Tests.Unit.Core.DomainServices.Repositories
 {
     public class OrganizationRepositoryTest : WithAutoFixture
     {
-        private readonly Mock<IGenericRepository<Organization>> _repository;
+        private readonly Mock<IGenericRepository<Organization>> _genericRepository;
         private readonly OrganizationRepository _sut;
 
         public OrganizationRepositoryTest()
         {
-            _repository = new Mock<IGenericRepository<Organization>>();
-            _sut = new OrganizationRepository(_repository.Object);
+            _genericRepository = new Mock<IGenericRepository<Organization>>();
+            _sut = new OrganizationRepository(_genericRepository.Object);
         }
 
         [Fact]
@@ -53,9 +53,21 @@ namespace Tests.Unit.Core.DomainServices.Repositories
             Assert.False(result.HasValue);
         }
 
+        [Fact]
+        public void UpdateCallsGenericRepositoryWithArg()
+        {
+            var organization = CreateOrganization();
+
+            _sut.Update(organization);
+
+            _genericRepository.Verify(_ => _.Update(organization));
+            _genericRepository.Verify(_ => _.Save());
+
+        }
+
         private void ExpectRepositoryContent(params Organization[] response)
         {
-            _repository.Setup(x => x.AsQueryable()).Returns(response.AsQueryable());
+            _genericRepository.Setup(x => x.AsQueryable()).Returns(response.AsQueryable());
         }
 
         private Organization CreateOrganization(string cvr = null)

@@ -705,7 +705,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "Cannot ADD KLE which is already present in the system context", transactionMock);
+            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "Cannot Add KLE which is already present in the system context", transactionMock);
 
         }
 

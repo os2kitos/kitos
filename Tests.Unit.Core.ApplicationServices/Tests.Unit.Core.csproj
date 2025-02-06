@@ -193,18 +193,23 @@
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\Contract\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\Generic\Write\AssignmentUpdateServiceTest.cs" />
+    <Compile Include="ApplicationServices\GlobalOptions\GlobalRegularOptionsServiceTest.cs" />
+    <Compile Include="ApplicationServices\GlobalOptions\GlobalRoleOptionsServiceTest.cs" />
     <Compile Include="ApplicationServices\Handlers\AuthorizedUpdateOrganizationFromFKOrganisationCommandHandlerTest.cs" />
     <Compile Include="ApplicationServices\Handlers\RemoveUserFromKitosCommandHandler.cs" />
     <Compile Include="ApplicationServices\Handlers\ReportPendingFkOrganizationChangesToStakeHoldersHandlerTest.cs" />
     <Compile Include="ApplicationServices\Handlers\SendEmailToStakeholdersOnExternalOrganizationConnectionUpdatedHandlerTest.cs" />
+    <Compile Include="ApplicationServices\HelpTexts\HelpTextApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\Interface\ItInterfaceWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
+    <Compile Include="ApplicationServices\LocalOptions\GenericLocalOptionsServiceTest.cs" />
     <Compile Include="ApplicationServices\Messages\PublicMessagesServiceTest.cs" />
     <Compile Include="ApplicationServices\Notification\NotificationServiceTest.cs" />
     <Compile Include="ApplicationServices\Notification\RegistrationNotificationServiceTest.cs" />
     <Compile Include="ApplicationServices\Notification\RegistrationNotificationUserRelationsServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\OrganizationUnitServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\OrganizationTest.cs" />
+    <Compile Include="ApplicationServices\Organizations\OrganizationUnitWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\Organizations\StsOrganizationSynchronizationServiceTest.cs" />
     <Compile Include="ApplicationServices\ItSystems\ItSystemWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageMigrationServiceAdapterTest.cs" />
@@ -224,12 +229,14 @@
     <Compile Include="ApplicationServices\RightsHolders\RightsHolderSystemServiceTest.cs" />
     <Compile Include="ApplicationServices\OptionTypes\OptionsApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageWriteServiceTest.cs" />
-    <Compile Include="ApplicationServices\UIModuleCustomizationTest\UIModuleCustomizationTests.cs" />
+    <Compile Include="ApplicationServices\UIModuleCustomization\UIModuleCustomizationServiceTest.cs" />
     <Compile Include="ApplicationServices\UserRightsServiceTest.cs" />
-    <Compile Include="ApplicationServices\UserServiceTest.cs" />
+    <Compile Include="ApplicationServices\Users\UserServiceTest.cs" />
+    <Compile Include="ApplicationServices\Users\UserWriteServiceTest.cs" />
     <Compile Include="BackgroundJobs\ScheduleFkOrgUpdatesBackgroundJobTest.cs" />
     <Compile Include="BackgroundJobs\ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveStateTest.cs" />
     <Compile Include="DomainServices\Contract\ItContractOverviewReadModelUpdateTest.cs" />
+    <Compile Include="DomainServices\HelpTextServiceTest.cs" />
     <Compile Include="DomainServices\Notification\UserNotificationServiceTest.cs" />
     <Compile Include="DomainServices\Contract\ContractDataProcessingRegistrationAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandlerTest.cs" />
@@ -322,10 +329,6 @@
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Soap\Infrastructure.STS.SSO.csproj">
-      <Project>{a05389ea-25f4-45b5-8534-0775d9671456}</Project>
-      <Name>Infrastructure.STS.SSO</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.STS.Common\Infrastructure.STS.Common.csproj">
       <Project>{423D7522-4882-4438-94F4-7B3F5778C83F}</Project>
       <Name>Infrastructure.STS.Common</Name>
@@ -333,6 +336,10 @@
     <ProjectReference Include="..\Infrastructure.STS.Organization\Infrastructure.STS.Organization.csproj">
       <Project>{3DC91665-93BB-442D-B186-7E90C7CD6E32}</Project>
       <Name>Infrastructure.STS.Organization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Presentation.Web\Presentation.Web.csproj">
+      <Project>{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}</Project>
+      <Name>Presentation.Web</Name>
     </ProjectReference>
     <ProjectReference Include="..\Tests.Toolkit\Tests.Toolkit.csproj">
       <Project>{43199485-65c5-4bff-88b2-b594d5b58146}</Project>

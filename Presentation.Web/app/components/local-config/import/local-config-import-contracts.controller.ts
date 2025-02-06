@@ -12,7 +12,7 @@
     app.controller('local-config.import.ImportContractCtrl', [
         '$rootScope', '$scope', '$http', 'notify', 'user',
         function ($rootScope, $scope, $http, notify, user) {
-            $scope.url = 'api/excel?organizationId=' + user.currentOrganizationId + '&exportContracts';
+            $scope.url = 'api/local-admin/excel/contracts-by-id?organizationId=' + user.currentOrganizationId;
             $scope.title = 'IT Kontrakter';
 
             $scope.submit = function () {
@@ -25,7 +25,7 @@
                     formData.append('file', $scope.file, $scope.file.name);
                 }
 
-                $http.post('/api/excel?organizationId=' + user.currentOrganizationId + '&importContracts', formData, {
+                $http.post('/api/local-admin/excel/contracts-by-id?organizationId=' + user.currentOrganizationId, formData, {
                     // angular.identity, a bit of Angular magic to parse our FormData object
                     transformRequest: angular.identity,
                     // IMPORTANT!!! You might think this should be set to 'multipart/form-data'

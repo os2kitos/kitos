@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -6,7 +7,9 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Mapping;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.SystemUsage;
@@ -19,17 +22,20 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IItSystemUsageAttachedOptionRepository _itSystemUsageAttachedOptionRepository;
         private readonly ISensitivePersonalDataTypeRepository _sensitivePersonalDataTypeRepository;
+        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
         public GDPRExportService(
             IItSystemUsageRepository systemUsageRepository,
             IAuthorizationContext authorizationContext,
             IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
-            ISensitivePersonalDataTypeRepository sensitivePersonalDataTypeRepository)
+            ISensitivePersonalDataTypeRepository sensitivePersonalDataTypeRepository,
+            IEntityIdentityResolver entityIdentityResolver)
         {
             _systemUsageRepository = systemUsageRepository;
             _authorizationContext = authorizationContext;
             _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _sensitivePersonalDataTypeRepository = sensitivePersonalDataTypeRepository;
+            _entityIdentityResolver = entityIdentityResolver;
         }
 
         public Result<IEnumerable<GDPRExportReport>, OperationError> GetGDPRData(int organizationId)
@@ -46,6 +52,12 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
                 .ToList();
 
             return Result<IEnumerable<GDPRExportReport>, OperationError>.Success(gdpExportReports);
+        }
+
+        public Result<IEnumerable<GDPRExportReport>, OperationError> GetGDPRDataByUuid(Guid organizationUuid)
+        {
+            return _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid)
+                .Match(GetGDPRData, () => new OperationError($"Could not find organization with UUID: {organizationUuid}", OperationFailure.NotFound));
         }
 
         private GDPRExportReport Map(ItSystemUsage input,
@@ -72,9 +84,26 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
                 RiskAssessment = input.riskAssessment,
                 RiskAssessmentDate = input.riskAssesmentDate,
                 PlannedRiskAssessmentDate = input.PlannedRiskAssessmentDate,
+                RiskAssessmentNotes = input.noteRisks,
                 SystemName = input.MapItSystemName(),
-                SensitiveDataTypes = hasSensitiveData ? GetSensitiveDataTypes(input.Id, attachedOptions, sensitivePersonalDataTypes) : new List<string>()
+                SensitiveDataTypes = hasSensitiveData ? GetSensitiveDataTypes(input.Id, attachedOptions, sensitivePersonalDataTypes) : new List<string>(),
+                DPIADate = input.DPIADateFor,
+                TechnicalSupervisionDocumentationUrl = input.TechnicalSupervisionDocumentationUrl,
+                TechnicalSupervisionDocumentationUrlName = input.TechnicalSupervisionDocumentationUrlName,
+                UserSupervision = input.UserSupervision,
+                UserSupervisionDocumentationUrl = input.UserSupervisionDocumentationUrl,
+                UserSupervisionDocumentationUrlName = input.UserSupervisionDocumentationUrlName,
+                NextDataRetentionEvaluationDate = input.DPIAdeleteDate,
+                InsecureCountriesSubjectToDataTransfer = GetInsecureCountriesSubjectToDataTransfer(input).ToList()
             };
+        }
+
+        private static IEnumerable<string> GetInsecureCountriesSubjectToDataTransfer(ItSystemUsage input)
+        {
+            return input.AssociatedDataProcessingRegistrations
+                        .SelectMany(dpr => dpr.InsecureCountriesSubjectToDataTransfer)
+                        .Select(x => x.Name)
+                        .Distinct();
         }
 
         private IEnumerable<string> GetSensitiveDataTypes(

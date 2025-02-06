@@ -292,6 +292,43 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Fact]
+        public async Task Can_GET_All_Dprs_With_NameContentFiltering()
+        {
+            //Arrange
+            var content = $"CONTENT_{A<Guid>()}";
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var dpr1 = await CreateDPRAsync(organization.Id, $"{content}ONE");
+            var dpr2 = await CreateDPRAsync(organization.Id, $"TWO{content}");
+            await CreateDPRAsync(organization.Id);
+
+            //Act
+            var dprs = (await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, nameContains: content)).ToList();
+
+            //Assert
+            Assert.Equal(2, dprs.Count);
+            AssertExpectedShallowDPRs(dpr1, organization, dprs);
+            AssertExpectedShallowDPRs(dpr2, organization, dprs);
+        }
+
+        [Fact]
+        public async Task Can_GET_Dprs_With_NameEqualsFiltering()
+        {
+            //Arrange
+            var fullName = $"CONTENT_{A<Guid>()}";
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            await CreateDPRAsync(organization.Id, $"{fullName}ONE");
+            await CreateDPRAsync(organization.Id, $"TWO{fullName}");
+            var dpr3 = await CreateDPRAsync(organization.Id, fullName);
+
+            //Act
+            var contracts = (await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, nameEquals: fullName)).ToList();
+
+            //Assert
+            Assert.Single(contracts);
+            AssertExpectedShallowDPRs(dpr3, organization, contracts);
+        }
+
+        [Fact]
         public async Task Cannot_Get_All_Dprs_If_Empty_Guid_Used_For_Filtering()
         {
             //Arrange
@@ -609,6 +646,9 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             updatedDpr = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, registration.Uuid);
             Assert.Equal(contract2.Uuid, updatedDpr.General.MainContract.Uuid);
             Assert.Equal(contract2.Name, updatedDpr.General.MainContract.Name);
+            Assert.Equal(2, updatedDpr.General.AssociatedContracts.Count());
+            Assert.Contains(updatedDpr.General.AssociatedContracts, x => x.Uuid == contract1.Uuid);
+            Assert.Contains(updatedDpr.General.AssociatedContracts, x => x.Uuid == contract2.Uuid);
             Assert.False(updatedDpr.General.Valid);
 
             //Act - set contract to null
@@ -1206,6 +1246,218 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertExternalReferenceResults(referencesRequest3, dto3);
         }
 
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.User, true, false, false)]
+        public async Task Can_Get_DataProcessingRegistration_Permissions(OrganizationRole role, bool read, bool modify, bool delete)
+        {
+            //Arrange
+            var org = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUserAsync(org);
+
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
+
+            var dpr = await DataProcessingRegistrationHelper.CreateAsync(org.Id, A<string>());
+
+            //Act
+            var permissionsResponseDto = await DataProcessingRegistrationV2Helper.GetPermissionsAsync(token, dpr.Uuid);
+
+            //Assert
+            var expected = new DataProcessingRegistrationPermissionsResponseDTO()
+            {
+                Read = read,
+                Modify = modify,
+                Delete = delete
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.User, false)]
+        public async Task Can_Get_DataProcessingRegistration_CollectionPermissions(OrganizationRole role, bool create)
+        {
+            //Arrange
+            var org = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUserAsync(org);
+
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
+
+            //Act
+            var permissionsResponseDto = await DataProcessingRegistrationV2Helper.GetCollectionPermissionsAsync(token, org.Uuid);
+
+            //Assert
+            var expected = new ResourceCollectionPermissionsResponseDTO
+            {
+                Create = create
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+
+        [Fact]
+        public async Task Can_PATCH_Add_RoleAssignment()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUserAsync(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var (roles, users) = await CreateRoles(organization);
+            var createdDpr = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+
+            var assignment1 = roles.First();
+            var assignment2 = roles.Last();
+
+            //Act
+            using var assignmentResponse1 = await DataProcessingRegistrationV2Helper.SendPatchAddRoleAssignment(createdDpr.Uuid, assignment1);
+            using var duplicateAssignment1 = await DataProcessingRegistrationV2Helper.SendPatchAddRoleAssignment(createdDpr.Uuid, assignment1);
+            using var assignmentResponse2 = await DataProcessingRegistrationV2Helper.SendPatchAddRoleAssignment(createdDpr.Uuid, assignment2);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, duplicateAssignment1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, assignmentResponse1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, assignmentResponse2.StatusCode);
+            var updatedDTO = await assignmentResponse2.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
+            var rolesDTO = updatedDTO.Roles.ToList();
+            Assert.Equal(2, rolesDTO.Count);
+            Assert.Contains(rolesDTO, r => MatchExpectedAssignment(r, assignment1, users.First()));
+            Assert.Contains(rolesDTO, r => MatchExpectedAssignment(r, assignment2, users.Last()));
+        }
+
+        [Fact]
+        public async Task Can_PATCH_Remove_RoleAssignment()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUserAsync(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var (roles, users) = await CreateRoles(organization);
+            var createdDpr = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                Roles = roles
+            });
+
+            var assignment1 = roles.First();
+            var assignment2 = roles.Last();
+
+            //Act
+            using var assignment1Response = await DataProcessingRegistrationV2Helper.SendPatchAddRoleAssignment(createdDpr.Uuid, assignment1);
+            using var assignment2Response = await DataProcessingRegistrationV2Helper.SendPatchAddRoleAssignment(createdDpr.Uuid, assignment2);
+            using var removeAssignment = await DataProcessingRegistrationV2Helper.SendPatchRemoveRoleAssignment(createdDpr.Uuid, assignment1);
+            using var duplicateRemoveAssignment = await DataProcessingRegistrationV2Helper.SendPatchRemoveRoleAssignment(createdDpr.Uuid, assignment1);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, duplicateRemoveAssignment.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, removeAssignment.StatusCode);
+            var updatedDTO = await removeAssignment.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
+            var roleAssignment = Assert.Single(updatedDTO.Roles);
+            MatchExpectedAssignment(roleAssignment, assignment2, users.Last());
+        }
+
+        [Fact]
+        public async Task Can_Get_Available_DataProcessors()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, "87654321", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            //Act
+            var processors = await DataProcessingRegistrationV2Helper.GetAvailableDataProcessors(registration.Uuid, orgPrefix);
+
+            //Assert
+            Assert.Contains(processors, x => x.Uuid == organization.Uuid);
+        }
+
+
+        [Fact]
+        public async Task Can_Get_Available_DataProcessors_By_Cvr()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var orgCvr = A<string>().Substring(0, 9);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, orgCvr, OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            //Act
+            var processors = await DataProcessingRegistrationV2Helper.GetAvailableDataProcessors(registration.Uuid, orgCvr);
+
+            //Assert
+            Assert.Contains(processors, x => x.Uuid == organization.Uuid);
+        }
+
+        [Fact]
+        public async Task Can_Get_Available_SubDataProcessors()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, "87654321", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            //Act
+            var processors = await DataProcessingRegistrationV2Helper.GetAvailableSubDataProcessors(registration.Uuid, orgPrefix);
+
+            //Assert
+            Assert.Contains(processors, x => x.Uuid == organization.Uuid);
+        }
+
+        [Fact]
+        public async Task Can_Get_Available_SubDataProcessors_By_Cvr()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var orgCvr = A<string>().Substring(0, 9);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, orgCvr, OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            //Act
+            var processors = await DataProcessingRegistrationV2Helper.GetAvailableSubDataProcessors(registration.Uuid, orgCvr);
+
+            //Assert
+            Assert.Contains(processors, x => x.Uuid == organization.Uuid);
+        }
+
+        [Fact]
+        public async Task Can_Get_Available_Systems()
+        {
+            //Arrange
+            var systemPrefix = A<Guid>().ToString("N");
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var system1Name = $"{systemPrefix}{1}";
+            var system2Name = $"{systemPrefix}{2}";
+            var filteredOutSystemName = A<string>();
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(system1Name, organizationId, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(system2Name, organizationId, AccessModifier.Public);
+            var filteredOutSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(filteredOutSystemName, organizationId, AccessModifier.Public);
+            var usage1 = await ItSystemHelper.TakeIntoUseAsync(system1.Id, organizationId);
+            var usage2 = await ItSystemHelper.TakeIntoUseAsync(system2.Id, organizationId);
+            await ItSystemHelper.TakeIntoUseAsync(filteredOutSystem.Id, organizationId);
+
+            //Act
+            var dtos = (await DataProcessingRegistrationV2Helper.GetAvailableSystemsAsync(registration.Uuid, systemPrefix)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            dtos.Select(x => new { x.Uuid, x.Name }).ToExpectedObject().ShouldMatch(new[] { new { usage1.Uuid, system1.Name }, new { usage2.Uuid, system2.Name } });
+        }
+
         #region Asserters
 
         private static void AssertExternalReferenceResults(List<ExternalReferenceDataWriteRequestDTO> expected, DataProcessingRegistrationResponseDTO actual)
@@ -1348,6 +1600,13 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             }
         }
 
+        private static bool MatchExpectedAssignment(RoleAssignmentResponseDTO assignment, RoleAssignmentRequestDTO expectedRole, User expectedUser)
+        {
+            return assignment.Role.Uuid == expectedRole.RoleUuid &&
+                   assignment.User.Name == expectedUser.GetFullName() &&
+                   assignment.User.Uuid == expectedUser.Uuid;
+        }
+
         #endregion
 
         #region Creaters
@@ -1487,9 +1746,9 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             return (dataResponsible, basisForTransfer, inputDTO);
         }
 
-        private async Task<DataProcessingRegistrationDTO> CreateDPRAsync(int orgId)
+        private async Task<DataProcessingRegistrationDTO> CreateDPRAsync(int orgId, string name = null)
         {
-            return await DataProcessingRegistrationHelper.CreateAsync(orgId, CreateName());
+            return await DataProcessingRegistrationHelper.CreateAsync(orgId, name ?? CreateName());
         }
 
         private async Task<(string token, User user, OrganizationDTO organization)> CreatePrerequisitesAsync()
@@ -1539,6 +1798,29 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         private string CreateEmail()
         {
             return $"{A<string>()}{DateTime.Now.Ticks}@kitos.dk";
+        }
+        
+        private async Task<(List<RoleAssignmentRequestDTO>, List<User>)> CreateRoles(OrganizationDTO organization)
+        {
+            var (user1, _) = await CreateApiUserAsync(organization);
+            var (user2, _) = await CreateApiUserAsync(organization);
+            var dprRoles = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationRoles, organization.Uuid, 10, 0)).RandomItems(2).ToList();
+            var role1 = dprRoles.First();
+            var role2 = dprRoles.Last();
+            var roles = new List<RoleAssignmentRequestDTO>
+            {
+                new()
+                {
+                    RoleUuid = role1.Uuid,
+                    UserUuid = user1.Uuid
+                },
+                new()
+                {
+                    RoleUuid = role2.Uuid,
+                    UserUuid = user2.Uuid
+                }
+            };
+            return (roles, new List<User> { user1, user2 });
         }
 
         #endregion

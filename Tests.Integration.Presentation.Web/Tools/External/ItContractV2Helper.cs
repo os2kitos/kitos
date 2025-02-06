@@ -8,22 +8,26 @@ using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
+using Core.DomainModel.Organization;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
+using Presentation.Web.Models.API.V2.Response.Shared;
+using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public static class ItContractV2Helper
     {
-        public static async Task<IEnumerable<ItContractResponseDTO>> GetItContractsAsync(string token, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, Guid? responsibleOrgUnitUuid = null, Guid? supplierUuid = null, string nameContent = null, DateTime? changedSinceGtEq = null, int page = 0, int pageSize = 10)
+        public static async Task<IEnumerable<ItContractResponseDTO>> GetItContractsAsync(string token, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, Guid? responsibleOrgUnitUuid = null, Guid? supplierUuid = null, string nameContent = null, string nameEquals = null, DateTime? changedSinceGtEq = null, int page = 0, int pageSize = 10)
         {
-            using var response = await SendGetItContractsAsync(token, organizationUuid, systemUuid, systemUsageUuid, dataProcessingRegistrationUuid, responsibleOrgUnitUuid, supplierUuid, nameContent, changedSinceGtEq, page, pageSize);
+            using var response = await SendGetItContractsAsync(token, organizationUuid, systemUuid, systemUsageUuid, dataProcessingRegistrationUuid, responsibleOrgUnitUuid, supplierUuid, nameContent, nameEquals, changedSinceGtEq, page, pageSize);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItContractResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetItContractsAsync(string token, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, Guid? responsibleOrgUnitUuid = null, Guid? supplierUuid = null, string nameContent = null, DateTime? changedSinceGtEq = null, int page = 0, int pageSize = 10)
+        public static async Task<HttpResponseMessage> SendGetItContractsAsync(string token, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, Guid? responsibleOrgUnitUuid = null, Guid? supplierUuid = null, string nameContent = null, string nameEquals = null, DateTime? changedSinceGtEq = null, int page = 0, int pageSize = 10)
         {
             var queryParameters = new List<KeyValuePair<string, string>>()
             {
@@ -51,6 +55,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (nameContent != null)
                 queryParameters.Add(new KeyValuePair<string, string>("nameContent", nameContent));
+
+            if (nameEquals != null)
+                queryParameters.Add(new KeyValuePair<string, string>("nameEquals", nameEquals));
 
             if (changedSinceGtEq.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("changedSinceGtEq", changedSinceGtEq.Value.ToString("O")));
@@ -151,6 +158,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.Termination), dto));
         }
 
+        public static async Task<HttpResponseMessage> SendPatchParentContractAsync(string token, Guid contractUuid, Guid parentGuid)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.ParentContractUuid), parentGuid));
+        }
+
         private static Dictionary<string, object> CreatePatchPayload(string propertyName, object dto)
         {
             return dto.AsPatchPayloadOfProperty(propertyName);
@@ -165,6 +177,85 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             using var response = await SendDeleteContractAsync(token, contractUuid);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetAvailableDataProcessingRegistrationsAsync(Guid uuid, string nameQuery, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{uuid}/data-processing-registrations?nameQuery={nameQuery}"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
+        }
+
+        public static async Task<IEnumerable<RegistrationHierarchyNodeResponseDTO>> GetHierarchyAsync(Guid uuid, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var path = $"api/v2/internal/it-contracts/{uuid}/hierarchy";
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl(path), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<RegistrationHierarchyNodeResponseDTO>>();
+        }
+
+        public static async Task<ItContractPermissionsResponseDTO> GetPermissionsAsync(string token, Guid uuid)
+        {
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{uuid:D}/permissions"), token);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ItContractPermissionsResponseDTO>();
+        }
+
+        public static async Task<ResourceCollectionPermissionsResponseDTO> GetCollectionPermissionsAsync(string token, Guid organizationUuid)
+        {
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/permissions?organizationUuid={organizationUuid:D}"), token);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ResourceCollectionPermissionsResponseDTO>();
+        }
+
+        public static async Task<ExternalReferenceDataResponseDTO> AddExternalReferenceAsync(string token, Guid contractUuid, ExternalReferenceDataWriteRequestDTO request)
+        {
+            using var response = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/external-references"), request, token);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<ExternalReferenceDataResponseDTO>();
+        }
+
+        public static async Task<ExternalReferenceDataResponseDTO> UpdateExternalReferenceAsync(string token, Guid contractUuid, Guid externalReferenceUuid, ExternalReferenceDataWriteRequestDTO request)
+        {
+            using var response = await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/external-references/{externalReferenceUuid}"), token, request);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<ExternalReferenceDataResponseDTO>();
+        }
+
+        public static async Task DeleteExternalReferenceAsync(string token, Guid contractUuid, Guid externalReferenceUuid)
+        {
+            using var response = await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/external-references/{externalReferenceUuid}"), token);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+        public static async Task<IEnumerable<ExtendedRoleAssignmentResponseDTO>> GetRoleAssignmentsInternalAsync(Guid uuid)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{uuid:D}/roles"), cookie); ;
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ExtendedRoleAssignmentResponseDTO>>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchAddRoleAssignment(Guid uuid, RoleAssignmentRequestDTO dto)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var response = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{uuid}/roles/add"), cookie, dto);
+            return response;
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchRemoveRoleAssignment(Guid uuid, RoleAssignmentRequestDTO dto)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{uuid}/roles/remove"), cookie, dto);
         }
     }
 }

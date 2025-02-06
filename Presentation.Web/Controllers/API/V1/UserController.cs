@@ -99,13 +99,13 @@ namespace Presentation.Web.Controllers.API.V1
                 // if we are sending a reminder:
                 if (existingUser != null && sendReminder)
                 {
-                    _userService.IssueAdvisMail(existingUser, true, orgId.Value);
+                    _userService.IssueAdvisMail(existingUser, true, orgId.Value, false);
                     return Ok(Map(existingUser));
                 }
                 // if we are sending an advis:
                 if (existingUser != null && sendAdvis)
                 {
-                    _userService.IssueAdvisMail(existingUser, false, orgId.Value);
+                    _userService.IssueAdvisMail(existingUser, false, orgId.Value, false);
                     return Ok(Map(existingUser));
                 }
 

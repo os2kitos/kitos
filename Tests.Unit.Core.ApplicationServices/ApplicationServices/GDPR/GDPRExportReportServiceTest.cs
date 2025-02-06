@@ -13,6 +13,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.SystemUsage;
 
@@ -29,6 +30,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IItSystemUsageAttachedOptionRepository> _attachedOptionRepository;
         private readonly Mock<ISensitivePersonalDataTypeRepository> _sensitivePersonalDataTypeRepository;
+        private readonly Mock<IEntityIdentityResolver> _entityIdentityResolver;
 
         private const string datahandlerContractTypeName = "Databehandleraftale";
         private const int datahandlerContractTypeId = 5;
@@ -39,10 +41,12 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _authorizationContext = new Mock<IAuthorizationContext>();
             _attachedOptionRepository = new Mock<IItSystemUsageAttachedOptionRepository>();
             _sensitivePersonalDataTypeRepository = new Mock<ISensitivePersonalDataTypeRepository>();
+            _entityIdentityResolver = new Mock<IEntityIdentityResolver>();
             _sut = new GDPRExportService(_usageRepository.Object,
                 _authorizationContext.Object,
                 _attachedOptionRepository.Object,
-                _sensitivePersonalDataTypeRepository.Object);
+                _sensitivePersonalDataTypeRepository.Object,
+                _entityIdentityResolver.Object);
         }
 
         [Fact]

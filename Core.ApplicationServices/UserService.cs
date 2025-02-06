@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Security;
@@ -22,6 +23,7 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Infrastructure.Services.DataAccess;
+using Core.DomainServices.Generic;
 
 
 namespace Core.ApplicationServices
@@ -46,8 +48,9 @@ namespace Core.ApplicationServices
         private readonly SHA256Managed _crypt;
         private readonly IOrganizationalUserContext _organizationalUserContext;
         private readonly ICommandBus _commandBus;
+        private readonly IEntityIdentityResolver _identityResolver;
         private static readonly RNGCryptoServiceProvider rngCsp = new();
-        private const string KitosManualsLink = "https://info.kitos.dk/s/qZPox9byHBRsMi2";
+        private const string KitosManualsLink = "https://info.kitos.dk/s/YeFJqK6D2f2CQCR";
 
         public UserService(TimeSpan ttl,
             string baseUrl,
@@ -65,7 +68,8 @@ namespace Core.ApplicationServices
             IOrganizationService organizationService,
             ITransactionManager transactionManager,
             IOrganizationalUserContext organizationalUserContext,
-            ICommandBus commandBus)
+            ICommandBus commandBus
+            , IEntityIdentityResolver identityResolver)
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
@@ -84,6 +88,7 @@ namespace Core.ApplicationServices
             _transactionManager = transactionManager;
             _organizationalUserContext = organizationalUserContext;
             _commandBus = commandBus;
+            _identityResolver = identityResolver;
             _crypt = new SHA256Managed();
             if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
             {
@@ -91,7 +96,7 @@ namespace Core.ApplicationServices
             }
         }
 
-        public User AddUser(User user, bool sendMailOnCreation, int orgId)
+        public User AddUser(User user, bool sendMailOnCreation, int orgId, bool newUI)
         {
             // hash his salt and default password
             var utcNow = DateTime.UtcNow;
@@ -112,15 +117,27 @@ namespace Core.ApplicationServices
 
             var savedUser = _userRepository.Get(u => u.Id == user.Id).FirstOrDefault();
 
-            _domainEvents.Raise(new EntityBeingDeletedEvent<User>(savedUser));
+            _domainEvents.Raise(new EntityCreatedEvent<User>(savedUser));
 
             if (sendMailOnCreation)
-                IssueAdvisMail(savedUser, false, orgId);
+                IssueAdvisMail(savedUser, false, orgId, newUI);
 
             return savedUser;
         }
 
-        public void IssueAdvisMail(User user, bool reminder, int orgId)
+        public void UpdateUser(User user, bool? sendMailOnUpdate, int? scopedToOrganizationId, bool newUI)
+        {
+            _userRepository.Update(user);
+
+            _domainEvents.Raise(new EntityUpdatedEvent<User>(user));
+
+            if (sendMailOnUpdate.HasValue && sendMailOnUpdate.Value && scopedToOrganizationId.HasValue)
+            {
+                IssueAdvisMail(user, false, scopedToOrganizationId.Value, newUI);
+            }
+        }
+
+        public void IssueAdvisMail(User user, bool reminder, int orgId, bool newUI)
         {
             if (user == null || _userRepository.GetByKey(user.Id) == null)
                 throw new ArgumentNullException(nameof(user));
@@ -128,7 +145,7 @@ namespace Core.ApplicationServices
             var org = _orgRepository.GetByKey(orgId);
 
             var reset = GenerateResetRequest(user);
-            var resetLink = _baseUrl + "#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
+            var resetLink = _baseUrl + GetUrlRoute(newUI) + HttpUtility.UrlEncode(reset.Hash);
 
             var subject = (reminder ? "Påmindelse: " : string.Empty) + "Oprettelse som ny bruger i KITOS " + _mailSuffix;
             var content = "<h2>Kære " + user.Name + "</h2>" +
@@ -148,7 +165,7 @@ namespace Core.ApplicationServices
             _userRepository.Save();
         }
 
-        public PasswordResetRequest IssuePasswordReset(User user, string subject, string content)
+        public PasswordResetRequest IssuePasswordReset(User user, string subject, string content, bool newUI = false)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
@@ -158,7 +175,7 @@ namespace Core.ApplicationServices
             if (content == null)
             {
                 reset = GenerateResetRequest(user);
-                var resetLink = _baseUrl + "#/reset-password/" + HttpUtility.UrlEncode(reset.Hash);
+                var resetLink = _baseUrl + GetUrlRoute(newUI) + HttpUtility.UrlEncode(reset.Hash);
                 mailContent = "<p>Du har bedt om at få nulstillet dit password.</p>" +
                               "<p><a href='" + resetLink +
                               "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
@@ -180,6 +197,60 @@ namespace Core.ApplicationServices
             _mailClient.Send(message);
 
             return reset;
+        }
+
+        public bool IsEmailInUse(string email)
+        {
+            var matchingEmails = _userRepository.Get(x => x.Email == email);
+            return matchingEmails.Any();
+        }
+
+        public Result<User, OperationError> GetUserByEmail(Guid organizationUuid, string email)
+        {
+            return _organizationService.GetPermissions(organizationUuid)
+                .Match(permissions =>
+                {
+                    if (permissions.Read == false)
+                        return new OperationError(
+                            $"User not allowed to read organization with uuid: {organizationUuid}",
+                            OperationFailure.Forbidden);
+                    return Maybe<OperationError>.None;
+                }, error => error)
+                .Match<Result<User, OperationError>>(error => error,
+                    () =>
+                    {
+                        return _repository.AsQueryable().FirstOrDefault(u =>
+                            u.Email == email);
+                    });
+        }
+
+        public Result<User, OperationError> GetUserByUuid(Guid userUuid)
+        {
+            return _repository.GetByUuid(userUuid)
+                .Match<Result<User, OperationError>>(user => user,
+                    () => new OperationError("User is not member of the organization", OperationFailure.NotFound))
+                .Bind(user =>
+                {
+                    if (_authorizationContext.AllowReads(user) == false)
+                    {
+                        return new OperationError($"Not allowed to read User with uuid: {userUuid}",
+                            OperationFailure.Forbidden);
+                    }
+
+                    return Result<User, OperationError>.Success(user);
+                });
+        }
+
+        //Temporary solution for supporting links to both both the old and new UI. (27/11/2024)
+        private string GetUrlRoute(bool newUI)
+        {
+            if (newUI)
+            {
+                return "ui/reset-password/";
+            } else
+            {
+                return "#/reset-password/";
+            }
         }
 
         private PasswordResetRequest GenerateResetRequest(User user)
@@ -295,6 +366,30 @@ namespace Core.ApplicationServices
                 );
         }
 
+        public IQueryable<User> GetUsers(params IDomainQuery<User>[] queries)
+        {
+            var query = new IntersectionQuery<User>(queries);
+
+            return _repository.GetUsers()
+                .Where(x => !x.Deleted)
+                .Transform(query.Apply);
+        }
+
+        public Result<IEnumerable<Organization>, OperationError> GetUserOrganizations(Guid userUuid)
+        {
+            return _repository.GetByUuid(userUuid)
+                .Match(user =>
+                {
+                    if (_authorizationContext.AllowReads(user) == false)
+                    {
+                        return new OperationError($"Not allowed to read User with uuid: {userUuid}",
+                            OperationFailure.Forbidden);
+                    }
+
+                    return Result<IEnumerable<Organization>, OperationError>.Success(user.GetUniqueOrganizations().ToList());
+                }, () => new OperationError("User is not member of the organization", OperationFailure.NotFound));
+        }
+
         public Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries)
         {
             if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
@@ -318,49 +413,59 @@ namespace Core.ApplicationServices
                 .Select(organization => new UserAdministrationPermissions(AllowDelete(organization.Id)));
         }
 
-        private bool AllowDelete(int? optionalOrganizationScopeId)
+        private bool AllowDelete(int? scopedToOrganizationId)
         {
-            return _authorizationContext.HasPermission(new DeleteAnyUserPermission(optionalOrganizationScopeId.FromNullableValueType()));
+            return _authorizationContext.HasPermission(new DeleteAnyUserPermission(scopedToOrganizationId.FromNullableValueType()));
         }
 
         public Maybe<OperationError> DeleteUser(Guid userUuid, int? scopedToOrganizationId = null)
         {
+            return AllowDelete(scopedToOrganizationId)
+                ? DeleteUserIfNoDeletionConflicts(userUuid, scopedToOrganizationId)
+                : new OperationError(OperationFailure.Forbidden);
+        }
+
+        private Maybe<OperationError> DeleteUserIfNoDeletionConflicts(Guid userUuid, int? scopedToOrganizationId)
+        {
+            return WithNonNullUser(userUuid)
+                .Bind(WithNonCurrentUser)
+                .Match((user) => PerformDeleteUser(user, scopedToOrganizationId),
+                    error => error);
+        }
+
+        private Maybe<OperationError> PerformDeleteUser(User user, int? scopedToOrganizationId)
+        {
             var hasOrganizationIdValue = scopedToOrganizationId.HasValue;
 
-            if (AllowDelete(scopedToOrganizationId))
+            using var transaction = _transactionManager.Begin();
+            var operationErrorMaybe = hasOrganizationIdValue
+                ? DeleteUser(scopedToOrganizationId.Value, user)
+                : DeleteUserFromKitos(user);
+            if (!operationErrorMaybe.HasValue)
             {
-                var user = _userRepository.AsQueryable().ByUuid(userUuid);
-                if (user == null)
-                {
-                    return new OperationError($"User with Uuid {userUuid} was not found", OperationFailure.NotFound);
-                }
-
-                if (_organizationalUserContext.UserId == user.Id)
-                {
-                    return new OperationError("You cannot delete a user you are currently logged in as", OperationFailure.Forbidden);
-                }
-
-                using var transaction = _transactionManager.Begin();
-                var result = hasOrganizationIdValue
-                    ? DeleteUser(scopedToOrganizationId.Value, user)
-                    : DeleteUserFromKitos(user);
-
-                if (result.HasValue)
-                {
-                    transaction.Rollback();
-                }
-                else
-                {
-                    _userRepository.Save();
-                    transaction.Commit();
-
-                    _domainEvents.Raise(new AdministrativeAccessRightsChanged(user.Id));
-                }
-
-                return result;
+                _userRepository.Save();
+                transaction.Commit();
+                _domainEvents.Raise(new AdministrativeAccessRightsChanged(user.Id));
             }
+            else transaction.Rollback();
+            return operationErrorMaybe;
+        }
 
-            return new OperationError(OperationFailure.Forbidden);
+        private Result<User, OperationError> WithNonNullUser(Guid userUuid)
+        {
+            var user = _userRepository.AsQueryable().ByUuid(userUuid);
+            return user != null ? user : new OperationError($"User with Uuid {userUuid} was not found", OperationFailure.NotFound);
+        }
+
+        private Result<User, OperationError> WithNonCurrentUser(User user)
+        {
+            if (_organizationalUserContext.UserId == user.Id)
+            {
+                return new OperationError("You cannot delete a user you are currently logged in as",
+                    OperationFailure.Forbidden);
+            }
+            return _organizationalUserContext.UserId != user.Id ? user : new OperationError("You cannot delete a user you are currently logged in as",
+                OperationFailure.Forbidden);
         }
 
         private Maybe<OperationError> DeleteUserFromKitos(User userToDelete)

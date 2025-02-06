@@ -231,7 +231,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return response;
         }
 
-        public static ItSystemUsage CreateItSystemUsageAsync(ItSystemUsage body, Cookie optionalLogin = null)
+        public static ItSystemUsage CreateItSystemUsage(ItSystemUsage body, Cookie optionalLogin = null)
         {
             body.ObjectOwnerId ??= TestEnvironment.DefaultItSystemId;
             body.LastChangedByUserId ??= TestEnvironment.DefaultUserId;

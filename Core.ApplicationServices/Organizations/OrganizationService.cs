@@ -12,12 +12,14 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
 
 using Serilog;
+using Organization = Core.DomainModel.Organization.Organization;
 
 namespace Core.ApplicationServices.Organizations
 {
@@ -28,16 +30,21 @@ namespace Core.ApplicationServices.Organizations
         private readonly IOrgUnitService _orgUnitService;
         private readonly IOrganizationRightsService _organizationRightsService;
         private readonly IDomainEvents _domainEvents;
+        private readonly IEntityIdentityResolver _identityResolver;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
+        private readonly IGenericRepository<ContactPerson> _contactPersonRepository;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationalUserContext _userContext;
         private readonly ILogger _logger;
         private readonly ITransactionManager _transactionManager;
+        private readonly IGenericRepository<DataResponsible> _dataResponsibleRepository;
+        private readonly IGenericRepository<DataProtectionAdvisor> _dataProtectionAdvisorRepository;
 
         public OrganizationService(
             IGenericRepository<Organization> orgRepository,
             IGenericRepository<OrganizationRight> orgRightRepository,
+            IGenericRepository<ContactPerson> contactPersonRepository,
             IGenericRepository<User> userRepository,
             IAuthorizationContext authorizationContext,
             IOrganizationalUserContext userContext,
@@ -46,10 +53,13 @@ namespace Core.ApplicationServices.Organizations
             IOrganizationRepository repository,
             IOrganizationRightsService organizationRightsService,
             IOrgUnitService orgUnitService,
-            IDomainEvents domainEvents)
+            IDomainEvents domainEvents,
+            IEntityIdentityResolver identityResolver, IGenericRepository<DataResponsible> dataResponsibleRepository,
+            IGenericRepository<DataProtectionAdvisor> dataProtectionAdvisorRepository)
         {
             _orgRepository = orgRepository;
             _orgRightRepository = orgRightRepository;
+            _contactPersonRepository = contactPersonRepository;
             _userRepository = userRepository;
             _authorizationContext = authorizationContext;
             _userContext = userContext;
@@ -58,6 +68,9 @@ namespace Core.ApplicationServices.Organizations
             _repository = repository;
             _orgUnitService = orgUnitService;
             _domainEvents = domainEvents;
+            _identityResolver = identityResolver;
+            _dataResponsibleRepository = dataResponsibleRepository;
+            _dataProtectionAdvisorRepository = dataProtectionAdvisorRepository;
             _organizationRightsService = organizationRightsService;
         }
 
@@ -128,12 +141,6 @@ namespace Core.ApplicationServices.Organizations
             return
                 _authorizationContext.AllowModify(organization) &&
                 _authorizationContext.HasPermission(new DefineOrganizationTypePermission(organizationType, organization.Id));
-        }
-
-        public Result<bool, OperationError> CanActiveUserModifyCvr(Guid organizationUuid)
-        {
-            return GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
-                .Select(_ => _userContext.IsGlobalAdmin());
         }
 
         public Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg)
@@ -329,7 +336,7 @@ namespace Core.ApplicationServices.Organizations
         }
 
         public Maybe<OperationError> RemoveOrganization(Guid uuid, bool enforceDeletion)
-        {
+        {   
             using var transaction = _transactionManager.Begin();
             var organizationWhichCanBeDeleted = GetOrganization(uuid).Bind(WithDeletionAccess);
 
@@ -362,6 +369,7 @@ namespace Core.ApplicationServices.Organizations
             catch (Exception error)
             {
                 _logger.Error(error, "Failed while deleting organization with uuid: {uuid}", uuid);
+                transaction.Rollback();
                 return new OperationError("Exception during deletion", OperationFailure.UnknownError);
             }
             return Maybe<OperationError>.None;
@@ -378,6 +386,61 @@ namespace Core.ApplicationServices.Organizations
             return Result<IEnumerable<Organization>, OperationError>.Success(_orgRepository.AsQueryable().ByIds(userOrganizationsIds.ToList()));
         }
 
+        public Result<OrganizationPermissionsResult, OperationError> GetPermissions(Guid organizationUuid)
+        {
+            return GetModifyCvrPermission(organizationUuid).Bind(modifyCvr => GetOrganization(organizationUuid)
+                .Transform(result =>
+                    OrganizationPermissionsResult.FromResolutionResult(result, _authorizationContext,
+                        modifyCvr)));
+        }
+
+        private Result<bool, OperationError> GetModifyCvrPermission(Guid organizationUuid)
+        {
+            var result = CanActiveUserModifyCvr(organizationUuid);
+            if (result.Failed && result.Error.FailureType == OperationFailure.Forbidden) return false;
+            return result;
+        }
+
+        public Result<bool, OperationError> CanActiveUserModifyCvr(Guid organizationUuid)
+        {
+            return GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Select(_ => _userContext.IsGlobalAdmin());
+        }
+
+        public Maybe<DataResponsible> GetDataResponsible(int organizationId)
+        {
+            return _dataResponsibleRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
+        }
+
+        public Maybe<ContactPerson> GetContactPerson(int organizationId)
+        {
+            return _contactPersonRepository.AsQueryable()
+                .FirstOrNone(cp => cp.OrganizationId.Equals(organizationId));
+        }
+
+        public Maybe<DataProtectionAdvisor> GetDataProtectionAdvisor(int organizationId)
+        {
+            return _dataProtectionAdvisorRepository.AsQueryable()
+                .FirstOrNone(dpa => dpa.OrganizationId.Equals(organizationId));
+        }
+
+        public Result<Config, OperationError> GetUIRootConfig(Guid organizationUuid)
+        {
+            return GetOrganization(organizationUuid)
+                .Match(organization =>
+                    Result<Config, OperationError>.Success(organization.Config),
+                    error => error);
+        }
+
+        public GridPermissions GetGridPermissions(int orgId)
+        {
+            return new GridPermissions
+            {
+                ConfigModificationPermission = HasRole(orgId, OrganizationRole.LocalAdmin)
+            };
+        }
+
         private Result<Organization, OperationError> WithDeletionAccess(Organization organization)
         {
             if (_authorizationContext.AllowDelete(organization))
@@ -386,6 +449,11 @@ namespace Core.ApplicationServices.Organizations
             }
 
             return new OperationError(OperationFailure.Forbidden);
+        }
+
+        private bool HasRole(int orgId, OrganizationRole role)
+        {
+            return _userContext.HasRole(orgId, role);
         }
     }
 }

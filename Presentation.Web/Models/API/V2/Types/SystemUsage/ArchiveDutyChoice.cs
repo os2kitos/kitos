@@ -17,6 +17,10 @@
         /// <summary>
         /// Archive duty is unknown
         /// </summary>
-        Unknown = 3
+        Unknown = 3,
+        /// <summary>
+        /// Data is kept, selected or all documents are discarded
+        /// </summary>
+        PreserveDataCanDiscardDocuments = 4
     }
 }

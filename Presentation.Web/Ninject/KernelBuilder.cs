@@ -129,8 +129,16 @@ using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
 using Core.ApplicationServices.Generic;
+using Core.ApplicationServices.GlobalOptions;
+using Core.ApplicationServices.HelpTexts;
+using Core.ApplicationServices.Organizations.Write;
+using Core.ApplicationServices.Users.Write;
 using Infrastructure.STS.OrganizationSystem.DomainServices;
 using Kombit.InfrastructureSamples.Token;
+using Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping;
+using Presentation.Web.Controllers.API.V2.Internal.Users.Mapping;
+using Core.ApplicationServices.LocalOptions;
+using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 
 namespace Presentation.Web.Ninject
 {
@@ -210,6 +218,7 @@ namespace Presentation.Web.Ninject
                 .WithConstructorArgument("mailSuffix", Settings.Default.MailSuffix)
                 .WithConstructorArgument("defaultUserPassword", Settings.Default.DefaultUserPassword)
                 .WithConstructorArgument("useDefaultUserPassword", bool.Parse(Settings.Default.UseDefaultPassword));
+            kernel.Bind<IUserWriteService>().To<UserWriteService>().InCommandScope(Mode);
             kernel.Bind<IOrgUnitService>().To<OrgUnitService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationRoleService>().To<OrganizationRoleService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationRightsService>().To<OrganizationRightsService>().InCommandScope(Mode);
@@ -219,6 +228,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IRegistrationNotificationUserRelationsService>().To<RegistrationNotificationUserRelationsService>().InCommandScope(Mode);
             kernel.Bind<INotificationService>().To<NotificationService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InCommandScope(Mode);
+            kernel.Bind<IOrganizationWriteService>().To<OrganizationWriteService>().InCommandScope(Mode);
             kernel.Bind<IItSystemService>().To<ItSystemService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageMigrationServiceAdapter>().To<ItSystemUsageMigrationServiceAdapter>().InCommandScope(Mode);
@@ -268,7 +278,9 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ITrackingService>().To<TrackingService>().InCommandScope(Mode);
             kernel.Bind<IUIModuleCustomizationService>().To<UIModuleCustomizationService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationUnitService>().To<OrganizationUnitService>().InCommandScope(Mode);
+            kernel.Bind<IOrganizationUnitWriteService>().To<OrganizationUnitWriteService>().InCommandScope(Mode);
             kernel.Bind<IEntityIdMapper>().To<EntityIdMapper>().InCommandScope(Mode);
+            kernel.Bind<IEntityTreeUuidCollector>().To<EntityTreeUuidCollector>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);
@@ -316,12 +328,24 @@ namespace Presentation.Web.Ninject
 
             //Public messages
             kernel.Bind<IPublicMessagesService>().To<PublicMessagesService>().InCommandScope(Mode);
+
+            //Local option types
+            RegisterLocalOptionTypes(kernel);
+
+            //Global option types
+            RegisterGlobalOptionTypes(kernel);
+
+            //Help Texts
+            kernel.Bind<IHelpTextService>().To<HelpTextService>().InCommandScope(Mode);
+            kernel.Bind<IHelpTextApplicationService>().To<HelpTextApplicationService>().InCommandScope(Mode);
         }
 
         private void RegisterMappers(IKernel kernel)
         {
             //Generic
             kernel.Bind<IEntityWithDeactivatedStatusMapper>().To<EntityWithDeactivatedStatusMapper>().InCommandScope(Mode);
+            kernel.Bind<ILocalOptionTypeResponseMapper>().To<LocalOptionTypeResponseMapper>().InCommandScope(Mode);
+            kernel.Bind<ILocalOptionTypeWriteModelMapper>().To<LocalOptionTypeWriteModelMapper>().InCommandScope(Mode);
 
             //Systems
             kernel.Bind<IItSystemWriteModelMapper>().To<ItSystemWriteModelMapper>().InCommandScope(Mode);
@@ -353,10 +377,33 @@ namespace Presentation.Web.Ninject
 
             //Public messages
             kernel.Bind<IPublicMessagesWriteModelMapper>().To<PublicMessagesWriteModelMapper>().InCommandScope(Mode);
-            
+
             //Notifications
             kernel.Bind<INotificationWriteModelMapper>().To<NotificationWriteModelMapper>().InCommandScope(Mode);
             kernel.Bind<INotificationResponseMapper>().To<NotificationResponseMapper>().InCommandScope(Mode);
+
+            //Organization unit
+            kernel.Bind<IOrganizationUnitWriteModelMapper>().To<OrganizationUnitWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IOrganizationUnitResponseModelMapper>().To<OrganizationUnitResponseModelMapper>().InCommandScope(Mode);
+
+            //User
+            kernel.Bind<IUserWriteModelMapper>().To<UserWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IUserResponseModelMapper>().To<UserResponseModelMapper>().InCommandScope(Mode);
+
+            //Organization
+            kernel.Bind<IOrganizationResponseMapper>().To<OrganizationResponseMapper>().InCommandScope(Mode);
+            kernel.Bind<IOrganizationWriteModelMapper>().To<OrganizationWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IOrganizationTypeMapper>().To<OrganizationTypeMapper>().InCommandScope(Mode);
+
+            //Global option types
+            kernel.Bind<IGlobalOptionTypeWriteModelMapper>().To<GlobalOptionTypeWriteModelMapper>()
+                .InCommandScope(Mode);
+            kernel.Bind<IGlobalOptionTypeResponseMapper>().To<GlobalOptionTypeResponseMapper>().InCommandScope(Mode);
+
+            //Help texts
+            kernel.Bind<IHelpTextResponseMapper>().To<HelpTextResponseMapper>().InCommandScope(Mode);
+            kernel.Bind<IHelpTextWriteModelMapper>().To<HelpTextWriteModelMapper>().InCommandScope(Mode);
+
         }
 
         private void RegisterSSO(IKernel kernel)
@@ -464,11 +511,127 @@ namespace Presentation.Web.Ninject
                 .ForEach(tHandlerInterface => kernel.Bind(tHandlerInterface).To<THandler>().InCommandScope(Mode));
         }
 
+        private void RegisterLocalOptionTypes(IKernel kernel)
+        {
+            RegisterLocalItSystemOptionTypes(kernel);
+            RegisterLocalDprOptionTypes(kernel);
+            RegisterLocalItContractOptionTypes(kernel);
+
+            kernel.Bind<IGenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole>>()
+                .To<GenericLocalOptionsService<LocalOrganizationUnitRole, OrganizationUnitRight, OrganizationUnitRole>>().InCommandScope(Mode);
+        }
+
+        private void RegisterGlobalOptionTypes(IKernel kernel)
+        {
+            //IT Systems
+            RegisterGlobalRegularOptionService<BusinessType, ItSystem>(kernel);
+            RegisterGlobalRegularOptionService<ArchiveLocation, ItSystemUsage>(kernel);
+            RegisterGlobalRoleOptionService<ItSystemRole, ItSystemRight>(kernel);
+            RegisterGlobalRegularOptionService<SensitivePersonalDataType, ItSystem>(kernel);
+            RegisterGlobalRegularOptionService<ItSystemRole, ItSystemRight>(kernel);
+            RegisterGlobalRegularOptionService<RegisterType, ItSystemUsage>(kernel);
+            RegisterGlobalRegularOptionService<ItSystemCategories, ItSystemUsage>(kernel);
+            RegisterGlobalRegularOptionService<InterfaceType, ItInterface>(kernel);
+            RegisterGlobalRegularOptionService<RelationFrequencyType, SystemRelation>(kernel);
+            RegisterGlobalRegularOptionService<DataType, DataRow>(kernel);
+            RegisterGlobalRegularOptionService<ArchiveType, ItSystemUsage>(kernel);
+            RegisterGlobalRegularOptionService<ArchiveTestLocation, ItSystemUsage>(kernel);
+
+            //IT Contracts
+            RegisterGlobalRegularOptionService<OptionExtendType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<TerminationDeadlineType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<PurchaseFormType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<ProcurementStrategyType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<PriceRegulationType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<PaymentModelType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<PaymentFreqencyType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<ItContractType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<ItContractTemplateType, ItContract>(kernel);
+            RegisterGlobalRoleOptionService<ItContractRole, ItContractRight>(kernel);
+            RegisterGlobalRegularOptionService<CriticalityType, ItContract>(kernel);
+            RegisterGlobalRegularOptionService<AgreementElementType, ItContract>(kernel);
+
+            //DPR
+            RegisterGlobalRoleOptionService<DataProcessingRegistrationRole, DataProcessingRegistrationRight>(kernel);
+            RegisterGlobalRegularOptionService<DataProcessingCountryOption, DataProcessingRegistration>(kernel);
+            RegisterGlobalRegularOptionService<DataProcessingOversightOption, DataProcessingRegistration>(kernel);
+            RegisterGlobalRegularOptionService<DataProcessingDataResponsibleOption, DataProcessingRegistration>(kernel);
+            RegisterGlobalRegularOptionService<DataProcessingBasisForTransferOption, DataProcessingRegistration>(kernel);
+
+            //Organization
+            RegisterGlobalRegularOptionService<CountryCode, Organization>(kernel);
+
+            //Organization unit
+            RegisterGlobalRoleOptionService<OrganizationUnitRole, OrganizationUnitRight>(kernel);
+        }
+
+        private void RegisterLocalItContractOptionTypes(IKernel kernel)
+        {
+            RegisterLocalOptionService<LocalItContractRole, ItContractRight, ItContractRole>(kernel);
+            RegisterLocalOptionService<LocalItContractType, ItContract, ItContractType>(kernel);
+            RegisterLocalOptionService<LocalItContractTemplateType, ItContract, ItContractTemplateType>(kernel);
+            RegisterLocalOptionService<LocalPurchaseFormType, ItContract, PurchaseFormType>(kernel);
+            RegisterLocalOptionService<LocalPaymentModelType, ItContract, PaymentModelType>(kernel);
+            RegisterLocalOptionService<LocalAgreementElementType, ItContract, AgreementElementType>(kernel);
+            RegisterLocalOptionService<LocalOptionExtendType, ItContract, OptionExtendType>(kernel);
+            RegisterLocalOptionService<LocalPaymentFreqencyType, ItContract, PaymentFreqencyType>(kernel);
+            RegisterLocalOptionService<LocalPriceRegulationType, ItContract, PriceRegulationType>(kernel);
+            RegisterLocalOptionService<LocalProcurementStrategyType, ItContract, ProcurementStrategyType>(kernel);
+            RegisterLocalOptionService<LocalTerminationDeadlineType, ItContract, TerminationDeadlineType>(kernel);
+            RegisterLocalOptionService<LocalCriticalityType, ItContract, CriticalityType>(kernel);
+        }
+
+        private void RegisterLocalItSystemOptionTypes(IKernel kernel)
+        {
+            RegisterLocalOptionService<LocalItSystemRole, ItSystemRight, ItSystemRole>(kernel);
+            RegisterLocalOptionService<LocalBusinessType, ItSystem, BusinessType>(kernel);
+            RegisterLocalOptionService<LocalArchiveType, ItSystemUsage, ArchiveType>(kernel);
+            RegisterLocalOptionService<LocalArchiveLocation, ItSystemUsage, ArchiveLocation>(kernel);
+            RegisterLocalOptionService<LocalArchiveTestLocation, ItSystemUsage, ArchiveTestLocation>(kernel);
+            RegisterLocalOptionService<LocalDataType, DataRow, DataType>(kernel);
+            RegisterLocalOptionService<LocalRelationFrequencyType, SystemRelation, RelationFrequencyType>(kernel);
+            RegisterLocalOptionService<LocalInterfaceType, ItInterface, InterfaceType>(kernel);
+            RegisterLocalOptionService<LocalSensitivePersonalDataType, ItSystem, SensitivePersonalDataType>(kernel);
+            RegisterLocalOptionService<LocalItSystemCategories, ItSystemUsage, ItSystemCategories>(kernel);
+            RegisterLocalOptionService<LocalRegisterType, ItSystemUsage, RegisterType>(kernel);
+        }
+
+        private void RegisterLocalDprOptionTypes(IKernel kernel)
+        {
+            RegisterLocalOptionService<LocalDataProcessingRegistrationRole, DataProcessingRegistrationRight, DataProcessingRegistrationRole>(kernel);
+            RegisterLocalOptionService<LocalDataProcessingBasisForTransferOption, DataProcessingRegistration, DataProcessingBasisForTransferOption>(kernel);
+            RegisterLocalOptionService<LocalDataProcessingOversightOption, DataProcessingRegistration, DataProcessingOversightOption>(kernel);
+            RegisterLocalOptionService<LocalDataProcessingDataResponsibleOption, DataProcessingRegistration, DataProcessingDataResponsibleOption>(kernel);
+            RegisterLocalOptionService<LocalDataProcessingCountryOption, DataProcessingRegistration, DataProcessingCountryOption>(kernel);
+        }
+
+        private void RegisterLocalOptionService<TLocalOptionType, TReferenceType, TOptionType>(IKernel kernel)
+            where TLocalOptionType : LocalOptionEntity<TOptionType>, new()
+            where TOptionType : OptionEntity<TReferenceType>
+        {
+            kernel.Bind<IGenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType>>()
+                .To<GenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType>>().InCommandScope(Mode);
+        }
+
+        private void RegisterGlobalRegularOptionService<TOptionType, TReferenceType>(IKernel kernel)
+            where TOptionType : OptionEntity<TReferenceType>, new()
+        {
+            kernel.Bind<IGlobalRegularOptionsService<TOptionType, TReferenceType>>()
+                .To<GlobalRegularOptionsService<TOptionType, TReferenceType>>().InCommandScope(Mode);
+        }
+
+        private void RegisterGlobalRoleOptionService<TOptionType, TReferenceType>(IKernel kernel)
+            where TOptionType : OptionEntity<TReferenceType>, IRoleEntity, new()
+        {
+            kernel.Bind<IGlobalRoleOptionsService<TOptionType, TReferenceType>>()
+                .To<GlobalRoleOptionsService<TOptionType, TReferenceType>>().InCommandScope(Mode);
+        }
+
         private void RegisterOptions(IKernel kernel)
         {
             //IT-interface
             RegisterOptionsService<ItInterface, InterfaceType, LocalInterfaceType>(kernel);
-            
+
             RegisterOptionsService<DataRow, DataType, LocalDataType>(kernel);
 
             //Data processing registrations

@@ -6,7 +6,7 @@ using Core.Abstractions.Types;
 namespace Core.DomainModel.Notification
 {
 
-    public class UserNotification : Entity, IOwnedByOrganization, IHasName
+    public class UserNotification : Entity, IOwnedByOrganization, IHasName, IHasUuid
     {
         public UserNotification(string name, string notificationMessage, NotificationType notificationType, int organizationId, int userId, DateTime created)
         {
@@ -16,11 +16,14 @@ namespace Core.DomainModel.Notification
             OrganizationId = organizationId;
             NotificationRecipientId = userId;
             Created = created;
+            Uuid = Guid.NewGuid();
         }
 
         public UserNotification()
         {
         }
+
+        public Guid Uuid { get; set; }
 
         public string Name { get; set; }
         public string NotificationMessage { get; set; }
@@ -49,6 +52,11 @@ namespace Core.DomainModel.Notification
                 ItSystemUsage ??
                 ItContract ??
                 (IEntityWithUserNotification)DataProcessingRegistration;
+        }
+
+        public Guid GetRelatedEntityUuid()
+        {
+            return GetOwner().Uuid;
         }
 
         public int GetRelatedEntityId()

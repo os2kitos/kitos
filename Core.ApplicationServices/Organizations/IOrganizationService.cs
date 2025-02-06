@@ -45,7 +45,16 @@ namespace Core.ApplicationServices.Organizations
         /// <returns></returns>
         Maybe<OperationError> RemoveOrganization(Guid organizationUuid, bool enforceDeletion);
 
+
         Result<IEnumerable<Organization>, OperationError> GetUserOrganizations(int userId);
         Result<bool, OperationError> CanActiveUserModifyCvr(Guid organizationUuid);
+        Result<OrganizationPermissionsResult, OperationError> GetPermissions(Guid organizationUuid);
+
+        public GridPermissions GetGridPermissions(int orgId);
+        public Maybe<DataResponsible> GetDataResponsible(int organizationId);
+        public Maybe<ContactPerson> GetContactPerson(int organizationId);
+        public Maybe<DataProtectionAdvisor> GetDataProtectionAdvisor(int organizationId);
+
+        Result<Config, OperationError> GetUIRootConfig(Guid organizationUuid);
     }
 }

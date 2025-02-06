@@ -334,11 +334,13 @@ namespace Core.ApplicationServices.System
             return systemResult
                 .Transform
                 (
-                    system => ResourcePermissionsResult
-                        .FromResolutionResult(system, _authorizationContext)
-                        .Select(permissions =>
-                            new SystemPermissions(permissions, GetDeletionConflicts(system, permissions.Delete)))
-                );
+                    system =>
+                    {
+                        return ResourcePermissionsResult
+                            .FromResolutionResult(system, _authorizationContext)
+                            .Select(permissions =>
+                                new SystemPermissions(permissions, GetDeletionConflicts(system, permissions.Delete), GetEditVisibilityPermission(system, permissions.Modify)));
+                    });
         }
 
         private static IEnumerable<SystemDeletionConflict> GetDeletionConflicts(Result<ItSystem, OperationError> system, bool allowDelete)
@@ -346,6 +348,16 @@ namespace Core.ApplicationServices.System
             return allowDelete
                 ? system.Select(GetDeletionConflicts).Match(conflicts => conflicts, _ => Array.Empty<SystemDeletionConflict>())
                 : Array.Empty<SystemDeletionConflict>();
+        }
+
+        private bool GetEditVisibilityPermission(Result<ItSystem, OperationError> system, bool allowModify)
+        {
+            return allowModify && system.Select(GetEditVisibilityPermission).Match(permission => permission, _ => false);
+        }
+
+        private bool GetEditVisibilityPermission(ItSystem system)
+        {
+            return _authorizationContext.HasPermission(new VisibilityControlPermission(system));
         }
 
         private static IEnumerable<SystemDeletionConflict> GetDeletionConflicts(ItSystem arg)
@@ -503,7 +515,7 @@ namespace Core.ApplicationServices.System
         {
             return Mutate(itSystemId, system => system.AccessModifier != accessModifier, updateWithResult: system =>
             {
-                if (!_authorizationContext.HasPermission(new VisibilityControlPermission(system)))
+                if (!GetEditVisibilityPermission(system))
                 {
                     return new OperationError(OperationFailure.Forbidden);
                 }

@@ -4,27 +4,33 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.DomainModel.Organization;
 using Presentation.Web.Infrastructure;
+using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Options;
+using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public static class DataProcessingRegistrationV2Helper
     {
-        public static async Task<IEnumerable<DataProcessingRegistrationResponseDTO>> GetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, bool? agreementConcluded = null, DateTime? changedSinceGtEq = null)
+        public static async Task<IEnumerable<DataProcessingRegistrationResponseDTO>> GetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, bool? agreementConcluded = null, string nameContains = null, string nameEquals = null, DateTime? changedSinceGtEq = null)
         {
-            using var response = await SendGetDPRsAsync(token, page, pageSize, organizationUuid, systemUuid, systemUsageUuid, dataProcessorUuid, subDataProcessorUuid, agreementConcluded, changedSinceGtEq);
+            using var response = await SendGetDPRsAsync(token, page, pageSize, organizationUuid, systemUuid, systemUsageUuid, dataProcessorUuid, subDataProcessorUuid, agreementConcluded, nameContains, nameEquals, changedSinceGtEq);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<DataProcessingRegistrationResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, bool? agreementConcluded = null, DateTime? changedSinceGtEq = null)
+        public static async Task<HttpResponseMessage> SendGetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, bool? agreementConcluded = null, string nameContains = null, string nameEquals = null, DateTime? changedSinceGtEq = null)
         {
             var queryParameters = new List<KeyValuePair<string, string>>()
             {
@@ -49,6 +55,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (agreementConcluded.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("agreementConcluded", agreementConcluded.Value.ToString()));
+
+            if (nameContains != null)
+                queryParameters.Add(new KeyValuePair<string, string>("nameContains", nameContains));
+
+            if (nameEquals != null)
+                queryParameters.Add(new KeyValuePair<string, string>("nameEquals", nameEquals));
 
             if (changedSinceGtEq.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("changedSinceGtEq", changedSinceGtEq.Value.ToString("O")));
@@ -178,6 +190,62 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendPatchName(string token, Guid uuid, string name)
         {
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, CreatePatchPayload(nameof(UpdateDataProcessingRegistrationRequestDTO.Name), name));
+        }
+
+        public static async Task<DataProcessingRegistrationPermissionsResponseDTO> GetPermissionsAsync(string token, Guid uuid)
+        {
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid:D}/permissions"), token);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<DataProcessingRegistrationPermissionsResponseDTO>();
+        }
+
+        public static async Task<ResourceCollectionPermissionsResponseDTO> GetCollectionPermissionsAsync(string token, Guid organizationUuid)
+        {
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/permissions?organizationUuid={organizationUuid:D}"), token);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ResourceCollectionPermissionsResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchAddRoleAssignment(Guid uuid, RoleAssignmentRequestDTO dto)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var response = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/data-processing-registrations/{uuid}/roles/add"), cookie, dto);
+            return response;
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchRemoveRoleAssignment(Guid uuid, RoleAssignmentRequestDTO dto)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/data-processing-registrations/{uuid}/roles/remove"), cookie, dto);
+        }
+
+        public static async Task<IEnumerable<ShallowOrganizationResponseDTO>> GetAvailableDataProcessors(Guid uuid, string nameQuery, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/data-processing-registrations/{uuid}/data-processors/available?nameQuery={nameQuery}"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ShallowOrganizationResponseDTO>>();
+        }
+
+        public static async Task<IEnumerable<ShallowOrganizationResponseDTO>> GetAvailableSubDataProcessors(Guid uuid, string nameQuery, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/data-processing-registrations/{uuid}/sub-data-processors/available?nameQuery={nameQuery}"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ShallowOrganizationResponseDTO>>();
+        }
+
+        public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetAvailableSystemsAsync(Guid uuid, string nameQuery, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/data-processing-registrations/{uuid}/system-usages/available?nameQuery={nameQuery}"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
         }
     }
 }

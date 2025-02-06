@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Contracts;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -28,9 +29,14 @@ namespace Core.ApplicationServices.Contract
         IQueryable<ItContract> Query(params IDomainQuery<ItContract>[] conditions);
         Result<ContractOptions, OperationError> GetAssignableContractOptions(int organizationId);
         Result<IEnumerable<(int year, int quarter)>, OperationError> GetAppliedProcurementPlans(int organizationId);
+
+        Result<IEnumerable<(int year, int quarter)>, OperationError> GetAppliedProcurementPlansByUuid(
+            Guid organizationUuid);
         Maybe<OperationError> SetResponsibleUnit(int contractId, Guid targetUnitUuid);
         Maybe<OperationError> RemoveResponsibleUnit(int contractId);
         Maybe<OperationError> RemovePaymentResponsibleUnits(int contractId, bool isInternal, IEnumerable<int> paymentIds);
         Maybe<OperationError> TransferPayments(int contractId, Guid targetUnitUuid, bool isInternal, IEnumerable<int> paymentIds);
+        Result<ContractPermissions, OperationError> GetPermissions(Guid uuid);
+        Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid);
     }
 }

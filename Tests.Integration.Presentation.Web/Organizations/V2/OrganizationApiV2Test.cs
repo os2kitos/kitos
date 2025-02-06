@@ -8,6 +8,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
@@ -16,7 +17,7 @@ using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.Organ
 
 namespace Tests.Integration.Presentation.Web.Organizations.V2
 {
-    public class OrganizationApiV2Test : WithAutoFixture
+    public class OrganizationApiV2Test : OrganizationApiV2TestBase
     {
         [Fact]
         public async Task GET_Organizations_With_RightsHolders_Access_Returns_Empty_If_User_Does_Not_Have_RightsHoldersAccessInAnyOrganization()
@@ -33,7 +34,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
-        public async Task GET_Organizations_With_RightsHolders_Access_Returns_Organizations_Where_User_Has_RigtsHolderAccessRole()
+        public async Task GET_Organizations_With_RightsHolders_Access_Returns_Organizations_Where_User_Has_RightsHolderAccessRole()
         {
             //Arrange
             var email = CreateEmail();
@@ -206,19 +207,6 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var expectedResult = InnerToExternalOrgType[createdWith];
             Assert.Equal(expectedResult, dto.OrganizationType);
-        }
-
-        private async Task<OrganizationDTO> CreateOrganizationAsync(OrganizationTypeKeys orgType)
-        {
-            var organizationName = CreateName();
-            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
-                organizationName, "V2" + string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), orgType, AccessModifier.Public);
-            return organization;
-        }
-
-        private string CreateName()
-        {
-            return $"{nameof(OrganizationApiV2Test)}æøå{A<string>()}";
         }
 
         private string CreateEmail()

@@ -71,7 +71,7 @@ namespace Core.ApplicationServices.SSO.State
             }
             catch (Exception e)
             {
-                _logger.Error(e,"Failed to joind privileges");
+                _logger.Error(e,"Failed to join privileges");
             }
 
             return "ERROR creating privileges as string";
@@ -85,9 +85,12 @@ namespace Core.ApplicationServices.SSO.State
 
         private bool CurrentUserHasKitosPrivilege()
         {
+            // For local testing using Korsbaek Kommune users, uncomment the following line
+            //return true;
+
             return _parser
-                .MatchPrivilege(_samlKitosReadAccessRoleIdentifier)
-                .HasValue;
+            .MatchPrivilege(_samlKitosReadAccessRoleIdentifier)
+            .HasValue;
         }
     }
 }

@@ -34,6 +34,23 @@ namespace Tests.Unit.Core.Model
         }
 
         [Fact]
+        public void Cannot_Add_Local_TaskRef_That_Is_Already_On_System()
+        {
+            var someKle = new TaskRef(){ Uuid = A<Guid>()};
+            var kleAdditions = new List<TaskRef>() { someKle };
+            _sut.ItSystem = new ItSystem()
+            {
+                TaskRefs = kleAdditions
+            };
+
+            var result = _sut.UpdateKLEDeviations(kleAdditions, new List<TaskRef>());
+
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
+            Assert.Empty(_sut.TaskRefs);
+        }
+
+        [Fact]
         public void AddUsageRelationTo_Returns_Error_If_Destination_Equals_Self()
         {
             //Arrange

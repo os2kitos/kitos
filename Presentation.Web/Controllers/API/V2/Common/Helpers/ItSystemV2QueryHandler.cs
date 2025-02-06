@@ -29,7 +29,9 @@ namespace Presentation.Web.Controllers.API.V2.Common.Helpers
             string nameEquals = null,
             string nameContains = null,
             CommonOrderByProperty? orderByProperty = null,
-            BoundedPaginationQuery paginationQuery = null)
+            BoundedPaginationQuery paginationQuery = null,
+            Guid? excludeUuid = null,
+            Guid? excludeChildrenOfUuid = null)
         {
             var refinements = new List<IDomainQuery<ItSystem>>();
 
@@ -59,6 +61,12 @@ namespace Presentation.Web.Controllers.API.V2.Common.Helpers
 
             if (nameContains != null)
                 refinements.Add(new QueryByPartOfName<ItSystem>(nameContains));
+
+            if(excludeUuid.HasValue)
+                refinements.Add(new QueryExceptEntitiesWithUuids<ItSystem>(new List<Guid> {excludeUuid.Value}));
+
+            if(excludeChildrenOfUuid.HasValue)
+                refinements.Add(new QueryExceptChildrenOfUuid(excludeChildrenOfUuid.Value));
 
             return service.GetAvailableSystems(refinements.ToArray())
                 .OrderApiResultsByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)

@@ -20,6 +20,8 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Role;
+using Core.ApplicationServices.Model.GDPR;
+using Core.ApplicationServices.Organizations;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -41,7 +43,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IOrganizationalUserContext _userContext;
         private readonly IGenericRepository<DataProcessingRegistrationOversightDate> _dataProcessingRegistrationOversightDateRepository;
         private readonly IGenericRepository<SubDataProcessor> _sdpRepository;
-
+        private readonly IOrganizationService _organizationService;
 
         public DataProcessingRegistrationApplicationService(
             IAuthorizationContext authorizationContext,
@@ -59,7 +61,8 @@ namespace Core.ApplicationServices.GDPR
             ITransactionManager transactionManager,
             IOrganizationalUserContext userContext,
             IGenericRepository<DataProcessingRegistrationOversightDate> dataProcessingRegistrationOversightDateRepository,
-            IGenericRepository<SubDataProcessor> sdpRepository)
+            IGenericRepository<SubDataProcessor> sdpRepository, 
+            IOrganizationService organizationService)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;
@@ -77,6 +80,7 @@ namespace Core.ApplicationServices.GDPR
             _userContext = userContext;
             _dataProcessingRegistrationOversightDateRepository = dataProcessingRegistrationOversightDateRepository;
             _sdpRepository = sdpRepository;
+            _organizationService = organizationService;
         }
 
         public Result<DataProcessingRegistration, OperationError> Create(int organizationId, string name)
@@ -224,17 +228,22 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<IEnumerable<ItSystemUsage>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
         {
-            if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
             return WithReadAccess<IEnumerable<ItSystemUsage>>(id, registration =>
-                _systemAssignmentService
-                    .GetApplicableSystems(registration)
-                    .Where(x => x.ItSystem.Name.Contains(nameQuery))
-                    .OrderBy(x => x.Id)
-                    .Take(pageSize)
-                    .OrderBy(x => x.ItSystem.Name)
-                    .ToList()
+                {
+                    var query = _systemAssignmentService
+                        .GetApplicableSystems(registration);
+
+                    if (!string.IsNullOrEmpty(nameQuery))
+                        query = query.Where(x => x.ItSystem.Name.Contains(nameQuery));
+
+                    return query
+                        .OrderBy(x => x.Id)
+                        .Take(pageSize)
+                        .OrderBy(x => x.ItSystem.Name)
+                        .ToList();
+                }
             );
         }
 
@@ -250,18 +259,23 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<IEnumerable<Organization>, OperationError> GetDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
         {
-            if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
             return WithReadAccess<IEnumerable<Organization>>(id,
                 registration =>
-                    _dataProcessingRegistrationDataProcessorAssignmentService
-                        .GetApplicableDataProcessors(registration)
-                        .ByPartOfNameOrCvr(nameQuery)
-                        .OrderBy(x => x.Id)
-                        .Take(pageSize)
-                        .OrderBy(x => x.Name)
-                        .ToList());
+                {
+                    var query = _dataProcessingRegistrationDataProcessorAssignmentService
+                        .GetApplicableDataProcessors(registration);
+
+                    if (!string.IsNullOrEmpty(nameQuery))
+                        query = query.ByPartOfNameOrCvr(nameQuery);
+
+                    return query
+                            .OrderBy(x => x.Id)
+                            .Take(pageSize)
+                            .OrderBy(x => x.Name)
+                            .ToList();
+                });
         }
 
         public Result<Organization, OperationError> AssignDataProcessor(int id, int organizationId)
@@ -276,18 +290,22 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<IEnumerable<Organization>, OperationError> GetSubDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
         {
-            if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
             return WithReadAccess<IEnumerable<Organization>>(id,
                 registration =>
-                    _dataProcessingRegistrationDataProcessorAssignmentService
-                        .GetApplicableSubDataProcessors(registration)
-                        .ByPartOfNameOrCvr(nameQuery)
-                        .OrderBy(x => x.Id)
+                {
+                    var query = _dataProcessingRegistrationDataProcessorAssignmentService
+                        .GetApplicableSubDataProcessors(registration);
+
+                    if (!string.IsNullOrEmpty(nameQuery))
+                        query = query.ByPartOfNameOrCvr(nameQuery);
+
+                    return query.OrderBy(x => x.Id)
                         .Take(pageSize)
                         .OrderBy(x => x.Name)
-                        .ToList());
+                        .ToList();
+                });
         }
 
         public Result<DataProcessingRegistration, OperationError> SetSubDataProcessorsState(int id, YesNoUndecidedOption state)
@@ -584,6 +602,32 @@ namespace Core.ApplicationServices.GDPR
                     dpr => _authorizationContext.AllowReads(dpr) ? dpr : new OperationError(OperationFailure.Forbidden),
                     () => new OperationError(OperationFailure.NotFound)
                 );
+        }
+
+        public Result<DataProcessingRegistrationPermissions, OperationError> GetPermissions(Guid uuid)
+        {
+            return GetByUuid(uuid).Transform(GetPermissions);
+        }
+
+        public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid)
+                .Select(organization => ResourceCollectionPermissionsResult.FromOrganizationId<DataProcessingRegistration>(organization.Id, _authorizationContext));
+        }
+
+        private Result<DataProcessingRegistrationPermissions, OperationError> GetPermissions(Result<DataProcessingRegistration, OperationError> systemResult)
+        {
+            return systemResult
+                .Transform
+                (
+                    system =>
+                    {
+                        return ResourcePermissionsResult
+                            .FromResolutionResult(system, _authorizationContext)
+                            .Select(permissions =>
+                                new DataProcessingRegistrationPermissions(permissions));
+                    });
         }
     }
 }

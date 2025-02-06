@@ -435,7 +435,8 @@
                                 this.criticalityOptionViewModel.enabledOptions,
                                 true),
                             false)
-                        .withRendering(dataItem => dataItem.CriticalityId ? Helpers.RenderFieldsHelper.renderString(this.criticalityOptionViewModel.getOptionText(dataItem.CriticalityId)) : ""))
+                        .withRendering(dataItem => dataItem.CriticalityId ? Helpers.RenderFieldsHelper.renderString(this.criticalityOptionViewModel.getOptionText(dataItem.CriticalityId)) : "")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.criticality)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ResponsibleOrgUnitName")
@@ -496,7 +497,8 @@
                                 this.contractTemplateOptionViewModel.enabledOptions,
                                 true),
                             false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.contractTemplateOptionViewModel.getOptionText(dataItem.ContractTemplateId))))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(this.contractTemplateOptionViewModel.getOptionText(dataItem.ContractTemplateId)))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage.children.template)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName(this.purchaseFormIdPropertyName)

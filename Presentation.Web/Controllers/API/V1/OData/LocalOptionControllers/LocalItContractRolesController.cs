@@ -2,6 +2,7 @@
 using Core.DomainModel.ItContract;
 using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
+using Core.DomainServices.Generic;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
@@ -12,9 +13,12 @@ namespace Presentation.Web.Controllers.API.V1.OData.LocalOptionControllers
     [ODataRoutePrefix("LocalItContractRoles")]
     public class LocalItContractRolesController : LocalOptionBaseController<LocalItContractRole, ItContractRight, ItContractRole>
     {
-        public LocalItContractRolesController(IGenericRepository<LocalItContractRole> repository, IGenericRepository<ItContractRole> optionsRepository)
+        private readonly IEntityIdentityResolver _identityResolver;
+
+        public LocalItContractRolesController(IGenericRepository<LocalItContractRole> repository, IGenericRepository<ItContractRole> optionsRepository, IEntityIdentityResolver identityResolver)
             : base(repository, optionsRepository)
         {
+            _identityResolver = identityResolver;
         }
 
         [EnableQuery]

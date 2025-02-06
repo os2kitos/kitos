@@ -37,7 +37,7 @@ namespace Presentation.Web.Infrastructure.Filters
         {
             if (context.CandidateState is FailedState failedState)
             {
-                if(context.GetJobParameter<bool>(HangfireNoMoreRetriesKey))
+                if (context.GetJobParameter<bool>(HangfireNoMoreRetriesKey))
                 {
                     if (IsSendAdvice(context))
                     {
@@ -75,7 +75,7 @@ namespace Presentation.Web.Infrastructure.Filters
                                 userNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.Value, nameForNotification, $"Afsendelse af advis fejlede efter {KitosConstants.MaxHangfireRetries} forsøg. Undersøg gerne nærmere og rapportér evt. fejlen.", advice.RelationId.Value, advice.Type, NotificationType.Advice);
                             }
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             logger.Error(e, $"Failed to create user notification for failed hangfire job: {context.BackgroundJob.Job}");
                         }

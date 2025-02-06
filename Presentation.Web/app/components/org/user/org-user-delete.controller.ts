@@ -226,6 +226,31 @@
                 );
         }
 
+        copy() {
+            if (!confirm('Er du sikker på, at du vil kopiere rollerne?')) {
+                return;
+            }
+
+            const selectedRoles = this.collectSelectedRoles();
+            const selectedAdminRoles = this.collectSelectedAdminRoles();
+            this.userRoleAdministrationService
+                .copyAssignedRoles(
+                    this.loggedInUser.currentOrganizationId,
+                    this.userToModify.Id,
+                    this.selectedUser.Id,
+                    {
+                        administrativeAccessRoles: selectedAdminRoles.map(x => x.role),
+                        rights: selectedRoles.reduce<Array<Models.Users.IAssignedRightDTO>>((result, next) => result.concat(next.selectedModels.map(x => x.right)),
+                            [])
+                    }
+                ).then(success => {
+                    if (success) {
+                        this.deselectAll();
+                    }
+                }
+                );
+        }
+
         cancel() {
             this.$uibModalInstance.dismiss();
         }

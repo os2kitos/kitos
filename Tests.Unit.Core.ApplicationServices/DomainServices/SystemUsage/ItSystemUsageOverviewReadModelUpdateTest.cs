@@ -69,7 +69,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Email = $"test@tester.dk"
         };
 
-        private Mock<IGenericRepository<ItSystemUsageOverviewItContractReadModel>> _itContractReadModelRepoMock;
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewItContractReadModel>> _itContractReadModelRepoMock;
 
         [Fact]
         public void Apply_Generates_Correct_Read_Model()
@@ -155,17 +155,25 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Name = A<string>(),
                 IsAgreementConcluded = A<YesNoIrrelevantOption>()
             };
+            var organizationId = A<int>();
+            var parentItSystemUsage = new ItSystemUsage()
+            {
+                Uuid = A<Guid>(),
+                OrganizationId = organizationId
+            };
             var parentSystem = new ItSystem
             {
                 Id = A<int>(),
                 Name = A<string>(),
-                Disabled = A<bool>()
+                Disabled = A<bool>(),
+                Usages = new List<ItSystemUsage>(){ parentItSystemUsage },
             };
             var system = new ItSystem
             {
                 Id = A<int>(),
                 OrganizationId = A<int>(),
                 Name = A<string>(),
+                Description = A<string>(),
                 Disabled = A<bool>(),
                 PreviousName= A<string>(),
                 Parent = parentSystem,
@@ -193,7 +201,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             var systemUsage = new ItSystemUsage
             {
                 Id = A<int>(),
-                OrganizationId = A<int>(),
+                OrganizationId = organizationId,
                 ItSystem = system,
                 ExpirationDate = DateTime.Now.AddDays(-1),
                 Version = A<string>(),
@@ -231,6 +239,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 },
                 GeneralPurpose = A<string>(),
                 HostedAt = A<HostedAt>(),
+                UserCount = A<UserCount>(),
                 UsageRelations = new List<SystemRelation>
                 {
                     outgoingRelation
@@ -282,6 +291,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             };
             systemUsage.ArchivePeriods = archivePeriods;
 
+            systemUsage.ItSystemCategories = new ItSystemCategories
+                { Id = A<int>(), Uuid = A<Guid>(), Name = A<string>() };
+
             var readModel = new ItSystemUsageOverviewReadModel();
 
             //Act
@@ -314,9 +326,13 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.LinkToDirectoryUrl, readModel.LinkToDirectoryUrl);
             Assert.Equal(systemUsage.GeneralPurpose, readModel.GeneralPurpose);
             Assert.Equal(systemUsage.HostedAt, readModel.HostedAt);
+            Assert.Equal(systemUsage.UserCount, readModel.UserCount);
             Assert.Equal(systemUsage.riskAssesmentDate, readModel.RiskAssessmentDate);
             Assert.Equal(systemUsage.PlannedRiskAssessmentDate, readModel.PlannedRiskAssessmentDate);
             Assert.Equal(systemUsage.ItSystem.PreviousName, readModel.SystemPreviousName);
+            Assert.Equal(systemUsage.ItSystem.Description, readModel.SystemDescription);
+            Assert.Equal(systemUsage.DPIA, readModel.DPIAConducted);
+            Assert.Equal(systemUsage.isBusinessCritical, readModel.IsBusinessCritical);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
@@ -330,6 +346,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(system.ExternalUuid, readModel.ExternalSystemUuid);
             Assert.Equal(system.BelongsTo.Id, readModel.ItSystemRightsHolderId);
             Assert.Equal(system.BelongsTo.Name, readModel.ItSystemRightsHolderName);
+            Assert.Equal(systemUsage.ItSystemCategories.Uuid, readModel.ItSystemCategoriesUuid);
+            Assert.Equal(systemUsage.ItSystemCategories.Id, readModel.ItSystemCategoriesId);
+            Assert.Equal(systemUsage.ItSystemCategories.Name, readModel.ItSystemCategoriesName);
             Assert.Equal(system.BusinessType.Id, readModel.ItSystemBusinessTypeId);
             Assert.Equal(system.BusinessType.Uuid, readModel.ItSystemBusinessTypeUuid);
             Assert.Equal(system.BusinessType.Name, readModel.ItSystemBusinessTypeName);
@@ -338,6 +357,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(parentSystem.Name, readModel.ParentItSystemName);
             Assert.Equal(parentSystem.Id, readModel.ParentItSystemId);
             Assert.Equal(parentSystem.Disabled, readModel.ParentItSystemDisabled);
+            Assert.Equal(system.Parent.Usages.FirstOrDefault()!.Uuid, readModel.ParentItSystemUsageUuid);
 
             //Assigned Roles
             var roleAssignment = Assert.Single(readModel.RoleAssignments);
@@ -385,7 +405,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(expectedContracts.Count, readModel.AssociatedContracts.Count);
             expectedContracts.ForEach(contract =>
             {
-                Assert.True(readModel.AssociatedContractsNamesCsv.Contains(contract.Name));
+                Assert.Contains(contract.Name, readModel.AssociatedContractsNamesCsv);
                 Assert.Contains(readModel.AssociatedContracts, associatedContract =>
                     associatedContract.ItContractId == contract.Id &&
                     associatedContract.ItContractName == contract.Name &&
@@ -497,6 +517,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             //Assert
             Assert.Null(readModel.ParentItSystemName);
             Assert.Null(readModel.ParentItSystemId);
+            Assert.Null(readModel.ParentItSystemUsageUuid);
         }
 
         [Fact]
@@ -689,6 +710,36 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
 
             //Assert
             Assert.Equal(HostedAt.UNDECIDED, readModel.HostedAt);
+        }
+
+        [Fact]
+        public void Apply_Generates_UserCount_As_UNDECIDED_If_UserCount_Is_Null()
+        {
+            //Arrange
+            var system = new ItSystem
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
+            var systemUsage = new ItSystemUsage
+            {
+                Id = A<int>(),
+                OrganizationId = A<int>(),
+                ItSystem = system,
+                ObjectOwner = DefaultTestUser,
+                LastChangedByUser = DefaultTestUser,
+                LastChanged = A<DateTime>(),
+                AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>(),
+                UserCount = null
+            };
+
+            var readModel = new ItSystemUsageOverviewReadModel();
+
+            //Act
+            _sut.Apply(systemUsage, readModel);
+
+            //Assert
+            Assert.Equal(UserCount.UNDECIDED, readModel.UserCount);
         }
 
         private ItSystemUsageOverviewReadModel Test_ActiveAccordingToValidityPeriod_Based_On_ExpirationDate(DateTime expirationDate)

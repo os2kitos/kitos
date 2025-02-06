@@ -67,6 +67,7 @@
     <Compile Include="Mapping\AdviceUserRelationMap.cs" />
     <Compile Include="Mapping\AttachedOptionMap.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
+    <Compile Include="Mapping\CountryCodeMap.cs" />
     <Compile Include="Mapping\CriticalityTypeMap.cs" />
     <Compile Include="Mapping\CustomizedUINodeMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationMap.cs" />
@@ -1034,6 +1035,62 @@
     <Compile Include="Migrations\202401120652462_AddedPreviousNameToSystemUsageReadModel.designer.cs">
       <DependentUpon>202401120652462_AddedPreviousNameToSystemUsageReadModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202406060800551_oversight-date-uuid.cs" />
+    <Compile Include="Migrations\202406060800551_oversight-date-uuid.designer.cs">
+      <DependentUpon>202406060800551_oversight-date-uuid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202408121228045_ItContractReferenceUuids.cs" />
+    <Compile Include="Migrations\202408121228045_ItContractReferenceUuids.designer.cs">
+      <DependentUpon>202408121228045_ItContractReferenceUuids.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202408140740032_ItContractReadModelChoiceTypeUuids.cs" />
+    <Compile Include="Migrations\202408140740032_ItContractReadModelChoiceTypeUuids.designer.cs">
+      <DependentUpon>202408140740032_ItContractReadModelChoiceTypeUuids.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202408141200331_DataProcessingRegistrationChoiceTypeUuids.cs" />
+    <Compile Include="Migrations\202408141200331_DataProcessingRegistrationChoiceTypeUuids.designer.cs">
+      <DependentUpon>202408141200331_DataProcessingRegistrationChoiceTypeUuids.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202408160815331_ContractReadModelSystemUuid.cs" />
+    <Compile Include="Migrations\202408160815331_ContractReadModelSystemUuid.designer.cs">
+      <DependentUpon>202408160815331_ContractReadModelSystemUuid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202408221223410_UsageReadModelSystemDescription.cs" />
+    <Compile Include="Migrations\202408221223410_UsageReadModelSystemDescription.designer.cs">
+      <DependentUpon>202408221223410_UsageReadModelSystemDescription.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202408231128146_FixSystemDescriptionIndex.cs" />
+    <Compile Include="Migrations\202408231128146_FixSystemDescriptionIndex.designer.cs">
+      <DependentUpon>202408231128146_FixSystemDescriptionIndex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202409031119418_Added Email On Dataprocessing Registration.cs" />
+    <Compile Include="Migrations\202409031119418_Added Email On Dataprocessing Registration.Designer.cs">
+      <DependentUpon>202409031119418_Added Email On Dataprocessing Registration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202411191141307_Add country code to organization.cs" />
+    <Compile Include="Migrations\202411191141307_Add country code to organization.designer.cs">
+      <DependentUpon>202411191141307_Add country code to organization.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202412021334284_Add_UUID_To_UserNotification.cs" />
+    <Compile Include="Migrations\202412021334284_Add_UUID_To_UserNotification.Designer.cs">
+      <DependentUpon>202412021334284_Add_UUID_To_UserNotification.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202501091001395_UsageCategoriesAndUserCount.cs" />
+    <Compile Include="Migrations\202501091001395_UsageCategoriesAndUserCount.Designer.cs">
+      <DependentUpon>202501091001395_UsageCategoriesAndUserCount.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202501160951303_Parent_Usage_Uuid_On_Read_Model.cs" />
+    <Compile Include="Migrations\202501160951303_Parent_Usage_Uuid_On_Read_Model.designer.cs">
+      <DependentUpon>202501160951303_Parent_Usage_Uuid_On_Read_Model.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202501231413228_add_dpia_and_businessCritical_fields_to_usage_overview.cs" />
+    <Compile Include="Migrations\202501231413228_add_dpia_and_businessCritical_fields_to_usage_overview.Designer.cs">
+      <DependentUpon>202501231413228_add_dpia_and_businessCritical_fields_to_usage_overview.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202501281353180_add_latest_oversight_remark_to_dpr_read_model.cs" />
+    <Compile Include="Migrations\202501281353180_add_latest_oversight_remark_to_dpr_read_model.Designer.cs">
+      <DependentUpon>202501281353180_add_latest_oversight_remark_to_dpr_read_model.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
@@ -1046,6 +1103,48 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202401120652462_AddedPreviousNameToSystemUsageReadModel.resx">
       <DependentUpon>202401120652462_AddedPreviousNameToSystemUsageReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202406060800551_oversight-date-uuid.resx">
+      <DependentUpon>202406060800551_oversight-date-uuid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202408121228045_ItContractReferenceUuids.resx">
+      <DependentUpon>202408121228045_ItContractReferenceUuids.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202408140740032_ItContractReadModelChoiceTypeUuids.resx">
+      <DependentUpon>202408140740032_ItContractReadModelChoiceTypeUuids.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202408141200331_DataProcessingRegistrationChoiceTypeUuids.resx">
+      <DependentUpon>202408141200331_DataProcessingRegistrationChoiceTypeUuids.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202408160815331_ContractReadModelSystemUuid.resx">
+      <DependentUpon>202408160815331_ContractReadModelSystemUuid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202408221223410_UsageReadModelSystemDescription.resx">
+      <DependentUpon>202408221223410_UsageReadModelSystemDescription.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202408231128146_FixSystemDescriptionIndex.resx">
+      <DependentUpon>202408231128146_FixSystemDescriptionIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202409031119418_Added Email On Dataprocessing Registration.resx">
+      <DependentUpon>202409031119418_Added Email On Dataprocessing Registration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202411191141307_Add country code to organization.resx">
+      <DependentUpon>202411191141307_Add country code to organization.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202412021334284_Add_UUID_To_UserNotification.resx">
+      <DependentUpon>202412021334284_Add_UUID_To_UserNotification.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202501091001395_UsageCategoriesAndUserCount.resx">
+      <DependentUpon>202501091001395_UsageCategoriesAndUserCount.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202501160951303_Parent_Usage_Uuid_On_Read_Model.resx">
+      <DependentUpon>202501160951303_Parent_Usage_Uuid_On_Read_Model.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202501231413228_add_dpia_and_businessCritical_fields_to_usage_overview.resx">
+      <DependentUpon>202501231413228_add_dpia_and_businessCritical_fields_to_usage_overview.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202501281353180_add_latest_oversight_remark_to_dpr_read_model.resx">
+      <DependentUpon>202501281353180_add_latest_oversight_remark_to_dpr_read_model.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_DataRow.sql" />
     <EmbeddedResource Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.resx">
@@ -1064,6 +1163,7 @@
       <DependentUpon>202303030830463_notification_uuid.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_ExternalReference.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_UserNotification.sql" />
     <Compile Include="Services\DatabaseTransaction.cs" />
     <Compile Include="Services\EntityFrameworkContextDatabaseControl.cs" />
     <Compile Include="Services\PocoTypeFromProxyResolver.cs" />

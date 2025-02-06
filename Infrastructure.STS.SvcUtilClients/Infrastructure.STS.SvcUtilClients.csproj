@@ -31,7 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AdresseService.cs" />
+    <Compile Include="BrugerService.cs" />
     <Compile Include="OrganisationSystemService.cs" />
+    <Compile Include="PersonService.cs" />
     <Compile Include="VirksomhedService.cs" />
     <Compile Include="OrganisationService.cs" />
   </ItemGroup>
@@ -51,6 +54,171 @@
     <PackageReference Include="System.ServiceModel.Federation" Version="4.10.*" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Adresse\run.bat" />
+    <None Include="Adresse\wsdl\Adresse.wsdl" />
+    <None Include="Adresse\wsdl\Adresse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\AdresseBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\AdresseOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\Bruger.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\BrugerBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\BrugerOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\Facet.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\FacetBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\FacetOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\GenerelleDefinitioner.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\Interessefaellesskab.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\InteressefaellesskabBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\InteressefaellesskabOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\ItSystem.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\ItSystemBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\ItSystemOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\Klasse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\KlasseBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\KlasseOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\Klassifikation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\KlassifikationBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\KlassifikationOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\KlassifikationSystemOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\Myndighed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\MyndighedBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\MyndighedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\OIOIDWS.wsdl" />
+    <None Include="Adresse\wsdl\Organisation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\OrganisationAdministrationOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\OrganisationBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\OrganisationEnhed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\OrganisationEnhedBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\OrganisationEnhedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\OrganisationFaelles.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\OrganisationFunktion.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\OrganisationFunktionBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\OrganisationFunktionOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\OrganisationOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\OrganisationSystemOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\Part.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\Person.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\PersonBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\PersonOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\RequestHeader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\SagDokObjekt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\Virksomhed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\VirksomhedBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Adresse\wsdl\VirksomhedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Bruger\BrugerOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Bruger\run.bat" />
+    <None Include="Bruger\wsdl\Bruger.wsdl" />
+    <None Include="Bruger\wsdl\Bruger.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Bruger\wsdl\BrugerBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Bruger\wsdl\GenerelleDefinitioner.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Bruger\wsdl\OIOIDWS.wsdl" />
+    <None Include="Bruger\wsdl\RequestHeader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Bruger\wsdl\SagDokObjekt.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="OrganisationSystem\OrganisationSystemOperationer.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -228,6 +396,152 @@
     <None Include="Organisation\wsdl\SagDokObjekt.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Person\PersonOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\run.bat" />
+    <None Include="Person\wsdl\Adresse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\AdresseBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\AdresseOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\Bruger.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\BrugerBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\BrugerOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\Facet.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\FacetBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\FacetOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\GenerelleDefinitioner.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\Interessefaellesskab.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\InteressefaellesskabBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\InteressefaellesskabOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\ItSystem.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\ItSystemBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\ItSystemOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\Klasse.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\KlasseBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\KlasseOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\Klassifikation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\KlassifikationBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\KlassifikationOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\KlassifikationSystemOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\Myndighed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\MyndighedBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\MyndighedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\Organisation.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\OrganisationAdministrationOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\OrganisationBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\OrganisationEnhed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\OrganisationEnhedBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\OrganisationEnhedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\OrganisationFaelles.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\OrganisationFunktion.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\OrganisationFunktionBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\OrganisationFunktionOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\OrganisationOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\OrganisationSystemOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\Part.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\Person.wsdl" />
+    <None Include="Person\wsdl\Person.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\PersonBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\PersonOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\RequestHeader.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\SagDokObjekt.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\Virksomhed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\VirksomhedBesked.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Person\wsdl\VirksomhedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="runall.bat" />
     <None Include="Virksomhed\run.bat" />
     <None Include="Virksomhed\VirksomhedServiceMsg.xsd">
@@ -256,5 +570,10 @@
     <None Include="Virksomhed\wsdl\VirksomhedOperationer.xsd">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Adresse\wsdl\RequestHeader-example.xml" />
+    <Content Include="Person\wsdl\RequestHeader-example.xml" />
   </ItemGroup>
 </Project>

@@ -4,16 +4,22 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.SystemUsage;
+using Core.ApplicationServices.SystemUsage.Relations;
 using Core.ApplicationServices.SystemUsage.Write;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainServices.Generic;
 using Presentation.Web.Controllers.API.V2.Common.Helpers;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
+using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
 
@@ -27,11 +33,17 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
     {
         private readonly IItSystemUsageService _itSystemUsageService;
         private readonly IItSystemUsageWriteService _writeService;
+        private readonly IItsystemUsageRelationsService _relationsService;
+        private readonly IEntityIdentityResolver _identityResolver;
+        private readonly IItSystemUsageResponseMapper _responseMapper;
 
-        public ItSystemUsageInternalV2Controller(IItSystemUsageService itSystemUsageService, IItSystemUsageWriteService writeService)
+        public ItSystemUsageInternalV2Controller(IItSystemUsageService itSystemUsageService, IItSystemUsageWriteService writeService, IItsystemUsageRelationsService relationsService, IEntityIdentityResolver identityResolver, IItSystemUsageResponseMapper responseMapper)
         {
             _itSystemUsageService = itSystemUsageService;
             _writeService = writeService;
+            _relationsService = relationsService;
+            _identityResolver = identityResolver;
+            _responseMapper = responseMapper;
         }
 
         /// <summary>
@@ -61,6 +73,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
             [NonEmptyGuid] Guid? relatedToSystemUuid = null,
             [NonEmptyGuid] Guid? relatedToSystemUsageUuid = null,
             [NonEmptyGuid] Guid? relatedToContractUuid = null,
+            [NonEmptyGuid] Guid? systemUuid = null,
             string systemNameContent = null,
             DateTime? changedSinceGtEq = null,
             CommonOrderByProperty? orderByProperty = null,
@@ -70,7 +83,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _itSystemUsageService
-                .ExecuteItSystemUsagesQuery(organizationUuid, relatedToSystemUuid, relatedToSystemUsageUuid, relatedToContractUuid, null, systemNameContent, changedSinceGtEq, orderByProperty, paginationQuery)
+                .ExecuteItSystemUsagesQuery(organizationUuid, relatedToSystemUuid, relatedToSystemUsageUuid, relatedToContractUuid, systemUuid, systemNameContent, changedSinceGtEq, orderByProperty, paginationQuery)
                 .Select(Map)
                 .Transform(Ok);
         }
@@ -118,6 +131,28 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItSystemUsages
             return _writeService
                 .DeleteByItSystemAndOrganizationUuids(systemUuid, organizationUuid)
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+        }
+
+        [HttpGet]
+        [Route("relations/{contractUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<GeneralSystemRelationResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetRelations([NonEmptyGuid] Guid contractUuid)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            var contractId = _identityResolver.ResolveDbId<ItContract>(contractUuid);
+            if (contractId.IsNone)
+            {
+                return FromOperationError(new OperationError($"Contract with uuid was not found: {contractUuid}",
+                    OperationFailure.NotFound));
+            }
+
+            return _relationsService.GetRelationsAssociatedWithContract(contractId.Value)
+                .Select(relations => relations.Select(_responseMapper.MapGeneralSystemRelationDTO))
+                .Match(Ok, FromOperationError);
         }
 
         private static ItSystemUsageSearchResultResponseDTO Map(ItSystemUsage usage)

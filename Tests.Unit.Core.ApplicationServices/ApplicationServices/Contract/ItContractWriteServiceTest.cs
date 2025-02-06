@@ -9,6 +9,7 @@ using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
+using Core.ApplicationServices.Generic;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared.Write;
@@ -53,6 +54,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IItSystemUsageService> _usageServiceMock;
         private readonly Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>> _roleAssignmentService;
         private readonly Mock<IDataProcessingRegistrationApplicationService> _dprServiceMock;
+        private readonly Mock<IEntityTreeUuidCollector> _entityTreeUuidCollector;
 
         public ItContractWriteServiceTest()
         {
@@ -70,7 +72,23 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _usageServiceMock = new Mock<IItSystemUsageService>();
             _roleAssignmentService = new Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>>();
             _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _referenceServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _roleAssignmentService.Object, _dprServiceMock.Object, Mock.Of<IGenericRepository<EconomyStream>>());
+            _entityTreeUuidCollector = new Mock<IEntityTreeUuidCollector>();
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, 
+                _identityResolverMock.Object, 
+                _optionResolverMock.Object, 
+                _transactionManagerMock.Object, 
+                _domainEventsMock.Object, 
+                _databaseControlMock.Object, 
+                _agreementElementTypeRepository.Object, 
+                _authContext.Object, 
+                _organizationServiceMock.Object, 
+                _referenceServiceMock.Object, 
+                _assignmentUpdateServiceMock.Object, 
+                _usageServiceMock.Object, 
+                _roleAssignmentService.Object, 
+                _dprServiceMock.Object, 
+                Mock.Of<IGenericRepository<EconomyStream>>(),
+                _entityTreeUuidCollector.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -1414,6 +1432,105 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertPayments(parameters.Payments.Value, contract);
         }
 
+
+        [Fact]
+        public void Can_Add_Role()
+        {
+            //Arrange
+            var (_, _, contract, transaction) = SetupCreateScenarioPrerequisites();
+            var existingAssignment = A<UserRolePair>();
+            contract.Rights.Add(new ItContractRight { Role = new ItContractRole { Uuid = existingAssignment.RoleUuid }, User = new User { Uuid = existingAssignment.UserUuid } });
+            var newAssignment = A<UserRolePair>();
+
+            ExpectGetReturns(contract.Uuid, contract);
+            ExpectAllowModifySuccess(contract);
+
+            _roleAssignmentService.Setup(x => x.BatchUpdateRoles(
+                        contract,
+                        It.Is<IEnumerable<(Guid roleUuid, Guid user)>>(assignments =>
+                            MatchExpectedAssignments(assignments, new[] { existingAssignment, newAssignment }.ToList()))
+                    )
+                )
+                .Returns(Maybe<OperationError>.None);
+
+            //Act
+            var createResult = _sut.AddRole(contract.Uuid, newAssignment);
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+        [Fact]
+        public void Cannot_Add_Duplicate_Role_Assignment()
+        {
+            //Arrange
+            var (_, _, contract, transaction) = SetupCreateScenarioPrerequisites();
+            var existingAssignment = A<UserRolePair>();
+            contract.Rights.Add(new ItContractRight { Role = new ItContractRole { Uuid = existingAssignment.RoleUuid }, User = new User { Uuid = existingAssignment.UserUuid } });
+
+            ExpectGetReturns(contract.Uuid, contract);
+            ExpectAllowModifySuccess(contract);
+
+            //Act
+            var createResult = _sut.AddRole(contract.Uuid, existingAssignment);
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.Conflict, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transaction);
+        }
+
+        [Fact]
+        public void Can_Remove_Role()
+        {
+            //Arrange
+            var (_, _, contract, transaction) = SetupCreateScenarioPrerequisites();
+            var existingAssignment1 = A<UserRolePair>();
+            var existingAssignment2 = A<UserRolePair>();
+            contract.Rights.Add(new ItContractRight { Role = new ItContractRole { Uuid = existingAssignment1.RoleUuid }, User = new User { Uuid = existingAssignment1.UserUuid } });
+            contract.Rights.Add(new ItContractRight { Role = new ItContractRole { Uuid = existingAssignment2.RoleUuid }, User = new User { Uuid = existingAssignment2.UserUuid } });
+
+            ExpectGetReturns(contract.Uuid, contract);
+            ExpectAllowModifySuccess(contract);
+
+            _roleAssignmentService
+                .Setup(x => x.BatchUpdateRoles(
+                        contract,
+                        It.Is<IEnumerable<(Guid roleUuid, Guid user)>>(assignments =>
+                            MatchExpectedAssignments(assignments, new[] { existingAssignment1 }.ToList()))
+                    )
+                )
+                .Returns(Maybe<OperationError>.None);
+
+            //Act
+            var createResult = _sut.RemoveRole(contract.Uuid, existingAssignment2);
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Remove_Role_If_Not_Assigned()
+        {
+            //Arrange
+            var (_, _, contract, transaction) = SetupCreateScenarioPrerequisites();
+            var existingAssignment1 = A<UserRolePair>();
+            var assignmentThatDoesNotExist = A<UserRolePair>();
+            contract.Rights.Add(new ItContractRight { Role = new ItContractRole { Uuid = existingAssignment1.RoleUuid }, User = new User { Uuid = existingAssignment1.UserUuid } });
+
+            ExpectGetReturns(contract.Uuid, contract);
+            ExpectAllowModifySuccess(contract);
+
+            //Act
+            var createResult = _sut.RemoveRole(contract.Uuid, assignmentThatDoesNotExist);
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transaction);
+        }
+
         private static void AssertPayments(ItContractPaymentDataModificationParameters input, ItContract updatedContract)
         {
             AssertPaymentStream(input.ExternalPayments.NewValue.ToList(), updatedContract.ExternEconomyStreams.ToList());
@@ -1700,6 +1817,11 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var trasactionMock = new Mock<IDatabaseTransaction>();
             _transactionManagerMock.Setup(x => x.Begin()).Returns(trasactionMock.Object);
             return trasactionMock;
+        }
+
+        private static bool MatchExpectedAssignments(IEnumerable<(Guid roleUuid, Guid user)> actual, List<UserRolePair> expected)
+        {
+            return actual.SequenceEqual(expected.Select(p => (roleUuid: p.RoleUuid, user: p.UserUuid)));
         }
     }
 }

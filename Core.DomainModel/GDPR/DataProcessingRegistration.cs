@@ -468,6 +468,11 @@ namespace Core.DomainModel.GDPR
             return oversightDate.Value;
         }
 
+        public Maybe<DataProcessingRegistrationOversightDate> GetLatestOversight()
+        {
+            return OversightDates.OrderByDescending(x => x.OversightDate).FirstOrNone();
+        }
+
         private Maybe<DataProcessingRegistrationOversightDate> GetOversightDate(int oversightId)
         {
             return OversightDates.FirstOrDefault(x => x.Id == oversightId).FromNullable();

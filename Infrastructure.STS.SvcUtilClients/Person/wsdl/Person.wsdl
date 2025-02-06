@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+        name="PersonService"
+        targetNamespace="http://stoettesystemerne.dk/organisation/6/"
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:tns="http://stoettesystemerne.dk/organisation/6/"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/"
+        xmlns:wsp="http://www.w3.org/ns/ws-policy"
+        xmlns:type="http://stoettesystemerne.dk/organisation/person/6/"
+        xmlns:header="http://kombit.dk/xml/schemas/RequestHeader/1/">
+
+
+  <wsdl:import namespace="http://serviceplatformen.dk/xml/wsdl/soap11/Security/Policy"
+               location="policies/OIOIDWS.wsdl"/>
+        
+  <wsdl:types>
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+		<xsd:import namespace="http://stoettesystemerne.dk/organisation/person/6/" schemaLocation="../xsd/6.0.STS-0/PersonOperationer.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/person/6/" schemaLocation="../xsd/6.0.STS-0/Person.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/person/6/" schemaLocation="../xsd/6.0.STS-0/PersonBesked.xsd"/>
+        <xsd:import namespace="http://stoettesystemerne.dk/organisation/6/" schemaLocation="../xsd/6.0.STS-0/OrganisationFaelles.xsd"/>
+        <xsd:import namespace="urn:oio:sts:part:6" schemaLocation="../xsd/6.0.STS-0/Part.xsd"/>
+        <xsd:import namespace="urn:oio:sts:6" schemaLocation="../xsd/6.0.STS-0/GenerelleDefinitioner.xsd"/>
+        <xsd:import namespace="urn:oio:sagdok:3.0.0" schemaLocation="../xsd/common/SagDokObjekt.xsd"/>
+        <xsd:import namespace="http://kombit.dk/xml/schemas/RequestHeader/1/" schemaLocation="../xsd/common/RequestHeader.xsd" />
+      </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="PersonImporterRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:ImportInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonOpretResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:OpretOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonLaesRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:LaesInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonListeResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:ListOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonPassiverRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:PassiverInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonSletRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:SletInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonLaesResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:LaesOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonRetResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:RetOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonRetRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:RetInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonImporterResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:ImportOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonSoegResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:SoegOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonOpretRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:OpretInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonSletResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:SletOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonPassiverResponseMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="response" element="type:PassiverOutput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonSoegRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:SoegInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PersonListeRequestMessage">
+    <wsdl:part name="header" element="header:RequestHeader"/>
+    <wsdl:part name="request" element="type:ListInput">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="PersonPortType">
+    <wsdl:operation name="opret">
+      <wsdl:input message="tns:PersonOpretRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:PersonOpretResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <wsdl:input message="tns:PersonImporterRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:PersonImporterResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <wsdl:input message="tns:PersonPassiverRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:PersonPassiverResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <wsdl:input message="tns:PersonLaesRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:PersonLaesResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <wsdl:input message="tns:PersonRetRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:PersonRetResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <wsdl:input message="tns:PersonSletRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:PersonSletResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <wsdl:input message="tns:PersonSoegRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:PersonSoegResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <wsdl:input message="tns:PersonListeRequestMessage">
+    </wsdl:input>
+      <wsdl:output message="tns:PersonListeResponseMessage">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Person" type="tns:PersonPortType">
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsp:PolicyReference URI="#ServiceplatformBindingPolicy"/>
+    <wsdl:operation name="opret">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/person/opret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:PersonOpretRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:PersonOpretResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="importer">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/person/importer" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:PersonImporterRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:PersonImporterResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="passiver">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/person/passiver" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:PersonPassiverRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:PersonPassiverResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="laes">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/person/laes" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:PersonLaesRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:PersonLaesResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ret">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/person/ret" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:PersonRetRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:PersonRetResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="slet">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/person/slet" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:PersonSletRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:PersonSletResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="soeg">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/person/soeg" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:PersonSoegRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:PersonSoegResponseMessage" part="header" use="literal"/>
+        <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="list">
+      <soap12:operation soapAction="http://kombit.dk/sts/organisation/person/list" soapActionRequired="false"/>
+      <wsdl:input>
+        <soap12:header message="tns:PersonListeRequestMessage" part="header" use="literal"/>
+        <soap12:body parts="request" use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:header message="tns:PersonListeResponseMessage" part="header" use="literal"/>
+       <soap12:body parts="response" use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="PersonService">
+    <wsdl:port name="Person" binding="tns:Person">
+      <soap12:address location="http://kombit.dk/sts/organisation/person"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

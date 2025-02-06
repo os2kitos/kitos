@@ -447,7 +447,7 @@ namespace Tests.Integration.Presentation.Web.Notifications
                     return result.Uuid;
                 case OwnerResourceType.ItSystemUsage:
                     var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-                    var usageResult = ItSystemUsageHelper.CreateItSystemUsageAsync(new ItSystemUsage { ItSystemId = system.Id, OrganizationId = organizationId });
+                    var usageResult = ItSystemUsageHelper.CreateItSystemUsage(new ItSystemUsage { ItSystemId = system.Id, OrganizationId = organizationId });
                     return usageResult.Uuid;
                 case OwnerResourceType.DataProcessingRegistration:
                     var dpr = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());

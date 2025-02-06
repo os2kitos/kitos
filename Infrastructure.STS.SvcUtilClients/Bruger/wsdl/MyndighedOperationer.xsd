@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified"
+        targetNamespace="http://stoettesystemerne.dk/organisation/myndighed/6/"
+        xmlns:oio="urn:oio:definitions:1.0.0"
+        xmlns:myndighed="http://stoettesystemerne.dk/organisation/myndighed/6/"
+        xmlns:sd="urn:oio:sagdok:3.0.0"
+        oio:mapping="urn:oio:sagdok:MPD:3.0.0"
+        xmlns:sts="urn:oio:sts:6"
+        >
+
+    <import namespace = "urn:oio:sagdok:3.0.0" schemaLocation="../common/SagDokObjekt.xsd"/>
+    <import namespace = "urn:oio:sts:6" schemaLocation="GenerelleDefinitioner.xsd"/>
+    <include schemaLocation="Myndighed.xsd"/>
+    
+    <element name="ImportInput" type="myndighed:ImportInputType" oio:definition="urn:oio:sts:myndighedimportinput:ADD:2.0.0"/>
+    <element name="ImportOutput" type="sd:BasicOutputType" oio:definition="urn:oio:sts:myndighedimportoutput:ASDD:2.0.0"/>
+    
+    <element name="OpretInput" type="myndighed:OpretInputType" oio:definition="urn:oio:sts:myndighedopretinput:ADD:2.0.0"/>
+    <element name="OpretOutput" type="sd:OpretOutputType" oio:definition="urn:oio:sts:myndighedopretoutput:ADD:2.0.0"/>
+
+    <element name="RetInput" type="myndighed:RetInputType" oio:definition="urn:oio:sts:myndighedretinput:ADD:2.0.0"/>
+    <element name="RetOutput" type="sd:BasicOutputType" oio:definition="urn:oio:sts:myndighedretoutput:ASDD:1.0.0"/>
+    
+    <element name="PassiverInput" type="sd:UuidNoteInputType" oio:definition="urn:oio:sts:myndighedpassiverinput:ASDD:1.0.0"/>
+    <element name="PassiverOutput" type="sd:BasicOutputType" oio:definition="urn:oio:sts:myndighedpassiveroutput:ASDD:1.0.0"/>
+    
+    <element name="SletInput" type="sd:UuidNoteInputType" oio:definition="urn:oio:sts:myndighedsletinput:ASDD:1.0.0"/>
+    <element name="SletOutput" type="sd:BasicOutputType" oio:definition="urn:oio:sts:myndighedsletoutput:ASDD:1.0.0"/>
+    
+    <element name="LaesInput" type="sd:LaesInputType" oio:definition="urn:oio:sts:myndighedlaesinput:ASDD:1.0.0"/>
+    <element name="LaesOutput" type="myndighed:LaesOutputType" oio:definition="urn:oio:sts:myndighedlaesoutput:ADD:2.0.0"/>
+
+    <element name="ListInput" type="sd:ListInputType" oio:definition="urn:oio:sts:myndighedlistinput:ASDD:1.0.0"/>
+    <element name="ListOutput" type="myndighed:ListOutputType" oio:definition="urn:oio:sts:myndighedlistoutput:ADD:2.0.0"/>
+
+    <element name="SoegInput" type="myndighed:SoegInputType" oio:definition="urn:oio:sts:myndighedsoeginput:ADD:2.0.0"/>
+    <element name="SoegOutput" type="sd:SoegOutputType" oio:definition="urn:oio:sts:myndighedsoegoutput:ASDD:1.0.0"/>
+    
+    <complexType name="ImportInputType" oio:definition="urn:oio:sts:myndighedimportinput:ADD:2.0.0">
+        <sequence>
+            <element ref="myndighed:Myndighed" oio:content="myndighed"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="OpretInputType" oio:definition="urn:oio:sts:myndighedopretinput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:OpretInputType">
+                <sequence>
+                    <element ref="myndighed:AttributListe" oio:content="attributter"/>
+                    <element ref="myndighed:TilstandListe" oio:content="tilstande"/>
+                    <element ref="myndighed:RelationListe" oio:content="relationer"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="RetInputType" oio:definition="urn:oio:sts:myndighedretinput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:RetInputType">
+                <sequence>
+                    <element ref="myndighed:AttributListe" minOccurs="0" oio:content="attributter"/>
+                    <element ref="myndighed:TilstandListe" minOccurs="0" oio:content="tilstande"/>
+                    <element ref="myndighed:RelationListe" minOccurs="0" oio:content="relationer"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="LaesOutputType" oio:definition="urn:oio:sts:myndighedlaesoutput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:BasicOutputType">
+                <sequence>
+		            <element name="FiltreretOejebliksbillede" type="myndighed:FiltreretOejebliksbilledeType" minOccurs="0" oio:content="filtreretoejebliksbillede"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="ListOutputType" oio:definition="urn:oio:sts:myndighedlistoutput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:ListOutputType">
+                <sequence>
+		            <element name="FiltreretOejebliksbillede" type="myndighed:FiltreretOejebliksbilledeType" minOccurs="0" maxOccurs="unbounded" oio:content="filtreretoejebliksbillede"/>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+    <complexType name="FiltreretOejebliksbilledeType" oio:definition="urn:oio:sts:myndighedfiltreretoejebliksbillede:ADD:1.0.0">
+		<sequence>
+			<element name="ObjektType" type="sd:SagDokObjektType" oio:content="objekt"/>
+			<element name="Registrering" type="myndighed:RegistreringType" minOccurs="0" maxOccurs="unbounded" oio:content="registrering"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="SoegInputType" oio:definition="urn:oio:sts:myndighedsoeginput:ADD:2.0.0">
+        <complexContent>
+            <extension base="sd:SoegInputType">
+                <sequence>
+                <sequence>
+		            <element ref="myndighed:AttributListe" oio:content="soegattributter"/>
+		            <element ref="myndighed:TilstandListe" oio:content="soegtilstande"/>
+		            <element ref="myndighed:RelationListe" oio:content="soegrelationer"/>
+                </sequence>
+                </sequence>
+            </extension>
+        </complexContent>
+    </complexType>
+
+</schema>

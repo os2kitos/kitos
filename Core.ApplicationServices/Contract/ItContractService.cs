@@ -5,14 +5,17 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Contracts;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
@@ -42,6 +45,8 @@ namespace Core.ApplicationServices.Contract
         private readonly IOptionsService<ItContract, OptionExtendType> _optionExtendOptionsService;
         private readonly IOptionsService<ItContract, TerminationDeadlineType> _terminationDeadlineOptionsService;
         private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
+        private readonly IOrganizationService _organizationService;
+        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
         public ItContractService(
             IItContractRepository repository,
@@ -60,8 +65,9 @@ namespace Core.ApplicationServices.Contract
             IOptionsService<ItContract, PaymentModelType> paymentModelOptionsService,
             IOptionsService<ItContract, PaymentFreqencyType> paymentFrequencyOptionsService,
             IOptionsService<ItContract, OptionExtendType> optionExtendOptionsService,
-            IOptionsService<ItContract, TerminationDeadlineType> terminationDeadlineOptionsService, 
-            IGenericRepository<EconomyStream> economyStreamRepository)
+            IOptionsService<ItContract, TerminationDeadlineType> terminationDeadlineOptionsService,
+            IGenericRepository<EconomyStream> economyStreamRepository, IOrganizationService organizationService,
+            IEntityIdentityResolver entityIdentityResolver)
         {
             _repository = repository;
             _referenceService = referenceService;
@@ -81,6 +87,8 @@ namespace Core.ApplicationServices.Contract
             _optionExtendOptionsService = optionExtendOptionsService;
             _terminationDeadlineOptionsService = terminationDeadlineOptionsService;
             _economyStreamRepository = economyStreamRepository;
+            _organizationService = organizationService;
+            _entityIdentityResolver = entityIdentityResolver;
         }
 
         public Result<ItContract, OperationError> Create(int organizationId, string name)
@@ -158,7 +166,7 @@ namespace Core.ApplicationServices.Contract
                 if (error.HasValue)
                     return error.Value;
             }
-            
+
             return Maybe<OperationError>.None;
         }
 
@@ -185,7 +193,7 @@ namespace Core.ApplicationServices.Contract
                     _economyStreamRepository.DeleteWithReferencePreload(economyStream);
                 }
                 _economyStreamRepository.Save();
-                
+
                 //Delete the contract
                 var deleteByContractId = _referenceService.DeleteByContractId(id);
                 if (deleteByContractId.Failed)
@@ -221,18 +229,20 @@ namespace Core.ApplicationServices.Contract
 
         public Result<IEnumerable<DataProcessingRegistration>, OperationError> GetDataProcessingRegistrationsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
         {
-            if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
             return WithReadAccess<IEnumerable<DataProcessingRegistration>>(id, contract =>
-                _contractDataProcessingRegistrationAssignmentService
-                    .GetApplicableDataProcessingRegistrations(contract)
-                    .ByPartOfName(nameQuery)
-                    .OrderBy(x => x.Id)
+            {
+                var query = _contractDataProcessingRegistrationAssignmentService
+                    .GetApplicableDataProcessingRegistrations(contract);
+
+                if (!string.IsNullOrEmpty(nameQuery)) query = query.ByPartOfName(nameQuery);
+
+                return query.OrderBy(x => x.Id)
                     .Take(pageSize)
                     .OrderBy(x => x.Name)
-                    .ToList()
-            );
+                    .ToList();
+            });
         }
 
         public IQueryable<ItContract> Query(params IDomainQuery<ItContract>[] conditions)
@@ -327,6 +337,13 @@ namespace Core.ApplicationServices.Contract
                 );
         }
 
+        public Result<IEnumerable<(int year, int quarter)>, OperationError> GetAppliedProcurementPlansByUuid(
+            Guid organizationUuid)
+        {
+            return _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid)
+                .Match(GetAppliedProcurementPlans, () => new OperationError($"Could not find organization with uuid: {organizationUuid}", OperationFailure.NotFound));
+        }
+
         public Maybe<OperationError> SetResponsibleUnit(int contractId, Guid targetUnitUuid)
         {
             return Modify(contractId, contract =>
@@ -348,7 +365,34 @@ namespace Core.ApplicationServices.Contract
                 return Result<ItContract, OperationError>.Success(contract);
             }).MatchFailure();
         }
-        
+
+
+        public Result<ContractPermissions, OperationError> GetPermissions(Guid uuid)
+        {
+            return GetContract(uuid).Transform(GetPermissions);
+        }
+
+        public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid)
+                .Select(organization => ResourceCollectionPermissionsResult.FromOrganizationId<ItContract>(organization.Id, _authorizationContext));
+        }
+
+        private Result<ContractPermissions, OperationError> GetPermissions(Result<ItContract, OperationError> systemResult)
+        {
+            return systemResult
+                .Transform
+                (
+                    system =>
+                    {
+                        return ResourcePermissionsResult
+                            .FromResolutionResult(system, _authorizationContext)
+                            .Select(permissions =>
+                                new ContractPermissions(permissions));
+                    });
+        }
+
         private Result<ContractOptions, OperationError> WithOrganizationReadAccess(int organizationId, Func<Result<ContractOptions, OperationError>> authorizedAction)
         {
             var readAccessLevel = _authorizationContext.GetOrganizationReadAccessLevel(organizationId);

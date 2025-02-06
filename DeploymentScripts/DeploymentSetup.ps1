@@ -6,6 +6,10 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     
     $parameters = Get-SSM-Parameters -environmentName "$envName"
 
+    if($parameters.Count -eq 0) {
+        throw "No parameters found for environment $envName"
+    }
+
     $Env:KitosHostName = $parameters["HostName"]
     $Env:MsDeployUserName = $parameters["MsDeployUserName"]
     $Env:MsDeployPassword = $parameters["MsDeployPassword"]
@@ -35,6 +39,9 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     $Env:StsCertificateAlias = $parameters["StsCertificateAlias"]
     $Env:StsCertificateThumbprint = $parameters["StsCertificateThumbprint"]
     $Env:OrgService6EntityId = $parameters["OrgService6EntityId"]
+    $Env:StsBrugerPort = $parameters["StsBrugerPort"]
+    $Env:StsAdressePort = $parameters["StsAdressePort"]
+    $Env:StsPersonPort = $parameters["StsPersonPort"]
     $Env:StsVirksomhedPort = $parameters["StsVirksomhedPort"]
     $Env:StsOrganisationPort = $parameters["StsOrganisationPort"]
     $Env:StsOrganisationSystemPort = $parameters["StsOrganisationSystemPort"]

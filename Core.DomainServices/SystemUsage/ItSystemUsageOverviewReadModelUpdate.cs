@@ -64,6 +64,7 @@ namespace Core.DomainServices.SystemUsage
             destination.ExternalSystemUuid = source.ItSystem.ExternalUuid;
             destination.OrganizationId = source.OrganizationId;
             destination.SystemName = source.ItSystem.Name;
+            destination.SystemDescription = source.ItSystem.Description;
             destination.ItSystemDisabled = source.ItSystem.Disabled;
             destination.ActiveAccordingToValidityPeriod = source.IsActiveAccordingToDateFields;
             destination.ActiveAccordingToLifeCycle = source.IsActiveAccordingToLifeCycle;
@@ -85,13 +86,17 @@ namespace Core.DomainServices.SystemUsage
             destination.LinkToDirectoryName = source.LinkToDirectoryUrlName;
             destination.LinkToDirectoryUrl = source.LinkToDirectoryUrl;
             destination.HostedAt = source.HostedAt.GetValueOrDefault(HostedAt.UNDECIDED);
+            destination.UserCount = source.UserCount.GetValueOrDefault(UserCount.UNDECIDED);
             destination.LifeCycleStatus = source.LifeCycleStatus;
             destination.SystemPreviousName = source.ItSystem.PreviousName;
+            destination.DPIAConducted = source.DPIA;
+            destination.IsBusinessCritical = source.isBusinessCritical;
 
-            PatchParentSystemName(source, destination);
+            PatchParentSystemInformation(source, destination);
             PatchRoleAssignments(source, destination);
             PatchOrganizationUnits(source, destination);
             PatchItSystemBusinessType(source, destination);
+            PatchItSystemCategories(source, destination);
             PatchItSystemRightsHolder(source, destination);
             PatchKLE(source, destination);
             PatchReference(source, destination);
@@ -407,6 +412,14 @@ namespace Core.DomainServices.SystemUsage
             destination.ItSystemBusinessTypeUuid = source.ItSystem.BusinessType?.Uuid;
             destination.ItSystemBusinessTypeName = GetNameOfItSystemOption(source.ItSystem, source.ItSystem.BusinessType, _businessTypeService);
         }
+        
+        private void PatchItSystemCategories(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.ItSystemCategoriesId = source.ItSystemCategories?.Id;
+            destination.ItSystemCategoriesUuid = source.ItSystemCategories?.Uuid;
+            destination.ItSystemCategoriesName = source.ItSystemCategories?.Name;
+        }
+
         private static void PatchItSystemRightsHolder(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.ItSystemRightsHolderId = source.ItSystem.BelongsTo?.Id;
@@ -509,12 +522,19 @@ namespace Core.DomainServices.SystemUsage
             destination.ResponsibleOrganizationUnitName = source.ResponsibleUsage?.OrganizationUnit?.Name;
         }
 
-        private static void PatchParentSystemName(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private static void PatchParentSystemInformation(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.ParentItSystemName = source.ItSystem.Parent?.Name;
             destination.ParentItSystemId = source.ItSystem.Parent?.Id;
             destination.ParentItSystemUuid = source.ItSystem.Parent?.Uuid;
             destination.ParentItSystemDisabled = source.ItSystem.Parent?.Disabled;
+            destination.ParentItSystemUsageUuid = GetParentSystemUsageUuid(source.ItSystem, source.OrganizationId);
+        }
+
+        private static Guid? GetParentSystemUsageUuid(ItSystem itSystem, int organizationId)
+        {
+            var parentUsage = itSystem.Parent?.Usages.FirstOrDefault(u => u.OrganizationId == organizationId);
+            return parentUsage?.Uuid;
         }
 
         private void PatchRoleAssignments(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)

@@ -23,6 +23,19 @@
                 );
         }
 
+        getRawDataFromUrl<TResponse>(url: string) {
+            return this
+                .$http
+                .get<any>(url)
+                .then(
+                    result => {
+                        var response = result.data
+                        return response as TResponse;
+                    },
+                    error => this.handleServerError(error)
+                );
+        }
+
         delete(url: string, payload?: any): ng.IPromise<boolean> {
             let config: ng.IRequestShortcutConfig;
             if (payload) {

@@ -19,6 +19,10 @@ using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Core.Abstractions.Extensions;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Response.Shared;
+using System.ComponentModel.DataAnnotations;
+using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 {
@@ -32,13 +36,22 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         private readonly IItContractResponseMapper _responseMapper;
         private readonly IItContractWriteModelMapper _writeModelMapper;
         private readonly IItContractWriteService _writeService;
+        private readonly IResourcePermissionsResponseMapper _permissionResponseMapper;
+        private readonly IExternalReferenceResponseMapper _referenceResponseMapper;
 
-        public ItContractV2Controller(IItContractService itContractService, IItContractResponseMapper responseMapper, IItContractWriteModelMapper writeModelMapper, IItContractWriteService writeService)
+        public ItContractV2Controller(IItContractService itContractService,
+            IItContractResponseMapper responseMapper,
+            IItContractWriteModelMapper writeModelMapper,
+            IItContractWriteService writeService,
+            IResourcePermissionsResponseMapper permissionResponseMapper,
+            IExternalReferenceResponseMapper referenceResponseMapper)
         {
             _itContractService = itContractService;
             _responseMapper = responseMapper;
             _writeModelMapper = writeModelMapper;
             _writeService = writeService;
+            _permissionResponseMapper = permissionResponseMapper;
+            _referenceResponseMapper = referenceResponseMapper;
         }
 
         /// <summary>
@@ -66,6 +79,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             [NonEmptyGuid] Guid? responsibleOrgUnitUuid = null,
             [NonEmptyGuid] Guid? supplierUuid = null,
             string nameContent = null,
+            string nameEquals = null,
             DateTime? changedSinceGtEq = null,
             CommonOrderByProperty? orderByProperty = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
@@ -96,8 +110,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (!string.IsNullOrWhiteSpace(nameContent))
                 conditions.Add(new QueryByPartOfName<ItContract>(nameContent));
 
+            if(!string.IsNullOrWhiteSpace(nameEquals))
+                conditions.Add(new QueryByName<ItContract>(nameEquals));
+
             if (changedSinceGtEq.HasValue)
                 conditions.Add(new QueryByChangedSinceGtEq<ItContract>(changedSinceGtEq.Value));
+
 
             return _itContractService
                 .Query(conditions.ToArray())
@@ -233,6 +251,126 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             return _writeService
                 .Delete(contractUuid)
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+        }
+
+        /// <summary>
+        /// Returns the permissions of the authenticated client in the context of a specific IT-Contract
+        /// </summary>
+        /// <param name="contractUuid">UUID of the contract entity</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{contractUuid}/permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractPermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItContractPermissions([NonEmptyGuid] Guid contractUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itContractService
+                .GetPermissions(contractUuid)
+                .Select(_responseMapper.MapPermissions)
+                .Match(Ok, FromOperationError);
+        }
+
+
+        /// <summary>
+        /// Returns the permissions of the authenticated client for the IT-Contract resources collection in the context of an organization (IT-Contract permissions in a specific Organization)
+        /// </summary>
+        /// <param name="organizationUuid">UUID of the organization</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("permissions")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourceCollectionPermissionsResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult GetItContractCollectionPermissions([Required][NonEmptyGuid] Guid organizationUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itContractService.GetCollectionPermissions(organizationUuid)
+                .Select(_permissionResponseMapper.Map)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Creates an external reference for the contract
+        /// </summary>
+        /// <param name="contractUuid"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("{contractUuid}/external-references")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ExternalReferenceDataResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PostExternalReference([NonEmptyGuid] Guid contractUuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var properties = _writeModelMapper.MapExternalReference(dto);
+
+            return _writeService
+                .AddExternalReference(contractUuid, properties)
+                .Select(_referenceResponseMapper.MapExternalReference)
+                .Match(reference => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{contractUuid}/external-references/{reference.Uuid}", reference), FromOperationError);
+        }
+
+        /// <summary>
+        /// Updates a contract external reference
+        /// </summary>
+        /// <param name="contractUuid"></param>
+        /// <param name="externalReferenceUuid"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("{contractUuid}/external-references/{externalReferenceUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ExternalReferenceDataResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutExternalReference([NonEmptyGuid] Guid contractUuid, [NonEmptyGuid] Guid externalReferenceUuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var properties = _writeModelMapper.MapExternalReference(dto);
+
+            return _writeService
+                .UpdateExternalReference(contractUuid, externalReferenceUuid, properties)
+                .Select(_referenceResponseMapper.MapExternalReference)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Deletes a contract external reference
+        /// </summary>
+        /// <param name="contractUuid"></param>
+        /// <param name="externalReferenceUuid"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("{contractUuid}/external-references/{externalReferenceUuid}")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteExternalReference([NonEmptyGuid] Guid contractUuid, [NonEmptyGuid] Guid externalReferenceUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .DeleteExternalReference(contractUuid, externalReferenceUuid)
+                .Match(_ => NoContent(), FromOperationError);
         }
 
         private CreatedNegotiatedContentResult<ItContractResponseDTO> MapCreatedResponse(ItContractResponseDTO dto)

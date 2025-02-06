@@ -60,7 +60,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 OrganizationId = system.OrganizationId,
                 ItSystemId = system.Id
             };
-            var itSystemUsage = ItSystemUsageHelper.CreateItSystemUsageAsync(newSystemUsage);
+            var itSystemUsage = ItSystemUsageHelper.CreateItSystemUsage(newSystemUsage);
 
             //Act
             var patchObject = new { UserCount = EnumRange.All<UserCount>().RandomItem() };

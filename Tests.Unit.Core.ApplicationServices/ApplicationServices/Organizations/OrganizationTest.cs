@@ -657,6 +657,20 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             Assert.Equal(numberOfLogs, result.Value.Count());
         }
 
+        [Fact]
+        public void Get_Module_Customization_Sets_Up_New_If_None_Found()
+        {
+            var module = "someModule";
+
+            var result = _sut.GetUiModuleCustomization(module);
+
+            Assert.True(result.HasValue);
+            var customization = result.Value;
+            Assert.Equal(module, customization.Module);
+            Assert.Equal(_sut.Uuid, customization.Organization.Uuid);
+
+        }
+
         private OrganizationUnit CreateOrganizationUnit()
         {
             return new OrganizationUnit

@@ -3,9 +3,9 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.ApplicationServices.ScheduledJobs;
+using Core.ApplicationServices.Users.Write;
 using Core.DomainModel;
-using Core.DomainServices;
-using Infrastructure.Services.Cryptography;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
@@ -18,42 +18,21 @@ namespace Presentation.Web.Controllers.API.V1
     public class PasswordResetRequestController : BaseApiController
     {
         private readonly IUserService _userService;
-        private readonly IUserRepository _userRepository;
-        private readonly ICryptoService _cryptoService;
+        private readonly IUserWriteService _userWriteService;
+        private readonly IHangfireApi _hangfire;
 
-        public PasswordResetRequestController(IUserService userService, IUserRepository userRepository, ICryptoService cryptoService)
+        public PasswordResetRequestController(IUserService userService, IUserWriteService userWriteService, IHangfireApi hangfire)
         {
             _userService = userService;
-            _userRepository = userRepository;
-            _cryptoService = cryptoService;
+            _userWriteService = userWriteService;
+            _hangfire = hangfire;
         }
 
         // POST api/PasswordResetRequest
         public HttpResponseMessage Post([FromBody] UserDTO input)
         {
-            try
-            {
-                var user = _userRepository.GetByEmail(input.Email);
-                if (user == null)
-                {
-                    //Intentional OK... do not be a membership db oracle
-                    Logger.Info("User attempted to issue reset request for email {hashedEmail} which was not found in KITOS.", _cryptoService.Encrypt(input.Email ?? string.Empty));
-                    return Ok();
-                }
-                if (!user.CanAuthenticate())
-                {
-                    Logger.Warn("User with id {userId} cannot authenticate and will not be issued a reset password email", user.Id);
-                    return Ok();
-                }
-
-                _userService.IssuePasswordReset(user, null, null);
-
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                return CreateResponse(HttpStatusCode.InternalServerError, e);
-            }
+            _hangfire.Schedule(() => _userWriteService.RequestPasswordReset(input.Email, false));
+            return NoContent();
         }
 
         // GET api/PasswordResetRequest

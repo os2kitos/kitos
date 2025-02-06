@@ -269,7 +269,7 @@ namespace Core.DomainServices.Repositories.KLE
         #region Additions
 
         private void UpdateAddedTaskRefs(IEnumerable<KLEChange> changes,
-            int ownedByOrgnizationUnitId)
+            int ownedByOrganizationUnitId)
         {
             var additions = changes.Where(c => c.ChangeType == KLEChangeType.Added).ToList();
             _logger.Debug($"Additions: {additions.Count}");
@@ -280,7 +280,7 @@ namespace Core.DomainServices.Repositories.KLE
                     Type = kleChange.Type,
                     TaskKey = kleChange.TaskKey,
                     Description = kleChange.UpdatedDescription,
-                    OwnedByOrganizationUnitId = ownedByOrgnizationUnitId,
+                    OwnedByOrganizationUnitId = ownedByOrganizationUnitId,
                     ActiveFrom = kleChange.ActiveFrom,
                     ActiveTo = kleChange.ActiveTo,
                 }
@@ -316,7 +316,8 @@ namespace Core.DomainServices.Repositories.KLE
                 var existingTaskRef = update.Item1;
                 if (_kleParentHelper.TryDeduceParentTaskKey(update.Item2.TaskKey, out var parentTaskKey))
                 {
-                    var parent = _existingTaskRefRepository.Get(t => t.TaskKey == parentTaskKey).First();
+                    var parent = _existingTaskRefRepository.Get(t => t.TaskKey == parentTaskKey).FirstOrDefault();
+                    if (parent == null) continue;
                     existingTaskRef.ParentId = parent.Id;
                     existingTaskRef.OwnedByOrganizationUnitId = ownedByOrgnizationUnitId;
                 }

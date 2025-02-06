@@ -8,8 +8,10 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
 using Core.Abstractions.Extensions;
+using Core.DomainModel.ItContract;
 using Core.DomainServices.Extensions;
 using ExpectedObjects;
+using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -299,6 +301,24 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(2, contracts.Count);
             AssertExpectedShallowContracts(contract1, organization, contracts);
             AssertExpectedShallowContracts(contract2, organization, contracts);
+        }
+
+        [Fact]
+        public async Task Can_GET_Contracts_With_NameEqualsFiltering()
+        {
+            //Arrange
+            var fullName = $"CONTENT_{A<Guid>()}";
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            await CreateContractAsync(organization.Id, $"{fullName}ONE");
+            await CreateContractAsync(organization.Id, $"TWO{fullName}");
+            var contract3 = await CreateContractAsync(organization.Id, fullName);
+
+            //Act
+            var contracts = (await ItContractV2Helper.GetItContractsAsync(token, nameEquals: fullName)).ToList();
+
+            //Assert
+            Assert.Single(contracts);
+            AssertExpectedShallowContracts(contract3, organization, contracts);
         }
 
         [Fact]
@@ -1861,6 +1881,146 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
+        [Theory]    
+        [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true, true)]
+        [InlineData(OrganizationRole.User, true, false, false)]
+        public async Task Can_Get_ItContract_Permissions(OrganizationRole role, bool read, bool modify, bool delete)
+        {
+            //Arrange
+            var org = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(org);
+
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
+
+            var system = await ItContractHelper.CreateContract(A<string>(), org.Id);
+
+            //Act
+            var permissionsResponseDto = await ItContractV2Helper.GetPermissionsAsync(token, system.Uuid);
+
+            //Assert
+            var expected = new ItContractPermissionsResponseDTO
+            {
+                Read = read,
+                Modify = modify,
+                Delete = delete
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.User, false)]
+        public async Task Can_Get_ItContract_CollectionPermissions(OrganizationRole role, bool create)
+        {
+            //Arrange
+            var org = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(org);
+
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
+
+            //Act
+            var permissionsResponseDto = await ItContractV2Helper.GetCollectionPermissionsAsync(token, org.Uuid);
+
+            //Assert
+            var expected = new ResourceCollectionPermissionsResponseDTO
+            {
+                Create = create
+            };
+            Assert.Equivalent(expected, permissionsResponseDto);
+        }
+
+        [Theory]
+        [InlineData(false, false, true)]
+        [InlineData(true, true, true)]
+        [InlineData(true, false, false)]
+        public async Task Can_Get_Validation_Details(bool expectDateError, bool enforceValid, bool expectValid)
+        {
+            //Arrange
+            var (token, _, org) = await CreatePrerequisitesAsync();
+            var itContractDto = await ItContractHelper.CreateContract(A<string>(), org.Id);
+            await ItContractHelper.PatchContract(itContractDto.Id, org.Id, new
+            {
+                Active = enforceValid,
+                Concluded = DateTime.Now.AddDays(expectDateError ? 1 : -1)
+            });
+
+            //Act
+            var result = await ItContractV2Helper.GetItContractAsync(token, itContractDto.Uuid);
+
+            //Assert
+            Assert.Equal(expectValid, result.General.Validity.Valid);
+            Assert.Equal(enforceValid, result.General.Validity.EnforcedValid);
+            if (expectDateError)
+            {
+                var dateError = Assert.Single(result.General.Validity.ValidationErrors);
+                Assert.Equal(ItContractValidationError.StartDateNotPassed.ToItContractValidationErrorChoice(), dateError);
+            }
+            else
+            {
+                Assert.Empty(result.General.Validity.ValidationErrors);
+            }
+        }
+
+        [Fact]
+        public async Task Can_Create_Update_And_Delete_ExternalReference()
+        {
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            var requestDto = new CreateNewContractRequestDTO
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName()
+            };
+            var request = new ExternalReferenceDataWriteRequestDTO
+            {
+                DocumentId = A<string>(),
+                MasterReference = A<bool>(),
+                Title = A<string>(),
+                Url = A<string>()
+            };
+            var contract = await ItContractV2Helper.PostContractAsync(token, requestDto);
+
+            //Act
+            var createdReference = await ItContractV2Helper.AddExternalReferenceAsync(token, contract.Uuid, request);
+
+            //Assert
+            AssertExternalReference(request, createdReference);
+
+            var afterCreate = await ItContractV2Helper.GetItContractAsync(token, contract.Uuid);
+
+            var checkCreatedExternalReference = Assert.Single(afterCreate.ExternalReferences);
+            AssertExternalReference(request, checkCreatedExternalReference);
+
+            //Arrange - update
+            var updateRequest = new ExternalReferenceDataWriteRequestDTO
+            {
+                DocumentId = A<string>(),
+                MasterReference = request.MasterReference || A<bool>(),
+                Title = A<string>(),
+                Url = A<string>()
+            };
+
+            //Act - update
+            var updatedReference = await ItContractV2Helper.UpdateExternalReferenceAsync(token, contract.Uuid, createdReference.Uuid, updateRequest);
+
+            //Assert - update
+            AssertExternalReference(updateRequest, updatedReference);
+
+            var afterUpdate = await ItContractV2Helper.GetItContractAsync(token, contract.Uuid);
+
+            var checkUpdatedExternalReference = Assert.Single(afterUpdate.ExternalReferences);
+            AssertExternalReference(updateRequest, checkUpdatedExternalReference);
+
+            //Act - delete
+            await ItContractV2Helper.DeleteExternalReferenceAsync(token, contract.Uuid, createdReference.Uuid);
+
+            //Assert - delete
+            var afterDelete = await ItContractV2Helper.GetItContractAsync(token, contract.Uuid);
+            Assert.Empty(afterDelete.ExternalReferences);
+        }
+
         private async Task<List<Guid>> CreateDataProcessingRegistrationUuids(string token, OrganizationDTO organization)
         {
             var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
@@ -2375,6 +2535,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             Assert.Equal(expected.RoleUuid, actual.Role?.Uuid);
             Assert.Equal(expected.UserUuid, actual.User?.Uuid);
+        }
+
+        private static void AssertExternalReference(ExternalReferenceDataWriteRequestDTO expected, ExternalReferenceDataResponseDTO actual)
+        {
+            Assert.Equal(expected.DocumentId, actual.DocumentId);
+            Assert.Equal(expected.Title, actual.Title);
+            Assert.Equal(expected.Url, actual.Url);
+            Assert.Equal(expected.MasterReference, actual.MasterReference);
         }
     }
 }

@@ -5,6 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Transactions;
 using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
@@ -13,6 +16,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DataAccess;
@@ -30,6 +34,8 @@ namespace Core.ApplicationServices
         private readonly ITransactionManager _transactionManager;
         private readonly IItContractWriteService _contractWriteService;
         private readonly IOrganizationRepository _organizationRepository;
+        private readonly IAuthorizationContext _authorizationContext;
+        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
         public ExcelService(IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<User> userRepository,
@@ -39,7 +45,9 @@ namespace Core.ApplicationServices
             ICryptoService cryptoService,
             ITransactionManager transactionManager,
             IItContractWriteService contractWriteService,
-            IOrganizationRepository organizationRepository)
+            IOrganizationRepository organizationRepository,
+            IAuthorizationContext authorizationContext,
+            IEntityIdentityResolver entityIdentityResolver)
         {
             _orgUnitRepository = orgUnitRepository;
             _userRepository = userRepository;
@@ -50,6 +58,8 @@ namespace Core.ApplicationServices
             _transactionManager = transactionManager;
             _contractWriteService = contractWriteService;
             _organizationRepository = organizationRepository;
+            _authorizationContext = authorizationContext;
+            _entityIdentityResolver = entityIdentityResolver;
         }
 
         /// <summary>
@@ -107,14 +117,14 @@ namespace Core.ApplicationServices
             }
         }
 
-        public void ExportItContracts(Stream stream, int organizationId)
+        public Stream ExportItContracts(Stream stream, int organizationId)
         {
             var contracts = _itContractRepository.Get(x => x.OrganizationId == organizationId);
 
             var set = new DataSet();
             set.Tables.Add(GetItContractTable(contracts));
 
-            _excelHandler.Export(set, stream);
+            return _excelHandler.Export(set, stream);
         }
 
         public void ImportItContracts(Stream stream, int organizationId)
@@ -494,6 +504,29 @@ namespace Core.ApplicationServices
                 // if we got here, we're home frreeeee
                 scope.Complete();
             }
+        }
+
+        public Result<int, OperationError> ResolveOrganizationIdAndValidateAccess(Guid organizationUuid)
+        {
+            return ResolveOrganizationId(organizationUuid)
+                .Bind(organizationId => AllowAccess(organizationId)
+                    ? Result<int, OperationError>.Success(organizationId)
+                    : new OperationError("User is not allowed to perform batch import", OperationFailure.Forbidden));
+        }
+
+        private Result<int, OperationError> ResolveOrganizationId(Guid organizationUuid)
+        {
+            return _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid)
+                .Match(
+                    Result<int, OperationError>.Success, 
+                    () => new OperationError($"Organization with uuid: '{organizationUuid}' was not found",
+                        OperationFailure.NotFound)
+                    );
+        }
+
+        private bool AllowAccess(int organizationId)
+        {
+            return _authorizationContext.HasPermission(new BatchImportPermission(organizationId));
         }
 
         private static long? StringToEan(string s)

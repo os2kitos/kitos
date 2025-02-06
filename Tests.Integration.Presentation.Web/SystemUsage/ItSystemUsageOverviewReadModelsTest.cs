@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
@@ -84,6 +85,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             var systemName = A<string>();
             var systemPreviousName = A<string>();
+            var systemDescription = A<string>();
             var systemDisabled = A<bool>();
 
             var systemParentName = A<string>();
@@ -103,14 +105,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var riskSupervisionDocumentationUrlName = A<string>();
             var generalPurpose = A<string>();
             var hostedAt = A<HostedAt>();
+            var userCount = A<UserCount>();
 
             var contract1Name = A<string>();
             var contract2Name = A<string>();
 
             var dataProcessingRegistrationName = A<string>();
 
-            var system = await PrepareItSystem(systemName, systemPreviousName, organizationId, organizationName, AccessModifier.Public);
+            var system = await PrepareItSystem(systemName, systemPreviousName, systemDescription, organizationId, organizationName, AccessModifier.Public);
             var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
+            var systemParentUsage = await ItSystemHelper.TakeIntoUseAsync(systemParent.Id, organizationId);
+
             var systemId = DatabaseAccess.GetEntityId<Core.DomainModel.ItSystem.ItSystem>(system.Uuid);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(systemId, organizationId);
 
@@ -138,6 +143,10 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // Parent system 
             await ItSystemHelper.SendSetDisabledRequestAsync(systemParent.Id, systemParentDisabled).WithExpectedResponseCode(HttpStatusCode.NoContent).DisposeAsync();
 
+            var dataClassification =
+                (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.ItSystemCategories,
+                    organizationId)).RandomItem();
+
             // System Usage changes
             var body = new
             {
@@ -149,18 +158,19 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 ArchiveDuty = archiveDuty,
                 RiskAssessment = riskAssessment,
                 RiskAssessmentDate = riskAssessmentDate,
-                linkToDirectoryUrl = linkToDirectoryUrl,
-                linkToDirectoryUrlName = linkToDirectoryUrlName,
-                riskSupervisionDocumentationUrl = riskSupervisionDocumentationUrl,
-                riskSupervisionDocumentationUrlName = riskSupervisionDocumentationUrlName,
+                linkToDirectoryUrl,
+                linkToDirectoryUrlName,
+                riskSupervisionDocumentationUrl,
+                riskSupervisionDocumentationUrlName,
                 GeneralPurpose = generalPurpose,
-                HostedAt = hostedAt
+                UserCount = userCount,
+                ItSystemCategoriesId = dataClassification.Id
             };
             await ItSystemUsageHelper.PatchSystemUsage(systemUsage.Id, organizationId, body);
             var sensitiveDataLevel = await ItSystemUsageHelper.AddSensitiveDataLevel(systemUsage.Id, A<SensitiveDataLevel>());
             var isHoldingDocument = A<bool>();
             await ItSystemUsageHelper.SetIsHoldingDocumentRequestAsync(systemUsage.Id, isHoldingDocument);
-
+            
             // Responsible Organization Unit and relevant units
             var orgUnitName1 = A<string>();
             var orgUnitName2 = A<string>();
@@ -265,6 +275,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(linkToDirectoryUrl, readModel.LinkToDirectoryUrl);
             Assert.Equal(generalPurpose, readModel.GeneralPurpose);
             Assert.Equal(hostedAt, readModel.HostedAt);
+            Assert.Equal(userCount, readModel.UserCount);
 
             if (riskAssessment == DataOptions.YES)
             {
@@ -287,11 +298,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // From System
             Assert.Equal(systemName, readModel.SystemName);
             Assert.Equal(systemPreviousName, readModel.SystemPreviousName);
+            Assert.Equal(systemDescription, readModel.SystemDescription);
             Assert.Equal(systemDisabled, readModel.ItSystemDisabled);
             Assert.Equal(system.Uuid.ToString("D"), readModel.ItSystemUuid);
             Assert.Equal(businessType.Id, readModel.ItSystemBusinessTypeId);
             Assert.Equal(businessType.Uuid, readModel.ItSystemBusinessTypeUuid);
             Assert.Equal(businessType.Name, readModel.ItSystemBusinessTypeName);
+            Assert.Equal(dataClassification.Uuid, readModel.ItSystemCategoriesUuid);
+            Assert.Equal(dataClassification.Name, readModel.ItSystemCategoriesName);
             Assert.Equal(organizationId, readModel.ItSystemRightsHolderId);
             Assert.Equal(organizationName, readModel.ItSystemRightsHolderName);
             Assert.Equal(taskRef.TaskRef.TaskKey ?? string.Empty, readModel.ItSystemKLEIdsAsCsv);
@@ -305,6 +319,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(systemParent.Id, readModel.ParentItSystemId);
             Assert.Equal(systemParent.Uuid, readModel.ParentItSystemUuid);
             Assert.Equal(systemParentDisabled, readModel.ParentItSystemDisabled);
+            Assert.Equal(systemParentUsage.Uuid, readModel.ParentItSystemUsageUuid);
 
             // Role assignment
             var roleAssignment = Assert.Single(readModel.RoleAssignments);
@@ -339,7 +354,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(expectedContracts.Count, readModel.AssociatedContracts.Count);
             foreach (var expectedContract in expectedContracts)
             {
-                Assert.True(readModel.AssociatedContractsNamesCsv.Contains(expectedContract.Name));
+                Assert.Contains(expectedContract.Name, readModel.AssociatedContractsNamesCsv);
                 Assert.Contains(readModel.AssociatedContracts, c => c.ItContractId == expectedContract.Id);
             }
 
@@ -1010,7 +1025,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             return x.OrganizationUnitId == organizationUnit1.Id && x.OrganizationUnitUuid == organizationUnit1.Uuid && x.OrganizationUnitName == organizationUnit1.Name;
         }
 
-        private static async Task<ItSystemResponseDTO> PrepareItSystem(string systemName, string systemPreviousName, int organizationId, string organizationName, AccessModifier accessModifier)
+        private static async Task<ItSystemResponseDTO> PrepareItSystem(string systemName, string systemPreviousName, string systemDescription, int organizationId, string organizationName, AccessModifier accessModifier)
         {
             var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, organizationName,
                 TestCvr, OrganizationTypeKeys.Virksomhed, accessModifier);
@@ -1019,7 +1034,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             {
                 OrganizationUuid = organization.Uuid,
                 Name = systemName,
-                PreviousName = systemPreviousName
+                PreviousName = systemPreviousName,
+                Description = systemDescription
             });
             return system;
         }

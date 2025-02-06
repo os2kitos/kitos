@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Abstractions.Types;
 
 namespace Core.DomainModel
 {
@@ -55,5 +56,68 @@ namespace Core.DomainModel
         public bool IsEnabled { get; set; }
         public int Priority { get; set; }
         public Guid Uuid { get; set; }
+
+        public void UpdateLocalOptionValues<TLocal>(LocalOptionEntity<TLocal>? localOption)
+        {
+            if (localOption == null)
+            {
+                ResetLocalOptionAvailability();
+                return;
+            }
+            UpdateIsLocallyAvailable(localOption.IsActive);
+            UpdateDescription(localOption.Description);
+        }
+
+        public void ResetLocalOptionAvailability()
+        {
+            IsLocallyAvailable = false;
+        }
+
+        private void UpdateIsLocallyAvailable(bool isActive)
+        {
+            if (IsObligatory && !isActive) return;
+            if (IsEnabled) IsLocallyAvailable = isActive;
+        }
+
+        private void UpdateDescription(string description)
+        {
+           if (!string.IsNullOrEmpty(description)) Description = description;
+        }
+
+        public void UpdateDescription(Maybe<string> description)
+        {
+            Description = description.HasValue ? description.Value : null;
+        }
+
+        public void UpdateName(Maybe<string> name)
+        {
+            Name = name.HasValue ? name.Value : null;
+        }
+
+        public void UpdateIsObligatory(Maybe<bool> isObligatory)
+        {
+            IsObligatory = isObligatory.HasValue && isObligatory.Value;
+        }
+
+        public void UpdateIsEnabled(Maybe<bool> isEnabled)
+        {
+            IsEnabled = isEnabled.HasValue && isEnabled.Value;
+        }
+
+        public void IncreasePriority()
+        {
+            Priority++;
+        }
+
+        public void DecreasePriority()
+        {
+            Priority--;
+        }
+
+        public void SetPriority(int newPriority)
+        {
+            Priority = newPriority;
+        }
+
     }
 }

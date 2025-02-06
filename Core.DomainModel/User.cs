@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
@@ -155,10 +156,27 @@ namespace Core.DomainModel
                 .Distinct();
         }
 
+        public IEnumerable<Organization.Organization> GetOrganizationsWhereRoleIsAssigned(OrganizationRole role)
+        {
+            return OrganizationRights
+                    .Where(x => x.Role == role)
+                    .Select(x => x.Organization)
+                    .ToList();
+        }
+
         public IEnumerable<Organization.Organization> GetOrganizations()
         {
             return OrganizationRights
                 .Select(x => x.Organization)
+                .ToList();
+        }
+
+        public IEnumerable<Organization.Organization> GetUniqueOrganizations()
+        {
+            return OrganizationRights
+                .Select(x => x.Organization)
+                .GroupBy(org => org.Uuid)
+                .Select(group => group.First())
                 .ToList();
         }
 
@@ -168,6 +186,41 @@ namespace Core.DomainModel
                 .Where(organizationRight => organizationRight.Organization.Uuid == organizationUuid)
                 .Select(organizationRight => organizationRight.Role)
                 .Distinct();
+        }
+
+
+
+        public Maybe<OperationError> UpdateEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return new OperationError($"Email '{email}' is required", OperationFailure.BadInput);
+            }
+            Email = email;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateFirstName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return new OperationError($"Name '{name}' is required", OperationFailure.BadInput);
+            }
+            Name = name;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateLastName(string lastName)
+        {
+            if (string.IsNullOrWhiteSpace(lastName))
+            {
+                return new OperationError($"Last name '{lastName}' is required", OperationFailure.BadInput);
+            }
+            LastName = lastName;
+
+            return Maybe<OperationError>.None;
         }
 
         #region Authentication

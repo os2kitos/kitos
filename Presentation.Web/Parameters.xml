@@ -1,152 +1,167 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <parameters>
-  <!-- SERILOG -->
-  <parameter name="serilog:minimum-level" description="" defaultvalue="__SerilogMinimumLogLevel__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='serilog:minimum-level']/@value">
-    </parameterentry>
-  </parameter>
+    <!-- SERILOG -->
+    <parameter name="serilog:minimum-level" description="" defaultvalue="__SerilogMinimumLogLevel__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='serilog:minimum-level']/@value">
+        </parameterentry>
+    </parameter>
 
-  <parameter name="serilog:write-to:Elasticsearch.nodeUris" description="" defaultvalue="__ElasticSearchNodeUri__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='serilog:write-to:Elasticsearch.nodeUris']/@value">
-    </parameterentry>
-  </parameter>
+    <parameter name="serilog:write-to:Elasticsearch.nodeUris" description="" defaultvalue="__ElasticSearchNodeUri__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='serilog:write-to:Elasticsearch.nodeUris']/@value">
+        </parameterentry>
+    </parameter>
 
-  <!-- Kitos token configuration -->
-  <parameter name="SecurityKeyString" description="" defaultvalue="__SecurityKeyString__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='SecurityKeyString']/@value">
-    </parameterentry>
-  </parameter>
+    <!-- Kitos token configuration -->
+    <parameter name="SecurityKeyString" description="" defaultvalue="__SecurityKeyString__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='SecurityKeyString']/@value">
+        </parameterentry>
+    </parameter>
 
-  <!-- Email -->
-  <parameter name="SmtpFromEmail" description="" defaultvalue="__SmtpFromEmail__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/@from">
-    </parameterentry>
-  </parameter>
+    <!-- Email -->
+    <parameter name="SmtpFromEmail" description="" defaultvalue="__SmtpFromEmail__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/@from">
+        </parameterentry>
+    </parameter>
 
-  <parameter name="SmtpNetworkHost" description="" defaultvalue="__SmtpNetworkHost__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@host">
-    </parameterentry>
-  </parameter>
+    <parameter name="SmtpNetworkHost" description="" defaultvalue="__SmtpNetworkHost__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@host">
+        </parameterentry>
+    </parameter>
 
-  <parameter name="SmtpPort" description="" defaultvalue="__SmtpPort__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@port">
-    </parameterentry>
-  </parameter>
+    <parameter name="SmtpPort" description="" defaultvalue="__SmtpPort__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@port">
+        </parameterentry>
+    </parameter>
 
-  <parameter name="SmtpUserName" description="" defaultvalue="__SmtpUserName__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@userName">
-    </parameterentry>
-  </parameter>
+    <parameter name="SmtpUserName" description="" defaultvalue="__SmtpUserName__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@userName">
+        </parameterentry>
+    </parameter>
 
-  <parameter name="SmtpPassword" description="" defaultvalue="__SmtpPassword__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@password">
-    </parameterentry>
-  </parameter>
+    <parameter name="SmtpPassword" description="" defaultvalue="__SmtpPassword__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@password">
+        </parameterentry>
+    </parameter>
 
-  <!-- Presentation.Web.Properties.Settings -->
-  <parameter name="ResetPasswordTTL" description="" defaultvalue="__ResetPasswordTTL__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='ResetPasswordTTL']/value/text()">
-    </parameterentry>
-  </parameter>
+    <!-- Presentation.Web.Properties.Settings -->
+    <parameter name="ResetPasswordTTL" description="" defaultvalue="__ResetPasswordTTL__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='ResetPasswordTTL']/value/text()">
+        </parameterentry>
+    </parameter>
 
-  <parameter name="BaseUrl" description="" defaultvalue="__BaseUrl__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='BaseUrl']/value/text()">
-    </parameterentry>
-  </parameter>
+    <parameter name="BaseUrl" description="" defaultvalue="__BaseUrl__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='BaseUrl']/value/text()">
+        </parameterentry>
+    </parameter>
 
-  <parameter name="MailSuffix" description="" defaultvalue="__MailSuffix__" tags="">
-    <parameterValidation kind="AllowEmpty" />
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='MailSuffix']/value/text()">
-    </parameterentry>
-  </parameter>
+    <parameter name="MailSuffix" description="" defaultvalue="__MailSuffix__" tags="">
+        <parameterValidation kind="AllowEmpty" />
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='MailSuffix']/value/text()">
+        </parameterentry>
+    </parameter>
 
-  <parameter name="Environment" description="" defaultvalue="__Environment__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='Environment']/value/text()">
-    </parameterentry>
-  </parameter>
+    <parameter name="Environment" description="" defaultvalue="__Environment__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='Environment']/value/text()">
+        </parameterentry>
+    </parameter>
 
-  <parameter name="DeploymentVersion" description="" defaultvalue="__DeploymentVersion__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='DeploymentVersion']/value/text()">
-    </parameterentry>
-  </parameter>
+    <parameter name="DeploymentVersion" description="" defaultvalue="__DeploymentVersion__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='DeploymentVersion']/value/text()">
+        </parameterentry>
+    </parameter>
 
-  <parameter name="DefaultUserPassword" description="" defaultvalue="__DefaultUserPassword__" tags="">
-    <parameterValidation kind="AllowEmpty" />
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='DefaultUserPassword']/value/text()">
-    </parameterentry>
-  </parameter>
+    <parameter name="DefaultUserPassword" description="" defaultvalue="__DefaultUserPassword__" tags="">
+        <parameterValidation kind="AllowEmpty" />
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='DefaultUserPassword']/value/text()">
+        </parameterentry>
+    </parameter>
 
-  <parameter name="UseDefaultPassword" description="" defaultvalue="__UseDefaultPassword__" tags="">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='UseDefaultPassword']/value/text()">
-    </parameterentry>
-  </parameter>
+    <parameter name="UseDefaultPassword" description="" defaultvalue="__UseDefaultPassword__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='UseDefaultPassword']/value/text()">
+        </parameterentry>
+    </parameter>
 
-  <!-- SSO SAML configuration -->
-  <parameter name="SsoServiceProviderServer" defaultvalue="__SSO_ServiceProvider_Server__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://kitos-local.strongminds.dk']/@server"/>
-  </parameter>
+    <!-- SSO SAML configuration -->
+    <parameter name="SsoServiceProviderServer" defaultvalue="__SSO_ServiceProvider_Server__">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://kitos-local.strongminds.dk']/@server"/>
+    </parameter>
 
-  <parameter name="SsoIDPEndPoints" defaultvalue="__SSO_KOMBIT_Proxy__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://saml.adgangsstyring.eksterntest-stoettesystemerne.dk']/@id"/>
-  </parameter>
+    <parameter name="SsoIDPEndPoints" defaultvalue="__SSO_KOMBIT_Proxy__">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://saml.adgangsstyring.eksterntest-stoettesystemerne.dk']/@id"/>
+    </parameter>
 
-  <parameter name="SsoServiceProviderId" defaultvalue="__SSO_ServiceProvider_Id__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[local-name() = 'ServiceProvider'][@id='https://kitos-local.strongminds.dk']/@id"/>
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'Federation']//*[local-name() = 'Audience']/text()"/>
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='SsoServiceProviderId']/value/text()"/>
-  </parameter>
+    <parameter name="SsoServiceProviderId" defaultvalue="__SSO_ServiceProvider_Id__">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[local-name() = 'ServiceProvider'][@id='https://kitos-local.strongminds.dk']/@id"/>
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'Federation']//*[local-name() = 'Audience']/text()"/>
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='SsoServiceProviderId']/value/text()"/>
+    </parameter>
 
-  <parameter name="SsoCertificateThumbPrint" defaultvalue="__SSO_CERT_Thumb__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SigningCertificate'][@x509FindType='FindByThumbprint']/@findValue"/>
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='SsoCertificateThumbprint']/value/text()"/>
-  </parameter>
+    <parameter name="SsoCertificateThumbPrint" defaultvalue="__SSO_CERT_Thumb__">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SigningCertificate'][@x509FindType='FindByThumbprint']/@findValue"/>
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='SsoCertificateThumbprint']/value/text()"/>
+    </parameter>
 
-  <parameter name="StsOrganisationEndpointHost" defaultvalue="__STS_ORG_HOST__">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationEndpointHost']/value/text()"/>
-  </parameter>
+    <parameter name="StsOrganisationEndpointHost" defaultvalue="__STS_ORG_HOST__">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationEndpointHost']/value/text()"/>
+    </parameter>
 
-  <parameter name="StsIssuer" defaultvalue="__STS_ISSUER">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsIssuer']/value/text()"/>
-  </parameter>
+    <parameter name="StsIssuer" defaultvalue="__STS_ISSUER">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsIssuer']/value/text()"/>
+    </parameter>
 
-  <parameter name="StsCertificateEndpoint" defaultvalue="__STS_CERT_ENDPOINT">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsCertificateEndpoint']/value/text()"/>
-  </parameter>
+    <parameter name="StsCertificateEndpoint" defaultvalue="__STS_CERT_ENDPOINT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsCertificateEndpoint']/value/text()"/>
+    </parameter>
 
-  <parameter name="ServiceCertificateAliasOrg" defaultvalue="__SERVICE_CERT_ALIAS_ORG">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='ServiceCertificateAliasOrg']/value/text()"/>
-  </parameter>
+    <parameter name="ServiceCertificateAliasOrg" defaultvalue="__SERVICE_CERT_ALIAS_ORG">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='ServiceCertificateAliasOrg']/value/text()"/>
+    </parameter>
 
-  <parameter name="StsCertificateAlias" defaultvalue="__STS_CERT_ALIAS">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsCertificateAlias']/value/text()"/>
-  </parameter>
+    <parameter name="StsCertificateAlias" defaultvalue="__STS_CERT_ALIAS">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsCertificateAlias']/value/text()"/>
+    </parameter>
 
-  <parameter name="StsCertificateThumbprint" defaultvalue="__STS_CERT_THUMBPRINT">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsCertificateThumbprint']/value/text()"/>
-  </parameter>
+    <parameter name="StsCertificateThumbprint" defaultvalue="__STS_CERT_THUMBPRINT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsCertificateThumbprint']/value/text()"/>
+    </parameter>
 
-  <parameter name="OrgService6EntityId" defaultvalue="__ORG_SERVICE_6_ENTITY_ID">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='OrgService6EntityId']/value/text()"/>
-  </parameter>
-  
-  <parameter name="StsVirksomhedPort" defaultvalue="__STS_VIRKSOMHED_PORT">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='VirksomhedPort']/@address"/>
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsVirksomhedPort']/value/text()"/>
-  </parameter>
-  
-  <parameter name="StsOrganisationPort" defaultvalue="__STS_ORGANISATION_PORT">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='OrganisationPort']/@address"/>
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationPort']/value/text()"/>
-  </parameter>
-  
-  <parameter name="StsOrganisationSystemPort" defaultvalue="__STS_ORGANISATION_SYSTEM_PORT">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='OrganisationSystemPort']/@address"/>
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationSystemPort']/value/text()"/>
-  </parameter>
-  
-  <parameter name="StsOrganisationCertificateThumbprint" defaultvalue="__STS_ORGANISATION_CERTIFICATE_THUMBPRINT">
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/behaviors/endpointBehaviors/behavior/clientCredentials/serviceCertificate/defaultCertificate/@findValue"/>
-    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationCertificateThumbprint']/value/text()"/>
-  </parameter>
+    <parameter name="OrgService6EntityId" defaultvalue="__ORG_SERVICE_6_ENTITY_ID">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='OrgService6EntityId']/value/text()"/>
+    </parameter>
+
+    <parameter name="StsBrugerPort" defaultvalue="__STS_BRUGER_PORT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='BrugerPort']/@address"/>
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsBrugerPort']/value/text()"/>
+    </parameter>
+    
+    <parameter name="StsAdressePort" defaultvalue="__STS_ADRESSE_PORT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='AdressePort']/@address"/>
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsAdressePort']/value/text()"/>
+    </parameter>
+    
+    <parameter name="StsPersonPort" defaultvalue="__STS_PERSON_PORT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='PersonPort']/@address"/>
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsPersonPort']/value/text()"/>
+    </parameter>
+    
+    <parameter name="StsVirksomhedPort" defaultvalue="__STS_VIRKSOMHED_PORT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='VirksomhedPort']/@address"/>
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsVirksomhedPort']/value/text()"/>
+    </parameter>
+
+    <parameter name="StsOrganisationPort" defaultvalue="__STS_ORGANISATION_PORT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='OrganisationPort']/@address"/>
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationPort']/value/text()"/>
+    </parameter>
+
+    <parameter name="StsOrganisationSystemPort" defaultvalue="__STS_ORGANISATION_SYSTEM_PORT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='OrganisationSystemPort']/@address"/>
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationSystemPort']/value/text()"/>
+    </parameter>
+
+    <parameter name="StsOrganisationCertificateThumbprint" defaultvalue="__STS_ORGANISATION_CERTIFICATE_THUMBPRINT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/behaviors/endpointBehaviors/behavior/clientCredentials/serviceCertificate/defaultCertificate/@findValue"/>
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationCertificateThumbprint']/value/text()"/>
+    </parameter>
 
 </parameters>

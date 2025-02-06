@@ -86,6 +86,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(general.HasSubDataProcessors);
             Assert.Empty(general.SubDataProcessors);
             Assert.Null(general.MainContract);
+            Assert.Empty(general.AssociatedContracts);
             Assert.True(general.Valid);
 
             var oversight = dto.Oversight;
@@ -126,6 +127,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertYesNoUndecided(dpr.HasSubDataProcessors, general.HasSubDataProcessors);
             AssertSubDataProcessors(dpr.AssignedSubDataProcessors, general.SubDataProcessors);
             AssertIdentity(dpr.MainContract, general.MainContract);
+            AssertOptionalIdentities(dpr.AssociatedContracts, general.AssociatedContracts);
             Assert.Equal(dpr.IsActiveAccordingToMainContract, general.Valid);
         }
 
@@ -428,6 +430,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 .Zip(orderedActual, (expected, actual) => new { expected, actual })
                 .ToList())
             {
+                Assert.Equal(comparison.expected.Uuid, comparison.actual.Uuid);
                 Assert.Equal(comparison.expected.OversightDate, comparison.actual.CompletedAt);
                 Assert.Equal(comparison.expected.OversightRemark, comparison.actual.Remark);
             }

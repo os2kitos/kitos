@@ -39,7 +39,7 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
             if (organization == null) throw new ArgumentNullException(nameof(organization));
 
             //Search for org units by org uuid
-            const int pageSize = 1000;
+            const int pageSize = 500;
             int currentPageSize;
             var totalIds = 0;
             var totalResults = new List<(Guid, RegistreringType5)>();
@@ -221,16 +221,10 @@ namespace Infrastructure.STS.OrganizationSystem.DomainServices
                 },
                 FremsoegObjekthierarkiInput = new FremsoegObjekthierarkiInputType()
                 {
-                    MaksimalAntalKvantitet = pageSize.ToString("D"),
                     FoersteResultatReference = skip.ToString("D"),
-                    /*BrugerSoegEgenskab = new EgenskabType3(),
-                    InteressefaellesskabSoegEgenskab = new EgenskabType4(),
-                    ItSystemSoegEgenskab = new EgenskabType5(),
-                    OrganisationEnhedSoegEgenskab = new EgenskabType1(),
-                    OrganisationFunktionSoegEgenskab = new EgenskabType2(),
-                    OrganisationSoegEgenskab = new EgenskabType(),
-                    SoegRegistrering = new SoegRegistreringType(),
-                    SoegVirkning = new SoegVirkningType()*/
+                    MaksimalAntalKvantitet = pageSize.ToString("D"),
+                    BrugerSoegEgenskab = new EgenskabType3 { BrugerNavn = "EXCLUDE!"},
+                    OrganisationFunktionSoegEgenskab = new EgenskabType2 { FunktionNavn = "EXCLUDE!"}
                 }
             };
             return listRequest;

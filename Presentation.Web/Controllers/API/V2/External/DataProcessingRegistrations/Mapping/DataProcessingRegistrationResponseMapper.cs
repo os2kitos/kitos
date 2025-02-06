@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.ApplicationServices.Model.GDPR;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Shared;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
@@ -39,6 +40,16 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             };
         }
 
+        public DataProcessingRegistrationPermissionsResponseDTO MapPermissions(DataProcessingRegistrationPermissions permissions)
+        {
+            return new DataProcessingRegistrationPermissionsResponseDTO
+            {
+                Delete = permissions.BasePermissions.Delete,
+                Modify = permissions.BasePermissions.Modify,
+                Read = permissions.BasePermissions.Read
+            };
+        }
+
         private DataProcessingRegistrationOversightResponseDTO MapOversight(DataProcessingRegistration dataProcessingRegistration)
         {
             return new DataProcessingRegistrationOversightResponseDTO
@@ -73,6 +84,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         {
             return new OversightDateDTO
             {
+                Uuid = oversightDate.Uuid,
                 CompletedAt = oversightDate.OversightDate,
                 Remark = oversightDate.OversightRemark
             };
@@ -99,6 +111,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 HasSubDataProcessors = MapYesNoUndecided(dataProcessingRegistration.HasSubDataProcessors),
                 SubDataProcessors = dataProcessingRegistration.AssignedSubDataProcessors?.Select(ToSubDataProcessorDTO).ToList(),
                 MainContract = dataProcessingRegistration.MainContract?.MapIdentityNamePairDTO(),
+                AssociatedContracts = dataProcessingRegistration.AssociatedContracts?.Select(x => x.MapIdentityNamePairDTO()).ToList(),
                 Valid = dataProcessingRegistration.IsActiveAccordingToMainContract
             };
         }

@@ -5,6 +5,7 @@ namespace Presentation.Web.Models.API.V2.Types.DataProcessing
 {
     public class OversightDateDTO
     {
+        public Guid Uuid { get; set; }
         /// <summary>
         /// Date of oversight completion
         /// </summary>

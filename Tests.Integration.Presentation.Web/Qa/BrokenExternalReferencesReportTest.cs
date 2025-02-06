@@ -11,8 +11,7 @@ using Core.DomainModel;
 using Core.DomainModel.Qa.References;
 using CsvHelper;
 using CsvHelper.Configuration;
-
-using Presentation.Web.Models.API.V1.Qa;
+using Presentation.Web.Models.API.V2.Internal.Response.QA;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
@@ -126,14 +125,12 @@ namespace Tests.Integration.Presentation.Web.Qa
             Assert.True(dto.Available);
 
             //Act
-            using (var deleteReferenceResponse = await ReferencesHelper.DeleteReferenceAsync(referenceToBeExplicitlyDeleted.Id))
-            using (var deleteItSystemResponse = await ItSystemHelper.SendDeleteItSystemAsync(system.Id, TestEnvironment.DefaultOrganizationId))
-            using (var deleteInterfaceResponse = await InterfaceHelper.SendDeleteInterfaceRequestAsync(interfaceDto.Id))
-            {
-                Assert.Equal(HttpStatusCode.OK, deleteReferenceResponse.StatusCode);
-                Assert.Equal(HttpStatusCode.OK, deleteItSystemResponse.StatusCode);
-                Assert.Equal(HttpStatusCode.OK, deleteInterfaceResponse.StatusCode);
-            }
+            using var deleteReferenceResponse = await ReferencesHelper.DeleteReferenceAsync(referenceToBeExplicitlyDeleted.Id);
+            using var deleteItSystemResponse = await ItSystemHelper.SendDeleteItSystemAsync(system.Id, TestEnvironment.DefaultOrganizationId);
+            using var deleteInterfaceResponse = await InterfaceHelper.SendDeleteInterfaceRequestAsync(interfaceDto.Id);
+            Assert.Equal(HttpStatusCode.OK, deleteReferenceResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, deleteItSystemResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, deleteInterfaceResponse.StatusCode);
         }
 
         private static void AssertBrokenLinkRow(LinkReportCsvFormat brokenLink, string expectedOrigin, string expectedName, string expectedReferenceName, string expectedErrorCategory, string expectedErrorCode, string expectedUrl)
@@ -148,26 +145,22 @@ namespace Tests.Integration.Presentation.Web.Qa
 
         private static async Task<Dictionary<string, List<LinkReportCsvFormat>>> GetBrokenLinksReportAsync()
         {
-            using (var response = await BrokenExternalReferencesReportHelper.SendGetCurrentCsvAsync())
-            {
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                using (var csvReader = new CsvReader(new StringReader(await response.Content.ReadAsStringAsync()),
-                    new CsvConfiguration(CultureInfo.InvariantCulture)
-                    {
-                        Delimiter = ";",
-                        HasHeaderRecord = true
-                    }))
+            using var response = await BrokenExternalReferencesReportHelper.SendGetCurrentCsvAsync();
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            using var csvReader = new CsvReader(new StringReader(await response.Content.ReadAsStringAsync()),
+                new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
-                    var result = new Dictionary<string, List<LinkReportCsvFormat>>();
+                    Delimiter = ";",
+                    HasHeaderRecord = true
+                });
+            var result = new Dictionary<string, List<LinkReportCsvFormat>>();
 
-                    foreach (var parentGroup in csvReader.GetRecords<LinkReportCsvFormat>().GroupBy(record => record.Navn))
-                    {
-                        result[parentGroup.Key] = new List<LinkReportCsvFormat>(parentGroup);
-                    }
-
-                    return result;
-                }
+            foreach (var parentGroup in csvReader.GetRecords<LinkReportCsvFormat>().GroupBy(record => record.Navn))
+            {
+                result[parentGroup.Key] = new List<LinkReportCsvFormat>(parentGroup);
             }
+
+            return result;
         }
 
         private static void PurgeBrokenExternalReferencesReportTable()
@@ -183,11 +176,11 @@ namespace Tests.Integration.Presentation.Web.Qa
             });
         }
 
-        private static async Task<BrokenExternalReferencesReportStatusDTO> WaitForReportGenerationCompletedAsync()
+        private static async Task<BrokenExternalReferencesReportStatusResponseDTO> WaitForReportGenerationCompletedAsync()
         {
             var beginning = DateTime.Now;
             var waitedFor = DateTime.Now.Subtract(beginning);
-            BrokenExternalReferencesReportStatusDTO dto;
+            BrokenExternalReferencesReportStatusResponseDTO dto;
             do
             {
                 dto = await BrokenExternalReferencesReportHelper.GetStatusAsync();

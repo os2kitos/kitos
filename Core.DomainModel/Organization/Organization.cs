@@ -69,6 +69,10 @@ namespace Core.DomainModel.Organization
 
         public string GetActiveCvr() => Cvr ?? ForeignCvr;
 
+        public int? ForeignCountryCodeId { get; set; }
+        
+        public virtual CountryCode ForeignCountryCode { get; set; }
+
         public AccessModifier AccessModifier { get; set; }
         public Guid Uuid { get; set; }
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
@@ -163,9 +167,14 @@ namespace Core.DomainModel.Organization
             if (module == null)
                 throw new ArgumentNullException(nameof(module));
 
-            return UIModuleCustomizations
-                .SingleOrDefault(config => config.Module == module)
-                .FromNullable();
+            var moduleCustomization = UIModuleCustomizations
+                .SingleOrDefault(customization => customization.Module == module);
+            if (moduleCustomization != null) return moduleCustomization.FromNullable();
+
+            moduleCustomization = new UIModuleCustomization() { Organization = this, Module = module };
+            UIModuleCustomizations.Add(moduleCustomization);
+
+            return moduleCustomization.FromNullable();
         }
 
         public Result<UIModuleCustomization, OperationError> ModifyModuleCustomization(string module, IEnumerable<CustomizedUINode> nodes)
@@ -514,6 +523,68 @@ namespace Core.DomainModel.Organization
                 .Select(x => x.User)
                 .ToList()
                 .AsReadOnly();
+        }
+
+        public void UpdateAddress(Maybe<string> address)
+        {
+            Adress = address.HasValue ? address.Value : null;
+        }
+
+        public void UpdateCvr(Maybe<string> cvr)
+        {
+            Cvr = cvr.HasValue ? cvr.Value : null;
+        }
+
+        public void UpdateEmail(Maybe<string> email)
+        {
+            Email = email.HasValue ? email.Value : null;
+        }
+
+        public void UpdatePhone(Maybe<string> phone)
+        {
+            Phone = phone.HasValue ? phone.Value : null;
+        }
+
+        public void UpdateName(Maybe<string> name)
+        {
+            Name = name.HasValue ? name.Value : null;
+        }
+
+        public void UpdateForeignCvr(Maybe<string> foreignCvr)
+        {
+            ForeignCvr = foreignCvr.HasValue ? foreignCvr.Value : null;
+        }
+
+        public void UpdateType(int typeId)
+        {
+            TypeId = typeId;
+        }
+
+        public void UpdateShowDataProcessing(Maybe<bool> showDataProcessing)
+        {
+            HandleConfigPropertyUpdate(showDataProcessing, config => config.ShowDataProcessing = showDataProcessing.Value);
+        }
+
+        public void UpdateShowITContracts(Maybe<bool> showITContracts)
+        {
+            HandleConfigPropertyUpdate(showITContracts, config => config.ShowItContractModule = showITContracts.Value);
+        }
+
+        public void UpdateShowITSystems(Maybe<bool> showITSystems)
+        {
+            HandleConfigPropertyUpdate(showITSystems, config => config.ShowItSystemModule = showITSystems.Value);
+        }
+
+        public void UpdateForeignCountryCode(CountryCode countryCode)
+        {
+            ForeignCountryCode = countryCode;
+            ForeignCountryCodeId = countryCode?.Id;
+        }
+
+        private void HandleConfigPropertyUpdate(Maybe<bool> maybeValue, Action<Config> updateAction)
+        {
+            this.Config ??= Config.Default(this.ObjectOwner);
+            if (maybeValue.HasValue) updateAction(this.Config);
         }
 
         /// <summary>

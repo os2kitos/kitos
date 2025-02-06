@@ -237,6 +237,7 @@
     <Compile Include="DomainServices\Interface\QueryInterfaceByUsedInOrganizationUuidTest.cs" />
     <Compile Include="DomainServices\Interface\QueryByInterfaceIdTest.cs" />
     <Compile Include="DomainServices\IntersectionQueryTest.cs" />
+    <Compile Include="DomainServices\QueryExceptEntitiesWithUuidsTest.cs" />
     <Compile Include="DomainServices\SystemUsage\ItSystemUsageOverviewReadModelRepositoryTest.cs" />
     <Compile Include="DomainServices\KLE\QueryByDescriptionContentTest.cs" />
     <Compile Include="DomainServices\KLE\QueryByKeyPrefixTest.cs" />
@@ -273,6 +274,7 @@
     <Compile Include="DomainServices\QueryExceptEntitiesWithIdsTest.cs" />
     <Compile Include="DomainServices\QueryUserByNameOrEmailTest.cs" />
     <Compile Include="DomainServices\RejectAllResultsQueryTest.cs" />
+    <Compile Include="DomainServices\System\QueryExceptChildrenOfUuidTest.cs" />
     <Compile Include="DomainServices\System\QuerySystemByUsedInOrganizationUuidTest.cs" />
     <Compile Include="DomainServices\Users\QueryByRoleAssignmentTest.cs" />
     <Compile Include="DomainServices\Users\QueryByCrossOrganizationPermissionsTest.cs" />
@@ -282,6 +284,7 @@
     <Compile Include="Extensions\ItSystemExtensions.cs" />
     <Compile Include="Extensions\OrganizationOwnedObjectExtensions.cs" />
     <Compile Include="Extensions\QueryableApiResponseOrderingExtensionsTest.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapperTest.cs" />
     <Compile Include="Helpers\DataProcessingRegistrationReadModelTestData.cs" />
     <Compile Include="Helpers\ItSystemUsageOverviewReadModelTestData.cs" />
@@ -302,6 +305,13 @@
     <Compile Include="Models\V2\DataProcessingRegistrationWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationResponseMapperTest.cs" />
     <Compile Include="Models\V2\ExternalReferenceResponseMapperTest.cs" />
+    <Compile Include="Models\V2\Internal\GlobalOptionTypeResponseMapperTest.cs" />
+    <Compile Include="Models\V2\Internal\GlobalOptionTypeWriteModelMapperTest.cs" />
+    <Compile Include="Models\V2\Internal\HelpTextResponseMapperTest.cs" />
+    <Compile Include="Models\V2\Internal\HelpTextWriteModelMapperTest.cs" />
+    <Compile Include="Models\V2\Internal\LocalOptionTypeWriteModelMapperTest.cs" />
+    <Compile Include="Models\V2\Internal\UserResponseMapperTest.cs" />
+    <Compile Include="Models\V2\Internal\UserWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItContractResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItContractWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItInterfaceResponseMapperTest.cs" />
@@ -313,12 +323,19 @@
     <Compile Include="Models\V2\ItSystemWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\NotificationResponseMapperTest.cs" />
     <Compile Include="Models\V2\NotificationWriteModelMapperTest.cs" />
+    <Compile Include="Models\V2\LocalOptionTypeResponseMapperTest.cs" />
+    <Compile Include="Models\V2\OrganizationResponseMapperTest.cs" />
+    <Compile Include="Models\V2\OrganizationTypeMapperTest.cs" />
+    <Compile Include="Models\V2\OrganizationUnitWriteModelMapperTest.cs" />
+    <Compile Include="Models\V2\OrganizationWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\PublicMessagesWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\WriteModelMapperTestBase.cs" />
     <Compile Include="Services\ItSystemServiceTest.cs" />
     <Compile Include="Services\ItSystemUsageMigrationServiceTest.cs" />
     <Compile Include="Services\OrganizationRightsServiceTest.cs" />
     <Compile Include="Services\OrganizationServiceTest.cs" />
+    <Compile Include="Services\OrganizationServiceTestBase.cs" />
+    <Compile Include="Services\OrganizationWriteServiceTest.cs" />
     <Compile Include="Services\ReferenceServiceTest.cs" />
     <Compile Include="Infrastructure\AutoMapperTest.cs" />
     <Compile Include="WebHomeController.cs" />
@@ -356,13 +373,13 @@
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Presentation.Web\Presentation.Web.csproj">
-      <Project>{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}</Project>
-      <Name>Presentation.Web</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Tests.Toolkit\Tests.Toolkit.csproj">
       <Project>{43199485-65c5-4bff-88b2-b594d5b58146}</Project>
       <Name>Tests.Toolkit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Presentation.Web\Presentation.Web.csproj">
+      <Project>{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}</Project>
+      <Name>Presentation.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

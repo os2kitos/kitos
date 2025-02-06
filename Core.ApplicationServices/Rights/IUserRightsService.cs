@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.RightsHolder;
 using Core.ApplicationServices.Model.Users;
@@ -13,5 +14,8 @@ namespace Core.ApplicationServices.Rights
         Maybe<OperationError> RemoveAllRights(int userId, int organizationId);
         Maybe<OperationError> RemoveRights(int userId, int organizationId, UserRightsChangeParameters parameters);
         Maybe<OperationError> TransferRights(int fromUserId, int toUserId, int organizationId, UserRightsChangeParameters parameters);
+
+        Maybe<OperationError> CopyRights(int fromUserId, int toUserId, int organizationId,
+            UserRightsChangeParameters parameters);
     }
 }

@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.DomainServices.Generic;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -19,12 +20,14 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         private readonly UserNotificationApplicationService _sut;
         private readonly Mock<IUserNotificationService> _userNotificationService;
         private readonly Mock<IOrganizationalUserContext> _activeUserContext;
+        private readonly Mock<IEntityIdentityResolver> _entityIdentityResolver;
 
         public UserNotificationApplicationServiceTest()
         {
             _userNotificationService = new Mock<IUserNotificationService>();
             _activeUserContext = new Mock<IOrganizationalUserContext>();
-            _sut = new UserNotificationApplicationService(_userNotificationService.Object, _activeUserContext.Object);
+            _entityIdentityResolver = new Mock<IEntityIdentityResolver>();
+            _sut = new UserNotificationApplicationService(_userNotificationService.Object, _activeUserContext.Object, _entityIdentityResolver.Object);
         }
 
         [Fact]
@@ -32,7 +35,8 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var notificationId = A<int>();
-            var notification = new UserNotification {
+            var notification = new UserNotification
+            {
                 Id = notificationId,
                 NotificationRecipientId = A<int>()
             };
@@ -42,7 +46,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             _activeUserContext.Setup(x => x.UserId).Returns(notification.NotificationRecipientId);
 
             //Act
-            
+
             var result = _sut.Delete(notificationId);
 
             //Assert
@@ -106,7 +110,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
 
             SetupUserNotificationService(numberOfNotifications, orgId, userId, relatedEntityType);
 
-             _activeUserContext.Setup(x => x.UserId).Returns(userId);
+            _activeUserContext.Setup(x => x.UserId).Returns(userId);
 
             //Act
             var result = _sut.GetNotificationsForUser(orgId, userId, relatedEntityType);
@@ -125,7 +129,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var orgId = A<int>();
             var relatedEntityType = A<RelatedEntityType>();
 
-            SetupUserNotificationService(numberOfNotifications, orgId, userId, relatedEntityType); 
+            SetupUserNotificationService(numberOfNotifications, orgId, userId, relatedEntityType);
             _activeUserContext.Setup(x => x.UserId).Returns(A<int>());
 
             //Act

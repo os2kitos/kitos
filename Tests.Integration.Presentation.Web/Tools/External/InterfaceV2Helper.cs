@@ -91,10 +91,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? usedInOrganizationUuid = null,
             string nameContains = null,
             string interfaceId = null,
-            Guid? organizationUuid = null
+            Guid? organizationUuid = null,
+            Guid? availableInOrganizationUuid = null
             )
         {
-            using var response = await SendGetInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals, usedInOrganizationUuid, nameContains, interfaceId, organizationUuid);
+            using var response = await SendGetInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid, includeDeactivated, changedSinceGtEq, nameEquals, usedInOrganizationUuid, nameContains, interfaceId, organizationUuid, availableInOrganizationUuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItInterfaceResponseDTO>>();
@@ -111,7 +112,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? usedInOrganizationUuid = null,
             string nameContains = null,
             string interfaceId = null,
-            Guid? organizationUuid = null
+            Guid? organizationUuid = null,
+            Guid? availableInOrganizationUuid = null
             )
         {
             var path = BasePathInterfaces;
@@ -146,6 +148,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (organizationUuid != null)
                 queryParameters.Add(new KeyValuePair<string, string>("organizationUuid", organizationUuid.Value.ToString("D")));
+
+            if (availableInOrganizationUuid != null)
+                queryParameters.Add(new KeyValuePair<string, string>("availableInOrganizationUuid", availableInOrganizationUuid.Value.ToString()));
 
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";

@@ -15,9 +15,9 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
 {
     public abstract class BaseItInterfaceApiV2Test : WithAutoFixture
     {
-        protected async Task<OrganizationDTO> CreateOrganization()
+        protected async Task<OrganizationDTO> CreateOrganization(string cvr = "11223344")
         {
-            return await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            return await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), cvr, OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
         }
 
         protected string CreateName()

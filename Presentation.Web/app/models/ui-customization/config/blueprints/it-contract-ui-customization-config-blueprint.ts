@@ -16,6 +16,12 @@
                     contractType: {
                         text: "Kontrakttype"
                     },
+                    template: {
+                        text: "Kontraktskabelon"
+                    },
+                    criticality: {
+                        text: "Kritikalitet"
+                    },
                     purchaseForm: {
                         text: "Indkøbsform"
                     },

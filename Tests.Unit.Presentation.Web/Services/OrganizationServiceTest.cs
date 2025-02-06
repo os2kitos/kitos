@@ -6,6 +6,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -16,19 +17,19 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
 
 using Moq;
 using Serilog;
-using Tests.Toolkit.Patterns;
 using Tests.Unit.Presentation.Web.Extensions;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Services
 {
-    public class OrganizationServiceTest : WithAutoFixture
+    public class OrganizationServiceTest : OrganizationServiceTestBase
     {
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly OrganizationService _sut;
@@ -42,6 +43,10 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IOrgUnitService> _orgUnitServiceMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IOrganizationRightsService> _organizationRightsServiceMock;
+        private readonly Mock<IGenericRepository<ContactPerson>> _contactPersonRepository;
+        private readonly Mock<IEntityIdentityResolver> _identityResolver;
+        private readonly Mock<IGenericRepository<DataResponsible>> _dataResponsibleRepository;
+        private readonly Mock<IGenericRepository<DataProtectionAdvisor>> _dataProtectionAdvisorRepository;
 
         public OrganizationServiceTest()
         {
@@ -58,10 +63,15 @@ namespace Tests.Unit.Presentation.Web.Services
             _orgUnitServiceMock = new Mock<IOrgUnitService>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _organizationRightsServiceMock = new Mock<IOrganizationRightsService>();
+            _contactPersonRepository = new Mock<IGenericRepository<ContactPerson>>();
+            _identityResolver = new Mock<IEntityIdentityResolver>();
+            _dataResponsibleRepository = new Mock<IGenericRepository<DataResponsible>>();
+            _dataProtectionAdvisorRepository = new Mock<IGenericRepository<DataProtectionAdvisor>>();
 
             _sut = new OrganizationService(
                 _organizationRepository.Object,
                 _orgRightRepository.Object,
+                _contactPersonRepository.Object,
                 _userRepository.Object,
                 _authorizationContext.Object,
                 _userContext.Object,
@@ -70,7 +80,83 @@ namespace Tests.Unit.Presentation.Web.Services
                 _repositoryMock.Object,
                 _organizationRightsServiceMock.Object,
                 _orgUnitServiceMock.Object,
-                _domainEventsMock.Object);
+                _domainEventsMock.Object,
+                _identityResolver.Object,
+                _dataResponsibleRepository.Object,
+                _dataProtectionAdvisorRepository.Object);
+        }
+
+        [Fact]
+        public void Can_Get_UI_Root_Config()
+        {
+            var orgUuid = A<Guid>();
+            var org = new Organization()
+            {
+                Uuid = orgUuid,
+                Config = new Config()
+                {
+                    Id = A<int>(),
+                    ShowItSystemModule = A<bool>(),
+                    ShowDataProcessing = A<bool>()
+                }
+            };
+            _repositoryMock.Setup(_ => _.GetByUuid(orgUuid)).Returns(org);
+            _authorizationContext.Setup(_ => _.AllowReads(org)).Returns(true);
+
+            var uiRootConfig = _sut.GetUIRootConfig(orgUuid);
+
+            Assert.True(uiRootConfig.Ok);
+            var expected = org.Config;
+            var value = uiRootConfig.Value;
+            Assert.Equal(expected.Id, value.Id);
+            Assert.Equal(expected.ShowItSystemModule, value.ShowItSystemModule);
+            Assert.Equal(expected.ShowDataProcessing, value.ShowDataProcessing);
+        }
+
+        [Fact]
+        public void Get_UI_Root_Config_Returns_Not_Found_If_No_Org()
+        {
+            var orgUuid = A<Guid>();
+            var org = new Organization()
+            {
+                Uuid = orgUuid,
+                Config = new Config()
+                {
+                    Id = A<int>(),
+                    ShowItSystemModule = A<bool>(),
+                    ShowDataProcessing = A<bool>()
+                }
+            };
+            _repositoryMock.Setup(_ => _.GetByUuid(orgUuid)).Returns(Maybe<Organization>.None);
+            _authorizationContext.Setup(_ => _.AllowReads(org)).Returns(true);
+
+            var uiRootConfig = _sut.GetUIRootConfig(orgUuid);
+
+            Assert.True(uiRootConfig.Failed);
+            Assert.Equal(OperationFailure.NotFound, uiRootConfig.Error.FailureType);
+        }
+
+        [Fact]
+        public void Get_UI_Root_Config_Returns_Forbidden_If_No_Read_Access()
+        {
+            var orgUuid = A<Guid>();
+            var org = new Organization()
+            {
+                Uuid = orgUuid,
+                Config = new Config()
+                {
+                    Id = A<int>(),
+                    ShowItSystemModule = A<bool>(),
+                    ShowDataProcessing = A<bool>()
+                }
+            };
+            _repositoryMock.Setup(_ => _.GetByUuid(orgUuid)).Returns(org);
+            _authorizationContext.Setup(_ => _.AllowReads(org)).Returns(false);
+
+            var uiRootConfig = _sut.GetUIRootConfig(orgUuid);
+
+            Assert.True(uiRootConfig.Failed);
+            Assert.Equal(OperationFailure.Forbidden, uiRootConfig.Error.FailureType);
         }
 
         [Fact]
@@ -776,6 +862,76 @@ namespace Tests.Unit.Presentation.Web.Services
             VerifyOrganizationDeleted(result, transaction, organization);
         }
 
+        [Theory]
+        [InlineData(true, true, true, true)]
+        [InlineData(true, true, true, false)]
+        [InlineData(true, true, false, true)]
+        [InlineData(true, true, false, false)]
+        [InlineData(true, false, true, true)]
+        [InlineData(true, false, true, false)]
+        [InlineData(true, false, false, true)]
+        [InlineData(true, false, false, false)]
+        [InlineData(false, true, true, true)]
+        [InlineData(false, true, true, false)]
+        [InlineData(false, true, false, true)]
+        [InlineData(false, true, false, false)]
+        [InlineData(false, false, true, true)]
+        [InlineData(false, false, true, false)]
+        [InlineData(false, false, false, true)]
+        [InlineData(false, false, false, false)]
+
+        public void Can_Get_Permissions(bool read, bool modify, bool delete, bool modifyCvr)
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var organization = new Organization { Uuid = uuid };
+            ExpectGetOrganizationByUuidReturns(uuid, organization);
+            _authorizationContext.SetupSequence(_ => _.AllowReads(organization))
+                .Returns(true)
+                .Returns(read);
+            ExpectAllowModifyReturns(organization, modify);
+            _userContext.Setup(_ => _.IsGlobalAdmin()).Returns(modifyCvr);
+            _authorizationContext.Setup(x => x.AllowDelete(organization)).Returns(delete);
+            _repositoryMock.Setup(_ => _.GetByUuid(uuid)).Returns(organization);
+            _authorizationContext.Setup(_ => _.GetOrganizationReadAccessLevel(organization.Id))
+                .Returns(OrganizationDataReadAccessLevel.All);
+            //Act
+            var result = _sut.GetPermissions(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var permissions = result.Value;
+            Assert.Equivalent(new OrganizationPermissionsResult(new ResourcePermissionsResult(read, modify, delete), modifyCvr), permissions);
+        }
+
+        [Fact]
+        public void Can_Get_Permissions_Returns_Not_Found()
+        {
+            //Arrange
+            var wrongUuid = A<Guid>();
+            ExpectGetOrganizationByUuidReturns(wrongUuid, Maybe<Organization>.None);
+
+            //Act
+            var result = _sut.GetPermissions(wrongUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, false)]
+        [InlineData(OrganizationRole.LocalAdmin, true)]
+        [InlineData(OrganizationRole.User, false)]
+        public void Get_Grid_Permissions_Returns_Expected_Result(OrganizationRole roleBeingAsked, bool shouldHaveModificationPermission)
+        {
+            var org = CreateOrganization();
+
+            _userContext.Setup(x => x.HasRole(org.Id, roleBeingAsked)).Returns(true);
+            var permissions = _sut.GetGridPermissions(org.Id);
+            Assert.Equal(shouldHaveModificationPermission, permissions.ConfigModificationPermission);
+        }
+
         private void VerifyOrganizationDeleted(Maybe<OperationError> result, Mock<IDatabaseTransaction> transaction, Organization organization)
         {
             Assert.True(result.IsNone);
@@ -818,13 +974,6 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetOrganizationByUuidReturns(organization.Uuid, organization);
             ExpectAllowReadOrganizationReturns(organization, allowRead);
             ExpectAllowDeleteReturns(organization, allowDelete);
-            return organization;
-        }
-
-        private Organization CreateOrganization()
-        {
-            var organizationId = A<Guid>();
-            var organization = new Organization() { Uuid = organizationId, Id = A<int>() };
             return organization;
         }
 
@@ -871,6 +1020,11 @@ namespace Tests.Unit.Presentation.Web.Services
         private void ExpectAllowModifyReturns(IEntity organization, bool value)
         {
             _authorizationContext.Setup(x => x.AllowModify(organization)).Returns(value);
+        }
+
+        private void ExpectAllowReadReturns(IEntity unit, bool result)
+        {
+            _authorizationContext.Setup(x => x.AllowReads(unit)).Returns(result);
         }
 
         private void ExpectAllowCreateReturns<T>(bool value) where T : IEntity
