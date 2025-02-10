@@ -73,8 +73,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var usage = CreateSystemUsage(system, contract, orgId);
             usage.AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>
             {
-                new DataProcessingRegistration {IsAgreementConcluded = YesNoIrrelevantOption.YES, Name = A<string>()},
-                new DataProcessingRegistration {IsAgreementConcluded = YesNoIrrelevantOption.IRRELEVANT, Name = A<string>()}
+                new DataProcessingRegistration {IsAgreementConcluded = YesNoIrrelevantOption.YES, Name = A<string>(), InsecureCountriesSubjectToDataTransfer = {CreateCountryOption(), CreateCountryOption(), CreateCountryOption()}},
+                new DataProcessingRegistration {IsAgreementConcluded = YesNoIrrelevantOption.IRRELEVANT, Name = A<string>(), InsecureCountriesSubjectToDataTransfer = {CreateCountryOption(), CreateCountryOption()}}
             };
 
             var sensitivePersonalDataType = CreateSensitivePersonalDataType();
@@ -202,9 +202,22 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(usage.ItSystem.Name, gdprExportReport.SystemName);
             Assert.Equal(usage.isBusinessCritical, gdprExportReport.BusinessCritical);
             Assert.Equal(usage.DPIA, gdprExportReport.DPIA);
+            Assert.Equal(usage.DPIADateFor, gdprExportReport.DPIADate);
+
             Assert.Equal(usage.riskAssessment, gdprExportReport.RiskAssessment);
             Assert.Equal(usage.riskAssesmentDate, gdprExportReport.RiskAssessmentDate);
             Assert.Equal(usage.preriskAssessment, gdprExportReport.PreRiskAssessment);
+            Assert.Equal(usage.PlannedRiskAssessmentDate, gdprExportReport.PlannedRiskAssessmentDate);
+            Assert.Equal(usage.noteRisks, gdprExportReport.RiskAssessmentNotes);
+
+            Assert.Equal(usage.TechnicalSupervisionDocumentationUrl, gdprExportReport.TechnicalSupervisionDocumentationUrl);
+            Assert.Equal(usage.TechnicalSupervisionDocumentationUrlName,
+                gdprExportReport.TechnicalSupervisionDocumentationUrlName);
+            Assert.Equal(usage.UserSupervisionDocumentationUrl, usage.UserSupervisionDocumentationUrl);
+            Assert.Equal(usage.UserSupervisionDocumentationUrlName, gdprExportReport.UserSupervisionDocumentationUrlName);
+            Assert.Equal(usage.DPIAdeleteDate, gdprExportReport.NextDataRetentionEvaluationDate);
+
+            AssertCountriesSubjectToTransferMatches(usage, gdprExportReport);
 
             if (!string.IsNullOrEmpty(usage.LinkToDirectoryUrl))
             {
@@ -215,7 +228,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 Assert.False(gdprExportReport.LinkToDirectory);
             }
 
-            Assert.Equal(usage.AssociatedDataProcessingRegistrations?.Any(x=>x.IsAgreementConcluded == YesNoIrrelevantOption.YES) == true, gdprExportReport.DataProcessingAgreementConcluded);
+            Assert.Equal(usage.AssociatedDataProcessingRegistrations?.Any(x => x.IsAgreementConcluded == YesNoIrrelevantOption.YES) == true, gdprExportReport.DataProcessingAgreementConcluded);
 
             if (usage.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.NONE))
             {
@@ -255,11 +268,28 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
         }
 
+        private void AssertCountriesSubjectToTransferMatches(ItSystemUsage usage, GDPRExportReport report)
+        {
+            var countriesInReport = report.InsecureCountriesSubjectToDataTransfer;
+            foreach (var dpr in usage.AssociatedDataProcessingRegistrations)
+            {
+                Assert.True(dpr.InsecureCountriesSubjectToDataTransfer.All(country => countriesInReport.Contains(country.Name)));
+            }
+        }
+
         private SensitivePersonalDataType CreateSensitivePersonalDataType()
         {
             return new SensitivePersonalDataType()
             {
                 Id = Math.Abs(A<int>()),
+                Name = A<string>()
+            };
+        }
+
+        private DataProcessingCountryOption CreateCountryOption()
+        {
+            return new DataProcessingCountryOption
+            {
                 Name = A<string>()
             };
         }
@@ -318,8 +348,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 OrganizationId = orgId,
                 isBusinessCritical = A<DataOptions>(),
                 DPIA = A<DataOptions>(),
+                DPIADateFor = A<DateTime>(),
                 riskAssessment = A<DataOptions>(),
                 riskAssesmentDate = A<DateTime>(),
+                PlannedRiskAssessmentDate = A<DateTime>(),
+                noteRisks = A<string>(),
                 LinkToDirectoryUrl = A<string>(),
                 HostedAt = A<HostedAt>(),
                 preriskAssessment = A<RiskLevel>(),
@@ -329,7 +362,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                     {
                         SensitivityDataLevel = A<SensitiveDataLevel>()
                     }
-                }
+                },
+                TechnicalSupervisionDocumentationUrl = A<string>(),
+                TechnicalSupervisionDocumentationUrlName = A<string>(),
+                UserSupervisionDocumentationUrl = A<string>(),
+                UserSupervisionDocumentationUrlName = A<string>(),
+                DPIAdeleteDate = A<DateTime>(),
+
             };
         }
     }
