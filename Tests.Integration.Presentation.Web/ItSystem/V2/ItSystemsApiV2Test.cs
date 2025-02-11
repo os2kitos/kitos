@@ -22,6 +22,7 @@ using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.System;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.Internal.References;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Extensions;
 using Xunit;
@@ -850,16 +851,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(expected.Uuid, actual.Uuid);
         }
 
-        private IEnumerable<T> WithRandomMaster<T>(IEnumerable<T> references) where T : ExternalReferenceDataWriteRequestDTO
-        {
-            var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
-            orderedRandomly.First().MasterReference = true;
-            foreach (var externalReferenceDataDto in orderedRandomly.Skip(1))
-                externalReferenceDataDto.MasterReference = false;
-
-            return orderedRandomly;
-        }
-
         private async Task<(
             CreateItSystemRequestDTO fullRequest,
             List<KLEDetailsDTO> kleChoices,
@@ -911,7 +902,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
         private List<ExternalReferenceDataWriteRequestDTO> CreateExternalReferences()
         {
-            return Many<ExternalReferenceDataWriteRequestDTO>().Transform(WithRandomMaster).ToList();
+            return Many<ExternalReferenceDataWriteRequestDTO>().Transform(ExternalReferenceTestHelper.WithRandomMaster).ToList();
         }
 
         private static async Task<IdentityNamePairResponseDTO> GetRandomBusinessType(OrganizationDTO organizationDto)

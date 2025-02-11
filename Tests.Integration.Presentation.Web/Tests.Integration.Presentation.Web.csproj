@@ -156,6 +156,7 @@
     <Compile Include="Organizations\V2\OrganizationGridApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationInternalApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationUnitRegistrationApiV2Test.cs" />
+    <Compile Include="References\ExternalReferenceInternalApiV2Test.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -172,6 +173,8 @@
     <Compile Include="Tools\Internal\Notifications\NotificationV2Helper.cs" />
     <Compile Include="Tools\Internal\Organizations\OrganizationInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\Organizations\OrganizationUnitRegistrationV2Helper.cs" />
+    <Compile Include="Tools\Internal\References\ExternalReferencesInternalV2Helper.cs" />
+    <Compile Include="Tools\Internal\References\ExternalReferenceTestHelper.cs" />
     <Compile Include="Tools\Internal\Users\PasswordResetV2Helper.cs" />
     <Compile Include="Tools\Internal\Users\UsersV2Helper.cs" />
     <Compile Include="Tools\OrganizationGridTestHelper.cs" />

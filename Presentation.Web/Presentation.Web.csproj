@@ -368,6 +368,7 @@
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationTypeMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\OrganizationUnits\OrganizationUnitRoleTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\ExternalReferences\ExternalReferencesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GdprExportReportInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\DataProcessingRegistrations\DprGlobalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\OrganizationGlobalCountryCodesInternalV2Controller.cs" />
@@ -531,6 +532,7 @@
     <Compile Include="Models\API\V2\Internal\Request\ResetPasswordRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\User\MutateRightRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\User\MutateUserRightsRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\ExternalReferences\ExternalReferenceWithLastChangedResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\GdprReportResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\ItContract\AppliedProcurementPlanResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Notifications\AlertResponseDTO.cs" />
