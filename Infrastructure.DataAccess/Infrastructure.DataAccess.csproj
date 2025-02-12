@@ -1103,6 +1103,14 @@
     <Compile Include="Migrations\202502111858490_Usage_ai_technology_field_as_yesNoUndecided.designer.cs">
       <DependentUpon>202502111858490_Usage_ai_technology_field_as_yesNoUndecided.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202502120738253_rigsarkiv_fields_on_usage_readmodel.cs" />
+    <Compile Include="Migrations\202502120738253_rigsarkiv_fields_on_usage_readmodel.designer.cs">
+      <DependentUpon>202502120738253_rigsarkiv_fields_on_usage_readmodel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202502121309143_Usage_catalogArchiveDuty_index.cs" />
+    <Compile Include="Migrations\202502121309143_Usage_catalogArchiveDuty_index.designer.cs">
+      <DependentUpon>202502121309143_Usage_catalogArchiveDuty_index.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
@@ -1166,6 +1174,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202502111858490_Usage_ai_technology_field_as_yesNoUndecided.resx">
       <DependentUpon>202502111858490_Usage_ai_technology_field_as_yesNoUndecided.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202502120738253_rigsarkiv_fields_on_usage_readmodel.resx">
+      <DependentUpon>202502120738253_rigsarkiv_fields_on_usage_readmodel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202502121309143_Usage_catalogArchiveDuty_index.resx">
+      <DependentUpon>202502121309143_Usage_catalogArchiveDuty_index.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_DataRow.sql" />
     <EmbeddedResource Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.resx">

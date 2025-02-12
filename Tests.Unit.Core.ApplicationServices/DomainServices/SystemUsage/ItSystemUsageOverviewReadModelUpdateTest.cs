@@ -196,7 +196,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                         TaskKey = A<string>(),
                         Description = A<string>()
                     }
-                }
+                },
+                ArchiveDuty = A<ArchiveDutyRecommendationTypes>(),
+                ArchiveDutyComment = A<string>(),
             };
             var systemUsage = new ItSystemUsage
             {
@@ -355,6 +357,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(system.BusinessType.Id, readModel.ItSystemBusinessTypeId);
             Assert.Equal(system.BusinessType.Uuid, readModel.ItSystemBusinessTypeUuid);
             Assert.Equal(system.BusinessType.Name, readModel.ItSystemBusinessTypeName);
+            Assert.Equal(system.ArchiveDuty, readModel.CatalogArchiveDuty);
+            Assert.Equal(system.ArchiveDutyComment, readModel.CatalogArchiveDutyComment);
 
             //Parent System
             Assert.Equal(parentSystem.Name, readModel.ParentItSystemName);

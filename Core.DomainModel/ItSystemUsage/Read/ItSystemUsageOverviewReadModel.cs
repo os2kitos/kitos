@@ -135,5 +135,8 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public DataOptions? DPIAConducted { get; set; }
 
         public DataOptions? IsBusinessCritical { get; set; }
+
+        public ArchiveDutyRecommendationTypes? CatalogArchiveDuty { get; set; }
+        public string CatalogArchiveDutyComment { get; set; }
     }
 }
