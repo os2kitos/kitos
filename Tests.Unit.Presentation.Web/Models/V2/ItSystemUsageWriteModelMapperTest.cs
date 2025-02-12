@@ -5,8 +5,10 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
+using Core.DomainModel.Shared;
 using Moq;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
@@ -1309,6 +1311,22 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 AssertPropertyContainsDataChange(output.NumberOfExpectedUsersInterval).lower);
             Assert.Equal(input.NumberOfExpectedUsers.UpperBound,
                 AssertPropertyContainsDataChange(output.NumberOfExpectedUsersInterval).upperBound);
+            AssertContainsAiTechnology(input.ContainsAITechnology, output.ContainsAITechnology);
+        }
+
+        private static void AssertContainsAiTechnology(YesNoUndecidedChoice? expected, OptionalValueChange<Maybe<YesNoUndecidedOption>> actual)
+        {
+            if (!actual.HasChange)
+            {
+                Assert.Null(expected);
+            }
+            else
+            {
+                var maybe = actual.NewValue;
+                Assert.True(maybe.HasValue);
+                var mappedActual = maybe.Value.ToYesNoUndecidedChoice();
+                Assert.Equal(expected, mappedActual);
+            }
         }
 
         private static void AssertKLE(IEnumerable<Guid> expected, OptionalValueChange<Maybe<IEnumerable<Guid>>> actual)

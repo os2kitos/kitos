@@ -242,6 +242,9 @@ namespace Core.DomainModel.ItSystemUsage
 
         public UserCount? UserCount { get; set; }
 
+        public YesNoUndecidedOption? ContainsAITechnology { get; set; }
+
+
         #region GDPR
         public string GeneralPurpose { get; set; }
         public DataOptions? isBusinessCritical { get; set; }
@@ -323,6 +326,11 @@ namespace Core.DomainModel.ItSystemUsage
         public bool HasDataProcessingAgreement() =>
             AssociatedDataProcessingRegistrations?.Any(x => x.IsAgreementConcluded == YesNoIrrelevantOption.YES) == true;
 
+        public void UpdateContainsAITechnology(Maybe<YesNoUndecidedOption> containsAITechnology)
+        {
+            if (containsAITechnology.HasValue) ContainsAITechnology = containsAITechnology.Value;
+            else ContainsAITechnology = null;
+        }
 
         public Result<SystemRelation, OperationError> AddUsageRelationTo(
             ItSystemUsage toSystemUsage,

@@ -91,6 +91,7 @@ namespace Core.DomainServices.SystemUsage
             destination.SystemPreviousName = source.ItSystem.PreviousName;
             destination.DPIAConducted = source.DPIA;
             destination.IsBusinessCritical = source.isBusinessCritical;
+            destination.ContainsAITechnology = source.ContainsAITechnology;
 
             PatchParentSystemInformation(source, destination);
             PatchRoleAssignments(source, destination);

@@ -251,6 +251,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 LifeCycleStatus = A<LifeCycleStatusType>()
             };
 
+            systemUsage.ContainsAITechnology = A<YesNoUndecidedOption>();
+
             // Add ResponsibleOrganizationUnit
             var responsibleOrgUnitUsage = CreateOrganizationUnitUsage(systemUsage);
             systemUsage.ResponsibleUsage = responsibleOrgUnitUsage;
@@ -333,6 +335,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.ItSystem.Description, readModel.SystemDescription);
             Assert.Equal(systemUsage.DPIA, readModel.DPIAConducted);
             Assert.Equal(systemUsage.isBusinessCritical, readModel.IsBusinessCritical);
+            Assert.Equal(systemUsage.ContainsAITechnology, readModel.ContainsAITechnology);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);

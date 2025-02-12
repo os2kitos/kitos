@@ -1091,6 +1091,18 @@
     <Compile Include="Migrations\202501281353180_add_latest_oversight_remark_to_dpr_read_model.Designer.cs">
       <DependentUpon>202501281353180_add_latest_oversight_remark_to_dpr_read_model.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202502110639238_Usage_contains_ai_technology.cs" />
+    <Compile Include="Migrations\202502110639238_Usage_contains_ai_technology.designer.cs">
+      <DependentUpon>202502110639238_Usage_contains_ai_technology.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202502110649472_Read_model_ai_technology_field.cs" />
+    <Compile Include="Migrations\202502110649472_Read_model_ai_technology_field.designer.cs">
+      <DependentUpon>202502110649472_Read_model_ai_technology_field.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202502111858490_Usage_ai_technology_field_as_yesNoUndecided.cs" />
+    <Compile Include="Migrations\202502111858490_Usage_ai_technology_field_as_yesNoUndecided.designer.cs">
+      <DependentUpon>202502111858490_Usage_ai_technology_field_as_yesNoUndecided.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
@@ -1145,6 +1157,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202501281353180_add_latest_oversight_remark_to_dpr_read_model.resx">
       <DependentUpon>202501281353180_add_latest_oversight_remark_to_dpr_read_model.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202502110639238_Usage_contains_ai_technology.resx">
+      <DependentUpon>202502110639238_Usage_contains_ai_technology.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202502110649472_Read_model_ai_technology_field.resx">
+      <DependentUpon>202502110649472_Read_model_ai_technology_field.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202502111858490_Usage_ai_technology_field_as_yesNoUndecided.resx">
+      <DependentUpon>202502111858490_Usage_ai_technology_field_as_yesNoUndecided.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_DataRow.sql" />
     <EmbeddedResource Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.resx">

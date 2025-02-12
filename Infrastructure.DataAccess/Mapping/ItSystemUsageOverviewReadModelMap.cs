@@ -119,6 +119,9 @@ namespace Infrastructure.DataAccess.Mapping
                .IsOptional()
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ArchiveDuty", 0);
 
+            Property(x => x.ContainsAITechnology)
+                .IsOptional();
+
             Property(x => x.IsHoldingDocument)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_IsHoldingDocument", 0);
 
