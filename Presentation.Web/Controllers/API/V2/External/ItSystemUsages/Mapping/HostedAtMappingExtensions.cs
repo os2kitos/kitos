@@ -14,7 +14,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             (
                 (HostingChoice.External, HostedAt.EXTERNAL),
                 (HostingChoice.OnPremise, HostedAt.ONPREMISE),
-                (HostingChoice.Undecided, HostedAt.UNDECIDED)
+                (HostingChoice.Undecided, HostedAt.UNDECIDED),
+                (HostingChoice.Hybrid, HostedAt.HYBRID)
             );
         }
 
