@@ -75,5 +75,10 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         /// </summary>
         [NonEmptyGuid]
         public Guid? MainContractUuid { get; set; }
+        /// <summary>
+        /// Defines the organization unit that is responsible for this Data Processing Registration
+        /// </summary>
+        [NonEmptyGuid]
+        public Guid? ResponsibleOrganizationUnitUuid { get; set; }
     }
 }

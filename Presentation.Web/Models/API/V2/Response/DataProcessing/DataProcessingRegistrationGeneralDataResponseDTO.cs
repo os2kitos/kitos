@@ -71,5 +71,10 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         /// Defines the associated contracts with this data processing registration
         /// </summary>
         public IEnumerable<IdentityNamePairResponseDTO> AssociatedContracts { get; set; }
+        /// <summary>
+        /// The organization unit responsible for this data processing registration
+        /// </summary>
+        public IdentityNamePairResponseDTO ResponsibleOrganizationUnit { get; set; }
+
     }
 }

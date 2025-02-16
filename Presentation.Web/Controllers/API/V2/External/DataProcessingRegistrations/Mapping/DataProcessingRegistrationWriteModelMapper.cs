@@ -59,9 +59,9 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             return parameters;
         }
 
-        private DataProcessingRegistrationModificationParameters Map<TDto, TExternalReferenceDto>(TDto dto, bool enforceFallbackIfNotProvided) 
-            where TDto: DataProcessingRegistrationWriteRequestDTO, IHasNameExternal, IHasExternalReference<TExternalReferenceDto>
-            where TExternalReferenceDto: ExternalReferenceDataWriteRequestDTO
+        private DataProcessingRegistrationModificationParameters Map<TDto, TExternalReferenceDto>(TDto dto, bool enforceFallbackIfNotProvided)
+            where TDto : DataProcessingRegistrationWriteRequestDTO, IHasNameExternal, IHasExternalReference<TExternalReferenceDto>
+            where TExternalReferenceDto : ExternalReferenceDataWriteRequestDTO
         {
             TSection WithResetDataIfSectionIsNotDefined<TSection>(TSection deserializedValue, Expression<Func<TDto, TSection>> propertySelection) where TSection : new() => WithResetDataIfPropertyIsDefined(deserializedValue, propertySelection, enforceFallbackIfNotProvided);
             TSection WithResetDataIfSectionIsNotDefinedWithFallback<TSection>(TSection deserializedValue, Expression<Func<TDto, TSection>> propertySelection, Func<TSection> fallbackFactory) => WithResetDataIfPropertyIsDefined(deserializedValue, propertySelection, fallbackFactory, enforceFallbackIfNotProvided);
@@ -81,7 +81,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 Roles = dto.Roles.FromNullable().Select(MapRoles)
             };
         }
-        
+
         private Maybe<IEnumerable<UpdatedExternalReferenceProperties>> MapCreateReferences(CreateDataProcessingRegistrationRequestDTO dto)
         {
             return dto.ExternalReferences.FromNullable().Select(BaseMapCreateReferences);
@@ -144,7 +144,8 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
                 MainContractUuid = rule.MustUpdate(x => x.General.MainContractUuid)
                     ? dto.MainContractUuid.AsChangedValue()
-                    : OptionalValueChange<Guid?>.None
+                    : OptionalValueChange<Guid?>.None,
+                ResponsibleUnitUuid = rule.MustUpdate(x => x.General.ResponsibleOrganizationUnitUuid) ? dto.ResponsibleOrganizationUnitUuid.AsChangedValue() : OptionalValueChange<Guid?>.None
             };
         }
 

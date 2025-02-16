@@ -48,6 +48,15 @@ namespace Core.DomainServices.GDPR
             PatchContracts(source, destination);
             PatchActiveState(source, destination);
             PatchLastUpdateBy(source, destination);
+            PatchResponsibleOrganizationUnit(source, destination);
+        }
+
+        private static void PatchResponsibleOrganizationUnit(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
+        {
+            var responsibleUnit = source.ResponsibleOrganizationUnit;
+            destination.ResponsibleOrgUnitUuid = responsibleUnit?.Uuid;
+            destination.ResponsibleOrgUnitId = responsibleUnit?.Id;
+            destination.ResponsibleOrgUnitName = responsibleUnit?.Name;
         }
 
         private static void PatchBasicInformation(DataProcessingRegistration source,

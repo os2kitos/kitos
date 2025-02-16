@@ -29,7 +29,10 @@ using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
+using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
 using Presentation.Web.Models.API.V2.Response.Shared;
+using Presentation.Web.Models.API.V2.Types.Organization;
+using Newtonsoft.Json.Linq;
 
 namespace Tests.Integration.Presentation.Web.GDPR.V2
 {
@@ -463,22 +466,24 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Theory]
-        [InlineData(true, true, true, true, true)]
-        [InlineData(true, true, true, true, false)]
-        [InlineData(true, true, true, false, true)]
-        [InlineData(true, true, false, true, true)]
-        [InlineData(true, false, true, true, true)]
-        [InlineData(false, true, true, true, true)]
+        [InlineData(true, true, true, true, true, false)]
+        [InlineData(true, true, true, true, true, true)]
+        [InlineData(true, true, true, true, false, true)]
+        [InlineData(true, true, true, false, true, true)]
+        [InlineData(true, true, false, true, true, true)]
+        [InlineData(true, false, true, true, true, true)]
+        [InlineData(false, true, true, true, true, true)]
         public async Task Can_POST_With_GeneralData(
             bool withDataProcessors,
             bool withSubDataProcessors,
             bool withResponsible,
             bool withBasisForTransfer,
-            bool withInsecureCountries)
+            bool withInsecureCountries,
+            bool withResponsibleUnit)
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(withDataProcessors, withSubDataProcessors, withResponsible, withBasisForTransfer, withInsecureCountries, organization);
+            var (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(withDataProcessors, withSubDataProcessors, withResponsible, withBasisForTransfer, withInsecureCountries, withResponsibleUnit, organization);
 
             var request = new CreateDataProcessingRegistrationRequestDTO
             {
@@ -566,7 +571,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var createdDpr = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
 
             //Act - change all properties
-            var (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(true, true, true, true, true, organization);
+            var (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(true, true, true, true, true, true, organization);
             await DataProcessingRegistrationV2Helper.SendPatchGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
@@ -574,7 +579,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertGeneralData(organization, dataResponsible, inputDto, basisForTransfer, freshDTO);
 
             //Act - change all properties
-            (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(true, false, true, false, true, organization);
+            (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(true, false, true, false, true, true, organization);
             await DataProcessingRegistrationV2Helper.SendPatchGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
@@ -582,7 +587,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertGeneralData(organization, dataResponsible, inputDto, basisForTransfer, freshDTO);
 
             //Act - change all properties
-            (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(false, true, false, true, false, organization);
+            (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(false, true, false, true, false, false, organization);
             await DataProcessingRegistrationV2Helper.SendPatchGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
@@ -1076,7 +1081,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var (dataResponsible, basisForTransfer, generalDataWriteRequestDto) = await CreateGeneralDataInput(true, true, true, true, true, organization);
+            var (dataResponsible, basisForTransfer, generalDataWriteRequestDto) = await CreateGeneralDataInput(true, true, true, true, true, true, organization);
             var userForRole = await CreateUser(organization);
             var role = (await DataProcessingRegistrationV2Helper.GetRolesAsync(token, organization.Uuid, 0, 1)).First();
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
@@ -1128,7 +1133,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             };
             var newRegistration = await DataProcessingRegistrationV2Helper.PostAsync(token, createRequest);
 
-            var (dataResponsible1, basisForTransfer1, generalRequest1) = await CreateGeneralDataInput(true, true, true, true, true, organization);
+            var (dataResponsible1, basisForTransfer1, generalRequest1) = await CreateGeneralDataInput(true, true, true, true, true, true, organization);
 
             var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
             var system1Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system1.Uuid });
@@ -1170,7 +1175,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertExternalReferenceResults(referencesRequest1, dto1, true);
 
             //Act - Put on filled
-            var (dataResponsible2, basisForTransfer2, generalRequest2) = await CreateGeneralDataInput(true, true, true, true, true, organization);
+            var (dataResponsible2, basisForTransfer2, generalRequest2) = await CreateGeneralDataInput(true, true, true, true, true, true, organization);
 
             var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
             var system2Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system2.Uuid });
@@ -1458,6 +1463,26 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             dtos.Select(x => new { x.Uuid, x.Name }).ToExpectedObject().ShouldMatch(new[] { new { usage1.Uuid, system1.Name }, new { usage2.Uuid, system2.Name } });
         }
 
+        [Fact]
+        public async Task Can_Not_Update_DPR_If_Org_Unit_Doesnt_Exist()
+        {
+            var invalidOrgUnitGuid = A<Guid>();
+            var (token, _, org) = await CreatePrerequisitesAsync();
+            var createdDpr = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = org.Uuid
+            });
+            var generalData = new DataProcessingRegistrationGeneralDataWriteRequestDTO
+                { ResponsibleOrganizationUnitUuid = invalidOrgUnitGuid };
+
+            var response = await DataProcessingRegistrationV2Helper.SendPatchGeneralDataAsync(token, createdDpr.Uuid, generalData);
+
+            Assert.False(response.IsSuccessStatusCode);
+
+
+        }
+
         #region Asserters
 
         private static void AssertExternalReferenceResults(List<ExternalReferenceDataWriteRequestDTO> expected, DataProcessingRegistrationResponseDTO actual)
@@ -1685,8 +1710,15 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
            bool withResponsible,
            bool withBasisForTransfer,
            bool withInsecureCountries,
+           bool withResponsibleUnit,
            OrganizationDTO organization)
         {
+            OrganizationUnitResponseDTO responsibleUnit = null;
+            if (withResponsibleUnit)
+            {
+                var rootUnit = await GetRootUnit(organization.Uuid);
+                responsibleUnit = await OrganizationUnitV2Helper.CreateUnitAsync(organization.Uuid, new CreateOrganizationUnitRequestDTO { Name = A<string>(), Origin = OrganizationUnitOriginChoice.Kitos, ParentUuid = rootUnit.Uuid });
+            }
             var sdpBasisForTransfer = (await OptionV2ApiHelper.GetOptionsAsync(
                     OptionV2ApiHelper.ResourceName.DataProcessingRegistrationBasisForTransfer, organization.Uuid, 10, 0)
                 )
@@ -1741,7 +1773,8 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                         InsecureThirdCountrySubjectToDataProcessingUuid = transferToThirdCountry == YesNoUndecidedChoice.Yes ? sdpCountry.Uuid : null,
                         BasisForTransferUuid = sdpBasisForTransfer.Uuid
                     };
-                }).ToList()
+                }).ToList(),
+                ResponsibleOrganizationUnitUuid = responsibleUnit?.Uuid
             };
             return (dataResponsible, basisForTransfer, inputDTO);
         }
@@ -1821,6 +1854,14 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                 }
             };
             return (roles, new List<User> { user1, user2 });
+        }
+
+        private async Task<OrganizationUnitResponseDTO> GetRootUnit(Guid organizationUuid)
+        {
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token.Token, organizationUuid);
+            var rootUnit = units.First(x => x.ParentOrganizationUnit == null);
+            return rootUnit;
         }
 
         #endregion

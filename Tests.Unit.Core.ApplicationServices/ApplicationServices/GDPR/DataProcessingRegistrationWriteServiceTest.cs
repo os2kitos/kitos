@@ -2150,7 +2150,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(newAssignment.UserUuid, newRight.UserId);
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(newAssignment.RoleUuid, newRight.RoleId);
-           
+
             ExpectRoleAssignmentReturns(dpr, newRight.RoleId, newRight.UserId, newRight);
 
             //Act
@@ -2160,7 +2160,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transaction);
         }
-        
+
         [Fact]
         public void Can_Remove_Role()
         {
@@ -2187,6 +2187,100 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Can_Create_With_Responsible_Unit()
+        {
+            Guid? orgUnitUuid = A<Guid>();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters { ResponsibleUnitUuid = orgUnitUuid.AsChangedValue() };
+            var (orgUuid, parameters, dpr, _) = SetupCreateScenarioPrerequisites(generalData: generalData);
+            dpr.Organization = new Organization { OrgUnits = { new OrganizationUnit { Uuid = orgUnitUuid.Value } } };
+
+            var result = _sut.Create(orgUuid, parameters);
+
+            Assert.True(result.Ok);
+            Assert.Equal(result.Value.ResponsibleOrganizationUnit.Uuid, orgUnitUuid);
+        }
+
+        [Fact]
+        public void Can_Update_With_Responsible_Unit()
+        {
+            //Arrange
+            Guid? orgUnitUuid = A<Guid>();
+            var parameters = new DataProcessingRegistrationModificationParameters
+            {
+                General = new UpdatedDataProcessingRegistrationGeneralDataParameters { ResponsibleUnitUuid = orgUnitUuid.AsChangedValue() }
+            };
+            var dataProcessingRegistration = new DataProcessingRegistration
+            {
+                Organization = new Organization { OrgUnits = { new OrganizationUnit { Uuid = orgUnitUuid.Value } } }
+            };
+            var transaction = ExpectTransaction();
+            var dprUuid = A<Guid>();
+
+            ExpectGetDataProcessingRegistrationReturns(dprUuid, dataProcessingRegistration);
+
+            //Act
+            var result = _sut.Update(dprUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(result.Value.ResponsibleOrganizationUnit.Uuid, orgUnitUuid);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Can_Reset_Responsible_Unit()
+        {
+            //Arrange
+            Guid? orgUnitUuid = null;
+            var parameters = new DataProcessingRegistrationModificationParameters
+            {
+                General = new UpdatedDataProcessingRegistrationGeneralDataParameters { ResponsibleUnitUuid = orgUnitUuid.AsChangedValue() }
+            };
+            var dataProcessingRegistration = new DataProcessingRegistration
+            {
+                ResponsibleOrganizationUnit = new OrganizationUnit {Uuid = A<Guid>()}
+            };
+            var transaction = ExpectTransaction();
+            var dprUuid = A<Guid>();
+
+            ExpectGetDataProcessingRegistrationReturns(dprUuid, dataProcessingRegistration);
+
+            //Act
+            var result = _sut.Update(dprUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Null(result.Value.ResponsibleOrganizationUnit);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Can_Not_Update_If_Unit_Does_Not_Exist_In_Organization()
+        {
+            //Arrange
+            Guid? orgUnitUuid = A<Guid>();
+            var parameters = new DataProcessingRegistrationModificationParameters
+            {
+                General = new UpdatedDataProcessingRegistrationGeneralDataParameters { ResponsibleUnitUuid = orgUnitUuid.AsChangedValue() }
+            };
+            var dataProcessingRegistration = new DataProcessingRegistration
+            {
+                Organization = new Organization()
+            };
+            var transaction = ExpectTransaction();
+            var dprUuid = A<Guid>();
+
+            ExpectGetDataProcessingRegistrationReturns(dprUuid, dataProcessingRegistration);
+
+            //Act
+            var result = _sut.Update(dprUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertTransactionNotCommitted(transaction);
         }
 
         private void ExpectBatchUpdateExternalReferencesReturns(DataProcessingRegistration dpr, IEnumerable<UpdatedExternalReferenceProperties> externalReferences, Maybe<OperationError> value)

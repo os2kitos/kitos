@@ -121,7 +121,7 @@ namespace Core.ApplicationServices.GDPR.Write
                 .Select(ExtractAssignedRoles)
                 .Bind<DataProcessingRegistrationModificationParameters>(existingRoles =>
                 {
-                     if (!existingRoles.Contains(assignment))
+                    if (!existingRoles.Contains(assignment))
                     {
                         return new OperationError("Assignment does not exist", OperationFailure.BadInput);
                     }
@@ -185,7 +185,7 @@ namespace Core.ApplicationServices.GDPR.Write
                 return new OperationError($"Duplicates of 'User Role Pairs' are not allowed", OperationFailure.BadInput);
             }
 
-            var existingRightsList = dpr.Rights.Select(x => new UserRolePair(x.User.Uuid,x.Role.Uuid)).ToList();
+            var existingRightsList = dpr.Rights.Select(x => new UserRolePair(x.User.Uuid, x.Role.Uuid)).ToList();
 
             foreach (var (delta, item) in existingRightsList.ComputeDelta(newRightsList, x => x))
             {
@@ -286,7 +286,20 @@ namespace Core.ApplicationServices.GDPR.Write
                 .Bind(r => r.WithOptionalUpdate(parameters.DataProcessorUuids, UpdateDataProcessors))
                 .Bind(r => r.WithOptionalUpdate(parameters.HasSubDataProcessors, (registration, newValue) => _applicationService.SetSubDataProcessorsState(registration.Id, newValue ?? YesNoUndecidedOption.Undecided)))
                 .Bind(r => r.WithOptionalUpdate(parameters.SubDataProcessors, UpdateSubDataProcessors))
-                .Bind(r => r.WithOptionalUpdate(parameters.MainContractUuid, UpdateMainContract));
+                .Bind(r => r.WithOptionalUpdate(parameters.MainContractUuid, UpdateMainContract))
+                .Bind(r => r.WithOptionalUpdate(parameters.ResponsibleUnitUuid, UpdateResponsibleUnit));
+        }
+
+        private Result<DataProcessingRegistration, OperationError> UpdateResponsibleUnit(DataProcessingRegistration dpr, Guid? orgUnitUuid)
+        {
+            if (orgUnitUuid == null)
+            {
+                dpr.ResetResponsibleOrganizationUnit();
+                return dpr;
+            }
+            var updateResult = dpr.SetResponsibleOrganizationUnit(orgUnitUuid.Value);
+            return updateResult.Match<Result<DataProcessingRegistration, OperationError>>(err => err, () => dpr);
+
         }
 
         private Result<DataProcessingRegistration, OperationError> UpdateSystemAssignments(DataProcessingRegistration dpr, IEnumerable<Guid> systemUsageUuids)
@@ -482,7 +495,7 @@ namespace Core.ApplicationServices.GDPR.Write
                 Roles = new UpdatedDataProcessingRegistrationRoles
                 {
                     UserRolePairs = existingRoles.FromNullable().AsChangedValue()
-                } 
+                }
             };
         }
     }
