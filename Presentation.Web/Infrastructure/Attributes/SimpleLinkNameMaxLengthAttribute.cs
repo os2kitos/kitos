@@ -23,7 +23,7 @@ namespace Presentation.Web.Infrastructure.Attributes
 
             return value switch
             {
-                SimpleLinkDTO link => link.Name?.Length <= _maxLength,
+                SimpleLinkDTO link => link.Name == null || link.Name?.Length <= _maxLength,
                 _ => false
             };
         }
