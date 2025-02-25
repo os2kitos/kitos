@@ -37,7 +37,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
                 LastModified = itSystem.LastChanged,
                 LastModifiedBy = itSystem.LastChangedByUser?.MapIdentityNamePairDTO(),
                 Scope = itSystem.AccessModifier.ToChoice(),
-                OrganizationContext = itSystem.Organization?.MapShallowOrganizationResponseDTO()
+                OrganizationContext = itSystem.Organization?.MapShallowOrganizationResponseDTO(),
+                DBSName = itSystem.DBSName,
+                DBSDataProcessorName = itSystem.DBSDataProcessorName
             };
 
             MapBaseInformation(itSystem, dto);

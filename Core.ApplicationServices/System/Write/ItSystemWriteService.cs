@@ -106,29 +106,7 @@ namespace Core.ApplicationServices.System.Write
 
         public Result<ItSystem, OperationError> Update(Guid systemUuid, SystemUpdateParameters parameters)
         {
-            using var transaction = _transactionManager.Begin();
-            try
-            {
-                var result = GetSystemAndAuthorizeAccess(systemUuid)
-                    .Bind(system => ApplyUpdates(system, parameters));
-
-                if (result.Ok)
-                {
-                    SaveAndNotify(result.Value, transaction);
-                }
-                else
-                {
-                    transaction.Rollback();
-                    _logger.Error("User {id} failed to update It-System {uuid} due to error: {errorMessage}", _userContext.UserId, systemUuid, result.Error.ToString());
-                }
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                _logger.Error(e, "User {id} Failed updating system with uuid {uuid}", _userContext.UserId, systemUuid);
-                return new OperationError(OperationFailure.UnknownError);
-            }
+            return PerformUpdateTransaction(systemUuid, system => ApplyUpdates(system, parameters), WithWriteAccess);
         }
 
         public Result<ItSystem, OperationError> Delete(Guid systemUuid)
@@ -145,6 +123,11 @@ namespace Core.ApplicationServices.System.Write
 
                     return new OperationError(deleteResult.ToString("G"), OperationFailure.UnknownError);
                 });
+        }
+
+        public Result<ItSystem, OperationError> DBSUpdate(Guid systemUuid, DBSUpdateParameters parameters)
+        {
+            return PerformUpdateTransaction(systemUuid, system => ApplyDBSUpdates(system, parameters), WithDBSWriteAccess);
         }
 
         public Result<ExternalReference, OperationError> AddExternalReference(Guid systemUuid, ExternalReferenceProperties externalReferenceProperties)
@@ -177,6 +160,35 @@ namespace Core.ApplicationServices.System.Write
                 });
         }
 
+        private Result<ItSystem, OperationError> PerformUpdateTransaction(Guid systemUuid,
+            Func<ItSystem, Result<ItSystem, OperationError>> mutation, Func<ItSystem, Result<ItSystem, OperationError>> authorizeMethod)
+        {
+            using var transaction = _transactionManager.Begin();
+            try
+            {
+                var result = _systemService.GetSystem(systemUuid)
+                    .Bind(authorizeMethod)
+                    .Bind(mutation);
+
+                if (result.Ok)
+                {
+                    SaveAndNotify(result.Value, transaction);
+                }
+                else
+                {
+                    transaction.Rollback();
+                    _logger.Error("User {id} failed to update It-System {uuid} due to error: {errorMessage}", _userContext.UserId, systemUuid, result.Error.ToString());
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "User {id} Failed updating system with uuid {uuid}", _userContext.UserId, systemUuid);
+                return new OperationError(OperationFailure.UnknownError);
+            }
+        }
+
         private Result<ItSystem, OperationError> WithWriteAccess(ItSystem system)
         {
             return _authorizationContext.AllowModify(system) ? system : new OperationError(OperationFailure.Forbidden);
@@ -197,6 +209,13 @@ namespace Core.ApplicationServices.System.Write
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.RightsHolderUuid, (itSystem, newValue) => _systemService.UpdateRightsHolder(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Scope, (itSystem, newValue) => _systemService.UpdateAccessModifier(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Deactivated, HandleDeactivatedState));
+        }
+
+        private Result<ItSystem, OperationError> ApplyDBSUpdates(ItSystem itSystem, DBSUpdateParameters parameters)
+        {
+            return itSystem.WithOptionalUpdate(parameters.SystemName, (sys, dbsName) => sys.UpdateDBSName(dbsName))
+                .Bind(system => system.WithOptionalUpdate(parameters.DataProcessorName, (sys, dbsDataProcessorName) => sys.UpdateDBSDataProcessorName(dbsDataProcessorName)));
+
         }
 
         private Result<ItSystem, OperationError> HandleDeactivatedState(ItSystem itSystem, bool deactivated)
@@ -278,6 +297,11 @@ namespace Core.ApplicationServices.System.Write
             return _systemService
                 .GetSystem(systemUuid)
                 .Bind(WithWriteAccess);
+        }
+
+        private Result<ItSystem, OperationError> WithDBSWriteAccess(ItSystem system)
+        {
+            return WithWriteAccess(system); //Placeholder for now
         }
     }
 }

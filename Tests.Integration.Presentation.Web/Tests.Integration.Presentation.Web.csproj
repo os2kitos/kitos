@@ -143,6 +143,7 @@
     <Compile Include="Internal\GdprReport\GdprReportApiV2Test.cs" />
     <Compile Include="Internal\Messages\PublicMessagesApiV2Test.cs" />
     <Compile Include="ItSystem\V2\BaseItSystemsApiV2Test.cs" />
+    <Compile Include="ItSystem\V2\ItSystemDBSV2ApiTest.cs" />
     <Compile Include="ItSystem\V2\ItSystemLocalOptionTypesInternalV2ApiTest.cs" />
     <Compile Include="ItSystem\V2\ItSystemsInternalApiV2Test.cs" />
     <Compile Include="ItSystem\V2\ItSystemsApiV2RightsHoldersTest.cs" />
@@ -163,6 +164,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Tools\Extensions\StringExtensions.cs" />
+    <Compile Include="Tools\External\DBSV2Helper.cs" />
     <Compile Include="Tools\HelpTextsInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\DPR\DataProcessingRegistrationInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\GdprReportV2Helper.cs" />

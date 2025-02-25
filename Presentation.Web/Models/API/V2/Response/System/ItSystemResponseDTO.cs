@@ -39,5 +39,9 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// </summary>
         [Required]
         public ShallowOrganizationResponseDTO OrganizationContext { get; set; }
+
+        public string DBSName { get; set; }
+        public string DBSDataProcessorName { get; set; }
+
     }
 }

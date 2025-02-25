@@ -74,7 +74,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             AssertBaseResponseProperties(itSystem, expectedReferences, dto);
-
+            Assert.Equal(itSystem.DBSName, dto.DBSName);
+            Assert.Equal(itSystem.DBSDataProcessorName, dto.DBSDataProcessorName);
         }
 
         [Fact]
@@ -156,7 +157,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                     Uuid = x.Uuid,
                     Description = x.Description,
                     TaskKey = x.KleNumber
-                }).ToList()
+                }).ToList(),
+                DBSName = A<string>(),
+                DBSDataProcessorName = A<string>()
             };
             return itSystem;
         }

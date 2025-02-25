@@ -1,4 +1,5 @@
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -60,6 +61,16 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.Uuid)
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_System_Uuuid", 0);
+
+            Property(x => x.DBSName)
+                .IsOptional()
+                .HasMaxLength(ItSystem.MaxNameLength)
+                .HasIndexAnnotation("ItSystem_IX_DBSName");
+
+            Property(x => x.DBSDataProcessorName)
+                .IsOptional()
+                .HasMaxLength(Organization.MaxNameLength)
+                .HasIndexAnnotation("ItSystem_IX_DBSDataProcessorName"); ;
 
             TypeMapping.AddIndexOnAccessModifier<ItSystemMap, ItSystem>(this);
         }

@@ -138,6 +138,10 @@ namespace Core.DomainModel.ItSystem
 
         public string ArchiveDutyComment { get; set; }
 
+        public string DBSName { get; set; }
+
+        public string DBSDataProcessorName { get; set; }
+
         public bool TryGetInterfaceExhibit(out ItInterfaceExhibit interfaceExhibit, int interfaceId)
         {
             interfaceExhibit = ItInterfaceExhibits.FirstOrDefault(i => i.ItInterface.Id == interfaceId);
@@ -279,6 +283,16 @@ namespace Core.DomainModel.ItSystem
             ArchiveDuty = recommendation;
             ArchiveDutyComment = comment;
             return Maybe<OperationError>.None;
+        }
+
+        public void UpdateDBSName(string dbsName)
+        {
+            DBSName = dbsName;
+        }
+
+        public void UpdateDBSDataProcessorName(string dbsDataProcessorName)
+        {
+            DBSDataProcessorName = dbsDataProcessorName;
         }
     }
 }

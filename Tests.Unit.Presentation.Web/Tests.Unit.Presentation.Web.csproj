@@ -297,6 +297,7 @@
     <Compile Include="Infrastructure\SimpleLinkNameMaxLengthAttributeTest.cs" />
     <Compile Include="Models\EntityWithDeactivatedStatusMapperTest.cs" />
     <Compile Include="Models\V2\CommandPermissionsResponseMapperTest.cs" />
+    <Compile Include="Models\V2\DBSWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\Enums\BaseEnumMapperTest.cs" />
     <Compile Include="Models\V2\Enums\ItInterfaceDeletionConflictMappingExtensionsTest.cs" />
     <Compile Include="Models\V2\Enums\SystemDeletionConflictMappingExtensionsTest.cs" />

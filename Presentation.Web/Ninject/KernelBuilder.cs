@@ -404,6 +404,9 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IHelpTextResponseMapper>().To<HelpTextResponseMapper>().InCommandScope(Mode);
             kernel.Bind<IHelpTextWriteModelMapper>().To<HelpTextWriteModelMapper>().InCommandScope(Mode);
 
+            //DBS
+            kernel.Bind<IDBSWriteModelMapper>().To<DBSWriteModelMapper>().InCommandScope(Mode);
+
         }
 
         private void RegisterSSO(IKernel kernel)

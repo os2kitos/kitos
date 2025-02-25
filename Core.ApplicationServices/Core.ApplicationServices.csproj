@@ -250,6 +250,7 @@
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageOrganizationalUseParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageRoles.cs" />
     <Compile Include="Model\Shared\Write\UserRolePair.cs" />
+    <Compile Include="Model\System\DBSUpdateParameters.cs" />
     <Compile Include="Model\System\RightsHolderSystemUpdateParameters.cs" />
     <Compile Include="Model\System\SharedSystemUpdateParameters.cs" />
     <Compile Include="Model\System\SystemDeletionConflict.cs" />
