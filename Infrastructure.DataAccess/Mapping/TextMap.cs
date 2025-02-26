@@ -8,8 +8,8 @@ namespace Infrastructure.DataAccess.Mapping
         {
             // Properties
             // Table & Column Mappings
-            this.ToTable("Text");
-            this.Property(t => t.Value).HasColumnName("Value");
+            ToTable("Text");
+            Property(t => t.Value).HasColumnName("Value");
 
         }
     }

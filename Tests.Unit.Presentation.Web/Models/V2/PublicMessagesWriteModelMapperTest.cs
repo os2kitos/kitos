@@ -19,7 +19,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
             _currentHttpRequestMock
                 .Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
-                .Returns(GetAllInputPropertyNames<PublicMessagesRequestDTO>());
+                .Returns(GetAllInputPropertyNames<PublicMessageRequestDTO>());
             _sut = new PublicMessagesWriteModelMapper(_currentHttpRequestMock.Object);
         }
 
@@ -32,61 +32,55 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void FromPATCH_Returns_Correct_Write_Params()
         {
             //Arrange
-            var dto = A<PublicMessagesRequestDTO>();
+            var dto = A<PublicMessageRequestDTO>();
 
             //Act
             var mapping = _sut.FromPATCH(dto);
 
             //Assert
-            Assert.Equal(dto.About, AssertPropertyContainsDataChange(mapping.About));
-            Assert.Equal(dto.ContactInfo, AssertPropertyContainsDataChange(mapping.ContactInfo));
-            Assert.Equal(dto.Misc, AssertPropertyContainsDataChange(mapping.Misc));
-            Assert.Equal(dto.Guides, AssertPropertyContainsDataChange(mapping.Guides));
-            Assert.Equal(dto.StatusMessages, AssertPropertyContainsDataChange(mapping.StatusMessages));
+            AssertPropertyContainsDataChange(mapping.LongDescription);
+            AssertPropertyContainsDataChange(mapping.Link);
+            AssertPropertyContainsDataChange(mapping.ShortDescription);
+            AssertPropertyContainsDataChange(mapping.Status);
         }
 
         [Theory]
         [MemberData(nameof(GetUndefinedGeneralSectionsInput))]
         public void FromPATCH_Ignores_Undefined_Properties(
-            bool noAbout,
-            bool noGuide,
-            bool noContactInfo,
-            bool noMisc,
-            bool noStatusMessages)
+            bool noTitle,
+            bool noLongDescription,
+            bool noShortDescription,
+            bool noLink,
+            bool noStatus)
         {
             //Arrange
-            var emptyInput = new PublicMessagesRequestDTO();
-            ConfigureInput(
-                noAbout,
-                noGuide,
-                noContactInfo,
-                noMisc,
-                noStatusMessages);
+            var emptyInput = new PublicMessageRequestDTO();
+            ConfigureInput(noTitle,
+                noLongDescription, noShortDescription, noLink, noStatus);
 
             //Act
             var output = _sut.FromPATCH(emptyInput);
 
             //Assert that all general properties are mapped correctly
-            Assert.Equal(noAbout, output.About.IsUnchanged);
-            Assert.Equal(noGuide, output.Guides.IsUnchanged);
-            Assert.Equal(noStatusMessages, output.StatusMessages.IsUnchanged);
-            Assert.Equal(noContactInfo, output.ContactInfo.IsUnchanged);
-            Assert.Equal(noMisc, output.Misc.IsUnchanged);
+            Assert.Equal(noLongDescription, output.LongDescription.IsUnchanged);
+            Assert.Equal(noShortDescription, output.ShortDescription.IsUnchanged);
+            Assert.Equal(noLink, output.Link.IsUnchanged);
+            Assert.Equal(noStatus, output.Status.IsUnchanged);
         }
 
         private void ConfigureInput(
-            bool noAbout,
-            bool noGuide,
-            bool noContactInfo,
-            bool noMisc,
-            bool noStatusMessages)
+            bool noTitle,
+            bool noLongDescription,
+            bool noShortDescription,
+            bool noLink,
+            bool noStatus)
         {
-            var properties = GetAllInputPropertyNames<PublicMessagesRequestDTO>();
-            if (noAbout) properties.Remove(nameof(PublicMessagesRequestDTO.About));
-            if (noMisc) properties.Remove(nameof(PublicMessagesRequestDTO.Misc));
-            if (noContactInfo) properties.Remove(nameof(PublicMessagesRequestDTO.ContactInfo));
-            if (noStatusMessages) properties.Remove(nameof(PublicMessagesRequestDTO.StatusMessages));
-            if (noGuide) properties.Remove(nameof(PublicMessagesRequestDTO.Guides));
+            var properties = GetAllInputPropertyNames<PublicMessageRequestDTO>();
+            if (noTitle) properties.Remove(nameof(PublicMessageRequestDTO.Title));
+            if (noLongDescription) properties.Remove(nameof(PublicMessageRequestDTO.LongDescription));
+            if (noShortDescription) properties.Remove(nameof(PublicMessageRequestDTO.ShortDescription));
+            if (noLink) properties.Remove(nameof(PublicMessageRequestDTO.Link));
+            if (noStatus) properties.Remove(nameof(PublicMessageRequestDTO.Status));
 
             _currentHttpRequestMock
                 .Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))

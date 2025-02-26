@@ -1,6 +1,7 @@
 ﻿using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Messages;
 using Core.ApplicationServices.Model.Shared;
+using Core.DomainModel.PublicMessage;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Internal.Request;
@@ -13,32 +14,39 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping
         {
         }
 
-        public WritePublicMessagesParams FromPATCH(PublicMessagesRequestDTO request)
+        public WritePublicMessagesParams FromPOST(PublicMessageRequestDTO request)
         {
-            var rule = CreateChangeRule<PublicMessagesRequestDTO>(false);
+            return MapParams(request, true);
+        }
+
+        public WritePublicMessagesParams FromPATCH(PublicMessageRequestDTO request)
+        {
+            return MapParams(request, false);
+        }
+
+        private WritePublicMessagesParams MapParams(PublicMessageRequestDTO request, bool enforceChanges)
+        {
+            var rule = CreateChangeRule<PublicMessageRequestDTO>(enforceChanges);
 
             return new WritePublicMessagesParams
             {
-                Misc = rule.MustUpdate(x => x.Misc)
-                    ? request.Misc.AsChangedValue()
+                Title = rule.MustUpdate(x => x.Title)
+                    ? request.Title.AsChangedValue()
                     : OptionalValueChange<string>.None,
-
-                About = rule.MustUpdate(x => x.About)
-                    ? request.About.AsChangedValue()
+                LongDescription = rule.MustUpdate(x => x.LongDescription)
+                    ? request.LongDescription.AsChangedValue()
                     : OptionalValueChange<string>.None,
-
-                ContactInfo = rule.MustUpdate(x => x.ContactInfo)
-                    ? request.ContactInfo.AsChangedValue()
+                Link = rule.MustUpdate(x => x.Link)
+                    ? request.Link.AsChangedValue()
                     : OptionalValueChange<string>.None,
-
-                StatusMessages = rule.MustUpdate(x => x.StatusMessages)
-                    ? request.StatusMessages.AsChangedValue()
+                ShortDescription = rule.MustUpdate(x => x.ShortDescription)
+                    ? request.ShortDescription.AsChangedValue()
                     : OptionalValueChange<string>.None,
-
-                Guides = rule.MustUpdate(x => x.Guides)
-                    ? request.Guides.AsChangedValue()
-                    : OptionalValueChange<string>.None
+                Status = rule.MustUpdate(x => x.Status)
+                    ? (request.Status?.ToPublicMessageStatus()).AsChangedValue()
+                    : OptionalValueChange<PublicMessageStatus?>.None
             };
+
         }
     }
 }

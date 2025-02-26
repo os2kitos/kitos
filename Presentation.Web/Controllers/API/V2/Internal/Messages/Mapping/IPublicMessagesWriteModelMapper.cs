@@ -5,6 +5,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping
 {
     public interface IPublicMessagesWriteModelMapper
     {
-        WritePublicMessagesParams FromPATCH(PublicMessagesRequestDTO request);
+        WritePublicMessagesParams FromPOST(PublicMessageRequestDTO request);
+        WritePublicMessagesParams FromPATCH(PublicMessageRequestDTO request);
     }
 }

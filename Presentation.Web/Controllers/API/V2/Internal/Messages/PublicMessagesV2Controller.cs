@@ -1,14 +1,18 @@
-﻿using Swashbuckle.Swagger.Annotations;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Swashbuckle.Swagger.Annotations;
 using System.Net;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Messages;
-using Core.ApplicationServices.Model.Messages;
+using Core.DomainModel.PublicMessage;
 using Presentation.Web.Models.API.V2.Internal.Request;
 using Presentation.Web.Models.API.V2.Internal.Response;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Messages
 {
@@ -35,33 +39,51 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
         [HttpGet]
         [Route]
         [AllowAnonymous]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PublicMessagesResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<PublicMessageResponseDTO>))]
         public IHttpActionResult Get()
         {
             var publicMessages = _publicMessagesService.Read();
-            var dto = ToDTO(publicMessages);
-            return Ok(dto);
+            var dtos = publicMessages.Select(ToDTO).ToList();
+            return Ok(dtos);
+        }
+
+        [HttpPost]
+        [Route]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PublicMessageResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        public IHttpActionResult Post([FromBody] PublicMessageRequestDTO body)
+        {
+            if (body == null)
+            {
+                return BadRequest("Missing request body");
+            }
+            var parameters = _writeModelMapper.FromPOST(body);
+            return _publicMessagesService.Create(parameters)
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
         /// Update the public messages
         /// </summary>
         [HttpPatch]
-        [Route]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PublicMessagesResponseDTO))]
+        [Route("{messageUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PublicMessageResponseDTO))]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
-        public IHttpActionResult Patch([FromBody] PublicMessagesRequestDTO body)
+        public IHttpActionResult Patch([NonEmptyGuid] Guid messageUuid, [FromBody] PublicMessageRequestDTO body)
         {
             if (body == null)
             {
                 return BadRequest("Missing request body");
             }
 
-            return _writeModelMapper
-                .FromPATCH(body)
-                .Transform(_publicMessagesService.Write)
+            var parameters = _writeModelMapper.FromPATCH(body);
+
+            return _publicMessagesService.Patch(messageUuid, parameters)
                 .Select(ToDTO)
                 .Match(Ok, FromOperationError);
         }
@@ -81,16 +103,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages
                 .Transform(Ok);
         }
 
-        private static PublicMessagesResponseDTO ToDTO(PublicMessages publicMessages)
+        private static PublicMessageResponseDTO ToDTO(PublicMessage publicMessage)
         {
-            return new PublicMessagesResponseDTO
-            {
-                Guides = publicMessages.Guides,
-                Misc = publicMessages.Misc,
-                ContactInfo = publicMessages.ContactInfo,
-                About = publicMessages.About,
-                StatusMessages = publicMessages.StatusMessages
-            };
+            return new PublicMessageResponseDTO(publicMessage);
         }
     }
 }

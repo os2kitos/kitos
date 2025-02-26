@@ -130,6 +130,8 @@
     <Compile Include="Organization\StsOrganizationConsequenceLog.cs" />
     <Compile Include="Organization\UnitAccessRights.cs" />
     <Compile Include="Organization\UnitAccessRightsWithUnitData.cs" />
+    <Compile Include="PublicMessage\PublicMessage.cs" />
+    <Compile Include="PublicMessage\PublicMessageStatus.cs" />
     <Compile Include="Shared\LifeCycleEventType.cs" />
     <Compile Include="Shared\RelatedEntityType.cs" />
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />
@@ -299,7 +301,7 @@
     <Compile Include="Shared\YesNoIrrelevantOption.cs" />
     <Compile Include="Organization\StsOrganizationIdentity.cs" />
     <Compile Include="SSO\SsoUserIdentity.cs" />
-    <Compile Include="Text.cs" />
+    <Compile Include="PublicMessage\Text.cs" />
     <Compile Include="Tracking\LifeCycleTrackingEvent.cs" />
     <Compile Include="Tracking\TrackedEntityType.cs" />
     <Compile Include="Tracking\BaseTrackingEvent.cs" />

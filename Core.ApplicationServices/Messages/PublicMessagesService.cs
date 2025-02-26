@@ -1,29 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Messages;
-using Core.ApplicationServices.Model.Shared;
-using Core.DomainModel;
+using Core.DomainModel.PublicMessage;
 using Core.DomainServices;
-using Serilog;
+using Core.DomainServices.Extensions;
 
 namespace Core.ApplicationServices.Messages
 {
     public class PublicMessagesService : IPublicMessagesService
     {
-        private readonly IGenericRepository<Text> _repository;
+        private readonly IGenericRepository<PublicMessage> _repository;
         private readonly IOrganizationalUserContext _organizationalUserContext;
-        private readonly ILogger _logger;
 
         public PublicMessagesService(
-            IGenericRepository<Text> repository,
-            IOrganizationalUserContext organizationalUserContext,
-            ILogger logger)
+            IGenericRepository<PublicMessage> repository,
+            IOrganizationalUserContext organizationalUserContext)
         {
             _repository = repository;
             _organizationalUserContext = organizationalUserContext;
-            _logger = logger;
         }
 
         public ResourcePermissionsResult GetPermissions()
@@ -32,69 +30,64 @@ namespace Core.ApplicationServices.Messages
             return new ResourcePermissionsResult(true, allowModify, false);
         }
 
-        public PublicMessages Read()
+        public IEnumerable<PublicMessage> Read()
         {
-            var texts = GetTextsLookup();
-            return MapPublicMessages(texts);
+            return _repository.AsQueryable().OrderBy(x => x.Id).ToList();
         }
-
-        private PublicMessages MapPublicMessages(IReadOnlyDictionary<int, Text> texts)
-        {
-            return new PublicMessages(
-                MapText(texts, Text.SectionIds.About),
-                MapText(texts, Text.SectionIds.Guides),
-                MapText(texts, Text.SectionIds.StatusMessages),
-                MapText(texts, Text.SectionIds.Misc),
-                MapText(texts, Text.SectionIds.ContactInfo)
-            );
-        }
-
-        public Result<PublicMessages, OperationError> Write(WritePublicMessagesParams parameters)
+        
+        public Result<PublicMessage, OperationError> Create(WritePublicMessagesParams parameters)
         {
             if (!GetPermissions().Modify)
             {
                 return new OperationError(OperationFailure.Forbidden);
             }
-            var texts = GetTextsLookup();
-            WriteChange(parameters.About, Text.SectionIds.About, texts);
-            WriteChange(parameters.ContactInfo, Text.SectionIds.ContactInfo, texts);
-            WriteChange(parameters.Guides, Text.SectionIds.Guides, texts);
-            WriteChange(parameters.Misc, Text.SectionIds.Misc, texts);
-            WriteChange(parameters.StatusMessages, Text.SectionIds.StatusMessages, texts);
+
+            var message = new PublicMessage();
+            var result = WriteChange(message, parameters);
+            if (result.Failed) 
+                return result.Error;
+
+            _repository.Insert(message);
             _repository.Save();
-
-            return MapPublicMessages(texts);
+            return message;
         }
 
-        private void WriteChange(OptionalValueChange<string> change, int textId, Dictionary<int, Text> texts)
+        public Result<PublicMessage, OperationError> Patch(Guid messageUuid, WritePublicMessagesParams parameters)
         {
-            if (change.HasChange)
+            if (!GetPermissions().Modify)
             {
-                if (texts.TryGetValue(textId, out var text))
-                {
-                    text.Value = change.NewValue;
-                }
-                else
-                {
-                    _logger.Error("Missing text id for the front page {textId}. Not able to change unknown text", textId);
-                }
-            }
-        }
-
-        private Dictionary<int, Text> GetTextsLookup()
-        {
-            return _repository.AsQueryable().ToDictionary(x => x.Id, x => x);
-        }
-
-        private string MapText(IReadOnlyDictionary<int, Text> textMap, int textId)
-        {
-            if (textMap.TryGetValue(textId, out var text))
-            {
-                return text.Value ?? string.Empty;
+                return new OperationError(OperationFailure.Forbidden);
             }
 
-            _logger.Error("Missing text id for the front page {textId}. Returning empty text", textId);
-            return string.Empty;
+            var updateResult = GetMessageByUuid(messageUuid)
+                .Match(message => WriteChange(message, parameters),
+                    () => new OperationError($"Message with uuid: {messageUuid} was not found", OperationFailure.NotFound));
+
+            if (updateResult.Failed)
+            {
+                return updateResult.Error;
+            }
+            
+            _repository.Save();
+            return updateResult.Value;
+        }
+
+        private static Result<PublicMessage, OperationError> WriteChange(PublicMessage message, WritePublicMessagesParams parameters)
+        {
+            return message.WithOptionalUpdate(parameters.LongDescription, (updateText, value) => updateText.UpdateLongDescription(value))
+                    .Bind(updatedText => updatedText.WithOptionalUpdate(parameters.Title, (updateText, title) => updateText.UpdateTitle(title)))
+                    .Bind(updatedText => updatedText.WithOptionalUpdate(parameters.ShortDescription,
+                        (updateText, shortDescription) => updateText.UpdateShortDescription(shortDescription)))
+                    .Bind(updatedText =>
+                        updatedText.WithOptionalUpdate(parameters.Link,
+                            (updateText, link) => updateText.UpdateLink(link)))
+                    .Bind(updatedText => updatedText.WithOptionalUpdate(parameters.Status,
+                        (updateText, status) => updateText.UpdateStatus(status)));
+        }
+
+        private Maybe<PublicMessage> GetMessageByUuid(Guid uuid)
+        {
+            return _repository.AsQueryable().ByUuid(uuid);
         }
     }
 }

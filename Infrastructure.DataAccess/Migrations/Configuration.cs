@@ -10,6 +10,7 @@ using Infrastructure.Services.Cryptography;
 
 namespace Infrastructure.DataAccess.Migrations
 {
+    using Core.DomainModel.PublicMessage;
     using System.Data.Entity.Migrations;
     using System.Linq;
 
@@ -493,6 +494,88 @@ namespace Infrastructure.DataAccess.Migrations
                     context.Texts.AddOrUpdate(new Text()
                     {
                         Value = @"Kontaktinformationer",
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
+                const string longDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tortor ligula, malesuada nec molestie sit amet, tempor quis elit. Suspendisse porttitor imperdiet lacus, sed ultrices augue pharetra sed. Maecenas rutrum metus non dui blandit, vel dignissim lacus pellentesque. Etiam magna nunc, lacinia blandit diam in, laoreet gravida urna. Suspendisse potenti. Nunc ornare sapien sit amet faucibus eleifend. Nunc eros sapien, hendrerit in lacus sit amet, posuere auctor augue. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer imperdiet ante id nunc tincidunt lacinia. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vivamus pharetra lorem ut libero fringilla iaculis. Curabitur et suscipit leo, non fermentum nibh. Proin id leo vehicula, dignissim felis vitae, imperdiet leo.";
+
+                if (!context.PublicMessages.Any(x => x.Id == 1))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage()
+                    {
+                        Title = @"Vejledninger",
+                        LongDescription = longDescription,
+                        ShortDescription = "Skabeloner til brug ved oprettelse af IT-Systemer, leverandører og snitflader finder du her.",
+                        Link = "https://google.com",
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
+                if (!context.PublicMessages.Any(x => x.Id == 2))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage()
+                    {
+                        Title = @"Skabeloner",
+                        LongDescription = longDescription,
+                        ShortDescription = "Brugerklubben i Kitos har et filarkiv, hvor du og dine kolleger kan tilgå materiale om Kitos.",
+                        Link = "https://google.com",
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
+                if (!context.PublicMessages.Any(x => x.Id == 4))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage()
+                    {
+                        Title = @"Driftsstatus",
+                        LongDescription = longDescription,
+                        ShortDescription = "Hvis der opleves fejl i Kitos vil du kunne se en begrundelse på denne side.",
+                        Link = "https://google.com",
+                        Status = PublicMessageStatus.Active,
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
+                if (!context.PublicMessages.Any(x => x.Id == 3))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage()
+                    {
+                        Title = @"Arrangementer",
+                        LongDescription = longDescription,
+                        ShortDescription = "Brugerklubben holder løbende arrangementer, som du har mulighed for at tilmelde dig.",
+                        Link = "https://google.com",
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
+
+                if (!context.PublicMessages.Any(x => x.Id == 5))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage()
+                    {
+                        Title = @"OS2Kitos kontaktpersoner",
+                        LongDescription = longDescription,
+                        ShortDescription = "Se hvem, der er Kitos kontaktpersoner i kommunerne og spar med hinanden.",
+                        Link = "https://google.com",
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
+                if (!context.PublicMessages.Any(x => x.Id == 6))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage()
+                    {
+                        Title = @"Kontakt",
+                        LongDescription = longDescription,
+                        ShortDescription = "Har du nogen spørgsmål til Kitos? Kontakt os og vi vil hjælpe dig hurtigst muligt.",
+                        Link = "https://google.com",
                         ObjectOwnerId = globalAdmin.Id,
                         LastChangedByUserId = globalAdmin.Id
                     });
