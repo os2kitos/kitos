@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Principal;
 using Presentation.Web.Infrastructure.Model.Authentication;
+using Core.Abstractions.Types;
+using System.Linq;
 
 namespace Presentation.Web.Infrastructure
 {
@@ -43,6 +45,39 @@ namespace Presentation.Web.Infrastructure
             {
                 Logger.Error(exn, "TokenValidator: Exception creating token.");
                 throw;
+            }
+        }
+
+        public Result<TokenIntrospectionResponse, OperationError> VerifyToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            var validationParams = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = BearerTokenConfig.SecurityKey,
+                ValidateIssuer = true,
+                ValidIssuer = BearerTokenConfig.Issuer,
+                ValidateLifetime = true,
+                ValidateAudience = false
+            };
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, validationParams, out var validatedToken);
+                var jwtToken = (JwtSecurityToken)validatedToken;
+
+                return new TokenIntrospectionResponse
+                {
+                    Active = true,
+                    Expiration = jwtToken.ValidTo,
+                    Claims = principal.Claims.Select(c => new ClaimResponse { Type = c.Type, Value = c.Value }).ToList()
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "TokenValidator: Exception verifying token.");
+                return new OperationError("Invalid token", OperationFailure.Forbidden);
             }
         }
     }

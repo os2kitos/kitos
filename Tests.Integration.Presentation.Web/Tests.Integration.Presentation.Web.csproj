@@ -128,6 +128,7 @@
     <Compile Include="Advice\AdviceTest.cs" />
     <Compile Include="Advice\AdviceTestBase.cs" />
     <Compile Include="Authorization\GetOrganizationsTests.cs" />
+    <Compile Include="Authorization\TokenV2Tests.cs" />
     <Compile Include="Contract\ItContractOverviewReadModelsApiTest.cs" />
     <Compile Include="Contract\ItContractSequentialTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
