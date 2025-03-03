@@ -19,5 +19,6 @@
         public static readonly string ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState = $"{NamePrefix}fix-stale-itcontract-rms";
         public static readonly string ScheduleFkOrgUpdates = $"{NamePrefix}schedule-fk-org-updates";
         public static readonly string PurgeOrphanedHangfireJobs = $"{NamePrefix}purge-orphaned-hangfire-jobs";
+        public static readonly string CreateInitialPublicMessages = $"{NamePrefix}create-initial-public-messages";
     }
 }
