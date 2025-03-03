@@ -32,8 +32,20 @@ namespace Tests.PubSubTester.Controllers
         private static HttpClient CreateClient()
         {
             var client = new HttpClient();
-            client.BaseAddress = new Uri("http://localhost:43000");
+            client.BaseAddress = new Uri("https://localhost:7226");
             return client;
+        }
+
+        [HttpPost]
+        [Route("publish")]
+        public async Task<IActionResult> Publish(PublishRequestDTO request)
+        {
+            var client = CreateClient();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {request.Token}");
+            var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+            var response = await client.PostAsync("api/publish", content);
+
+            return Ok(response);
         }
     }
 }

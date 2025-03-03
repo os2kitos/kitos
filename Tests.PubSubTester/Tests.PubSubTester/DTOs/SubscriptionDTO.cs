@@ -3,6 +3,6 @@
     public class SubscriptionDTO
     {
         public string Callback { get; set; }
-        public IEnumerable<string> Topic { get; set; }
+        public List<string> Topics { get; set; }
     }
 }
