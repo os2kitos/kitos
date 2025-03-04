@@ -118,6 +118,5 @@ namespace Core.DomainModel
         {
             Priority = newPriority;
         }
-
     }
 }
