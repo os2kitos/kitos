@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PubSub.Application.DTOs;
 using PubSub.Application.Mapping;
@@ -8,7 +9,7 @@ using PubSub.Core.Services.Subscribe;
 namespace PubSub.Application.Controllers;
 
 [ApiController]
-
+[Authorize]
 [Route("api/subscribe")]
 public class SubscribeController : ControllerBase
 {
@@ -24,6 +25,7 @@ public class SubscribeController : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Subscribe([FromBody] SubscribeRequestDto request)
     {
         if (!ModelState.IsValid) return BadRequest();

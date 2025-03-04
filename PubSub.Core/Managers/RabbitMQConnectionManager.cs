@@ -1,5 +1,4 @@
-﻿using PubSub.Core.Models;
-using RabbitMQ.Client;
+﻿using RabbitMQ.Client;
 
 namespace PubSub.Core.Managers
 {

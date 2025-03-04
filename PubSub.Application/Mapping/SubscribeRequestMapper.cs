@@ -10,7 +10,7 @@ namespace PubSub.Application.Mapping
             return new Subscription()
             {
                 Callback = dto.Callback,
-                Topics = dto.Topics.Select(t => new Topic() { Name = t})
+                Topics = dto.Topics.Select(t => new Topic(t))
             };
         }
     }
