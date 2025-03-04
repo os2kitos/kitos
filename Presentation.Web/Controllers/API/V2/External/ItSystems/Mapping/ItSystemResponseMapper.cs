@@ -38,8 +38,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
                 LastModifiedBy = itSystem.LastChangedByUser?.MapIdentityNamePairDTO(),
                 Scope = itSystem.AccessModifier.ToChoice(),
                 OrganizationContext = itSystem.Organization?.MapShallowOrganizationResponseDTO(),
-                DBSName = itSystem.DBSName,
-                DBSDataProcessorName = itSystem.DBSDataProcessorName
+                LegalName = itSystem.LegalName,
+                LegalDataProcessorName = itSystem.LegalDataProcessorName
             };
 
             MapBaseInformation(itSystem, dto);

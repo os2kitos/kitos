@@ -49,6 +49,10 @@ namespace Infrastructure.DataAccess.Mapping
             Property(t => t.Uuid)
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_User_Uuid", 0);
+
+            Property(t => t.IsSystemIntegrator)
+                .IsRequired()
+                .HasIndexAnnotation("IX_User_IsSystemIntegrator");
         }
     }
 }

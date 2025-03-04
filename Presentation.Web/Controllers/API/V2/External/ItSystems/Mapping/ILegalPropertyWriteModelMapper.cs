@@ -3,8 +3,8 @@ using Presentation.Web.Models.API.V2.Request.System.Regular;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 {
-    public interface IDBSWriteModelMapper
+    public interface ILegalPropertyWriteModelMapper
     {
-        public DBSUpdateParameters FromPATCH(UpdateDBSPropertiesRequestDTO request);
+        public LegalUpdateParameters FromPATCH(LegalPropertiesUpdateRequestDTO request);
     }
 }

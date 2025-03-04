@@ -7,14 +7,14 @@ using Presentation.Web.Models.API.V2.Request.System.Regular;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 {
-    public class DBSWriteModelMapper : WriteModelMapperBase, IDBSWriteModelMapper
+    public class LegalPropertyWriteModelMapper : WriteModelMapperBase, ILegalPropertyWriteModelMapper
     {
-        public DBSWriteModelMapper(ICurrentHttpRequest currentHttpRequest) : base(currentHttpRequest) {}
+        public LegalPropertyWriteModelMapper(ICurrentHttpRequest currentHttpRequest) : base(currentHttpRequest) {}
 
-        public DBSUpdateParameters FromPATCH(UpdateDBSPropertiesRequestDTO request)
+        public LegalUpdateParameters FromPATCH(LegalPropertiesUpdateRequestDTO request)
         {
-            var rule = CreateChangeRule<UpdateDBSPropertiesRequestDTO>(false);
-            return new DBSUpdateParameters
+            var rule = CreateChangeRule<LegalPropertiesUpdateRequestDTO>(false);
+            return new LegalUpdateParameters
             {
                 SystemName = rule.MustUpdate(x => x.SystemName) ? request.SystemName.AsChangedValue() : OptionalValueChange<string>.None,
                 DataProcessorName = rule.MustUpdate(x => x.DataProcessorName) ? request.DataProcessorName.AsChangedValue() : OptionalValueChange<string>.None

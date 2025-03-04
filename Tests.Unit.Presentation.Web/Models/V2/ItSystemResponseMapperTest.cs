@@ -74,8 +74,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             AssertBaseResponseProperties(itSystem, expectedReferences, dto);
-            Assert.Equal(itSystem.DBSName, dto.DBSName);
-            Assert.Equal(itSystem.DBSDataProcessorName, dto.DBSDataProcessorName);
+            Assert.Equal(itSystem.LegalName, dto.LegalName);
+            Assert.Equal(itSystem.LegalDataProcessorName, dto.LegalDataProcessorName);
         }
 
         [Fact]
@@ -158,8 +158,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                     Description = x.Description,
                     TaskKey = x.KleNumber
                 }).ToList(),
-                DBSName = A<string>(),
-                DBSDataProcessorName = A<string>()
+                LegalName = A<string>(),
+                LegalDataProcessorName = A<string>()
             };
             return itSystem;
         }

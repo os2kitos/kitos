@@ -138,9 +138,9 @@ namespace Core.DomainModel.ItSystem
 
         public string ArchiveDutyComment { get; set; }
 
-        public string DBSName { get; set; }
+        public string LegalName { get; set; }
 
-        public string DBSDataProcessorName { get; set; }
+        public string LegalDataProcessorName { get; set; }
 
         public bool TryGetInterfaceExhibit(out ItInterfaceExhibit interfaceExhibit, int interfaceId)
         {
@@ -285,14 +285,14 @@ namespace Core.DomainModel.ItSystem
             return Maybe<OperationError>.None;
         }
 
-        public void UpdateDBSName(string dbsName)
+        public void UpdateLegalName(string legalName)
         {
-            DBSName = dbsName;
+            LegalName = legalName;
         }
 
-        public void UpdateDBSDataProcessorName(string dbsDataProcessorName)
+        public void UpdateLegalDataProcessorName(string legalDataProcessorName)
         {
-            DBSDataProcessorName = dbsDataProcessorName;
+            LegalDataProcessorName = legalDataProcessorName;
         }
     }
 }

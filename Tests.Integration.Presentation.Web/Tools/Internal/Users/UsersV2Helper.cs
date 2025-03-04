@@ -110,7 +110,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             {
                 new ("emailQuery", email)
             };
-            
+
             var query = string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"));
 
             using var response = await HttpApi.GetWithCookieAsync(
@@ -125,7 +125,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
         public static async Task<IEnumerable<OrganizationResponseDTO>> GetUserOrganization(Guid userUuid)
         {
             var requestCookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            
+
             using var response = await HttpApi.GetWithCookieAsync(
                 TestEnvironment.CreateUrl(
                     $"{GlobalUserControllerPrefix()}/{userUuid}/organizations"), requestCookie);
@@ -208,6 +208,25 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<UserResponseDTO>();
+        }
+
+        public static async Task<IEnumerable<UserReferenceResponseDTO>> GetSystemIntegrators()
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"{GlobalUserControllerPrefix()}/system-integrators");
+            using var response = await HttpApi.GetWithCookieAsync(url, cookie);
+            Assert.True(response.IsSuccessStatusCode);
+
+            return await response.ReadResponseBodyAsAsync<IEnumerable<UserReferenceResponseDTO>>();
+        }
+
+        public static async Task<HttpResponseMessage> UpdateSystemIntegrator(Guid userUuid,
+            bool requestedSystemIntegratorStatus, OrganizationRole role = OrganizationRole.GlobalAdmin)
+        {
+            var cookie = await HttpApi.GetCookieAsync(role);
+            var url = TestEnvironment.CreateUrl($"{GlobalUserControllerPrefix()}/system-integrators/{userUuid}?requestedValue={requestedSystemIntegratorStatus}");
+            return await HttpApi.PatchWithCookieAsync(url, cookie, null);
         }
 
         private static string ControllerPrefix(Guid organizationUuid)

@@ -754,6 +754,18 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, result);
         }
 
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Allow_Legal_Properties_Change_Only_If_User_Is_System_Integrator(bool isSystemIntegrator)
+        {
+            _userContextMock.Setup(x => x.IsSystemIntegrator()).Returns(isSystemIntegrator);
+
+            var result = _sut.HasPermission(new ChangeLegalSystemPropertiesPermission());
+
+            Assert.Equal(isSystemIntegrator, result);
+        }
+
         private void Allow_Create_Returns<T>(bool expectedResult)
         {
             //Arrange

@@ -154,6 +154,7 @@
     <Compile Include="Queries\User\QueryByCrossOrganizationPermissions.cs" />
     <Compile Include="Queries\User\QueryByRoleAssignment.cs" />
     <Compile Include="Queries\ItSystem\QuerySystemByUsedInOrganizationUuid.cs" />
+    <Compile Include="Queries\User\QueryBySystemIntegrator.cs" />
     <Compile Include="Queries\User\QueryGlobalAdmin.cs" />
     <Compile Include="Queries\User\QueryUserByEmail.cs" />
     <Compile Include="Repositories\Contract\IItContractOverviewReadModelRepository.cs" />

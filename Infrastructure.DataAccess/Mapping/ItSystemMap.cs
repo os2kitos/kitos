@@ -62,15 +62,15 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_System_Uuuid", 0);
 
-            Property(x => x.DBSName)
+            Property(x => x.LegalName)
                 .IsOptional()
                 .HasMaxLength(ItSystem.MaxNameLength)
-                .HasIndexAnnotation("ItSystem_IX_DBSName");
+                .HasIndexAnnotation("ItSystem_IX_LegalName");
 
-            Property(x => x.DBSDataProcessorName)
+            Property(x => x.LegalDataProcessorName)
                 .IsOptional()
                 .HasMaxLength(Organization.MaxNameLength)
-                .HasIndexAnnotation("ItSystem_IX_DBSDataProcessorName"); ;
+                .HasIndexAnnotation("ItSystem_IX_LegalDataProcessorName"); ;
 
             TypeMapping.AddIndexOnAccessModifier<ItSystemMap, ItSystem>(this);
         }

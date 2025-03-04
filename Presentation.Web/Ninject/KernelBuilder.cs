@@ -406,7 +406,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IHelpTextWriteModelMapper>().To<HelpTextWriteModelMapper>().InCommandScope(Mode);
 
             //DBS
-            kernel.Bind<IDBSWriteModelMapper>().To<DBSWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<ILegalPropertyWriteModelMapper>().To<LegalPropertyWriteModelMapper>().InCommandScope(Mode);
 
         }
 

@@ -218,6 +218,33 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
                 .Match(Ok, FromOperationError);
         }
 
+        [HttpGet]
+        [Route("system-integrators")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<UserReferenceResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult GetSystemIntegrators()
+        {
+            var results = _userService.GetUsers(new QueryBySystemIntegrator());
+            var mappedUsers = results.AsEnumerable()
+                .Select(InternalDtoModelV2MappingExtensions.MapUserReferenceResponseDTO).ToList();
+            return Ok(mappedUsers);
+        }
+
+        [HttpPatch]
+        [Route("system-integrators/{userUuid}")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult UpdateSystemIntegrator([NonEmptyGuid] [FromUri] Guid userUuid, [FromUri] bool requestedValue)
+        {
+            return _userWriteService.UpdateSystemIntegrator(userUuid, requestedValue)
+                    .Match(NoContent, FromOperationError);
+        }
+
         private static IEnumerable<UserWithOrganizationResponseDTO> ToUserWithOrgDTOs(List<UserRoleAssociationDTO> dtos)
         {
             return dtos.Select(ToUserWithOrgDTO).ToList();

@@ -40,8 +40,8 @@ namespace Presentation.Web.Models.API.V2.Response.System
         [Required]
         public ShallowOrganizationResponseDTO OrganizationContext { get; set; }
 
-        public string DBSName { get; set; }
-        public string DBSDataProcessorName { get; set; }
+        public string LegalName { get; set; }
+        public string LegalDataProcessorName { get; set; }
 
     }
 }

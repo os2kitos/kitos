@@ -400,6 +400,31 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             Assert.True(result.IsSuccessStatusCode);
         }
 
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        public async Task Can_Only_Patch_System_Integrators_As_Global_Admin(OrganizationRole role)
+        {
+            var (_, user) = await CreateOrgAndUser();
+
+            var result = await UsersV2Helper.UpdateSystemIntegrator(user.Uuid, A<bool>(), role);
+
+            var isGlobalAdmin = role == OrganizationRole.GlobalAdmin;
+            Assert.Equal(isGlobalAdmin, result.IsSuccessStatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Get_System_Integrators()
+        {
+            var (_, user) = await CreateOrgAndUser();
+            await UsersV2Helper.UpdateSystemIntegrator(user.Uuid, true);
+
+            var result = await UsersV2Helper.GetSystemIntegrators();
+
+            Assert.Contains(user.Uuid, result.Select(x => x.Uuid));
+        }
+
         private async Task<(OrganizationDTO, UserResponseDTO)> CreateOrgAndUser()
         {
             var org = await CreateOrganizationAsync();

@@ -16,12 +16,13 @@ namespace Core.ApplicationServices.Authorization
         private readonly bool _stakeHolderAccess;
         private readonly HashSet<OrganizationCategory> _membershipCategories;
         private readonly bool _isGlobalAdmin;
+        private readonly bool _isSystemIntegrator;
 
         public OrganizationalUserContext(
             int userId,
             IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> roles,
             IReadOnlyDictionary<int, OrganizationCategory> categoriesOfMemberOrganizations,
-            bool stakeHolderAccess)
+            bool stakeHolderAccess, bool systemIntegrator)
         {
             UserId = userId;
             _categoriesOfMemberOrganizations = categoriesOfMemberOrganizations;
@@ -31,6 +32,8 @@ namespace Core.ApplicationServices.Authorization
                 .ToDictionary(kvp => kvp.Key, kvp => new HashSet<OrganizationRole>(kvp.Value))
                 .AsReadOnly();
             _isGlobalAdmin = _roles.Values.Any(x => x.Contains(OrganizationRole.GlobalAdmin));
+            _isSystemIntegrator = systemIntegrator;
+
         }
 
         public int UserId { get; }
@@ -87,6 +90,11 @@ namespace Core.ApplicationServices.Authorization
                 default:
                     return false;
             }
+        }
+
+        public bool IsSystemIntegrator()
+        {
+            return _isSystemIntegrator;
         }
     }
 }

@@ -368,8 +368,8 @@
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationTypeMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\OrganizationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystems\ItSystemDBSV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\DBSWriteModelMapper.cs" />
-    <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\IDBSWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\LegalPropertyWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\ILegalPropertyWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\OrganizationUnits\OrganizationUnitRoleTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\Tokens\TokenV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\ExternalReferences\ExternalReferencesInternalV2Controller.cs" />
@@ -609,7 +609,7 @@
     <Compile Include="Models\API\V2\Request\OrganizationUnit\UpdateOrganizationUnitRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Request\Organizations\OrganizationMasterDataRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationMasterDataRolesResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Request\System\Regular\UpdateDBSPropertiesRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\System\Regular\LegalPropertiesUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Token\TokenIntrospectionRequest.cs" />
     <Compile Include="Models\API\V2\Request\User\BaseUserRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\User\CreateUserRequestDTO.cs" />

@@ -9,24 +9,24 @@ using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
 {
-    public class DBSWriteModelMapperTest : WriteModelMapperTestBase
+    public class LegalPropertyWriteModelMapperTest : WriteModelMapperTestBase
     {
         private readonly Mock<ICurrentHttpRequest> _currentHttpRequestMock;
-        private readonly DBSWriteModelMapper _sut;
+        private readonly LegalPropertyWriteModelMapper _sut;
 
-        public DBSWriteModelMapperTest()
+        public LegalPropertyWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
             _currentHttpRequestMock.Setup(x =>
                     x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
-                .Returns(GetAllInputPropertyNames<UpdateDBSPropertiesRequestDTO>());
-            _sut = new DBSWriteModelMapper(_currentHttpRequestMock.Object);
+                .Returns(GetAllInputPropertyNames<LegalPropertiesUpdateRequestDTO>());
+            _sut = new LegalPropertyWriteModelMapper(_currentHttpRequestMock.Object);
         }
 
         [Fact]
         public void Can_Map_From_PATCH()
         {
-            var input = A<UpdateDBSPropertiesRequestDTO>();
+            var input = A<LegalPropertiesUpdateRequestDTO>();
 
             var output = _sut.FromPATCH(input);
 

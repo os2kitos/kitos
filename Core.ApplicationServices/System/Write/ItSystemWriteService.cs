@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.Shared;
@@ -125,9 +126,9 @@ namespace Core.ApplicationServices.System.Write
                 });
         }
 
-        public Result<ItSystem, OperationError> DBSUpdate(Guid systemUuid, DBSUpdateParameters parameters)
+        public Result<ItSystem, OperationError> LegalPropertiesUpdate(Guid systemUuid, LegalUpdateParameters parameters)
         {
-            return PerformUpdateTransaction(systemUuid, system => ApplyDBSUpdates(system, parameters), WithDBSWriteAccess);
+            return PerformUpdateTransaction(systemUuid, system => ApplyLegalPropertyUpdates(system, parameters), WithLegalPropertyWriteAccess);
         }
 
         public Result<ExternalReference, OperationError> AddExternalReference(Guid systemUuid, ExternalReferenceProperties externalReferenceProperties)
@@ -211,10 +212,10 @@ namespace Core.ApplicationServices.System.Write
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Deactivated, HandleDeactivatedState));
         }
 
-        private Result<ItSystem, OperationError> ApplyDBSUpdates(ItSystem itSystem, DBSUpdateParameters parameters)
+        private static Result<ItSystem, OperationError> ApplyLegalPropertyUpdates(ItSystem itSystem, LegalUpdateParameters parameters)
         {
-            return itSystem.WithOptionalUpdate(parameters.SystemName, (sys, dbsName) => sys.UpdateDBSName(dbsName))
-                .Bind(system => system.WithOptionalUpdate(parameters.DataProcessorName, (sys, dbsDataProcessorName) => sys.UpdateDBSDataProcessorName(dbsDataProcessorName)));
+            return itSystem.WithOptionalUpdate(parameters.SystemName, (sys, legalName) => sys.UpdateLegalName(legalName))
+                .Bind(system => system.WithOptionalUpdate(parameters.DataProcessorName, (sys, legalDataProcessorName) => sys.UpdateLegalDataProcessorName(legalDataProcessorName)));
 
         }
 
@@ -299,9 +300,10 @@ namespace Core.ApplicationServices.System.Write
                 .Bind(WithWriteAccess);
         }
 
-        private Result<ItSystem, OperationError> WithDBSWriteAccess(ItSystem system)
+        private Result<ItSystem, OperationError> WithLegalPropertyWriteAccess(ItSystem system)
         {
-            return WithWriteAccess(system); //Placeholder for now
+            var hasPermission = _authorizationContext.HasPermission(new ChangeLegalSystemPropertiesPermission());
+            return hasPermission ? system : new OperationError(OperationFailure.Forbidden);
         }
     }
 }

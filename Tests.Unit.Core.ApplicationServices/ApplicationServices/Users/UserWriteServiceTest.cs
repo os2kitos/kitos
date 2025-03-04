@@ -525,6 +525,26 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             VerifyNoPasswordResetsHasBeenIssued();
         }
 
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Can_Only_Update_System_Integrator_Role_As_Global_Admin(bool isGlobalAdmin)
+        {
+            var user = SetupUser();
+            ExpectGetUserByUuid(user.Uuid, user);
+            ExpectIsGlobalAdminReturns(isGlobalAdmin);
+            ExpectTransactionBegins();
+
+            var result = _sut.UpdateSystemIntegrator(user.Uuid, true);
+
+            if (isGlobalAdmin)
+            {
+                _userServiceMock.Verify(x => x.UpdateUser(user, null, null, true), Times.Once);
+                Assert.True(result.Value.IsSystemIntegrator);
+            }
+            Assert.Equal(result.Ok, isGlobalAdmin);
+        }
+
         private void VerifyNoPasswordResetsHasBeenIssued()
         {
             _userServiceMock.Verify(x => x.IssuePasswordReset(It.IsAny<User>(), null, null, true), Times.Never());

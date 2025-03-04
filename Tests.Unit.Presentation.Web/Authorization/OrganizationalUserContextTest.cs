@@ -32,7 +32,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         private void SetupSut(
             IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> roleMap = null,
             IReadOnlyDictionary<int, OrganizationCategory> categoryMap = null,
-            bool isStakeHolder = true)
+            bool isStakeHolder = true, bool isSystemIntegrator = true)
         {
             _userId = A<int>();
             _municipalityOrganizationId = A<int>();
@@ -54,7 +54,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
                 _userId,
                 _rolesPerOrganizationId,
                 _categoryPerOrganizationId,
-                isStakeHolder
+                isStakeHolder,
+                isSystemIntegrator
             );
         }
 
@@ -232,6 +233,18 @@ namespace Tests.Unit.Presentation.Web.Authorization
             var result = _sut.HasStakeHolderAccess();
 
             //Assert
+            Assert.Equal(expected,result);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Is_System_Integrator_Returns(bool expected)
+        {
+            SetupSut(isSystemIntegrator:expected);
+
+            var result = _sut.IsSystemIntegrator();
+
             Assert.Equal(expected,result);
         }
 

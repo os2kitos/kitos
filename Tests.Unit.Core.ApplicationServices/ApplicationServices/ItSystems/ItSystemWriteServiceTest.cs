@@ -5,6 +5,7 @@ using AutoFixture;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.System;
@@ -1004,37 +1005,43 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
         }
 
         [Fact]
-        public void Can_Update_DBS_Properties()
+        public void Can_Update_Legal_Properties()
         {
             var systemUuid = A<Guid>();
             var system = new ItSystem { Uuid = systemUuid };
-            var parameters = A<DBSUpdateParameters>();
+            var parameters = A<LegalUpdateParameters>();
             ExpectSystemServiceGetSystemReturns(systemUuid, system);
-            ExpectAllowModifyReturns(system, true);
+            ExpectHasLegalChangePermissionReturns(true);
             var transaction = ExpectTransactionBegins();
 
-            var result = _sut.DBSUpdate(systemUuid, parameters);
+            var result = _sut.LegalPropertiesUpdate(systemUuid, parameters);
 
             Assert.True(result.Ok);
-            Assert.Equal(parameters.SystemName.NewValue, result.Value.DBSName);
-            Assert.Equal(parameters.DataProcessorName.NewValue, result.Value.DBSDataProcessorName);
+            Assert.Equal(parameters.SystemName.NewValue, result.Value.LegalName);
+            Assert.Equal(parameters.DataProcessorName.NewValue, result.Value.LegalDataProcessorName);
             transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
         }
 
         [Theory]
         [InlineData(false)]
         [InlineData(true)]
-        public void Can_Only_Update_DBS_Properties_With_Permission(bool hasPermission)
+        public void Can_Only_Update_Legal_Properties_With_Permission(bool hasPermission)
         {
             var systemUuid = A<Guid>();
             var system = new ItSystem { Uuid = systemUuid };
             ExpectSystemServiceGetSystemReturns(systemUuid, system);
-            ExpectAllowModifyReturns(system, hasPermission);
+            ExpectHasLegalChangePermissionReturns(hasPermission);
             ExpectTransactionBegins();
 
-            var result = _sut.DBSUpdate(systemUuid, A<DBSUpdateParameters>());
+            var result = _sut.LegalPropertiesUpdate(systemUuid, A<LegalUpdateParameters>());
 
             Assert.Equal(hasPermission, result.Ok);
+        }
+
+        private void ExpectHasLegalChangePermissionReturns(bool hasPermission)
+        {
+            _authorizationContextMock.Setup(x => x.HasPermission(It.IsAny<ChangeLegalSystemPropertiesPermission>()))
+                .Returns(hasPermission);
         }
 
         private ExternalReferenceProperties CreateExternalReferenceProperties()

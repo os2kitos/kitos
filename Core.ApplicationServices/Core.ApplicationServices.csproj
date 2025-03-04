@@ -72,6 +72,7 @@
     <Compile Include="Authentication\AuthenticationScope.cs" />
     <Compile Include="Authentication\ApplicationAuthenticationState.cs" />
     <Compile Include="Authorization\CommandPermissionResult.cs" />
+    <Compile Include="Authorization\Permissions\ChangeLegalSystemPropertiesPermission.cs" />
     <Compile Include="Generic\EntityTreeUuidCollector.cs" />
     <Compile Include="Generic\ExtendedExtendedEntityIdentityResolverService.cs" />
     <Compile Include="Generic\IEntityIdMapper.cs" />
@@ -249,7 +250,7 @@
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageOrganizationalUseParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageRoles.cs" />
     <Compile Include="Model\Shared\Write\UserRolePair.cs" />
-    <Compile Include="Model\System\DBSUpdateParameters.cs" />
+    <Compile Include="Model\System\LegalUpdateParameters.cs" />
     <Compile Include="Model\System\RightsHolderSystemUpdateParameters.cs" />
     <Compile Include="Model\System\SharedSystemUpdateParameters.cs" />
     <Compile Include="Model\System\SystemDeletionConflict.cs" />

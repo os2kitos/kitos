@@ -16,5 +16,6 @@ namespace Core.ApplicationServices.Authorization
         bool HasRoleInAnyOrganization(OrganizationRole role);
         bool HasRoleIn(int organizationId);
         bool HasRoleInSameOrganizationAs(IEntity entity);
+        bool IsSystemIntegrator();
     }
 }
