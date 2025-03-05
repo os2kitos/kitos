@@ -2,6 +2,7 @@
 using Moq;
 using Moq.Protected;
 using System.Net;
+using Microsoft.Extensions.Configuration;
 using PubSub.Test.Base.Tests.Toolkit.Patterns;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
@@ -28,7 +29,8 @@ namespace PubSub.Test.Unit.Core
                     StatusCode = HttpStatusCode.OK,
                 });
             var httpClientFactoryMock = SetupHttpClientFactory(handlerMock.Object);
-            var sut = new HttpSubscriberNotifierService(httpClientFactoryMock.Object);
+            var configurationMock = new Mock<IConfiguration>();
+            var sut = new HttpSubscriberNotifierService(httpClientFactoryMock.Object, configurationMock.Object);
             var message = A<string>();
             var callback = A<string>();
 

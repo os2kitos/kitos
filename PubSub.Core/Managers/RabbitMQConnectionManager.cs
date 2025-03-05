@@ -20,6 +20,7 @@ namespace PubSub.Core.Managers
             }
             return _connection;
         }
+
         public void Dispose()
         {
             _connection?.CloseAsync();

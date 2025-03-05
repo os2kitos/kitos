@@ -1,7 +1,10 @@
-﻿using System.Text;
+﻿using System.Security.Cryptography;
+using System.Text;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Tests.PubSubTester.DTOs;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Tests.PubSubTester.Controllers
 {
@@ -26,6 +29,25 @@ namespace Tests.PubSubTester.Controllers
         public IActionResult Callback(string id, [FromBody] string message)
         {
             logger.LogInformation($"callbackId: {id}, message: {message}");
+
+            using var hmacsha256 = new HMACSHA256(Encoding.UTF8.GetBytes("local-no-secret"));
+            var hash = hmacsha256.ComputeHash(Encoding.UTF8.GetBytes(message));
+            var result = Convert.ToBase64String(hash);
+
+            if (Request.Headers.TryGetValue("Signature-Header", out var signatureHeader))
+            {
+                logger.LogInformation($"Signature-Header: {signatureHeader}");
+            }
+            else
+            {
+                logger.LogWarning("Signature-Header not found in the request.");
+            }
+
+            if (signatureHeader == result)
+            {
+                logger.LogInformation("Signature-Header matches the hash result.");
+            }
+
             return Ok();
         }
 
