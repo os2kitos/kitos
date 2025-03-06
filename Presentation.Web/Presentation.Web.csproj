@@ -497,8 +497,6 @@
     <Compile Include="Infrastructure\Attributes\V2StyleJsonResponseSerializationAttribute.cs" />
     <Compile Include="Infrastructure\Config\V2JsonSerializationConfig.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\NotificationTypeMappingExtensions.cs" />
-    <Compile Include="Infrastructure\Model\Authentication\ClaimResponse.cs" />
-    <Compile Include="Infrastructure\Model\Authentication\TokenIntrospectionResponse.cs" />
     <Compile Include="LoginHandler.ashx.cs">
       <DependentUpon>LoginHandler.ashx</DependentUpon>
     </Compile>
@@ -610,7 +608,9 @@
     <Compile Include="Models\API\V2\Internal\Request\Organizations\OrganizationMasterDataRequestDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Organizations\OrganizationMasterDataRolesResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\System\Regular\LegalPropertiesUpdateRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Token\ClaimResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Token\TokenIntrospectionRequest.cs" />
+    <Compile Include="Models\API\V2\Request\Token\TokenIntrospectionResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\User\BaseUserRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\User\CreateUserRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\User\DefaultUserStartPreferenceChoice.cs" />
@@ -1442,10 +1442,7 @@
     <Compile Include="Infrastructure\Attributes\PublicApiAttribute.cs" />
     <Compile Include="Infrastructure\ExceptionLogFilterAttribute.cs" />
     <Compile Include="Infrastructure\LogInterceptor.cs" />
-    <Compile Include="Infrastructure\Model\Authentication\BearerTokenConfig.cs" />
-    <Compile Include="Infrastructure\Model\Authentication\KitosApiToken.cs" />
     <Compile Include="Infrastructure\Middleware\OwinNinjectMiddleware.cs" />
-    <Compile Include="Infrastructure\TokenValidator.cs" />
     <Compile Include="Models\API\V1\ArchivePeriodDTO.cs" />
     <Compile Include="Models\API\V1\ContactPersonDTO.cs" />
     <Compile Include="Models\API\V1\DataResponsibleDTO.cs" />

@@ -2,13 +2,14 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Model.Authentication.Commands;
 using Core.DomainModel;
 using Core.DomainModel.Commands;
 using Core.DomainModel.Extensions;
-using Presentation.Web.Infrastructure;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Properties;
 using Swashbuckle.Swagger.Annotations;
 using AuthenticationScheme = Core.DomainModel.Users.AuthenticationScheme;
 
@@ -19,10 +20,12 @@ namespace Presentation.Web.Controllers.API.V1.Auth
     {
 
         private readonly ICommandBus _commandBus;
+        private readonly ITokenValidator _tokenValidator;
 
-        public TokenAuthenticationController(ICommandBus commandBus)
+        public TokenAuthenticationController(ICommandBus commandBus, ITokenValidator tokenValidator)
         {
             _commandBus = commandBus;
+            _tokenValidator = tokenValidator;
         }
 
         /// <summary>
@@ -61,7 +64,7 @@ namespace Presentation.Web.Controllers.API.V1.Auth
 
                 var user = validationResult.Value;
 
-                var token = new TokenValidator().CreateToken(user);
+                var token = _tokenValidator.CreateToken(user);
 
                 var response = new GetTokenResponseDTO
                 {

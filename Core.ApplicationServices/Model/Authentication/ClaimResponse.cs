@@ -1,4 +1,4 @@
-﻿namespace Presentation.Web.Infrastructure.Model.Authentication
+﻿namespace Core.ApplicationServices.Model.Authentication
 {
     public class ClaimResponse
     {
