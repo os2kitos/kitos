@@ -68,6 +68,7 @@
     <Compile Include="Http\EndpointValidationErrorType.cs" />
     <Compile Include="Http\IEndpointValidationService.cs" />
     <Compile Include="Http\EndpointValidationError.cs" />
+    <Compile Include="Http\IKitosHttpClient.cs" />
     <Compile Include="Http\ServiceEndpointConfiguration.cs" />
     <Compile Include="KLEDataBridge\IKLEDataBridge.cs" />
     <Compile Include="KLEDataBridge\KLEDataBridge.cs" />
