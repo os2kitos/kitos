@@ -43,13 +43,22 @@ namespace PubSub.Core.Consumers
             var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.ReceivedAsync += async (_, eventArgs) =>
             {
-                var body = eventArgs.Body.ToArray();
-                var message = _messageSerializer.Deserialize(body);
-                foreach (var callbackUrl in _callbackUrls)
+                try
                 {
-                    await _subscriberNotifierService.Notify(message, callbackUrl.AbsoluteUri);
+                    var body = eventArgs.Body.ToArray();
+                    var message = _messageSerializer.Deserialize(body);
+
+                    foreach (var callbackUrl in _callbackUrls)
+                    {
+                        await _subscriberNotifierService.Notify(message, callbackUrl.AbsoluteUri);
+                    }
                 }
-            };
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Exception in consumer: {ex.Message}\n{ex.StackTrace}");
+                }
+            
+        };
             return consumer;
         }
 

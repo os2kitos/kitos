@@ -8,22 +8,24 @@ namespace PubSub.Application.Config;
 
 public static class ServiceCollectionExtensions
 {
-    private static readonly string RabbitMQConfigSection = "RabbitMQ";
-    private static readonly string RabbitMQHostNameKey = "HostName";
-
     public static IServiceCollection AddRabbitMQ(this IServiceCollection services, ConfigurationManager configuration)
     {
-        var rabbitMQSettings = configuration.GetSection(RabbitMQConfigSection);
-        var hostName = rabbitMQSettings.GetValue<string>(RabbitMQHostNameKey);
-        if (hostName == null) throw new ArgumentNullException("No RabbitMQ host name found in appsettings.");
-        var connectionFactory = new ConnectionFactory { HostName = hostName };
-
+        var connectionFactory = GetConnectionFactory(configuration);
         services.AddSingleton<IConnectionFactory>(_ => connectionFactory);
         services.AddSingleton<ISubscriberService, RabbitMQSubscriberService>();
         services.AddSingleton<IConnectionManager, RabbitMQConnectionManager>();
         services.AddSingleton<IPublisherService, RabbitMQPublisherService>();
 
         return services;
+    }
+
+    private static IConnectionFactory GetConnectionFactory(IConfiguration configuration)
+    {
+        var rabbitMQAppSettings = configuration.GetSection(Constants.Config.MessageBus.ConfigSection);
+        var hostName = rabbitMQAppSettings.GetValue<string>(Constants.Config.MessageBus.HostName) ?? throw new ArgumentNullException("No RabbitMQ host name found in settings.");
+        var user = configuration.GetValue<string>(Constants.Config.MessageBus.User) ?? throw new ArgumentNullException("No RabbitMQ username found in settings.");
+        var password = configuration.GetValue<string>(Constants.Config.MessageBus.Password) ?? throw new ArgumentNullException("No RabbitMQ password found in settings.");
+        return new ConnectionFactory { HostName = hostName, UserName = user, Password = password };
     }
 
     public static IServiceCollection AddRequestMapping(this IServiceCollection services)

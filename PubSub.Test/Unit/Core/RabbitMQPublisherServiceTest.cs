@@ -24,7 +24,7 @@ namespace PubSub.Test.Unit.Core
             var sut = new RabbitMQPublisherService(connectionManager.Object, messageSerializer.Object);
             var publication = A<Publication>();
 
-            await sut.Publish(publication);
+            await sut.PublishAsync(publication);
             AssertChannelDeclaresQueue(channel);
         }
     }

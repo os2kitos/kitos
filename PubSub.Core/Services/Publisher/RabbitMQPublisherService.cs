@@ -16,7 +16,7 @@ namespace PubSub.Core.Services.Publisher
             _messageSerializer = messageSerializer;
         }
 
-        public async Task Publish(Publication publication)
+        public async Task PublishAsync(Publication publication)
         {
             var topic = publication.Topic;
             var connection = await _connectionManager.GetConnectionAsync();

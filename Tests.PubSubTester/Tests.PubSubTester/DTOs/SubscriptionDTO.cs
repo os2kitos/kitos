@@ -2,7 +2,7 @@
 {
     public class SubscriptionDTO
     {
-        public string Callback { get; set; }
-        public List<string> Topics { get; set; }
+        public Uri Callback { get; set; }
+        public IEnumerable<string> Topics { get; set; }
     }
 }

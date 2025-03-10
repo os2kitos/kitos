@@ -18,7 +18,7 @@ namespace PubSub.Application.Config
             await ValidateTokenResponse(response);
 
             return new JsonWebToken(token);
-        }
+          }
 
         private static HttpRequestMessage GetHttpRequestMessage(IConfiguration configuration)
         {

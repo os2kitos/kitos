@@ -28,7 +28,7 @@ namespace PubSub.Application.Controllers
             if (!ModelState.IsValid) return BadRequest("Invalid request object provided.");
 
             var publication = _publishRequestMapper.FromDto(request);
-            await _publisherService.Publish(publication);
+            await _publisherService.PublishAsync(publication);
 
             return NoContent();
         }

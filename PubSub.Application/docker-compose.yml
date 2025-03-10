@@ -1,0 +1,33 @@
+﻿version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: $(RABBIT_MQ_USER)
+      RABBITMQ_DEFAULT_PASS: $(RABBIT_MQ_PASSWORD)
+    networks:
+      - app_network
+
+  api:
+    image: kitos-pubsub
+    container_name: kitos-pubsub
+    depends_on:
+      - rabbitmq
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
+      RABBIT_MQ_USER: ${RABBIT_MQ_USER}
+      RABBIT_MQ_PASSWORD: ${RABBIT_MQ_PASSWORD}
+      PUBSUB_API_KEY: ${PUBSUB_API_KEY}
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    networks:
+      - app_network
+    extra_hosts:
+       - ${IDP_HOST_MAPPING}
+
+networks:
+  app_network:
+    driver: bridge
