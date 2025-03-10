@@ -9,12 +9,10 @@ namespace Infrastructure.Services.KLEDataBridge
     {
         public XDocument GetAllActiveKleNumbers()
         {
-            using (var client = new WebClient())
-            using (var stream = client.OpenRead(Settings.Default.KLEOnlineUrl?.TrimEnd('/') + "/emneplan"))
-            using (var reader = new StreamReader(stream))
-            {
-                return XDocument.Load(reader);
-            }
+            using var client = new WebClient();
+            using var stream = client.OpenRead(Settings.Default.KLEOnlineUrl?.TrimEnd('/') + "/emneplan");
+            using var reader = new StreamReader(stream);
+            return XDocument.Load(reader);
         }
     }
 }

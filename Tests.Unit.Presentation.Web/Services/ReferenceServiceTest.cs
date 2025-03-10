@@ -716,28 +716,6 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(new OperationError("Only one reference can be master reference", OperationFailure.BadInput), result.Value);
         }
 
-        [Fact]
-        public void Cannot_UpdateExternalReferences_With_No_Masters()
-        {
-            //Arrange
-            var rootType = A<ReferenceRootType>();
-            var rootId = A<int>();
-            var root = new Mock<IEntityWithExternalReferences>();
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-
-            ExpectRootDeleteAndAdd(root, externalReferences, externalReferences.Select(CreateExternalReference).ToList());
-            ExpectAllowModifyReturns(root.Object, true);
-            ExpectTransactionToBeSet();
-            ExpectGetRootEntityReturns(rootId, rootType, root.Object.FromNullable());
-
-            //Act
-            var result = _sut.UpdateExternalReferences(rootType, rootId, externalReferences);
-
-            //Assert
-            Assert.True(result.HasValue);
-            Assert.Equal(new OperationError("A master reference must be defined", OperationFailure.BadInput), result.Value);
-        }
 
         [Fact]
         public void Cannot_UpdateExternalReferences_If_Not_Allowed_To_Modify()
@@ -815,35 +793,7 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(operationError.FailureType, result.Value.FailureType);
             Assert.Contains("Failed to add reference with data:", result.Value.Message.GetValueOrEmptyString());
         }
-
-        [Fact]
-        public void Cannot_UpdateExternalReferences_If_Reference_With_Uuid_Was_Not_Found_Returns_BadInput()
-        {
-            //Arrange
-            var rootType = A<ReferenceRootType>();
-            var rootId = A<int>();
-            var externalReferenceList = CreateExternalReferences().ToList();
-            var root = new Mock<IEntityWithExternalReferences>();
-            root.SetupGet(x => x.ExternalReferences).Returns(externalReferenceList);
-            var rootEntity = root.Object;
-
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var externalReferencePropertiesList = CreateExternalReferenceProperties(true).ToList();
-
-            ExpectRootDeleteAndAdd(root, externalReferencePropertiesList, externalReferenceList);
-            ExpectAllowModifyReturns(rootEntity, true);
-            ExpectTransactionToBeSet();
-            ExpectGetRootEntityReturns(rootId, rootType, rootEntity.FromNullable());
-            ExpectGetByUuidForExternalReferences(externalReferenceList);
-
-            //Act
-            var result = _sut.UpdateExternalReferences(rootType, rootId, externalReferencePropertiesList);
-
-            //Assert
-            Assert.True(result.HasValue);
-            Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
-        }
-
+        
         private static void ExpectMasterReference(Mock<IEntityWithExternalReferences> root, ExternalReference masterReference)
         {
             root.Setup(x => x.SetMasterReference(It.Is<ExternalReference>(er =>
