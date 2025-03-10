@@ -11,7 +11,7 @@ namespace Tests.Unit.Core.DomainServices.SSO
         [Fact]
         private void MatchPrivilege_WhenNoPrivilegeNodeFound_ReturnsValidResult()
         {
-            var mockIdentity = new Saml20Identity(string.Empty, new List<SamlAttribute>(), string.Empty);
+            var mockIdentity = new Saml20Identity(string.Empty, new List<SamlAttribute>());
             var sut = Saml20IdentityParser.CreateFrom(mockIdentity);
             var matchPrivilege = sut.MatchPrivilege("dummy");
             Assert.False(matchPrivilege.HasValue);
