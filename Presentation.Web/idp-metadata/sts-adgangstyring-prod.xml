@@ -1,4 +1,4 @@
-<EntityDescriptor ID="_083d6da3-4cfb-4c63-b5ab-92f1a53db797" entityID="https://saml.adgangsstyring.stoettesystemerne.dk" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+<EntityDescriptor ID="_02bed042-13e9-4d87-b0b6-dfca009a6e7e" entityID="https://saml.n2adgangsstyring.stoettesystemerne.dk" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
   <IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
     <KeyDescriptor use="signing">
       <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
@@ -14,12 +14,12 @@
         </X509Data>
       </KeyInfo>
     </KeyDescriptor>
-    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" ResponseLocation="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/signoff.idp" />
-    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" ResponseLocation="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/signoff.idp" />
-    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/services/signoff/saml2/soap" ResponseLocation="https://adgangsstyring.stoettesystemerne.dk/runtime/services/signoff/saml2/soap" />
+    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://n2adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" ResponseLocation="https://n2adgangsstyring.stoettesystemerne.dk/runtime/saml2/signoff.idp" />
+    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://n2adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" ResponseLocation="https://n2adgangsstyring.stoettesystemerne.dk/runtime/saml2/signoff.idp" />
+    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://n2adgangsstyring.stoettesystemerne.dk/runtime/services/signoff/saml2/soap" ResponseLocation="https://n2adgangsstyring.stoettesystemerne.dk/runtime/services/signoff/saml2/soap" />
     <NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName</NameIDFormat>
-    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" />
-    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" />
+    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://n2adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" />
+    <SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://n2adgangsstyring.stoettesystemerne.dk/runtime/saml2/issue.idp" />
     <Attribute Name="dk:gov:saml:attribute:KombitSpecVer" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Specification Version" xmlns="urn:oasis:names:tc:SAML:2.0:assertion">
       <AttributeValue>1.0</AttributeValue>
     </Attribute>
@@ -34,6 +34,6 @@
     <Attribute Name="dk:gov:saml:attribute:Privileges_intermediate" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic" FriendlyName="Privileges" xmlns="urn:oasis:names:tc:SAML:2.0:assertion" />
   </IDPSSODescriptor>
   <AttributeAuthorityDescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
-    <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://adgangsstyring.stoettesystemerne.dk/runtime/services/attributeservice/saml2/soap" />
+    <AttributeService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://n2adgangsstyring.stoettesystemerne.dk/runtime/services/attributeservice/saml2/soap" />
   </AttributeAuthorityDescriptor>
 </EntityDescriptor>
