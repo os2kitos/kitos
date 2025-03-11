@@ -253,6 +253,7 @@ namespace Core.ApplicationServices.Notification
             MapRecipients(model, notification);
 
             notification.Scheduling = Scheduling.Immediate;
+            notification.Name = "Ikke navngivet";
             notification.StopDate = null;
             notification.AlarmDate = null;
 
