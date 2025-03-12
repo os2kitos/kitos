@@ -205,6 +205,10 @@
     <Compile Include="ApplicationServices\HelpTexts\HelpTextApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\Interface\ItInterfaceWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
+    <Compile Include="ApplicationServices\KitosEvents\HttpEventPublisherTest.cs" />
+    <Compile Include="ApplicationServices\KitosEvents\KitosEventMapperTest.cs" />
+    <Compile Include="ApplicationServices\KitosEvents\KitosEventPublisherTest.cs" />
+    <Compile Include="ApplicationServices\KitosEvents\KitosInternalTokenIssuerTest.cs" />
     <Compile Include="ApplicationServices\LocalOptions\GenericLocalOptionsServiceTest.cs" />
     <Compile Include="ApplicationServices\Messages\PublicMessagesServiceTest.cs" />
     <Compile Include="ApplicationServices\Notification\NotificationServiceTest.cs" />
@@ -276,6 +280,7 @@
     <Compile Include="Infrastructure\StsTokenFetcherTest.cs" />
     <Compile Include="Model\DataProcessingRegistrationTest.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandlerTest.cs" />
+    <Compile Include="Model\EventHandlers\PublishSystemEventsHandlerTest.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandlerTest.cs" />
     <Compile Include="Model\HasRightsEntityTest.cs" />
     <Compile Include="Model\ItAdvice\ItAdviceTests.cs" />

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
@@ -163,6 +164,11 @@ namespace Core.DomainModel.ItSystem
             return Maybe<int>.None;
         }
 
+        public Maybe<Organization.Organization> GetRightsHolder()
+        {
+            return BelongsTo.FromNullable();
+        }
+
         public void AddTaskRef(TaskRef taskRef)
         {
             var existing = GetTaskRef(taskRef.Id);
@@ -293,6 +299,15 @@ namespace Core.DomainModel.ItSystem
         public void UpdateLegalDataProcessorName(string legalDataProcessorName)
         {
             LegalDataProcessorName = legalDataProcessorName;
+        }
+
+        public ItSystemSnapshot Snapshot()
+        {
+
+            return new ItSystemSnapshot
+            {
+                Name = Name
+            };
         }
     }
 }

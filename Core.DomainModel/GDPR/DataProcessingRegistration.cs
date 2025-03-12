@@ -505,5 +505,13 @@ namespace Core.DomainModel.GDPR
         {
             LastChanged = DateTime.UtcNow;
         }
+
+        public DprSnapshot Snapshot()
+        {
+            return new DprSnapshot
+            {
+                DataProcessorUuids = DataProcessors.Select(x => x.Uuid).ToHashSet()
+            };
+        }
     }
 }

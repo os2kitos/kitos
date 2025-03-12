@@ -36,5 +36,6 @@ namespace Core.ApplicationServices
         bool IsEmailInUse(string email);
         Result<User, OperationError> GetUserByEmail(Guid organizationUuid, string email);
         Result<User, OperationError> GetUserByUuid(Guid userUuid);
+        Result<User, OperationError> GetGlobalAdmin();
     }
 }

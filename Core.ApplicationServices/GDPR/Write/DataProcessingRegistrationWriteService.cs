@@ -13,6 +13,7 @@ using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -134,12 +135,21 @@ namespace Core.ApplicationServices.GDPR.Write
         {
             using var transaction = _transactionManager.Begin();
 
-            var result = getDpr()
-                .Bind(systemUsage => PerformUpdates(systemUsage, parameters));
+            var dprResult = getDpr();
+
+            if (dprResult.Failed)
+            {
+                return dprResult.Error;
+            }
+
+            var dpr = dprResult.Value;
+            var snapshot = dpr.Snapshot();
+
+            var result = PerformUpdates(dpr, parameters);
 
             if (result.Ok)
             {
-                _domainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(result.Value));
+                _domainEvents.Raise(new DprChangedEvent(dpr, snapshot.FromNullable()));
                 _databaseControl.SaveChanges();
                 transaction.Commit();
             }

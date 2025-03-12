@@ -71,5 +71,8 @@
     <Setting Name="StsPersonPort" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://organisation.eksterntest-stoettesystemerne.dk/organisation/person/6</Value>
     </Setting>
+    <Setting Name="PubSubBaseUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://localhost:7226/</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

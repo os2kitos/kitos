@@ -164,4 +164,9 @@
         <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationCertificateThumbprint']/value/text()"/>
     </parameter>
 
+    <parameter name="PubSubBaseUrl" description="" defaultvalue="__PubSubBaseUrl__" tags="">
+	    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='PubSubBaseUrl']/value/text()">
+	    </parameterentry>
+    </parameter>
+
 </parameters>

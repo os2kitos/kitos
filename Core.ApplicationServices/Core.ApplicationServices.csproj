@@ -74,6 +74,7 @@
     <Reference Include="System.IdentityModel.Tokens.Jwt, Version=6.22.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.6.22.0\lib\net472\System.IdentityModel.Tokens.Jwt.dll</HintPath>
     </Reference>
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -86,7 +87,9 @@
     <Compile Include="Authentication\AuthenticationMethod.cs" />
     <Compile Include="Authentication\AuthenticationScope.cs" />
     <Compile Include="Authentication\ApplicationAuthenticationState.cs" />
+    <Compile Include="Authentication\IKitosInternalTokenIssuer.cs" />
     <Compile Include="Authentication\ITokenValidator.cs" />
+    <Compile Include="Authentication\KitosInternalTokenIssuer.cs" />
     <Compile Include="Authentication\TokenValidator.cs" />
     <Compile Include="Authorization\CommandPermissionResult.cs" />
     <Compile Include="Authorization\Permissions\ChangeLegalSystemPropertiesPermission.cs" />
@@ -101,9 +104,16 @@
     <Compile Include="GlobalOptions\IGlobalRoleOptionsService.cs" />
     <Compile Include="HelpTexts\HelpTextApplicationService.cs" />
     <Compile Include="HelpTexts\IHelpTextApplicationService.cs" />
+    <Compile Include="IEventBody.cs" />
     <Compile Include="Interface\Write\IItInterfaceWriteService.cs" />
     <Compile Include="Interface\Write\ItInterfaceWriteService.cs" />
     <Compile Include="Authorization\ResourceCollectionPermissionsResult.cs" />
+    <Compile Include="KitosEvents\HttpEventPublisher.cs" />
+    <Compile Include="KitosEvents\IHttpEventPublisher.cs" />
+    <Compile Include="KitosEvents\IKitosEventPublisherService.cs" />
+    <Compile Include="KitosEvents\KitosEventPublisherService.cs" />
+    <Compile Include="KitosEvents\KitosQueueTopics.cs" />
+    <Compile Include="KitosEvents\PublishSystemChangeEventHandler.cs" />
     <Compile Include="LocalOptions\GenericLocalOptionsService.cs" />
     <Compile Include="LocalOptions\IGenericLocalOptionsService.cs" />
     <Compile Include="Model\Authentication\BearerTokenConfig.cs" />
@@ -207,6 +217,11 @@
     <Compile Include="Model\Interface\ItInterfacePermissions.cs" />
     <Compile Include="Model\Interface\ItInterfaceWriteModel.cs" />
     <Compile Include="Model\Interface\ItInterfaceWriteModelParametersBase.cs" />
+    <Compile Include="Model\KitosEvents\IKitosEventMapper.cs" />
+    <Compile Include="Model\KitosEvents\KitosEvent.cs" />
+    <Compile Include="Model\KitosEvents\KitosEventDTO.cs" />
+    <Compile Include="Model\KitosEvents\KitosEventMapper.cs" />
+    <Compile Include="Model\KitosEvents\SystemChangeEventBodyModel.cs" />
     <Compile Include="Model\LocalOptions\LocalOptionCreateParameters.cs" />
     <Compile Include="Model\LocalOptions\LocalOptionUpdateParameters.cs" />
     <Compile Include="Model\Messages\WritePublicMessagesParams.cs" />

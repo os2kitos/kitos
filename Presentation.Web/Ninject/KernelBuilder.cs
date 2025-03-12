@@ -131,6 +131,7 @@ using Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping;
 using Core.ApplicationServices.Generic;
 using Core.ApplicationServices.GlobalOptions;
 using Core.ApplicationServices.HelpTexts;
+using Core.ApplicationServices.KitosEvents;
 using Core.ApplicationServices.Organizations.Write;
 using Core.ApplicationServices.Users.Write;
 using Infrastructure.STS.OrganizationSystem.DomainServices;
@@ -138,6 +139,7 @@ using Kombit.InfrastructureSamples.Token;
 using Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Users.Mapping;
 using Core.ApplicationServices.LocalOptions;
+using Core.ApplicationServices.Model.KitosEvents;
 using Core.BackgroundJobs.Model.PublicMessages;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 
@@ -341,6 +343,13 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IHelpTextApplicationService>().To<HelpTextApplicationService>().InCommandScope(Mode);
 
             kernel.Bind<ITokenValidator>().To<TokenValidator>().InCommandScope(Mode).WithConstructorArgument("baseUrl", Settings.Default.BaseUrl);
+            kernel.Bind<IKitosInternalTokenIssuer>().To<KitosInternalTokenIssuer>().InCommandScope(Mode);
+            kernel.Bind<IKitosHttpClient>().To<KitosHttpClient>().InCommandScope(Mode);
+
+            kernel.Bind<IKitosEventPublisherService>().To<KitosEventPublisherService>().InCommandScope(Mode);
+            kernel.Bind<IHttpEventPublisher>().To<HttpEventPublisher>().InCommandScope(Mode).WithConstructorArgument("pubSubBaseUrl", Settings.Default.PubSubBaseUrl);
+            kernel.Bind<IKitosEventMapper>().To<KitosEventMapper>().InCommandScope(Mode);
+
         }
 
         private void RegisterMappers(IKernel kernel)
@@ -483,6 +492,9 @@ namespace Presentation.Web.Ninject
             //Organization
             RegisterDomainEvents<HandleOrganizationBeingDeleted>(kernel);
             RegisterDomainEvents<SendEmailToStakeholdersOnExternalOrganizationConnectionUpdatedHandler>(kernel);
+
+            //Kitos Events
+            RegisterDomainEvents<PublishSystemChangesEventHandler>(kernel);
         }
 
         private void RegisterDomainEvents<THandler>(IKernel kernel)

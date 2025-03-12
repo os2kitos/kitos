@@ -15,6 +15,7 @@ using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -172,6 +173,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.True(result.Ok);
             Assert.Same(dataProcessingRegistration, result.Value);
             AssertTransactionCommitted(transaction);
+            _domainEventsMock.Verify(x => x.Raise(It.IsAny<DprChangedEvent>()), Times.Once);
         }
 
         [Fact]
@@ -2241,7 +2243,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             };
             var dataProcessingRegistration = new DataProcessingRegistration
             {
-                ResponsibleOrganizationUnit = new OrganizationUnit {Uuid = A<Guid>()}
+                ResponsibleOrganizationUnit = new OrganizationUnit { Uuid = A<Guid>() }
             };
             var transaction = ExpectTransaction();
             var dprUuid = A<Guid>();

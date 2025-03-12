@@ -15,6 +15,7 @@ using Core.ApplicationServices.System.Write;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainServices.Generic;
@@ -462,6 +463,7 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
             //Assert
             Assert.True(result.Ok);
             transaction.Verify(x => x.Commit(), Times.Once);
+            _domainEventsMock.Verify(x => x.Raise(It.IsAny<ItSystemChangedEvent>()), Times.Once);
         }
 
         [Fact]

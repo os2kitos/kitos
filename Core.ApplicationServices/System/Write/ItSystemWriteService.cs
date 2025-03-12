@@ -13,6 +13,7 @@ using Core.ApplicationServices.References;
 using Core.DomainModel.Events;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.References;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Repositories.Organization;
@@ -88,7 +89,7 @@ namespace Core.ApplicationServices.System.Write
 
                 if (result.Ok)
                 {
-                    SaveAndNotify(result.Value, transaction);
+                    SaveAndNotify(result.Value, transaction, Maybe<ItSystemSnapshot>.None);
                 }
                 else
                 {
@@ -167,13 +168,20 @@ namespace Core.ApplicationServices.System.Write
             using var transaction = _transactionManager.Begin();
             try
             {
-                var result = _systemService.GetSystem(systemUuid)
-                    .Bind(authorizeMethod)
-                    .Bind(mutation);
+                var systemWithWriteAccess = _systemService.GetSystem(systemUuid)
+                    .Bind(authorizeMethod);
+                if (systemWithWriteAccess.Failed)
+                {
+                    return systemWithWriteAccess.Error;
+                }
+
+                var system = systemWithWriteAccess.Value;
+                var snapshot = system.Snapshot();
+                var result = mutation(system);
 
                 if (result.Ok)
                 {
-                    SaveAndNotify(result.Value, transaction);
+                    SaveAndNotify(result.Value, transaction, snapshot.FromNullable());
                 }
                 else
                 {
@@ -286,9 +294,9 @@ namespace Core.ApplicationServices.System.Write
 
         }
 
-        private void SaveAndNotify(ItSystem system, IDatabaseTransaction transaction)
+        private void SaveAndNotify(ItSystem system, IDatabaseTransaction transaction, Maybe<ItSystemSnapshot> snapshot)
         {
-            _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(system));
+            _domainEvents.Raise(new ItSystemChangedEvent(system, snapshot));
             _databaseControl.SaveChanges();
             transaction.Commit();
         }

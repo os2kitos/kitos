@@ -65,6 +65,8 @@
     <Compile Include="Extensions\HierarchyExtensions.cs" />
     <Compile Include="Extensions\StsOrganizationUnitExtensions.cs" />
     <Compile Include="GDPR\ChangeHasSubDataProcessorsResult.cs" />
+    <Compile Include="GDPR\DprSnapshot.cs" />
+    <Compile Include="GDPR\Events\DprChangedEvent.cs" />
     <Compile Include="GDPR\SubDataProcessor.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationValidationError.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationValidationResult.cs" />
@@ -99,6 +101,8 @@
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewItContractReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewRelevantOrgUnitReadModel.cs" />
     <Compile Include="ItSystemUsage\TechnicalPrecaution.cs" />
+    <Compile Include="ItSystem\DomainEvents\ItSystemChangedEvent.cs" />
+    <Compile Include="ItSystem\ItSystemSnapshot.cs" />
     <Compile Include="KendoConfig\KendoColumnConfiguration.cs" />
     <Compile Include="LocalOptions\LocalCriticalityType.cs" />
     <Compile Include="Notification\IEntityWithUserNotification.cs" />

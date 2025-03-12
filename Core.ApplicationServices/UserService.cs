@@ -24,6 +24,7 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Infrastructure.Services.DataAccess;
 using Core.DomainServices.Generic;
+using Core.DomainServices.Queries.User;
 
 
 namespace Core.ApplicationServices
@@ -241,13 +242,20 @@ namespace Core.ApplicationServices
                 });
         }
 
+        public Result<User, OperationError> GetGlobalAdmin()
+        {
+            var globalAdmin = GetUsers(new QueryByGlobalAdmin()).FirstOrNone();
+            return globalAdmin.Match<Result<User, OperationError>>(user => user, () => new OperationError(OperationFailure.NotFound));
+        }
+
         //Temporary solution for supporting links to both both the old and new UI. (27/11/2024)
         private string GetUrlRoute(bool newUI)
         {
             if (newUI)
             {
                 return "ui/reset-password/";
-            } else
+            }
+            else
             {
                 return "#/reset-password/";
             }

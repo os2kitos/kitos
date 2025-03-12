@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Polly, Version=7.0.0.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
       <HintPath>..\packages\Polly.7.2.3\lib\net472\Polly.dll</HintPath>
     </Reference>
@@ -68,6 +71,8 @@
     <Compile Include="Http\EndpointValidationErrorType.cs" />
     <Compile Include="Http\IEndpointValidationService.cs" />
     <Compile Include="Http\EndpointValidationError.cs" />
+    <Compile Include="Http\IKitosHttpClient.cs" />
+    <Compile Include="Http\KitosHttpClient.cs" />
     <Compile Include="Http\ServiceEndpointConfiguration.cs" />
     <Compile Include="KLEDataBridge\IKLEDataBridge.cs" />
     <Compile Include="KLEDataBridge\KLEDataBridge.cs" />
