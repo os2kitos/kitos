@@ -4,6 +4,7 @@
     {
         StartDateNotPassed = 0,
         EndDatePassed = 1,
-        TerminationPeriodExceeded = 2
+        TerminationPeriodExceeded = 2,
+        InvalidParentContract = 3,
     }
 }

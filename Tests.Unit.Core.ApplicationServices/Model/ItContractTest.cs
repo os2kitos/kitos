@@ -786,7 +786,7 @@ namespace Tests.Unit.Core.Model
             var randomDay = new Random(A<int>()).Next(1, 28);
             var now = new DateTime(validDate.Year, validDate.Month, randomDay);
             var terminationDeadline = new Random(A<int>()).Next(1, 12);
-            
+
             var sut = new ItContract
             {
                 Terminated = now.AddMonths(-1 * terminationDeadline).AddDays(dayOffset),
@@ -799,7 +799,7 @@ namespace Tests.Unit.Core.Model
 
             //Act
             var result = sut.Validate(now);
-            
+
             //Assert
             Assert.True(result.Result);//If not enforced valid we expect the value to be false
             Assert.Equal(enforceValid, result.EnforcedValid);
@@ -851,6 +851,22 @@ namespace Tests.Unit.Core.Model
             Assert.True(result.Result);//If not enforced valid we expect the value to be false
             Assert.Equal(enforceValid, result.EnforcedValid);
             Assert.Empty(result.ValidationErrors);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Should_Invalidate_Contract_When_Valid_Parent_Is_Required_But_Parent_Is_Invalid(bool enforceValid)
+        {
+            var now = DateTime.Now;
+            var invalidParent = new ItContract { ExpirationDate = now.AddDays(-1)};
+            var sut = new ItContract { Parent = invalidParent, RequireValidParent = true, Active = enforceValid};
+
+            var result = sut.Validate(now);
+
+            Assert.Equal(enforceValid, result.Result);
+            var error = Assert.Single(result.ValidationErrors);
+            Assert.Equal(ItContractValidationError.InvalidParentContract, error);
         }
 
         [Fact]
@@ -948,7 +964,7 @@ namespace Tests.Unit.Core.Model
         public void Can_Reset_EconomyStream(bool isInternal)
         {
             var id = A<int>();
-            var unit = new OrganizationUnit {Id = A<int>()};
+            var unit = new OrganizationUnit { Id = A<int>() };
             var contract = new ItContract();
             if (isInternal)
             {
@@ -1010,8 +1026,8 @@ namespace Tests.Unit.Core.Model
         public void Can_Transfer_EconomyStream(bool isInternal)
         {
             var id = A<int>();
-            var unit = new OrganizationUnit {Id = A<int>()};
-            var targetUnit = new OrganizationUnit {Uuid = A<Guid>()};
+            var unit = new OrganizationUnit { Id = A<int>() };
+            var targetUnit = new OrganizationUnit { Uuid = A<Guid>() };
             var contract = new ItContract()
             {
                 Organization = new Organization()
@@ -1061,7 +1077,7 @@ namespace Tests.Unit.Core.Model
         public void Transfer_EconomyStream_Returns_NotFound(bool isInternal)
         {
             var id = A<int>();
-            var contract = new ItContract(){Organization = new Organization()};
+            var contract = new ItContract() { Organization = new Organization() };
 
             var error = contract.TransferEconomyStream(id, A<Guid>(), isInternal);
 

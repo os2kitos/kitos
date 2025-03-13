@@ -759,7 +759,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             (contractType, contractTemplateType, agreementElements, criticalityType, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, false, true, false, false);
             using var response2 = await ItContractV2Helper.SendPatchContractGeneralDataAsync(token, dto.Uuid, generalDataWriteRequestDto);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
-            
+
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertGeneralDataSection(generalDataWriteRequestDto, contractType, contractTemplateType, agreementElements, criticalityType, freshDTO);
@@ -768,7 +768,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var resetRequest = new ContractGeneralDataWriteRequestDTO();
             using var response3 = await ItContractV2Helper.SendPatchContractGeneralDataAsync(token, dto.Uuid, resetRequest);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
-            
+
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertGeneralDataSection(resetRequest, null, null, null, null, freshDTO);
@@ -1881,7 +1881,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-        [Theory]    
+        [Theory]
         [InlineData(OrganizationRole.GlobalAdmin, true, true, true)]
         [InlineData(OrganizationRole.LocalAdmin, true, true, true)]
         [InlineData(OrganizationRole.User, true, false, false)]
@@ -2021,6 +2021,27 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Empty(afterDelete.ExternalReferences);
         }
 
+        [Fact]
+        public async Task Contract_Is_Invalid_If_Parent_Is_Invalid()
+        {
+            var now = DateTime.Now;
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            var request = new CreateNewContractRequestDTO
+            {
+                Name = A<string>(),
+                OrganizationUuid = organization.Uuid,
+                General = new ContractGeneralDataWriteRequestDTO
+                { Validity = new ContractValidityWriteRequestDTO { ValidTo = now.AddDays(-1) } }
+            };
+            var invalidContract = await ItContractV2Helper.PostContractAsync(token, request);
+
+            var response = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO { Name = A<string>(), OrganizationUuid = organization.Uuid, ParentContractUuid = invalidContract.Uuid, General = new ContractGeneralDataWriteRequestDTO { Validity = new ContractValidityWriteRequestDTO { RequireValidParent = true } } });
+
+            Assert.False(response.General.Validity.Valid);
+            var error = Assert.Single(response.General.Validity.ValidationErrors);
+            Assert.Equal(ItContractValidationErrorChoice.InvalidParentContract, error);
+        }
+
         private async Task<List<Guid>> CreateDataProcessingRegistrationUuids(string token, OrganizationDTO organization)
         {
             var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
@@ -2073,13 +2094,13 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         private List<UpdateExternalReferenceDataWriteRequestDTO> CreateNewExternalReferenceDataWithOldUuid(IEnumerable<ExternalReferenceDataResponseDTO> createExternalReferences)
         {
             return createExternalReferences.Select(externalReference => new UpdateExternalReferenceDataWriteRequestDTO
-                {
-                    Uuid = externalReference.Uuid,
-                    Title = A<string>(),
-                    DocumentId = A<string>(),
-                    Url = A<string>(),
-                    MasterReference = externalReference.MasterReference
-                })
+            {
+                Uuid = externalReference.Uuid,
+                Title = A<string>(),
+                DocumentId = A<string>(),
+                Url = A<string>(),
+                MasterReference = externalReference.MasterReference
+            })
                 .ToList();
         }
 
@@ -2186,7 +2207,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return contractResponsibleDataWriteRequestDto;
         }
 
-        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, IdentityNamePairResponseDTO criticalityType,ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(OrganizationDTO organization, bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withCriticalityType)
+        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, IdentityNamePairResponseDTO criticalityType, ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(OrganizationDTO organization, bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withCriticalityType)
         {
             var contractType = withContractType
                 ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractContractTypes,
@@ -2216,7 +2237,8 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 {
                     ValidFrom = DateTime.Now,
                     EnforcedValid = A<bool>(),
-                    ValidTo = DateTime.Now.AddDays(2)
+                    ValidTo = DateTime.Now.AddDays(2),
+                    RequireValidParent = A<bool>()
                 }
             };
 
@@ -2238,6 +2260,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(request?.Validity?.ValidTo?.Date, freshDTO.General.Validity?.ValidTo);
             Assert.Equal(request?.Validity?.ValidFrom?.Date, freshDTO.General.Validity?.ValidFrom);
             Assert.Equal(request?.Validity?.EnforcedValid == true, freshDTO.General.Validity?.EnforcedValid == true);
+            Assert.Equal(request?.Validity?.RequireValidParent == true, freshDTO.General.Validity?.RequireValidParent == true);
             AssertCrossReference(criticalityType, freshDTO.General.Criticality);
 
             if (expectedAgreementElements == null)
@@ -2335,15 +2358,15 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         private static void AssertExternalReferenceResults(IReadOnlyCollection<UpdateExternalReferenceDataWriteRequestDTO> expected, ItContractResponseDTO actual, bool ignoreUuid = false)
         {
             Assert.Equal(expected.Count, actual.ExternalReferences.Count());
-            
+
             expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
-                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).Select(x => 
+                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).Select(x =>
                     new UpdateExternalReferenceDataWriteRequestDTO
                     {
                         Uuid = ignoreUuid ? null : x.Uuid,
                         DocumentId = x.DocumentId,
                         MasterReference = x.MasterReference,
-                        Title = x.Title, 
+                        Title = x.Title,
                         Url = x.Url
                     }).ToList());
         }

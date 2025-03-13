@@ -10,9 +10,11 @@ namespace Core.DomainModel.ItContract
         public bool EnforcedValid { get; }
 
         public ItContractValidationResult(bool enforcedValid, IEnumerable<ItContractValidationError> validationErrors)
+
         {
-            ValidationErrors = validationErrors.ToList();
-            Result = enforcedValid || validationErrors.Any() == false;
+            var errors = validationErrors.ToList();
+            ValidationErrors = errors;
+            Result = enforcedValid || errors.Any() == false;
             EnforcedValid = enforcedValid;
         }
     }

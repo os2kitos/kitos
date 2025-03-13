@@ -495,7 +495,8 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.EnforceValid, (c, newValue) => c.Active = newValue.GetValueOrFallback(false)))
                 .Bind(itContract => UpdateValidityPeriod(itContract, generalData).Match<Result<ItContract, OperationError>>(error => error, () => itContract))
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.AgreementElementUuids, UpdateAgreementElements))
-                .Bind(itContract => itContract.WithOptionalUpdate(generalData.CriticalityUuid, UpdateContractCriticality));
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.CriticalityUuid, UpdateContractCriticality))
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.RequireValidParent, UpdateRequireValidParent));
         }
 
         private Maybe<OperationError> UpdateAgreementElements(ItContract contract, IEnumerable<Guid> agreementElements)
@@ -636,6 +637,12 @@ namespace Core.ApplicationServices.Contract.Write
                     error => new OperationError($"Failed to set parent with Uuid: {newParentUuid.Value} on contract with Uuid: {contract.Uuid} with error message: {error.Message.GetValueOrEmptyString()}",
                         error.FailureType), () => Maybe<OperationError>.None
                 );
+        }
+
+        private void UpdateRequireValidParent(ItContract itContract, Maybe<bool> requireValidParent)
+        {
+            if (requireValidParent.IsNone) return;
+            itContract.SetRequireValidParent(requireValidParent.Value);
         }
 
         private Maybe<OperationError> UpdateName(ItContract contract, string newName)

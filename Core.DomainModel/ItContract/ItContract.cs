@@ -44,7 +44,7 @@ namespace Core.DomainModel.ItContract
         {
             var enforcedActive = Active;
             var errors = new List<ItContractValidationError>();
-            
+
             var today = todayReference.Date;
             var startDate = (Concluded ?? today).Date;
             var endDate = DateTime.MaxValue;
@@ -77,6 +77,11 @@ namespace Core.DomainModel.ItContract
                 {
                     errors.Add(ItContractValidationError.TerminationPeriodExceeded);
                 }
+            }
+
+            if (RequireValidParent && Parent != null && !Parent.IsActive)
+            {
+                errors.Add(ItContractValidationError.InvalidParentContract);
             }
 
             return new ItContractValidationResult(enforcedActive, errors);
@@ -339,6 +344,8 @@ namespace Core.DomainModel.ItContract
         ///     The parent.
         /// </value>
         public virtual ItContract Parent { get; set; }
+
+        public bool RequireValidParent { get; set; }
 
         /// <summary>
         ///     Gets or sets the contract children.
@@ -850,8 +857,8 @@ namespace Core.DomainModel.ItContract
 
         public Maybe<OperationError> ResetEconomyStreamOrganizationUnit(int id, bool isInternal)
         {
-            return isInternal 
-                ? ResetEconomyStreamOrganizationUnit(id, InternEconomyStreams) 
+            return isInternal
+                ? ResetEconomyStreamOrganizationUnit(id, InternEconomyStreams)
                 : ResetEconomyStreamOrganizationUnit(id, ExternEconomyStreams);
         }
 
@@ -930,6 +937,11 @@ namespace Core.DomainModel.ItContract
         public void MarkAsDirty()
         {
             LastChanged = DateTime.UtcNow;
+        }
+
+        public void SetRequireValidParent(bool requireValidParent)
+        {
+            RequireValidParent = requireValidParent;
         }
     }
 }

@@ -73,20 +73,20 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _roleAssignmentService = new Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>>();
             _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
             _entityTreeUuidCollector = new Mock<IEntityTreeUuidCollector>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, 
-                _identityResolverMock.Object, 
-                _optionResolverMock.Object, 
-                _transactionManagerMock.Object, 
-                _domainEventsMock.Object, 
-                _databaseControlMock.Object, 
-                _agreementElementTypeRepository.Object, 
-                _authContext.Object, 
-                _organizationServiceMock.Object, 
-                _referenceServiceMock.Object, 
-                _assignmentUpdateServiceMock.Object, 
-                _usageServiceMock.Object, 
-                _roleAssignmentService.Object, 
-                _dprServiceMock.Object, 
+            _sut = new ItContractWriteService(_itContractServiceMock.Object,
+                _identityResolverMock.Object,
+                _optionResolverMock.Object,
+                _transactionManagerMock.Object,
+                _domainEventsMock.Object,
+                _databaseControlMock.Object,
+                _agreementElementTypeRepository.Object,
+                _authContext.Object,
+                _organizationServiceMock.Object,
+                _referenceServiceMock.Object,
+                _assignmentUpdateServiceMock.Object,
+                _usageServiceMock.Object,
+                _roleAssignmentService.Object,
+                _dprServiceMock.Object,
                 Mock.Of<IGenericRepository<EconomyStream>>(),
                 _entityTreeUuidCollector.Object);
         }
@@ -293,15 +293,16 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         }
 
         [Theory]
-        [InlineData(true, true, true, true, true, true)]
-        [InlineData(true, true, true, true, true, false)]
-        [InlineData(true, true, true, true, false, true)]
-        [InlineData(true, true, true, false, true, true)]
-        [InlineData(true, true, false, true, true, true)]
-        [InlineData(true, false, true, true, true, true)]
-        [InlineData(false, true, true, true, true, true)]
-        [InlineData(false, false, false, false, false, false)]
-        public void Can_Create_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withValidFrom, bool withValidTo, bool withCriticalityType)
+        [InlineData(true, true, true, true, true, true, true)]
+        [InlineData(true, true, true, true, true, false, true)]
+        [InlineData(true, true, true, true, false, true, true)]
+        [InlineData(true, true, true, false, true, true, true)]
+        [InlineData(true, true, false, true, true, true, true)]
+        [InlineData(true, false, true, true, true, true, true)]
+        [InlineData(false, true, true, true, true, true, true)]
+        [InlineData(false, false, false, false, false, false, true)]
+        [InlineData(false, false, false, false, false, false, false)]
+        public void Can_Create_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withValidFrom, bool withValidTo, bool withCriticalityType, bool withRequireValidParent)
         {
             // Arrange
             var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
@@ -315,7 +316,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 criticalityTypeUuid,
                 agreementElementUuids,
                 agreementElementTypes,
-                parameters) = SetupGeneralSectionInput(withContractType, withContractTemplate, withAgreementElements, withValidFrom, withValidTo, withCriticalityType, createdContract, organizationUuid);
+                parameters, requireValidParent) = SetupGeneralSectionInput(withContractType, withContractTemplate, withAgreementElements, withValidFrom, withValidTo, withCriticalityType, createdContract, organizationUuid, withRequireValidParent);
 
             itContractModificationParameters.General = parameters;
 
@@ -327,7 +328,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(result.Ok);
             AssertTransactionCommitted(transaction);
             var contract = result.Value;
-            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract);
+            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract, requireValidParent);
         }
 
         [Fact]
@@ -1307,7 +1308,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 criticalityType,
                 agreementElementUuids,
                 agreementElementTypes,
-                generalData) = SetupGeneralSectionInput(true, true, true, true, true, true, createdContract, organizationUuid);
+                generalData, requireValidParent) = SetupGeneralSectionInput(true, true, true, true, true, true, createdContract, organizationUuid, true);
 
             parameters.General = generalData;
 
@@ -1399,7 +1400,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             Assert.Equal(parent, contract.Parent);
 
-            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract);
+            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract, requireValidParent);
 
             AssertProcurement(parameters.Procurement.Value, contract);
 
@@ -1692,7 +1693,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable(),
                 PaymentModel = paymentModel.FromNullable(),
                 AgreementPeriod = agreementPeriod.FromNullable(),
-                Payments = payments.FromNullable()
+                Payments = payments.FromNullable(),
             };
             var createdContract = new ItContract
             {
@@ -1708,7 +1709,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             return (organization.Uuid, parameters, createdContract, transaction);
         }
 
-        private (string contractId, Guid? contractTypeUuid, Guid? contractTemplateUuid, bool enforceValid, DateTime? validFrom, DateTime? validTo, Guid? criticalityTypeUuid, List<Guid> agreementElementUuids, Dictionary<Guid, AgreementElementType> agreementElementTypes, ItContractGeneralDataModificationParameters parameters) SetupGeneralSectionInput(
+        private (string contractId, Guid? contractTypeUuid, Guid? contractTemplateUuid, bool enforceValid, DateTime? validFrom, DateTime? validTo, Guid? criticalityTypeUuid, List<Guid> agreementElementUuids, Dictionary<Guid, AgreementElementType> agreementElementTypes, ItContractGeneralDataModificationParameters parameters, bool requireValidParent) SetupGeneralSectionInput(
           bool withContractType,
           bool withContractTemplate,
           bool withAgreementElements,
@@ -1716,7 +1717,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
           bool withValidTo,
           bool withCriticalityType,
           ItContract contract,
-          Guid organizationUuid)
+          Guid organizationUuid,
+          bool requireValidParent)
         {
             var contractId = A<string>();
             var contractTypeUuid = withContractType ? A<Guid>() : (Guid?)null;
@@ -1734,6 +1736,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 EnforceValid = enforceValid.FromNullable().AsChangedValue(),
                 ValidFrom = validFrom?.FromNullable().AsChangedValue() ?? Maybe<DateTime>.None.AsChangedValue(),
                 ValidTo = validTo?.FromNullable().AsChangedValue() ?? Maybe<DateTime>.None.AsChangedValue(),
+                RequireValidParent = requireValidParent.FromNullable().AsChangedValue(),
                 CriticalityUuid = criticalityTypeUuid.AsChangedValue(),
                 AgreementElementUuids = agreementElementUuids.AsChangedValue<IEnumerable<Guid>>()
             };
@@ -1750,7 +1753,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             foreach (var agreementElementType in agreementElementTypes)
                 ExpectGetOptionTypeReturnsIfInputIdIsDefined<AgreementElementType>(organizationUuid, agreementElementType.Key,
                     (agreementElementType.Value, true));
-            return (contractId, contractTypeUuid, contractTemplateUuid, enforceValid, validFrom, validTo, criticalityTypeUuid, agreementElementUuids, agreementElementTypes, parameters);
+            return (contractId, contractTypeUuid, contractTemplateUuid, enforceValid, validFrom, validTo, criticalityTypeUuid, agreementElementUuids, agreementElementTypes, parameters, requireValidParent);
         }
 
         private static void AssertGeneralSection(
@@ -1760,13 +1763,15 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             bool expectedEnforceValid,
             Dictionary<Guid, AgreementElementType> expectedAgreementElementTypes,
             List<Guid> expectedAgreementElementUuids,
-            ItContract actualContract)
+            ItContract actualContract,
+            bool expectedRequireValidParent)
         {
             Assert.Equal(expectedContractId, actualContract.ItContractId);
             Assert.Equal(expectedValidFrom, actualContract.Concluded);
             Assert.Equal(expectedValidTo, actualContract.ExpirationDate);
             Assert.Equal(expectedEnforceValid, actualContract.Active);
             Assert.Equal(expectedAgreementElementTypes.Count, actualContract.AssociatedAgreementElementTypes.Count);
+            Assert.Equal(expectedRequireValidParent, actualContract.RequireValidParent);
             var agreementElementsDiff = expectedAgreementElementUuids
                 .Except(actualContract.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType.Uuid)).ToList();
             Assert.Empty(agreementElementsDiff);
