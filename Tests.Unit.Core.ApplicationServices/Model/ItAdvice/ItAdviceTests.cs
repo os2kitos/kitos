@@ -27,14 +27,17 @@ namespace Tests.Unit.Core.Model.ItAdvice
             Assert.False(_sut.CanBeDeleted);
         }
 
-        [Fact]
-        public void CanBeDeleted_Returns_False_When_Advice_Is_Active()
+        [Theory]
+        [InlineData(AdviceType.Immediate)]
+        [InlineData(AdviceType.Repeat)]
+        public void Only_Immediate_Advice_Can_Be_Deleted_When_Active(AdviceType adviceType)
         {
             //Arrange
             _sut.IsActive = true;
+            _sut.AdviceType = adviceType;
 
             //Act + Assert
-            Assert.False(_sut.CanBeDeleted);
+            Assert.Equal(_sut.CanBeDeleted, _sut.IsType(AdviceType.Immediate));
         }
 
         [Fact]
@@ -43,6 +46,7 @@ namespace Tests.Unit.Core.Model.ItAdvice
             //Arrange
             _sut.IsActive = false;
             _sut.AdviceSent.Clear();
+            _sut.AdviceType = AdviceType.Repeat;
 
             //Act + Assert
             Assert.True(_sut.CanBeDeleted);
