@@ -755,16 +755,14 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         }
 
         [Theory]
-        [InlineData(RelatedEntityType.itSystemUsage)]
-        [InlineData(RelatedEntityType.dataProcessingRegistration)]
-        [InlineData(RelatedEntityType.itContract)]
-        public void GetAccessRights_ReadOnly_When_Notification_Is_Immediate(RelatedEntityType relatedEntityType)
+        [MemberData(nameof(AllRelatedEntityTypeAndBoolFlagCombinations))]
+        public void GetAccessRights_Can_Only_Delete_When_Notification_Is_Immediate_And_Active(RelatedEntityType relatedEntityType, bool isActive)
         {
             //Arrange
             var notificationUuid = A<Guid>();
             var notificationId = A<int>();
             var relatedEntityUuid = A<Guid>();
-            var notification = CreateNewNotification(relatedEntityType, notificationType: AdviceType.Immediate);
+            var notification = CreateNewNotification(relatedEntityType, notificationType: AdviceType.Immediate, isActive: isActive);
 
             ExpectResolveIdReturns<Advice>(notificationUuid, notificationId);
             ExpectGetNotificationByIdReturns(notificationId, notification);
@@ -779,7 +777,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             Assert.True(accessRights.Read);
             Assert.False(accessRights.Modify);
             Assert.False(accessRights.Deactivate);
-            Assert.False(accessRights.Delete);
+            Assert.Equal(accessRights.Delete, isActive);
         }
 
         [Theory]
@@ -1199,6 +1197,25 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
                     _usageRepository.Verify(x => x.Save(), Times.Once);
                     break;
                 default: throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null);
+            }
+        }
+
+        public static IEnumerable<object[]> AllRelatedEntityTypeAndBoolFlagCombinations()
+        {
+            var entityTypes = new[] {
+                RelatedEntityType.itSystemUsage,
+                RelatedEntityType.dataProcessingRegistration,
+                RelatedEntityType.itContract
+            };
+
+            var flags = new[] { true, false };
+
+            foreach (var entity in entityTypes)
+            {
+                foreach (var flag in flags)
+                {
+                    yield return new object[] { entity, flag };
+                }
             }
         }
     }

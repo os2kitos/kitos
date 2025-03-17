@@ -24,13 +24,14 @@ namespace Core.DomainModel.Advice
         Immediate = 0,
         Repeat = 1
     }
-    
+
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
     public class Advice : Entity, ISystemModule, IContractModule, IHasUuid
     {
-        public Advice() {
+        public Advice()
+        {
             AdviceSent = new List<AdviceSent>();
             Reciepients = new List<AdviceUserRelation>();
             Uuid = Guid.NewGuid();
@@ -94,7 +95,7 @@ namespace Core.DomainModel.Advice
         /// The sent date.
         /// </value>
         public DateTime? SentDate { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the body of the email.
         /// </summary>
@@ -133,7 +134,7 @@ namespace Core.DomainModel.Advice
                 {
                     return false;
                 }
-                return !IsActive;
+                return IsActive == IsType(AdviceType.Immediate);
             }
         }
 
@@ -142,9 +143,14 @@ namespace Core.DomainModel.Advice
             return ObjectOwnerId == null || RelationId == null;
         }
 
-        public static string CreatePartitionJobId(int adviceId,int partition)
+        public static string CreatePartitionJobId(int adviceId, int partition)
         {
             return $"{CreateJobId(adviceId)}_part_{partition}";
+        }
+
+        public bool IsType(AdviceType type)
+        {
+            return AdviceType == type;
         }
     }
 }
