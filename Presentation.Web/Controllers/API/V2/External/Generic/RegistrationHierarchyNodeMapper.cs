@@ -2,21 +2,24 @@
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
+using Presentation.Web.Models.API.V2.Response.System;
 
 namespace Presentation.Web.Controllers.API.V2.External.Generic
 {
     public class RegistrationHierarchyNodeMapper 
     {
-        public static IEnumerable<RegistrationHierarchyNodeWithActivationStatusResponseDTO> MapHierarchyToDtosWithDisabledStatus<TEntity>(IEnumerable<TEntity> hierarchy) where TEntity : class, IHierarchy<TEntity>, IHasUuid, IHasName, IEntityWithEnabledStatus
+        public static IEnumerable<ItSystemHierarchyNodeResponseDTO> MapSystemHierarchyToDtos(IEnumerable<ItSystem> hierarchy)
         {
             return hierarchy
-                .Select(x => new RegistrationHierarchyNodeWithActivationStatusResponseDTO
+                .Select(x => new ItSystemHierarchyNodeResponseDTO
                 {
                     Node = x.MapIdentityNamePairDTO(), 
                     Parent = x.Parent?.MapIdentityNamePairDTO(),
-                    Deactivated = x.Disabled
+                    Deactivated = x.Disabled,
+                    IsInUse = x.Usages.Any()
                 })
                 .ToList();
         }
