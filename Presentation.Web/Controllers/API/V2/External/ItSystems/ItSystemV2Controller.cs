@@ -217,7 +217,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems/{uuid}/hierarchy")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegistrationHierarchyNodeWithActivationStatusResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemHierarchyNodeResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -232,7 +232,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                     id => _itSystemService.GetCompleteHierarchy(id),
                     () => new OperationError($"System with uuid: {uuid} was not found", OperationFailure.NotFound)
                 )
-                .Select(RegistrationHierarchyNodeMapper.MapHierarchyToDtosWithDisabledStatus)
+                .Select(RegistrationHierarchyNodeMapper.MapSystemHierarchyToDtos)
                 .Match(Ok, FromOperationError);
         }
 
