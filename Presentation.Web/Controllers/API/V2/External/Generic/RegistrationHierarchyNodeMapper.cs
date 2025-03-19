@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
@@ -11,7 +12,19 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
 {
     public class RegistrationHierarchyNodeMapper 
     {
-        public static IEnumerable<ItSystemHierarchyNodeResponseDTO> MapSystemHierarchyToDtos(IEnumerable<ItSystem> hierarchy)
+        public static IEnumerable<RegistrationHierarchyNodeWithActivationStatusResponseDTO> MapHierarchyToDtosWithDisabledStatus<TEntity>(IEnumerable<TEntity> hierarchy) where TEntity : class, IHierarchy<TEntity>, IHasUuid, IHasName, IEntityWithEnabledStatus
+        {
+            return hierarchy
+                .Select(x => new RegistrationHierarchyNodeWithActivationStatusResponseDTO
+                {
+                    Node = x.MapIdentityNamePairDTO(),
+                    Parent = x.Parent?.MapIdentityNamePairDTO(),
+                    Deactivated = x.Disabled
+                })
+                .ToList();
+        }
+
+        public static IEnumerable<ItSystemHierarchyNodeResponseDTO> MapSystemHierarchyToDtos(IEnumerable<ItSystem> hierarchy, Guid organizationUuid)
         {
             return hierarchy
                 .Select(x => new ItSystemHierarchyNodeResponseDTO
@@ -19,7 +32,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
                     Node = x.MapIdentityNamePairDTO(), 
                     Parent = x.Parent?.MapIdentityNamePairDTO(),
                     Deactivated = x.Disabled,
-                    IsInUse = x.Usages.Any()
+                    IsInUse = x.Usages.Any(x => x.Organization.Uuid == organizationUuid)
                 })
                 .ToList();
         }

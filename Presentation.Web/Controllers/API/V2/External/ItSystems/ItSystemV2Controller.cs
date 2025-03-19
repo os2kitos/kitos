@@ -20,7 +20,6 @@ using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
-using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.System;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Swashbuckle.Swagger.Annotations;
@@ -28,8 +27,8 @@ using Core.ApplicationServices.System.Write;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using System.ComponentModel.DataAnnotations;
-using System.Web.ModelBinding;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 {
@@ -42,7 +41,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         private readonly IItSystemService _itSystemService;
         private readonly IRightsHolderSystemService _rightsHolderSystemService;
         private readonly IItSystemWriteModelMapper _writeModelMapper;
-        private readonly IEntityIdentityResolver _entityIdentityResolver;
         private readonly IItSystemWriteService _writeService;
         private readonly IItSystemResponseMapper _systemResponseMapper;
         private readonly IExternalReferenceResponseMapper _referenceResponseMapper;
@@ -51,7 +49,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         public ItSystemV2Controller(IItSystemService itSystemService,
             IRightsHolderSystemService rightsHolderSystemService,
             IItSystemWriteModelMapper writeModelMapper,
-            IEntityIdentityResolver entityIdentityResolver,
             IItSystemWriteService writeService,
             IItSystemResponseMapper systemResponseMapper,
             IExternalReferenceResponseMapper referenceResponseMapper,
@@ -60,7 +57,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             _itSystemService = itSystemService;
             _rightsHolderSystemService = rightsHolderSystemService;
             _writeModelMapper = writeModelMapper;
-            _entityIdentityResolver = entityIdentityResolver;
             _writeService = writeService;
             _systemResponseMapper = systemResponseMapper;
             _referenceResponseMapper = referenceResponseMapper;
@@ -208,8 +204,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 .Select(_systemResponseMapper.ToSystemResponseDTO)
                 .Match(Ok, FromOperationError);
         }
-
-
+        
         /// <summary>
         /// Returns hierarchy for the specified IT-System
         /// </summary>
@@ -217,7 +212,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems/{uuid}/hierarchy")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemHierarchyNodeResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegistrationHierarchyNodeWithActivationStatusResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -226,13 +221,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _entityIdentityResolver.ResolveDbId<ItSystem>(uuid)
-                .Match
-                (
-                    id => _itSystemService.GetCompleteHierarchy(id),
-                    () => new OperationError($"System with uuid: {uuid} was not found", OperationFailure.NotFound)
-                )
-                .Select(RegistrationHierarchyNodeMapper.MapSystemHierarchyToDtos)
+            return _itSystemService.GetCompleteHierarchyByUuid(uuid)
+                .Select(RegistrationHierarchyNodeMapper.MapHierarchyToDtosWithDisabledStatus)
                 .Match(Ok, FromOperationError);
         }
 
