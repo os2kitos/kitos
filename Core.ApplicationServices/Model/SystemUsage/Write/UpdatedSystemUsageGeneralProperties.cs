@@ -20,5 +20,8 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         public OptionalValueChange<Maybe<DateTime>> ValidTo { get; set; } = OptionalValueChange<Maybe<DateTime>>.None;
         public OptionalValueChange<Maybe<Guid>> MainContractUuid { get; set; } = OptionalValueChange<Maybe<Guid>>.None;
         public OptionalValueChange<Maybe<YesNoUndecidedOption>> ContainsAITechnology { get; set; } = OptionalValueChange<Maybe<YesNoUndecidedOption>>.None;
+        public OptionalValueChange<Maybe<YesNoPartiallyOption>> WebAccessibilityCompliance { get; set; } = OptionalValueChange<Maybe<YesNoPartiallyOption>>.None;
+        public OptionalValueChange<Maybe<DateTime>> LastWebAccessibilityCheck { get; set; } = OptionalValueChange<Maybe<DateTime>>.None;
+        public OptionalValueChange<string> WebAccessibilityNotes { get; set; } = OptionalValueChange<string>.None;
     }
 }

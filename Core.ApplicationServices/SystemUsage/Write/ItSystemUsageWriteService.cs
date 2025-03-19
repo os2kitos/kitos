@@ -55,7 +55,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage> _registerTypeAssignmentService;
         private readonly IGenericRepository<ItSystemUsageSensitiveDataLevel> _sensitiveDataLevelRepository;
         private readonly IGenericRepository<ItSystemUsagePersonalData> _personalDataOptionsRepository;
-        
+
         public ItSystemUsageWriteService(
             IItSystemUsageService systemUsageService,
             ITransactionManager transactionManager,
@@ -152,7 +152,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(_ =>
                     {
                         var getIdResult = _identityResolver.ResolveDbId<ExternalReference>(externalReferenceUuid);
-                        if(getIdResult.IsNone)
+                        if (getIdResult.IsNone)
                             return new OperationError($"ExternalReference with uuid: {externalReferenceUuid} was not found", OperationFailure.NotFound);
                         var externalReferenceId = getIdResult.Value;
 
@@ -226,12 +226,12 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             //Optionally apply changes across the entire update specification
             return systemUsage.WithOptionalUpdate(parameters.GeneralProperties, PerformGeneralDataPropertiesUpdate)
-                    .Bind(usage => usage.WithOptionalUpdate(parameters.Roles, PerformRoleAssignmentUpdates))
-                    .Bind(usage => usage.WithOptionalUpdate(parameters.OrganizationalUsage, PerformOrganizationalUsageUpdate))
-                    .Bind(usage => usage.WithOptionalUpdate(parameters.KLE, PerformKLEUpdate))
-                    .Bind(usage => usage.WithOptionalUpdate(parameters.ExternalReferences, PerformReferencesUpdate))
-                    .Bind(usage => usage.WithOptionalUpdate(parameters.GDPR, PerformGDPRUpdates))
-                    .Bind(usage => usage.WithOptionalUpdate(parameters.Archiving, PerformArchivingUpdate));
+                .Bind(usage => usage.WithOptionalUpdate(parameters.Roles, PerformRoleAssignmentUpdates))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.OrganizationalUsage, PerformOrganizationalUsageUpdate))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.KLE, PerformKLEUpdate))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.ExternalReferences, PerformReferencesUpdate))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.GDPR, PerformGDPRUpdates))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.Archiving, PerformArchivingUpdate));
         }
 
         private Result<ItSystemUsage, OperationError> PerformGDPRUpdates(ItSystemUsage itSystemUsage, UpdatedSystemUsageGDPRProperties parameters)
@@ -643,7 +643,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.LifeCycleStatus, (systemUsage, lifeCycleStatus) => systemUsage.LifeCycleStatus = lifeCycleStatus))
                 .Bind(usage => UpdateValidityPeriod(usage, generalProperties))
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.MainContractUuid, UpdateMainContract))
-                .Bind(usage => usage.WithOptionalUpdate(generalProperties.ContainsAITechnology, (systemUsage, containsAITechnology) => systemUsage.UpdateContainsAITechnology(containsAITechnology)));
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.ContainsAITechnology, (systemUsage, containsAITechnology) => systemUsage.UpdateContainsAITechnology(containsAITechnology)))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.WebAccessibilityCompliance, (systemUsage, webAccessibilityCompliance) => systemUsage.UpdateWebAccessibilityCompliance(webAccessibilityCompliance)))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.LastWebAccessibilityCheck, (systemUsage, lastWebAccessibilityCheck) => systemUsage.UpdateLastWebAccessibilityCheck(lastWebAccessibilityCheck)))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.WebAccessibilityNotes, (systemUsage, webAccessibilityNotes) => systemUsage.UpdateWebAccessibilityNotes(webAccessibilityNotes)));
         }
 
         private static Result<ItSystemUsage, OperationError> UpdateValidityPeriod(ItSystemUsage usage, UpdatedSystemUsageGeneralProperties generalProperties)

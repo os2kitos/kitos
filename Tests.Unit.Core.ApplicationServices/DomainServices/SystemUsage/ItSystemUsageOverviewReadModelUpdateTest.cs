@@ -166,7 +166,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 Name = A<string>(),
                 Disabled = A<bool>(),
-                Usages = new List<ItSystemUsage>(){ parentItSystemUsage },
+                Usages = new List<ItSystemUsage>() { parentItSystemUsage },
             };
             var system = new ItSystem
             {
@@ -175,7 +175,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Name = A<string>(),
                 Description = A<string>(),
                 Disabled = A<bool>(),
-                PreviousName= A<string>(),
+                PreviousName = A<string>(),
                 Parent = parentSystem,
                 Uuid = A<Guid>(),
                 BelongsTo = new Organization
@@ -296,7 +296,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             systemUsage.ArchivePeriods = archivePeriods;
 
             systemUsage.ItSystemCategories = new ItSystemCategories
-                { Id = A<int>(), Uuid = A<Guid>(), Name = A<string>() };
+            { Id = A<int>(), Uuid = A<Guid>(), Name = A<string>() };
+            systemUsage.WebAccessibilityCompliance = A<YesNoPartiallyOption>();
+            systemUsage.LastWebAccessibilityCheck = A<DateTime>();
+            systemUsage.WebAccessibilityNotes = A<string>();
 
             var readModel = new ItSystemUsageOverviewReadModel();
 
@@ -338,6 +341,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.DPIA, readModel.DPIAConducted);
             Assert.Equal(systemUsage.isBusinessCritical, readModel.IsBusinessCritical);
             Assert.Equal(systemUsage.ContainsAITechnology, readModel.ContainsAITechnology);
+            Assert.Equal(systemUsage.WebAccessibilityCompliance, readModel.WebAccessibilityCompliance);
+            Assert.Equal(systemUsage.LastWebAccessibilityCheck, readModel.LastWebAccessibilityCheck);
+            Assert.Equal(systemUsage.WebAccessibilityNotes, readModel.WebAccessibilityNotes);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);

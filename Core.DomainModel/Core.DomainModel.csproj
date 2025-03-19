@@ -301,6 +301,7 @@
     <Compile Include="References\AddReferenceCommand.cs" />
     <Compile Include="References\ReferenceRootType.cs" />
     <Compile Include="GDPR\YearMonthIntervalOption.cs" />
+    <Compile Include="Shared\YesNoPartiallyOption.cs" />
     <Compile Include="Shared\YesNoUndecidedOption.cs" />
     <Compile Include="Shared\YesNoIrrelevantOption.cs" />
     <Compile Include="Organization\StsOrganizationIdentity.cs" />

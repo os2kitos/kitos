@@ -41,7 +41,7 @@ namespace Core.DomainServices.SystemUsage
             IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel> itSystemUsageUsedByRelationReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewUsingSystemUsageReadModel> itSystemUsageUsingRelationReadModelRepository,
             IOptionsService<ItSystem, BusinessType> businessTypeService,
-            IGenericRepository<ItSystemUsageOverviewRelevantOrgUnitReadModel> relevantOrgUnitsRepository, 
+            IGenericRepository<ItSystemUsageOverviewRelevantOrgUnitReadModel> relevantOrgUnitsRepository,
             IGenericRepository<ItSystemUsageOverviewItContractReadModel> itSystemUsageOverviewContractReadModelsRepository)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
@@ -94,6 +94,9 @@ namespace Core.DomainServices.SystemUsage
             destination.ContainsAITechnology = source.ContainsAITechnology;
             destination.CatalogArchiveDuty = source.ItSystem.ArchiveDuty;
             destination.CatalogArchiveDutyComment = source.ItSystem.ArchiveDutyComment;
+            destination.WebAccessibilityCompliance = source.WebAccessibilityCompliance;
+            destination.LastWebAccessibilityCheck = source.LastWebAccessibilityCheck;
+            destination.WebAccessibilityNotes = source.WebAccessibilityNotes;
 
             PatchParentSystemInformation(source, destination);
             PatchRoleAssignments(source, destination);
@@ -415,7 +418,7 @@ namespace Core.DomainServices.SystemUsage
             destination.ItSystemBusinessTypeUuid = source.ItSystem.BusinessType?.Uuid;
             destination.ItSystemBusinessTypeName = GetNameOfItSystemOption(source.ItSystem, source.ItSystem.BusinessType, _businessTypeService);
         }
-        
+
         private void PatchItSystemCategories(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.ItSystemCategoriesId = source.ItSystemCategories?.Id;

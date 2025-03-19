@@ -52,5 +52,17 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// Whether the system usage is known to include any kind of AI technology
         /// </summary>
         public YesNoUndecidedChoice? ContainsAITechnology { get; set; }
+        /// <summary>
+        /// Defines if the system is web accessibility compliant
+        /// </summary>
+        public YesNoPartiallyChoice? WebAccessibilityCompliance { get; set; }
+        /// <summary>
+        /// Last time the supplier checked system web accessibility
+        /// </summary>
+        public DateTime? LastWebAccessibilityCheck { get; set; }
+        /// <summary>
+        /// Notes related to the web accessibility of the system
+        /// </summary>
+        public string WebAccessibilityNotes { get; set; }
     }
 }

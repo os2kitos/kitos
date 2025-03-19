@@ -403,7 +403,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
                 ContainsAITechnology = rule.MustUpdate(x => x.General.ContainsAITechnology)
                     ? (source.ContainsAITechnology?.ToYesNoUndecidedOption() ?? Maybe<YesNoUndecidedOption>.None).AsChangedValue()
-                    : OptionalValueChange<Maybe<YesNoUndecidedOption>>.None
+                    : OptionalValueChange<Maybe<YesNoUndecidedOption>>.None,
+                WebAccessibilityCompliance = rule.MustUpdate(x => x.General.WebAccessibilityCompliance)
+                    ? source.WebAccessibilityCompliance.FromNullableValueType().Select(x => x.ToYesNoPartiallyOption()).AsChangedValue()
+                    : OptionalValueChange<Maybe<YesNoPartiallyOption>>.None,
+
+                LastWebAccessibilityCheck = rule.MustUpdate(x => x.General.LastWebAccessibilityCheck)
+                    ? source.LastWebAccessibilityCheck.FromNullableValueType().AsChangedValue()
+                    : OptionalValueChange<Maybe<DateTime>>.None,
+
+                WebAccessibilityNotes = rule.MustUpdate(x => x.General.WebAccessibilityNotes)
+                    ? source.WebAccessibilityNotes.AsChangedValue()
+                    : OptionalValueChange<string>.None,
             };
         }
 

@@ -8,6 +8,7 @@ using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
 using Moq;
@@ -90,6 +91,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(itSystemUsage.IsActiveAccordingToLifeCycle, dto.General.Validity.ValidAccordingToLifeCycle);
             Assert.Equal(itSystemUsage.IsActiveAccordingToMainContract, dto.General.Validity.ValidAccordingToMainContract);
             Assert.Equal(itSystemUsage.CheckSystemValidity().Result, dto.General.Validity.Valid);
+            Assert.Equal(itSystemUsage.WebAccessibilityCompliance, dto.General.WebAccessibilityCompliance?.ToYesNoPartiallyOption());
+            Assert.Equal(itSystemUsage.LastWebAccessibilityCheck, dto.General.LastWebAccessibilityCheck);
+            Assert.Equal(itSystemUsage.WebAccessibilityNotes, dto.General.WebAccessibilityNotes);
         }
 
         [Fact]
@@ -679,19 +683,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected, actual);
         }
 
-        private static void AssertIdentities<T>(ICollection<T> sourceCollection, IEnumerable<IdentityNamePairResponseDTO> dtoCollection) where T : IHasUuid, IHasName
-        {
-            var expectedValues = sourceCollection.OrderBy(x => x.Name).ToList();
-            var actualValues = dtoCollection.OrderBy(x => x.Name).ToList();
-
-            Assert.Equal(expectedValues.Count, actualValues.Count);
-
-            foreach (var comparison in expectedValues.Zip(actualValues, (expected, actual) => new { expected, actual }).ToList())
-            {
-                AssertIdentity(comparison.expected, comparison.actual);
-            }
-        }
-
         private void AssignGeneralPropertiesSection(ItSystemUsage itSystemUsage)
         {
             itSystemUsage.LocalSystemId = A<string>();
@@ -704,6 +695,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.LifeCycleStatus = A<LifeCycleStatusType>();
             itSystemUsage.Concluded = A<DateTime>();
             itSystemUsage.ExpirationDate = A<DateTime>();
+            itSystemUsage.WebAccessibilityCompliance = A<YesNoPartiallyOption>();
+            itSystemUsage.LastWebAccessibilityCheck = A<DateTime>();
+            itSystemUsage.WebAccessibilityNotes = A<string>();
+
         }
 
         private void AssignBasicProperties(ItSystemUsage itSystemUsage)

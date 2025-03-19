@@ -87,7 +87,7 @@
     </parameter>
 
     <parameter name="SsoIDPEndPoints" defaultvalue="__SSO_KOMBIT_Proxy__">
-        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://saml.adgangsstyring.eksterntest-stoettesystemerne.dk']/@id"/>
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://saml.n2adgangsstyring.eksterntest-stoettesystemerne.dk']/@id"/>
     </parameter>
 
     <parameter name="SsoServiceProviderId" defaultvalue="__SSO_ServiceProvider_Id__">

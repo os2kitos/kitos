@@ -1732,7 +1732,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var organizationUuid = A<Guid>();
             var error = A<OperationError>();
 
-            ExpectGetSystemReturns(systemUuid, new ItSystem{Uuid = systemUuid, Id = A<int>()});
+            ExpectGetSystemReturns(systemUuid, new ItSystem { Uuid = systemUuid, Id = A<int>() });
             ExpectGetOrganizationReturns(organizationUuid, error);
             //Act
             var resultError = _sut.DeleteByItSystemAndOrganizationUuids(systemUuid, organizationUuid);
@@ -1751,7 +1751,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var usageUuid = A<Guid>();
             var system = new ItSystem { Uuid = systemUuid, Id = A<int>() };
             var organization = new Organization { Uuid = organizationUuid, Id = A<int>() };
-            var usage = new ItSystemUsage { Uuid = usageUuid, Id= A<int>() };
+            var usage = new ItSystemUsage { Uuid = usageUuid, Id = A<int>() };
             var error = A<OperationError>();
 
             ExpectGetSystemReturns(systemUuid, system);
@@ -1776,7 +1776,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var usageUuid = A<Guid>();
             var system = new ItSystem { Uuid = systemUuid, Id = A<int>() };
             var organization = new Organization { Uuid = organizationUuid, Id = A<int>() };
-            var usage = new ItSystemUsage { Uuid = usageUuid, Id= A<int>() };
+            var usage = new ItSystemUsage { Uuid = usageUuid, Id = A<int>() };
 
             ExpectGetSystemReturns(systemUuid, system);
             ExpectGetOrganizationReturns(organizationUuid, organization);
@@ -1789,7 +1789,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(resultError.IsNone);
         }
-        
+
         [Fact]
         public void Can_Update_All_On_Empty_ItSystemUsage()
         {
@@ -2003,7 +2003,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden,result.Error.FailureType);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]
@@ -2020,7 +2020,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectUpdateArchivePeriodReturns(itSystemUsage.Id, periodUuid, updatedProperties.StartDate, updatedProperties.EndDate, updatedProperties.ArchiveId, updatedProperties.Approved, new ArchivePeriod());
 
             //Act
-            var result = _sut.UpdateJournalPeriod(itSystemUsage.Uuid, periodUuid,updatedProperties);
+            var result = _sut.UpdateJournalPeriod(itSystemUsage.Uuid, periodUuid, updatedProperties);
 
             //Assert
             Assert.True(result.Ok);
@@ -2805,6 +2805,58 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(expectedFailure, result.Error.FailureType);
         }
 
+        [Fact]
+        public void Can_Update_Web_Accessibility_Properties()
+        {
+            var usage = new ItSystemUsage { Uuid = A<Guid>() };
+            var org = new Organization { Uuid = A<Guid>() };
+            SetupSimpleUpdate(usage, org);
+            var parameters = new SystemUsageUpdateParameters { GeneralProperties = new UpdatedSystemUsageGeneralProperties { WebAccessibilityCompliance = A<YesNoPartiallyOption>().FromNullable().AsChangedValue(), LastWebAccessibilityCheck = A<DateTime>().FromNullable().AsChangedValue(), WebAccessibilityNotes = A<string>().AsChangedValue() } };
+
+            var result = _sut.Update(usage.Uuid, parameters);
+
+            Assert.True(result.Ok);
+            var updatedSystem = result.Value;
+            var generalProperties = parameters.GeneralProperties.Value;
+            Assert.Equal(generalProperties.WebAccessibilityCompliance.NewValue, updatedSystem.WebAccessibilityCompliance);
+            Assert.Equal(generalProperties.LastWebAccessibilityCheck.NewValue, updatedSystem.LastWebAccessibilityCheck);
+            Assert.Equal(generalProperties.WebAccessibilityNotes.NewValue, updatedSystem.WebAccessibilityNotes);
+        }
+
+        [Fact]
+        public void Can_Reset_Web_Accessibility_Properties()
+        {
+            var usage = new ItSystemUsage { Uuid = A<Guid>(), WebAccessibilityCompliance = A<YesNoPartiallyOption>(), LastWebAccessibilityCheck = A<DateTime>(), WebAccessibilityNotes = A<string>() };
+            var org = new Organization { Uuid = A<Guid>() };
+            SetupSimpleUpdate(usage, org);
+            var parameters = new SystemUsageUpdateParameters
+            {
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
+                {
+                    WebAccessibilityCompliance = Maybe<YesNoPartiallyOption>.None.AsChangedValue(),
+                    LastWebAccessibilityCheck = Maybe<DateTime>.None.AsChangedValue(),
+                    WebAccessibilityNotes =
+                ((string)null).AsChangedValue()
+                }
+            };
+
+            var result = _sut.Update(usage.Uuid, parameters);
+
+            Assert.True(result.Ok);
+            var updatedSystem = result.Value;
+            Assert.Null(updatedSystem.WebAccessibilityCompliance);
+            Assert.Null(updatedSystem.LastWebAccessibilityCheck);
+            Assert.Null(updatedSystem.WebAccessibilityNotes);
+        }
+
+        private void SetupSimpleUpdate(ItSystemUsage usage, Organization org)
+        {
+            ExpectGetOrganizationReturns(org.Uuid, org);
+            ExpectGetSystemUsageReturns(usage.Uuid, usage);
+            ExpectAllowModifyReturns(usage, true);
+            ExpectTransaction();
+        }
+
         private void ExpectAddExternalReferenceReturns(int usageId, ExternalReferenceProperties properties, Result<ExternalReference, OperationError> result)
         {
             _referenceServiceMock.Setup(x => x.AddReference(usageId, ReferenceRootType.SystemUsage, properties)).Returns(result);
@@ -2852,7 +2904,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(generalProperties.LocalSystemId.NewValue, actual.LocalSystemId);
             Assert.Equal(generalProperties.SystemVersion.NewValue, actual.Version);
             Assert.Equal(generalProperties.Notes.NewValue, actual.Note);
-            
+
             if (shouldBeEmpty)
             {
                 Assert.Null(actual.Concluded);
@@ -3210,17 +3262,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 Name = A<string>(),
                 OrganizationId = organization.Id,
                 Organization = organization
-            };
-        }
-
-        private static SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithoutData()
-        {
-            return new SystemUsageUpdateParameters
-            {
-                Roles = new UpdatedSystemUsageRoles()
-                {
-                    UserRolePairs = Maybe<IEnumerable<UserRolePair>>.None.AsChangedValue()
-                }.FromNullable()
             };
         }
 
