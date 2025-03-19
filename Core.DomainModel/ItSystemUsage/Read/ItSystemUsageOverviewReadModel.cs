@@ -138,5 +138,9 @@ namespace Core.DomainModel.ItSystemUsage.Read
 
         public ArchiveDutyRecommendationTypes? CatalogArchiveDuty { get; set; }
         public string CatalogArchiveDutyComment { get; set; }
+
+        public YesNoPartiallyOption? WebAccessibilityCompliance { get; set; }
+        public DateTime? LastWebAccessibilityCheck { get; set; }
+        public string WebAccessibilityNotes { get; set; }
     }
 }
