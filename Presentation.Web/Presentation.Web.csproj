@@ -1461,7 +1461,7 @@
     <Compile Include="Models\API\V1\GetTokenResponseDTO.cs" />
     <Compile Include="Models\API\V1\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\API\V1\UpdateDefaultOrgUnitDto.cs" />
-    <Compile Include="Controllers\Web\OldHomeController.cs" />
+    <Compile Include="Controllers\Web\Old\OldHomeController.cs" />
     <Compile Include="Models\API\V1\ItInterfaceDTO.cs" />
     <Compile Include="Models\API\V1\ItInterfaceExhibitDTO.cs" />
     <Compile Include="Models\API\V1\ExcelImportErrorDTO.cs" />
