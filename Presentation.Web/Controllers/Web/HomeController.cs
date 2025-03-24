@@ -75,7 +75,7 @@ namespace Presentation.Web.Controllers.Web
                 PushTempVariable(ssoErrorCode, SsoErrorKey);
             }
 
-            return RedirectToAction(nameof(OldHomeController.Index));
+            return Redirect("/old");
         }
 
         public ActionResult WithFeature(TemporaryFeature? feature)
@@ -83,14 +83,14 @@ namespace Presentation.Web.Controllers.Web
             if (feature.HasValue)
                 PushTempVariable(feature, FeatureToggleKey);
 
-            return RedirectToAction(nameof(OldHomeController.Index));
+            return Redirect("/old");
         }
 
         public ActionResult SsoAuthenticated()
         {
             PushTempVariable(true, SsoAuthenticationCompletedKey);
 
-            return RedirectToAction(nameof(OldHomeController.Index));
+            return Redirect("/old");
         }
 
         private void PushTempVariable<T>(T value, string key)
