@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystem;
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
@@ -309,6 +310,15 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<IEnumerable<RegistrationHierarchyNodeWithActivationStatusResponseDTO>>();
+        }
+        public static async Task<IEnumerable<ItSystemHierarchyNodeResponseDTO>> GetInternalHierarchyAsync(Guid organizationUuid, Guid systemUuid)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var path = $"{BasePath}/internal/organization/{organizationUuid}/it-systems/{systemUuid}/hierarchy";
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl(path), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemHierarchyNodeResponseDTO>>();
         }
 
         public static async Task<ExternalReferenceDataResponseDTO> AddExternalReferenceAsync(string token, Guid systemUuid, ExternalReferenceDataWriteRequestDTO request)

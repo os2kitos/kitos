@@ -20,6 +20,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
@@ -50,6 +51,7 @@ namespace Core.ApplicationServices.System
         private readonly IItInterfaceService _interfaceService;
         private readonly IItSystemUsageService _systemUsageService;
         private readonly IOrganizationService _organizationService;
+        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
         public ItSystemService(
             IItSystemRepository itSystemRepository,
@@ -65,7 +67,8 @@ namespace Core.ApplicationServices.System
             IOperationClock operationClock,
             IItInterfaceService interfaceService,
             IItSystemUsageService systemUsageService,
-            IOrganizationService organizationService)
+            IOrganizationService organizationService,
+            IEntityIdentityResolver entityIdentityResolver)
         {
             _itSystemRepository = itSystemRepository;
             _authorizationContext = authorizationContext;
@@ -81,6 +84,7 @@ namespace Core.ApplicationServices.System
             _interfaceService = interfaceService;
             _systemUsageService = systemUsageService;
             _organizationService = organizationService;
+            _entityIdentityResolver = entityIdentityResolver;
         }
 
         public Result<ItSystem, OperationError> GetSystem(Guid uuid)
@@ -149,6 +153,15 @@ namespace Core.ApplicationServices.System
             return itSystems;
         }
 
+        public Result<IEnumerable<ItSystem>, OperationError> GetCompleteHierarchyByUuid(Guid systemUuid)
+        {
+            return _entityIdentityResolver.ResolveDbId<ItSystem>(systemUuid)
+                .Match
+                (
+                    GetCompleteHierarchy,
+                    () => new OperationError($"System with uuid: {systemUuid} was not found", OperationFailure.NotFound)
+                );
+        }
         public Result<IEnumerable<ItSystem>, OperationError> GetCompleteHierarchy(int systemId)
         {
             return GetSystem(systemId)

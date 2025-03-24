@@ -27,6 +27,7 @@ using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Events;
+using Core.DomainServices.Generic;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -49,6 +50,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IItInterfaceService> _interfaceServiceMock;
         private readonly Mock<IItSystemUsageService> _systemUsageServiceMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
+        private readonly Mock<IEntityIdentityResolver> _entityIdentityResolver;
 
         public ItSystemServiceTest()
         {
@@ -66,6 +68,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _interfaceServiceMock = new Mock<IItInterfaceService>();
             _systemUsageServiceMock = new Mock<IItSystemUsageService>();
             _organizationServiceMock = new Mock<IOrganizationService>();
+            _entityIdentityResolver = new Mock<IEntityIdentityResolver>();
             _sut = new ItSystemService(
                 _systemRepository.Object,
                 _authorizationContext.Object,
@@ -80,7 +83,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 Mock.Of<IOperationClock>(),
                 _interfaceServiceMock.Object,
                 _systemUsageServiceMock.Object,
-                _organizationServiceMock.Object
+                _organizationServiceMock.Object,
+                _entityIdentityResolver.Object
                 );
         }
 
@@ -1297,6 +1301,56 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
+        public void Can_Get_Hierarchy_By_Uuid()
+        {
+            //Arrange
+            var (root, createdItSystems) = CreateHierarchy();
+
+            ExpectAllowReadsReturns(root, true);
+            ExpectGetSystemReturns(root.Id, root);
+            ExpectResolveIdReturns<ItSystem>(root.Uuid, root.Id);
+
+            //Act
+            var result = _sut.GetCompleteHierarchyByUuid(root.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var hierarchy = result.Value.ToList();
+            Assert.Equal(createdItSystems.Count, hierarchy.Count);
+
+            foreach (var node in hierarchy)
+            {
+                var system = createdItSystems.FirstOrDefault(x => x.Id == node.Id);
+                Assert.NotNull(system);
+                if (node.Id == root.Id)
+                {
+                    Assert.Null(node.Parent);
+                }
+                else
+                {
+                    Assert.NotNull(node.Parent);
+                    Assert.Equal(node.Parent.Id, system.Parent.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public void Get_Hierarchy_By_Uuid_Return_NotFound()
+        {
+            //Arrange
+            var (root, _) = CreateHierarchy();
+
+            ExpectResolveIdReturns<ItSystem>(root.Uuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.GetCompleteHierarchyByUuid(root.Uuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
         public void Activate_Returns_Ok()
         {
             //Arrange
@@ -1687,6 +1741,11 @@ namespace Tests.Unit.Presentation.Web.Services
         private void ExpectGetSystemReturns(int id, ItSystem system)
         {
             _systemRepository.Setup(x => x.GetSystem(id)).Returns(system);
+        }
+
+        private void ExpectResolveIdReturns<T>(Guid uuid, Maybe<int> result) where T : class, IHasUuid, IHasId
+        {
+            _entityIdentityResolver.Setup(x => x.ResolveDbId<T>(uuid)).Returns(result);
         }
 
         private void ExpectGetSystemReturns(Guid id, Maybe<ItSystem> system)

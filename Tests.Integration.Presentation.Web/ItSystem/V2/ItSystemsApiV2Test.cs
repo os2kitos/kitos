@@ -13,6 +13,7 @@ using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Interface;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
+using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.KLE;
 using Presentation.Web.Models.API.V2.Response.Organization;
@@ -428,6 +429,31 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var response = await ItSystemV2Helper.GetHierarchyAsync(token, rootUuid);
 
             //Assert
+            AssertHierarchy(rootUuid, response, createdSystems);
+        }
+
+        [Fact]
+        public async Task Can_Get_Internal_Hierarchy()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var (rootUuid, createdSystems) = CreateHierarchy(organization.Id);
+            var firstSystem = createdSystems.First();
+            await ItSystemHelper.TakeIntoUseAsync(firstSystem.Id, organization.Id);
+
+
+            //Act
+            var response = await ItSystemV2Helper.GetInternalHierarchyAsync(organization.Uuid, rootUuid);
+
+            //Assert
+            var hierarchy = response.ToList();
+            AssertHierarchy(rootUuid, hierarchy, createdSystems);
+            var usedSystem = Assert.Single(hierarchy.Where(x => x.IsInUse));
+            Assert.Equal(firstSystem.Uuid, usedSystem.Node.Uuid);
+        }
+
+        private static void AssertHierarchy(Guid rootUuid, IEnumerable<RegistrationHierarchyNodeWithActivationStatusResponseDTO> response, IReadOnlyList<Core.DomainModel.ItSystem.ItSystem> createdSystems)
+        {
             var hierarchy = response.ToList();
             Assert.Equal(createdSystems.Count, hierarchy.Count);
 
