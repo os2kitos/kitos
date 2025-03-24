@@ -7,10 +7,12 @@ using Core.DomainServices;
 using Presentation.Web.Models.Application.FeatureToggle;
 using Presentation.Web.Models.Application.RuntimeEnv;
 
-namespace Presentation.Web.Controllers.Web
+namespace Presentation.Web.Controllers.Web.Old
 {
     [SessionState(SessionStateBehavior.Required)]
-    public class HomeController : Controller
+
+    [RoutePrefix("old")]
+    public class OldHomeController : Controller
     {
         private readonly IAuthenticationContext _userContext;
         private readonly IUserRepository _userRepository;
@@ -19,13 +21,14 @@ namespace Presentation.Web.Controllers.Web
         private const string FeatureToggleKey = "FEATURE_TOGGLE";
         private const string SsoAuthenticationCompletedKey = "SSO_PREFERRED_START";
 
-        public HomeController(IAuthenticationContext userContext, IUserRepository userRepository)
+        public OldHomeController(IAuthenticationContext userContext, IUserRepository userRepository)
         {
             _userContext = userContext;
             _userRepository = userRepository;
             _isProd = KitosEnvironmentConfiguration.FromConfiguration().Environment == KitosEnvironment.Production;
         }
 
+        [Route("")]
         public ActionResult Index()
         {
             ViewBag.StylingScheme = _isProd ? "PROD" : "TEST";
@@ -33,7 +36,7 @@ namespace Presentation.Web.Controllers.Web
             AppendFeatureToggles();
             AppendSsoLoginInformation();
 
-            return Redirect("/ui");
+            return View();
         }
 
         private void AppendSsoLoginInformation()
