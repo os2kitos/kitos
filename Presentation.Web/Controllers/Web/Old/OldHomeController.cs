@@ -70,36 +70,6 @@ namespace Presentation.Web.Controllers.Web.Old
             }
         }
 
-        public ActionResult SsoError(SsoErrorCode? ssoErrorCode)
-        {
-            if (ssoErrorCode.HasValue)
-            {
-                PushTempVariable(ssoErrorCode, SsoErrorKey);
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        public ActionResult WithFeature(TemporaryFeature? feature)
-        {
-            if (feature.HasValue)
-                PushTempVariable(feature, FeatureToggleKey);
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        public ActionResult SsoAuthenticated()
-        {
-            PushTempVariable(true, SsoAuthenticationCompletedKey);
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        private void PushTempVariable<T>(T value, string key)
-        {
-            TempData[key] = value;
-        }
-
         private Maybe<T> PopTempVariable<T>(string key)
         {
             if (TempData[key] is T value)
