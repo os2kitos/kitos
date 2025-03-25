@@ -480,7 +480,7 @@ namespace Core.DomainModel.ItSystemUsage
             return new RemoveSensitiveDataLevelResultModel(dataLevelToRemove, removedPersonalData);
         }
 
-        private bool SensitiveDataLevelExists(SensitiveDataLevel sensitiveDataLevel)
+        public bool SensitiveDataLevelExists(SensitiveDataLevel sensitiveDataLevel)
         {
             return SensitiveDataLevels.Any(x => x.SensitivityDataLevel == sensitiveDataLevel);
         }
