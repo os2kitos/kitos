@@ -463,7 +463,7 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
             //Assert
             Assert.True(result.Ok);
             transaction.Verify(x => x.Commit(), Times.Once);
-            _domainEventsMock.Verify(x => x.Raise(It.IsAny<ItSystemChangedEvent>()), Times.Once);
+            _domainEventsMock.Verify(x => x.Raise(It.IsAny<EntityUpdatedEventWithSnapshot<ItSystem, ItSystemSnapshot>>()), Times.Once);
         }
 
         [Fact]

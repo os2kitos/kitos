@@ -6,7 +6,6 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.KitosEvents;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.GDPR.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
@@ -14,7 +13,7 @@ using Core.DomainModel.Organization;
 
 namespace Core.ApplicationServices.KitosEvents;
 
-public class PublishSystemChangesEventHandler : IDomainEventHandler<ItSystemChangedEvent>, IDomainEventHandler<DprChangedEvent>
+public class PublishSystemChangesEventHandler : IDomainEventHandler<EntityUpdatedEventWithSnapshot<ItSystem, ItSystemSnapshot>>, IDomainEventHandler<EntityUpdatedEventWithSnapshot<DataProcessingRegistration, DprSnapshot>>
 {
     private readonly IKitosEventPublisherService _eventPublisher;
     private const string QueueTopic = KitosQueueTopics.SystemChangedEventTopic;
@@ -23,7 +22,7 @@ public class PublishSystemChangesEventHandler : IDomainEventHandler<ItSystemChan
     {
         _eventPublisher = eventPublisher;
     }
-    public void Handle(ItSystemChangedEvent domainEvent)
+    public void Handle(EntityUpdatedEventWithSnapshot<ItSystem, ItSystemSnapshot> domainEvent)
     {
         var changeEvent = CalculateChangeEventFromSystemModel(domainEvent);
         if (changeEvent.IsNone)
@@ -34,7 +33,7 @@ public class PublishSystemChangesEventHandler : IDomainEventHandler<ItSystemChan
         _eventPublisher.PublishEvent(newEvent);
     }
 
-    public void Handle(DprChangedEvent domainEvent)
+    public void Handle(EntityUpdatedEventWithSnapshot<DataProcessingRegistration, DprSnapshot> domainEvent)
     {
         var changeEvents = CalculateChangeEventsFromDprModel(domainEvent);
         if (changeEvents.IsNone)
@@ -49,7 +48,7 @@ public class PublishSystemChangesEventHandler : IDomainEventHandler<ItSystemChan
         }
     }
 
-    private static Maybe<IEnumerable<SystemChangeEventBodyModel>> CalculateChangeEventsFromDprModel(DprChangedEvent domainEvent)
+    private static Maybe<IEnumerable<SystemChangeEventBodyModel>> CalculateChangeEventsFromDprModel(EntityUpdatedEventWithSnapshot<DataProcessingRegistration, DprSnapshot> domainEvent)
     {
         var snapshotMaybe = domainEvent.Snapshot;
         var dprAfter = domainEvent.Entity;
@@ -86,7 +85,7 @@ public class PublishSystemChangesEventHandler : IDomainEventHandler<ItSystemChan
         return dataProcessor.IsNone ? system.GetRightsHolder() : dataProcessor;
     }
 
-    private static Maybe<SystemChangeEventBodyModel> CalculateChangeEventFromSystemModel(ItSystemChangedEvent changeEvent)
+    private static Maybe<SystemChangeEventBodyModel> CalculateChangeEventFromSystemModel(EntityUpdatedEventWithSnapshot<ItSystem, ItSystemSnapshot> changeEvent)
     {
         var snapshotMaybe = changeEvent.Snapshot;
         var systemAfter = changeEvent.Entity;
