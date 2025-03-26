@@ -296,7 +296,7 @@ namespace Core.ApplicationServices.System.Write
 
         private void SaveAndNotify(ItSystem system, IDatabaseTransaction transaction, Maybe<ItSystemSnapshot> snapshot)
         {
-            _domainEvents.Raise(new ItSystemChangedEvent(system, snapshot));
+            _domainEvents.Raise(new EntityUpdatedEventWithSnapshot<ItSystem, ItSystemSnapshot>(system, snapshot));
             _databaseControl.SaveChanges();
             transaction.Commit();
         }

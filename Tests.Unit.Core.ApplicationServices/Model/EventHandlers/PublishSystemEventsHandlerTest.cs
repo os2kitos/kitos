@@ -5,6 +5,7 @@ using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KitosEvents;
 using Core.ApplicationServices.Model.KitosEvents;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Events;
 using Core.DomainModel.ItSystem;
@@ -35,7 +36,7 @@ public class PublishSystemEventsHandlerTest : WithAutoFixture
     {
         var snapshot = A<ItSystemSnapshot>();
         var itSystem = CreateItSystem();
-        var newEvent = new ItSystemChangedEvent(itSystem, snapshot);
+        var newEvent = new EntityUpdatedEventWithSnapshot<ItSystem, ItSystemSnapshot>(itSystem, snapshot);
         var expectedBody = new SystemChangeEventBodyModel
         {
             SystemUuid = itSystem.Uuid,
@@ -56,7 +57,7 @@ public class PublishSystemEventsHandlerTest : WithAutoFixture
         var newestProcessor = new Organization { Uuid = A<Guid>(), Name = A<string>() };
         dpr.DataProcessors.Add(newestProcessor);
 
-        var newEvent = new DprChangedEvent(dpr, snapshot);
+        var newEvent = new EntityUpdatedEventWithSnapshot<DataProcessingRegistration, DprSnapshot>(dpr, snapshot);
         var expectedBody = new SystemChangeEventBodyModel
         {
             SystemUuid = dpr.SystemUsages.First().ItSystem.Uuid,
@@ -76,7 +77,7 @@ public class PublishSystemEventsHandlerTest : WithAutoFixture
         var snapshot = A<DprSnapshot>();
         var dpr = CreateDpr(new List<Guid>());
         var system = dpr.SystemUsages.First().ItSystem;
-        var newEvent = new DprChangedEvent(dpr, snapshot);
+        var newEvent = new EntityUpdatedEventWithSnapshot<DataProcessingRegistration, DprSnapshot>(dpr, snapshot);
         var expectedBody = new SystemChangeEventBodyModel
         {
             SystemUuid = system.Uuid,
