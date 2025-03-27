@@ -37,5 +37,6 @@ namespace Core.ApplicationServices
         Result<User, OperationError> GetUserByEmail(Guid organizationUuid, string email);
         Result<User, OperationError> GetUserByUuid(Guid userUuid);
         Result<User, OperationError> GetGlobalAdmin();
+        Result<OrganizationUnit, OperationError> GetDefaultOrganizationUnit(Guid organizationUuid, Guid userUuid);
     }
 }

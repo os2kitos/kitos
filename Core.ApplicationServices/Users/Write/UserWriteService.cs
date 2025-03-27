@@ -201,6 +201,34 @@ namespace Core.ApplicationServices.Users.Write
             _userService.IssuePasswordReset(user, null, null, newUi);
         }
 
+        public Maybe<OperationError> SetDefaultOrgUnit(Guid userUuid, Guid organizationUuid, Guid organizationUnitUuid)
+        {
+            var orgIdResult = ResolveUuidToId<Organization>(organizationUuid);
+            if (orgIdResult.Failed)
+            {
+                return orgIdResult.Error;
+            }
+            var unitIdResult = ResolveUuidToId<OrganizationUnit>(organizationUnitUuid);
+            if (unitIdResult.Failed)
+            {
+                return unitIdResult.Error;
+            }
+
+            return _userService.GetUserByUuid(userUuid)
+                .Match(user =>
+                {
+                    try
+                    {
+                        _organizationService.SetDefaultOrgUnit(user, orgIdResult.Value, unitIdResult.Value);
+                        return Maybe<OperationError>.None;
+                    }
+                    catch(Exception ex)
+                    {
+                        return new OperationError(ex.Message, OperationFailure.UnknownError);
+                    }
+                }, error => error);
+        }
+
         private Result<User, OperationError> ChangeLocalAdminStatus<T>(Guid organizationUuid, Guid userUuid, Func<int, int, Result<T, OperationFailure>> changeLocalAdminStatus)
         {
             var transaction = _transactionManager.Begin();

@@ -10,7 +10,7 @@ using Xunit;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
 using System.Linq;
 using Presentation.Web.Models.API.V2.Response.Organization;
-using System.Data;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
 {
@@ -227,6 +227,23 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             var cookie = await HttpApi.GetCookieAsync(role);
             var url = TestEnvironment.CreateUrl($"{GlobalUserControllerPrefix()}/system-integrators/{userUuid}?requestedValue={requestedSystemIntegratorStatus}");
             return await HttpApi.PatchWithCookieAsync(url, cookie, null);
+        }
+
+        public static async Task SetDefaultUnit(Guid organizationUuid, Guid userUuid, Guid unitUuid, OrganizationRole role = OrganizationRole.GlobalAdmin)
+        {
+            var cookie = await HttpApi.GetCookieAsync(role);
+            var url = TestEnvironment.CreateUrl($"{ControllerPrefix(organizationUuid)}/{userUuid}/default-unit/{unitUuid}");
+            using var response = await HttpApi.PatchWithCookieAsync(url, cookie, null);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        public static async Task<IdentityNamePairResponseDTO> GetDefaultUnit(Guid organizationUuid, Guid userUuid, OrganizationRole role = OrganizationRole.GlobalAdmin)
+        {
+            var cookie = await HttpApi.GetCookieAsync(role);
+            var url = TestEnvironment.CreateUrl($"{ControllerPrefix(organizationUuid)}/{userUuid}/default-unit");
+            using var response = await HttpApi.GetWithCookieAsync(url, cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IdentityNamePairResponseDTO>();
         }
 
         private static string ControllerPrefix(Guid organizationUuid)

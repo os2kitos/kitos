@@ -13,7 +13,9 @@ using System.Web.Http.Results;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Model.Users;
 using Core.DomainModel.Organization;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Models.API.V2.Internal.Request.User;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Users
 {
@@ -160,6 +162,32 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
             return _userService
                 .GetUserInOrganization(organizationUuid, userUuid)
                 .Bind(user => _userResponseModelMapper.ToUserResponseDTO(organizationUuid, user))
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpPatch]
+        [Route("{userUuid}/default-unit/{organizationUnitUuid}")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult PatchDefaultOrgUnit(Guid organizationUuid, Guid userUuid, Guid organizationUnitUuid)
+        {
+            return _userWriteService.SetDefaultOrgUnit(userUuid, organizationUuid, organizationUnitUuid)
+                .Match(FromOperationError, NoContent);
+        }
+
+        [HttpGet]
+        [Route("{userUuid}/default-unit")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IdentityNamePairResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult GetUserDefaultUnit(Guid organizationUuid, Guid userUuid)
+        {
+            return _userService
+                .GetDefaultOrganizationUnit(organizationUuid, userUuid)
+                .Select(unit=> unit.MapIdentityNamePairDTO())
                 .Match(Ok, FromOperationError);
         }
 

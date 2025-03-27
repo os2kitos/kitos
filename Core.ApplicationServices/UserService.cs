@@ -421,6 +421,14 @@ namespace Core.ApplicationServices
                 .Select(organization => new UserAdministrationPermissions(AllowDelete(organization.Id)));
         }
 
+        public Result<OrganizationUnit, OperationError> GetDefaultOrganizationUnit(Guid organizationUuid, Guid userUuid)
+        {
+            return _organizationService.GetOrganization(organizationUuid)
+                .Bind(organization => GetUserInOrganization(organizationUuid, userUuid)
+                    .Select(user => (org: organization, user)))
+                .Bind<OrganizationUnit>(result => _organizationService.GetDefaultUnit(result.org, result.user));
+        }
+
         private bool AllowDelete(int? scopedToOrganizationId)
         {
             return _authorizationContext.HasPermission(new DeleteAnyUserPermission(scopedToOrganizationId.FromNullableValueType()));
