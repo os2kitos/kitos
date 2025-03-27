@@ -15,6 +15,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
+using Serilog;
 
 namespace Core.ApplicationServices.Users.Write
 {
@@ -29,6 +30,7 @@ namespace Core.ApplicationServices.Users.Write
         private readonly IUserRightsService _userRightsService;
         private readonly IOrganizationalUserContext _organizationalUserContext;
         private readonly IUserRepository _userRepository;
+        private readonly ILogger _logger;
 
         public UserWriteService(IUserService userService,
             IOrganizationRightsService organizationRightsService,
@@ -38,7 +40,8 @@ namespace Core.ApplicationServices.Users.Write
             IEntityIdentityResolver entityIdentityResolver,
             IUserRightsService userRightsService,
             IOrganizationalUserContext organizationalUserContext,
-            IUserRepository userRepository)
+            IUserRepository userRepository, 
+            ILogger logger)
         {
             _userService = userService;
             _organizationRightsService = organizationRightsService;
@@ -49,6 +52,7 @@ namespace Core.ApplicationServices.Users.Write
             _userRightsService = userRightsService;
             _organizationalUserContext = organizationalUserContext;
             _userRepository = userRepository;
+            _logger = logger;
         }
 
         public Result<User, OperationError> Create(Guid organizationUuid, CreateUserParameters parameters)
@@ -224,6 +228,7 @@ namespace Core.ApplicationServices.Users.Write
                     }
                     catch(Exception ex)
                     {
+                        _logger.Error(ex.Message, ex);
                         return new OperationError(ex.Message, OperationFailure.UnknownError);
                     }
                 }, error => error);
