@@ -18,6 +18,7 @@ using Core.ApplicationServices.Rights;
 using Core.DomainServices.Generic;
 using Core.ApplicationServices.Model.Users;
 using Core.DomainServices;
+using Serilog;
 
 namespace Tests.Unit.Core.ApplicationServices.Users
 {
@@ -34,6 +35,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
         private readonly Mock<IUserRightsService> _userRightsServiceMock;
         private readonly Mock<IOrganizationalUserContext> _organizationalUserContextMock;
         private readonly Mock<IUserRepository> _userRepositoryMock;
+        private readonly Mock<ILogger> _loggerMock;
 
         public UserWriteServiceTest()
         {
@@ -46,7 +48,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             _userRightsServiceMock = new Mock<IUserRightsService>();
             _organizationalUserContextMock = new Mock<IOrganizationalUserContext>();
             _userRepositoryMock = new Mock<IUserRepository>();
-
+            _loggerMock = new Mock<ILogger>();
 
             _sut = new UserWriteService(_userServiceMock.Object, 
                 _organizationRightsServiceMock.Object, 
@@ -56,7 +58,8 @@ namespace Tests.Unit.Core.ApplicationServices.Users
                 _entityIdentityResolverMock.Object,
                 _userRightsServiceMock.Object,
                 _organizationalUserContextMock.Object,
-                _userRepositoryMock.Object);
+                _userRepositoryMock.Object,
+                _loggerMock.Object);
         }
 
         [Fact]
