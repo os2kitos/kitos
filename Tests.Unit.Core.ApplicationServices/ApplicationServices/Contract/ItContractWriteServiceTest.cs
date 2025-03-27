@@ -293,16 +293,15 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         }
 
         [Theory]
-        [InlineData(true, true, true, true, true, true, true)]
-        [InlineData(true, true, true, true, true, false, true)]
-        [InlineData(true, true, true, true, false, true, true)]
-        [InlineData(true, true, true, false, true, true, true)]
-        [InlineData(true, true, false, true, true, true, true)]
-        [InlineData(true, false, true, true, true, true, true)]
-        [InlineData(false, true, true, true, true, true, true)]
-        [InlineData(false, false, false, false, false, false, true)]
-        [InlineData(false, false, false, false, false, false, false)]
-        public void Can_Create_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withValidFrom, bool withValidTo, bool withCriticalityType, bool withRequireValidParent)
+        [InlineData(true, true, true, true, true, true)]
+        [InlineData(true, true, true, true, true, false)]
+        [InlineData(true, true, true, true, false, true)]
+        [InlineData(true, true, true, false, true, true)]
+        [InlineData(true, true, false, true, true, true)]
+        [InlineData(true, false, true, true, true, true)]
+        [InlineData(false, true, true, true, true, true)]
+        [InlineData(false, false, false, false, false, false)]
+        public void Can_Create_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withValidFrom, bool withValidTo, bool withCriticalityType)
         {
             // Arrange
             var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
@@ -316,7 +315,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 criticalityTypeUuid,
                 agreementElementUuids,
                 agreementElementTypes,
-                parameters, requireValidParent) = SetupGeneralSectionInput(withContractType, withContractTemplate, withAgreementElements, withValidFrom, withValidTo, withCriticalityType, createdContract, organizationUuid, withRequireValidParent);
+                parameters) = SetupGeneralSectionInput(withContractType, withContractTemplate, withAgreementElements, withValidFrom, withValidTo, withCriticalityType, createdContract, organizationUuid);
 
             itContractModificationParameters.General = parameters;
 
@@ -328,7 +327,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(result.Ok);
             AssertTransactionCommitted(transaction);
             var contract = result.Value;
-            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract, requireValidParent);
+            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract, false);
         }
 
         [Fact]
@@ -1308,7 +1307,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 criticalityType,
                 agreementElementUuids,
                 agreementElementTypes,
-                generalData, requireValidParent) = SetupGeneralSectionInput(true, true, true, true, true, true, createdContract, organizationUuid, true);
+                generalData) = SetupGeneralSectionInput(true, true, true, true, true, true, createdContract, organizationUuid);
 
             parameters.General = generalData;
 
@@ -1400,7 +1399,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             Assert.Equal(parent, contract.Parent);
 
-            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract, requireValidParent);
+            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract, false);
 
             AssertProcurement(parameters.Procurement.Value, contract);
 
@@ -1530,6 +1529,70 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(createResult.Failed);
             Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
             AssertTransactionNotCommitted(transaction);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Can_Set_RequireValidContract_When_Parent_Exists(bool requireValidParent)
+        {
+            var newParentContract = new ItContract { Uuid = A<Guid>() };
+            var contract = new ItContract { Uuid = A<Guid>() };
+            var parameters = new ItContractModificationParameters
+            {
+                ParentContractUuid = ((Guid?)newParentContract.Uuid).AsChangedValue(),
+                General = new ItContractGeneralDataModificationParameters
+                {
+                    RequireValidParent = requireValidParent.FromNullable().AsChangedValue(),
+                }
+            };
+            ExpectTransaction();
+            ExpectGetReturns(newParentContract.Uuid, newParentContract);
+            ExpectGetReturns(contract.Uuid, contract);
+            ExpectAllowModifySuccess(contract);
+
+            var result = _sut.Update(contract.Uuid, parameters);
+
+            Assert.True(result.Ok);
+            Assert.Equal(requireValidParent, result.Value.RequireValidParent);
+        }
+
+        [Fact]
+        public void Can_Not_Set_RequireValidParent_To_True_When_No_Parent_Exists()
+        {
+            var contract = new ItContract { Uuid = A<Guid>() };
+            var parameters = new ItContractModificationParameters
+            {
+                General = new ItContractGeneralDataModificationParameters
+                {
+                    RequireValidParent = true.FromNullable().AsChangedValue(),
+                }
+            };
+            ExpectTransaction();
+            ExpectGetReturns(contract.Uuid, contract);
+            ExpectAllowModifySuccess(contract);
+
+            var result = _sut.Update(contract.Uuid, parameters);
+
+            Assert.True(result.Failed);
+        }
+
+        [Fact]
+        public void RequireValidParent_Is_Set_To_False_If_Parent_Is_Cleared()
+        {
+            var contract = new ItContract { Uuid = A<Guid>(), Parent = new ItContract(), RequireValidParent = true };
+            var parameters = new ItContractModificationParameters
+            {
+                ParentContractUuid = ((Guid?)null).AsChangedValue(),
+            };
+            ExpectTransaction();
+            ExpectGetReturns(contract.Uuid, contract);
+            ExpectAllowModifySuccess(contract);
+
+            var result = _sut.Update(contract.Uuid, parameters);
+
+            Assert.True(result.Ok);
+            Assert.False(result.Value.RequireValidParent);
         }
 
         private static void AssertPayments(ItContractPaymentDataModificationParameters input, ItContract updatedContract)
@@ -1709,7 +1772,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             return (organization.Uuid, parameters, createdContract, transaction);
         }
 
-        private (string contractId, Guid? contractTypeUuid, Guid? contractTemplateUuid, bool enforceValid, DateTime? validFrom, DateTime? validTo, Guid? criticalityTypeUuid, List<Guid> agreementElementUuids, Dictionary<Guid, AgreementElementType> agreementElementTypes, ItContractGeneralDataModificationParameters parameters, bool requireValidParent) SetupGeneralSectionInput(
+        private (string contractId, Guid? contractTypeUuid, Guid? contractTemplateUuid, bool enforceValid, DateTime? validFrom, DateTime? validTo, Guid? criticalityTypeUuid, List<Guid> agreementElementUuids, Dictionary<Guid, AgreementElementType> agreementElementTypes, ItContractGeneralDataModificationParameters parameters) SetupGeneralSectionInput(
           bool withContractType,
           bool withContractTemplate,
           bool withAgreementElements,
@@ -1717,8 +1780,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
           bool withValidTo,
           bool withCriticalityType,
           ItContract contract,
-          Guid organizationUuid,
-          bool requireValidParent)
+          Guid organizationUuid)
         {
             var contractId = A<string>();
             var contractTypeUuid = withContractType ? A<Guid>() : (Guid?)null;
@@ -1736,7 +1798,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 EnforceValid = enforceValid.FromNullable().AsChangedValue(),
                 ValidFrom = validFrom?.FromNullable().AsChangedValue() ?? Maybe<DateTime>.None.AsChangedValue(),
                 ValidTo = validTo?.FromNullable().AsChangedValue() ?? Maybe<DateTime>.None.AsChangedValue(),
-                RequireValidParent = requireValidParent.FromNullable().AsChangedValue(),
                 CriticalityUuid = criticalityTypeUuid.AsChangedValue(),
                 AgreementElementUuids = agreementElementUuids.AsChangedValue<IEnumerable<Guid>>()
             };
@@ -1753,7 +1814,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             foreach (var agreementElementType in agreementElementTypes)
                 ExpectGetOptionTypeReturnsIfInputIdIsDefined<AgreementElementType>(organizationUuid, agreementElementType.Key,
                     (agreementElementType.Value, true));
-            return (contractId, contractTypeUuid, contractTemplateUuid, enforceValid, validFrom, validTo, criticalityTypeUuid, agreementElementUuids, agreementElementTypes, parameters, requireValidParent);
+            return (contractId, contractTypeUuid, contractTemplateUuid, enforceValid, validFrom, validTo, criticalityTypeUuid, agreementElementUuids, agreementElementTypes, parameters);
         }
 
         private static void AssertGeneralSection(

@@ -79,12 +79,13 @@ namespace Core.DomainModel.ItContract
                 }
             }
 
-            if (RequireValidParent && Parent != null && !Parent.IsActive)
+            var parentIsValid = Parent != null && Parent.IsActive;
+            if (RequireValidParent && !parentIsValid)
             {
                 errors.Add(ItContractValidationError.InvalidParentContract);
             }
 
-            return new ItContractValidationResult(enforcedActive, errors);
+            return new ItContractValidationResult(enforcedActive, RequireValidParent, parentIsValid, errors);
         }
         public ItContractValidationResult Validate()
         {
@@ -653,6 +654,7 @@ namespace Core.DomainModel.ItContract
         {
             Parent?.Track();
             Parent = null;
+            RequireValidParent = false;
         }
 
         public Maybe<OperationError> SetParent(ItContract newParent)
@@ -939,9 +941,14 @@ namespace Core.DomainModel.ItContract
             LastChanged = DateTime.UtcNow;
         }
 
-        public void SetRequireValidParent(bool requireValidParent)
+        public Maybe<OperationError> SetRequireValidParent(bool requireValidParent)
         {
+            if (requireValidParent && Parent == null)
+            {
+                return new OperationError("Cannot require valid parent, with no parent unit set", OperationFailure.BadInput);
+            }
             RequireValidParent = requireValidParent;
+            return Maybe<OperationError>.None;
         }
     }
 }
