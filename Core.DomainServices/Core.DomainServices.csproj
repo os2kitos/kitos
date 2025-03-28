@@ -157,6 +157,7 @@
     <Compile Include="Queries\User\QueryBySystemIntegrator.cs" />
     <Compile Include="Queries\User\QueryGlobalAdmin.cs" />
     <Compile Include="Queries\User\QueryUserByEmail.cs" />
+    <Compile Include="RaiseEntityUpdatedOnSnapshotEventsHandler.cs" />
     <Compile Include="Repositories\Contract\IItContractOverviewReadModelRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractOverviewReadModelRepository.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />
