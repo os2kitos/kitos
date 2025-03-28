@@ -1146,6 +1146,7 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
+    <Content Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\Add Country Codes.sql" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Delete_Users_Other_Than_Preserved_Users.sql" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix staging DB\Get_Users_To_Preserve.sql" />
     <EmbeddedResource Include="Migrations\202304250853598_Extend_SystemUsageOverviewReadmodel_With_Contracts.resx">
