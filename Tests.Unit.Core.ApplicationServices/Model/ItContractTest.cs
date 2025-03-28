@@ -859,14 +859,28 @@ namespace Tests.Unit.Core.Model
         public void Should_Invalidate_Contract_When_Valid_Parent_Is_Required_But_Parent_Is_Invalid(bool enforceValid)
         {
             var now = DateTime.Now;
-            var invalidParent = new ItContract { ExpirationDate = now.AddDays(-1)};
-            var sut = new ItContract { Parent = invalidParent, RequireValidParent = true, Active = enforceValid};
+            var invalidParent = new ItContract { ExpirationDate = now.AddDays(-1) };
+            var sut = new ItContract { Parent = invalidParent, RequireValidParent = true, Active = enforceValid };
 
             var result = sut.Validate(now);
 
             Assert.Equal(enforceValid, result.Result);
             var error = Assert.Single(result.ValidationErrors);
             Assert.Equal(ItContractValidationError.InvalidParentContract, error);
+        }
+
+        [Fact]
+        public void Should_Validate_Contract_When_Valid_Parent_Is_Required_With_Valid_Contract_Despite_Errors()
+        {
+            var now = DateTime.Now;
+            var validParent = new ItContract();
+            var sut = new ItContract { ExpirationDate = now.AddDays(-1), RequireValidParent = true, Parent = validParent};
+
+            var result = sut.Validate(now);
+
+            var error = Assert.Single(result.ValidationErrors);
+            Assert.Equal(ItContractValidationError.EndDatePassed, error);
+            Assert.True(result.Result);
         }
 
         [Fact]

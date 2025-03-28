@@ -495,6 +495,10 @@ namespace Presentation.Web.Ninject
 
             //Kitos Events
             RegisterDomainEvents<PublishSystemChangesEventHandler>(kernel);
+
+            RegisterDomainEvents<RaiseEntityUpdatedOnSnapshotEventsHandler<ItSystem, ItSystemSnapshot>>(kernel);
+            RegisterDomainEvents<RaiseEntityUpdatedOnSnapshotEventsHandler<DataProcessingRegistration, DprSnapshot>>(kernel);
+
         }
 
         private void RegisterDomainEvents<THandler>(IKernel kernel)

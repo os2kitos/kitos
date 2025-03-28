@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel.ItSystem
 {
-    public class ItSystemSnapshot
+    public class ItSystemSnapshot : ISnapshot<ItSystem>
     {
         public string Name { get; set; }
     }

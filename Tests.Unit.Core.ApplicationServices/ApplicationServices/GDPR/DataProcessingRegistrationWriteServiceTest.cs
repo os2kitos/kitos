@@ -173,7 +173,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.True(result.Ok);
             Assert.Same(dataProcessingRegistration, result.Value);
             AssertTransactionCommitted(transaction);
-            _domainEventsMock.Verify(x => x.Raise(It.IsAny<DprChangedEvent>()), Times.Once);
+            _domainEventsMock.Verify(x => x.Raise(It.IsAny<EntityUpdatedEventWithSnapshot<DataProcessingRegistration, DprSnapshot>>()), Times.Once);
         }
 
         [Fact]
