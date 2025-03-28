@@ -498,6 +498,7 @@
     <Compile Include="Controllers\API\V2\Internal\Users\Mapping\UserWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Internal\Users\PasswordResetV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\Users\UsersInternalV2Controller.cs" />
+    <Compile Include="Controllers\Web\HomeController.cs" />
     <Compile Include="Infrastructure\Attributes\V2StyleJsonResponseSerializationAttribute.cs" />
     <Compile Include="Infrastructure\Config\V2JsonSerializationConfig.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\Mapping\NotificationTypeMappingExtensions.cs" />
@@ -1460,7 +1461,7 @@
     <Compile Include="Models\API\V1\GetTokenResponseDTO.cs" />
     <Compile Include="Models\API\V1\OrganizationSimpleDTO.cs" />
     <Compile Include="Models\API\V1\UpdateDefaultOrgUnitDto.cs" />
-    <Compile Include="Controllers\Web\HomeController.cs" />
+    <Compile Include="Controllers\Web\Old\OldHomeController.cs" />
     <Compile Include="Models\API\V1\ItInterfaceDTO.cs" />
     <Compile Include="Models\API\V1\ItInterfaceExhibitDTO.cs" />
     <Compile Include="Models\API\V1\ExcelImportErrorDTO.cs" />
@@ -1993,6 +1994,8 @@
     <None Include="Schema\public-extensions-schema.xsd">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Views\old\shared\Error.cshtml" />
+    <Content Include="Views\old\shared\_Layout.cshtml" />
     <None Include="Web.Release.config">
       <DependentUpon>Web.config</DependentUpon>
       <IsTransformFile>True</IsTransformFile>
@@ -2012,10 +2015,8 @@
     <Content Include="Images\orderedList8.png" />
     <Content Include="Images\orderedList9.png" />
     <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Web.config" />
-    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\OldHome\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

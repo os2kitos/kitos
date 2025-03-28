@@ -4,14 +4,15 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.SSO.Model;
 using Core.DomainServices;
-using Presentation.Web.Controllers.Web.Old;
 using Presentation.Web.Models.Application.FeatureToggle;
 using Presentation.Web.Models.Application.RuntimeEnv;
 
-namespace Presentation.Web.Controllers.Web
+namespace Presentation.Web.Controllers.Web.Old
 {
     [SessionState(SessionStateBehavior.Required)]
-    public class HomeController : Controller
+
+    [RoutePrefix("old")]
+    public class OldHomeController : Controller
     {
         private readonly IAuthenticationContext _userContext;
         private readonly IUserRepository _userRepository;
@@ -20,13 +21,14 @@ namespace Presentation.Web.Controllers.Web
         private const string FeatureToggleKey = "FEATURE_TOGGLE";
         private const string SsoAuthenticationCompletedKey = "SSO_PREFERRED_START";
 
-        public HomeController(IAuthenticationContext userContext, IUserRepository userRepository)
+        public OldHomeController(IAuthenticationContext userContext, IUserRepository userRepository)
         {
             _userContext = userContext;
             _userRepository = userRepository;
             _isProd = KitosEnvironmentConfiguration.FromConfiguration().Environment == KitosEnvironment.Production;
         }
 
+        [Route("")]
         public ActionResult Index()
         {
             ViewBag.StylingScheme = _isProd ? "PROD" : "TEST";
@@ -34,7 +36,7 @@ namespace Presentation.Web.Controllers.Web
             AppendFeatureToggles();
             AppendSsoLoginInformation();
 
-            return Redirect("/ui");
+            return View();
         }
 
         private void AppendSsoLoginInformation()
@@ -66,36 +68,6 @@ namespace Presentation.Web.Controllers.Web
             {
                 ViewBag.FeatureToggle = feature.Value;
             }
-        }
-
-        public ActionResult SsoError(SsoErrorCode? ssoErrorCode)
-        {
-            if (ssoErrorCode.HasValue)
-            {
-                PushTempVariable(ssoErrorCode, SsoErrorKey);
-            }
-
-            return Redirect("/old");
-        }
-
-        public ActionResult WithFeature(TemporaryFeature? feature)
-        {
-            if (feature.HasValue)
-                PushTempVariable(feature, FeatureToggleKey);
-
-            return Redirect("/old");
-        }
-
-        public ActionResult SsoAuthenticated()
-        {
-            PushTempVariable(true, SsoAuthenticationCompletedKey);
-
-            return Redirect("/old");
-        }
-
-        private void PushTempVariable<T>(T value, string key)
-        {
-            TempData[key] = value;
         }
 
         private Maybe<T> PopTempVariable<T>(string key)
