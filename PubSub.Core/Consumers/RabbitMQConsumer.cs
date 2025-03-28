@@ -13,19 +13,19 @@ namespace PubSub.Core.Consumers
         private readonly IConnectionManager _connectionManager;
         private readonly ISubscriberNotifierService _subscriberNotifierService;
         private readonly Topic _topic;
-        private readonly IMessageSerializer _messageSerializer;
+        private readonly IPayloadSerializer _payloadSerializer;
         private readonly HashSet<Uri> _callbackUrls = new();
         private IConnection _connection;
         private IChannel _channel;
         private IAsyncBasicConsumer _consumerCallback;
 
 
-        public RabbitMQConsumer(IConnectionManager connectionManager, ISubscriberNotifierService subscriberNotifierService, IMessageSerializer messageSerializer, Topic topic)
+        public RabbitMQConsumer(IConnectionManager connectionManager, ISubscriberNotifierService subscriberNotifierService, IPayloadSerializer payloadSerializer, Topic topic)
         {
             _connectionManager = connectionManager;
             _subscriberNotifierService = subscriberNotifierService;
             _topic = topic;
-            _messageSerializer = messageSerializer;
+            _payloadSerializer = payloadSerializer;
         }
 
         public async Task StartListeningAsync()
@@ -46,11 +46,11 @@ namespace PubSub.Core.Consumers
                 try
                 {
                     var body = eventArgs.Body.ToArray();
-                    var message = _messageSerializer.Deserialize(body);
+                    var payload = _payloadSerializer.Deserialize(body);
 
                     foreach (var callbackUrl in _callbackUrls)
                     {
-                        await _subscriberNotifierService.Notify(message, callbackUrl.AbsoluteUri);
+                        await _subscriberNotifierService.Notify(payload, callbackUrl.AbsoluteUri);
                     }
                 }
                 catch (Exception ex)

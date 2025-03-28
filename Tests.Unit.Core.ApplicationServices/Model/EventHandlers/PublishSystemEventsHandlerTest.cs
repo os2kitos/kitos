@@ -15,22 +15,17 @@ using Core.DomainModel.Organization;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
-
 namespace Tests.Unit.Core.Model.EventHandlers;
-
 public class PublishSystemEventsHandlerTest : WithAutoFixture
 {
     private readonly PublishSystemChangesEventHandler _sut;
     private readonly Mock<IKitosEventPublisherService> _eventPublisher;
-
     private const string ExpectedQueueTopic = "KitosITSystemChangedEvent";
-
     public PublishSystemEventsHandlerTest()
     {
         _eventPublisher = new Mock<IKitosEventPublisherService>();
         _sut = new PublishSystemChangesEventHandler(_eventPublisher.Object);
     }
-
     [Fact]
     public void Can_Publish_System_Name_Change()
     {
@@ -45,10 +40,8 @@ public class PublishSystemEventsHandlerTest : WithAutoFixture
         var expectedEvent = new KitosEvent(expectedBody, ExpectedQueueTopic);
 
         _sut.Handle(newEvent);
-
         VerifyEventIsPublished(expectedEvent);
     }
-
     [Fact]
     public void Can_Publish_Data_Processor_Change()
     {
@@ -67,10 +60,8 @@ public class PublishSystemEventsHandlerTest : WithAutoFixture
         var expectedEvent = new KitosEvent(expectedBody, ExpectedQueueTopic);
 
         _sut.Handle(newEvent);
-
         VerifyEventIsPublished(expectedEvent);
     }
-
     [Fact]
     public void Publishes_RightsHolder_If_No_Data_Processors()
     {
@@ -87,10 +78,8 @@ public class PublishSystemEventsHandlerTest : WithAutoFixture
         var expectedEvent = new KitosEvent(expectedBody, ExpectedQueueTopic);
 
         _sut.Handle(newEvent);
-
         VerifyEventIsPublished(expectedEvent);
     }
-
     private void VerifyEventIsPublished(KitosEvent expectedEvent)
     {
         _eventPublisher.Verify(x => x.PublishEvent(It.Is<KitosEvent>(e => EventsMatch(e, expectedEvent)
@@ -127,10 +116,8 @@ public class PublishSystemEventsHandlerTest : WithAutoFixture
             BelongsTo = new Organization { Uuid = A<Guid>(), Name = A<string>() }
         };
     }
-
     private DataProcessingRegistration CreateDpr(IEnumerable<Guid> uuids)
     {
         return new DataProcessingRegistration { SystemUsages = new List<ItSystemUsage> { new ItSystemUsage { ItSystem = CreateItSystem() } }, DataProcessors = uuids.Select(x => new Organization { Uuid = x }).ToList() };
     }
-
 }

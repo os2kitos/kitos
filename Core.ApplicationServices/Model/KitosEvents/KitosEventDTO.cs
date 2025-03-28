@@ -2,12 +2,12 @@
 
 public class KitosEventDTO
 {
-    public KitosEventDTO(string message, string topic)
+    public KitosEventDTO(object payload, string topic)
     {
 
-        Message = message;
+        Payload = payload;
         Topic = topic;
     }
-    public string Message { get; }
+    public object Payload { get; }
     public string Topic { get; }
 }

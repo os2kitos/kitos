@@ -41,7 +41,7 @@ var callbackAuthenticatorConfig = new CallbackAuthenticatorConfig() { ApiKey = p
 
 builder.Services.AddRabbitMQ(builder.Configuration);
 builder.Services.AddHttpClient<ISubscriberNotifierService, HttpSubscriberNotifierService>();
-builder.Services.AddSingleton<IMessageSerializer, UTF8MessageSerializer>();
+builder.Services.AddSingleton<IPayloadSerializer, JsonPayloadSerializer>();
 builder.Services.AddSingleton<ISubscriberNotifierService, HttpSubscriberNotifierService>();
 builder.Services.AddSingleton<ISubscriptionStore, InMemorySubscriptionStore>();
 builder.Services.AddSingleton<IRabbitMQConsumerFactory, RabbitMQConsumerFactory>();

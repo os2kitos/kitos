@@ -7,17 +7,14 @@ using Core.ApplicationServices.Model.KitosEvents;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 
 namespace Core.ApplicationServices.KitosEvents;
-
 public class PublishSystemChangesEventHandler : IDomainEventHandler<EntityUpdatedEventWithSnapshot<ItSystem, ItSystemSnapshot>>, IDomainEventHandler<EntityUpdatedEventWithSnapshot<DataProcessingRegistration, DprSnapshot>>
 {
     private readonly IKitosEventPublisherService _eventPublisher;
     private const string QueueTopic = KitosQueueTopics.SystemChangedEventTopic;
-
     public PublishSystemChangesEventHandler(IKitosEventPublisherService eventPublisher)
     {
         _eventPublisher = eventPublisher;
@@ -32,7 +29,6 @@ public class PublishSystemChangesEventHandler : IDomainEventHandler<EntityUpdate
         var newEvent = new KitosEvent(changeEvent.Value, QueueTopic);
         _eventPublisher.PublishEvent(newEvent);
     }
-
     public void Handle(EntityUpdatedEventWithSnapshot<DataProcessingRegistration, DprSnapshot> domainEvent)
     {
         var changeEvents = CalculateChangeEventsFromDprModel(domainEvent);
@@ -40,7 +36,6 @@ public class PublishSystemChangesEventHandler : IDomainEventHandler<EntityUpdate
         {
             return;
         }
-
         foreach (var changeEvent in changeEvents.Value)
         {
             var newEvent = new KitosEvent(changeEvent, QueueTopic);

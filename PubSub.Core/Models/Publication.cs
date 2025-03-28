@@ -1,4 +1,6 @@
-﻿namespace PubSub.Core.Models
+﻿using System.Text.Json;
+
+namespace PubSub.Core.Models
 {
-    public record Publication(Topic Topic, string Message);
+    public record Publication(Topic Topic, JsonElement Payload);
 }

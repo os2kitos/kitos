@@ -18,7 +18,7 @@ public class SystemChangeEventBodyModel : IEventBody
         if (SystemName.HasChange) keyValuePairs.Add(nameof(SystemName), SystemName.NewValue);
         if (DataProcessorUuid.HasChange) keyValuePairs.Add(nameof(DataProcessorUuid), DataProcessorUuid.NewValue.HasValue ? DataProcessorUuid.NewValue.Value : null);
         if (DataProcessorName.HasChange) keyValuePairs.Add(nameof(DataProcessorName), DataProcessorName.NewValue);
-        
+
         return keyValuePairs;
     }
 
