@@ -42,6 +42,11 @@
             <li><a data-ng-if="user.isLocalAdmin" data-ui-sref="local-config.current-org" data-ui-sref-active="active" data-element-type="localAdminAnchor">Lokal admin</a></li>
             <li><a data-ng-if="user.isGlobalAdmin" data-ui-sref="global-admin.organizations" data-ui-sref-active="active" data-element-type="globalAdminAnchor">Global admin</a></li>
             <li><a data-ng-show="userHasOrgChoices" data-ng-click="changeOrganization()" data-element-type="changeOrganizationAnchor">Skift organisation</a></li>
+            <li>
+                <a href="/ui" data-element-type="newUIAnchor">
+                    Prøv den nye brugerflade
+                </a>
+            </li>
             <li><a data-ng-click="logout()" data-element-type="logOutAnchor">Log ud</a></li>
         </ul>
     </div>

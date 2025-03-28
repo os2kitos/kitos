@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Moq;
+﻿using Moq;
 using Xunit;
 using Serilog;
 using Core.ApplicationServices.Model.KitosEvents;

@@ -18,13 +18,12 @@ namespace Tests.Unit.Core.ApplicationServices.KitosEvents
         public void Can_Map_Kitos_Events()
         {
             var eventBody = A<SystemChangeEventBodyModel>();
-            var expectedMessage = JsonConvert.SerializeObject(eventBody.ToKeyValuePairs());
             var expectedTopic = A<string>();
             var kitosEvent = new KitosEvent(eventBody, expectedTopic);
 
             var dto = _sut.MapKitosEventToDTO(kitosEvent);
 
-            Assert.Equal(expectedMessage, dto.Message);
+            Assert.Equal(eventBody.ToKeyValuePairs(), dto.Payload);
             Assert.Equal(expectedTopic, dto.Topic);
         }
     }
