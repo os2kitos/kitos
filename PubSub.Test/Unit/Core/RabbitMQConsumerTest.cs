@@ -19,7 +19,7 @@ namespace PubSub.Test.Unit.Core
             var channel = new Mock<IChannel>();
             mockConnectionManager.Setup(_ => _.GetConnectionAsync()).ReturnsAsync(connection.Object);
             connection.Setup(_ => _.CreateChannelAsync(null, default)).ReturnsAsync(channel.Object);
-            var messageSerializer = new Mock<IMessageSerializer>();
+            var messageSerializer = new Mock<IPayloadSerializer>();
 
             var mockSubscriberNotifierService = new Mock<ISubscriberNotifierService>();
             var topic = A<Topic>();

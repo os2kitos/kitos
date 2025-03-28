@@ -3,6 +3,7 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Tests.PubSubTester.DTOs;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Tests.PubSubTester.Controllers
 {
@@ -12,7 +13,7 @@ namespace Tests.PubSubTester.Controllers
     {
         //Select an api url here depending on if you are connecting to a local PubSub api or the one on the staging log server
         //private static readonly string PubSubApiUrl = "http://10.212.74.11:8080";
-        private static readonly string PubSubApiUrl = "http://localhost:8080";
+        private static readonly string PubSubApiUrl = "https://localhost:7226";
 
         [HttpPost]
         [Route("subscribe")]
@@ -28,12 +29,12 @@ namespace Tests.PubSubTester.Controllers
 
         [HttpPost]
         [Route("callback/{id}")]
-        public IActionResult Callback(string id, [FromBody] string message)
+        public IActionResult Callback(string id, [FromBody] MessageDTO<object> message)
         {
             logger.LogInformation($"callbackId: {id}, message: {message}");
 
             using var hmacsha256 = new HMACSHA256(Encoding.UTF8.GetBytes("local-no-secret"));
-            var hash = hmacsha256.ComputeHash(Encoding.UTF8.GetBytes(message));
+            var hash = hmacsha256.ComputeHash(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message)));
             var result = Convert.ToBase64String(hash);
 
             if (Request.Headers.TryGetValue("Signature-Header", out var signatureHeader))
@@ -50,6 +51,13 @@ namespace Tests.PubSubTester.Controllers
                 logger.LogInformation("Signature-Header matches the hash result.");
             }
 
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("systemChange")]
+        public IActionResult Callback([FromBody] MessageDTO<SystemChangeDTO> dto)
+        {
             return Ok();
         }
 
@@ -71,4 +79,17 @@ namespace Tests.PubSubTester.Controllers
             return Ok(response);
         }
     }
+}
+
+public class MessageDTO<T>
+{
+    public T Payload { get; set; }
+}
+
+public class SystemChangeDTO
+{
+    public Guid SystemUuid { get; set; }
+    public string? SystemName { get; set; }
+    public Guid? DataProcessorUuid { get; set; }
+    public string? DataProcessorName { get; set; }
 }

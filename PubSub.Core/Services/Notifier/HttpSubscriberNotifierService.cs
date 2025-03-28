@@ -1,6 +1,6 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Microsoft.Extensions.Configuration;
+﻿using System.Text;
+using System.Text.Json;
+using PubSub.Core.Models;
 using PubSub.Core.Services.CallbackAuthentication;
 
 namespace PubSub.Core.Services.Notifier
@@ -15,13 +15,22 @@ namespace PubSub.Core.Services.Notifier
             _httpClientFactory = httpClientFactory;
             _callbackAuthenticator = callbackAuthenticator;
         }
-        public async Task Notify(string message, string recipient)
+        public async Task Notify(JsonElement payload, string recipient)
         {
             using var httpClient = _httpClientFactory.CreateClient();
-            var content = new StringContent($"\"{message}\"", Encoding.UTF8, "application/json");
-            var authentication = _callbackAuthenticator.GetAuthentication(message);
+
+            var publicationDto = new PublicationDTO(payload);
+
+            string jsonPayload = JsonSerializer.Serialize(publicationDto);
+
+            var authentication = _callbackAuthenticator.GetAuthentication(jsonPayload);
             httpClient.DefaultRequestHeaders.Add("Signature-Header", authentication);
+
+            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+
             await httpClient.PostAsync(recipient, content);
         }
+
+
     }
 }

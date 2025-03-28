@@ -2,14 +2,19 @@
 using Moq;
 using Moq.Protected;
 using System.Net;
-using Microsoft.Extensions.Configuration;
+using System.Text.Json;
 using PubSub.Test.Base.Tests.Toolkit.Patterns;
 using PubSub.Core.Services.CallbackAuthentication;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace PubSub.Test.Unit.Core
 {
     public class HttpSubscriberNotifierServiceTest: WithAutoFixture
     {
+        private class DummyDTO
+        {
+            public string Field { get; set; }
+        }
         [Fact]
         public async Task Can_Post_With_Client_From_Factory()
         {  
@@ -31,20 +36,23 @@ namespace PubSub.Test.Unit.Core
             var httpClientFactoryMock = SetupHttpClientFactory(handlerMock.Object);
             var callbackAuthenticator = new Mock<ICallbackAuthenticator>();
             var sut = new HttpSubscriberNotifierService(httpClientFactoryMock.Object, callbackAuthenticator.Object);
-            var message = A<string>();
+           
             var callback = A<string>();
+            var dummy = new DummyDTO { Field = "TestValue" };
+            var json = JsonSerializer.Serialize(dummy);
+            var payload = JsonDocument.Parse(json).RootElement;
 
-            await sut.Notify(message, callback);
+            await sut.Notify(payload, callback);
 
             httpClientFactoryMock.Verify(_ => _.CreateClient(It.IsAny<string>()), Times.Once);
-            await AssertHttpContent(message, capturedRequest);
+            await AssertHttpContent(payload, capturedRequest);
         }
 
-        private async Task AssertHttpContent(string expected, HttpRequestMessage? request) {
+        private async Task AssertHttpContent(JsonElement expected, HttpRequestMessage? request) {
             Assert.NotNull(request);
             Assert.NotNull(request.Content);
             var content = await request.Content.ReadAsStringAsync();
-            Assert.Contains(expected, content);
+            Assert.Contains(expected.GetRawText(), content);
         }
 
         private Mock<IHttpClientFactory> SetupHttpClientFactory(HttpMessageHandler httpMessageHandler)

@@ -5,7 +5,7 @@ using PubSub.Test.Base.Tests.Toolkit.Patterns;
 
 namespace PubSub.Test.Unit.Application
 {
-    public class PublishRequestMapperTest: WithAutoFixture
+    public class PublishRequestMapperTest : WithAutoFixture
     {
         private PublishRequestMapper _sut;
 
@@ -22,7 +22,7 @@ namespace PubSub.Test.Unit.Application
             var publication = _sut.FromDto(dto);
 
             Assert.Equal(dto.Topic, publication.Topic.Name);
-            Assert.Equal(dto.Message, publication.Message);
+            Assert.Equal(dto.Payload, publication.Payload);
         }
     }
 }

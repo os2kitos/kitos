@@ -7,7 +7,7 @@ namespace PubSub.Application.Mapping
     {
         public Publication FromDto(PublishRequestDto dto)
         {
-            return new Publication(new Topic(dto.Topic), dto.Message);
+            return new Publication(new Topic(dto.Topic), dto.Payload);
         }
     }
 }
