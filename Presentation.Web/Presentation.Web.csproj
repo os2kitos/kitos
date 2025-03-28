@@ -591,6 +591,7 @@
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\UnitAccessRightsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\OrganizationUnit\UnitAccessRightsWithUnitDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\User\UserCollectionPermissionsResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\User\UserDefaultUnitResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\User\UserReferenceWithOrganizationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\User\UserResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\User\UserIsPartOfCurrentOrgResponseDTO.cs" />

@@ -15,6 +15,7 @@ using System;
 using Presentation.Web.Models.API.V2.Internal.Request.User;
 using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Presentation.Web.Models.API.V2.Types.Organization;
 
 namespace Tests.Integration.Presentation.Web.Users.V2
 {
@@ -423,6 +424,29 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var result = await UsersV2Helper.GetSystemIntegrators();
 
             Assert.Contains(user.Uuid, result.Select(x => x.Uuid));
+        }
+
+        [Fact]
+        public async Task Can_Set_Default_Unit()
+        {
+            var (organization, user) = await CreateOrgAndUser();
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token.Token, organization.Uuid);
+            var parentUnit = Assert.Single(units);
+
+            var unit = await OrganizationUnitV2Helper.CreateUnitAsync(organization.Uuid, new CreateOrganizationUnitRequestDTO
+            {
+                Name = A<string>(),
+                Origin = A<OrganizationUnitOriginChoice>(),
+                ParentUuid = parentUnit.Uuid,
+                LocalId = A<string>()
+            });
+
+            await UsersV2Helper.SetDefaultUnit(organization.Uuid, user.Uuid, unit.Uuid);
+
+            var defaultUnit = await UsersV2Helper.GetDefaultUnit(organization.Uuid, user.Uuid);
+
+            Assert.Equal(unit.Uuid, defaultUnit.Uuid);
         }
 
         private async Task<(OrganizationDTO, UserResponseDTO)> CreateOrgAndUser()
