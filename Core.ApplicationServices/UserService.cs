@@ -426,7 +426,14 @@ namespace Core.ApplicationServices
             return _organizationService.GetOrganization(organizationUuid)
                 .Bind(organization => GetUserInOrganization(organizationUuid, userUuid)
                     .Select(user => (org: organization, user)))
-                .Bind<OrganizationUnit>(result => _organizationService.GetDefaultUnit(result.org, result.user));
+                .Bind(result =>
+                {
+                    var defaultUnit = _organizationService.GetDefaultUnit(result.org, result.user);
+
+                    return defaultUnit == null 
+                        ? new OperationError("No default unit found", OperationFailure.NotFound) 
+                        : Result<OrganizationUnit, OperationError>.Success(defaultUnit);
+                });
         }
 
         private bool AllowDelete(int? scopedToOrganizationId)
