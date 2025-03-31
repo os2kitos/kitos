@@ -24,7 +24,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
         {
             _mailClient = mailClient;
             _logger = logger;
-            _changeLogLink = new Uri(baseUrl.Url, "/#/local-config/import/organization").AbsoluteUri;
+            _changeLogLink = new Uri(baseUrl.Url, "/ui/local-admin/import").AbsoluteUri;
         }
 
         public void Handle(ExternalOrganizationConnectionUpdated domainEvent)
