@@ -257,5 +257,22 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{uuid}/roles/remove"), cookie, dto);
         }
+
+        public static async Task DeleteMultipleAsync(MultipleContractsRequestDto request)
+        {
+
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/delete-multiple"), cookie, request);
+
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        public static async Task TransferMultipleAsync(Guid parentUuid, MultipleContractsRequestDto request)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{parentUuid}/transfer"), cookie, request);
+
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
     }
 }

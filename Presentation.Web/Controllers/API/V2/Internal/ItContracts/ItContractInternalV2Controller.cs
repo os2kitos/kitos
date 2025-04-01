@@ -174,7 +174,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
         /// <summary>
         /// Delete multiple existing contracts
         /// </summary>
-        /// <param name="contractUuid"></param>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpDelete]
@@ -194,6 +193,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
+        /// <summary>
+        /// Transfer multiple contracts
+        /// </summary>
+        /// <param name="parentUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPatch]
         [Route("{parentUuid}/transfer")]
         [SwaggerResponse(HttpStatusCode.NoContent)]
@@ -203,7 +208,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult TransferItContractRange([NonEmptyGuid] Guid parentUuid, [FromBody] MultipleContractsRequestDto request)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid)    
                 return BadRequest(ModelState);
 
             return _writeService
