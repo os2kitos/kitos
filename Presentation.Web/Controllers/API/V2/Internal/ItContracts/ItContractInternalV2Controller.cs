@@ -21,6 +21,7 @@ using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Internal.Response.ItContract;
+using Presentation.Web.Models.API.V2.Request.Contract;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 {
@@ -168,6 +169,46 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
             return _itContractService.GetAppliedProcurementPlansByUuid(organizationUuid)
                 .Select(plans => plans.Select(MapAppliedProcurementPlansToDTO))
                 .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Delete multiple existing contracts
+        /// </summary>
+        /// <param name="contractUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("delete-multiple")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult DeleteItContractRange([FromBody] MultipleContractsRequestDto request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .DeleteRange(request.ContractUuids)
+                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+        }
+
+        [HttpPatch]
+        [Route("{parentUuid}/transfer")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult TransferItContractRange([NonEmptyGuid] Guid parentUuid, [FromBody] MultipleContractsRequestDto request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .TransferContracts(parentUuid, request.ContractUuids)
+                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
         private static AppliedProcurementPlanResponseDTO MapAppliedProcurementPlansToDTO((int, int) procurementTuple)

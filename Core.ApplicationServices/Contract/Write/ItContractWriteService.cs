@@ -139,15 +139,57 @@ namespace Core.ApplicationServices.Contract.Write
 
         public Maybe<OperationError> Delete(Guid itContractUuid)
         {
-            var dbId = _entityIdentityResolver.ResolveDbId<ItContract>(itContractUuid);
-
-            if (dbId.IsNone)
-                return new OperationError("Invalid contract uuid", OperationFailure.NotFound);
-
-            return _contractService
-                .Delete(dbId.Value)
-                .Match(_ => Maybe<OperationError>.None, failure => new OperationError("Failed deleting contract", failure));
+            return ResolveContractId(itContractUuid)
+                .Match
+                (
+                    id => _contractService.Delete(id)
+                        .Match
+                        (
+                            _ => Maybe<OperationError>.None,
+                            failure => new OperationError("Failed deleting contract", failure)
+                        ), 
+                    error => error);
         }
+
+        public Maybe<OperationError> DeleteRange(IEnumerable<Guid> itContractUuids)
+        {
+            using var transaction = _transactionManager.Begin();
+            foreach (var itContractUuid in itContractUuids)
+            {
+                var result = Delete(itContractUuid);
+                if (result.HasValue)
+                {
+                    transaction.Rollback();
+                    return result.Value;
+                }
+            }
+            transaction.Commit();
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> TransferContracts(Guid parentUuid, IEnumerable<Guid> itContractUuids)
+        {
+            var parameters = new ItContractModificationParameters
+            {
+                ParentContractUuid = (parentUuid as Guid?).AsChangedValue()
+            };
+
+            using var transaction = _transactionManager.Begin();
+            foreach (var itContractUuid in itContractUuids)
+            {
+                var result = Update(itContractUuid, parameters);
+                if (result.Failed)
+                {
+                    transaction.Rollback();
+                    return result.Error;
+                }
+            }
+            transaction.Commit();
+
+            return Maybe<OperationError>.None;
+        }
+
 
         public Result<ExternalReference, OperationError> AddExternalReference(Guid contractUuid, ExternalReferenceProperties externalReferenceProperties)
         {
@@ -219,6 +261,16 @@ namespace Core.ApplicationServices.Contract.Write
             }
 
             return contract;
+        }
+
+        private Result<int, OperationError> ResolveContractId(Guid uuid)
+        {
+            var dbId = _entityIdentityResolver.ResolveDbId<ItContract>(uuid);
+
+            if (dbId.IsNone)
+                return new OperationError("Invalid contract uuid", OperationFailure.NotFound);
+
+            return dbId.Value;
         }
 
         private Result<ItContract, OperationError> ApplyUpdates(ItContract contract, ItContractModificationParameters parameters)

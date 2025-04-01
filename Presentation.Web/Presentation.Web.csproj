@@ -598,6 +598,7 @@
     <Compile Include="Models\API\V2\Internal\Response\User\UserWithApiAccessResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\User\UserWithCrossOrganizationalRightsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\User\UserWithOrganizationResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\MultipleContractsRequestDto.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesCreation.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesUpdate.cs" />
     <Compile Include="Models\API\V2\Request\Interface\CreateItInterfaceRequestDTO.cs" />
