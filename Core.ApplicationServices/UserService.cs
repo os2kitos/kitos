@@ -257,7 +257,7 @@ namespace Core.ApplicationServices
             }
             else
             {
-                return "#/reset-password/";
+                return "old#/reset-password/";
             }
         }
 
