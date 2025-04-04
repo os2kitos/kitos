@@ -79,19 +79,19 @@ namespace Presentation.Web
             recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchUpdateStaleSystemUsageRmAsync(CancellationToken.None)),
-                cronExpression: Cron.Daily(), // Every night at 00:00
+                cronExpression: Cron.Daily(2), // Every night at 02:00
                 timeZone: TimeZoneInfo.Local);
 
             recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchUpdateStaleContractRmAsync(CancellationToken.None)),
-                cronExpression: Cron.Daily(), // Every night at 00:00
+                cronExpression: Cron.Daily(2), // Every night at 02:00
                 timeZone: TimeZoneInfo.Local);
 
             recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.ScheduleUpdatesForDataProcessingReadModelsWhichChangesActiveState,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchUpdateStaleDataProcessingRegistrationReadModels(CancellationToken.None)),
-                cronExpression: Cron.Daily(), // Every night at 00:00
+                cronExpression: Cron.Daily(2), // Every night at 02:00
                 timeZone: TimeZoneInfo.Local);
 
             recurringJobManager.AddOrUpdate(
