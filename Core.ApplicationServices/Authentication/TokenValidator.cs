@@ -30,6 +30,10 @@ namespace Core.ApplicationServices.Authentication
             var handler = new JwtSecurityTokenHandler();
             var identity = new ClaimsIdentity(new GenericIdentity(user.Id.ToString(), "TokenAuth"));
 
+            if (user.IsGlobalAdmin)
+            {
+                identity.AddClaim(new Claim("CanPublish", "true"));
+            }
             // securityKey length should be >256b
             try
             {
