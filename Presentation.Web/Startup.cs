@@ -79,7 +79,7 @@ namespace Presentation.Web
             recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchUpdateStaleSystemUsageRmAsync(CancellationToken.None)),
-                cronExpression: Cron.Daily(2), // Every night at 02:00
+                cronExpression: Cron.Daily(2), // Every night at 02:00 (if job runs a 00:00 - date validity check doesn't update correctly)
                 timeZone: TimeZoneInfo.Local);
 
             recurringJobManager.AddOrUpdate(
