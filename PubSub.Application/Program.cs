@@ -19,6 +19,16 @@ builder.Configuration
     .AddJsonFile($"appsettings.{environment}.json")
     .AddEnvironmentVariables();
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(443, listenOptions =>
+    {
+        var certPassword = Environment.GetEnvironmentVariable(Constants.Config.Certificate.CertPassword);
+        listenOptions.UseHttps("/etc/ssl/certs/kitos-pubsub.pfx", certPassword);
+    });
+});
+
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
