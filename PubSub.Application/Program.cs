@@ -19,6 +19,16 @@ builder.Configuration
     .AddJsonFile($"appsettings.{environment}.json")
     .AddEnvironmentVariables();
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(443, listenOptions =>
+    {
+        var certPassword = Environment.GetEnvironmentVariable(Constants.Config.Certificate.CertPassword);
+        listenOptions.UseHttps("/etc/ssl/certs/kitos-pubsub.pfx", certPassword);
+    });
+});
+
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -36,6 +46,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.IncludeErrorDetails = true;
     });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(Constants.Config.Validation.CanPublishPolicy, policy =>
+        policy.RequireClaim("CanPublish", "true"));
+});
+
+
 var pubSubApiKey = builder.Configuration.GetValue<string>(Constants.Config.CallbackAuthentication.PubSubApiKey) ?? throw new ArgumentNullException("No api key for callback authentication found in appsettings");
 var callbackAuthenticatorConfig = new CallbackAuthenticatorConfig() { ApiKey = pubSubApiKey };
 
@@ -52,7 +69,7 @@ builder.Services.AddRequestMapping();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();

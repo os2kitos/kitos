@@ -502,6 +502,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 using var crypto = new CryptoService();
                 var user = x.AsQueryable().ById(userId);
                 user.Password = crypto.Encrypt(password + user.Salt);
+                user.IsGlobalAdmin = role == OrganizationRole.GlobalAdmin;
             });
 
             var token = await GetTokenAsync(new KitosCredentials(email, password));

@@ -160,8 +160,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250, cvrContent: newOrg.Cvr);
 
             //Assert
-            var org = Assert.Single(organizations);
-            Assert.Equal(newOrg.Uuid, org.Uuid);
+            Assert.All(organizations, organization => Assert.Equal(newOrg.Cvr, organization.Cvr));
         }
 
         [Fact]

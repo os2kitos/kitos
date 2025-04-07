@@ -1,4 +1,4 @@
-﻿version: '3.8'
+﻿version: '2.2'
 
 services:
   rabbitmq:
@@ -11,18 +11,20 @@ services:
       - app_network
 
   api:
-    image: kitos-pubsub
+    image: strongminds/kitos-pubsub:latest
     container_name: kitos-pubsub
     depends_on:
       - rabbitmq
+    volumes:
+      - /etc/ssl/certs/kitos-pubsub.pfx:/etc/ssl/certs/kitos-pubsub.pfx:ro 
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       RABBIT_MQ_USER: ${RABBIT_MQ_USER}
       RABBIT_MQ_PASSWORD: ${RABBIT_MQ_PASSWORD}
       PUBSUB_API_KEY: ${PUBSUB_API_KEY}
+      CERT_PASSWORD: ${CERT_PASSWORD}
     ports:
-      - "8080:8080"
-      - "8081:8081"
+      - "443:443"
     networks:
       - app_network
     extra_hosts:
