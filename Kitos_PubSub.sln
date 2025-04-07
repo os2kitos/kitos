@@ -3,11 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSub.Application", "PubSub.Application\PubSub.Application.csproj", "{80E096AD-6FFA-48F3-B3A5-4CF016C8FBF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubSub.Application", "PubSub.Application\PubSub.Application.csproj", "{80E096AD-6FFA-48F3-B3A5-4CF016C8FBF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSub.Test", "PubSub.Test\PubSub.Test.csproj", "{7B3B4644-76DE-4F72-91AE-6DF97465F86F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubSub.Test", "PubSub.Test\PubSub.Test.csproj", "{7B3B4644-76DE-4F72-91AE-6DF97465F86F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSub.Core", "PubSub.Core\PubSub.Core.csproj", "{495F6676-DD05-4AD1-B01B-332C55D8ED64}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubSub.Core", "PubSub.Core\PubSub.Core.csproj", "{495F6676-DD05-4AD1-B01B-332C55D8ED64}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FD2786DE-4D97-481A-8525-9A1523B80EE6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "DeploymentScripts", "{BD718C5F-DE87-40E1-AA4E-0A4F76D8AE10}"
+	ProjectSection(SolutionItems) = preProject
+		DeploymentScripts\DeployPubsubToEnvironment.ps1 = DeploymentScripts\DeployPubsubToEnvironment.ps1
+		DeploymentScripts\SetupPubsubEnviroment.ps1 = DeploymentScripts\SetupPubsubEnviroment.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +38,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BD718C5F-DE87-40E1-AA4E-0A4F76D8AE10} = {FD2786DE-4D97-481A-8525-9A1523B80EE6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CB2E886B-FF67-485E-8668-15903AFD299D}

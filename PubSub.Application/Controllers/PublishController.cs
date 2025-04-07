@@ -7,7 +7,7 @@ using PubSub.Core.Services.Publisher;
 namespace PubSub.Application.Controllers
 {
     [ApiController]
-    [Authorize]
+    [Authorize(Policy = Constants.Config.Validation.CanPublishPolicy)]
     [Route("api/publish")]
     public class PublishController: ControllerBase
     {

@@ -8,6 +8,7 @@
             {
                 public const string Url = "JwtValidation:ApiUrl";
                 public const string Endpoint = "JwtValidation:ValidationEndpoint";
+                public const string CanPublishPolicy = "CanPublishPolicy";
             }
 
             public class Environment
@@ -27,6 +28,11 @@
             public class CallbackAuthentication
             {
                 public const string PubSubApiKey = "PUBSUB_API_KEY";
+            }
+
+            public class Certificate
+            {
+                public const string CertPassword = "CERT_PASSWORD";
             }
         }
     }
