@@ -39,7 +39,7 @@ namespace PubSub.Core.Consumers
             await _channel.BasicConsumeAsync(topicName, autoAck: true, consumer: _consumerCallback);
         }
 
-        private IAsyncBasicConsumer GetConsumerCallback() {
+        private AsyncEventingBasicConsumer GetConsumerCallback() {
             var consumer = new AsyncEventingBasicConsumer(_channel);
             consumer.ReceivedAsync += async (_, eventArgs) =>
             {
@@ -57,8 +57,7 @@ namespace PubSub.Core.Consumers
                 {
                     Console.WriteLine($"Exception in consumer: {ex.Message}\n{ex.StackTrace}");
                 }
-            
-        };
+            };
             return consumer;
         }
 
