@@ -2,6 +2,7 @@
 using PubSub.Application.DTOs;
 using PubSub.Application.Mapping;
 using PubSub.Test.Base.Tests.Toolkit.Patterns;
+using System.Text.Json;
 
 namespace PubSub.Test.Unit.Application
 {
@@ -17,7 +18,9 @@ namespace PubSub.Test.Unit.Application
         [Fact]
         public void Can_Map_From_Dto()
         {
-            var dto = A<PublishRequestDto>();
+            var jsonString = "\"Hello, World!\"";
+            var jsonElement = JsonSerializer.Deserialize<JsonElement>(jsonString);
+            var dto = new PublishRequestDto { Topic = A<string>(), Payload = jsonElement };
 
             var publication = _sut.FromDto(dto);
 
