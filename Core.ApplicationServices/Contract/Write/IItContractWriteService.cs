@@ -14,7 +14,7 @@ namespace Core.ApplicationServices.Contract.Write
         Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters);
         Result<ItContract, OperationError> Update(Guid itContractUuid, ItContractModificationParameters parameters);
         Maybe<OperationError> Delete(Guid itContractUuid);
-        Maybe<OperationError> DeleteRange(IEnumerable<Guid> itContractUuids);
+        Maybe<OperationError> DeleteContractWithChildren(Guid itContractUuid);
         Maybe<OperationError> TransferContracts(Guid parentUuid, IEnumerable<Guid> itContractUuids);
         Result<ExternalReference, OperationError> AddExternalReference(Guid contractUuid,
             ExternalReferenceProperties externalReferenceProperties);

@@ -17,6 +17,7 @@ using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
@@ -147,25 +148,16 @@ namespace Core.ApplicationServices.Contract.Write
                         (
                             _ => Maybe<OperationError>.None,
                             failure => new OperationError("Failed deleting contract", failure)
-                        ), 
+                        ),
                     error => error);
         }
 
-        public Maybe<OperationError> DeleteRange(IEnumerable<Guid> itContractUuids)
+        public Maybe<OperationError> DeleteContractWithChildren(Guid itContractUuid)
         {
-            using var transaction = _transactionManager.Begin();
-            foreach (var itContractUuid in itContractUuids)
-            {
-                var result = Delete(itContractUuid);
-                if (result.HasValue)
-                {
-                    transaction.Rollback();
-                    return result.Value;
-                }
-            }
-            transaction.Commit();
-
-            return Maybe<OperationError>.None;
+            return _contractService.GetContract(itContractUuid)
+                .Select(contract => contract.FlattenHierarchy())
+                .Match(DeleteHierarchy,
+                    error => error);
         }
 
         public Maybe<OperationError> TransferContracts(Guid parentUuid, IEnumerable<Guid> itContractUuids)
@@ -251,6 +243,18 @@ namespace Core.ApplicationServices.Contract.Write
                     return CreateRoleAssignmentUpdate(existingRoles.Except(assignment.WrapAsEnumerable()));
                 })
                 .Bind(update => Update(systemUsageUuid, update));
+        }
+
+        private Maybe<OperationError> DeleteHierarchy(IEnumerable<ItContract> hierarchy)
+        {
+            foreach (var contract in hierarchy)
+            {
+                var result = _contractService.Delete(contract.Id);
+                if (result.Failed)
+                    return new OperationError($"Failed deleting contract with Uuid: {contract.Uuid}", result.Error);
+            }
+
+            return Maybe<OperationError>.None;
         }
 
         private Result<ItContract, OperationError> WithWriteAccess(ItContract contract)

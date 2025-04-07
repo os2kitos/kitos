@@ -155,25 +155,27 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         }
 
         [Fact]
-        public void Can_Delete_Multiple()
+        public void Can_Delete_With_Children()
         {
             //Arrange
-            var contractUuid = A<Guid>();
-            var contractUuid2 = A<Guid>();
-            var contractDbId = A<int>();
-            var contractDbId2 = A<int>();
+            var parentUuid = A<Guid>();
+            var childUuid = A<Guid>();
+            var parentId = A<int>();
+            var childId = A<int>();
 
-            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(contractUuid, contractDbId);
-            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(contractUuid2, contractDbId2);
-            _itContractServiceMock.Setup(x => x.Delete(contractDbId)).Returns(new ItContract());
-            _itContractServiceMock.Setup(x => x.Delete(contractDbId2)).Returns(new ItContract());
+            var child = new ItContract { Id = childId, Uuid = childUuid, ParentId = parentId};
+            var parent = new ItContract { Id = parentId, Uuid = parentUuid, Children = new List<ItContract>{child}};
+            child.Parent = parent;
+
+            ExpectGetReturns(parentUuid, parent);
+            ExpectGetReturns(childUuid, child);
+            _itContractServiceMock.Setup(x => x.Delete(parentId)).Returns(new ItContract());
+            _itContractServiceMock.Setup(x => x.Delete(childId)).Returns(new ItContract());
 
             ExpectTransaction();
 
-            var request = new List<Guid> { contractUuid, contractUuid2 };
-
             //Act
-            var error = _sut.DeleteRange(request);
+            var error = _sut.DeleteContractWithChildren(parentUuid);
 
             //Assert
             Assert.True(error.IsNone);

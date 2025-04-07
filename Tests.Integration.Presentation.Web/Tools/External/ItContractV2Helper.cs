@@ -258,11 +258,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{uuid}/roles/remove"), cookie, dto);
         }
 
-        public static async Task DeleteMultipleAsync(MultipleContractsRequestDto request)
+        public static async Task DeleteWithChildrenAsync(Guid uuid)
         {
-
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            using var response = await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/delete-multiple"), cookie, request);
+            using var response = await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{uuid}/delete-with-children"), cookie);
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }

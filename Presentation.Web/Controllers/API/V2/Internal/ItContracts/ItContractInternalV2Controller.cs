@@ -16,7 +16,6 @@ using Swashbuckle.Swagger.Annotations;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
-using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Contract;
@@ -172,28 +171,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
         }
 
         /// <summary>
-        /// Delete multiple existing contracts
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpDelete]
-        [Route("delete-multiple")]
-        [SwaggerResponse(HttpStatusCode.NoContent)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeleteItContractRange([FromBody] MultipleContractsRequestDto request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .DeleteRange(request.ContractUuids)
-                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
-        }
-
-        /// <summary>
         /// Transfer multiple contracts
         /// </summary>
         /// <param name="parentUuid"></param>
@@ -215,6 +192,29 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
                 .TransferContracts(parentUuid, request.ContractUuids)
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
+
+        /// <summary>
+        /// Delete an existing contract together with all its children
+        /// </summary>
+        /// <param name="contractUuid"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("{contractUuid}/delete-with-children")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult DeleteItContractWithChildren([NonEmptyGuid] Guid contractUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .DeleteContractWithChildren(contractUuid)
+                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+        }
+
 
         private static AppliedProcurementPlanResponseDTO MapAppliedProcurementPlansToDTO((int, int) procurementTuple)
         {

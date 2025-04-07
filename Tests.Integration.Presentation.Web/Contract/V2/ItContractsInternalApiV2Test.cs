@@ -210,20 +210,19 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_Delete_Multiple_Contracts()
+        public async Task Can_Delete_Contract_With_Children()
         {
             //Arrange
-            const int organizationId = TestEnvironment.DefaultOrganizationId;
-            var contract = await ItContractHelper.CreateContract(A<string>(), organizationId);
-            var contract2 = await ItContractHelper.CreateContract(A<string>(), organizationId);
-            
-            var request = new MultipleContractsRequestDto()
-            {
-                ContractUuids = new List<Guid> { contract.Uuid, contract2.Uuid }
-            };
+            var organization = await CreateOrganizationAsync();
+            var (_, token) = await CreateApiUserAsync(organization);
+            var contract = await ItContractHelper.CreateContract(A<string>(), organization.Id);
+            var contract2 = await ItContractHelper.CreateContract(A<string>(), organization.Id);
+            using var patchParentResponse = await ItContractV2Helper.SendPatchParentContractAsync(token, contract2.Uuid, contract.Uuid);
+            Assert.Equal(HttpStatusCode.OK, patchParentResponse.StatusCode);
+
 
             //Act
-            await ItContractV2Helper.DeleteMultipleAsync(request);
+            await ItContractV2Helper.DeleteWithChildrenAsync(contract.Uuid);
 
             //Assert
             using var contract1Response = await ItContractHelper.SendGetItContract(contract.Id);
