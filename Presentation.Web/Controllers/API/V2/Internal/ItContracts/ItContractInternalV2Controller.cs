@@ -86,6 +86,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
                 .Match(Ok, FromOperationError);
         }
 
+        [HttpGet]
+        [Route("{contractUuid}/sub-hierarchy")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItContractHierarchyNodeResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetSubHierarchy([NonEmptyGuid] Guid contractUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itContractService.GetContract(contractUuid)
+                .Select(contract => contract.FlattenHierarchy())
+                .Select(RegistrationHierarchyNodeMapper.MapContractHierarchyToDtos)
+                .Match(Ok, FromOperationError);
+        }
+
         /// <summary>
         /// Get roles assigned to the contract
         /// </summary>

@@ -199,6 +199,17 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<IEnumerable<RegistrationHierarchyNodeResponseDTO>>();
         }
 
+        public static async Task<IEnumerable<RegistrationHierarchyNodeResponseDTO>> GetSubHierarchyAsync(Guid uuid, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var path = $"api/v2/internal/it-contracts/{uuid}/sub-hierarchy";
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl(path), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<RegistrationHierarchyNodeResponseDTO>>();
+        }
+
         public static async Task<ItContractPermissionsResponseDTO> GetPermissionsAsync(string token, Guid uuid)
         {
             using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{uuid:D}/permissions"), token);

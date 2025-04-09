@@ -48,7 +48,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (_, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
-            var (rootUuid, createdContracts) = CreateHierarchy(organization.Id);
+            var (rootUuid,_, _, _, createdContracts) = CreateHierarchy(organization.Id);
 
             //Act
             var response = await ItContractV2Helper.GetHierarchyAsync(rootUuid);
@@ -70,6 +70,24 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                     Assert.Equal(node.Parent.Uuid, contract.Parent.Uuid);
                 }
             }
+        }
+        [Fact]
+        public async Task Can_Get_SubHierarchy()
+        {
+            //Arrange
+            var (_, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var (rootUuid, childContractUuid, siblingContractUuid, grandchildContractUuid, _) = CreateHierarchy(organization.Id);
+
+            //Act
+            var response = await ItContractV2Helper.GetSubHierarchyAsync(childContractUuid);
+
+            //Assert
+            var hierarchy = response.ToList();
+            var hierarchyUuids = hierarchy.Select(x => x.Node.Uuid).ToList();
+            Assert.Contains(childContractUuid, hierarchyUuids);
+            Assert.Contains(grandchildContractUuid, hierarchyUuids);
+            Assert.DoesNotContain(rootUuid, hierarchyUuids);
+            Assert.DoesNotContain(siblingContractUuid, hierarchyUuids);
         }
 
         [Fact]
@@ -291,13 +309,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return (token, organization);
         }
 
-        private (Guid rootUuid, IReadOnlyList<ItContract> createdItContracts) CreateHierarchy(int orgId)
+        private (Guid rootUuid, Guid childContractUuid, Guid siblingContractUuid, Guid grandchildContractUuid, IReadOnlyList<ItContract> createdItContracts) CreateHierarchy(int orgId)
         {
             var rootContract = CreateContract(orgId);
             var childContract = CreateContract(orgId);
+            var siblingContract = CreateContract(orgId);
             var grandchildContract = CreateContract(orgId);
 
-            var createdSystems = new List<ItContract> { rootContract, childContract, grandchildContract };
+            var createdSystems = new List<ItContract> { rootContract, childContract, siblingContract, grandchildContract };
 
             childContract.Children = new List<ItContract>
             {
@@ -305,7 +324,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             };
             rootContract.Children = new List<ItContract>
             {
-                childContract
+                childContract, siblingContract
             };
 
             DatabaseAccess.MutateEntitySet<ItContract>(repository =>
@@ -313,7 +332,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 repository.Insert(rootContract);
             });
 
-            return (rootContract.Uuid, createdSystems);
+            return (rootContract.Uuid, childContract.Uuid, siblingContract.Uuid, grandchildContract.Uuid, createdSystems);
         }
 
         protected async Task<OrganizationDTO> CreateOrganizationAsync()
