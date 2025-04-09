@@ -177,20 +177,20 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPatch]
-        [Route("{parentUuid}/transfer")]
+        [Route("transfer")]
         [SwaggerResponse(HttpStatusCode.NoContent)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult TransferItContractRange([NonEmptyGuid] Guid parentUuid, [FromBody] MultipleContractsRequestDto request)
+        public IHttpActionResult TransferItContractRange([FromBody] MultipleContractsRequestDto request)
         {
             if (!ModelState.IsValid)    
                 return BadRequest(ModelState);
 
             return _writeService
-                .TransferContracts(parentUuid, request.ContractUuids)
-                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+                .TransferContracts(request.ParentUuid, request.ContractUuids)
+                .Match(FromOperationError, NoContent);
         }
 
         /// <summary>
@@ -212,7 +212,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 
             return _writeService
                 .DeleteContractWithChildren(contractUuid)
-                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+                .Match(FromOperationError, NoContent);
         }
 
 

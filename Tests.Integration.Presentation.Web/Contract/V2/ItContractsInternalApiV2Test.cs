@@ -241,13 +241,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var contract2 = await ItContractHelper.CreateContract(A<string>(), organizationId);
             var contract3 = await ItContractHelper.CreateContract(A<string>(), organizationId);
 
-            var request = new MultipleContractsRequestDto()
+            var request = new MultipleContractsRequestDto
             {
-                ContractUuids = new List<Guid> { contract2.Uuid, contract3.Uuid }
+                ContractUuids = new List<Guid> { contract2.Uuid, contract3.Uuid },
+                ParentUuid = contract.Uuid
             };
 
             //Act
-            await ItContractV2Helper.TransferMultipleAsync(contract.Uuid, request);
+            await ItContractV2Helper.TransferMultipleAsync(request);
 
             //Assert
             var contract2Response = await ItContractHelper.GetItContract(contract2.Id);
@@ -255,6 +256,30 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             Assert.Equal(contract.Id, contract2Response.ParentId);
             Assert.Equal(contract.Id, contract3Response.ParentId);
+        }
+
+        [Fact]
+        public async Task Can_Transfer_Multiple_Contracts_To_None()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var contract2 = await ItContractHelper.CreateContract(A<string>(), organizationId);
+            var contract3 = await ItContractHelper.CreateContract(A<string>(), organizationId);
+
+            var request = new MultipleContractsRequestDto()
+            {
+                ContractUuids = new List<Guid> { contract2.Uuid, contract3.Uuid }
+            };
+
+            //Act
+            await ItContractV2Helper.TransferMultipleAsync(request);
+
+            //Assert
+            var contract2Response = await ItContractHelper.GetItContract(contract2.Id);
+            var contract3Response = await ItContractHelper.GetItContract(contract3.Id);
+
+            Assert.Null(contract2Response.ParentId);
+            Assert.Null(contract3Response.ParentId);
         }
 
         protected async Task<(string token, OrganizationDTO createdOrganization)> CreateStakeHolderUserInNewOrganizationAsync()

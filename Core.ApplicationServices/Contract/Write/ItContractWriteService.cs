@@ -156,15 +156,15 @@ namespace Core.ApplicationServices.Contract.Write
         {
             return _contractService.GetContract(itContractUuid)
                 .Select(contract => contract.FlattenHierarchy())
-                .Match(DeleteHierarchy,
+                .Match(DeleteRange,
                     error => error);
         }
 
-        public Maybe<OperationError> TransferContracts(Guid parentUuid, IEnumerable<Guid> itContractUuids)
+        public Maybe<OperationError> TransferContracts(Guid? parentUuid, IEnumerable<Guid> itContractUuids)
         {
             var parameters = new ItContractModificationParameters
             {
-                ParentContractUuid = (parentUuid as Guid?).AsChangedValue()
+                ParentContractUuid = parentUuid.AsChangedValue()
             };
 
             using var transaction = _transactionManager.Begin();
@@ -245,9 +245,9 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(update => Update(systemUsageUuid, update));
         }
 
-        private Maybe<OperationError> DeleteHierarchy(IEnumerable<ItContract> hierarchy)
+        private Maybe<OperationError> DeleteRange(IEnumerable<ItContract> contracts)
         {
-            foreach (var contract in hierarchy)
+            foreach (var contract in contracts)
             {
                 var result = _contractService.Delete(contract.Id);
                 if (result.Failed)

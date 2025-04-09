@@ -266,10 +266,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
-        public static async Task TransferMultipleAsync(Guid parentUuid, MultipleContractsRequestDto request)
+        public static async Task TransferMultipleAsync(MultipleContractsRequestDto request)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            using var response = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{parentUuid}/transfer"), cookie, request);
+            using var response = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/transfer"), cookie, request);
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
