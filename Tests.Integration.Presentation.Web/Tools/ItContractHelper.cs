@@ -50,14 +50,18 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<ItContractDTO> GetItContract(int contractId)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-
-            var url = TestEnvironment.CreateUrl($"api/ItContract/{contractId}");
-
-            using var result = await HttpApi.GetWithCookieAsync(url, cookie);
+            using var result = await SendGetItContract(contractId);
             var contract = await result.ReadResponseBodyAsKitosApiResponseAsync<ItContractDTO>();
 
             return contract;
+        }
+
+        public static async Task<HttpResponseMessage> SendGetItContract(int contractId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/ItContract/{contractId}");
+
+            return await HttpApi.GetWithCookieAsync(url, cookie);
         }
 
         public static async Task<ItSystemUsageSimpleDTO> AddItSystemUsage(int contractId, int usageId, int organizationId)

@@ -155,6 +155,62 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         }
 
         [Fact]
+        public void Can_Delete_With_Children()
+        {
+            //Arrange
+            var parentUuid = A<Guid>();
+            var childUuid = A<Guid>();
+            var parentId = A<int>();
+            var childId = A<int>();
+
+            var child = new ItContract { Id = childId, Uuid = childUuid, ParentId = parentId};
+            var parent = new ItContract { Id = parentId, Uuid = parentUuid, Children = new List<ItContract>{child}};
+            child.Parent = parent;
+
+            ExpectGetReturns(parentUuid, parent);
+            ExpectGetReturns(childUuid, child);
+            _itContractServiceMock.Setup(x => x.Delete(parentId)).Returns(new ItContract());
+            _itContractServiceMock.Setup(x => x.Delete(childId)).Returns(new ItContract());
+
+            ExpectTransaction();
+
+            //Act
+            var error = _sut.DeleteContractWithChildren(parentUuid);
+
+            //Assert
+            Assert.True(error.IsNone);
+        }
+
+        [Fact]
+        public void Can_Transfer_Multiple()
+        {
+            //Arrange
+            var contractUuid = A<Guid>();
+            var contractUuid2 = A<Guid>();
+
+            var request = new List<Guid> { contractUuid, contractUuid2 };
+            var (_, _, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var contract1 = new ItContract{Organization = createdContract.Organization, OrganizationId = createdContract.OrganizationId};
+            var contract2 = new ItContract{ Organization = createdContract.Organization, OrganizationId = createdContract.OrganizationId };
+
+            ExpectGetReturns(createdContract.Uuid, createdContract);
+            ExpectGetReturns(contractUuid, contract1);
+            ExpectGetReturns(contractUuid2, contract2);
+            ExpectAllowModifySuccess(createdContract);
+            ExpectAllowModifySuccess(contract1);
+            ExpectAllowModifySuccess(contract2);
+            _entityTreeUuidCollector.Setup(x => x.CollectSelfAndDescendantUuids(contract1)).Returns(new List<Guid?>());
+            _entityTreeUuidCollector.Setup(x => x.CollectSelfAndDescendantUuids(contract2)).Returns(new List<Guid?>());
+
+            //Act
+            var result = _sut.TransferContracts(createdContract.Uuid, request);
+
+            //Assert
+            Assert.True(result.IsNone);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
         public void Can_Create_With_Name()
         {
             //Arrange

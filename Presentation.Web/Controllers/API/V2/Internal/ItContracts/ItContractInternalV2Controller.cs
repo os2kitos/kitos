@@ -16,11 +16,11 @@ using Swashbuckle.Swagger.Annotations;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
-using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Internal.Response.ItContract;
+using Presentation.Web.Models.API.V2.Request.Contract;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 {
@@ -82,6 +82,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 
             return _itContractService.GetContract(contractUuid)
                 .Select(contract => contract.FlattenCompleteHierarchy())
+                .Select(RegistrationHierarchyNodeMapper.MapContractHierarchyToDtos)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("{contractUuid}/sub-hierarchy")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItContractHierarchyNodeResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetSubHierarchy([NonEmptyGuid] Guid contractUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _itContractService.GetContract(contractUuid)
+                .Select(contract => contract.FlattenHierarchy())
                 .Select(RegistrationHierarchyNodeMapper.MapContractHierarchyToDtos)
                 .Match(Ok, FromOperationError);
         }
@@ -169,6 +186,52 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
                 .Select(plans => plans.Select(MapAppliedProcurementPlansToDTO))
                 .Match(Ok, FromOperationError);
         }
+
+        /// <summary>
+        /// Transfer multiple contracts
+        /// </summary>
+        /// <param name="parentUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("transfer")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult TransferItContractRange([FromBody] MultipleContractsRequestDto request)
+        {
+            if (!ModelState.IsValid)    
+                return BadRequest(ModelState);
+
+            return _writeService
+                .TransferContracts(request.ParentUuid, request.ContractUuids)
+                .Match(FromOperationError, NoContent);
+        }
+
+        /// <summary>
+        /// Delete an existing contract together with all its children
+        /// </summary>
+        /// <param name="contractUuid"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("{contractUuid}/delete-with-children")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult DeleteItContractWithChildren([NonEmptyGuid] Guid contractUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .DeleteContractWithChildren(contractUuid)
+                .Match(FromOperationError, NoContent);
+        }
+
 
         private static AppliedProcurementPlanResponseDTO MapAppliedProcurementPlansToDTO((int, int) procurementTuple)
         {
