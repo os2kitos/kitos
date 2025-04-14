@@ -20,7 +20,7 @@ namespace Core.BackgroundJobs.Model.PublicMessages
             _repository = repository;
         }
 
-        public string Id => StandardJobIds.CreateInitialPublicMessages;
+        public string Id => StandardJobIds.CreateMainPublicMessage;
         public Task<Result<string, OperationError>> ExecuteAsync(CancellationToken token = default)
         {
             var doesMainExist = _repository.AsQueryable().Any(x => x.IsMain);
