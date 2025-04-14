@@ -11,12 +11,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping
         {
             Mapping = new EnumMap<PublicMessageIconTypeChoice, PublicMessageIconType>
             (
-                (PublicMessageIconTypeChoice.Instructions, PublicMessageIconType.Instructions),
-                (PublicMessageIconTypeChoice.Templates, PublicMessageIconType.Templates),
-                (PublicMessageIconTypeChoice.OperationalStatus, PublicMessageIconType.OperationalStatus),
-                (PublicMessageIconTypeChoice.Events, PublicMessageIconType.Events),
-                (PublicMessageIconTypeChoice.ContactPerson, PublicMessageIconType.ContactPerson),
-                (PublicMessageIconTypeChoice.Contact, PublicMessageIconType.Contact)
+                (PublicMessageIconTypeChoice.Document, PublicMessageIconType.Document),
+                (PublicMessageIconTypeChoice.Clipboard, PublicMessageIconType.Clipboard),
+                (PublicMessageIconTypeChoice.Settings, PublicMessageIconType.Settings),
+                (PublicMessageIconTypeChoice.Calendar, PublicMessageIconType.Calendar),
+                (PublicMessageIconTypeChoice.MultipleUsers, PublicMessageIconType.MultipleUsers),
+                (PublicMessageIconTypeChoice.Mail, PublicMessageIconType.Mail)
             );
         }
 
