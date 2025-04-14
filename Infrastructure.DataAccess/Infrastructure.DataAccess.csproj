@@ -1144,6 +1144,10 @@
     <Compile Include="Migrations\202503180748378_AddWebAccessibilityFieldsToUsageReadModel.Designer.cs">
       <DependentUpon>202503180748378_AddWebAccessibilityFieldsToUsageReadModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202504140750401_IconTypeAndIsMainPublicMessage.cs" />
+    <Compile Include="Migrations\202504140750401_IconTypeAndIsMainPublicMessage.Designer.cs">
+      <DependentUpon>202504140750401_IconTypeAndIsMainPublicMessage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Content Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\Add Country Codes.sql" />
@@ -1238,6 +1242,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202503180748378_AddWebAccessibilityFieldsToUsageReadModel.resx">
       <DependentUpon>202503180748378_AddWebAccessibilityFieldsToUsageReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202504140750401_IconTypeAndIsMainPublicMessage.resx">
+      <DependentUpon>202504140750401_IconTypeAndIsMainPublicMessage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_DataRow.sql" />
     <EmbeddedResource Include="Migrations\202301261301403_ItSystemUsageOverviewReadModel_With_Uuids.resx">

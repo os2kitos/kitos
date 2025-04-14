@@ -72,7 +72,7 @@ namespace Core.ApplicationServices.Messages
             return updateResult.Value;
         }
 
-        private static Result<PublicMessage, OperationError> WriteChange(PublicMessage message, WritePublicMessagesParams parameters)
+        private Result<PublicMessage, OperationError> WriteChange(PublicMessage message, WritePublicMessagesParams parameters)
         {
             return message.WithOptionalUpdate(parameters.LongDescription, (updateText, value) => updateText.UpdateLongDescription(value))
                     .Bind(updatedText => updatedText.WithOptionalUpdate(parameters.Title, (updateText, title) => updateText.UpdateTitle(title)))
@@ -82,7 +82,26 @@ namespace Core.ApplicationServices.Messages
                         updatedText.WithOptionalUpdate(parameters.Link,
                             (updateText, link) => updateText.UpdateLink(link)))
                     .Bind(updatedText => updatedText.WithOptionalUpdate(parameters.Status,
-                        (updateText, status) => updateText.UpdateStatus(status)));
+                        (updateText, status) => updateText.UpdateStatus(status)))
+                    .Bind(updatedMessage => updatedMessage.WithOptionalUpdate(parameters.IconType, (updateMessage, iconType) => updateMessage.UpdateIconType(iconType)))
+                    .Bind(updatedMessage => updatedMessage.WithOptionalUpdate(parameters.IsMain, UpdateIsMain));
+        }
+
+        private Result<PublicMessage, OperationError> UpdateIsMain(PublicMessage message, bool isMain)
+        {
+            if (isMain)
+            {
+                var messages = _repository.AsQueryable();
+                var error = message.UpdateMain(messages);
+                if(error.HasValue)
+                    return error.Value;
+            }
+            else
+            {
+                message.RemoveMain();
+            }
+
+            return message;
         }
 
         private Maybe<PublicMessage> GetMessageByUuid(Guid uuid)

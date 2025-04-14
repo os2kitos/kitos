@@ -44,7 +44,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping
                     : OptionalValueChange<string>.None,
                 Status = rule.MustUpdate(x => x.Status)
                     ? (request.Status?.ToPublicMessageStatus()).AsChangedValue()
-                    : OptionalValueChange<PublicMessageStatus?>.None
+                    : OptionalValueChange<PublicMessageStatus?>.None,
+                IsMain = rule.MustUpdate(x => x.IsMain)
+                    ? request.IsMain.AsChangedValue()
+                    : OptionalValueChange<bool>.None,
+                IconType = rule.MustUpdate(x => x.IconType)
+                    ? (request.IconType?.ToPublicMessageIconType()).AsChangedValue()
+                    : OptionalValueChange<PublicMessageIconType?>.None
+
             };
 
         }

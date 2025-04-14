@@ -136,6 +136,7 @@
     <Compile Include="Organization\UnitAccessRightsWithUnitData.cs" />
     <Compile Include="PublicMessage\PublicMessage.cs" />
     <Compile Include="PublicMessage\PublicMessageStatus.cs" />
+    <Compile Include="PublicMessage\PublicMessageIconType.cs" />
     <Compile Include="Shared\LifeCycleEventType.cs" />
     <Compile Include="Shared\RelatedEntityType.cs" />
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />

@@ -10,9 +10,7 @@ using Core.ApplicationServices.Model.Messages;
 using Core.DomainModel;
 using Core.DomainModel.PublicMessage;
 using Core.DomainServices;
-using Core.DomainServices.Extensions;
 using Moq;
-using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -72,6 +70,8 @@ namespace Tests.Unit.Core.ApplicationServices.Messages
                 Assert.Equal(testMessage.ShortDescription, resultMessage.ShortDescription);
                 Assert.Equal(testMessage.Link, resultMessage.Link);
                 Assert.Equal(testMessage.Status, resultMessage.Status);
+                Assert.Equal(testMessage.IconType, resultMessage.IconType);
+                Assert.Equal(testMessage.IsMain, resultMessage.IsMain);
             }
         }
 
@@ -85,7 +85,9 @@ namespace Tests.Unit.Core.ApplicationServices.Messages
                 LongDescription = A<string>().AsChangedValue(),
                 ShortDescription = A<string>().AsChangedValue(),
                 Link = A<string>().AsChangedValue(),
-                Status = A<PublicMessageStatus?>().AsChangedValue()
+                Status = A<PublicMessageStatus?>().AsChangedValue(),
+                IconType = A<PublicMessageIconType?>().AsChangedValue(),
+                IsMain = A<bool>().AsChangedValue(),
             };
 
             //Act
@@ -108,7 +110,9 @@ namespace Tests.Unit.Core.ApplicationServices.Messages
                 LongDescription = A<string>().AsChangedValue(),
                 ShortDescription = A<string>().AsChangedValue(),
                 Link = A<string>().AsChangedValue(),
-                Status = A<PublicMessageStatus?>().AsChangedValue()
+                Status = A<PublicMessageStatus?>().AsChangedValue(),
+                IconType = A<PublicMessageIconType?>().AsChangedValue(),
+                IsMain = A<bool>().AsChangedValue(),
             };
 
             var message = A<PublicMessage>();

@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Core.Abstractions.Types;
 
 namespace Core.DomainModel.PublicMessage
 {
@@ -19,6 +22,8 @@ namespace Core.DomainModel.PublicMessage
         public PublicMessageStatus? Status { get; set; }
         public string ShortDescription { get; set; }
         public string Link { get; set; }
+        public PublicMessageIconType? IconType { get; set; }
+        public bool IsMain { get; set; }
 
         public void UpdateTitle(string title)
         {
@@ -42,6 +47,34 @@ namespace Core.DomainModel.PublicMessage
         public void UpdateLink(string link)
         {
             Link = link;
+        }
+
+        public void UpdateIconType(PublicMessageIconType? iconType)
+        {
+            IconType = iconType;
+        }
+
+        public void RemoveMain()
+        {
+            IsMain = false;
+        }
+
+        public Maybe<OperationError> UpdateMain(IEnumerable<PublicMessage> existingMessages)
+        {
+            var messagesWithMain = existingMessages.Where(x => x.IsMain).ToList();
+            if (messagesWithMain.Count > 1)
+            {
+                return new OperationError("There can be only one main message", OperationFailure.BadState);
+            }
+
+            var existingMain = messagesWithMain.FirstOrDefault();
+            if (existingMain != null)
+            {
+                existingMain.RemoveMain();
+            }
+
+            IsMain = true;
+            return Maybe<OperationError>.None;
         }
     }
 }

@@ -14,5 +14,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Request
 
         public PublicMessageStatusChoice? Status { get; set; }
         public string Link { get; set; }
+        public PublicMessageIconTypeChoice? IconType{ get; set; }
+        public bool IsMain { get; set; }
     }
 }
