@@ -6,7 +6,7 @@
         Clipboard = 1,
         Settings = 2,
         Calendar = 3,
-        ContactPerson = 4,
-        Contact = 5
+        MultipleUsers = 4,
+        Mail = 5
     }
 }
