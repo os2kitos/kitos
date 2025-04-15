@@ -381,6 +381,7 @@
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\DataProcessingRegistrations\DprGlobalRoleOptionTypesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\OrganizationGlobalCountryCodesInternalV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\GlobalOptionTypes\OrganizationUnit\OrganizationUnitGlobalRoleOptionTypesInternalV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Internal\Messages\Mapping\PublicMessageIconTypeChoiceExtension.cs" />
     <Compile Include="Controllers\API\V2\Internal\Messages\Mapping\PublicMessageStatusChoiceExtension.cs" />
     <Compile Include="Controllers\API\V2\Internal\Notifications\AlertsV2Controller.cs" />
     <Compile Include="Controllers\API\V2\Internal\QA\BrokenExternalReferencesReportInternalV2Controller.cs" />
@@ -547,6 +548,7 @@
     <Compile Include="Models\API\V2\Internal\Response\ItContract\AppliedProcurementPlanResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\Notifications\AlertResponseDTO.cs" />
     <Compile Include="Models\API\V2\Internal\Response\PasswordResetResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Internal\Response\PublicMessageIconTypeChoice.cs" />
     <Compile Include="Models\API\V2\Internal\Response\PublicMessageStatusChoice.cs" />
     <Compile Include="Models\API\V2\Internal\Response\QA\BrokenExternalReferencesReportColumnsV2.cs" />
     <Compile Include="Models\API\V2\Internal\Response\QA\BrokenExternalReferencesReportCsvMapperV2.cs" />

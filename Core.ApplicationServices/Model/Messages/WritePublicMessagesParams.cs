@@ -10,5 +10,7 @@ namespace Core.ApplicationServices.Model.Messages
         public OptionalValueChange<string> ShortDescription { get; set; } = OptionalValueChange<string>.None;
         public OptionalValueChange<PublicMessageStatus?> Status { get; set; } = OptionalValueChange<PublicMessageStatus?>.None;
         public OptionalValueChange<string> Link { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<PublicMessageIconType?> IconType{ get; set; } = OptionalValueChange<PublicMessageIconType?>.None;
+        public OptionalValueChange<bool> IsMain{ get; set; } = OptionalValueChange<bool>.None;
     }
 }

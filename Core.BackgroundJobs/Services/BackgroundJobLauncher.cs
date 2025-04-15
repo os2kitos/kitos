@@ -31,6 +31,7 @@ namespace Core.BackgroundJobs.Services
         private readonly ScheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState _scheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState;
         private readonly ScheduleFkOrgUpdatesBackgroundJob _scheduleFkOrgUpdatesBackgroundJob;
         private readonly CreateInitialPublicMessages _createInitialPublicMessages;
+        private readonly CreateMainPublicMessage _createMainPublicMessage;
 
         public BackgroundJobLauncher(
             ILogger logger,
@@ -48,7 +49,8 @@ namespace Core.BackgroundJobs.Services
             ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState contractOverviewReadModelsWhichChangesActiveState,
             ScheduleFkOrgUpdatesBackgroundJob scheduleFkOrgUpdatesBackgroundJob, 
             ScheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState scheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState,
-            CreateInitialPublicMessages createInitialPublicMessages)
+            CreateInitialPublicMessages createInitialPublicMessages,
+            CreateMainPublicMessage createMainPublicMessage)
         {
             _logger = logger;
             _checkExternalLinksJob = checkExternalLinksJob;
@@ -66,6 +68,7 @@ namespace Core.BackgroundJobs.Services
             _scheduleFkOrgUpdatesBackgroundJob = scheduleFkOrgUpdatesBackgroundJob;
             _scheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState = scheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState;
             _createInitialPublicMessages = createInitialPublicMessages;
+            _createMainPublicMessage = createMainPublicMessage;
         }
 
         public async Task LaunchUpdateItContractOverviewReadModels(CancellationToken token = default)
@@ -142,6 +145,11 @@ namespace Core.BackgroundJobs.Services
         public async Task LaunchCreatePublicMessagesTask(CancellationToken token = default)
         {
             await Launch(_createInitialPublicMessages, token);
+        }
+
+        public async Task LaunchCreateMainPublicMessageTask(CancellationToken token = default)
+        {
+            await Launch(_createMainPublicMessage, token);
         }
 
         private async Task Launch(IAsyncBackgroundJob job, CancellationToken token = default)
