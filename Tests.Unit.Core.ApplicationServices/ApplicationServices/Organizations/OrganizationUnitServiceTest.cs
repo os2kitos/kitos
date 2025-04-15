@@ -7,6 +7,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Organizations;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
@@ -809,6 +810,29 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             //Assert
             Assert.Equal(createResult.Ok, canModify);
+
+        }
+
+        [Fact]
+        public void Create_Role_Bulk_Assignment_Returns_Unit()
+        {
+            //Arrange
+            var unitUuid = A<Guid>();
+            var assignment1 = A<UserRolePair>();
+            var assignment2 = A<UserRolePair>();
+            var assignments = new List<UserRolePair> { assignment1, assignment2 };
+            var unit = new OrganizationUnit { };
+            var right = new OrganizationUnitRight { };
+            ExpectGetOrganizationUnitReturns(unitUuid, unit);
+            ExpectAllowModifyReturns(unit, true);
+            _assignmentService.Setup(x => x.AssignRole(unit, assignment1.RoleUuid, assignment1.UserUuid)).Returns(right);
+            _assignmentService.Setup(x => x.AssignRole(unit, assignment2.RoleUuid, assignment2.UserUuid)).Returns(right);
+
+            //Act
+            var createResult = _sut.CreateBulkRoleAssignment(unitUuid, assignments);
+
+            //Assert
+            Assert.True(createResult.Ok);
 
         }
 

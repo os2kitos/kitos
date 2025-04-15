@@ -21,6 +21,7 @@ using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Internal.Response.ItContract;
 using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Response.SystemUsage;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 {
@@ -145,6 +146,30 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 
             return _writeService
                 .AddRole(contractUuid, request.ToUserRolePair())
+                .Select(_responseMapper.MapContractDTO)
+                .Match(Ok, FromOperationError);
+        }
+        /// Add role assignment for multiple users to the it-contract
+        /// Constraint: Duplicates are not allowed (existing assignment of the same user/role)
+        /// </summary>
+        /// <param name="contractUuid"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("{contractUuid}/roles/bulk/add")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict, Description = "If duplicate is detected")]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PatchAddBulkRoleAssignment([NonEmptyGuid] Guid contractUuid, [FromBody] BulkRoleAssignmentRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .AddRoleRange(contractUuid, request.ToUserRolePairs())
                 .Select(_responseMapper.MapContractDTO)
                 .Match(Ok, FromOperationError);
         }

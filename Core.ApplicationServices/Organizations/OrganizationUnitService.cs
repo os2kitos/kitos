@@ -7,6 +7,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Organizations;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
@@ -295,13 +296,28 @@ namespace Core.ApplicationServices.Organizations
             return ModifyUnitRights(organizationUnitUuid, unit => _assignmentService.AssignRole(unit, roleUuid, userUuid));
         }
 
+        public Result<OrganizationUnit, OperationError> CreateBulkRoleAssignment(Guid organizationUnitUuid, IEnumerable<UserRolePair> assignments)
+        {
+            return ModifyUnitRights<OrganizationUnit>(organizationUnitUuid, unit =>
+            {
+                foreach (var userRolePair in assignments)
+                {
+                    var result = _assignmentService.AssignRole(unit, userRolePair.RoleUuid, userRolePair.UserUuid);
+                    if(result.Failed)
+                        return result.Error;
+                }
+
+                return unit;
+            });
+        }
+
         public Result<OrganizationUnitRight, OperationError> DeleteRoleAssignment(Guid organizationUnitUuid, Guid roleUuid, Guid userUuid)
         {
             return ModifyUnitRights(organizationUnitUuid, unit => _assignmentService.RemoveRole(unit, roleUuid, userUuid));
         }
 
-        private Result<OrganizationUnitRight, OperationError> ModifyUnitRights(Guid organizationUnitUuid,
-            Func<OrganizationUnit, Result<OrganizationUnitRight, OperationError>> mutation)
+        private Result<T, OperationError> ModifyUnitRights<T>(Guid organizationUnitUuid,
+            Func<OrganizationUnit, Result<T, OperationError>> mutation)
         {
             var unitResult = _organizationService.GetOrganizationUnit(organizationUnitUuid);
             if (unitResult.Failed)
