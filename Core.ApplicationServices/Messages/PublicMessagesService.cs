@@ -92,9 +92,24 @@ namespace Core.ApplicationServices.Messages
             if (isMain)
             {
                 var messages = _repository.AsQueryable();
-                var error = message.UpdateMain(messages);
-                if(error.HasValue)
-                    return error.Value;
+                var messagesWithMain = messages.Where(x => x.IsMain).ToList();
+                if (messagesWithMain.Count > 1)
+                {
+                    return new OperationError("There can be only one main message", OperationFailure.BadState);
+                }
+
+                var existingMain = messagesWithMain.FirstOrDefault();
+                if (existingMain?.Uuid == message.Uuid)
+                {
+                    return message;
+                }
+
+                if (existingMain != null)
+                {
+                    existingMain.RemoveMain();
+                }
+                message.SetAsMain();
+
             }
             else
             {

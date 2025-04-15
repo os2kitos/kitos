@@ -59,22 +59,9 @@ namespace Core.DomainModel.PublicMessage
             IsMain = false;
         }
 
-        public Maybe<OperationError> UpdateMain(IEnumerable<PublicMessage> existingMessages)
+        public void SetAsMain()
         {
-            var messagesWithMain = existingMessages.Where(x => x.IsMain).ToList();
-            if (messagesWithMain.Count > 1)
-            {
-                return new OperationError("There can be only one main message", OperationFailure.BadState);
-            }
-
-            var existingMain = messagesWithMain.FirstOrDefault();
-            if (existingMain != null)
-            {
-                existingMain.RemoveMain();
-            }
-
             IsMain = true;
-            return Maybe<OperationError>.None;
         }
     }
 }
