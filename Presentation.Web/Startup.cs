@@ -133,6 +133,12 @@ namespace Presentation.Web
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchCreatePublicMessagesTask(CancellationToken.None)),
                 cronExpression: Cron.Never(), //On demand
                 timeZone: TimeZoneInfo.Local);
+
+            recurringJobManager.AddOrUpdate(
+                recurringJobId: StandardJobIds.CreateInitialPublicMessages,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchCreateMainPublicMessageTask(CancellationToken.None)),
+                cronExpression: Cron.Never(), //On demand
+                timeZone: TimeZoneInfo.Local);
         }
     }
 }

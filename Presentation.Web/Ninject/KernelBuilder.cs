@@ -886,6 +886,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<ScheduleFkOrgUpdatesBackgroundJob>().ToSelf().InCommandScope(Mode);
 
             kernel.Bind<CreateInitialPublicMessages>().ToSelf().InCommandScope(Mode);
+            kernel.Bind<CreateMainPublicMessage>().ToSelf().InCommandScope(Mode);
         }
     }
 }
