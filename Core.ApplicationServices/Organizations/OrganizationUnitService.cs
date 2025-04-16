@@ -300,12 +300,8 @@ namespace Core.ApplicationServices.Organizations
         {
             return ModifyUnitRights<OrganizationUnit>(organizationUnitUuid, unit =>
             {
-                foreach (var userRolePair in assignments)
-                {
-                    var result = _assignmentService.AssignRole(unit, userRolePair.RoleUuid, userRolePair.UserUuid);
-                    if(result.Failed)
-                        return result.Error;
-                }
+                _assignmentService.BatchUpdateRoles(unit, assignments.Select(pair => (pair.RoleUuid, pair.UserUuid))
+                    .ToList());
 
                 return unit;
             });

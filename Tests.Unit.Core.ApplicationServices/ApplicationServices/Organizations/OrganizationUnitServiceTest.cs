@@ -822,12 +822,17 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var assignment2 = A<UserRolePair>();
             var assignments = new List<UserRolePair> { assignment1, assignment2 };
             var unit = new OrganizationUnit { };
-            var right = new OrganizationUnitRight { };
+
             ExpectGetOrganizationUnitReturns(unitUuid, unit);
             ExpectAllowModifyReturns(unit, true);
-            _assignmentService.Setup(x => x.AssignRole(unit, assignment1.RoleUuid, assignment1.UserUuid)).Returns(right);
-            _assignmentService.Setup(x => x.AssignRole(unit, assignment2.RoleUuid, assignment2.UserUuid)).Returns(right);
 
+            _assignmentService.Setup(x => x.BatchUpdateRoles(
+                        unit,
+                        It.Is<IEnumerable<(Guid roleUuid, Guid user)>>(assignments =>
+                            MatchExpectedAssignments(assignments, new[] { assignment1, assignment2 }.ToList()))
+                    )
+                )
+                .Returns(Maybe<OperationError>.None);
             //Act
             var createResult = _sut.CreateBulkRoleAssignment(unitUuid, assignments);
 
@@ -942,6 +947,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
             return transaction;
+        }
+        private static bool MatchExpectedAssignments(IEnumerable<(Guid roleUuid, Guid user)> actual, List<UserRolePair> expected)
+        {
+            return actual.SequenceEqual(expected.Select(p => (roleUuid: p.RoleUuid, user: p.UserUuid)));
         }
     }
 }

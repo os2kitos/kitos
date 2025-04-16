@@ -102,6 +102,7 @@
     <Compile Include="GlobalOptions\GlobalRoleOptionsService.cs" />
     <Compile Include="GlobalOptions\IGlobalRegularOptionsService.cs" />
     <Compile Include="GlobalOptions\IGlobalRoleOptionsService.cs" />
+    <Compile Include="Helpers\RoleMappingHelper.cs" />
     <Compile Include="HelpTexts\HelpTextApplicationService.cs" />
     <Compile Include="HelpTexts\IHelpTextApplicationService.cs" />
     <Compile Include="IEventBody.cs" />
@@ -272,6 +273,7 @@
     <Compile Include="Model\Shared\NamedEntityWithUuid.cs" />
     <Compile Include="Model\Shared\OptionalValueChange.cs" />
     <Compile Include="Model\Shared\Write\ExternalReferenceProperties.cs" />
+    <Compile Include="Model\Shared\Write\IParameterHasRoles.cs" />
     <Compile Include="Model\SystemUsage\Write\NamedLink.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemRelationParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageCreationParameters.cs" />

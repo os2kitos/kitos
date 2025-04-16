@@ -8,6 +8,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Generic;
 using Core.ApplicationServices.Generic.Write;
+using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
@@ -227,7 +228,7 @@ namespace Core.ApplicationServices.Contract.Write
         {
             return _contractService
                 .GetContract(systemUsageUuid)
-                .Select(ExtractAssignedRoles)
+                .Select(RoleMappingHelper.ExtractAssignedRoles)
                 .Bind<ItContractModificationParameters>(existingRoles =>
                 {
                     if (!existingRoles.Contains(assignment))
@@ -736,7 +737,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private static Result<ItContractModificationParameters, OperationError> GetRoleAssignmentUpdates(ItContract contract, IEnumerable<UserRolePair> assignments)
         {
-            var existingRoles = ExtractAssignedRoles(contract);
+            var existingRoles = RoleMappingHelper.ExtractAssignedRoles(contract);
             var newRoles = assignments.ToList();
 
             if (existingRoles.Any(newRoles.Contains))
@@ -747,10 +748,6 @@ namespace Core.ApplicationServices.Contract.Write
             return CreateRoleAssignmentUpdate(existingRoles.Concat(newRoles));
         }
 
-        private static IReadOnlyList<UserRolePair> ExtractAssignedRoles(ItContract contract)
-        {
-            return contract.Rights.Select(right => new UserRolePair(right.User.Uuid, right.Role.Uuid)).ToList();
-        }
 
         private static ItContractModificationParameters CreateRoleAssignmentUpdate(IEnumerable<UserRolePair> existingRoles)
         {

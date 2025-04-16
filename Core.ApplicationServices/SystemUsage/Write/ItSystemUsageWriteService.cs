@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
@@ -182,7 +183,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             return _systemUsageService
                 .GetReadableItSystemUsageByUuid(systemUsageUuid)
-                .Select(ExtractAssignedRoles)
+                .Select(RoleMappingHelper.ExtractAssignedRoles)
                 .Bind<SystemUsageUpdateParameters>(existingRoles =>
                 {
                     if (!existingRoles.Contains(assignment))
@@ -876,7 +877,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private static Result<SystemUsageUpdateParameters, OperationError> GetRoleAssignmentUpdates(ItSystemUsage usage, IEnumerable<UserRolePair> assignments)
         {
-            var existingRoles = ExtractAssignedRoles(usage);
+            var existingRoles = RoleMappingHelper.ExtractAssignedRoles(usage);
             var newRoles = assignments.ToList();
 
             if (existingRoles.Any(newRoles.Contains))
@@ -886,11 +887,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
 
             return CreateRoleAssignmentUpdate(existingRoles.Concat(newRoles));
-        }
-
-        private static IReadOnlyList<UserRolePair> ExtractAssignedRoles(ItSystemUsage systemUsage)
-        {
-            return systemUsage.Rights.Select(right => new UserRolePair(right.User.Uuid, right.Role.Uuid)).ToList();
         }
 
         private static SystemUsageUpdateParameters CreateRoleAssignmentUpdate(IEnumerable<UserRolePair> existingRoles)
