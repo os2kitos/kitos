@@ -6,11 +6,14 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.Helpers;
+using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -300,7 +303,12 @@ namespace Core.ApplicationServices.Organizations
         {
             return ModifyUnitRights<OrganizationUnit>(organizationUnitUuid, unit =>
             {
-                _assignmentService.BatchUpdateRoles(unit, assignments.Select(pair => (pair.RoleUuid, pair.UserUuid))
+                var assignmentList = assignments.ToList();
+                var result = GetRoleAssignmentUpdates(unit, assignmentList);
+                if(result.HasValue)
+                    return result.Value;
+
+                _assignmentService.BatchUpdateRoles(unit, assignmentList.Select(pair => (pair.RoleUuid, pair.UserUuid))
                     .ToList());
 
                 return unit;
@@ -310,6 +318,16 @@ namespace Core.ApplicationServices.Organizations
         public Result<OrganizationUnitRight, OperationError> DeleteRoleAssignment(Guid organizationUnitUuid, Guid roleUuid, Guid userUuid)
         {
             return ModifyUnitRights(organizationUnitUuid, unit => _assignmentService.RemoveRole(unit, roleUuid, userUuid));
+        }
+
+        private static Maybe<OperationError> GetRoleAssignmentUpdates(OrganizationUnit unit, IEnumerable<UserRolePair> assignments)
+        {
+            var existingRoles = RoleMappingHelper.ExtractAssignedRoles(unit);
+            var newRoles = assignments.ToList();
+
+            return existingRoles.Any(newRoles.Contains)
+                ? new OperationError("Role assignment exists", OperationFailure.Conflict)
+                : Maybe<OperationError>.None;
         }
 
         private Result<T, OperationError> ModifyUnitRights<T>(Guid organizationUnitUuid,
