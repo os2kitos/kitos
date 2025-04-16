@@ -36,7 +36,9 @@ namespace Tests.Integration.Presentation.Web.Internal.Messages
                      x.LongDescription == createdMessage.LongDescription &&
                      x.Link == createdMessage.Link &&
                      x.ShortDescription == createdMessage.ShortDescription &&
-                     x.Status == createdMessage.Status);
+                     x.Status == createdMessage.Status &&
+                     x.IsMain == createdMessage.IsMain &&
+                     x.IconType == createdMessage.IconType);
         }
 
         [Theory]
@@ -91,7 +93,9 @@ namespace Tests.Integration.Presentation.Web.Internal.Messages
                 Title = A<string>(),
                 LongDescription = A<string>(),
                 ShortDescription = A<string>(),
-                Status = A<PublicMessageStatusChoice>()
+                Status = A<PublicMessageStatusChoice>(),
+                IconType = A<PublicMessageIconTypeChoice>(),
+                IsMain = A<bool>(),
             };
 
             //Act

@@ -16,6 +16,8 @@ namespace Presentation.Web.Models.API.V2.Internal.Response
             Status = publicMessageModel.Status?.ToPublicMessageStatusChoice();
             Link = publicMessageModel.Link;
             Title = publicMessageModel.Title;
+            IconType = publicMessageModel.IconType?.ToPublicMessageIconTypeChoice();
+            IsMain = publicMessageModel.IsMain;
         }
 
         public Guid Uuid { get; set; }
@@ -24,5 +26,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Response
         public string ShortDescription { get; set; }
         public PublicMessageStatusChoice? Status { get; set; }
         public string Link { get; set; }
+        public PublicMessageIconTypeChoice? IconType { get; set; }
+        public bool IsMain { get; set; }
     }
 }
