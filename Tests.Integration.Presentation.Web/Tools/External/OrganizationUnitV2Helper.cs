@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Internal.Response.OrganizationUnit;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Xunit;
@@ -75,7 +76,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<OrganizationUnitResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> DeleteUnitAsync(Guid organizationUuid, Guid unitUuid, Cookie cookie = null)
+        public static async Task<HttpResponseMessage> SendDeleteUnitAsync(Guid organizationUuid, Guid unitUuid, Cookie cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl(
@@ -93,7 +94,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<IEnumerable<OrganizationUnitRolesResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> CreateRoleAssignmentAsync(Guid organizationUuid, Guid unitUuid, CreateOrganizationUnitRoleAssignmentRequestDTO request,
+        public static async Task<HttpResponseMessage> SendCreateRoleAssignmentAsync(Guid organizationUuid, Guid unitUuid, CreateOrganizationUnitRoleAssignmentRequestDTO request,
             Cookie cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -101,7 +102,15 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PostWithCookieAsync(url, requestCookie, request);
         }
 
-        public static async Task<HttpResponseMessage> DeleteRoleAssignmentAsync(Guid organizationUuid, Guid unitUuid, DeleteOrganizationUnitRoleAssignmentRequestDTO request,
+        public static async Task<HttpResponseMessage> SendCreateBulkRoleAssignmentAsync(Guid organizationUuid, Guid unitUuid, BulkRoleAssignmentRequestDTO request,
+            Cookie cookie = null)
+        {
+            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"{RolesRoutePrefix(organizationUuid, unitUuid)}/bulk/create");
+            return await HttpApi.PostWithCookieAsync(url, requestCookie, request);
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteRoleAssignmentAsync(Guid organizationUuid, Guid unitUuid, DeleteOrganizationUnitRoleAssignmentRequestDTO request,
             Cookie cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

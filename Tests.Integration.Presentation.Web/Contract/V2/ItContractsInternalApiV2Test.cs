@@ -149,6 +149,41 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
+        public async Task Can_PATCH_Add_Bulk_RoleAssignment()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUserAsync(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var (roles, users) = await CreateRoles(organization);
+            var createdContract = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+
+            var assignment1 = roles.First();
+            
+            var assignment = new BulkRoleAssignmentRequestDTO
+                { RoleUuid = assignment1.RoleUuid, UserUuids = new List<Guid> { users.First().Uuid, users.Last().Uuid } };
+
+            //Act
+            using var assignmentResponse = await ItContractV2Helper.SendPatchAddBulkRoleAssignment(createdContract.Uuid, assignment);
+            using var duplicateAssignment = await ItContractV2Helper.SendPatchAddBulkRoleAssignment(createdContract.Uuid, assignment);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, duplicateAssignment.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, assignmentResponse.StatusCode);
+            var updatedDTO = await assignmentResponse.ReadResponseBodyAsAsync<ItContractResponseDTO>();
+            var rolesDTO = updatedDTO.Roles.ToList();
+            Assert.Equal(2, rolesDTO.Count);
+            foreach (var role in rolesDTO)
+            {
+                Assert.True(MatchExpectedBulkAssignment(role, assignment));
+            }
+        }
+
+        [Fact]
         public async Task Can_PATCH_Remove_RoleAssignment()
         {
             //Arrange
@@ -388,6 +423,11 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return assignment.Role.Uuid == expectedRole.RoleUuid &&
                    assignment.User.Name == expectedUser.GetFullName() &&
                    assignment.User.Uuid == expectedUser.Uuid;
+        }
+
+        private static bool MatchExpectedBulkAssignment(RoleAssignmentResponseDTO actual, BulkRoleAssignmentRequestDTO expected)
+        {
+            return actual.Role.Uuid == expected.RoleUuid && expected.UserUuids.Contains(actual.User.Uuid);
         }
 
         private static bool MatchExpectedExtendedAssignment(ExtendedRoleAssignmentResponseDTO assignment, RoleAssignmentRequestDTO expectedRole, User expectedUser)

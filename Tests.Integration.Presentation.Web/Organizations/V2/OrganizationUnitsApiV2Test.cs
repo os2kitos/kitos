@@ -8,8 +8,11 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Internal.Response.OrganizationUnit;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.Organization;
 using Tests.Integration.Presentation.Web.Tools;
@@ -288,7 +291,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var testUnit = await OrganizationUnitV2Helper.CreateUnitAsync(organization.Uuid, createRequest);
 
             //Act
-            var deleteResult = await OrganizationUnitV2Helper.DeleteUnitAsync(organization.Uuid, testUnit.Uuid);
+            using var deleteResult = await OrganizationUnitV2Helper.SendDeleteUnitAsync(organization.Uuid, testUnit.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, deleteResult.StatusCode);
@@ -311,7 +314,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var createRequest = new CreateOrganizationUnitRoleAssignmentRequestDTO { UserUuid = user.Uuid, RoleUuid = role.Uuid};
             
             //Act
-            var createResponse = await OrganizationUnitV2Helper.CreateRoleAssignmentAsync(organization.Uuid, unit.Uuid, createRequest);
+            using var createResponse = await OrganizationUnitV2Helper.SendCreateRoleAssignmentAsync(organization.Uuid, unit.Uuid, createRequest);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, createResponse.StatusCode);
@@ -327,11 +330,49 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                 { UserUuid = user.Uuid, RoleUuid = role.Uuid };
 
             //Act
-            var deleteResponse =
-                await OrganizationUnitV2Helper.DeleteRoleAssignmentAsync(organization.Uuid, unit.Uuid, deleteRequest);
+            using var deleteResponse =
+                await OrganizationUnitV2Helper.SendDeleteRoleAssignmentAsync(organization.Uuid, unit.Uuid, deleteRequest);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Create_Bulk_Role_Assignment()
+        {
+            //Step 1 Create Role
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token.Token, organization.Uuid);
+            var unit = Assert.Single(units);
+
+            var user1 = await CreateUser(organization.Id);
+            var user2 = await CreateUser(organization.Id);
+            var orgUnitRoles = await GetOrganizationUnitRoleTypesAsync(organization.Uuid);
+            var role1 = orgUnitRoles.RandomItem();
+            var assignment = new BulkRoleAssignmentRequestDTO
+            { RoleUuid = role1.Uuid, UserUuids = new List<Guid> { user1.Uuid, user2.Uuid } };
+
+            //Act
+            using var createResponse = await OrganizationUnitV2Helper.SendCreateBulkRoleAssignmentAsync(organization.Uuid, unit.Uuid, assignment);
+            using var duplicateResponse = await OrganizationUnitV2Helper.SendCreateBulkRoleAssignmentAsync(organization.Uuid, unit.Uuid, assignment);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, duplicateResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, createResponse.StatusCode);
+            var getRightsResult = await OrganizationUnitV2Helper.GetUnitRolesAsync(organization.Uuid, unit.Uuid);
+            var roles = getRightsResult.ToList();
+            Assert.Equal(2, roles.Count);
+            foreach (var role in roles)
+            {
+                Assert.True(MatchExpectedBulkAssignment(role, assignment));
+            }
+        }
+
+        private static bool MatchExpectedBulkAssignment(OrganizationUnitRolesResponseDTO actual, BulkRoleAssignmentRequestDTO expected)
+        {
+            return actual.RoleAssignment.Role.Uuid == expected.RoleUuid && expected.UserUuids.Contains(actual.RoleAssignment.User.Uuid);
         }
 
         private async Task<IEnumerable<IdentityNamePairResponseDTO>> GetOrganizationUnitRoleTypesAsync(Guid orgUuid)

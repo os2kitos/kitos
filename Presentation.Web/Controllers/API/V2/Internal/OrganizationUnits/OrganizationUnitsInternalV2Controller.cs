@@ -147,7 +147,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         }
 
         [HttpPost]
-        [Route("{organizationUnitUuid}/roles/create/bulk")]
+        [Route("{organizationUnitUuid}/roles/bulk/create")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationUnitResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
