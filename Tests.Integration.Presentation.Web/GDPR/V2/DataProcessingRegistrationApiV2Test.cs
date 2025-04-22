@@ -1301,7 +1301,6 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equivalent(expected, permissionsResponseDto);
         }
 
-
         [Fact]
         public async Task Can_PATCH_Add_RoleAssignment()
         {
@@ -1333,6 +1332,41 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(2, rolesDTO.Count);
             Assert.Contains(rolesDTO, r => MatchExpectedAssignment(r, assignment1, users.First()));
             Assert.Contains(rolesDTO, r => MatchExpectedAssignment(r, assignment2, users.Last()));
+        }
+
+        [Fact]
+        public async Task Can_PATCH_Add_Bulk_RoleAssignment()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUserAsync(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var (roles, users) = await CreateRoles(organization);
+            var createdDpr = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+
+            var assignment1 = roles.First();
+
+            var assignment = new BulkRoleAssignmentRequestDTO
+                { RoleUuid = assignment1.RoleUuid, UserUuids = new List<Guid> { users.First().Uuid, users.Last().Uuid } };
+
+            //Act
+            using var assignmentResponse = await DataProcessingRegistrationV2Helper.SendPatchAddBulkRoleAssignment(createdDpr.Uuid, assignment);
+            using var duplicateAssignment = await DataProcessingRegistrationV2Helper.SendPatchAddBulkRoleAssignment(createdDpr.Uuid, assignment);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, duplicateAssignment.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, assignmentResponse.StatusCode);
+            var updatedDTO = await assignmentResponse.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
+            var rolesDTO = updatedDTO.Roles.ToList();
+            Assert.Equal(2, rolesDTO.Count);
+            foreach (var role in rolesDTO)
+            {
+                Assert.True(MatchExpectedBulkAssignment(role, assignment));
+            }
         }
 
         [Fact]
@@ -1630,6 +1664,11 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             return assignment.Role.Uuid == expectedRole.RoleUuid &&
                    assignment.User.Name == expectedUser.GetFullName() &&
                    assignment.User.Uuid == expectedUser.Uuid;
+        }
+
+        private static bool MatchExpectedBulkAssignment(RoleAssignmentResponseDTO actual, BulkRoleAssignmentRequestDTO expected)
+        {
+            return actual.Role.Uuid == expected.RoleUuid && expected.UserUuids.Contains(actual.User.Uuid);
         }
 
         #endregion

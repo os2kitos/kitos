@@ -1488,7 +1488,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertPayments(parameters.Payments.Value, contract);
         }
 
-
         [Fact]
         public void Can_Add_Role()
         {
@@ -1516,6 +1515,37 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transaction);
         }
+        [Fact]
+        public void Can_Add_Role_Range()
+        {
+            //Arrange
+            var (_, _, contract, transaction) = SetupCreateScenarioPrerequisites();
+            var existingAssignment = A<UserRolePair>();
+            contract.Rights.Add(new ItContractRight { Role = new ItContractRole { Uuid = existingAssignment.RoleUuid }, User = new User { Uuid = existingAssignment.UserUuid } });
+            var newAssignment = A<UserRolePair>();
+            var newAssignment2 = A<UserRolePair>();
+
+            var assignments = new List<UserRolePair> { newAssignment, newAssignment2 };
+
+            ExpectGetReturns(contract.Uuid, contract);
+            ExpectAllowModifySuccess(contract);
+
+            _roleAssignmentService.Setup(x => x.BatchUpdateRoles(
+                        contract,
+                        It.Is<IEnumerable<(Guid roleUuid, Guid user)>>(assignments =>
+                            MatchExpectedAssignments(assignments, new[] { existingAssignment, newAssignment, newAssignment2 }.ToList()))
+                    )
+                )
+                .Returns(Maybe<OperationError>.None);
+
+            //Act
+            var createResult = _sut.AddRoleRange(contract.Uuid, assignments);
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
         [Fact]
         public void Cannot_Add_Duplicate_Role_Assignment()
         {

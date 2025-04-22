@@ -215,6 +215,13 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return response;
         }
 
+        public static async Task<HttpResponseMessage> SendPatchAddBulkRoleAssignment(Guid uuid, BulkRoleAssignmentRequestDTO dto)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var response = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/data-processing-registrations/{uuid}/roles/bulk/add"), cookie, dto);
+            return response;
+        }
+
         public static async Task<HttpResponseMessage> SendPatchRemoveRoleAssignment(Guid uuid, RoleAssignmentRequestDTO dto)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

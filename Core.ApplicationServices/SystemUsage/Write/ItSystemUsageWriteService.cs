@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
@@ -170,25 +171,19 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<ItSystemUsage, OperationError> AddRole(Guid systemUsageUuid, UserRolePair assignment)
         {
-            return _systemUsageService
-                .GetReadableItSystemUsageByUuid(systemUsageUuid)
-                .Select(ExtractAssignedRoles)
-                .Bind<SystemUsageUpdateParameters>(existingRoles =>
-                {
-                    if (existingRoles.Contains(assignment))
-                    {
-                        return new OperationError("Role assignment exists", OperationFailure.Conflict);
-                    }
-                    return CreateRoleAssignmentUpdate(existingRoles.Append(assignment));
-                })
-                .Bind(update => Update(systemUsageUuid, update));
+            return AddRoles(systemUsageUuid, assignment.WrapAsEnumerable());
+        }
+
+        public Result<ItSystemUsage, OperationError> AddRoleRange(Guid systemUsageUuid, IEnumerable<UserRolePair> assignments)
+        {
+            return AddRoles(systemUsageUuid, assignments);
         }
 
         public Result<ItSystemUsage, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair assignment)
         {
             return _systemUsageService
                 .GetReadableItSystemUsageByUuid(systemUsageUuid)
-                .Select(ExtractAssignedRoles)
+                .Select(RoleMappingHelper.ExtractAssignedRoles)
                 .Bind<SystemUsageUpdateParameters>(existingRoles =>
                 {
                     if (!existingRoles.Contains(assignment))
@@ -197,6 +192,15 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     }
                     return CreateRoleAssignmentUpdate(existingRoles.Except(assignment.WrapAsEnumerable()));
                 })
+                .Bind(update => Update(systemUsageUuid, update));
+        }
+
+        private Result<ItSystemUsage, OperationError> AddRoles(Guid systemUsageUuid,
+            IEnumerable<UserRolePair> assignments)
+        {
+            return _systemUsageService
+                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+                .Bind(usage => GetRoleAssignmentUpdates(usage, assignments))
                 .Bind(update => Update(systemUsageUuid, update));
         }
 
@@ -871,9 +875,18 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return Maybe<int>.None;
         }
 
-        private static IReadOnlyList<UserRolePair> ExtractAssignedRoles(ItSystemUsage systemUsage)
+        private static Result<SystemUsageUpdateParameters, OperationError> GetRoleAssignmentUpdates(ItSystemUsage usage, IEnumerable<UserRolePair> assignments)
         {
-            return systemUsage.Rights.Select(right => new UserRolePair(right.User.Uuid, right.Role.Uuid)).ToList();
+            var existingRoles = RoleMappingHelper.ExtractAssignedRoles(usage);
+            var newRoles = assignments.ToList();
+
+            if (existingRoles.Any(newRoles.Contains))
+            {
+                return new OperationError("Role assignment exists", OperationFailure.Conflict);
+            }
+
+
+            return CreateRoleAssignmentUpdate(existingRoles.Concat(newRoles));
         }
 
         private static SystemUsageUpdateParameters CreateRoleAssignmentUpdate(IEnumerable<UserRolePair> existingRoles)

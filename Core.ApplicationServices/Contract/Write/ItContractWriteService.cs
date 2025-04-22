@@ -8,6 +8,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Generic;
 using Core.ApplicationServices.Generic.Write;
+using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
@@ -215,25 +216,19 @@ namespace Core.ApplicationServices.Contract.Write
 
         public Result<ItContract, OperationError> AddRole(Guid contractUuid, UserRolePair assignment)
         {
-            return _contractService
-                .GetContract(contractUuid)
-                .Select(ExtractAssignedRoles)
-                .Bind<ItContractModificationParameters>(existingRoles =>
-                {
-                    if (existingRoles.Contains(assignment))
-                    {
-                        return new OperationError("Role assignment exists", OperationFailure.Conflict);
-                    }
-                    return CreateRoleAssignmentUpdate(existingRoles.Append(assignment));
-                })
-                .Bind(update => Update(contractUuid, update));
+            return AddRoles(contractUuid, assignment.WrapAsEnumerable());
+        }
+
+        public Result<ItContract, OperationError> AddRoleRange(Guid contractUuid, IEnumerable<UserRolePair> assignments)
+        {
+            return AddRoles(contractUuid, assignments);
         }
 
         public Result<ItContract, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair assignment)
         {
             return _contractService
                 .GetContract(systemUsageUuid)
-                .Select(ExtractAssignedRoles)
+                .Select(RoleMappingHelper.ExtractAssignedRoles)
                 .Bind<ItContractModificationParameters>(existingRoles =>
                 {
                     if (!existingRoles.Contains(assignment))
@@ -244,6 +239,16 @@ namespace Core.ApplicationServices.Contract.Write
                 })
                 .Bind(update => Update(systemUsageUuid, update));
         }
+
+        private Result<ItContract, OperationError> AddRoles(Guid contractUuid,
+            IEnumerable<UserRolePair> assignments)
+        {
+            return _contractService
+                .GetContract(contractUuid)
+                .Bind(contract => GetRoleAssignmentUpdates(contract, assignments))
+                .Bind(update => Update(contractUuid, update));
+        }
+
 
         private Maybe<OperationError> DeleteRange(IEnumerable<ItContract> contracts)
         {
@@ -730,10 +735,19 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(WithWriteAccess);
         }
 
-        private static IReadOnlyList<UserRolePair> ExtractAssignedRoles(ItContract contract)
+        private static Result<ItContractModificationParameters, OperationError> GetRoleAssignmentUpdates(ItContract contract, IEnumerable<UserRolePair> assignments)
         {
-            return contract.Rights.Select(right => new UserRolePair(right.User.Uuid, right.Role.Uuid)).ToList();
+            var existingRoles = RoleMappingHelper.ExtractAssignedRoles(contract);
+            var newRoles = assignments.ToList();
+
+            if (existingRoles.Any(newRoles.Contains))
+            {
+                return new OperationError("Role assignment exists", OperationFailure.Conflict);
+            }
+            
+            return CreateRoleAssignmentUpdate(existingRoles.Concat(newRoles));
         }
+
 
         private static ItContractModificationParameters CreateRoleAssignmentUpdate(IEnumerable<UserRolePair> existingRoles)
         {

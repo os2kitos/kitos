@@ -24,6 +24,7 @@ namespace Core.ApplicationServices.Contract.Write
             DeleteExternalReference(Guid contractUuid, Guid externalReferenceUuid);
 
         Result<ItContract, OperationError> AddRole(Guid contractUuid, UserRolePair assignment);
+        Result<ItContract, OperationError> AddRoleRange(Guid contractUuid, IEnumerable<UserRolePair> assignments);
         Result<ItContract, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair assignment);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Organizations;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel.Organization;
 using System;
 using System.Collections.Generic;
@@ -36,6 +37,8 @@ namespace Core.ApplicationServices.Organizations
         Result<OrganizationUnitRight, OperationError> CreateRoleAssignment(Guid organizationUnitUuid, Guid roleUuid,
             Guid userUuid);
 
+        Result<OrganizationUnit, OperationError> CreateBulkRoleAssignment(Guid organizationUnitUuid,
+            IEnumerable<UserRolePair> assignments);
         Result<OrganizationUnitRight, OperationError> DeleteRoleAssignment(Guid organizationUnitUuid, Guid roleUuid,
             Guid userUuid);
 

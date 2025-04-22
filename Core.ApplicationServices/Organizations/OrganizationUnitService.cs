@@ -6,10 +6,14 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.Helpers;
+using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Organizations;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -295,13 +299,39 @@ namespace Core.ApplicationServices.Organizations
             return ModifyUnitRights(organizationUnitUuid, unit => _assignmentService.AssignRole(unit, roleUuid, userUuid));
         }
 
+        public Result<OrganizationUnit, OperationError> CreateBulkRoleAssignment(Guid organizationUnitUuid, IEnumerable<UserRolePair> assignments)
+        {
+            return ModifyUnitRights<OrganizationUnit>(organizationUnitUuid, unit =>
+            {
+                var assignmentList = assignments.ToList();
+                var result = GetRoleAssignmentUpdates(unit, assignmentList);
+                if(result.HasValue)
+                    return result.Value;
+
+                _assignmentService.BatchUpdateRoles(unit, assignmentList.Select(pair => (pair.RoleUuid, pair.UserUuid))
+                    .ToList());
+
+                return unit;
+            });
+        }
+
         public Result<OrganizationUnitRight, OperationError> DeleteRoleAssignment(Guid organizationUnitUuid, Guid roleUuid, Guid userUuid)
         {
             return ModifyUnitRights(organizationUnitUuid, unit => _assignmentService.RemoveRole(unit, roleUuid, userUuid));
         }
 
-        private Result<OrganizationUnitRight, OperationError> ModifyUnitRights(Guid organizationUnitUuid,
-            Func<OrganizationUnit, Result<OrganizationUnitRight, OperationError>> mutation)
+        private static Maybe<OperationError> GetRoleAssignmentUpdates(OrganizationUnit unit, IEnumerable<UserRolePair> assignments)
+        {
+            var existingRoles = RoleMappingHelper.ExtractAssignedRoles(unit);
+            var newRoles = assignments.ToList();
+
+            return existingRoles.Any(newRoles.Contains)
+                ? new OperationError("Role assignment exists", OperationFailure.Conflict)
+                : Maybe<OperationError>.None;
+        }
+
+        private Result<T, OperationError> ModifyUnitRights<T>(Guid organizationUnitUuid,
+            Func<OrganizationUnit, Result<T, OperationError>> mutation)
         {
             var unitResult = _organizationService.GetOrganizationUnit(organizationUnitUuid);
             if (unitResult.Failed)

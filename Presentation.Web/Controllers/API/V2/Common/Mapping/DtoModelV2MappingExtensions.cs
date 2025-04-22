@@ -1,4 +1,6 @@
-﻿using Core.ApplicationServices.Model.Shared.Write;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -48,6 +50,11 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         public static UserRolePair ToUserRolePair(this RoleAssignmentRequestDTO src)
         {
             return new UserRolePair(src.UserUuid, src.RoleUuid);
+        }
+
+        public static IEnumerable<UserRolePair> ToUserRolePairs(this BulkRoleAssignmentRequestDTO src)
+        {
+            return src.UserUuids.Select(uuid => new UserRolePair(uuid, src.RoleUuid)).ToList();
         }
     }
 }

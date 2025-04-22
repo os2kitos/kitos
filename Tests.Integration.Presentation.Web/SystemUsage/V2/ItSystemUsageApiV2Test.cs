@@ -1057,6 +1057,40 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
+        public async Task Can_PATCH_Add_Bulk_RoleAssignment()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+
+            var user1 = await CreateUser(organization);
+            var user2 = await CreateUser(organization);
+            var role1 = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().Where(r => r.IsObligatory && r.IsEnabled).RandomItem());
+
+            var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+
+            var assignment = new BulkRoleAssignmentRequestDTO
+                { RoleUuid = role1.Uuid, UserUuids = new List<Guid> { user1.Uuid, user2.Uuid } };
+
+            //Act
+            using var assignmentResponse = await ItSystemUsageV2Helper.SendPatchAddBulkRoleAssignment(token, createdDTO.Uuid, assignment);
+            using var duplicateAssignment = await ItSystemUsageV2Helper.SendPatchAddBulkRoleAssignment(token, createdDTO.Uuid, assignment);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, duplicateAssignment.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, assignmentResponse.StatusCode);
+            var updatedDTO = await assignmentResponse.ReadResponseBodyAsAsync<ItSystemUsageResponseDTO>();
+            var roles = updatedDTO.Roles.ToList();
+            Assert.Equal(2, roles.Count);
+            foreach (var role in roles)
+            {
+                Assert.True(MatchExpectedBulkAssignment(role, assignment));
+            }
+        }
+
+        [Fact]
         public async Task Can_PATCH_Remove_RoleAssignment()
         {
             //Arrange
@@ -2989,6 +3023,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         private static bool MatchExpectedAssignment(RoleAssignmentResponseDTO actual, RoleAssignmentRequestDTO expected)
         {
             return actual.Role.Uuid == expected.RoleUuid && actual.User.Uuid == expected.UserUuid;
+        }
+
+        private static bool MatchExpectedBulkAssignment(RoleAssignmentResponseDTO actual, BulkRoleAssignmentRequestDTO expected)
+        {
+            return actual.Role.Uuid == expected.RoleUuid && expected.UserUuids.Contains(actual.User.Uuid);
         }
     }
 }

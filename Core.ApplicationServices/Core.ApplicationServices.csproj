@@ -102,6 +102,7 @@
     <Compile Include="GlobalOptions\GlobalRoleOptionsService.cs" />
     <Compile Include="GlobalOptions\IGlobalRegularOptionsService.cs" />
     <Compile Include="GlobalOptions\IGlobalRoleOptionsService.cs" />
+    <Compile Include="Helpers\RoleMappingHelper.cs" />
     <Compile Include="HelpTexts\HelpTextApplicationService.cs" />
     <Compile Include="HelpTexts\IHelpTextApplicationService.cs" />
     <Compile Include="IEventBody.cs" />

@@ -603,6 +603,7 @@
     <Compile Include="Models\API\V2\Request\Contract\MultipleContractsRequestDto.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesCreation.cs" />
     <Compile Include="Models\API\V2\Request\Generic\ExternalReferences\IHasExternalReferencesUpdate.cs" />
+    <Compile Include="Models\API\V2\Request\Generic\Roles\BulkRoleAssignmentRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\CreateItInterfaceRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\ICommonItInterfaceRequestPropertiesDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\IItInterfaceWritablePropertiesRequestDTO.cs" />
