@@ -52,8 +52,8 @@ namespace Tests.Unit.Core.DomainServices.Organizations
         [Theory]
         [InlineData(OperationFailure.Forbidden, StsError.MissingServiceAgreement, CheckConnectionError.MissingServiceAgreement, OperationFailure.Forbidden)]
         [InlineData(OperationFailure.BadInput, StsError.ExistingServiceAgreementIssue, CheckConnectionError.ExistingServiceAgreementIssue, OperationFailure.BadInput)]
-        [InlineData(OperationFailure.BadInput, StsError.NotFound, CheckConnectionError.Unknown, OperationFailure.UnknownError)]
-        [InlineData(OperationFailure.BadInput, StsError.BadInput, CheckConnectionError.Unknown, OperationFailure.UnknownError)]
+        [InlineData(OperationFailure.BadInput, StsError.NotFound, CheckConnectionError.FailedToLookupOrganizationCompany, OperationFailure.UnknownError)]
+        [InlineData(OperationFailure.BadInput, StsError.BadInput, CheckConnectionError.FailedToLookupOrganizationCompany, OperationFailure.UnknownError)]
         public void ValidateConnection_Fails_With_Lookup_Error(OperationFailure failureTypeFromLookup, StsError errorFromLookup, CheckConnectionError expectedError, OperationFailure expectedFailure)
         {
             //Arrange

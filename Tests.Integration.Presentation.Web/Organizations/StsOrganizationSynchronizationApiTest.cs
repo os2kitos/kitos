@@ -76,7 +76,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         }
 
         [Theory]
-        [InlineData(UnAuthorizedCvr, false, CheckConnectionError.UserContextDoesNotExistOnSystem)]
+        [InlineData(UnAuthorizedCvr, false, CheckConnectionError.FailedToLookupOrganizationCompany)]
         [InlineData(null, false, CheckConnectionError.InvalidCvrOnOrganization)]
         [InlineData(AuthorizedCvr, true, null)]
         public async Task Can_GET_ConnectionStatus(string cvr, bool expectConnected, CheckConnectionError? expectedError)
