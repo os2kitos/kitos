@@ -3,7 +3,10 @@ param (
     [string]$targetEnvironment,
 
     [Parameter(Mandatory = $true)]
-    [string]$ASPNETCORE_ENVIRONMENT
+    [string]$ASPNETCORE_ENVIRONMENT,
+
+    [Parameter(Mandatory = $true)]
+    [string]$IMAGE_TAG 
 )
 
 .$PSScriptRoot\SetupPubsubEnviroment.ps1
@@ -21,9 +24,9 @@ if (-Not (Test-Path $composeFile)) {
     Write-Error "Compose file not found at: $composeFile"
     exit 1
 }
-$remoteUser = "kitosadmintest"
-$remoteHost = "10.212.74.11"
-$remotePath = "/home/kitosadmintest/app"
+$remoteUser = $Env:PUBSUB_REMOTE_TARGET_USER
+$remoteHost = $Env:PUBSUB_REMOTE_TARGET_HOST
+$remotePath = $Env:PUBSUB_REMOTE_TARGET_PATH
 $remoteTarget = "${remoteUser}@${remoteHost}:${remotePath}"
 
 # Copy the docker-compose file to the remote host
@@ -45,6 +48,8 @@ RABBIT_MQ_PASSWORD=$Env:RABBIT_MQ_PASSWORD
 PUBSUB_API_KEY=$Env:PUBSUB_API_KEY
 IDP_HOST_MAPPING=$Env:IDP_HOST_MAPPING
 CERT_PASSWORD=$Env:CERT_PASSWORD
+PUBSUB_CONNECTION_STRING=$Env:PUBSUB_CONNECTION_STRING
+IMAGE_TAG=$IMAGE_TAG
 "@
 
 # Copy the .env file to the remote host

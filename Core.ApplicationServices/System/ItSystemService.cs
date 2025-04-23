@@ -113,18 +113,8 @@ namespace Core.ApplicationServices.System
         public IQueryable<ItSystem> GetAvailableSystems(params IDomainQuery<ItSystem>[] conditions)
         {
             var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
-            var refinement = Maybe<IDomainQuery<ItSystem>>.None;
 
-            if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
-            {
-                var rightsHoldingOrganizations = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
-
-                refinement = new QueryByRightsHolderIdOrOwnOrganizationIds(rightsHoldingOrganizations, _userContext.OrganizationIds);
-            }
-            else if (accessLevel < CrossOrganizationDataReadAccessLevel.All)
-            {
-                refinement = new QueryAllByRestrictionCapabilities<ItSystem>(accessLevel, _userContext.OrganizationIds);
-            }
+            var refinement = GetQueryRefinement(accessLevel);
 
             var mainQuery = _itSystemRepository.GetSystems();
 
@@ -133,6 +123,23 @@ namespace Core.ApplicationServices.System
                 .GetValueOrFallback(mainQuery);
 
             return conditions.Any() ? new IntersectionQuery<ItSystem>(conditions).Apply(refinedResult) : refinedResult;
+        }
+
+        private Maybe<IDomainQuery<ItSystem>> GetQueryRefinement(CrossOrganizationDataReadAccessLevel accessLevel)
+        {
+
+            if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
+            {
+                var rightsHoldingOrganizations = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
+
+                return new QueryByRightsHolderIdOrOwnOrganizationIds(rightsHoldingOrganizations, _userContext.OrganizationIds);
+            }
+            if (accessLevel < CrossOrganizationDataReadAccessLevel.All && !_userContext.HasStakeHolderAccess())
+            {
+                return new QueryAllByRestrictionCapabilities<ItSystem>(accessLevel, _userContext.OrganizationIds);
+            }
+
+            return Maybe<IDomainQuery<ItSystem>>.None;
         }
 
         public IQueryable<ItSystem> GetAvailableSystems(int organizationId, string optionalNameSearch = null)
@@ -342,7 +349,7 @@ namespace Core.ApplicationServices.System
             return GetSystem(uuid).Transform(GetPermissions);
         }
 
-        private Result<SystemPermissions, OperationError> GetPermissions(Result<ItSystem,OperationError> systemResult)
+        private Result<SystemPermissions, OperationError> GetPermissions(Result<ItSystem, OperationError> systemResult)
         {
             return systemResult
                 .Transform

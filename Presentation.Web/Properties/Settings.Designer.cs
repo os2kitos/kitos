@@ -235,7 +235,7 @@ namespace Presentation.Web.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://localhost:7226/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://localhost/")]
         public string PubSubBaseUrl {
             get {
                 return ((string)(this["PubSubBaseUrl"]));

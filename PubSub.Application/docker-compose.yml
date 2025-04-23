@@ -9,9 +9,11 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBIT_MQ_PASSWORD}
     networks:
       - app_network
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
 
   api:
-    image: strongminds/kitos-pubsub:latest
+    image: strongminds/kitos-pubsub:${IMAGE_TAG}
     container_name: kitos-pubsub
     depends_on:
       - rabbitmq
@@ -23,6 +25,7 @@ services:
       RABBIT_MQ_PASSWORD: ${RABBIT_MQ_PASSWORD}
       PUBSUB_API_KEY: ${PUBSUB_API_KEY}
       CERT_PASSWORD: ${CERT_PASSWORD}
+      ConnectionStrings__DefaultConnection: ${PUBSUB_CONNECTION_STRING}
     ports:
       - "443:443"
     networks:
@@ -33,3 +36,7 @@ services:
 networks:
   app_network:
     driver: bridge
+
+volumes:
+  rabbitmq_data:    
+    

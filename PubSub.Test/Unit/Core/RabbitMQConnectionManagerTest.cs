@@ -1,5 +1,5 @@
 ﻿using Moq;
-using PubSub.Core.Managers;
+using PubSub.Application.Services;
 using RabbitMQ.Client;
 
 namespace PubSub.Test.Unit.Core

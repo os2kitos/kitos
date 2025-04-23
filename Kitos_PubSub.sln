@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubSub.Application", "PubSub.Application\PubSub.Application.csproj", "{80E096AD-6FFA-48F3-B3A5-4CF016C8FBF4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0F9EAAA6-056A-4A1D-8A0A-4A09803A797A} = {0F9EAAA6-056A-4A1D-8A0A-4A09803A797A}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PubSub.Test", "PubSub.Test\PubSub.Test.csproj", "{7B3B4644-76DE-4F72-91AE-6DF97465F86F}"
 EndProject
@@ -14,8 +17,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "DeploymentScripts", "{BD718C5F-DE87-40E1-AA4E-0A4F76D8AE10}"
 	ProjectSection(SolutionItems) = preProject
 		DeploymentScripts\DeployPubsubToEnvironment.ps1 = DeploymentScripts\DeployPubsubToEnvironment.ps1
+		DeploymentScripts\PubsubDBMigrations.ps1 = DeploymentScripts\PubsubDBMigrations.ps1
 		DeploymentScripts\SetupPubsubEnviroment.ps1 = DeploymentScripts\SetupPubsubEnviroment.ps1
+		DeploymentScripts\PreparePubsubDatabase.ps1 = DeploymentScripts\PreparePubsubDatabase.ps1
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSub.DataAccess", "PubSub.DataAccess\PubSub.DataAccess.csproj", "{0F9EAAA6-056A-4A1D-8A0A-4A09803A797A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSub.Core.Abstractions", "PubSub.Core.Abstractions\PubSub.Core.Abstractions.csproj", "{EDD341A1-685C-4D21-BF5B-76DEEB87E001}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,6 +44,14 @@ Global
 		{495F6676-DD05-4AD1-B01B-332C55D8ED64}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{495F6676-DD05-4AD1-B01B-332C55D8ED64}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{495F6676-DD05-4AD1-B01B-332C55D8ED64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F9EAAA6-056A-4A1D-8A0A-4A09803A797A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F9EAAA6-056A-4A1D-8A0A-4A09803A797A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F9EAAA6-056A-4A1D-8A0A-4A09803A797A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F9EAAA6-056A-4A1D-8A0A-4A09803A797A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDD341A1-685C-4D21-BF5B-76DEEB87E001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDD341A1-685C-4D21-BF5B-76DEEB87E001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDD341A1-685C-4D21-BF5B-76DEEB87E001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDD341A1-685C-4D21-BF5B-76DEEB87E001}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

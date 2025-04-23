@@ -95,6 +95,11 @@ namespace Core.ApplicationServices.Authorization
 
             var entityType = _typeResolver.Resolve(entity.GetType());
 
+            if (HasStakeHolderAccess() && IsItSystemOrInterface(entityType))
+            {
+                return true;
+            }
+
             var readAccessLevel = GetReadAccessLevel(entityType);
             return readAccessLevel switch
             {
@@ -109,6 +114,11 @@ namespace Core.ApplicationServices.Authorization
                 EntityReadAccessLevel.All => true,
                 _ => throw new ArgumentOutOfRangeException(nameof(readAccessLevel), "unsupported read access level")
             };
+        }
+
+        private bool IsItSystemOrInterface(Type entityType)
+        {
+            return entityType == typeof(ItSystem) || entityType == typeof(ItInterface);
         }
 
         private bool IsRightsHolderFor(IEntity entity)
