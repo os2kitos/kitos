@@ -1598,6 +1598,49 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Equal(error.FailureType, result.Error.FailureType);
         }
 
+        [Fact]
+        public void Stakeholders_Can_Access_All_Interfaces()
+        {
+
+            var localInterface = new ItInterface { AccessModifier = AccessModifier.Local };
+            var publicInterface = new ItInterface { AccessModifier = AccessModifier.Public };
+            var interfaces = new List<ItInterface> { localInterface, publicInterface };
+            ExpectInterfaceRepositoryReturns(interfaces);
+            ExpectUserOrganizationIdsReturns(new List<int>());
+            ExpectUserIsStakeholder();
+
+            var result = _sut.GetAvailableInterfaces();
+
+            Assert.Equal(2, result.Count());
+
+        }
+
+        private void ExpectUserIsStakeholder()
+        {
+            ExpectCrossOrganizationReadAccessReturns(CrossOrganizationDataReadAccessLevel.Public); //Access level for stakeholders
+            ExpectIsStakeHolder(true);
+        }
+
+        private void ExpectCrossOrganizationReadAccessReturns(CrossOrganizationDataReadAccessLevel accessLevel)
+        {
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(accessLevel);
+        }
+
+        private void ExpectIsStakeHolder(bool isStakeHolder)
+        {
+            _userContext.Setup(x => x.HasStakeHolderAccess()).Returns(isStakeHolder);
+        }
+
+        private void ExpectInterfaceRepositoryReturns(IEnumerable<ItInterface> interfaces)
+        {
+            _repository.Setup(x => x.GetInterfaces()).Returns(interfaces.AsQueryable());
+        }
+
+        private void ExpectUserOrganizationIdsReturns(IEnumerable<int> ids)
+        {
+            _userContext.Setup(x => x.OrganizationIds).Returns(ids);
+        }
+
         private void Test_Command_Which_Mutates_ItInterface_With_Success(
             Func<ItInterface, Result<ItInterface, OperationError>> command)
         {

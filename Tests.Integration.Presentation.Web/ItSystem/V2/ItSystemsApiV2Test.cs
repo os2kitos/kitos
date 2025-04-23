@@ -66,7 +66,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Fact]
-        public async Task Cannot_GET_ItSystem_As_Stakeholder_If_Local_System_Placed_In_Organization_Which_User_Is_Not_Member_Of()
+        public async Task Can_GET_Local_ItSystem_As_Stakeholder()
         {
             //Arrange
             var (token, _) = await CreateStakeHolderUserInNewOrganizationAsync();
@@ -76,7 +76,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             using var systemResponse = await ItSystemV2Helper.SendGetSingleAsync(token, entityUuid);
 
             //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, systemResponse.StatusCode);
+            Assert.True(systemResponse.IsSuccessStatusCode);
+            var system = await systemResponse.ReadResponseBodyAsAsync<ItSystemResponseDTO>();
+            Assert.Equal(entityUuid, system.Uuid);
         }
 
         [Fact]
@@ -173,13 +175,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
             var rightsHolder = await CreateOrganizationAsync();
 
-            var unExpectedAsItIsLocalInNonMemberOrg = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var expected1 = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            var expected2 = await CreateSystemAsync(organization.Id, AccessModifier.Local);
+            var expected1 = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var expected2 = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var expected3 = await CreateSystemAsync(organization.Id, AccessModifier.Local);
 
-            using var resp1 = await ItSystemHelper.SendSetBelongsToRequestAsync(unExpectedAsItIsLocalInNonMemberOrg.dbId, rightsHolder.Id, TestEnvironment.DefaultOrganizationId);
-            using var resp2 = await ItSystemHelper.SendSetBelongsToRequestAsync(expected1.dbId, rightsHolder.Id, TestEnvironment.DefaultOrganizationId);
-            using var resp3 = await ItSystemHelper.SendSetBelongsToRequestAsync(expected2.dbId, rightsHolder.Id, organization.Id);
+            using var resp1 = await ItSystemHelper.SendSetBelongsToRequestAsync(expected1.dbId, rightsHolder.Id, TestEnvironment.DefaultOrganizationId);
+            using var resp2 = await ItSystemHelper.SendSetBelongsToRequestAsync(expected2.dbId, rightsHolder.Id, TestEnvironment.DefaultOrganizationId);
+            using var resp3 = await ItSystemHelper.SendSetBelongsToRequestAsync(expected3.dbId, rightsHolder.Id, organization.Id);
 
             Assert.Equal(HttpStatusCode.OK, resp1.StatusCode);
             Assert.Equal(HttpStatusCode.OK, resp2.StatusCode);
@@ -188,10 +190,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Act
             var systems = (await ItSystemV2Helper.GetManyAsync(token, rightsHolderId: rightsHolder.Uuid)).ToList();
 
-            //Assert - only 2 are actually valid since the excluded one was hidden to the stakeholder
-            Assert.Equal(2, systems.Count);
+            Assert.Equal(3, systems.Count);
             Assert.Contains(systems, dto => dto.Uuid == expected1.uuid);
             Assert.Contains(systems, dto => dto.Uuid == expected2.uuid);
+            Assert.Contains(systems, dto => dto.Uuid == expected3.uuid);
         }
 
         [Theory]
