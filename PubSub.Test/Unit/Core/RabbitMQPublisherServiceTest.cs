@@ -1,11 +1,10 @@
 ﻿using Moq;
-using PubSub.Core.Managers;
 using PubSub.Core.Models;
-using PubSub.Core.Services.Publisher;
 using PubSub.Core.Services.Serializer;
 using PubSub.Test.Base;
 using RabbitMQ.Client;
 using System.Text.Json;
+using PubSub.Application.Services;
 
 namespace PubSub.Test.Unit.Core
 {
