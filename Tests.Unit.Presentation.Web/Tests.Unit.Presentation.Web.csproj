@@ -339,7 +339,6 @@
     <Compile Include="Services\OrganizationWriteServiceTest.cs" />
     <Compile Include="Services\ReferenceServiceTest.cs" />
     <Compile Include="Infrastructure\AutoMapperTest.cs" />
-    <Compile Include="WebHomeController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
