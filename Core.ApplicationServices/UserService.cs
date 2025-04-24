@@ -130,6 +130,7 @@ namespace Core.ApplicationServices
         {
             _userRepository.Update(user);
 
+            _domainEvents.Raise(new AdministrativeAccessRightsChanged(user.Id));
             _domainEvents.Raise(new EntityUpdatedEvent<User>(user));
 
             if (sendMailOnUpdate.HasValue && sendMailOnUpdate.Value && scopedToOrganizationId.HasValue)
@@ -430,8 +431,8 @@ namespace Core.ApplicationServices
                 {
                     var defaultUnit = _organizationService.GetDefaultUnit(result.org, result.user);
 
-                    return defaultUnit == null 
-                        ? new OperationError("No default unit found", OperationFailure.NotFound) 
+                    return defaultUnit == null
+                        ? new OperationError("No default unit found", OperationFailure.NotFound)
                         : Result<OrganizationUnit, OperationError>.Success(defaultUnit);
                 });
         }

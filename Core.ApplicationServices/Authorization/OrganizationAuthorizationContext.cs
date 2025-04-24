@@ -95,11 +95,6 @@ namespace Core.ApplicationServices.Authorization
 
             var entityType = _typeResolver.Resolve(entity.GetType());
 
-            if (HasStakeHolderAccess() && IsItSystemOrInterface(entityType))
-            {
-                return true;
-            }
-
             var readAccessLevel = GetReadAccessLevel(entityType);
             return readAccessLevel switch
             {
@@ -164,6 +159,11 @@ namespace Core.ApplicationServices.Authorization
         {
             var globalRead = _globalReadAccessPolicy.Allow(entityType) || IsGlobalAdmin();
             if (globalRead)
+            {
+                return EntityReadAccessLevel.All;
+            }
+
+            if (IsItSystemOrInterface(entityType) && HasStakeHolderAccess())
             {
                 return EntityReadAccessLevel.All;
             }
