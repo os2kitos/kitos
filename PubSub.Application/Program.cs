@@ -23,7 +23,7 @@ builder.WebHost.ConfigureKestrel((context, options) =>
         else
         {
             var certPassword = Environment.GetEnvironmentVariable(Constants.Config.Certificate.CertPassword);
-            listenOptions.UseHttps("/etc/ssl/certs/kitos-pubsub.pfx", certPassword);
+            listenOptions.UseHttps("/etc/ssl/certs/kitos-staging.pfx", certPassword);
         }
     });
 });
