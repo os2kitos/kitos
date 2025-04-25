@@ -64,6 +64,23 @@ namespace Tests.Integration.Presentation.Web.Authorization
             }
         }
 
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+
+        public async Task Only_SystemIntegrators_Has_CanSubscribe_Claim(bool isSystemIntegrator)
+        {
+            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User,
+                TestEnvironment.DefaultOrganizationId, true, false, isSystemIntegrator);
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+
+            var canSubscribeClaim = jwtToken.Claims.FirstOrDefault(c => c.Type == "CanSubscribe");
+            var hasCanSubscribeClaim = canSubscribeClaim?.Value == "true";
+            Assert.Equal(isSystemIntegrator, hasCanSubscribeClaim);
+        }
+
         private static async Task<HttpResponseMessage> SendValidateTokenRequest(string token)
         {
             return await HttpApi.PostAsync(TestEnvironment.CreateUrl("api/v2/token/validate"), new TokenIntrospectionRequest(){ Token = token });

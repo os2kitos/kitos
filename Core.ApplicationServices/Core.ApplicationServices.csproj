@@ -87,6 +87,7 @@
     <Compile Include="Authentication\AuthenticationMethod.cs" />
     <Compile Include="Authentication\AuthenticationScope.cs" />
     <Compile Include="Authentication\ApplicationAuthenticationState.cs" />
+    <Compile Include="Authentication\Constants\ClaimConstants.cs" />
     <Compile Include="Authentication\IKitosInternalTokenIssuer.cs" />
     <Compile Include="Authentication\ITokenValidator.cs" />
     <Compile Include="Authentication\KitosInternalTokenIssuer.cs" />

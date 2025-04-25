@@ -9,7 +9,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace PubSub.Application.Controllers;
 
 [ApiController]
-[Authorize]
+[Authorize(Policy = Constants.Config.Validation.CanSubscribePolicy)]
 [Route("api/subscribe")]
 public class SubscribeController : PubSubBaseController
 {

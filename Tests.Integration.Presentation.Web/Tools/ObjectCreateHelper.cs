@@ -26,7 +26,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Name = Fixture.Create<string>(),
                 LastName = Fixture.Create<string>(),
                 HasApiAccess = apiAccess,
-                HasStakeHolderAccess = stakeHolderAccess
+                HasStakeHolderAccess = stakeHolderAccess,
             };
         }
 

@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Security.Principal;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Authentication;
+using Core.DomainModel;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
@@ -30,10 +31,8 @@ namespace Core.ApplicationServices.Authentication
             var handler = new JwtSecurityTokenHandler();
             var identity = new ClaimsIdentity(new GenericIdentity(user.Id.ToString(), "TokenAuth"));
 
-            if (user.IsGlobalAdmin)
-            {
-                identity.AddClaim(new Claim("CanPublish", "true"));
-            }
+            AddUserClaims(identity, user);
+
             // securityKey length should be >256b
             try
             {
@@ -87,6 +86,19 @@ namespace Core.ApplicationServices.Authentication
             {
                 Logger.Error(ex, "TokenValidator: Exception verifying token.");
                 return new OperationError("Invalid token", OperationFailure.Forbidden);
+            }
+        }
+
+        private void AddUserClaims(ClaimsIdentity identity, User user)
+        {
+            if (user.IsGlobalAdmin)
+            {
+                identity.AddClaim(new Claim(Constants.ClaimConstants.CanPublish, Constants.ClaimConstants.True));
+            }
+
+            if (user.IsSystemIntegrator)
+            {
+                identity.AddClaim(new Claim(Constants.ClaimConstants.CanSubscribe, Constants.ClaimConstants.True));
             }
         }
     }

@@ -493,7 +493,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return (userId, password);
         }
 
-        public static async Task<(int userId, KitosCredentials credentials, string token)> CreateUserAndGetToken(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false, bool stakeHolderAccess = false)
+        public static async Task<(int userId, KitosCredentials credentials, string token)> CreateUserAndGetToken(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false, bool stakeHolderAccess = false, bool isSystemIntegrator = false)
         {
             var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess, stakeHolderAccess), role, organizationId);
             var password = Guid.NewGuid().ToString("N");
@@ -503,6 +503,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 var user = x.AsQueryable().ById(userId);
                 user.Password = crypto.Encrypt(password + user.Salt);
                 user.IsGlobalAdmin = role == OrganizationRole.GlobalAdmin;
+                user.IsSystemIntegrator = isSystemIntegrator;
             });
 
             var token = await GetTokenAsync(new KitosCredentials(email, password));
