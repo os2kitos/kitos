@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta name="Version" content="@typeof(Presentation.Web.MvcApplication).Assembly.GetName().Version" />
+    <meta http-equiv="X-UA-Compatible" content="IE=EDGE">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title data-ng-bind="page.title + ' - KITOS'">KITOS</title>
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon">
+
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.221/styles/kendo.common.min.css">
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.221/styles/kendo.rtl.min.css">
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.221/styles/kendo.default.min.css"/>
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2018.1.221/styles/kendo.mobile.all.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    @Styles.Render("~/Content/css/css")
+    @Scripts.Render("~/Scripts/vendor")
+    @Scripts.Render("~/Scripts/angular")
+    <script src="https://kendo.cdn.telerik.com/2018.1.221/js/jszip.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2018.1.221/js/kendo.all.min.js"></script>
+    <!-- Kendo localization -->
+    <script src="https://kendo.cdn.telerik.com/2018.1.221/js/messages/kendo.messages.da-DK.min.js"></script>
+    <!-- Kendo globalization -->
+    <script src="https://kendo.cdn.telerik.com/2018.1.221/js/cultures/kendo.culture.da-DK.min.js"></script>
+
+
+    @if (ViewBag.StylingScheme == "TEST")
+    {
+        <style>
+            #navbar-top {
+                background-color: purple !important;
+            }
+        </style>
+    }
+</head>
+<body data-ng-app="app" data-ng-cloak data-ng-strict-di>
+    @RenderBody()
+
+    <script>
+        // set current culture to "da-DK"
+        kendo.culture("da-DK");
+    </script>
+
+    @Scripts.Render("~/Scripts/app")
+
+    <script>
+        $(addCrudControls());
+
+        function addCrudControls() {
+            $('.crud').hide();
+            $('.panel').hover(
+                function () {
+                    $(this).find('.crud').show();
+                },
+                function () {
+                    $(this).find('.crud').hide();
+                }
+            );
+        };
+    </script>
+    <input id="__RequestVerificationToken" type="hidden" />
+
+</body>
+</html>
