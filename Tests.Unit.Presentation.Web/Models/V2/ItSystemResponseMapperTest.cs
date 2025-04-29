@@ -5,6 +5,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.System;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -12,6 +13,7 @@ using Moq;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.KLE;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.System;
@@ -109,6 +111,22 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(src.Created, mapped.Created);
             AssertOptionalUser(src.ObjectOwner, mapped.CreatedBy);
             AssertArchiveDuty(src, mapped.RecommendedArchiveDuty);
+            AssertMainContractSuppliers(src, mapped.MainContractSuppliers);
+        }
+
+        private static void AssertMainContractSuppliers(ItSystem src, IEnumerable<IdentityNamePairResponseDTO> mainContractSuppliers)
+        {
+            var firstUsage = src.Usages.First();
+            var secondUsage = src.Usages.Skip(1).First();
+            Assert.Equal(2, mainContractSuppliers.Count());
+            Assert.Contains(mainContractSuppliers, x => MainContractSupplierMatches(firstUsage, x));
+            Assert.Contains(mainContractSuppliers, x => MainContractSupplierMatches(secondUsage, x));
+        }
+
+        private static bool MainContractSupplierMatches(ItSystemUsage usage, IdentityNamePairResponseDTO mapped)
+        {
+            var supplier = usage.MainContract.ItContract.Supplier;
+            return mapped.Name == supplier.Name && mapped.Uuid == supplier.Uuid;
         }
 
         private static void AssertArchiveDuty(ItSystem src, RecommendedArchiveDutyResponseDTO mappedRecommendedArchiveDuty)
@@ -123,14 +141,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             {
                 Usages = new List<ItSystemUsage>()
                 {
-                    new ItSystemUsage()
-                    {
-                        Organization = CreateOrganization()
-                    },
-                    new ItSystemUsage()
-                    {
-                        Organization = CreateOrganization()
-                    }
+                    CreateItSystemUsage(),
+                    CreateItSystemUsage(),
+                    CreateItSystemUsage(),
+                    CreateItSystemUsage(false),
+                    CreateItSystemUsage(true, false),
                 },
                 Organization = hasOrganization ? CreateOrganization() : null,
                 ObjectOwner = hasOwner ? CreateUser() : null,
@@ -161,6 +176,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 LegalName = A<string>(),
                 LegalDataProcessorName = A<string>()
             };
+            itSystem.Usages.First().MainContract.ItContract.Supplier =
+                itSystem.Usages.Skip(2).First().MainContract.ItContract.Supplier; //setup duplicate supplier
             return itSystem;
         }
 
@@ -178,7 +195,29 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             return new Organization()
             {
                 Cvr = A<string>(),
-                Name = A<string>()
+                Name = A<string>(),
+                Uuid = A<Guid>()
+            };
+        }
+
+        private ItSystemUsage CreateItSystemUsage(bool withMainContract = true, bool withSupplier = true)
+        {
+            return new ItSystemUsage
+            {
+                Organization = CreateOrganization(),
+                MainContract = withMainContract
+                    ? new ItContractItSystemUsage
+                    {
+                        ItContract = CreateContract(withSupplier)
+                    } : null
+            };
+        }
+
+        private ItContract CreateContract(bool withSupplier = true)
+        {
+            return new ItContract
+            {
+                Supplier = withSupplier ? CreateOrganization() : null,
             };
         }
     }
