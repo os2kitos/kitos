@@ -88,5 +88,10 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// </summary>
         [Required]
         public RecommendedArchiveDutyResponseDTO RecommendedArchiveDuty { get; set; }
+        /// <summary>
+        ///A list of unique suppliers associated with each usage’s main contract.
+        /// </summary>
+        [Required]
+        public IEnumerable<IdentityNamePairResponseDTO> MainContractSuppliers { get; set; }
     }
 }

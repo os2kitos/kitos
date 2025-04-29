@@ -9,6 +9,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Interface;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
@@ -19,6 +20,7 @@ using Presentation.Web.Models.API.V2.Response.KLE;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Response.System;
+using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.System;
 using Tests.Integration.Presentation.Web.Tools;
@@ -473,6 +475,72 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                     Assert.Equal(node.Parent.Uuid, system.Parent.Uuid);
                 }
             }
+        }
+
+        [Fact]
+        public async Task Can_Get_Unique_Main_Contract_Suppliers()
+        {
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var organization = await CreateOrganizationAsync();
+            var itSystem = await CreateItSystemAsync(organization.Uuid);
+            var (_, supplierUuid1) = await CreateUsageWithMainContractAndSupplier(itSystem.Uuid, null);
+            var (_, supplierUuid2) = await CreateUsageWithMainContractAndSupplier(itSystem.Uuid, null);
+            var (_, _) = await CreateUsageWithMainContractAndSupplier(itSystem.Uuid, supplierUuid1); //Create duplicate supplier
+            await ItSystemUsageV2Helper.PostAsync(token.Token, new CreateItSystemUsageRequestDTO
+            {
+                SystemUuid = itSystem.Uuid,
+                OrganizationUuid = organization.Uuid
+            }); //System with no maincontract
+
+            var itSystemResponse = await ItSystemV2Helper.GetSingleAsync(token.Token, itSystem.Uuid);
+
+            var mainContractSuppliers = itSystemResponse.MainContractSuppliers;
+            Assert.Equal(2, mainContractSuppliers.Count());
+            Assert.Contains(mainContractSuppliers, x => x.Uuid == supplierUuid1);
+            Assert.Contains(mainContractSuppliers, x => x.Uuid == supplierUuid2);
+        }
+
+        private async Task<(ItSystemUsageResponseDTO, Guid)> CreateUsageWithMainContractAndSupplier(Guid systemUuid, Guid? supplierUuid)
+        {
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var organization = await CreateOrganizationAsync();
+            var request = new CreateItSystemUsageRequestDTO
+            {
+                SystemUuid = systemUuid,
+                OrganizationUuid = organization.Uuid,
+
+            };
+            var usage = await ItSystemUsageV2Helper.PostAsync(token.Token, request);
+            var finalSupplierUuid = supplierUuid ?? (await CreateOrganizationAsync()).Uuid;
+            var contract = await ItContractV2Helper.PostContractAsync(token.Token, new CreateNewContractRequestDTO
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = A<string>(),
+                SystemUsageUuids = usage.Uuid.WrapAsEnumerable(),
+                Supplier = new ContractSupplierDataWriteRequestDTO
+                {
+                    OrganizationUuid = finalSupplierUuid
+                }
+            });
+            var updateRequest = new UpdateItSystemUsageRequestDTO()
+            {
+                General = new GeneralDataUpdateRequestDTO
+                {
+                    MainContractUuid = contract.Uuid
+                }
+            };
+            await ItSystemUsageV2Helper.PutAsync(token.Token, usage.Uuid, updateRequest);
+            return (usage, finalSupplierUuid);
+        }
+
+        private async Task<ItSystemResponseDTO> CreateItSystemAsync(Guid organizationUuid)
+        {
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            return await ItSystemV2Helper.CreateSystemAsync(token.Token, new CreateItSystemRequestDTO
+            {
+                OrganizationUuid = organizationUuid,
+                Name = A<string>()
+            });
         }
 
         [Fact]
