@@ -106,34 +106,6 @@ namespace Presentation.Web.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://adgangsstyring.eksterntest-stoettesystemerne.dk/")]
-        public string StsIssuer {
-            get {
-                return ((string)(this["StsIssuer"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://adgangsstyring.eksterntest-stoettesystemerne.dk/runtime/services/kombittr" +
-            "ust/14/certificatemixed")]
-        public string StsCertificateEndpoint {
-            get {
-                return ((string)(this["StsCertificateEndpoint"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("eksterntest-stoettesystemerne.dk")]
-        public string StsOrganisationEndpointHost {
-            get {
-                return ((string)(this["StsOrganisationEndpointHost"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("ORG_EXTTEST_Organisation_1")]
         public string ServiceCertificateAliasOrg {
             get {
@@ -156,15 +128,6 @@ namespace Presentation.Web.Properties {
         public string StsCertificateThumbprint {
             get {
                 return ((string)(this["StsCertificateThumbprint"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://organisation.eksterntest-stoettesystemerne.dk/service/organisation/3")]
-        public string OrgService6EntityId {
-            get {
-                return ((string)(this["OrgService6EntityId"]));
             }
         }
         
@@ -239,6 +202,43 @@ namespace Presentation.Web.Properties {
         public string PubSubBaseUrl {
             get {
                 return ((string)(this["PubSubBaseUrl"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://n2adgangsstyring.eksterntest-stoettesystemerne.dk/")]
+        public string StsIssuer {
+            get {
+                return ((string)(this["StsIssuer"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://n2adgangsstyring.eksterntest-stoettesystemerne.dk/runtime/services/kombit" +
+            "trust/14/certificatemixed")]
+        public string StsCertificateEndpoint {
+            get {
+                return ((string)(this["StsCertificateEndpoint"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("exttest-stoettesystemerne.dk")]
+        public string StsOrganisationEndpointHost {
+            get {
+                return ((string)(this["StsOrganisationEndpointHost"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://stoettesystemerne.dk/service/organisation/3")]
+        public string OrgService6EntityId {
+            get {
+                return ((string)(this["OrgService6EntityId"]));
             }
         }
     }

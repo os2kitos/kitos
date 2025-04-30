@@ -29,15 +29,6 @@
     <Setting Name="SsoServiceProviderId" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://kitos-local.strongminds.dk</Value>
     </Setting>
-    <Setting Name="StsIssuer" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">https://adgangsstyring.eksterntest-stoettesystemerne.dk/</Value>
-    </Setting>
-    <Setting Name="StsCertificateEndpoint" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">https://adgangsstyring.eksterntest-stoettesystemerne.dk/runtime/services/kombittrust/14/certificatemixed</Value>
-    </Setting>
-    <Setting Name="StsOrganisationEndpointHost" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">eksterntest-stoettesystemerne.dk</Value>
-    </Setting>
     <Setting Name="ServiceCertificateAliasOrg" Type="System.String" Scope="Application">
       <Value Profile="(Default)">ORG_EXTTEST_Organisation_1</Value>
     </Setting>
@@ -46,9 +37,6 @@
     </Setting>
     <Setting Name="StsCertificateThumbprint" Type="System.String" Scope="Application">
       <Value Profile="(Default)">0aa7a193f18d095f7e2ce09d892178c9682b7924</Value>
-    </Setting>
-    <Setting Name="OrgService6EntityId" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://organisation.eksterntest-stoettesystemerne.dk/service/organisation/3</Value>
     </Setting>
     <Setting Name="StsVirksomhedPort" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://organisation.eksterntest-stoettesystemerne.dk/organisation/virksomhed/6</Value>
@@ -73,6 +61,18 @@
     </Setting>
     <Setting Name="PubSubBaseUrl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://localhost/</Value>
+    </Setting>
+    <Setting Name="StsIssuer" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://n2adgangsstyring.eksterntest-stoettesystemerne.dk/</Value>
+    </Setting>
+    <Setting Name="StsCertificateEndpoint" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://n2adgangsstyring.eksterntest-stoettesystemerne.dk/runtime/services/kombittrust/14/certificatemixed</Value>
+    </Setting>
+    <Setting Name="StsOrganisationEndpointHost" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">exttest-stoettesystemerne.dk</Value>
+    </Setting>
+    <Setting Name="OrgService6EntityId" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">http://stoettesystemerne.dk/service/organisation/3</Value>
     </Setting>
   </Settings>
 </SettingsFile>
