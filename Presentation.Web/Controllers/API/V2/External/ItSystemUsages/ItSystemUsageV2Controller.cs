@@ -315,31 +315,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 .Match(Ok, FromOperationError);
         }
 
-        /// Add role assignment for multiple users to the it-system usage
-        /// Constraint: Duplicates are not allowed (existing assignment of the same user/role)
-        /// </summary>
-        /// <param name="systemUsageUuid"></param>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPatch]
-        [Route("{systemUsageUuid}/roles/bulk/add")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Conflict, Description = "If duplicate is detected")]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PatchAddBulkRoleAssignment([NonEmptyGuid] Guid systemUsageUuid, [FromBody] BulkRoleAssignmentRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .AddRoleRange(systemUsageUuid, request.ToUserRolePairs())
-                .Select(_responseMapper.MapSystemUsageDTO)
-                .Match(Ok, FromOperationError);
-        }
-
         /// <summary>
         /// Remove an existing role assignment to the it-system usage
         /// </summary>

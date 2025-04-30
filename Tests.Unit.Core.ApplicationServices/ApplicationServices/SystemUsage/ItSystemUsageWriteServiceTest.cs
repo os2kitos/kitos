@@ -1381,38 +1381,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Fact]
-        public void Can_Add_Role_Range()
-        {
-            //Arrange
-            var (_, _, transactionMock, _, _, itSystemUsage) = CreateBasicTestVariables();
-            var existingAssignment = A<UserRolePair>();
-            itSystemUsage.Rights.Add(new ItSystemRight { Role = new ItSystemRole { Uuid = existingAssignment.RoleUuid }, User = new User { Uuid = existingAssignment.UserUuid } });
-            var newAssignment = A<UserRolePair>();
-            var newAssignment2 = A<UserRolePair>();
-
-            var assignments = new List<UserRolePair> { newAssignment, newAssignment2 };
-
-            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
-            ExpectAllowModifyReturns(itSystemUsage, true);
-
-            _roleAssignmentService
-                .Setup(x => x.BatchUpdateRoles(
-                        itSystemUsage,
-                        It.Is<IEnumerable<(Guid roleUuid, Guid user)>>(assignments =>
-                            MatchExpectedAssignments(assignments, new[] { existingAssignment, newAssignment, newAssignment2 }.ToList()))
-                    )
-                )
-                .Returns(Maybe<OperationError>.None);
-
-            //Act
-            var createResult = _sut.AddRoleRange(itSystemUsage.Uuid, assignments);
-
-            //Assert
-            Assert.True(createResult.Ok);
-            AssertTransactionCommitted(transactionMock);
-        }
-
-        [Fact]
         public void Can_Remove_Role()
         {
             //Arrange

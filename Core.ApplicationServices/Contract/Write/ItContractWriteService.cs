@@ -219,11 +219,6 @@ namespace Core.ApplicationServices.Contract.Write
             return AddRoles(contractUuid, assignment.WrapAsEnumerable());
         }
 
-        public Result<ItContract, OperationError> AddRoleRange(Guid contractUuid, IEnumerable<UserRolePair> assignments)
-        {
-            return AddRoles(contractUuid, assignments);
-        }
-
         public Result<ItContract, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair assignment)
         {
             return _contractService

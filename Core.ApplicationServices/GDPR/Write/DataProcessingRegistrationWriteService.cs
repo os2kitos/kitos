@@ -104,12 +104,6 @@ namespace Core.ApplicationServices.GDPR.Write
             return AddRoles(dprUuid, assignment.WrapAsEnumerable());
         }
 
-        public Result<DataProcessingRegistration, OperationError> AddRoleRange(Guid dprUuid,
-            IEnumerable<UserRolePair> assignments)
-        {
-            return AddRoles(dprUuid, assignments);
-        }
-
         public Result<DataProcessingRegistration, OperationError> RemoveRole(Guid dprUuid, UserRolePair assignment)
         {
             return _applicationService

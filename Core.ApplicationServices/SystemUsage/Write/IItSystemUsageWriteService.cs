@@ -14,7 +14,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
         Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters);
         Result<ItSystemUsage, OperationError> Update(Guid systemUsageUuid, SystemUsageUpdateParameters parameters);
         Result<ItSystemUsage, OperationError> AddRole(Guid systemUsageUuid, UserRolePair assignment);
-        Result<ItSystemUsage, OperationError> AddRoleRange(Guid systemUsageUuid, IEnumerable<UserRolePair> assignments);
         Result<ItSystemUsage, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair assignment);
         Maybe<OperationError> Delete(Guid itSystemUsageUuid);
         Result<SystemRelation, OperationError> CreateSystemRelation(Guid fromSystemUsageUuid, SystemRelationParameters parameters);
