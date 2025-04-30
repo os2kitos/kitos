@@ -581,6 +581,19 @@ namespace Infrastructure.DataAccess.Migrations
                     });
                 }
 
+                if (!context.PublicMessages.Any(x => x.Id == 7))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage
+                    {
+                        Title = "Kitos er Kommunernes IT Overblikssystem",
+                        ShortDescription = "Kitos er en open-source web-baseret løsning, der anvendes af 76 kommuner. Kitos skaber overblik over den samlede kommunale IT-portefølje.",
+                        Link = "https://www.os2.eu/os2kitos",
+                        IsMain = true,
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
                 #endregion
             }
         }

@@ -135,7 +135,7 @@ namespace Presentation.Web
                 timeZone: TimeZoneInfo.Local);
 
             recurringJobManager.AddOrUpdate(
-                recurringJobId: StandardJobIds.CreateInitialPublicMessages,
+                recurringJobId: StandardJobIds.CreateMainPublicMessage,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchCreateMainPublicMessageTask(CancellationToken.None)),
                 cronExpression: Cron.Never(), //On demand
                 timeZone: TimeZoneInfo.Local);
