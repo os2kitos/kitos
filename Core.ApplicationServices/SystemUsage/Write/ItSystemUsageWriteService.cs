@@ -174,11 +174,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return AddRoles(systemUsageUuid, assignment.WrapAsEnumerable());
         }
 
-        public Result<ItSystemUsage, OperationError> AddRoleRange(Guid systemUsageUuid, IEnumerable<UserRolePair> assignments)
-        {
-            return AddRoles(systemUsageUuid, assignments);
-        }
-
         public Result<ItSystemUsage, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair assignment)
         {
             return _systemUsageService

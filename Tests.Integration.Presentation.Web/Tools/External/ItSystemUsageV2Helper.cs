@@ -217,11 +217,6 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/roles/add"), token, dto);
         }
 
-        public static async Task<HttpResponseMessage> SendPatchAddBulkRoleAssignment(string token, Guid uuid, BulkRoleAssignmentRequestDTO dto)
-        {
-            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/roles/bulk/add"), token, dto);
-        }
-
         public static async Task<HttpResponseMessage> SendPatchRemoveRoleAssignment(string token, Guid uuid, RoleAssignmentRequestDTO dto)
         {
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/roles/remove"), token, dto);

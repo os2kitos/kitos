@@ -14,8 +14,6 @@ namespace Core.ApplicationServices.GDPR.Write
         Result<DataProcessingRegistration, OperationError> Update(Guid dataProcessingRegistrationUuid, DataProcessingRegistrationModificationParameters parameters);
         Maybe<OperationError> Delete(Guid dataProcessingRegistrationUuid);
         Result<DataProcessingRegistration, OperationError> AddRole(Guid dprUuid, UserRolePair assignment);
-        Result<DataProcessingRegistration, OperationError> AddRoleRange(Guid dprUuid,
-            IEnumerable<UserRolePair> assignments);
         Result<DataProcessingRegistration, OperationError> RemoveRole(Guid dprUuid, UserRolePair assignment);
     }
 }

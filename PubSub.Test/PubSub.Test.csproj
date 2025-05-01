@@ -20,16 +20,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PubSub.Application\PubSub.Application.csproj" />
-    <ProjectReference Include="..\PubSub.DataAccess\PubSub.DataAccess.csproj" />
+    <ProjectReference Include="..\PubSub.Application.Services\PubSub.Application.Services.csproj" />
+    <ProjectReference Include="..\PubSub.Application.Api\PubSub.Application.Api.csproj" />
+    <ProjectReference Include="..\PubSub.Core.Abstractions\PubSub.Core.Abstractions.csproj" />
+    <ProjectReference Include="..\PubSub.Core.DomainModel\PubSub.Core.DomainModel.csproj" />
+    <ProjectReference Include="..\PubSub.Core.Interfaces\PubSub.Core.Interfaces.csproj" />
+    <ProjectReference Include="..\PubSub.Infrastructure.MessageQueue\PubSub.Infrastructure.MessageQueue.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Unit\DataAccess\" />
   </ItemGroup>
 
 </Project>

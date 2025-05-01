@@ -131,31 +131,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
                 .Match(Ok, FromOperationError);
         }
 
-        /// Add role assignment for multiple users to the data processing registration
-        /// Constraint: Duplicates are not allowed (existing assignment of the same user/role)
-        /// </summary>
-        /// <param name="dprUuid"></param>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPatch]
-        [Route("{dprUuid}/roles/bulk/add")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Conflict, Description = "If duplicate is detected")]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PatchAddBulkRoleAssignment([NonEmptyGuid] Guid dprUuid, [FromBody] BulkRoleAssignmentRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .AddRoleRange(dprUuid, request.ToUserRolePairs())
-                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
-                .Match(Ok, FromOperationError);
-        }
-
         /// <summary>
         /// Remove an existing role assignment to the data processing registration
         /// </summary>
