@@ -5,6 +5,7 @@ using PubSub.Core.DomainModel.Serializer;
 using PubSub.Application.Services.RabbitMQUtils;
 using PubSub.Core.DomainModel.Consumer;
 using PubSub.Core.DomainModel.Notifier;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PubSub.Infrastructure.MessageQueue.Consumer
 {
@@ -13,23 +14,23 @@ namespace PubSub.Infrastructure.MessageQueue.Consumer
         private readonly IRabbitMQConnectionManager _connectionManager;
         private readonly ISubscriberNotifier _subscriberNotifierService;
         private readonly string _topic;
+        private readonly IServiceScopeFactory serviceScopeFactory;
         private readonly IJsonPayloadSerializer _payloadSerializer;
         private IConnection _connection;
         private IChannel _channel;
         private IAsyncBasicConsumer _consumerCallback;
-        private readonly ISubscriptionRepositoryProvider subscriptionRepositoryProvider;
 
         public RabbitMQConsumer(IRabbitMQConnectionManager connectionManager, 
             ISubscriberNotifier subscriberNotifierService, 
             IJsonPayloadSerializer payloadSerializer, 
             string topic,
-            ISubscriptionRepositoryProvider subscriptionRepositoryProvider)
+            IServiceScopeFactory serviceScopeFactory)
         {
             _connectionManager = connectionManager;
             _subscriberNotifierService = subscriberNotifierService;
             _topic = topic;
+            this.serviceScopeFactory = serviceScopeFactory;
             _payloadSerializer = payloadSerializer;
-            this.subscriptionRepositoryProvider = subscriptionRepositoryProvider;
         }
 
         public async Task StartListeningAsync()
@@ -52,7 +53,8 @@ namespace PubSub.Infrastructure.MessageQueue.Consumer
                 {
                     var body = eventArgs.Body.ToArray();
                     var payload = _payloadSerializer.Deserialize(body);
-                    var repository = subscriptionRepositoryProvider.Get();
+                    using var scope = serviceScopeFactory.CreateScope();
+                    var repository = scope.ServiceProvider.GetRequiredService<ISubscriptionRepository>();
                     var subscriptions = await repository.GetByTopic(_topic);
                     foreach (var callbackUrl in subscriptions.Select(x => x.Callback))
                     {

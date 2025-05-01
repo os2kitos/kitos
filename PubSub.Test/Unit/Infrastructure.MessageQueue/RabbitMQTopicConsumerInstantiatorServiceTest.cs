@@ -7,6 +7,7 @@ using PubSub.Infrastructure.MessageQueue.Consumer;
 using PubSub.Core.DomainModel.Consumer;
 using PubSub.Core.DomainModel.Notifier;
 using PubSub.Core.DomainServices;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace PubSub.Test.Unit.Infrastructure.MessageQueue
@@ -19,7 +20,7 @@ namespace PubSub.Test.Unit.Infrastructure.MessageQueue
         private readonly Mock<IRabbitMQConnectionManager> _mockConnectionManager;
         private readonly Mock<ISubscriberNotifier> _mockSubscriberNotifierService;
         private readonly Mock<IJsonPayloadSerializer> _messageSerializer;
-        private readonly Mock<ISubscriptionRepositoryProvider> _subscriptionRepository;
+        private readonly Mock<IServiceScopeFactory> _subscriptionRepository;
 
 
         public RabbitMQTopicConsumerInstantiatorServiceTest()
@@ -29,7 +30,7 @@ namespace PubSub.Test.Unit.Infrastructure.MessageQueue
             _consumerFactory = new Mock<IRabbitMQConsumerFactory>();
             _mockSubscriberNotifierService = new Mock<ISubscriberNotifier>();
             _messageSerializer = new Mock<IJsonPayloadSerializer>();
-            _subscriptionRepository = new Mock<ISubscriptionRepositoryProvider>();
+            _subscriptionRepository = new Mock<IServiceScopeFactory>();
             _sut = new RabbitMQTopicConsumerInstantiatorService(_mockConnectionManager.Object, _mockSubscriberNotifierService.Object, _subscriptionStore.Object, _consumerFactory.Object, _messageSerializer.Object, _subscriptionRepository.Object);
         }
 
@@ -39,7 +40,7 @@ namespace PubSub.Test.Unit.Infrastructure.MessageQueue
             var topic = A<string>();
             var consumer = new Mock<IConsumer>();
             _subscriptionStore.Setup(x => x.HasConsumer(topic)).Returns(false);
-            _consumerFactory.Setup(x => x.Create(It.IsAny<IRabbitMQConnectionManager>(), It.IsAny<ISubscriberNotifier>(), It.IsAny<IJsonPayloadSerializer>(), It.IsAny<string>(), It.IsAny<ISubscriptionRepositoryProvider>())).Returns(consumer.Object);
+            _consumerFactory.Setup(x => x.Create(It.IsAny<IRabbitMQConnectionManager>(), It.IsAny<ISubscriberNotifier>(), It.IsAny<IJsonPayloadSerializer>(), It.IsAny<string>(), It.IsAny<IServiceScopeFactory>())).Returns(consumer.Object);
 
             await _sut.InstantiateTopic(topic);
 

@@ -2,10 +2,10 @@
 using RabbitMQ.Client;
 using PubSub.Test.Base;
 using PubSub.Infrastructure.MessageQueue.Consumer;
-using PubSub.Core.DomainModel.Repositories;
 using PubSub.Core.DomainModel.Serializer;
 using PubSub.Application.Services.RabbitMQUtils;
 using PubSub.Core.DomainModel.Notifier;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PubSub.Test.Unit.Infrastructure.MessageQueue
 {
@@ -17,7 +17,7 @@ namespace PubSub.Test.Unit.Infrastructure.MessageQueue
             var mockConnectionManager = new Mock<IRabbitMQConnectionManager>();
             var connection = new Mock<IConnection>();
             var channel = new Mock<IChannel>();
-            var repo = new Mock<ISubscriptionRepositoryProvider>();
+            var repo = new Mock<IServiceScopeFactory>();
             mockConnectionManager.Setup(_ => _.GetConnectionAsync()).ReturnsAsync(connection.Object);
             connection.Setup(_ => _.CreateChannelAsync(null, default)).ReturnsAsync(channel.Object);
             var messageSerializer = new Mock<IJsonPayloadSerializer>();

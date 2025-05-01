@@ -98,7 +98,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IJsonPayloadSerializer, JsonPayloadSerializer>();
         services.AddScoped<ISubscriberNotifier, HttpSubscriberNotifier>();
         services.AddSingleton<ITopicConsumerStore, InMemoryTopicConsumerStore>();
-        services.AddScoped<ISubscriptionRepositoryProvider, SubscriptionRepositoryProvider>();
 
         services.AddScoped<ISubscriptionRepository, EntityFrameworkSubscriptionRepository>();
         services.AddScoped<ISubscriptionService, SubscriptionService>();
