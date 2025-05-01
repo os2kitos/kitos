@@ -1,7 +1,7 @@
 Function Run-Pubsub-DB-Migrations(
     [string]$connectionString
 ) {
-    $dataAccessFolder = Resolve-Path "$PSScriptRoot\..\PubSub.DataAccess"
+    $dataAccessFolder = Resolve-Path "$PSScriptRoot\..\PubSub.Infrastructure.DataAccess"
 
     # Set the environment variable for the design-time factory
     $env:DEFAULT_CONNECTION_STRING = $connectionString
