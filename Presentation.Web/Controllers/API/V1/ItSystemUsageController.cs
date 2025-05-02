@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Castle.Core.Internal;
 using Core.Abstractions.Types;
@@ -331,7 +332,7 @@ namespace Presentation.Web.Controllers.API.V1
                 {
                     tasks = usage.TaskRefs.Where(x => (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) && !x.Children.Any()).ToList();
 
-                    if (tasks.IsNullOrEmpty())
+                    if (!tasks.Any())
                     {
                         optOut = true;
                         tasks = usage.ItSystem.TaskRefs.Where(x => (x.Id == taskId || x.ParentId == taskId || x.Parent.ParentId == taskId) && !x.Children.Any()).ToList();
@@ -342,7 +343,7 @@ namespace Presentation.Web.Controllers.API.V1
                     // no taskId was specified so get everything
                     tasks = usage.TaskRefs.ToList();
 
-                    if (tasks.IsNullOrEmpty())
+                    if (!tasks.Any())
                     {
                         tasks = usage.ItSystem.TaskRefs.ToList();
                     }

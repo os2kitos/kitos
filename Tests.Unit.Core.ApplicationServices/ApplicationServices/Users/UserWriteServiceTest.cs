@@ -120,7 +120,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             Assert.True(result.Failed);
             Assert.Equal(error, result.Error.FailureType);
             Assert.True(result.Error.Message.HasValue);
-            Assert.True(result.Error.Message.Value.Contains("Failed to assign role"));
+            Assert.True(result.Error.Message.Value != null && result.Error.Message.Value.Contains("Failed to assign role"));
             transaction.Verify(x => x.Rollback(), Times.Once);
         }
 
