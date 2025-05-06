@@ -237,7 +237,7 @@ namespace Presentation.Web.Infrastructure
                 if (user.FailedAttempts >= MaxInvalidPasswordAttempts)
                 {
                     user.LockedOutDate = DateTime.Now;
-                    Logger.Info($"Uservalidation: {MaxInvalidPasswordAttempts} invalid login attempts. User with uuid {user.Uuid} has been locked.");
+                    Logger.Info($"Uservalidation: {MaxInvalidPasswordAttempts} invalid login attempts. A user has been locked.");
                     ResetAttempts(user);
                 }
             }
