@@ -195,12 +195,12 @@ namespace Presentation.Web.Infrastructure
                     {
                         ResetLockedOutDate(user);
                         ResetAttempts(user);
-                        Logger.Info($"Uservalidation: User with uuid {user.Uuid} has been unlocked.");
+                        Logger.Info($"Uservalidation: A user has been unlocked.");
                         isValid = CheckPassword(user, password);
                     }
                     else
                     {
-                        Logger.Info($"Uservalidation: User with uuid {user.Uuid} will be unlocked {unlockDate}.");
+                        Logger.Info($"Uservalidation: A user will be unlocked at {unlockDate}.");
                     }
 
                 }
