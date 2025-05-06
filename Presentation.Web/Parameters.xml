@@ -6,11 +6,6 @@
         </parameterentry>
     </parameter>
 
-    <parameter name="serilog:write-to:Elasticsearch.nodeUris" description="" defaultvalue="__ElasticSearchNodeUri__" tags="">
-        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='serilog:write-to:Elasticsearch.nodeUris']/@value">
-        </parameterentry>
-    </parameter>
-
     <!-- Kitos token configuration -->
     <parameter name="SecurityKeyString" description="" defaultvalue="__SecurityKeyString__" tags="">
         <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='SecurityKeyString']/@value">

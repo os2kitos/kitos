@@ -19,7 +19,6 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
                     "-skip:objectname=`"dirPath`",absolutepath=`"Default Web \Site\\App_Data$`" " + 
                     "-setParamFile:`"{1}\Presentation.Web.SetParameters.xml`" -allowUntrusted " + 
                     "-setParam:name=`"serilog:minimum-level`",value=`"{5}`" " + 
-                    "-setParam:name=`"serilog:write-to:Elasticsearch.nodeUris`",value=`"{6}`" " + 
                     "-setParam:name=`"SecurityKeyString`",value=`"{7}`" " + 
                     "-setParam:name=`"SmtpFromEmail`",value=`"{8}`" " + 
                     "-setParam:name=`"SmtpNetworkHost`",value=`"{9}`" " + 
