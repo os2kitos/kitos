@@ -195,12 +195,12 @@ namespace Presentation.Web.Infrastructure
                     {
                         ResetLockedOutDate(user);
                         ResetAttempts(user);
-                        Logger.Info($"Uservalidation: {user.Email} has been unlocked.");
+                        Logger.Info($"Uservalidation: A user has been unlocked.");
                         isValid = CheckPassword(user, password);
                     }
                     else
                     {
-                        Logger.Info($"Uservalidation: {user.Email} will be unlocked {unlockDate}.");
+                        Logger.Info($"Uservalidation: A user will be unlocked at {unlockDate}.");
                     }
 
                 }
@@ -237,7 +237,7 @@ namespace Presentation.Web.Infrastructure
                 if (user.FailedAttempts >= MaxInvalidPasswordAttempts)
                 {
                     user.LockedOutDate = DateTime.Now;
-                    Logger.Info($"Uservalidation: {MaxInvalidPasswordAttempts} invalid login attempts. {user.Email} has been locked.");
+                    Logger.Info($"Uservalidation: {MaxInvalidPasswordAttempts} invalid login attempts. A user has been locked.");
                     ResetAttempts(user);
                 }
             }
