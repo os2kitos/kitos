@@ -8,7 +8,6 @@ using Serilog;
 using Serilog.Exceptions.Core;
 using Serilog.Formatting.Compact;
 using Serilog.Formatting.Json;
-using Serilog.Sinks.Elasticsearch;
 using Serilog.Sinks.File;
 
 namespace Presentation.Web
