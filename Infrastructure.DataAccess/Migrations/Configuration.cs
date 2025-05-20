@@ -121,7 +121,7 @@ namespace Infrastructure.DataAccess.Migrations
                 var boss = new OrganizationUnitRole()
                 {
                     IsLocallyAvailable = true,
-                    Name = "Chef",
+                    Name = "Chefb",
                     Description = "Lederen af en organisationsenhed",
                     HasWriteAccess = true,
                     ObjectOwnerId = globalAdmin.Id,
@@ -451,7 +451,7 @@ namespace Infrastructure.DataAccess.Migrations
                 context.Organizations.AddOrUpdate(x => x.Name, commonOrganization/*, muni1, muni2*/);
                 context.SaveChanges();
 
-                
+
 
 
                 #endregion
@@ -641,6 +641,12 @@ namespace Infrastructure.DataAccess.Migrations
         private static void AddOptions<T, TReference>(IDbSet<T> dbSet, User objectOwner, params string[] names) where T : OptionEntity<TReference>, new()
         {
             var options = names.Select(name => CreateOption<T, TReference>(name, objectOwner)).ToList();
+            var i = options.Count;
+            foreach (var option in options)
+            {
+                option.Priority = i;
+                i--;
+            }
             try
             {
                 dbSet.AddOrUpdate(x => x.Name, options.ToArray());
@@ -649,12 +655,6 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 // we don't really care about duplicates
                 // just do nothing
-            }
-            var i = dbSet.Count();
-            foreach (var option in dbSet)
-            {
-                option.Priority = i;
-                i--;
             }
         }
 
@@ -680,7 +680,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             return org;
         }
-       
+
         #endregion
     }
 }
