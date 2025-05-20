@@ -1,6 +1,4 @@
-﻿version: '2.2'
-
-services:
+﻿services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
@@ -18,7 +16,7 @@ services:
     depends_on:
       - rabbitmq
     volumes:
-      - /etc/ssl/certs/kitos-staging.pfx:/etc/ssl/certs/kitos-staging.pfx:ro 
+      - /etc/ssl/certs/kitos-pubsub.pfx:/etc/ssl/certs/kitos-pubsub.pfx:ro
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
       RABBIT_MQ_USER: ${RABBIT_MQ_USER}

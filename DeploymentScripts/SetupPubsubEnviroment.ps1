@@ -18,4 +18,6 @@ Function Load-Pubsub-Parameters([String] $envName) {
     $Env:PUBSUB_REMOTE_TARGET_USER          = $parameters["PubSubRemoteTargetUser"]
     $Env:PUBSUB_REMOTE_TARGET_HOST          = $parameters["PubSubRemoteTargetHost"]
     $Env:PUBSUB_REMOTE_TARGET_PATH          = $parameters["PubSubRemoteTargetPath"]
+    $Env:PUBSUB_DOCKER_USERNAME             = $parameters["DockerUsername"]
+    $Env:PUBSUB_DOCKER_PASSWORD             = $parameters["DockerPassword"]
 }

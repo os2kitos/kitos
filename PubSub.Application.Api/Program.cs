@@ -23,7 +23,7 @@ builder.WebHost.ConfigureKestrel((context, options) =>
         else
         {
             var certPassword = Environment.GetEnvironmentVariable(Constants.Config.Certificate.CertPassword);
-            listenOptions.UseHttps("/etc/ssl/certs/kitos-staging.pfx", certPassword);
+            listenOptions.UseHttps(Constants.Config.Certificate.CertFilePath, certPassword);
         }
     });
 });
@@ -54,11 +54,8 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-if (!app.Environment.IsProduction())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

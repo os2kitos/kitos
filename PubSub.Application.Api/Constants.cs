@@ -34,6 +34,7 @@
             public static class Certificate
             {
                 public const string CertPassword = "CERT_PASSWORD";
+                public const string CertFilePath = "/etc/ssl/certs/kitos-pubsub.pfx";
             }
         }
 

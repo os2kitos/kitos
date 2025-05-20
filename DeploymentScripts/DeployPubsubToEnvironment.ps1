@@ -63,9 +63,13 @@ if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }
 
+$dockerUsername = $Env:PUBSUB_DOCKER_USERNAME
+$dockerPassword = $Env:PUBSUB_DOCKER_PASSWORD
 Write-Host "Executing docker commands on remote host..."
 $sshCommand = @"
 cd $remotePath;
+echo "Logging in to Docker"
+echo "$dockerPassword" | docker login -u "$dockerUsername" --password-stdin
 docker-compose down || true;
 docker-compose pull;
 docker-compose up -d --remove-orphans;
