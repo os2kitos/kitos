@@ -121,7 +121,7 @@ namespace Infrastructure.DataAccess.Migrations
                 var boss = new OrganizationUnitRole()
                 {
                     IsLocallyAvailable = true,
-                    Name = "Chefb",
+                    Name = "Chef",
                     Description = "Lederen af en organisationsenhed",
                     HasWriteAccess = true,
                     ObjectOwnerId = globalAdmin.Id,
