@@ -92,6 +92,6 @@ namespace Presentation.Web.Models.API.V2.Response.System
         ///A list of unique suppliers associated with each usage’s main contract.
         /// </summary>
         [Required]
-        public IEnumerable<IdentityNamePairResponseDTO> MainContractSuppliers { get; set; }
+        public IEnumerable<ShallowOrganizationResponseDTO> MainContractSuppliers { get; set; }
     }
 }
