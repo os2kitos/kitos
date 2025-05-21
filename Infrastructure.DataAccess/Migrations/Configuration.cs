@@ -197,12 +197,6 @@ namespace Infrastructure.DataAccess.Migrations
 
                 try
                 {
-                    var count = context.OrganizationUnitRoles.Count();
-                    foreach (var organizationUnitRole in context.OrganizationUnitRoles)
-                    {
-                        organizationUnitRole.Priority = count;
-                        count--;
-                    }
                     context.OrganizationUnitRoles.AddOrUpdate(role => role.Name, boss, resourcePerson, employee, digitalConsultant, itConsultant, leader, director);
                     context.SaveChanges();
                 }
@@ -318,13 +312,6 @@ namespace Infrastructure.DataAccess.Migrations
 
                 context.ItSystemRoles.AddOrUpdate(x => x.Name, systemOwnerRole, systemResponsibleRole, businessOwnerRole, superuserResponsibleRole, superuserRole, securityResponsibleRole, chanceManagerRole, dataOwnerRole, systemAdminRole);
 
-                var itSystemRolesCount = context.ItSystemRoles.Count();
-                foreach (var role in context.ItSystemRoles)
-                {
-                    role.Priority = itSystemRolesCount;
-                    itSystemRolesCount--;
-                }
-
                 context.SaveChanges();
 
                 #endregion
@@ -388,13 +375,6 @@ namespace Infrastructure.DataAccess.Migrations
                     Priority = 1
                 });
 
-                var itContractRolesCount = context.ItContractRoles.Count();
-                foreach (var role in context.ItContractRoles)
-                {
-                    role.Priority = itContractRolesCount;
-                    itContractRolesCount--;
-                }
-
                 context.SaveChanges();
 
                 #endregion
@@ -422,13 +402,6 @@ namespace Infrastructure.DataAccess.Migrations
                     Priority = 2
                 });
 
-                var dpaRolesCount = context.DataProcessingRegistrationRoles.Count();
-                foreach (var role in context.ItContractRoles)
-                {
-                    role.Priority = dpaRolesCount;
-                    dpaRolesCount--;
-                }
-
                 context.SaveChanges();
 
                 #endregion
@@ -451,7 +424,7 @@ namespace Infrastructure.DataAccess.Migrations
                 context.Organizations.AddOrUpdate(x => x.Name, commonOrganization/*, muni1, muni2*/);
                 context.SaveChanges();
 
-                
+
 
 
                 #endregion
@@ -641,6 +614,12 @@ namespace Infrastructure.DataAccess.Migrations
         private static void AddOptions<T, TReference>(IDbSet<T> dbSet, User objectOwner, params string[] names) where T : OptionEntity<TReference>, new()
         {
             var options = names.Select(name => CreateOption<T, TReference>(name, objectOwner)).ToList();
+            var i = options.Count;
+            foreach (var option in options)
+            {
+                option.Priority = i;
+                i--;
+            }
             try
             {
                 dbSet.AddOrUpdate(x => x.Name, options.ToArray());
@@ -649,12 +628,6 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 // we don't really care about duplicates
                 // just do nothing
-            }
-            var i = dbSet.Count();
-            foreach (var option in dbSet)
-            {
-                option.Priority = i;
-                i--;
             }
         }
 
@@ -680,7 +653,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             return org;
         }
-       
+
         #endregion
     }
 }
