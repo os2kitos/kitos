@@ -47,6 +47,7 @@ namespace Tools.Test.Database.Model.Tasks
                 new CreateKitosUserTask(_globalAdminApiUser, OrganizationRole.GlobalAdmin, $"{DefaultOrganizationName},{SecondOrganizationName}",true),
                 new CreateItSystemTask("DefaultTestItSystem",DefaultOrganizationName,null),
                 new CreateItSystemTask("SecondOrganizationDefaultTestItSystem",SecondOrganizationName,1),
+                new CreateItInterfaceTask("DefaultItInterface", DefaultOrganizationName),
                 new CreateItContractTask("DefaultTestItContract"),
                 new CreateDataProcessingRegistrationTask("DefaultDpa"),
                 new CreateTaskRefTask(DefaultOrganizationName)
