@@ -121,7 +121,7 @@ namespace Infrastructure.DataAccess.Migrations
                 var boss = new OrganizationUnitRole()
                 {
                     IsLocallyAvailable = true,
-                    Name = "Chefb",
+                    Name = "Chef",
                     Description = "Lederen af en organisationsenhed",
                     HasWriteAccess = true,
                     ObjectOwnerId = globalAdmin.Id,
@@ -197,12 +197,6 @@ namespace Infrastructure.DataAccess.Migrations
 
                 try
                 {
-                    var count = context.OrganizationUnitRoles.Count();
-                    foreach (var organizationUnitRole in context.OrganizationUnitRoles)
-                    {
-                        organizationUnitRole.Priority = count;
-                        count--;
-                    }
                     context.OrganizationUnitRoles.AddOrUpdate(role => role.Name, boss, resourcePerson, employee, digitalConsultant, itConsultant, leader, director);
                     context.SaveChanges();
                 }
@@ -318,13 +312,6 @@ namespace Infrastructure.DataAccess.Migrations
 
                 context.ItSystemRoles.AddOrUpdate(x => x.Name, systemOwnerRole, systemResponsibleRole, businessOwnerRole, superuserResponsibleRole, superuserRole, securityResponsibleRole, chanceManagerRole, dataOwnerRole, systemAdminRole);
 
-                var itSystemRolesCount = context.ItSystemRoles.Count();
-                foreach (var role in context.ItSystemRoles)
-                {
-                    role.Priority = itSystemRolesCount;
-                    itSystemRolesCount--;
-                }
-
                 context.SaveChanges();
 
                 #endregion
@@ -388,13 +375,6 @@ namespace Infrastructure.DataAccess.Migrations
                     Priority = 1
                 });
 
-                var itContractRolesCount = context.ItContractRoles.Count();
-                foreach (var role in context.ItContractRoles)
-                {
-                    role.Priority = itContractRolesCount;
-                    itContractRolesCount--;
-                }
-
                 context.SaveChanges();
 
                 #endregion
@@ -421,13 +401,6 @@ namespace Infrastructure.DataAccess.Migrations
                     LastChangedByUserId = globalAdmin.Id,
                     Priority = 2
                 });
-
-                var dpaRolesCount = context.DataProcessingRegistrationRoles.Count();
-                foreach (var role in context.ItContractRoles)
-                {
-                    role.Priority = dpaRolesCount;
-                    dpaRolesCount--;
-                }
 
                 context.SaveChanges();
 
