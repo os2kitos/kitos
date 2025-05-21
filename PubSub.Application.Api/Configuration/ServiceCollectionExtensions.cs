@@ -68,10 +68,39 @@ public static class ServiceCollectionExtensions
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = ctx =>
+                    {
+                        Console.WriteLine("Incoming token: {Token}", ctx.Token);
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = ctx =>
+                    {
+                        Console.WriteLine(
+                            ctx.Exception.ToString(),
+                            "Authentication failed for {Scheme}: {Error}",
+                            JwtBearerDefaults.AuthenticationScheme,
+                            ctx.Exception.Message);
+                        return Task.CompletedTask;
+                    },
+                    OnTokenValidated = ctx =>
+                    {
+                        Console.WriteLine(
+                            "Token valid: {Claims}",
+                            ctx.Principal.Claims.Select(c => $"{c.Type}={c.Value}"));
+                        return Task.CompletedTask;
+                    }
+                };
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     // Custom signature validator; consider refactoring if needed
-                    SignatureValidator = (token, _) => TokenValidator.ValidateTokenAsync(token, configuration, services).GetAwaiter().GetResult(),
+                    SignatureValidator = (token, _) =>
+                    {
+                        Console.WriteLine($"In token validator with token " + token);
+                        return TokenValidator.ValidateTokenAsync(token, configuration, services).GetAwaiter()
+                            .GetResult();
+                    },
                     ValidateIssuerSigningKey = false,
                     ValidateIssuer = false,
                     ValidateAudience = false,

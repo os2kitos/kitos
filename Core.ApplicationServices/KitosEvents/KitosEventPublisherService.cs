@@ -34,7 +34,7 @@ public class KitosEventPublisherService : IKitosEventPublisherService
             catch (Exception ex)
             {
                 _logger.Fatal($"Failed to post events. Exception: {ex}");
-                throw;
+                throw ex;
             }
         });
         postMethod.Wait();

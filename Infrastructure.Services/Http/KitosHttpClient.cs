@@ -31,11 +31,13 @@ public class KitosHttpClient : IKitosHttpClient
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         try
         {
-            return await _httpClient.SendAsync(request);
+            var debug = await _httpClient.SendAsync(request);
+            var toLog = await debug.Content.ReadAsStringAsync();
+            _logger.Fatal("Response from httpClient in KitosHttpClient: " + toLog + " with statuscode: " + debug.StatusCode);
         }
         catch (Exception e)
         {
-            _logger.Warning($"Failed to send to {request.RequestUri}, payload: {serializedObject}, exception: {e}");
+            _logger.Fatal($"Failed to send to {request.RequestUri}, payload: {serializedObject}, exception: {e}");
             throw e;
         }
 
