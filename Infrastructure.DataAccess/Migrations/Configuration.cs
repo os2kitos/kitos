@@ -1,5 +1,3 @@
-using System;
-using System.Data.Entity;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -7,6 +5,8 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Infrastructure.Services.Cryptography;
+using System;
+using System.Data.Entity;
 
 namespace Infrastructure.DataAccess.Migrations
 {
