@@ -289,7 +289,7 @@ namespace Core.ApplicationServices.Notification
             {
                 var idResult = ResolveRoleId(recipient.RoleUuid, relatedEntityType);
                 if (idResult.IsNone)
-                    return new OperationError($"Id for {relatedEntityType}Role with uuid: {recipient.RoleUuid} was not found", OperationFailure.NotFound); ;
+                    return new OperationError($"Id for {relatedEntityType}Role with uuid: {recipient.RoleUuid} was not found", OperationFailure.NotFound);
 
                 recipients.Add(new RoleRecipientModel(idResult.Value));
             }

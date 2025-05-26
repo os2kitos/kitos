@@ -1,5 +1,0 @@
-﻿By default all tests should be placed in the "Parallel" folder which is targeted by the parallel test job.
-
-If the test cannot be executed in parallel with others (e.g. it depends on transient state/needs full control), place it in the "sequential" folder
-
-If possible, rewrite sequential tests to be enabled for parallel execution.

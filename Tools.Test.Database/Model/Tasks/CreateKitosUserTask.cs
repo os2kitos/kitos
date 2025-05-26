@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data.Entity.Migrations;
-using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Infrastructure.DataAccess;

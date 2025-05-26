@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime;
 using Core.Abstractions.Types;
 
 namespace Core.Abstractions.Extensions

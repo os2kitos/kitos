@@ -294,7 +294,6 @@
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
     <Compile Include="Helpers\MoqTools.cs" />
     <Compile Include="Helpers\UserMock.cs" />
-    <Compile Include="Controllers\ItSystemControllerTest.cs" />
     <Compile Include="Infrastructure\CurrentAspNetRequestTest.cs" />
     <Compile Include="Infrastructure\NonEmptyGuidAttributeTest.cs" />
     <Compile Include="Infrastructure\SimpleLinkNameMaxLengthAttributeTest.cs" />
@@ -341,8 +340,6 @@
     <Compile Include="Services\OrganizationServiceTestBase.cs" />
     <Compile Include="Services\OrganizationWriteServiceTest.cs" />
     <Compile Include="Services\ReferenceServiceTest.cs" />
-    <Compile Include="Infrastructure\AutoMapperTest.cs" />
-    <Compile Include="WebHomeController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

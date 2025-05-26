@@ -49,8 +49,8 @@ namespace Core.ApplicationServices
         private readonly SHA256Managed _crypt;
         private readonly IOrganizationalUserContext _organizationalUserContext;
         private readonly ICommandBus _commandBus;
-        private readonly IEntityIdentityResolver _identityResolver;
         private static readonly RNGCryptoServiceProvider rngCsp = new();
+        private const string PasswordResetApiRoute = "ui/reset-password/";
         private const string KitosManualsLink = "https://info.kitos.dk/s/YeFJqK6D2f2CQCR";
 
         public UserService(TimeSpan ttl,
@@ -69,8 +69,7 @@ namespace Core.ApplicationServices
             IOrganizationService organizationService,
             ITransactionManager transactionManager,
             IOrganizationalUserContext organizationalUserContext,
-            ICommandBus commandBus
-            , IEntityIdentityResolver identityResolver)
+            ICommandBus commandBus)
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
@@ -89,7 +88,6 @@ namespace Core.ApplicationServices
             _transactionManager = transactionManager;
             _organizationalUserContext = organizationalUserContext;
             _commandBus = commandBus;
-            _identityResolver = identityResolver;
             _crypt = new SHA256Managed();
             if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
             {
@@ -97,7 +95,7 @@ namespace Core.ApplicationServices
             }
         }
 
-        public User AddUser(User user, bool sendMailOnCreation, int orgId, bool newUI)
+        public User AddUser(User user, bool sendMailOnCreation, int orgId)
         {
             // hash his salt and default password
             var utcNow = DateTime.UtcNow;
@@ -121,12 +119,12 @@ namespace Core.ApplicationServices
             _domainEvents.Raise(new EntityCreatedEvent<User>(savedUser));
 
             if (sendMailOnCreation)
-                IssueAdvisMail(savedUser, false, orgId, newUI);
+                IssueAdvisMail(savedUser, false, orgId);
 
             return savedUser;
         }
 
-        public void UpdateUser(User user, bool? sendMailOnUpdate, int? scopedToOrganizationId, bool newUI)
+        public void UpdateUser(User user, bool? sendMailOnUpdate, int? scopedToOrganizationId)
         {
             _userRepository.Update(user);
 
@@ -135,11 +133,11 @@ namespace Core.ApplicationServices
 
             if (sendMailOnUpdate.HasValue && sendMailOnUpdate.Value && scopedToOrganizationId.HasValue)
             {
-                IssueAdvisMail(user, false, scopedToOrganizationId.Value, newUI);
+                IssueAdvisMail(user, false, scopedToOrganizationId.Value);
             }
         }
 
-        public void IssueAdvisMail(User user, bool reminder, int orgId, bool newUI)
+        public void IssueAdvisMail(User user, bool reminder, int orgId)
         {
             if (user == null || _userRepository.GetByKey(user.Id) == null)
                 throw new ArgumentNullException(nameof(user));
@@ -147,7 +145,7 @@ namespace Core.ApplicationServices
             var org = _orgRepository.GetByKey(orgId);
 
             var reset = GenerateResetRequest(user);
-            var resetLink = _baseUrl + GetUrlRoute(newUI) + HttpUtility.UrlEncode(reset.Hash);
+            var resetLink = GetResetLink(reset.Hash);
 
             var subject = (reminder ? "Påmindelse: " : string.Empty) + "Oprettelse som ny bruger i KITOS " + _mailSuffix;
             var content = "<h2>Kære " + user.Name + "</h2>" +
@@ -167,7 +165,7 @@ namespace Core.ApplicationServices
             _userRepository.Save();
         }
 
-        public PasswordResetRequest IssuePasswordReset(User user, string subject, string content, bool newUI = false)
+        public PasswordResetRequest IssuePasswordReset(User user, string subject, string content)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
@@ -177,7 +175,7 @@ namespace Core.ApplicationServices
             if (content == null)
             {
                 reset = GenerateResetRequest(user);
-                var resetLink = _baseUrl + GetUrlRoute(newUI) + HttpUtility.UrlEncode(reset.Hash);
+                var resetLink = GetResetLink(reset.Hash);
                 mailContent = "<p>Du har bedt om at få nulstillet dit password.</p>" +
                               "<p><a href='" + resetLink +
                               "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
@@ -199,6 +197,11 @@ namespace Core.ApplicationServices
             _mailClient.Send(message);
 
             return reset;
+        }
+
+        private string GetResetLink(string hash)
+        {
+            return _baseUrl + PasswordResetApiRoute + HttpUtility.UrlEncode(hash);
         }
 
         public bool IsEmailInUse(string email)
@@ -247,19 +250,6 @@ namespace Core.ApplicationServices
         {
             var globalAdmin = GetUsers(new QueryByGlobalAdmin()).FirstOrNone();
             return globalAdmin.Match<Result<User, OperationError>>(user => user, () => new OperationError(OperationFailure.NotFound));
-        }
-
-        //Temporary solution for supporting links to both both the old and new UI. (27/11/2024)
-        private string GetUrlRoute(bool newUI)
-        {
-            if (newUI)
-            {
-                return "ui/reset-password/";
-            }
-            else
-            {
-                return "old#/reset-password/";
-            }
         }
 
         private PasswordResetRequest GenerateResetRequest(User user)

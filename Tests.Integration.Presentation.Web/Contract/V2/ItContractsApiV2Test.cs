@@ -1,23 +1,21 @@
-﻿using Core.DomainModel;
-using Core.DomainModel.Organization;
-using Presentation.Web.Models.API.V2.Response.Contract;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
 using Core.Abstractions.Extensions;
+using Core.DomainModel;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using ExpectedObjects;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
-using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
-using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
-using Presentation.Web.Models.API.V2.Request.SystemUsage;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Organization;
@@ -28,19 +26,18 @@ using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Extensions;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Contract.V2
 {
-    public class ItContractsApiV2Test : WithAutoFixture
+    public class ItContractsApiV2Test : BaseTest
     {
         [Fact]
         public async Task Can_GET_Specific_Contract()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var newContract = await CreateContractAsync(organization.Id);
+            var newContract = await CreateItContractAsync(organization.Uuid);
 
             //Act
             var dto = await ItContractV2Helper.GetItContractAsync(token, newContract.Uuid);
@@ -68,7 +65,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Arrange
             var (token, user, organization1) = await CreatePrerequisitesAsync();
             var organization2 = await CreateOrganizationAsync();
-            var newContract = await CreateContractAsync(organization2.Id);
+            var newContract = await CreateItContractAsync(organization2.Uuid);
 
             //Act
             using var response = await ItContractV2Helper.SendGetItContractAsync(token, newContract.Uuid);
@@ -95,8 +92,8 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var contract1 = await CreateContractAsync(organization.Id);
-            var contract2 = await CreateContractAsync(organization.Id);
+            var contract1 = await CreateItContractAsync(organization.Uuid);
+            var contract2 = await CreateItContractAsync(organization.Uuid);
 
             //Act
             var contracts = (await ItContractV2Helper.GetItContractsAsync(token)).ToList();
@@ -112,9 +109,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var contract1 = await CreateContractAsync(organization.Id);
-            var contract2 = await CreateContractAsync(organization.Id);
-            var contract3 = await CreateContractAsync(organization.Id);
+            var contract1 = await CreateItContractAsync(organization.Uuid);
+            var contract2 = await CreateItContractAsync(organization.Uuid);
+            var contract3 = await CreateItContractAsync(organization.Uuid);
 
             //Act
             var page1Contracts = (await ItContractV2Helper.GetItContractsAsync(token, page: 0, pageSize: 2)).ToList();
@@ -134,9 +131,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var contract1 = await CreateContractAsync(organization.Id);
-            var contract2 = await CreateContractAsync(organization.Id);
-            var contract3 = await CreateContractAsync(organization.Id);
+            var contract1 = await CreateItContractAsync(organization.Uuid);
+            var contract2 = await CreateItContractAsync(organization.Uuid);
+            var contract3 = await CreateItContractAsync(organization.Uuid);
 
             foreach (var contract in new[] { contract2, contract3, contract1 })
             {
@@ -159,9 +156,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization1) = await CreatePrerequisitesAsync();
-            var contract1 = await CreateContractAsync(organization1.Id);
+            var contract1 = await CreateItContractAsync(organization1.Uuid);
             var organization2 = await CreateOrganizationAsync();
-            var contract2 = await CreateContractAsync(organization2.Id);
+            var contract2 = await CreateItContractAsync(organization2.Uuid);
 
             //Act
             var contracts = (await ItContractV2Helper.GetItContractsAsync(token)).ToList();
@@ -176,10 +173,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization1) = await CreatePrerequisitesAsync();
-            var contract1 = await CreateContractAsync(organization1.Id);
+            var contract1 = await CreateItContractAsync(organization1.Uuid);
             var organization2 = await CreateOrganizationAsync();
-            var contract2 = await CreateContractAsync(organization2.Id);
-            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization2.Id).DisposeAsync();
+            var contract2 = await CreateItContractAsync(organization2.Uuid);
+            await HttpApi.SendAssignRoleToUserAsync(user.Uuid, OrganizationRole.LocalAdmin, organization2.Uuid).DisposeAsync();
 
             //Act
             var contracts = (await ItContractV2Helper.GetItContractsAsync(token, organizationUuid: organization1.Uuid)).ToList();
@@ -194,11 +191,12 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Local);
-            var newSystemUsage = await ItSystemHelper.TakeIntoUseAsync(newSystem.Id, organization.Id);
-            var contract1 = await CreateContractAsync(organization.Id);
-            var contract2 = await CreateContractAsync(organization.Id);
-            await ItContractHelper.AddItSystemUsage(contract1.Id, newSystemUsage.Id, organization.Id);
+            var newSystem = await CreateItSystemAsync(organization.Uuid);
+            var newSystemUsage = await TakeSystemIntoUsageAsync(newSystem.Uuid, organization.Uuid);
+            var contract1 = await CreateItContractAsync(organization.Uuid);
+            var contract2 = await CreateItContractAsync(organization.Uuid);
+            await ItContractV2Helper.SendPatchSystemUsagesAsync(await GetGlobalToken(), contract1.Uuid,
+                newSystemUsage.Uuid.WrapAsEnumerable());
 
             //Act
             var contracts = (await ItContractV2Helper.GetItContractsAsync(token, systemUuid: newSystem.Uuid)).ToList();
@@ -213,11 +211,12 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Local);
-            var newSystemUsage = await ItSystemHelper.TakeIntoUseAsync(newSystem.Id, organization.Id);
-            var contract1 = await CreateContractAsync(organization.Id);
-            var contract2 = await CreateContractAsync(organization.Id);
-            await ItContractHelper.AddItSystemUsage(contract1.Id, newSystemUsage.Id, organization.Id);
+            var newSystem = await CreateItSystemAsync(organization.Uuid);
+            var newSystemUsage = await TakeSystemIntoUsageAsync(newSystem.Uuid, organization.Uuid);
+            var contract1 = await CreateItContractAsync(organization.Uuid);
+            var contract2 = await CreateItContractAsync(organization.Uuid);
+            await ItContractV2Helper.SendPatchSystemUsagesAsync(await GetGlobalToken(), contract1.Uuid,
+                newSystemUsage.Uuid.WrapAsEnumerable());
 
             //Act
             var contracts = (await ItContractV2Helper.GetItContractsAsync(token, systemUsageUuid: newSystemUsage.Uuid)).ToList();
@@ -232,10 +231,12 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var dpr = await DataProcessingRegistrationHelper.CreateAsync(organization.Id, CreateName());
-            var contract1 = await CreateContractAsync(organization.Id);
-            var contract2 = await CreateContractAsync(organization.Id);
-            using var dprAssignmentResponse = await ItContractHelper.SendAssignDataProcessingRegistrationAsync(contract1.Id, dpr.Id);
+            var dpr = await CreateDPRAsync(organization.Uuid);
+            var contract1 = await CreateItContractAsync(organization.Uuid);
+            var contract2 = await CreateItContractAsync(organization.Uuid);
+            using var dprAssignmentResponse =
+                await ItContractV2Helper.SendPatchDataProcessingRegistrationsAsync(await GetGlobalToken(),
+                    contract1.Uuid, dpr.Uuid.WrapAsEnumerable());
             Assert.Equal(HttpStatusCode.OK, dprAssignmentResponse.StatusCode);
 
             //Act
@@ -251,10 +252,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var orgUnit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName());
-            var contract1 = await CreateContractAsync(organization.Id);
-            var contract2 = await CreateContractAsync(organization.Id);
-            using var responsibleOrgUnitAssignmentResponse = await ItContractHelper.SendAssignResponsibleOrgUnitAsync(contract1.Id, orgUnit.Id, organization.Id);
+            var orgUnit = await CreateOrganizationUnitAsync(organization.Uuid);
+            var contract1 = await CreateItContractAsync(organization.Uuid);
+            var contract2 = await CreateItContractAsync(organization.Uuid);
+            using var responsibleOrgUnitAssignmentResponse = await ItContractV2Helper.SendPatchContractResponsibleAsync(
+                await GetGlobalToken(), contract1.Uuid, new ContractResponsibleDataWriteRequestDTO
+                {
+                    OrganizationUnitUuid = orgUnit.Uuid
+                });
             Assert.Equal(HttpStatusCode.OK, responsibleOrgUnitAssignmentResponse.StatusCode);
 
             //Act
@@ -271,9 +276,11 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
             var supplier = await CreateOrganizationAsync();
-            var contract1 = await CreateContractAsync(organization.Id);
-            var contract2 = await CreateContractAsync(organization.Id);
-            using var supplierAssignmentResponse = await ItContractHelper.SendAssignSupplierAsync(contract1.Id, supplier.Id, organization.Id);
+            var contract1 = await CreateItContractAsync(organization.Uuid);
+            var contract2 = await CreateItContractAsync(organization.Uuid);
+            using var supplierAssignmentResponse = await ItContractV2Helper.SendPatchContractSupplierAsync(
+                await GetGlobalToken(), contract1.Uuid,
+                new ContractSupplierDataWriteRequestDTO { OrganizationUuid = supplier.Uuid });
             Assert.Equal(HttpStatusCode.OK, supplierAssignmentResponse.StatusCode);
 
             //Act
@@ -290,9 +297,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Arrange
             var content = $"CONTENT_{A<Guid>()}";
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var contract1 = await CreateContractAsync(organization.Id, $"{content}ONE");
-            var contract2 = await CreateContractAsync(organization.Id, $"TWO{content}");
-            var contract3 = await CreateContractAsync(organization.Id);
+            var contract1 = await CreateItContractAsync(organization.Uuid, $"{content}ONE");
+            var contract2 = await CreateItContractAsync(organization.Uuid, $"TWO{content}");
+            var contract3 = await CreateItContractAsync(organization.Uuid);
 
             //Act
             var contracts = (await ItContractV2Helper.GetItContractsAsync(token, nameContent: content)).ToList();
@@ -309,9 +316,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Arrange
             var fullName = $"CONTENT_{A<Guid>()}";
             var (token, _, organization) = await CreatePrerequisitesAsync();
-            await CreateContractAsync(organization.Id, $"{fullName}ONE");
-            await CreateContractAsync(organization.Id, $"TWO{fullName}");
-            var contract3 = await CreateContractAsync(organization.Id, fullName);
+            await CreateItContractAsync(organization.Uuid, $"{fullName}ONE");
+            await CreateItContractAsync(organization.Uuid, $"TWO{fullName}");
+            var contract3 = await CreateItContractAsync(organization.Uuid, fullName);
 
             //Act
             var contracts = (await ItContractV2Helper.GetItContractsAsync(token, nameEquals: fullName)).ToList();
@@ -467,7 +474,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Arrange
             var (token, user, organization1) = await CreatePrerequisitesAsync();
             var organization2 = await CreateOrganizationAsync();
-            var parent = await ItContractHelper.CreateContract(CreateName(), organization2.Id);
+            var parent = await CreateItContractAsync(organization2.Uuid);
 
             var requestDto = new CreateNewContractRequestDTO()
             {
@@ -489,8 +496,8 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Arrange
             var (token, user, organization1) = await CreatePrerequisitesAsync();
             var organization2 = await CreateOrganizationAsync();
-            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization2.Id).DisposeAsync();
-            var parent = await ItContractHelper.CreateContract(CreateName(), organization2.Id);
+            await HttpApi.SendAssignRoleToUserAsync(user.Uuid, OrganizationRole.LocalAdmin, organization2.Uuid).DisposeAsync();
+            var parent = await CreateItContractAsync(organization2.Uuid);
 
             var requestDto = new CreateNewContractRequestDTO()
             {
@@ -1012,10 +1019,8 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Arrange
             var (token1, _, organization1) = await CreatePrerequisitesAsync();
             var (token2, _, organization2) = await CreatePrerequisitesAsync();
-            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization1.Id, AccessModifier.Public);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization2.Id, AccessModifier.Public);
-            var system1Usage = await ItSystemUsageV2Helper.PostAsync(token1, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization1.Uuid, SystemUuid = system1.Uuid });
-            var system2Usage = await ItSystemUsageV2Helper.PostAsync(token2, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization2.Uuid, SystemUuid = system2.Uuid });
+            var system1Usage = await CreateSystemAndTakeItIntoUsage(organization1.Uuid);
+            var system2Usage = await CreateSystemAndTakeItIntoUsage(organization2.Uuid);
             var request = new CreateNewContractRequestDTO()
             {
                 OrganizationUuid = organization1.Uuid,
@@ -1038,12 +1043,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Arrange
             var (token, _, organization) = await CreatePrerequisitesAsync();
 
-            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
-            var system3 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
-            var system1Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system1.Uuid });
-            var system2Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system2.Uuid });
-            var system3Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system3.Uuid });
+            var system1Usage = await CreateSystemAndTakeItIntoUsage(organization.Uuid);
+            var system2Usage = await CreateSystemAndTakeItIntoUsage(organization.Uuid);
+            var system3Usage = await CreateSystemAndTakeItIntoUsage(organization.Uuid);
 
             var request = new CreateNewContractRequestDTO { Name = CreateName(), OrganizationUuid = organization.Uuid };
             var dto = await ItContractV2Helper.PostContractAsync(token, request);
@@ -1889,14 +1891,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var org = await CreateOrganizationAsync();
-            var (user, token) = await CreateApiUserAsync(org);
+            var (user, token) = await CreateApiUserAsync(org.Uuid);
 
-            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
+            await HttpApi.SendAssignRoleToUserAsync(user.Uuid, role, org.Uuid).DisposeAsync();
 
-            var system = await ItContractHelper.CreateContract(A<string>(), org.Id);
+            var contract = await CreateItContractAsync(org.Uuid);
 
             //Act
-            var permissionsResponseDto = await ItContractV2Helper.GetPermissionsAsync(token, system.Uuid);
+            var permissionsResponseDto = await ItContractV2Helper.GetPermissionsAsync(token, contract.Uuid);
 
             //Assert
             var expected = new ItContractPermissionsResponseDTO
@@ -1916,9 +1918,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var org = await CreateOrganizationAsync();
-            var (user, token) = await CreateApiUserAsync(org);
+            var (user, token) = await CreateApiUserAsync(org.Uuid);
 
-            await HttpApi.SendAssignRoleToUserAsync(user.Id, role, org.Id).DisposeAsync();
+            await HttpApi.SendAssignRoleToUserAsync(user.Uuid, role, org.Uuid).DisposeAsync();
 
             //Act
             var permissionsResponseDto = await ItContractV2Helper.GetCollectionPermissionsAsync(token, org.Uuid);
@@ -1939,12 +1941,17 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, _, org) = await CreatePrerequisitesAsync();
-            var itContractDto = await ItContractHelper.CreateContract(A<string>(), org.Id);
-            await ItContractHelper.PatchContract(itContractDto.Id, org.Id, new
-            {
-                Active = enforceValid,
-                Concluded = DateTime.Now.AddDays(expectDateError ? 1 : -1)
-            });
+            var itContractDto = await CreateItContractAsync(org.Uuid);
+
+            await ItContractV2Helper.SendPatchContractGeneralDataAsync(await GetGlobalToken(), itContractDto.Uuid,
+                new ContractGeneralDataWriteRequestDTO
+                {
+                    Validity = new ContractValidityWriteRequestDTO
+                    {
+                        ValidFrom = DateTime.Now.AddDays(expectDateError ? 1 : -1),
+                        EnforcedValid = enforceValid
+                    }
+                });
 
             //Act
             var result = await ItContractV2Helper.GetItContractAsync(token, itContractDto.Uuid);
@@ -2042,7 +2049,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(ItContractValidationErrorChoice.InvalidParentContract, error);
         }
 
-        private async Task<List<Guid>> CreateDataProcessingRegistrationUuids(string token, OrganizationDTO organization)
+        private async Task<List<Guid>> CreateDataProcessingRegistrationUuids(string token, ShallowOrganizationResponseDTO organization)
         {
             var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
             {
@@ -2057,10 +2064,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return new List<Guid> { dpr1.Uuid, dpr2.Uuid };
         }
 
-        private async Task<List<RoleAssignmentRequestDTO>> CreateRoles(OrganizationDTO organization)
+        private async Task<List<RoleAssignmentRequestDTO>> CreateRoles(ShallowOrganizationResponseDTO organization)
         {
-            var user1 = await CreateApiUserAsync(organization);
-            var user2 = await CreateApiUserAsync(organization);
+            var user1 = await CreateApiUserAsync(organization.Uuid);
+            var user2 = await CreateApiUserAsync(organization.Uuid);
             var contractRoles = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractRoles, organization.Uuid, 10, 0)).RandomItems(2).ToList();
             var role1 = contractRoles.First();
             var role2 = contractRoles.Last();
@@ -2104,12 +2111,12 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 .ToList();
         }
 
-        private async Task<List<Guid>> CreateSystemUsageUuids(string token, OrganizationDTO organization)
+        private async Task<List<Guid>> CreateSystemUsageUuids(string token, ShallowOrganizationResponseDTO organization)
         {
-            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
-            var system1Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system1.Uuid });
-            var system2Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system2.Uuid });
+            var system1 = await CreateItSystemAsync(organization.Uuid);
+            var system2 = await CreateItSystemAsync(organization.Uuid);
+            var system1Usage = await TakeSystemIntoUsageAsync(system1.Uuid, organization.Uuid);
+            var system2Usage = await TakeSystemIntoUsageAsync(system2.Uuid, organization.Uuid);
 
             return new List<Guid> { system1Usage.Uuid, system2Usage.Uuid };
         }
@@ -2195,7 +2202,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         private async Task<ContractSupplierDataWriteRequestDTO> CreateContractSupplierDataRequestDTO(bool withOrg, bool withSignedAt, bool withSignedBy)
         {
             var supplierOrganization = withOrg
-                ? (await OrganizationHelper.GetOrganizationAsync(TestEnvironment.DefaultOrganizationId))
+                ? await OrganizationV2Helper.GetOrganizationAsync(await GetGlobalToken(), DefaultOrgUuid)
                 : null;
             var contractResponsibleDataWriteRequestDto = new ContractSupplierDataWriteRequestDTO
             {
@@ -2207,7 +2214,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return contractResponsibleDataWriteRequestDto;
         }
 
-        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, IdentityNamePairResponseDTO criticalityType, ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(OrganizationDTO organization, bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withCriticalityType)
+        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, IdentityNamePairResponseDTO criticalityType, ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(ShallowOrganizationResponseDTO organization, bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withCriticalityType)
         {
             var contractType = withContractType
                 ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractContractTypes,
@@ -2277,21 +2284,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             }
         }
 
-        private async Task<OrganizationDTO> CreateOrganizationAsync()
-        {
-            var organizationName = CreateName();
-            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, organizationName, "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
-            return organization;
-        }
-
         private string CreateName()
         {
             return $"{nameof(ItContractsApiV2Test)}æøå{A<string>()}";
-        }
-
-        private string CreateEmail()
-        {
-            return $"{nameof(ItContractsApiV2Test)}{A<string>()}@test.dk";
         }
 
         private static void AssertCrossReference<TExpected, TActual>(TExpected expected, TActual actual) where TExpected : IHasNameExternal, IHasUuidExternal where TActual : IHasNameExternal, IHasUuidExternal
@@ -2300,13 +2295,13 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(expected?.Name, actual?.Name);
         }
 
-        private static void AssertExpectedShallowContracts(ItContractDTO expectedContent, OrganizationDTO expectedOrganization, IEnumerable<ItContractResponseDTO> dtos)
+        private static void AssertExpectedShallowContracts(ItContractResponseDTO expectedContent, ShallowOrganizationResponseDTO expectedOrganization, IEnumerable<ItContractResponseDTO> dtos)
         {
             var dto = Assert.Single(dtos, contract => contract.Uuid == expectedContent.Uuid);
             AssertExpectedShallowContract(expectedContent, expectedOrganization, dto);
         }
 
-        private static void AssertExpectedShallowContract(ItContractDTO expectedContent, OrganizationDTO expectedOrganization, ItContractResponseDTO dto)
+        private static void AssertExpectedShallowContract(ItContractResponseDTO expectedContent, ShallowOrganizationResponseDTO expectedOrganization, ItContractResponseDTO dto)
         {
             Assert.Equal(expectedContent.Uuid, dto.Uuid);
             Assert.Equal(expectedContent.Name, dto.Name);
@@ -2315,25 +2310,17 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(expectedOrganization.Cvr, dto.OrganizationContext.Cvr);
         }
 
-        private async Task<ItContractDTO> CreateContractAsync(int orgId, string name = null)
-        {
-            if (name == null)
-                return await ItContractHelper.CreateContract(CreateName(), orgId);
-
-            return await ItContractHelper.CreateContract(name, orgId);
-        }
-
-        private async Task<(string token, User user, OrganizationDTO organization)> CreatePrerequisitesAsync()
+        private async Task<(string token, User user, ShallowOrganizationResponseDTO organization)> CreatePrerequisitesAsync()
         {
             var organization = await CreateOrganizationAsync();
-            var (user, token) = await CreateApiUserAsync(organization);
-            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var (user, token) = await CreateApiUserAsync(organization.Uuid);
+            await HttpApi.SendAssignRoleToUserAsync(user.Uuid, OrganizationRole.LocalAdmin, organization.Uuid).DisposeAsync();
             return (token, user, organization);
         }
-        private async Task<(User user, string token)> CreateApiUserAsync(OrganizationDTO organization)
+        private async Task<(User user, string token)> CreateApiUserAsync(Guid organizationUuid)
         {
-            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
-            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
+            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organizationUuid, true, false);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userAndGetToken.userUuid));
             return (user, userAndGetToken.token);
         }
         private IEnumerable<ExternalReferenceDataWriteRequestDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
@@ -2395,7 +2382,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(contractResponsibleDataWriteRequestDto.SignedBy, freshDTO.Supplier.SignedBy);
         }
 
-        private async Task<ContractResponsibleDataWriteRequestDTO> CreateContractResponsibleDataRequestDTO(string token, OrganizationDTO organization, bool withOrgUnit, bool withSignedAt, bool withSignedBy)
+        private async Task<ContractResponsibleDataWriteRequestDTO> CreateContractResponsibleDataRequestDTO(string token, ShallowOrganizationResponseDTO organization, bool withOrgUnit, bool withSignedAt, bool withSignedBy)
         {
             var organizationUnit = withOrgUnit
                 ? (await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid, 0, 10)).RandomItem()
@@ -2479,7 +2466,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             }
         }
 
-        private async Task<ContractPaymentsDataWriteRequestDTO> CreatePaymentsInput(string token, OrganizationDTO organization, bool withExternal, bool withInternal)
+        private async Task<ContractPaymentsDataWriteRequestDTO> CreatePaymentsInput(string token, ShallowOrganizationResponseDTO organization, bool withExternal, bool withInternal)
         {
             List<PaymentRequestDTO> internalPayments = null;
             List<PaymentRequestDTO> externalPayments = null;
@@ -2522,7 +2509,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         private async Task<ContractAgreementPeriodDataWriteRequestDTO> CreateAgreementPeriodInput(bool hasExtensionOption, bool isContinuous, bool hasIrrevocableDate,
-            OrganizationDTO organization)
+            ShallowOrganizationResponseDTO organization)
         {
             var extensionOption = hasExtensionOption
                 ? (await OptionV2ApiHelper.GetOptionsAsync(

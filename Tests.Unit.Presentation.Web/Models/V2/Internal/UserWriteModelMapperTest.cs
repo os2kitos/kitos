@@ -4,8 +4,6 @@ using Presentation.Web.Controllers.API.V2.Internal.Users.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.User;
 using Tests.Toolkit.Extensions;
-using Tests.Unit.Presentation.Web.Models.V2;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2.Internal

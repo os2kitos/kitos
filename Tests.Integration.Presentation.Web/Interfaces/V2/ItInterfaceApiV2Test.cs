@@ -1,5 +1,4 @@
-﻿using Core.DomainModel;
-using Core.DomainModel.ItSystem;
+﻿using Core.DomainModel.ItSystem;
 using Core.DomainServices.Extensions;
 using System;
 using System.Collections.Generic;
@@ -16,6 +15,7 @@ using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Interface;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Response.Interface;
+using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.TestInputs;
@@ -33,10 +33,9 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Arrange
             var (token, _) = await CreateUserInNewOrg(true);
 
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id).DisposeAsync();
-
+            var system = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface.Uuid, system.Uuid);
             //Act
             using var result = await InterfaceV2Helper.SendGetInterfaceAsync(token, itInterface.Uuid);
 
@@ -52,13 +51,13 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Arrange
             var (token, org) = await CreateUserInNewOrg(true);
 
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id).DisposeAsync();
+            var system = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface = await CreateItInterfaceAsync(DefaultOrgUuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface.Uuid, system.Uuid);
 
             DatabaseAccess.MutateDatabase(db =>
             {
-                var dbInterface = db.ItInterfaces.AsQueryable().ById(itInterface.Id);
+                var dbInterface = db.ItInterfaces.AsQueryable().ByUuid(itInterface.Uuid);
 
                 dbInterface.Description = A<string>();
                 dbInterface.ItInterfaceId = A<string>();
@@ -77,7 +76,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.NotNull(itInterfaceDTO);
             DatabaseAccess.MapFromEntitySet<ItInterface, bool>(x =>
             {
-                var dbInterface = x.AsQueryable().ById(itInterface.Id);
+                var dbInterface = x.AsQueryable().ByUuid(itInterface.Uuid);
                 BaseItInterfaceResponseDTODBCheck(dbInterface, itInterfaceDTO);
 
                 Assert.Equal(dbInterface.LastChanged, itInterfaceDTO.LastModified);
@@ -99,11 +98,12 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var pageSize = 2;
             var pageNumber = 0; //Always takes the first page;
 
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), org.Id, AccessModifier.Public));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface1.Id).DisposeAsync();
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface2.Id).DisposeAsync();
+            var system = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface1 = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface2 = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Global);
+
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface1.Uuid, system.Uuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface2.Uuid, system.Uuid);
 
             //Act
             var result = await InterfaceV2Helper.GetInterfacesAsync(token, pageSize, pageNumber);
@@ -117,17 +117,17 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, organization) = await CreateUserInNewOrg(true);
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organization.Id, AccessModifier.Public));
-            var itInterface3 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            var system = await CreateItSystemAsync(DefaultOrgUuid);
+            var itInterface1 = await CreateItInterfaceAsync(DefaultOrgUuid);
+            var itInterface2 = await CreateItInterfaceAsync(organization.Uuid);
+            var itInterface3 = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
 
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organization.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
+            await ItSystemV2Helper.PatchRightsHolderAsync(system.Uuid, DefaultOrgUuid).DisposeAsync();
 
             //Change all in a specific order
             foreach (var interfaceDto in new[] { itInterface2, itInterface3, itInterface1 })
             {
-                await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, interfaceDto.Id).DisposeAsync();
+                await InterfaceV2Helper.PatchExposedBySystemAsync(interfaceDto.Uuid, system.Uuid);
             }
 
             var interface3LastModified = DatabaseAccess.MapFromEntitySet<ItInterface, DateTime>(x => x.AsQueryable().ByUuid(itInterface3.Uuid).LastChanged.Transform(dt => DateTime.SpecifyKind(dt, DateTimeKind.Utc)));
@@ -147,8 +147,8 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var (token, _) = await CreateStakeHolderUserInNewOrg();
             var searchName = A<string>();
             var invalidSearchName = $"{searchName}1";
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(searchName, A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(invalidSearchName, A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            var itInterface1 = await CreateItInterfaceAsync(DefaultOrgUuid, searchName);
+            await CreateItInterfaceAsync(DefaultOrgUuid, invalidSearchName);
 
             //Act
             var dtos = (await InterfaceV2Helper.GetInterfacesAsync(token, nameEquals: searchName, pageNumber: 0, pageSize: 10)).ToList();
@@ -166,15 +166,15 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var (token, _) = await CreateStakeHolderUserInNewOrg();
             var interfaceId = A<string>();
             var invalidInterfaceId = $"{interfaceId}1";
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), interfaceId, TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), invalidInterfaceId, TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            var itInterface1 = await CreateItInterfaceAsync(DefaultOrgUuid, interfaceId: interfaceId);
+            await CreateItInterfaceAsync(DefaultOrgUuid, interfaceId: invalidInterfaceId);
 
             //Act
             var dtos = (await InterfaceV2Helper.GetInterfacesAsync(token, interfaceId: interfaceId, pageNumber: 0, pageSize: 2)).ToList();
 
             //Assert
             var dto = Assert.Single(dtos);
-            Assert.Equal(dto.InterfaceId, itInterface1.ItInterfaceId);
+            Assert.Equal(dto.InterfaceId, itInterface1.InterfaceId);
             Assert.Equal(dto.Uuid, itInterface1.Uuid);
         }
 
@@ -183,8 +183,8 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, organization) = await CreateStakeHolderUserInNewOrg();
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organization.Id, AccessModifier.Public));
-            await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            var itInterface1 = await CreateItInterfaceAsync(organization.Uuid);
+            await CreateItInterfaceAsync(DefaultOrgUuid);
 
             //Act
             var dtos = (await InterfaceV2Helper.GetInterfacesAsync(token, organizationUuid: organization.Uuid, pageNumber: 0, pageSize: 2)).ToList();
@@ -202,9 +202,9 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var baseName = A<string>();
             var searchName = $"{baseName}1";
             var validName2 = searchName + A<string>();
-            await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(baseName, A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(searchName, A<string>(), org.Id, AccessModifier.Public));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(validName2, A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            await CreateItInterfaceAsync(DefaultOrgUuid, baseName);
+            var itInterface1 = await CreateItInterfaceAsync(org.Uuid, searchName);
+            var itInterface2 = await CreateItInterfaceAsync(DefaultOrgUuid, validName2);
 
             //Act
             var dtos = (await InterfaceV2Helper.GetInterfacesAsync(token, nameContains: searchName, pageNumber: 0, pageSize: 10)).ToList();
@@ -219,27 +219,21 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, organization) = await CreateStakeHolderUserInNewOrg();
-            var orgId = organization.Id;
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), orgId, AccessModifier.Public);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), orgId, AccessModifier.Public);
-            var system3 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var system = await CreateItSystemAsync(organization.Uuid);
+            var system2 = await CreateItSystemAsync(organization.Uuid);
+            var system3 = await CreateItSystemAsync(DefaultOrgUuid);
 
-            var validDto = InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), orgId, AccessModifier.Public);
-            var invalidNoExhibitDto = InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), orgId, AccessModifier.Public);
-            var invalidNoUsageDto = InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), orgId, AccessModifier.Public);
-            var invalidWrongOrganizationDto = InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var validInterface = await CreateItInterfaceAsync(organization.Uuid);
+            await CreateItInterfaceAsync(organization.Uuid);
+            var invalidNoUsageInterface = await CreateItInterfaceAsync(organization.Uuid);
+            var invalidWrongOrganizationInterface = await CreateItInterfaceAsync(DefaultOrgUuid);
 
-            var validInterface = await InterfaceHelper.CreateInterface(validDto);
-            await InterfaceHelper.CreateInterface(invalidNoExhibitDto);
-            var invalidNoUsageInterface = await InterfaceHelper.CreateInterface(invalidNoUsageDto);
-            var invalidWrongOrganizationInterface = await InterfaceHelper.CreateInterface(invalidWrongOrganizationDto);
+            await TakeSystemIntoUsageAsync(system.Uuid, organization.Uuid);
+            await TakeSystemIntoUsageAsync(system3.Uuid, DefaultOrgUuid);
 
-            await ItSystemHelper.TakeIntoUseAsync(system.Id, orgId);
-            await ItSystemHelper.TakeIntoUseAsync(system3.Id, TestEnvironment.DefaultOrganizationId);
-
-            await InterfaceExhibitHelper.CreateExhibit(system.Id, validInterface.Id);
-            await InterfaceExhibitHelper.CreateExhibit(system2.Id, invalidNoUsageInterface.Id);
-            await InterfaceExhibitHelper.CreateExhibit(system3.Id, invalidWrongOrganizationInterface.Id);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(validInterface.Uuid, system.Uuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(invalidNoUsageInterface.Uuid, system2.Uuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(invalidWrongOrganizationInterface.Uuid, system3.Uuid);
 
             //Act
             var dtos = (await InterfaceV2Helper.GetInterfacesAsync(token, usedInOrganizationUuid: organization.Uuid, pageNumber: 0, pageSize: 10)).ToList();
@@ -253,29 +247,23 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         public async Task Can_Get_Interfaces_As_Local_Admin_With_PublicOrOrganizationUuid_Filter()
         {
             var (token, organization) = await CreateUserInNewOrg(false, OrganizationRole.LocalAdmin);
-            var orgId = organization.Id;
             var otherOrganization = await CreateOrganization("99887766");
-            var otherOrgId = otherOrganization.Id;
-            var systemInThisOrganization = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), orgId, AccessModifier.Public);
-            var systemInOtherOrganization =
-                await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), otherOrgId,
-                    AccessModifier.Public);
+            var systemInThisOrganization = await CreateItSystemAsync(organization.Uuid);
+            var systemInOtherOrganization = await CreateItSystemAsync(otherOrganization.Uuid);
 
-            var publicInterface = await
-                InterfaceHelper.CreateInterface(
-                    InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), orgId, AccessModifier.Public));
-            var localInterfaceInThisOrg = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), orgId, AccessModifier.Local));
-            var localInterfaceInOtherOrg = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), otherOrgId, AccessModifier.Local));
+            var publicInterface = await CreateItInterfaceAsync(organization.Uuid);
+            var localInterfaceInThisOrg = await CreateItInterfaceAsync(organization.Uuid, scope: RegistrationScopeChoice.Local);
+            var localInterfaceInOtherOrg = await CreateItInterfaceAsync(otherOrganization.Uuid, scope: RegistrationScopeChoice.Local);
 
-            await ItSystemHelper.TakeIntoUseAsync(systemInThisOrganization.Id, orgId);
-            await ItSystemHelper.TakeIntoUseAsync(systemInOtherOrganization.Id, otherOrgId);
+            await TakeSystemIntoUsageAsync(systemInThisOrganization.Uuid, organization.Uuid);
+            await TakeSystemIntoUsageAsync(systemInOtherOrganization.Uuid, otherOrganization.Uuid);
 
-            await InterfaceExhibitHelper.CreateExhibit(systemInThisOrganization.Id, publicInterface.Id);
-            await InterfaceExhibitHelper.CreateExhibit(systemInThisOrganization.Id, localInterfaceInThisOrg.Id);
-            await InterfaceExhibitHelper.CreateExhibit(systemInThisOrganization.Id, localInterfaceInOtherOrg.Id);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(publicInterface.Uuid, systemInThisOrganization.Uuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(localInterfaceInThisOrg.Uuid, systemInThisOrganization.Uuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(localInterfaceInOtherOrg.Uuid, systemInThisOrganization.Uuid);
 
             var dtos = (await InterfaceV2Helper.GetInterfacesAsync(token,
-                availableInOrganizationUuid: organization.Uuid, pageNumber: 0, pageSize: 10)).ToList();
+                availableInOrganizationUuid: organization.Uuid, pageNumber: 0, pageSize: 200)).ToList();
 
             Assert.Contains(dtos, (dto) => dto.Uuid == publicInterface.Uuid);
             Assert.Contains(dtos, (dto) => dto.Uuid == localInterfaceInThisOrg.Uuid);
@@ -290,12 +278,13 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var pageSize = 2;
             var pageNumber = 0; //Always takes the first page;
 
-            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system1.Id, itInterface1.Id).DisposeAsync();
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system2.Id, itInterface2.Id).DisposeAsync();
+            var system1 = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var system2 = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface1 = await CreateItInterfaceAsync(DefaultOrgUuid);
+            var itInterface2 = await CreateItInterfaceAsync(DefaultOrgUuid);
+
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface1.Uuid, system1.Uuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface2.Uuid, system2.Uuid);
 
             //Act
             var result = await InterfaceV2Helper.GetInterfacesAsync(token, pageSize, pageNumber, system1.Uuid);
@@ -314,16 +303,17 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var pageSize = 2;
             var pageNumber = 0; //Always takes the first page;
 
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Local);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface1.Id).DisposeAsync();
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface2.Id).DisposeAsync();
+            var system = await CreateItSystemAsync(org.Uuid, scope: RegistrationScopeChoice.Local);
+            var itInterface1 = await CreateItInterfaceAsync(DefaultOrgUuid);
+            var itInterface2 = await CreateItInterfaceAsync(DefaultOrgUuid);
+
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface1.Uuid, system.Uuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface2.Uuid, system.Uuid);
 
             // Disable second interface
             DatabaseAccess.MutateDatabase(db =>
             {
-                var dbInterface = db.ItInterfaces.AsQueryable().ById(itInterface2.Id);
+                var dbInterface = db.ItInterfaces.AsQueryable().ByUuid(itInterface2.Uuid);
                 dbInterface.Disabled = true;
                 db.SaveChanges();
             });
@@ -626,23 +616,23 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.DoesNotContain(afterDelete.Data, x => x.Uuid == createdData.Uuid);
         }
 
-        private async Task<(string token, OrganizationDTO createdOrganization)> CreateStakeHolderUserInNewOrg()
+        private async Task<(string token, ShallowOrganizationResponseDTO createdOrganization)> CreateStakeHolderUserInNewOrg()
         {
             var org = await CreateOrganization();
-            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, org.Id, true, true);
+            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, org.Uuid, true, true);
             return (token, org);
         }
 
-        protected async Task<(string token, OrganizationDTO createdOrganization)> CreateUserInNewOrg(
+        protected async Task<(string token, ShallowOrganizationResponseDTO createdOrganization)> CreateUserInNewOrg(
             bool stakeHolderAccess = false,
             OrganizationRole role = OrganizationRole.User)
         {
             var org = await CreateOrganization();
-            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), role, org.Id, true, stakeHolderAccess);
+            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), role, org.Uuid, true, stakeHolderAccess);
             return (token, org);
         }
 
-        private async Task<CreateItInterfaceRequestDTO> CreateFullItInterfaceRequestAsync(GetTokenResponseDTO token, OrganizationDTO organization)
+        private async Task<CreateItInterfaceRequestDTO> CreateFullItInterfaceRequestAsync(GetTokenResponseDTO token, ShallowOrganizationResponseDTO organization)
         {
             var exposingSystem = await ItSystemV2Helper.CreateSystemAsync(token.Token,
                 new CreateItSystemRequestDTO() { OrganizationUuid = organization.Uuid, Name = CreateName() });

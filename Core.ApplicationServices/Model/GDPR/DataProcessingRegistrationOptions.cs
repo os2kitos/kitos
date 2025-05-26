@@ -2,7 +2,6 @@
 using System.Linq;
 using Core.DomainModel.GDPR;
 using Core.DomainServices.Model.Options;
-using Core.DomainServices.Options;
 
 namespace Core.ApplicationServices.Model.GDPR
 {

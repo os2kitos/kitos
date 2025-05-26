@@ -31,7 +31,7 @@ namespace Core.ApplicationServices.Users.Write
 
         Result<User, OperationError> UpdateSystemIntegrator(Guid userUuid, bool systemIntegratorStatus);
 
-        void RequestPasswordReset(string email, bool newUi);
+        void RequestPasswordReset(string email);
 
         Maybe<OperationError> SetDefaultOrgUnit(Guid userUuid, Guid organizationUuid, Guid organizationUnitUuid);
     }

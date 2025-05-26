@@ -2,24 +2,22 @@
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Runtime.InteropServices;
 using Core.DomainModel.Organization;
 using System.Threading.Tasks;
 using Core.ApplicationServices.Model.Authentication;
 using Presentation.Web.Models.API.V2.Request.Token;
 using Tests.Integration.Presentation.Web.Tools;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Authorization
 {
-    public class TokenV2Tests : WithAutoFixture
+    public class TokenV2Tests : BaseTest
     {
         [Fact]
         public async Task Can_Validate_Token()
         {
             //Arrange
-            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, TestEnvironment.DefaultOrganizationId, true, false);
+            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, DefaultOrgUuid, true, false);
 
             //Act
             var result = await ValidateToken(token);
@@ -46,7 +44,7 @@ namespace Tests.Integration.Presentation.Web.Authorization
         public async Task Only_Global_Admins_Has_CanPublish_Claim(OrganizationRole role)
         {
             var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), role,
-                TestEnvironment.DefaultOrganizationId, true, false);
+                DefaultOrgUuid, true, false);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtToken = tokenHandler.ReadJwtToken(token);
@@ -71,7 +69,7 @@ namespace Tests.Integration.Presentation.Web.Authorization
         public async Task Only_SystemIntegrators_Has_CanSubscribe_Claim(bool isSystemIntegrator)
         {
             var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User,
-                TestEnvironment.DefaultOrganizationId, true, false, isSystemIntegrator);
+                DefaultOrgUuid, true, false, isSystemIntegrator);
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtToken = tokenHandler.ReadJwtToken(token);
@@ -91,11 +89,6 @@ namespace Tests.Integration.Presentation.Web.Authorization
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<TokenIntrospectionResponse>();
-        }
-
-        private string CreateEmail()
-        {
-            return $"{nameof(TokenV2Tests)}{A<string>()}@test.dk";
         }
     }
 }

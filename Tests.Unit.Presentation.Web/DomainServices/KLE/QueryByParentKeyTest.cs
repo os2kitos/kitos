@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Queries.KLE;
 using Tests.Toolkit.Patterns;

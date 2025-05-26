@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V2.Types.Contract;
 
 namespace Presentation.Web.Models.API.V2.Request.Contract
 {

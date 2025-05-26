@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Presentation.Web.Models.API.V1
+﻿namespace Presentation.Web.Models.API.V1
 {
     public class LoginDTO : UserCredentialsDTO
     {
@@ -12,11 +10,5 @@ namespace Presentation.Web.Models.API.V1
     {
         public OrganizationDTO Organization { get; set; }
         public OrgUnitSimpleDTO DefaultOrgUnit { get; set; }
-    }
-
-    public class LoginResponseDTO
-    {
-        public UserDTO User { get; set; }
-        public IEnumerable<OrganizationAndDefaultUnitDTO> Organizations { get; set; }
     }
 }

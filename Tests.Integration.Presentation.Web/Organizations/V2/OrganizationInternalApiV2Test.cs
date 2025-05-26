@@ -5,10 +5,8 @@ using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json;
-using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
 using Presentation.Web.Models.API.V2.Request.Contract;
@@ -19,12 +17,12 @@ using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Extensions;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.Internal.Organizations;
-using Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration;
 using Xunit;
+using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
 
 namespace Tests.Integration.Presentation.Web.Organizations.V2
 {
-    public class OrganizationInternalApiV2Test: OrganizationApiV2TestBase
+    public class OrganizationInternalApiV2Test : OrganizationApiV2TestBase
     {
         private const int CvrMaxLength = 10;
 
@@ -36,7 +34,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(userRole);
-            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var organization = await CreateOrganizationAsync(A<OrganizationType>());
 
 
             //Act
@@ -56,7 +54,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         [Fact]
         public async Task Can_Get_Default_UI_Root_Config_For_New_Org()
         {
-            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var organization = await CreateOrganizationAsync(A<OrganizationType>());
 
             var response = await OrganizationInternalV2Helper.GetOrganizationUIRootConfig(organization.Uuid);
 
@@ -70,7 +68,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         [Fact]
         public async Task Can_Patch_UI_Root_Config()
         {
-            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var organization = await CreateOrganizationAsync(A<OrganizationType>());
             var dto = new UIRootConfigUpdateRequestDTO()
             {
                 ShowDataProcessing = A<bool>(),
@@ -91,7 +89,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         public async Task Get_UI_Customization_Returns_New_Empty_Customization_If_None_Exists()
         {
             var moduleName = "ItSystemUsages";
-            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var organization = await CreateOrganizationAsync(A<OrganizationType>());
 
             var response = await OrganizationInternalV2Helper.GetUIModuleCustomization(organization.Uuid, moduleName);
 
@@ -149,7 +147,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataResponseDTO>(content);
             Assert.Equal(organization.Uuid, responseDto.Uuid);
             Assert.Equal(organization.Cvr, responseDto.Cvr);
-            Assert.Equal(organization.Phone, responseDto.Phone);
+            Assert.Equal(organization.Name, responseDto.Name);
         }
 
         [Fact]
@@ -167,7 +165,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             using var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterData(organizationToPatch.Uuid, patchDto);
-            
+
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataResponseDTO>(content);
@@ -184,14 +182,14 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             using var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterData(organizationToPatch.Uuid, patchDto);
-            
+
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataResponseDTO>(content);
             Assert.Equal(patchDto.Cvr, responseDto.Cvr);
             Assert.Equal(organizationToPatch.Uuid, responseDto.Uuid);
         }
-        
+
         [Fact]
         public async Task Can_Get_Organization_Master_Data_Roles()
         {
@@ -265,9 +263,9 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             var requestDto = new OrganizationMasterDataRolesRequestDTO()
             {
-                   ContactPerson = contactPersonDto,
-                   DataResponsible = dataResponsibleDto,
-                   DataProtectionAdvisor = dataProtectionAdvisorDto
+                ContactPerson = contactPersonDto,
+                DataResponsible = dataResponsibleDto,
+                DataProtectionAdvisor = dataProtectionAdvisorDto
             };
 
             using var response =
@@ -297,18 +295,21 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var organization = await CreateTestOrganization();
             var resetRolesResponse =
-                 await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, 
+                 await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid,
                      new OrganizationMasterDataRolesRequestDTO());
-             Assert.Equal(HttpStatusCode.OK, resetRolesResponse.StatusCode);
-             var (contactPersonDto, dataResponsibleDto, dataProtectionAdvisorDto) = GetRequestDtos();
-             var request = new OrganizationMasterDataRolesRequestDTO();
+            Assert.Equal(HttpStatusCode.OK, resetRolesResponse.StatusCode);
+            var (contactPersonDto, dataResponsibleDto, dataProtectionAdvisorDto) = GetRequestDtos();
+            var request = new OrganizationMasterDataRolesRequestDTO();
             switch (roleType)
             {
-                case RoleType.ContactPerson: request.ContactPerson = contactPersonDto;
+                case RoleType.ContactPerson:
+                    request.ContactPerson = contactPersonDto;
                     break;
-                case RoleType.DataResponsible: request.DataResponsible = dataResponsibleDto;
+                case RoleType.DataResponsible:
+                    request.DataResponsible = dataResponsibleDto;
                     break;
-                case RoleType.DataProtectionAdvisor: request.DataProtectionAdvisor = dataProtectionAdvisorDto; 
+                case RoleType.DataProtectionAdvisor:
+                    request.DataProtectionAdvisor = dataProtectionAdvisorDto;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(roleType), roleType, null);
@@ -316,7 +317,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             using var response =
                 await OrganizationInternalV2Helper.PatchOrganizationMasterDataRoles(organization.Uuid, request);
-            
+
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
@@ -362,11 +363,10 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             using var response = await OrganizationInternalV2Helper.PatchOrganization(organization.Uuid, requestDto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var updatedOrganization = await OrganizationHelper.GetOrganizationAsync(organization.Id, cookie);
+            var updatedOrganization = await OrganizationV2Helper.GetOrganizationAsync(await GetGlobalToken(), organization.Uuid);
             Assert.Equal(requestDto.Cvr, updatedOrganization.Cvr);
             Assert.Equal(requestDto.Name, updatedOrganization.Name);
-            Assert.Equal((int)requestDto.Type, updatedOrganization.TypeId);
+            Assert.Equal(requestDto.Type, updatedOrganization.OrganizationType);
         }
 
         [Fact]
@@ -374,11 +374,11 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var requestDto = CreateRequestDtoWithoutCountryCode();
 
-            using var response = await OrganizationInternalV2Helper.CreateOrganization(requestDto);
+            using var response = await OrganizationInternalV2Helper.SendCreateOrganization(requestDto);
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             var organization = await response.ReadResponseBodyAsAsync<IdentityNamePairResponseDTO>();
-           
+
             Assert.Equal(requestDto.Name, organization.Name);
         }
 
@@ -391,7 +391,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var cookie = await HttpApi.GetCookieAsync(role);
             var requestDto = CreateRequestDtoWithoutCountryCode();
 
-            using var response = await OrganizationInternalV2Helper.CreateOrganization(requestDto, cookie);
+            using var response = await OrganizationInternalV2Helper.SendCreateOrganization(requestDto, cookie);
 
             var wasAllowed = response.StatusCode == HttpStatusCode.Created;
             var isGlobalAdmin = role == OrganizationRole.GlobalAdmin;
@@ -468,7 +468,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var contract = await contractResponse.ReadResponseBodyAsAsync<ItContractResponseDTO>();
 
             //Set the original organization to be deleted as the supplier for the contract
-            var patchRequest =  new ContractSupplierDataWriteRequestDTO { OrganizationUuid = organizationUuid};
+            var patchRequest = new ContractSupplierDataWriteRequestDTO { OrganizationUuid = organizationUuid };
             var patchResponse = await ItContractV2Helper.SendPatchContractSupplierAsync(token, contract.Uuid, patchRequest);
             Assert.Equal(HttpStatusCode.OK, patchResponse.StatusCode);
 
@@ -514,10 +514,9 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             return (contactPersonDto, dataResponsibleDto, dataProtectionAdvisorDto);
         }
 
-        private async Task<OrganizationDTO> CreateTestOrganization()
+        private async Task<ShallowOrganizationResponseDTO> CreateTestOrganization()
         {
-            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(),
-                "11223344", OrganizationTypeKeys.Kommune, AccessModifier.Local);
+            var organization = await CreateOrganizationAsync();
             Assert.NotNull(organization);
             return organization;
         }
@@ -527,11 +526,11 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             return A<string>().Truncate(CvrMaxLength);
         }
 
-        private async Task<(Cookie loginCookie, OrganizationDTO organization)> CreateUiCustomizationPrerequisitesAsync()
+        private async Task<(Cookie loginCookie, ShallowOrganizationResponseDTO organization)> CreateUiCustomizationPrerequisitesAsync()
         {
-            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var organization = await CreateOrganizationAsync(A<OrganizationType>());
             var (_, _, loginCookie) =
-                await HttpApi.CreateUserAndLogin(UIConfigurationHelper.CreateEmail(), OrganizationRole.LocalAdmin, organization.Id);
+                await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.LocalAdmin, organization.Uuid);
             return (loginCookie, organization);
         }
 

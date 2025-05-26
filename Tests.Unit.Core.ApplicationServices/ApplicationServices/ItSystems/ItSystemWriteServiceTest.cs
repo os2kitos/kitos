@@ -15,7 +15,6 @@ using Core.ApplicationServices.System.Write;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainServices.Generic;

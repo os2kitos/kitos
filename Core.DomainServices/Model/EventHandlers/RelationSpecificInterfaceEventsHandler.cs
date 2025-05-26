@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel.Events;

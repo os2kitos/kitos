@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Http.Results;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Notification;
@@ -98,7 +97,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
 
             //Assert
             Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType); ;
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
         
         [Fact]

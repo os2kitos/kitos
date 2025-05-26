@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
 namespace Presentation.Web.Models.API.V2.Internal.Response.Organizations.Conflicts
 {

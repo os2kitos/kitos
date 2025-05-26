@@ -70,7 +70,7 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.LegalDataProcessorName)
                 .IsOptional()
                 .HasMaxLength(Organization.MaxNameLength)
-                .HasIndexAnnotation("ItSystem_IX_LegalDataProcessorName"); ;
+                .HasIndexAnnotation("ItSystem_IX_LegalDataProcessorName");
 
             TypeMapping.AddIndexOnAccessModifier<ItSystemMap, ItSystem>(this);
         }

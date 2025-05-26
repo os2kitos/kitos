@@ -9,6 +9,7 @@ using Presentation.Web.Models.API.V2.Request.User;
 using Xunit;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
 using System.Linq;
+using System.Linq.Expressions;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
@@ -244,6 +245,27 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             using var response = await HttpApi.GetWithCookieAsync(url, cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<IdentityNamePairResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> PatchUserAsync(Guid organizationUuid, Guid userUuid, Cookie cookie = null, params KeyValuePair<string, object>[] kvpPairs)
+        {
+            var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"{ControllerPrefix(organizationUuid)}/{userUuid}/patch");
+            return await HttpApi.PatchWithCookieAsync(url, requestCookie, kvpPairs.ToDictionary(x => x.Key, x => x.Value));
+        }
+
+        public static async Task<HttpResponseMessage> PatchUserAsync<T>(
+            Guid organizationUuid,
+            Guid userUuid,
+            Expression<Func<UpdateUserRequestDTO, T>> propertySelector,
+            T value, Cookie cookie = null)
+        {
+            if (!(propertySelector.Body is MemberExpression m))
+                throw new ArgumentException("Selector must be a simple member access", nameof(propertySelector));
+
+            var propertyName = m.Member.Name;
+            var kvp = new KeyValuePair<string, object>(propertyName, value);
+            return await PatchUserAsync(organizationUuid, userUuid, cookie, kvp);
         }
 
         private static string ControllerPrefix(Guid organizationUuid)

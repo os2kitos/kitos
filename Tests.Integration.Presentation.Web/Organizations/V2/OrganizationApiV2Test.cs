@@ -1,17 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Response.Organization;
-using Presentation.Web.Models.API.V2.Response.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
-using Tests.Toolkit.Patterns;
 using Xunit;
 using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
 
@@ -24,7 +18,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var email = CreateEmail();
-            var userDetails = await HttpApi.CreateUserAndGetToken(email, OrganizationRole.User, TestEnvironment.DefaultOrganizationId, true);
+            var userDetails = await HttpApi.CreateUserAndGetToken(email, OrganizationRole.User, DefaultOrgUuid, true);
 
             //Act
             var organizations = await OrganizationV2Helper.GetOrganizationsForWhichUserIsRightsHolder(userDetails.token);
@@ -38,9 +32,9 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var email = CreateEmail();
-            var userDetails = await HttpApi.CreateUserAndGetToken(email, OrganizationRole.User, TestEnvironment.DefaultOrganizationId, true);
-            using var response1 = await HttpApi.SendAssignRoleToUserAsync(userDetails.userId, OrganizationRole.RightsHolderAccess, TestEnvironment.SecondOrganizationId);
-            Assert.Equal(HttpStatusCode.Created, response1.StatusCode);
+            var userDetails = await HttpApi.CreateUserAndGetToken(email, OrganizationRole.User, DefaultOrgUuid, true);
+            using var response1 = await HttpApi.SendAssignRoleToUserAsync(userDetails.userUuid, OrganizationRole.RightsHolderAccess, SecondOrgUuid);
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
             var secondOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.SecondOrganizationId);
             var firstOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
 
@@ -53,8 +47,8 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.NotNull(organization.Name);
 
             //Assign another org and observe the change
-            using var response2 = await HttpApi.SendAssignRoleToUserAsync(userDetails.userId, OrganizationRole.RightsHolderAccess, TestEnvironment.DefaultOrganizationId);
-            Assert.Equal(HttpStatusCode.Created, response1.StatusCode);
+            using var response2 = await HttpApi.SendAssignRoleToUserAsync(userDetails.userUuid, OrganizationRole.RightsHolderAccess, DefaultOrgUuid);
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
             organizations = (await OrganizationV2Helper.GetOrganizationsForWhichUserIsRightsHolder(userDetails.token)).ToList();
             Assert.Equal(2, organizations.Count);
@@ -66,7 +60,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var orgType = A<OrganizationTypeKeys>();
+            var orgType = A<OrganizationType>();
             var newOrg = await CreateOrganizationAsync(orgType);
 
             //Act
@@ -123,7 +117,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var newOrg = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var newOrg = await CreateOrganizationAsync(A<OrganizationType>());
 
             //Act
             var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250, nameContent: newOrg.Name);
@@ -137,8 +131,8 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         public async Task GET_Organizations_Returns_Ok_OnlyMyOrganizations_Filtering()
         {
             //Arrange
-            var newOrg = await CreateOrganizationAsync(OrganizationTypeKeys.Kommune);
-            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, newOrg.Id, true, false);
+            var newOrg = await CreateOrganizationAsync(OrganizationType.Municipality);
+            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, newOrg.Uuid, true, false);
 
             //Act
             var organizationsWithFiltering = await OrganizationV2Helper.GetOrganizationsAsync(token, 0, 2, onlyWhereUserHasMembership: true);
@@ -154,7 +148,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         public async Task GET_Organizations_Returns_Ok_Cvr_Filtering()
         { //Arrange
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var newOrg = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var newOrg = await CreateOrganizationAsync(A<OrganizationType>());
 
             //Act
             var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250, cvrContent: newOrg.Cvr);
@@ -167,7 +161,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         public async Task GET_Organizations_Returns_Ok_Uuid_Filtering()
         { //Arrange
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var newOrg = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var newOrg = await CreateOrganizationAsync(A<OrganizationType>());
 
             //Act
             var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250, uuid: newOrg.Uuid);
@@ -183,7 +177,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         public async Task GET_Organizations_Returns_Ok_NameOrCvr_Filtering(bool inputIsCvr)
         { //Arrange
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var newOrg = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var newOrg = await CreateOrganizationAsync(A<OrganizationType>());
 
             //Act
             var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250, nameOrCvrContent: inputIsCvr ? newOrg.Cvr : newOrg.Name);
@@ -193,24 +187,9 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(newOrg.Uuid, org.Uuid);
         }
 
-        private static readonly IReadOnlyDictionary<OrganizationTypeKeys, OrganizationType> InnerToExternalOrgType =
-            new ReadOnlyDictionary<OrganizationTypeKeys, OrganizationType>(new Dictionary<OrganizationTypeKeys, OrganizationType>()
-            {
-                {OrganizationTypeKeys.Kommune, OrganizationType.Municipality},
-                {OrganizationTypeKeys.Interessefællesskab, OrganizationType.CommunityOfInterest},
-                {OrganizationTypeKeys.Virksomhed, OrganizationType.Company},
-                {OrganizationTypeKeys.AndenOffentligMyndighed, OrganizationType.OtherPublicAuthority}
-            });
-
-        private static void AssertOrganizationType(OrganizationTypeKeys createdWith, OrganizationResponseDTO dto)
+        private static void AssertOrganizationType(OrganizationType createdWith, OrganizationResponseDTO dto)
         {
-            var expectedResult = InnerToExternalOrgType[createdWith];
-            Assert.Equal(expectedResult, dto.OrganizationType);
-        }
-
-        private string CreateEmail()
-        {
-            return $"{nameof(OrganizationApiV2Test)}{DateTime.Now.Ticks}{A<Guid>():N}@kitos.dk";
+            Assert.Equal(createdWith, dto.OrganizationType);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using AutoFixture;
 using Core.DomainModel;
-using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.User;
 using Tests.Toolkit.Patterns;
 using Xunit;

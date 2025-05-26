@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ServiceModel;
-using System.ServiceModel.Channels;
 using Digst.OioIdws.Soap.Bindings;
 
 namespace Infrastructure.STS.Common.Factories

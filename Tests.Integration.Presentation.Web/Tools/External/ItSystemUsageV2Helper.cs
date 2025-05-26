@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage;
 using Presentation.Web.Models.API.V2.Internal.Response.Roles;
@@ -372,6 +373,14 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             var path = $"{_baseUsageApiPath}/{systemUsageUuid}/journal-periods/{journalPeriodUuid}";
             return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl(path), token);
+        }
+
+        public static async Task<IEnumerable<ItSystemUsageOverviewReadModel>> QueryReadModelByNameContent(Guid organizationUuid, string nameContent, int top, int skip, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/ItSystemUsageOverviewReadModels?organizationUuid={organizationUuid:D}&$expand=RoleAssignments,ItSystemTaskRefs,SensitiveDataLevels,ArchivePeriods,DataProcessingRegistrations,DependsOnInterfaces,IncomingRelatedItSystemUsages,OutgoingRelatedItSystemUsages,RelevantOrganizationUnits,AssociatedContracts&$filter=contains(SystemName,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=SystemName"), cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<ItSystemUsageOverviewReadModel>();
         }
     }
 }

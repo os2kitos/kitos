@@ -1,5 +1,4 @@
 ﻿using System.Data.Entity.ModelConfiguration;
-using Core.DomainModel;
 using Core.DomainModel.KendoConfig;
 
 namespace Infrastructure.DataAccess.Mapping

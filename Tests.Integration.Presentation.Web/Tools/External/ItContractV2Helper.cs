@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.DomainModel.ItContract.Read;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -250,7 +251,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<IEnumerable<ExtendedRoleAssignmentResponseDTO>> GetRoleAssignmentsInternalAsync(Guid uuid)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{uuid:D}/roles"), cookie); ;
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/{uuid:D}/roles"), cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ExtendedRoleAssignmentResponseDTO>>();
@@ -283,6 +284,14 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             using var response = await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/it-contracts/transfer"), cookie, request);
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        public static async Task<IEnumerable<ItContractOverviewReadModel>> QueryReadModelByNameContent(Guid organizationUuidUuid, string nameContent, int top, int skip)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/ItContractOverviewReadModels?organizationUuid={organizationUuidUuid:D}&$expand=RoleAssignments&$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<ItContractOverviewReadModel>();
         }
     }
 }

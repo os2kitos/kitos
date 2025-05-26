@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.SSO;

@@ -1,9 +1,6 @@
 ﻿using Core.DomainModel.Organization;
-using Core.DomainModel;
-using Presentation.Web.Models.API.V1;
 using System.Threading.Tasks;
 using Tests.Integration.Presentation.Web.Tools;
-using Tests.Toolkit.Patterns;
 using Xunit;
 using Tests.Integration.Presentation.Web.Tools.Internal;
 using System.Collections.Generic;
@@ -19,7 +16,7 @@ using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
 namespace Tests.Integration.Presentation.Web.Internal.GdprReport
 {
-    public class GdprReportApiV2Test : WithAutoFixture
+    public class GdprReportApiV2Test : BaseTest
     {
 
         [Fact]
@@ -79,14 +76,6 @@ namespace Tests.Integration.Presentation.Web.Internal.GdprReport
                 PlannedRiskAssessmentDate = A<DateTime>(),
                 DPIAConducted = A<YesNoDontKnowChoice>(),
             };
-        }
-
-        private async Task<OrganizationDTO> CreateOrganizationAsync()
-        {
-            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(),
-                "11223344", OrganizationTypeKeys.Kommune, AccessModifier.Local);
-            Assert.NotNull(organization);
-            return organization;
         }
     }
 }

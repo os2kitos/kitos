@@ -5,24 +5,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Core.DomainModel;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.Organization;
 using Newtonsoft.Json;
-using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
 using Presentation.Web.Models.API.V2.Internal.Response;
+using Presentation.Web.Models.API.V2.Response.Organization;
 using Tests.Integration.Presentation.Web.Tools;
-using Tests.Integration.Presentation.Web.Tools.Extensions;
 using Tests.Integration.Presentation.Web.Tools.Internal;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem.V2
 {
-    public class ItSystemLocalOptionTypesInternalV2ApiTest: WithAutoFixture
+    public class ItSystemLocalOptionTypesInternalV2ApiTest: BaseTest
     {
-        private const int CvrLengthLimit = 10;
         private const string BusinessTypesUrlSuffix = "business-types";
         private const string ItSystemsApiPrefix = "api/v2/internal/it-systems";
 
@@ -123,9 +118,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.DoesNotContain(globalOption.Uuid, localOptions.Select(x => x.Uuid));
         }
 
-        private async Task<OrganizationDTO> CreateOrganization()
+        private async Task<ShallowOrganizationResponseDTO> CreateOrganization()
         {
-            var organization = await OrganizationHelper.CreateOrganizationAsync(A<int>(), A<string>(), A<string>().Truncate(CvrLengthLimit), OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var organization = await CreateOrganizationAsync();
             Assert.NotNull(organization);
             return organization;
         }

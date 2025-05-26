@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Core.Abstractions.Types;
 
 namespace Core.DomainModel.PublicMessage
 {

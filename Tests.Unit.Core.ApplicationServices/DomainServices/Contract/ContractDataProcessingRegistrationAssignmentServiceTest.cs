@@ -1,7 +1,5 @@
 ﻿using System.Linq;
 using Core.Abstractions.Types;
-using Core.BackgroundJobs.Model.ReadModels;
-using Core.DomainModel.Commands;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Events;

@@ -159,7 +159,6 @@
     <Compile Include="ArchiveDutyTypes.cs" />
     <Compile Include="AttachedOption.cs" />
     <Compile Include="BackgroundJobs\PendingReadModelUpdate.cs" />
-    <Compile Include="Constants\EntityConstants.cs" />
     <Compile Include="ContactPerson.cs" />
     <Compile Include="Events\EnabledStatusChanged.cs" />
     <Compile Include="ExternalReference.cs" />

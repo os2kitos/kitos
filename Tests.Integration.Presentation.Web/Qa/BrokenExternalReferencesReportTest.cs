@@ -7,20 +7,21 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.Abstractions.Extensions;
-using Core.DomainModel;
 using Core.DomainModel.Qa.References;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Presentation.Web.Models.API.V2.Internal.Response.QA;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.Internal.References;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Qa
 {
     [Collection(nameof(SequentialTestGroup))]
-    public class BrokenExternalReferencesReportTest : WithAutoFixture
+    public class BrokenExternalReferencesReportTest : BaseTest
     {
         private const string SystemReferenceUrl = "http://google.com/notfount1337.html";
         private const string InterfaceUrl = "http://google.com/notfounth4x0r.html";
@@ -87,12 +88,21 @@ namespace Tests.Integration.Presentation.Web.Qa
             //Arrange - a broken link in both a system and an interface
             PrepareForReportGeneration();
             PurgeBrokenExternalReferencesReportTable();
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<Guid>().ToString("N"), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var system = await CreateItSystemAsync(DefaultOrgUuid);
             var systemReferenceName = A<string>();
-            await ReferencesHelper.CreateReferenceAsync(systemReferenceName, null, SystemReferenceUrl, r => r.ItSystem_Id = system.Id);
+            await ItSystemV2Helper.SendPatchSystemAsync(await GetGlobalToken(), system.Uuid, x => x.ExternalReferences,
+                new[]
+                {
+                    new UpdateExternalReferenceDataWriteRequestDTO
+                    {
+                        Title = systemReferenceName,
+                        Url = SystemReferenceUrl
+                    }
+                });
 
-            var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            interfaceDto = await InterfaceHelper.SetUrlAsync(interfaceDto.Id, InterfaceUrl);
+            var interfaceDto = await CreateItInterfaceAsync(DefaultOrgUuid);
+            await InterfaceV2Helper.SendPatchInterfaceAsync(await GetGlobalToken(), interfaceDto.Uuid, x => x.UrlReference,
+                InterfaceUrl).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Act
             await BrokenExternalReferencesReportHelper.TriggerRequestAsync();
@@ -114,23 +124,34 @@ namespace Tests.Integration.Presentation.Web.Qa
             //Arrange - a broken link in both a system and an interface
             PrepareForReportGeneration();
             PurgeBrokenExternalReferencesReportTable();
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<Guid>().ToString("N"), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            await ReferencesHelper.CreateReferenceAsync(A<string>(), null, SystemReferenceUrl, r => r.ItSystem_Id = system.Id);
-            var referenceToBeExplicitlyDeleted = await ReferencesHelper.CreateReferenceAsync(A<string>(), null, SystemReferenceUrl, r => r.ItSystem_Id = system.Id);
+            var system = await CreateItSystemAsync(DefaultOrgUuid);
+            await ExternalReferencesV2Helper.PostItSystemReference(system.Uuid, new ExternalReferenceDataWriteRequestDTO
+            {
+                Title = A<string>(),
+                Url = SystemReferenceUrl
+            });
+            var referenceToBeExplicitlyDeleted = await ExternalReferencesV2Helper.PostItSystemReference(system.Uuid, new ExternalReferenceDataWriteRequestDTO
+            {
+                Title = A<string>(),
+                Url = SystemReferenceUrl
+            });
 
-            var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
-            interfaceDto = await InterfaceHelper.SetUrlAsync(interfaceDto.Id, InterfaceUrl);
+            var interfaceDto = await CreateItInterfaceAsync(DefaultOrgUuid);
+            await InterfaceV2Helper.SendPatchInterfaceAsync(await GetGlobalToken(), interfaceDto.Uuid,
+                x => x.UrlReference, InterfaceUrl).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             await BrokenExternalReferencesReportHelper.TriggerRequestAsync();
             var dto = await WaitForReportGenerationCompletedAsync();
             Assert.True(dto.Available);
 
             //Act
-            using var deleteReferenceResponse = await ReferencesHelper.DeleteReferenceAsync(referenceToBeExplicitlyDeleted.Id);
-            using var deleteItSystemResponse = await ItSystemHelper.SendDeleteItSystemAsync(system.Id, TestEnvironment.DefaultOrganizationId);
-            using var deleteInterfaceResponse = await InterfaceHelper.SendDeleteInterfaceRequestAsync(interfaceDto.Id);
-            Assert.Equal(HttpStatusCode.OK, deleteReferenceResponse.StatusCode);
-            Assert.Equal(HttpStatusCode.OK, deleteItSystemResponse.StatusCode);
-            Assert.Equal(HttpStatusCode.OK, deleteInterfaceResponse.StatusCode);
+            using var deleteReferenceResponse = await ExternalReferencesV2Helper.DeleteItSystemReferenceAsync(system.Uuid, referenceToBeExplicitlyDeleted.Uuid);
+            using var deleteItSystemResponse =
+                await ItSystemV2Helper.SendDeleteSystemAsync(await GetGlobalToken(), system.Uuid);
+            using var deleteInterfaceResponse =
+                await InterfaceV2Helper.SendDeleteItInterfaceAsync(await GetGlobalToken(), interfaceDto.Uuid);
+            Assert.Equal(HttpStatusCode.NoContent, deleteReferenceResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, deleteItSystemResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.NoContent, deleteInterfaceResponse.StatusCode);
         }
 
         private static void AssertBrokenLinkRow(LinkReportCsvFormat brokenLink, string expectedOrigin, string expectedName, string expectedReferenceName, string expectedErrorCategory, string expectedErrorCode, string expectedUrl)

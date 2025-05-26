@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using Xunit;
+﻿using Xunit;
 using Core.ApplicationServices.Model.KitosEvents;
 using Tests.Toolkit.Patterns;
 

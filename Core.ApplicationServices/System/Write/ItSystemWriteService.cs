@@ -13,7 +13,6 @@ using Core.ApplicationServices.References;
 using Core.DomainModel.Events;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.References;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Repositories.Organization;

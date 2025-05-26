@@ -1,12 +1,7 @@
-﻿using Core.Abstractions.Extensions;
-using Core.Abstractions.Types;
-using Core.ApplicationServices.Model.Contracts.Write;
-using Core.ApplicationServices.Model.Shared.Write;
-using Core.DomainModel.ItContract;
+﻿using Core.ApplicationServices.Model.Shared.Write;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
-using Core.DomainServices.GDPR;
 
 namespace Core.ApplicationServices.Helpers
 {

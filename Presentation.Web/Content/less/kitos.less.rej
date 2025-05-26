@@ -1,9 +1,0 @@
-diff a/Presentation.Web/Content/less/kitos.less b/Presentation.Web/Content/less/kitos.less	(rejected hunks)
-@@ -984,6 +984,7 @@
-                 h3 {
-                     font-size: 14px;
-                     font-weight: bold;
-+                    margin-top: 23px;
-                     border-bottom: 1px solid black;
-                 }
-             }

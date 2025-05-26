@@ -580,7 +580,6 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             Assert.True(result.Ok);
             var logResult = Assert.Single(result.Value);
-            ;
             Assert.Equal(2, logResult.GetEntries().Count());
         }
 

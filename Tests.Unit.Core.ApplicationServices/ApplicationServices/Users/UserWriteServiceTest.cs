@@ -120,7 +120,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             Assert.True(result.Failed);
             Assert.Equal(error, result.Error.FailureType);
             Assert.True(result.Error.Message.HasValue);
-            Assert.True(result.Error.Message.Value != null && result.Error.Message.Value.Contains("Failed to assign role"));
+            Assert.Contains("Failed to assign role", result.Error.Message.Value);
             transaction.Verify(x => x.Rollback(), Times.Once);
         }
 
@@ -185,7 +185,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             //Act
             var result = _sut.SendNotification(orgUuid, userUuid);
 
-            _userServiceMock.Verify(x => x.IssueAdvisMail(user, false, orgId, true), Times.Once);
+            _userServiceMock.Verify(x => x.IssueAdvisMail(user, false, orgId), Times.Once);
             Assert.True(result.IsNone);
         }
 
@@ -500,9 +500,9 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var user = SetupUser();
             ExpectGetUserByEmailReturns(user.Email, user);
 
-            _sut.RequestPasswordReset(user.Email, true);
+            _sut.RequestPasswordReset(user.Email);
 
-            _userServiceMock.Verify(x => x.IssuePasswordReset(user, null, null, true), Times.Once());
+            _userServiceMock.Verify(x => x.IssuePasswordReset(user, null, null), Times.Once());
         }
 
         [Fact]
@@ -511,7 +511,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var nonExistantMail = "test@mail.dk";
             ExpectGetUserByEmailReturns(nonExistantMail, null);
 
-            _sut.RequestPasswordReset(nonExistantMail, true);
+            _sut.RequestPasswordReset(nonExistantMail);
 
             VerifyNoPasswordResetsHasBeenIssued();
         }
@@ -523,7 +523,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             user.Deleted = true; //Make user unable to authenticate
             ExpectGetUserByEmailReturns(user.Email, user);
 
-            _sut.RequestPasswordReset(user.Email, true);
+            _sut.RequestPasswordReset(user.Email);
 
             VerifyNoPasswordResetsHasBeenIssued();
         }
@@ -542,7 +542,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
 
             if (isGlobalAdmin)
             {
-                _userServiceMock.Verify(x => x.UpdateUser(user, null, null, true), Times.Once);
+                _userServiceMock.Verify(x => x.UpdateUser(user, null, null), Times.Once);
                 Assert.True(result.Value.IsSystemIntegrator);
             }
             Assert.Equal(result.Ok, isGlobalAdmin);
@@ -550,7 +550,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
 
         private void VerifyNoPasswordResetsHasBeenIssued()
         {
-            _userServiceMock.Verify(x => x.IssuePasswordReset(It.IsAny<User>(), null, null, true), Times.Never());
+            _userServiceMock.Verify(x => x.IssuePasswordReset(It.IsAny<User>(), null, null), Times.Never());
         }
 
         private void ExpectGetUserByEmailReturns(string email, User user)
@@ -607,7 +607,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
 
         private void ExpectAddUserReturns(User user, bool sendMailOnCreation, int orgId)
         {
-            _userServiceMock.Setup(x => x.AddUser(user, sendMailOnCreation, orgId, true)).Returns(user);
+            _userServiceMock.Setup(x => x.AddUser(user, sendMailOnCreation, orgId)).Returns(user);
         }
         
         private void ExpectAddRoleReturns(OrganizationRole role, int organizationId, int userId, Result<OrganizationRight, OperationFailure> result)

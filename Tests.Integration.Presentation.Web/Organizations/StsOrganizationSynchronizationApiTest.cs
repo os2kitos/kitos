@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.Abstractions.Types;
-using Core.DomainModel;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Tracking;
@@ -19,13 +18,12 @@ using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Extensions;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Organizations
 {
     [Collection(nameof(SequentialTestGroup))]
-    public class StsOrganizationSynchronizationApiTest : WithAutoFixture
+    public class StsOrganizationSynchronizationApiTest : BaseTest
     {
         private const string UnAuthorizedCvr = "55133018"; //This one is Aarhus and we don't have a service agreement with them in STS Test environment
         private const string AuthorizedCvr = "58271713"; //This one is Ballerup and we have a service agreement with them in STS Test environment
@@ -797,7 +795,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
         private async Task<Guid> CreateOrgWithCvr(string cvr, bool fakeInitialConnection = false, bool fakeInitialSubscription = false)
         {
-            var org = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, $"StsSync_{A<Guid>():N}", cvr, OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var org = await CreateOrganizationAsync(cvr: cvr);
             if (fakeInitialConnection)
             {
                 DatabaseAccess.MutateEntitySet<Organization>(repo =>

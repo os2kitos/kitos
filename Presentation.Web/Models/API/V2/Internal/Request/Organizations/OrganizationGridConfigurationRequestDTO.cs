@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Core.DomainModel;
+﻿using System.Collections.Generic;
 
 namespace Presentation.Web.Models.API.V2.Internal.Request.Organizations
 {

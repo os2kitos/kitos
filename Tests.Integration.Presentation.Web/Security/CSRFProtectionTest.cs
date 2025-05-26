@@ -6,14 +6,15 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Newtonsoft.Json;
 using Presentation.Web.Helpers;
+using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Tests.Integration.Presentation.Web.Tools;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Security
 {
-    public class CSRFProtectionTest : WithAutoFixture
+    public class CSRFProtectionTest : BaseTest
     {
+        private const string ItSystemUrl = "api/v2/it-systems";
 
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
@@ -29,7 +30,7 @@ namespace Tests.Integration.Presentation.Web.Security
                 AccessModifier = AccessModifier.Public
             };
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, TestEnvironment.CreateUrl("api/itsystem"))
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, TestEnvironment.CreateUrl(ItSystemUrl))
             {
                 Content = new StringContent(JsonConvert.SerializeObject(itSystem), Encoding.UTF8, "application/json")
             };
@@ -60,7 +61,7 @@ namespace Tests.Integration.Presentation.Web.Security
                 AccessModifier = AccessModifier.Public
             };
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, TestEnvironment.CreateUrl("api/itsystem"))
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, TestEnvironment.CreateUrl(ItSystemUrl))
             {
                 Content = new StringContent(JsonConvert.SerializeObject(itSystem), Encoding.UTF8, "application/json")
             };
@@ -93,7 +94,7 @@ namespace Tests.Integration.Presentation.Web.Security
                 AccessModifier = AccessModifier.Public
             };
 
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, TestEnvironment.CreateUrl("api/itsystem"))
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, TestEnvironment.CreateUrl(ItSystemUrl))
             {
                 Content = new StringContent(JsonConvert.SerializeObject(itSystem), Encoding.UTF8, "application/json")
             };
@@ -118,16 +119,14 @@ namespace Tests.Integration.Presentation.Web.Security
         {
             //Arrange
             var cookie = await HttpApi.GetCookieAsync(role);
-            var itSystem = new
+            var request = new CreateItSystemRequestDTO
             {
-                name = A<string>(),
-                belongsToId = TestEnvironment.DefaultOrganizationId,
-                organizationId = TestEnvironment.DefaultOrganizationId,
-                AccessModifier = AccessModifier.Public
+                OrganizationUuid = DefaultOrgUuid,
+                Name = A<string>()
             };
 
             //Act
-            using (var httpResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("/api/itsystem"), cookie, itSystem))
+            using (var httpResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl(ItSystemUrl), cookie, request))
             {
                 //Assert
                 Assert.Equal(HttpStatusCode.Created, httpResponse.StatusCode);

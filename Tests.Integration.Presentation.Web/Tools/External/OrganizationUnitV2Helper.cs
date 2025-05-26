@@ -118,6 +118,13 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.DeleteWithCookieAsync(url, requestCookie, request);
         }
 
+        public static async Task<OrganizationUnitResponseDTO> GetRootUnit(Guid organizationUuid)
+        {
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var units = await GetOrganizationUnitsAsync(token.Token, organizationUuid);
+            return units.First(x => x.ParentOrganizationUnit == null);
+        }
+
         private static string RolesRoutePrefix(Guid organizationUuid, Guid unitUuid)
         {
             return $"{ControllerRoutePrefix(organizationUuid)}/{unitUuid}/roles";

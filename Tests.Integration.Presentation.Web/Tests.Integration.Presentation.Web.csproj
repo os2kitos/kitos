@@ -160,14 +160,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Advice\AdviceSequentialTest.cs" />
-    <Compile Include="Advice\AdviceTest.cs" />
-    <Compile Include="Advice\AdviceTestBase.cs" />
-    <Compile Include="Authorization\GetOrganizationsTests.cs" />
     <Compile Include="Authorization\TokenV2Tests.cs" />
     <Compile Include="Contract\ItContractOverviewReadModelsApiTest.cs" />
-    <Compile Include="Contract\ItContractSequentialTest.cs" />
-    <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Contract\V2\ItContractsInternalApiV2Test.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
     <Compile Include="GDPR\V2\DataProcessingRegistrationInternalAPIV2Test.cs" />
@@ -188,7 +182,6 @@
     <Compile Include="ItSystem\V2\ItSystemUsageMigrationApiV2Test.cs" />
     <Compile Include="Notifications\AlertsApiV2Test.cs" />
     <Compile Include="Notifications\NotificationApiV2Test.cs" />
-    <Compile Include="Options\V1\OptionApiTests.cs" />
     <Compile Include="Organizations\V2\LocalOrganizationUnitRoleOptionTypesInternalV2ApiTest.cs" />
     <Compile Include="Organizations\V2\OrganizationApiV2TestBase.cs" />
     <Compile Include="Organizations\V2\OrganizationGridApiV2Test.cs" />
@@ -200,6 +193,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Tools\BaseTest.cs" />
     <Compile Include="Tools\Extensions\StringExtensions.cs" />
     <Compile Include="Tools\External\LegalItSystemPropertiesV2Helper.cs" />
     <Compile Include="Tools\HelpTextsInternalV2Helper.cs" />
@@ -213,18 +207,13 @@
     <Compile Include="Tools\Internal\Organizations\OrganizationInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\Organizations\OrganizationUnitRegistrationV2Helper.cs" />
     <Compile Include="Tools\Internal\References\ExternalReferencesInternalV2Helper.cs" />
-    <Compile Include="Tools\Internal\References\ExternalReferenceTestHelper.cs" />
+    <Compile Include="Tools\Internal\References\ExternalReferencesV2Helper.cs" />
     <Compile Include="Tools\Internal\Users\PasswordResetV2Helper.cs" />
     <Compile Include="Tools\Internal\Users\UsersV2Helper.cs" />
-    <Compile Include="Tools\OrganizationGridTestHelper.cs" />
-    <Compile Include="Users\OrganizationRightApiTest.cs" />
-    <Compile Include="Organizations\OrganizationUnitTests.cs" />
-    <Compile Include="Organizations\OrganizationUnitRegistrationTests.cs" />
-    <Compile Include="Organizations\OrganizationSequentialTests.cs" />
+    <Compile Include="Tools\OrganizationGridConfigV2Helper.cs" />
     <Compile Include="Organizations\StsOrganizationSynchronizationApiTest.cs" />
     <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
     <Compile Include="GDPR\V2\DataProcessingRegistrationApiV2Test.cs" />
-    <Compile Include="Tools\LocalOptionHelper.cs" />
     <Compile Include="Tools\External\DeltaFeedV2Helper.cs" />
     <Compile Include="Tools\External\ApiV2HelperPatchPayloadExtensions.cs" />
     <Compile Include="Tools\External\DataProcessingRegistrationV2Helper.cs" />
@@ -233,39 +222,23 @@
     <Compile Include="Options\V2\OptionV2ApiTests.cs" />
     <Compile Include="Interfaces\V2\ItInterfaceApiV2Test.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelsTest.cs" />
-    <Compile Include="GDPR\DataProcessingRegistrationsTest.cs" />
-    <Compile Include="ItSystem\ItSystemUsageGDPRTest.cs" />
-    <Compile Include="ItSystem\SystemRelationsTest.cs" />
     <Compile Include="ItSystem\V2\ItSystemsApiV2Test.cs" />
-    <Compile Include="Kendo\KendoOverviewConfigurationTest.cs" />
     <Compile Include="KLE\KLEDataBridgeTest.cs" />
-    <Compile Include="KLE\KleUpdateIntegrationTests.cs" />
     <Compile Include="KLE\TaskRefIntegrityInput.cs" />
     <Compile Include="Organizations\V2\OrganizationApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationUnitsApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationUserApiV2Test.cs" />
-    <Compile Include="ItSystem\ItSystemTests.cs" />
-    <Compile Include="Interfaces\ItInterfacesTest.cs" />
-    <Compile Include="ItSystem\ItSystemUsageTests.cs" />
-    <Compile Include="LocalAdminArea\LocalConfigTest.cs" />
-    <Compile Include="Organizations\OrganizationTest.cs" />
-    <Compile Include="ItSystem\UsingOrganizationsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Qa\BrokenExternalReferencesReportTest.cs" />
-    <Compile Include="References\ExternalReferencesTest.cs" />
     <Compile Include="Security\AccessibilityTests.cs" />
     <Compile Include="Security\AuthorizationTests.cs" />
     <Compile Include="Security\CSRFProtectionTest.cs" />
     <Compile Include="Swagger\SwaggerDocumentationTest.cs" />
     <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelsTest.cs" />
     <Compile Include="TestEnvironmentValidation\TestEnvironmentTest.cs" />
-    <Compile Include="Tools\AdviceHelper.cs" />
-    <Compile Include="Tools\AuthorizationHelper.cs" />
     <Compile Include="Tools\BrokenExternalReferencesReportHelper.cs" />
     <Compile Include="Tools\DatabaseAccess.cs" />
-    <Compile Include="Tools\DataProcessingRegistrationHelper.cs" />
     <Compile Include="Tools\DisposableExtensions.cs" />
-    <Compile Include="Tools\EntityOptionHelper.cs" />
     <Compile Include="Tools\External\ItContractV2Helper.cs" />
     <Compile Include="Tools\External\ItSystemUsageV2Helper.cs" />
     <Compile Include="Tools\External\KleOptionV2Helper.cs" />
@@ -273,43 +246,20 @@
     <Compile Include="Tools\External\InterfaceV2Helper.cs" />
     <Compile Include="Tools\External\OrganizationUnitV2Helper.cs" />
     <Compile Include="Tools\External\OrganizationUserV2Helper.cs" />
-    <Compile Include="Tools\External\Rights\RightsType.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\HttpCommandAssertionHelper.cs" />
-    <Compile Include="Tools\InterfaceExhibitHelper.cs" />
-    <Compile Include="Tools\InterfaceHelper.cs" />
-    <Compile Include="Tools\Internal\UI_Configuration\UIConfigurationHelper.cs" />
-    <Compile Include="Tools\ItContractHelper.cs" />
-    <Compile Include="Tools\ItSystemHelper.cs" />
-    <Compile Include="Tools\ItSystemUsageHelper.cs" />
-    <Compile Include="Tools\KendoOverviewConfigurationHelper.cs" />
-    <Compile Include="Tools\KitosApiConstants.cs" />
-    <Compile Include="Tools\LocalConfigHelper.cs" />
     <Compile Include="Tools\Model\ApiUserDTO.cs" />
     <Compile Include="Tools\Model\CreateUserDTO.cs" />
     <Compile Include="Tools\Model\CSRFTokenDTO.cs" />
     <Compile Include="Tools\Model\KitosCredentials.cs" />
     <Compile Include="Tools\Model\KitosTestEnvironment.cs" />
     <Compile Include="Tools\Model\OrgRightDTO.cs" />
-    <Compile Include="Tools\Model\RightDTO.cs" />
     <Compile Include="Tools\ObjectCreateHelper.cs" />
-    <Compile Include="Tools\OrganizationHelper.cs" />
-    <Compile Include="Tools\OrganizationRegistrationHelper.cs" />
-    <Compile Include="Tools\OrganizationUnitHelper.cs" />
     <Compile Include="Tools\ReadModelTestTools.cs" />
-    <Compile Include="Tools\ReferencesHelper.cs" />
-    <Compile Include="Tools\External\Rights\RightsHelper.cs" />
-    <Compile Include="Tools\SsoIdentityHelper.cs" />
-    <Compile Include="Tools\SystemRelationHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
     <Compile Include="Tools\External\ItSystemV2Helper.cs" />
     <Compile Include="Tools\External\OrganizationV2Helper.cs" />
-    <Compile Include="Tools\UserHelper.cs" />
     <Compile Include="Tools\XUnit\SequentialTestGroup.cs" />
-    <Compile Include="UI_Configuration\UIConfigurationTests.cs" />
-    <Compile Include="Users\UserPermissionsAPITest.cs" />
-    <Compile Include="Users\UserRolesManagementApiTest.cs" />
-    <Compile Include="Users\UserTest.cs" />
     <Compile Include="Users\V2\PasswordResetInternalApiV2Test.cs" />
     <Compile Include="Users\V2\UserInternalApiV2Test.cs" />
   </ItemGroup>
@@ -361,11 +311,10 @@
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Tools\Internal\ItSystem\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

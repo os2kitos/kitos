@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;

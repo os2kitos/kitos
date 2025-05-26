@@ -4,18 +4,18 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Organization;
 using Presentation.Web.Infrastructure;
-using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Options;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Response.Shared;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
@@ -87,7 +87,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid:D}"), token, headers);
         }
 
-        public static async Task<DataProcessingRegistrationResponseDTO> PostAsync(string token, CreateDataProcessingRegistrationRequestDTO payload)
+        public static async Task<DataProcessingRegistrationResponseDTO> PostAsync(string token,
+            CreateDataProcessingRegistrationRequestDTO payload)
         {
             using var response = await SendPostAsync(token, payload);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -114,6 +115,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendPatchGeneralDataAsync(string token, Guid uuid, DataProcessingRegistrationGeneralDataWriteRequestDTO payload)
         {
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, CreatePatchPayload(nameof(DataProcessingRegistrationWriteRequestDTO.General), payload));
+        }
+
+        public static async Task<HttpResponseMessage> PatchSystemsAsync(Guid uuid, IEnumerable<Guid> payload)
+        {
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            return await SendPatchSystemsAsync(token.Token, uuid, payload);
         }
 
         public static async Task<HttpResponseMessage> SendPatchSystemsAsync(string token, Guid uuid, IEnumerable<Guid> payload)
@@ -192,6 +199,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, CreatePatchPayload(nameof(UpdateDataProcessingRegistrationRequestDTO.Name), name));
         }
 
+        public static async Task<HttpResponseMessage> SendPatchName(Cookie cookie, Guid uuid, string name)
+        {
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), cookie, CreatePatchPayload(nameof(UpdateDataProcessingRegistrationRequestDTO.Name), name));
+        }
+
         public static async Task<DataProcessingRegistrationPermissionsResponseDTO> GetPermissionsAsync(string token, Guid uuid)
         {
             using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid:D}/permissions"), token);
@@ -246,6 +258,28 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
+        }
+
+        public static async Task<DataProcessingRegistrationResponseDTO> PatchIsAgreementConcludedAsync(Guid dprUuid,
+            YesNoIrrelevantChoice choice)
+        {
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var request = new DataProcessingRegistrationGeneralDataWriteRequestDTO
+            {
+                IsAgreementConcluded = choice
+            };
+            using var response = await SendPatchGeneralDataAsync(token.Token, dprUuid, request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
+        }
+
+        //Read model endpoint
+        public static async Task<IEnumerable<DataProcessingRegistrationReadModel>> QueryReadModelByNameContent(Guid organizationUuid, string nameContent, int top, int skip, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/DataProcessingRegistrationReadModels?organizationUuid={organizationUuid}&$expand=RoleAssignments&$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<DataProcessingRegistrationReadModel>();
         }
     }
 }

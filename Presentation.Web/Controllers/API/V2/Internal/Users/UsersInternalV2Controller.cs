@@ -30,9 +30,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         private readonly IUserResponseModelMapper _userResponseModelMapper;
         private readonly IUserService _userService;
 
-        public UsersInternalV2Controller(IUserWriteModelMapper writeModelMapper, 
-            IUserWriteService userWriteService, 
-            IUserResponseModelMapper userResponseModelMapper, 
+        public UsersInternalV2Controller(IUserWriteModelMapper writeModelMapper,
+            IUserWriteService userWriteService,
+            IUserResponseModelMapper userResponseModelMapper,
             IUserService userService)
         {
             _writeModelMapper = writeModelMapper;
@@ -187,7 +187,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         {
             return _userService
                 .GetDefaultOrganizationUnit(organizationUuid, userUuid)
-                .Select(unit=> unit.MapIdentityNamePairDTO())
+                .Select(unit => unit.MapIdentityNamePairDTO())
                 .Match(Ok, FromOperationError);
         }
 

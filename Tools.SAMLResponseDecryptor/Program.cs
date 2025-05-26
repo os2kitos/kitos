@@ -15,7 +15,7 @@ namespace Tools.SAMLResponseDecryptor
             {
                 Console.WriteLine("Certificate file not found.");
                 return;
-            };
+            }
             Console.WriteLine("Enter the password for the certificate (from 1pwd):");
             var certificatePassword = Console.ReadLine();
             Console.WriteLine("Enter the SAML response symmetric key (<e:CipherValue>):");

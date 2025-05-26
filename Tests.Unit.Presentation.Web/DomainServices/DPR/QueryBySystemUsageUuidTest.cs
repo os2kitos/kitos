@@ -1,5 +1,4 @@
 ﻿using Core.DomainModel.GDPR;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries.DPR;
 using System;

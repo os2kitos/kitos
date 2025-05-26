@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel.GDPR;
 using Core.DomainServices.Model.Options;
-using Core.DomainServices.Options;
 
 namespace Core.DomainServices.Repositories.GDPR
 {

@@ -9,7 +9,6 @@ using Core.DomainModel.Commands;
 using Core.DomainModel.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
-using Presentation.Web.Properties;
 using Swashbuckle.Swagger.Annotations;
 using AuthenticationScheme = Core.DomainModel.Users.AuthenticationScheme;
 

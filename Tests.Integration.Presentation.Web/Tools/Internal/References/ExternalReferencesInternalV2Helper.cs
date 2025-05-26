@@ -21,7 +21,5 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.References
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<IEnumerable<ExternalReferenceWithLastChangedResponseDTO>>();
         }
-
-
     }
 }

@@ -1,6 +1,4 @@
-﻿using Presentation.Web.Models;
-using Tests.Integration.Presentation.Web.Tools.Model;
-using AutoFixture;
+﻿using AutoFixture;
 using Presentation.Web.Models.API.V1;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -15,28 +13,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 Email = email,
                 Password = pwd
-            };
-        }
-
-        public static ApiUserDTO MakeSimpleApiUserDto(string email, bool apiAccess, bool stakeHolderAccess = false)
-        {
-            return new()
-            {
-                Email = email,
-                Name = Fixture.Create<string>(),
-                LastName = Fixture.Create<string>(),
-                HasApiAccess = apiAccess,
-                HasStakeHolderAccess = stakeHolderAccess,
-            };
-        }
-
-        public static CreateUserDTO MakeSimpleCreateUserDto(ApiUserDTO apiUser)
-        {
-            return new()
-            {
-                user = apiUser,
-                organizationId = TestEnvironment.DefaultOrganizationId,
-                sendMailOnCreation = false
             };
         }
     }

@@ -18,7 +18,6 @@ using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.M
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
-using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Controllers.API.V2.External.Generic;

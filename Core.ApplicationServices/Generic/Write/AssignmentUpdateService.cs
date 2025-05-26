@@ -90,7 +90,7 @@ namespace Core.ApplicationServices.Generic.Write
                     case EnumerableExtensions.EnumerableDelta.Removed:
                         var removeError = unAssign(destination, existingAssignments[uuid]);
                         if (removeError.HasValue)
-                            return new OperationError($"Failed to remove during multi assignment with error message: {removeError.Value.Message.GetValueOrEmptyString()}", removeError.Value.FailureType); ;
+                            return new OperationError($"Failed to remove during multi assignment with error message: {removeError.Value.Message.GetValueOrEmptyString()}", removeError.Value.FailureType);
 
                         itemsToUpdate?.Remove(uuid);//Remove state before performing updates
                         break;
@@ -106,7 +106,7 @@ namespace Core.ApplicationServices.Generic.Write
                     //Perform the update to existing items
                     var updateError = update(destination, assignmentState);
                     if (updateError.HasValue)
-                        return new OperationError($"Failed to update during multi assignment with error message: {updateError.Value.Message.GetValueOrEmptyString()}", updateError.Value.FailureType); ;
+                        return new OperationError($"Failed to update during multi assignment with error message: {updateError.Value.Message.GetValueOrEmptyString()}", updateError.Value.FailureType);
                 }
             }
 

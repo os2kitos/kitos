@@ -15,7 +15,6 @@ using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.GDPR.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;

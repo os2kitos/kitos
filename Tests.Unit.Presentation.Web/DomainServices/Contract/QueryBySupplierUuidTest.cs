@@ -2,7 +2,6 @@
 using Core.DomainServices.Queries.Contract;
 using System;
 using System.Linq;
-using Core.DomainModel.GDPR;
 using Core.DomainModel.Organization;
 using Tests.Toolkit.Patterns;
 using Xunit;

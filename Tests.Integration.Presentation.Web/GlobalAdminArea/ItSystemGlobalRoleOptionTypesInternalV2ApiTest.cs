@@ -14,17 +14,14 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.GlobalAdminArea
 {
-    public class ItSystemGlobalRoleOptionTypesInternalV2ApiTest: WithAutoFixture
+    public class ItSystemGlobalRoleOptionTypesInternalV2ApiTest : WithAutoFixture
     {
-        private const string RolesUrlSuffix = "it-systems-roles";
-        private const string ItSystemsApiPrefix = "api/v2/internal/it-systems";
-
         [Fact]
         public async Task Can_Get_Global_Business_Types()
         {
             var expectedGlobalOption = SetupCreateGlobalItSystemRoleInDatabase();
 
-            using var response = await GlobalOptionTypeV2Helper.GetGlobalOptionTypes(RolesUrlSuffix, ItSystemsApiPrefix);
+            using var response = await GlobalOptionTypeV2Helper.GetGlobalOptionTypes(GlobalOptionTypeV2Helper.ItSystemRoles);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDtos = await response.ReadResponseBodyAsAsync<IEnumerable<GlobalRoleOptionResponseDTO>>();
@@ -39,7 +36,7 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
         {
             var dto = A<GlobalRoleOptionCreateRequestDTO>();
 
-            using var response = await GlobalOptionTypeV2Helper.CreateGlobalOptionType(RolesUrlSuffix, dto, ItSystemsApiPrefix);
+            using var response = await GlobalOptionTypeV2Helper.CreateGlobalOptionType(GlobalOptionTypeV2Helper.ItSystemRoles, dto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDto = await response.ReadResponseBodyAsAsync<GlobalRoleOptionResponseDTO>();
@@ -56,7 +53,7 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
 
             var dto = A<GlobalRoleOptionUpdateRequestDTO>();
 
-            using var response = await GlobalOptionTypeV2Helper.PatchGlobalOptionType(globalOption.Uuid, RolesUrlSuffix, dto, ItSystemsApiPrefix);
+            using var response = await GlobalOptionTypeV2Helper.PatchGlobalOptionType(globalOption.Uuid, GlobalOptionTypeV2Helper.ItSystemRoles, dto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDto = await response.ReadResponseBodyAsAsync<GlobalRoleOptionResponseDTO>();

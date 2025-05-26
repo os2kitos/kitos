@@ -1,6 +1,5 @@
 ﻿using Core.DomainModel.Organization;
 using Core.DomainModel;
-using System.Collections.Generic;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using System;

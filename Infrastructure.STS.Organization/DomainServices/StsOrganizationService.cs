@@ -12,7 +12,6 @@ using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.Common.Model.Token;
-using Kombit.InfrastructureSamples;
 using Kombit.InfrastructureSamples.OrganisationService;
 using Kombit.InfrastructureSamples.Token;
 using Serilog;

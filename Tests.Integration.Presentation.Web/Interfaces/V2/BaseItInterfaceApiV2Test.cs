@@ -1,33 +1,26 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Core.DomainModel;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Response.Interface;
 using System.Threading.Tasks;
-using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Interface;
+using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.System;
 using Tests.Integration.Presentation.Web.Tools;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Interfaces.V2
 {
-    public abstract class BaseItInterfaceApiV2Test : WithAutoFixture
+    public abstract class BaseItInterfaceApiV2Test : BaseTest
     {
-        protected async Task<OrganizationDTO> CreateOrganization(string cvr = "11223344")
+        protected async Task<ShallowOrganizationResponseDTO> CreateOrganization(string cvr = "11223344")
         {
-            return await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), cvr, OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            return await CreateOrganizationAsync(cvr: cvr);
         }
 
         protected string CreateName()
         {
             return $"{nameof(ItInterfaceApiV2Test)}{A<string>()}";
-        }
-
-        protected string CreateEmail()
-        {
-            return $"{A<string>()}@test.dk";
         }
 
         protected string CreateLongString(string parameterName)
@@ -40,16 +33,16 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             return longString;
         }
 
-        protected static void CheckBaseDTOValues(ItSystemDTO system, ItInterfaceDTO itInterface, BaseItInterfaceResponseDTO interfaceDTO)
+        protected static void CheckBaseDTOValues(ItSystemResponseDTO system, ItInterfaceResponseDTO itInterface, BaseItInterfaceResponseDTO interfaceDTO)
         {
             Assert.Equal(itInterface.Name, interfaceDTO.Name);
             Assert.Equal(system?.Name, interfaceDTO.ExposedBySystem?.Name);
             Assert.Equal(system?.Uuid, interfaceDTO.ExposedBySystem?.Uuid);
             Assert.Equal(itInterface.Uuid, interfaceDTO.Uuid);
             Assert.Equal(itInterface.Description, interfaceDTO.Description);
-            Assert.Equal(itInterface.Note, interfaceDTO.Notes);
-            Assert.Equal(itInterface.ItInterfaceId, interfaceDTO.InterfaceId);
-            Assert.Equal(itInterface.Url, interfaceDTO.UrlReference);
+            Assert.Equal(itInterface.Notes, interfaceDTO.Notes);
+            Assert.Equal(itInterface.InterfaceId, interfaceDTO.InterfaceId);
+            Assert.Equal(itInterface.UrlReference, interfaceDTO.UrlReference);
             Assert.Equal(itInterface.Version, interfaceDTO.Version);
         }
 

@@ -2,7 +2,6 @@
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
-using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using System.Linq;
 using Tests.Toolkit.Extensions;
 using Xunit;

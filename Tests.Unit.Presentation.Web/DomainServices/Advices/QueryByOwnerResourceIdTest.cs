@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Core.DomainModel.Advice;
-using Core.DomainModel.Shared;
 using Core.DomainServices.Queries.Notifications;
 using Tests.Toolkit.Patterns;
 using Xunit;

@@ -1,8 +1,0 @@
-﻿<div>
-    <ul class="nav nav-tabs">
-        <li data-ng-repeat="link in page.importsubnav" data-ng-if="!link.showWhen || $state.includes(link.showWhen)" data-ng-class="{'active': $state.includes(link.state)}">
-            <a data-ui-sref="{{link.state}}" class="">{{link.text}}</a>
-        </li>
-    </ul>
-</div>
-<div data-ui-view data-autoscroll="false"></div>

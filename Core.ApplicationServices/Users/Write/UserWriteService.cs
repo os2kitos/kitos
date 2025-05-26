@@ -67,7 +67,7 @@ namespace Core.ApplicationServices.Users.Write
                             using var transaction = _transactionManager.Begin();
 
 
-                            var user = _userService.AddUser(parameters.User, parameters.SendMailOnCreation, organization.Id, true);
+                            var user = _userService.AddUser(parameters.User, parameters.SendMailOnCreation, organization.Id);
 
                             var roleAssignmentError = AssignUserAdministrativeRoles(organization.Id, user.Id, parameters.Roles);
 
@@ -107,7 +107,7 @@ namespace Core.ApplicationServices.Users.Write
             }
 
             var user = updateUserResult.Value;
-            _userService.UpdateUser(user, parameters.SendMailOnUpdate, organization.Id, true);
+            _userService.UpdateUser(user, parameters.SendMailOnUpdate, organization.Id);
             transactionManager.Commit();
             return user;
         }
@@ -125,7 +125,7 @@ namespace Core.ApplicationServices.Users.Write
             {
                 return user.Error;
             }
-            _userService.IssueAdvisMail(user.Value, false, orgIdResult.Value, true);
+            _userService.IssueAdvisMail(user.Value, false, orgIdResult.Value);
             return Maybe<OperationError>.None;
         }
 
@@ -190,7 +190,7 @@ namespace Core.ApplicationServices.Users.Write
             return UpdateUser(userUuid, user => UpdateSystemIntegrator(user, systemIntegratorStatus));
         }
 
-        public void RequestPasswordReset(string email, bool newUi)
+        public void RequestPasswordReset(string email)
         {
             var userResult = _userRepository.GetByEmail(email).FromNullable();
             if (userResult.IsNone)
@@ -202,7 +202,7 @@ namespace Core.ApplicationServices.Users.Write
             {
                 return;
             }
-            _userService.IssuePasswordReset(user, null, null, newUi);
+            _userService.IssuePasswordReset(user, null, null);
         }
 
         public Maybe<OperationError> SetDefaultOrgUnit(Guid userUuid, Guid organizationUuid, Guid organizationUnitUuid)
@@ -273,7 +273,7 @@ namespace Core.ApplicationServices.Users.Write
             }
 
             var updatedUser = updateResult.Value;
-            _userService.UpdateUser(updatedUser, null, null, true);
+            _userService.UpdateUser(updatedUser, null, null);
             transaction.Commit();
             return updatedUser;
         }
