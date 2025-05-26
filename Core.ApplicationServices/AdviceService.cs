@@ -160,7 +160,6 @@ namespace Core.ApplicationServices
                             DeleteJobFromHangfire(advice);
                         }
 
-                        _adviceRepository.Update(advice);
                         _adviceRepository.Save();
                         _adviceSentRepository.Save();
                         transaction.Commit();
