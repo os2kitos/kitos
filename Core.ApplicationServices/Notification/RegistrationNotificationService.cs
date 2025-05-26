@@ -205,7 +205,7 @@ namespace Core.ApplicationServices.Notification
 
             using var transaction = _transactionManager.Begin();
 
-            newNotification.IsActive = true;//newNotification.AdviceType == AdviceType.Repeat;
+            newNotification.IsActive = true;
 
             _adviceRepository.Insert(newNotification);
             var error = RaiseAsRootModification(newNotification);
@@ -217,6 +217,7 @@ namespace Core.ApplicationServices.Notification
             }
 
             _adviceRepository.Save();
+            transaction.Commit();
 
             var name = Advice.CreateJobId(newNotification.Id);
 
@@ -225,7 +226,6 @@ namespace Core.ApplicationServices.Notification
             //Sends a notification and updates the job id
             _adviceService.CreateAdvice(newNotification);
 
-            transaction.Commit();
 
             return newNotification;
         }
