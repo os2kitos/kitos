@@ -28,9 +28,14 @@ namespace PubSub.Infrastructure.MessageQueue.Notifier
 
             var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-            await httpClient.PostAsync(recipient, content);
+            try
+            {
+                await httpClient.PostAsync(recipient, content);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Could not send message to reach recipient: ${recipient}, Exception: {ex}");
+            }
         }
-
-
     }
 }
