@@ -13,7 +13,7 @@ public class HttpEventPublisher : IHttpEventPublisher
     private readonly IKitosHttpClient _httpClient;
     private readonly IKitosInternalTokenIssuer _tokenIssuer;
     private readonly string _pubSubBaseUrl;
-    private const string PublishEndpoint = "api/publish";
+    private const string PublishEndpoint = "api/v1/publish";
     public HttpEventPublisher(IKitosHttpClient httpClient, IKitosInternalTokenIssuer tokenIssuer, string pubSubBaseUrl)
     {
         _httpClient = httpClient;

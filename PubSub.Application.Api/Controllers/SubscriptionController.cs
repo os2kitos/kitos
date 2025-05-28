@@ -1,6 +1,7 @@
 using CSharpFunctionalExtensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PubSub.Application.Api.Attributes;
 using PubSub.Application.Api.DTOs.Request;
 using PubSub.Application.Api.DTOs.Response;
 using PubSub.Application.Api.Mapping;
@@ -11,7 +12,8 @@ namespace PubSub.Application.Api.Controllers;
 
 [ApiController]
 [Authorize(Policy = Constants.Config.Validation.CanSubscribePolicy)]
-[Route("api/subscription")]
+[ApiVersion(Constants.ApiVersion.Version1)]
+[Route("subscription")]
 public class SubscriptionController : PubSubBaseController
 {
     private readonly ISubscriptionService _subscriptionService;

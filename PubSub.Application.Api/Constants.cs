@@ -44,5 +44,10 @@
             public const string CanSubscribe = "CanSubscribe";
             public const string True = "true";
         }
+
+        public static class ApiVersion
+        {
+            public const int Version1 = 1;
+        }
     }
 }

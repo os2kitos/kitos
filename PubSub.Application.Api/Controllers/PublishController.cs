@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PubSub.Application.Api.Attributes;
 using PubSub.Application.Api.DTOs.Request;
 using PubSub.Application.Api.Mapping;
 using PubSub.Core.DomainModel.Publisher;
@@ -8,11 +9,12 @@ using PubSub.Core.DomainServices;
 
 namespace PubSub.Application.Api.Controllers
 {
-    [ApiExplorerSettings(IgnoreApi = true)] 
+    [ApiExplorerSettings(IgnoreApi = true)]
     [ApiController]
+    [ApiVersion(Constants.ApiVersion.Version1)]
     [Authorize(Policy = Constants.Config.Validation.CanPublishPolicy)]
-    [Route("api/publish")]
-    public class PublishController: ControllerBase
+    [Route("publish")]
+    public class PublishController : ControllerBase
     {
         private readonly IPublisher _publisherService;
         private readonly IPublishRequestMapper _publishRequestMapper;
@@ -30,7 +32,8 @@ namespace PubSub.Application.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> Publish(PublishRequestDto request) {
+        public async Task<IActionResult> Publish(PublishRequestDto request)
+        {
             if (!ModelState.IsValid) return BadRequest("Invalid request object provided.");
 
             var publication = _publishRequestMapper.FromDto(request);

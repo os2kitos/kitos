@@ -34,7 +34,7 @@ namespace Tests.Unit.Core.ApplicationServices.KitosEvents
             var kitosToken = new KitosApiToken(new User(), token, A<DateTime>());
             _tokenIssuerMock.Setup(t => t.GetToken()).Returns(kitosToken);
 
-            var expectedUrl = new Uri(new Uri(_pubSubBaseUrl), "api/publish");
+            var expectedUrl = new Uri(new Uri(_pubSubBaseUrl), "api/v1/publish");
 
             await _sut.PostEventAsync(eventDTO);
 
