@@ -18,6 +18,7 @@ namespace Tools.Test.Database.Model.Tasks
         private readonly Credentials _normalUser;
         private readonly Credentials _apiUser;
         private readonly Credentials _globalAdminApiUser;
+        private readonly Credentials _systemIntegratorUser;
         private readonly IReadOnlyList<DatabaseTask> _tasks;
 
         public CreateFullTestDatabaseTask(
@@ -25,13 +26,15 @@ namespace Tools.Test.Database.Model.Tasks
             Credentials localAdmin,
             Credentials normalUser,
             Credentials apiUser,
-            Credentials globalAdminApiUser)
+            Credentials globalAdminApiUser,
+            Credentials systemIntegratorUser)
         {
             _globalAdmin = globalAdmin;
             _localAdmin = localAdmin;
             _normalUser = normalUser;
             _apiUser = apiUser;
             _globalAdminApiUser = globalAdminApiUser;
+            _systemIntegratorUser = systemIntegratorUser;
 
             _tasks = new List<DatabaseTask>
             {
@@ -45,6 +48,7 @@ namespace Tools.Test.Database.Model.Tasks
                 new CreateKitosUserTask(_normalUser, OrganizationRole.User, DefaultOrganizationName),
                 new CreateKitosUserTask(_apiUser, OrganizationRole.User, DefaultOrganizationName,true),
                 new CreateKitosUserTask(_globalAdminApiUser, OrganizationRole.GlobalAdmin, $"{DefaultOrganizationName},{SecondOrganizationName}",true),
+                new CreateKitosUserTask(_systemIntegratorUser, OrganizationRole.User, DefaultOrganizationName, true, true),
                 new CreateItSystemTask("DefaultTestItSystem",DefaultOrganizationName,null),
                 new CreateItSystemTask("SecondOrganizationDefaultTestItSystem",SecondOrganizationName,1),
                 new CreateItInterfaceTask("DefaultItInterface", DefaultOrganizationName),

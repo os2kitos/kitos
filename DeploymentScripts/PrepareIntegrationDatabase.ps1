@@ -43,4 +43,7 @@ Setup-Environment -environmentName $targetEnvironment
                 -apiUserUserName "$Env:TestUserApiUser" `
                 -apiUserPw "$Env:TestUserApiUserPw" `
                 -apiGlobalAdminUserName "$Env:TestUserApiGlobalAdmin" `
-                -apiGlobalAdminPw "$Env:TestUserApiGlobalAdminPw"
+                -apiGlobalAdminPw "$Env:TestUserApiGlobalAdminPw" `
+                -systemIntegratorEmail "$Env:TestUserSystemIntegrator" `
+                -systemIntegratorPw "$Env:TestUserSystemIntegratorPw"
+                

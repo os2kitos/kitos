@@ -39,5 +39,7 @@ $localUserPassword = "localNoSecret"
                 -apiUserUserName "local-api-user@kitos.dk" `
                 -apiUserPw "$localUserPassword" `
                 -apiGlobalAdminUserName "local-api-global-admin-user@kitos.dk" `
-                -apiGlobalAdminPw "$localUserPassword"
+                -apiGlobalAdminPw "$localUserPassword" `
+                -systemIntegratorEmail "local-api-system-integrator-user@kitos.dk" `
+                -systemIntegratorPw "$localUserPassword"
                 

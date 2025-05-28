@@ -1,6 +1,5 @@
 ﻿using Moq;
 using PubSub.Test.Base.Tests.Toolkit.Patterns;
-using PubSub.Application.Services;
 using PubSub.Core.DomainModel.Consumer;
 using PubSub.Infrastructure.DataAccess.TopicConsumerStore;
 

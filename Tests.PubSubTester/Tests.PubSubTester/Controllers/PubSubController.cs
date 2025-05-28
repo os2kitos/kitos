@@ -127,7 +127,7 @@ namespace Tests.PubSubTester.Controllers
         private static async Task<string> GetKitosToken()
         {
             var kitosClient = CreateClient(KitosApiUrl);
-            var body = new LoginDTO { Email = "local-api-global-admin-user@kitos.dk", Password = "localNoSecret" };
+            var body = new LoginDTO { Email = "local-api-system-integrator-user@kitos.dk", Password = "localNoSecret" };
             var content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
             var tokenResponse = await kitosClient.PostAsync("api/authorize/GetToken", content);
             var jsonResponse = await tokenResponse.Content.ReadAsStringAsync();

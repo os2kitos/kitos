@@ -6,7 +6,6 @@ using PubSub.Application.Services.RabbitMQUtils;
 using PubSub.Core.DomainModel.Consumer;
 using PubSub.Core.DomainModel.Notifier;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace PubSub.Infrastructure.MessageQueue.Consumer
 {

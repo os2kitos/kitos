@@ -1,6 +1,5 @@
 ﻿using Moq;
 using PubSub.Test.Base.Tests.Toolkit.Patterns;
-using PubSub.Core.DomainModel.Repositories;
 using PubSub.Core.DomainModel.Serializer;
 using PubSub.Application.Services.RabbitMQUtils;
 using PubSub.Infrastructure.MessageQueue.Consumer;
