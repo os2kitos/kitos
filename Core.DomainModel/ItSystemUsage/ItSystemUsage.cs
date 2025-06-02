@@ -16,6 +16,7 @@ using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystem.DataTypes;
 
 
+
 namespace Core.DomainModel.ItSystemUsage
 {
     /// <summary>
@@ -257,7 +258,7 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ICollection<ItSystemUsagePersonalData> PersonalDataOptions { get; set; }
         public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
 
-        public DataOptions? precautions { get; set; }
+        public DataOptions? precautions { get; private set; }
 
         public IEnumerable<TechnicalPrecaution> GetTechnicalPrecautions()
         {
@@ -270,34 +271,34 @@ namespace Core.DomainModel.ItSystemUsage
             if (precautionsOptionsPseudonomisering)
                 yield return TechnicalPrecaution.Pseudonymization;
         }
-        public bool precautionsOptionsEncryption { get; set; }
-        public bool precautionsOptionsPseudonomisering { get; set; }
-        public bool precautionsOptionsAccessControl { get; set; }
-        public bool precautionsOptionsLogning { get; set; }
-        public string TechnicalSupervisionDocumentationUrlName { get; set; }
-        public string TechnicalSupervisionDocumentationUrl { get; set; }
+        public bool precautionsOptionsEncryption { get; private set; }
+        public bool precautionsOptionsPseudonomisering { get; private set; }
+        public bool precautionsOptionsAccessControl { get; private set; }
+        public bool precautionsOptionsLogning { get; private set; }
+        public string TechnicalSupervisionDocumentationUrlName { get; private set; }
+        public string TechnicalSupervisionDocumentationUrl { get; private set; }
 
-        public DataOptions? UserSupervision { get; set; }
-        public DateTime? UserSupervisionDate { get; set; }
-        public string UserSupervisionDocumentationUrlName { get; set; }
-        public string UserSupervisionDocumentationUrl { get; set; }
+        public DataOptions? UserSupervision { get; private set; }
+        public DateTime? UserSupervisionDate { get; private set; }
+        public string UserSupervisionDocumentationUrlName { get; private set; }
+        public string UserSupervisionDocumentationUrl { get; private set; }
 
-        public DataOptions? riskAssessment { get; set; }
-        public DateTime? riskAssesmentDate { get; set; }
-        public RiskLevel? preriskAssessment { get; set; }
-        public DateTime? PlannedRiskAssessmentDate { get; set; }
-        public string RiskSupervisionDocumentationUrlName { get; set; }
-        public string RiskSupervisionDocumentationUrl { get; set; }
+        public DataOptions? riskAssessment { get; private set; }
+        public DateTime? riskAssesmentDate { get; private set; }
+        public RiskLevel? preriskAssessment { get; private set; }
+        public DateTime? PlannedRiskAssessmentDate { get; private set; }
+        public string RiskSupervisionDocumentationUrlName { get; private set; }
+        public string RiskSupervisionDocumentationUrl { get; private set; }
         public string noteRisks { get; set; }
 
-        public DataOptions? DPIA { get; set; }
-        public DateTime? DPIADateFor { get; set; }
-        public string DPIASupervisionDocumentationUrlName { get; set; }
-        public string DPIASupervisionDocumentationUrl { get; set; }
+        public DataOptions? DPIA { get; private set; }
+        public DateTime? DPIADateFor { get; private set; }
+        public string DPIASupervisionDocumentationUrlName { get; private set; }
+        public string DPIASupervisionDocumentationUrl { get; private set; }
 
-        public DataOptions? answeringDataDPIA { get; set; }
-        public DateTime? DPIAdeleteDate { get; set; }
-        public int numberDPIA { get; set; }
+        public DataOptions? answeringDataDPIA { get; private set; }
+        public DateTime? DPIAdeleteDate { get; private set; }
+        public int numberDPIA { get; private set; }
 
         public HostedAt? HostedAt { get; set; }
         #endregion
@@ -985,7 +986,45 @@ namespace Core.DomainModel.ItSystemUsage
             return removedPersonalData;
         }
 
+        private bool HasTechnicalPrecautions()
+        {
+            return precautions == DataOptions.YES;
+        }
+
+        public void UpdateTechnicalPrecautionsInPlace(DataOptions? precautions)
+        {
+            this.precautions = precautions;
+            if (HasTechnicalPrecautions()) return;
+            ResetTechnicalPrecautionsFields();
+
+        }
+
+        private void ResetTechnicalPrecautionsFields()
+        {
+            precautionsOptionsEncryption = false;
+            precautionsOptionsPseudonomisering = false;
+            precautionsOptionsAccessControl = false;
+            precautionsOptionsLogning = false;
+            TechnicalSupervisionDocumentationUrlName = null;
+            TechnicalSupervisionDocumentationUrl = null;
+        }
+
+        public Maybe<OperationError> UpdateTechnicalPrecautionsDocumentation(string url, string name)
+        {
+            return UpdateWithPrecondition(HasTechnicalPrecautions() || (url == null && name == null), () =>
+            {
+                TechnicalSupervisionDocumentationUrl = url;
+                TechnicalSupervisionDocumentationUrlName = name;
+            });
+        }
+
         public Maybe<OperationError> UpdateTechnicalPrecautions(IEnumerable<TechnicalPrecaution> technicalPrecautions)
+        {
+            var newPrecautions = technicalPrecautions.ToList();
+            return UpdateWithPrecondition(HasTechnicalPrecautions() || newPrecautions.Count == 0, () => InternalUpdateTechnicalPrecautions(newPrecautions));
+        }
+
+        private Maybe<OperationError> InternalUpdateTechnicalPrecautions(IEnumerable<TechnicalPrecaution> technicalPrecautions)
         {
             if (technicalPrecautions == null)
                 throw new ArgumentNullException(nameof(technicalPrecautions));
@@ -1167,6 +1206,170 @@ namespace Core.DomainModel.ItSystemUsage
             return MainContract?.ItContract?.IsActive == false
                 ? ItSystemUsageValidationError.MainContractNotActive
                 : Maybe<ItSystemUsageValidationError>.None;
+        }
+
+        private Maybe<OperationError> UpdateWithPrecondition(bool precondition, Func<Maybe<OperationError>> mutation)
+        {
+            return precondition ? mutation() : new OperationError(OperationFailure.BadInput);
+        }
+
+        //Overload to enable passing void functions.
+        private Maybe<OperationError> UpdateWithPrecondition(bool precondition, Action mutation)
+        {
+            return UpdateWithPrecondition(precondition, () =>
+            {
+                mutation();
+                return Maybe<OperationError>.None;
+            });
+        }
+
+        private bool HasUserSupervision()
+        {
+            return UserSupervision == DataOptions.YES;
+        }
+
+        public void UpdateUserSupervision(DataOptions? userSupervision)
+        {
+            UserSupervision = userSupervision;
+            if (HasUserSupervision()) return;
+            ResetUserSupervisionFields();
+        }
+
+        private void ResetUserSupervisionFields()
+        {
+            UserSupervisionDate = null;
+            UserSupervisionDocumentationUrl = null;
+            UserSupervisionDocumentationUrlName = null;
+        }
+
+        public Maybe<OperationError> UpdateUserSupervisionDate(DateTime? userSupervisionDate)
+        {
+            return UpdateWithPrecondition(
+                HasUserSupervision() || userSupervisionDate == null,
+                () => UserSupervisionDate = userSupervisionDate);
+        }
+
+        public Maybe<OperationError> UpdateUserSupervisionDocumentation(string url, string name)
+        {
+            return UpdateWithPrecondition(
+                HasUserSupervision() || (url == null && name == null),
+                () =>
+            {
+                UserSupervisionDocumentationUrl = url;
+                UserSupervisionDocumentationUrlName = name;
+            });
+        }
+
+        public void UpdateRiskAssessment(DataOptions? riskAssessment)
+        {
+            this.riskAssessment = riskAssessment;
+            if (HasRiskAssessment()) return;
+            ResetRiskAssessmentFields();
+        }
+
+        private void ResetRiskAssessmentFields()
+        {
+            riskAssesmentDate = null;
+            preriskAssessment = null;
+            RiskSupervisionDocumentationUrl = null;
+            RiskSupervisionDocumentationUrlName = null;
+            noteRisks = null;
+        }
+
+        private bool HasRiskAssessment()
+        {
+            return riskAssessment == DataOptions.YES;
+        }
+
+        public Maybe<OperationError> UpdateRiskAssessmentDate(DateTime? date)
+        {
+            return UpdateWithPrecondition(HasRiskAssessment() || date == null, () => riskAssesmentDate = date);
+        }
+
+        public Maybe<OperationError> UpdateRiskAssessmentLevel(RiskLevel? level)
+        {
+            return UpdateWithPrecondition(HasRiskAssessment() || level == null, () => preriskAssessment = level);
+        }
+
+        public Maybe<OperationError> UpdateRiskAssessmentDocumentation(string url, string name)
+        {
+            return UpdateWithPrecondition(HasRiskAssessment() || url == null && name == null,
+                () =>
+            {
+                RiskSupervisionDocumentationUrl = url;
+                RiskSupervisionDocumentationUrlName = name;
+            });
+        }
+
+        public Maybe<OperationError> UpdateRiskAssessmentNotes(string note)
+        {
+            return UpdateWithPrecondition(HasRiskAssessment() || note == null, () => noteRisks = note);
+        }
+
+        public void UpdatePlannedRiskAssessmentDate(DateTime? date)
+        {
+            PlannedRiskAssessmentDate = date;
+        }
+
+        public void UpdateDPIAConducted(DataOptions? dpia)
+        {
+            DPIA = dpia;
+            if (HasDPIA()) return;
+            ResetDPIAFields();
+        }
+
+        private void ResetDPIAFields()
+        {
+            DPIADateFor = null;
+            DPIASupervisionDocumentationUrl = null;
+            DPIASupervisionDocumentationUrlName = null;
+        }
+
+        private bool HasDPIA()
+        {
+            return DPIA == DataOptions.YES;
+        }
+
+        public Maybe<OperationError> UpdateDPIADate(DateTime? date)
+        {
+            return UpdateWithPrecondition(HasDPIA() || date == null, () => DPIADateFor = date);
+        }
+
+        public Maybe<OperationError> UpdateDPIADocumentation(string url, string name)
+        {
+            return UpdateWithPrecondition(HasDPIA() || url == null && name == null, () =>
+            {
+                DPIASupervisionDocumentationUrl = url;
+                DPIASupervisionDocumentationUrlName = name;
+            });
+        }
+
+        public void UpdateRetentionPeriodDefined(DataOptions? retentionPeriodDefined)
+        {
+            answeringDataDPIA = retentionPeriodDefined;
+            if (HasDataRetention()) return;
+            ResetRetentionPeriodFields();
+        }
+
+        private void ResetRetentionPeriodFields()
+        {
+            DPIAdeleteDate = null;
+            numberDPIA = 0;
+        }
+
+        private bool HasDataRetention()
+        {
+            return answeringDataDPIA == DataOptions.YES;
+        }
+
+        public Maybe<OperationError> UpdateNextDataRetentionEvaluationDate(DateTime? nextDataRetentionEvaluationDate)
+        {
+            return UpdateWithPrecondition(HasDataRetention() || nextDataRetentionEvaluationDate == null, () => DPIAdeleteDate = nextDataRetentionEvaluationDate);
+        }
+
+        public Maybe<OperationError> UpdateDataRetentionEvaluationFrequencyInMonths(int dataRetentionEvaluationFrequencyInMonths)
+        {
+            return UpdateWithPrecondition(HasDataRetention() || dataRetentionEvaluationFrequencyInMonths == 0, () => numberDPIA = dataRetentionEvaluationFrequencyInMonths);
         }
     }
 }

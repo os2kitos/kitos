@@ -36,7 +36,7 @@ using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.Organ
 
 namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 {
-    public class ItSystemUsageApiV2Test : BaseTest
+    public class ItSystemUsageApiV2Test : BaseItSystemUsageApiV2Test
     {
         [Fact]
         public async Task Can_Get_All_ItSystemUsages()
@@ -1091,15 +1091,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         {
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
-
-            var gdprInput = A<GDPRWriteRequestDTO>(); //Start with random values and then correct the ones where values matter
-            gdprInput.DataSensitivityLevels = Many<DataSensitivityLevelChoice>().Distinct().ToList(); //Must be unique
-            var registerTypes = await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageRegisterTypes, organization.Uuid, 10, 0);
-            var sensitiveTypes = await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemSensitivePersonalDataTypes, organization.Uuid, 10, 0);
-
-            gdprInput.SensitivePersonDataUuids = sensitiveTypes.Take(2).Select(x => x.Uuid).ToList();
-            gdprInput.RegisteredDataCategoryUuids = registerTypes.Take(2).Select(x => x.Uuid).ToList();
-            gdprInput.TechnicalPrecautionsApplied = Many<TechnicalPrecautionChoice>().Distinct().ToList(); //must be unique
+            var gdprInput = await CreateGDPRInputAsync(organization);
 
             //Act
             var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid, gdpr: gdprInput));
@@ -2213,6 +2205,99 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Contains(assignedRoles, assignment => MatchExpectedAssignment(assignment, role2, user2));
         }
 
+        public static IEnumerable<object[]> InvalidGdprRequests()
+        {
+            var fixture = new Fixture();
+
+            var nonYesValues = new List<YesNoDontKnowChoice?>
+                { YesNoDontKnowChoice.No, YesNoDontKnowChoice.Undecided, YesNoDontKnowChoice.DontKnow, null };
+
+            return new List<object[]>
+            {
+                new object[]
+                {
+                    new GDPRWriteRequestDTO
+                    {
+                        RiskAssessmentConducted = nonYesValues.RandomItem(),
+                        RiskAssessmentNotes     = fixture.Create<string>()
+                    }
+                },
+                new object[]
+                {
+                    new GDPRWriteRequestDTO
+                    {
+                        TechnicalPrecautionsInPlace       = nonYesValues.RandomItem(),
+                        TechnicalPrecautionsDocumentation = fixture.Create<SimpleLinkDTO>()
+                    }
+                },
+                new object[]
+                {
+                    new GDPRWriteRequestDTO
+                    {
+                        DPIAConducted = nonYesValues.RandomItem(),
+                        DPIADate = fixture.Create<DateTime>()
+                    }
+                },
+                new object[]
+                {
+                    new GDPRWriteRequestDTO
+                    {
+                        UserSupervision = nonYesValues.RandomItem(),
+                        UserSupervisionDocumentation = fixture.Create<SimpleLinkDTO>()
+                    }
+                },
+                new object[]
+                {
+                    new GDPRWriteRequestDTO
+                    {
+                        RetentionPeriodDefined = nonYesValues.RandomItem(),
+                        NextDataRetentionEvaluationDate = fixture.Create<DateTime>()
+                    }
+                }
+            };
+        }
+
+        [Theory]
+        [MemberData(nameof(InvalidGdprRequests))]
+        public async Task Patch_Gdpr_Returns_Bad_Request_For_Invalid_Requests(GDPRWriteRequestDTO invalidRequest)
+        {
+            var organization = await CreateOrganizationAsync();
+            var usage = await CreateSystemAndTakeItIntoUsage(organization.Uuid);
+            var token = await GetGlobalToken();
+
+            var response = await ItSystemUsageV2Helper.SendPatchGDPR(token, usage.Uuid, invalidRequest);
+
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Patching_Risk_Assessment_To_Non_Yes_Value_Resets_Other_Fields()
+        {
+            var organization = await CreateOrganizationAsync();
+            var usage = await CreateSystemAndTakeItIntoUsage(organization.Uuid);
+            var token = await GetGlobalToken();
+            var patchBefore = new GDPRWriteRequestDTO
+            {
+                RiskAssessmentConducted = YesNoDontKnowChoice.Yes,
+                RiskAssessmentConductedDate = A<DateTime>(),
+                RiskAssessmentNotes = A<string>(),
+                RiskAssessmentDocumentation = A<SimpleLinkDTO>(),
+                RiskAssessmentResult = A<RiskLevelChoice>()
+            };
+            await ItSystemUsageV2Helper.SendPatchGDPR(token, usage.Uuid, patchBefore).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            var resetRequest = new GDPRWriteRequestDTO { RiskAssessmentConducted = YesNoDontKnowChoice.No };
+
+            var response = await ItSystemUsageV2Helper.SendPatchGDPR(token, usage.Uuid, resetRequest);
+
+            var system = await response.ReadResponseBodyAsAsync<ItSystemUsageResponseDTO>();
+            var gdpr = system.GDPR;
+            Assert.Null(gdpr.RiskAssessmentConductedDate);
+            Assert.Null(gdpr.RiskAssessmentNotes);
+            Assert.Null(gdpr.RiskAssessmentDocumentation.Name);
+            Assert.Null(gdpr.RiskAssessmentDocumentation.Url);
+            Assert.Null(gdpr.RiskAssessmentResult);
+        }
+
         private static bool MatchExpectedAssignment(ExtendedRoleAssignmentResponseDTO assignment, ItSystemRole expectedRole, User expectedUser)
         {
             return assignment.Role.Name == expectedRole.Name &&
@@ -2473,29 +2558,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                     ValidTo = DateTime.UtcNow.Date.AddDays(Math.Abs(A<short>()))
                 },
             };
-        }
-
-        private async Task<GDPRWriteRequestDTO> CreateGDPRInputAsync(ShallowOrganizationResponseDTO organization)
-        {
-            var registerTypes =
-                await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageRegisterTypes,
-                    organization.Uuid, 10, 0);
-            var sensitiveTypes =
-                await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemSensitivePersonalDataTypes,
-                    organization.Uuid, 10, 0);
-
-            var gdprInput = A<GDPRWriteRequestDTO>(); //Start with random values and then correct the ones where values matter
-            var sensitivityLevels = Many<DataSensitivityLevelChoice>().Distinct().ToList();
-            if (sensitivityLevels.Contains(DataSensitivityLevelChoice.PersonData) == false)
-                sensitivityLevels.Add(DataSensitivityLevelChoice.PersonData);
-
-            gdprInput.DataSensitivityLevels = sensitivityLevels; //Must be unique
-            gdprInput.SpecificPersonalData = Many<GDPRPersonalDataChoice>().Distinct().ToList();
-            gdprInput.SensitivePersonDataUuids = sensitiveTypes.Take(2).Select(x => x.Uuid).ToList();
-            gdprInput.RegisteredDataCategoryUuids = registerTypes.Take(2).Select(x => x.Uuid).ToList();
-            gdprInput.TechnicalPrecautionsApplied = Many<TechnicalPrecautionChoice>().Distinct().ToList(); //must be unique
-            gdprInput.PlannedRiskAssessmentDate = A<DateTime>();
-            return gdprInput;
         }
 
         private static void AssertGDPR(GDPRWriteRequestDTO gdprInput, GDPRRegistrationsResponseDTO gdprResponse)

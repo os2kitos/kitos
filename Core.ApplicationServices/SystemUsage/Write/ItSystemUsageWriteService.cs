@@ -251,50 +251,38 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => usage.WithOptionalUpdate(parameters.SensitivePersonDataUuids, UpdateSensitivePersonDataIds))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.RegisteredDataCategoryUuids, UpdateRegisteredDataCategories))
 
+                //User supervision
+                .Bind(usage => usage.WithOptionalUpdate(parameters.UserSupervision, (systemUsage, supervision) => systemUsage.UpdateUserSupervision(supervision)))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.UserSupervisionDate, (systemUsage, date) => systemUsage.UpdateUserSupervisionDate(date)))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.UserSupervisionDocumentation, (systemUsage, newLink) => systemUsage.UpdateUserSupervisionDocumentation(
+                    newLink.Select(x => x.Url).GetValueOrDefault(), newLink.Select(x => x.Name).GetValueOrDefault())
+                ))
+
                 //Technical precautions
-                .Bind(usage => usage.WithOptionalUpdate(parameters.TechnicalPrecautionsInPlace, (systemUsage, precautions) => systemUsage.precautions = precautions))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.TechnicalPrecautionsInPlace, (systemUsage, precautions) => systemUsage.UpdateTechnicalPrecautionsInPlace(precautions)))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.TechnicalPrecautionsApplied, UpdateAppliedTechnicalPrecautions))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.TechnicalPrecautionsDocumentation,
-                    (systemUsage, newLink) =>
-                    {
-                        systemUsage.TechnicalSupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
-                        systemUsage.TechnicalSupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
-                    }))
+                    (systemUsage, newLink) => systemUsage.UpdateTechnicalPrecautionsDocumentation(newLink.Select(x => x.Url).GetValueOrDefault(), newLink.Select(x => x.Name).GetValueOrDefault())))
 
-                //User supervision
-                .Bind(usage => usage.WithOptionalUpdate(parameters.UserSupervision, (systemUsage, supervision) => systemUsage.UserSupervision = supervision))
-                .Bind(usage => usage.WithOptionalUpdate(parameters.UserSupervisionDate, (systemUsage, date) => systemUsage.UserSupervisionDate = date))
-                .Bind(usage => usage.WithOptionalUpdate(parameters.UserSupervisionDocumentation, (systemUsage, newLink) =>
-                   {
-                       systemUsage.UserSupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
-                       systemUsage.UserSupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
-                   }))
 
                 //Risk assessments
-                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentConducted, (systemUsage, conducted) => systemUsage.riskAssessment = conducted))
-                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentConductedDate, (systemUsage, date) => systemUsage.riskAssesmentDate = date))
-                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentResult, (systemUsage, result) => systemUsage.preriskAssessment = result))
-                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentDocumentation, (systemUsage, newLink) =>
-                   {
-                       systemUsage.RiskSupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
-                       systemUsage.RiskSupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
-                   }))
-                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentNotes, (systemUsage, notes) => systemUsage.noteRisks = notes))
-                .Bind(usage => usage.WithOptionalUpdate(parameters.PlannedRiskAssessmentDate, (systemUsage, date) => systemUsage.PlannedRiskAssessmentDate = date))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentConducted, (systemUsage, conducted) => systemUsage.UpdateRiskAssessment(conducted)))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentConductedDate, (systemUsage, date) => systemUsage.UpdateRiskAssessmentDate(date)))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentResult, (systemUsage, result) => systemUsage.UpdateRiskAssessmentLevel(result)))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentDocumentation, (systemUsage, newLink) => systemUsage.UpdateRiskAssessmentDocumentation(newLink.Select(x => x.Url).GetValueOrDefault(), newLink.Select(x => x.Name).GetValueOrDefault())))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentNotes, (systemUsage, notes) => systemUsage.UpdateRiskAssessmentNotes(notes)))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.PlannedRiskAssessmentDate, (systemUsage, date) => systemUsage.UpdatePlannedRiskAssessmentDate(date)))
 
                 //DPIA
-                .Bind(usage => usage.WithOptionalUpdate(parameters.DPIAConducted, (systemUsage, conducted) => systemUsage.DPIA = conducted))
-                .Bind(usage => usage.WithOptionalUpdate(parameters.DPIADate, (systemUsage, date) => systemUsage.DPIADateFor = date))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.DPIAConducted, (systemUsage, conducted) => systemUsage.UpdateDPIAConducted(conducted)))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.DPIADate, (systemUsage, date) => systemUsage.UpdateDPIADate(date)))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.DPIADocumentation, (systemUsage, newLink) =>
-                   {
-                       systemUsage.DPIASupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
-                       systemUsage.DPIASupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
-                   }))
+                   systemUsage.UpdateDPIADocumentation(newLink.Select(x => x.Url).GetValueOrDefault(), newLink.Select(x => x.Name).GetValueOrDefault())))
 
                 //Data retention
-                .Bind(usage => usage.WithOptionalUpdate(parameters.RetentionPeriodDefined, (systemUsage, retentionPeriodDefined) => systemUsage.answeringDataDPIA = retentionPeriodDefined))
-                .Bind(usage => usage.WithOptionalUpdate(parameters.NextDataRetentionEvaluationDate, (systemUsage, date) => systemUsage.DPIAdeleteDate = date))
-                .Bind(usage => usage.WithOptionalUpdate(parameters.DataRetentionEvaluationFrequencyInMonths, (systemUsage, frequencyInMonths) => systemUsage.numberDPIA = frequencyInMonths.GetValueOrDefault()));
+                .Bind(usage => usage.WithOptionalUpdate(parameters.RetentionPeriodDefined, (systemUsage, retentionPeriodDefined) => systemUsage.UpdateRetentionPeriodDefined(retentionPeriodDefined)))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.NextDataRetentionEvaluationDate, (systemUsage, date) => systemUsage.UpdateNextDataRetentionEvaluationDate(date)))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.DataRetentionEvaluationFrequencyInMonths, (systemUsage, frequencyInMonths) => systemUsage.UpdateDataRetentionEvaluationFrequencyInMonths(frequencyInMonths.GetValueOrDefault())));
         }
 
         private Maybe<OperationError> UpdateSensitivityLevels(Maybe<IEnumerable<SensitiveDataLevel>> levels, ItSystemUsage systemUsage)

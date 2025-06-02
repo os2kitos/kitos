@@ -222,15 +222,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var system2 = await CreateItSystemAsync(organization.Uuid);
             var system3 = await CreateItSystemAsync(organization.Uuid);
 
-            await ItSystemV2Helper.SendPatchSystemNameAsync(await GetGlobalToken(), system2.Uuid, CreateName());
-            await ItSystemV2Helper.SendPatchSystemNameAsync(await GetGlobalToken(), system3.Uuid, CreateName());
-            await ItSystemV2Helper.SendPatchSystemNameAsync(await GetGlobalToken(), system1.Uuid, CreateName());
+            await ItSystemV2Helper.SendPatchSystemNameAsync(await GetGlobalToken(), system2.Uuid, CreateName()).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemV2Helper.SendPatchSystemNameAsync(await GetGlobalToken(), system3.Uuid, CreateName()).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemV2Helper.SendPatchSystemNameAsync(await GetGlobalToken(), system1.Uuid, CreateName()).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             var system3DTO = await ItSystemV2Helper.GetSingleAsync(await GetGlobalToken(), system3.Uuid); //system 3 was changed as the second one and system 1 the last
 
 
             //Act
-            var dtos = (await ItSystemV2Helper.GetManyInternalAsync(cookie, changedSinceGtEq: system3DTO.LastModified, page: 0, pageSize: 10)).ToList();
+            var dtos = (await ItSystemV2Helper.GetManyInternalAsync(cookie, changedSinceGtEq: system3DTO.LastModified, page: 0, pageSize: 30)).ToList();
 
             //Assert
             Assert.Equal(2, dtos.Count);

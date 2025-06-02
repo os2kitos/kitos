@@ -334,7 +334,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
         private ItSystemUsage CreateSystemUsage(ItSystem system, ItContract contract, int orgId)
         {
-            return new()
+            var usage = new ItSystemUsage()
             {
                 Id = Math.Abs(A<int>()),
                 ItSystem = system,
@@ -347,15 +347,9 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 } : new List<ItContractItSystemUsage>(),
                 OrganizationId = orgId,
                 isBusinessCritical = A<DataOptions>(),
-                DPIA = A<DataOptions>(),
-                DPIADateFor = A<DateTime>(),
-                riskAssessment = A<DataOptions>(),
-                riskAssesmentDate = A<DateTime>(),
-                PlannedRiskAssessmentDate = A<DateTime>(),
                 noteRisks = A<string>(),
                 LinkToDirectoryUrl = A<string>(),
                 HostedAt = A<HostedAt>(),
-                preriskAssessment = A<RiskLevel>(),
                 SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>()
                 {
                     new()
@@ -363,13 +357,18 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                         SensitivityDataLevel = A<SensitiveDataLevel>()
                     }
                 },
-                TechnicalSupervisionDocumentationUrl = A<string>(),
-                TechnicalSupervisionDocumentationUrlName = A<string>(),
-                UserSupervisionDocumentationUrl = A<string>(),
-                UserSupervisionDocumentationUrlName = A<string>(),
-                DPIAdeleteDate = A<DateTime>(),
-
             };
+            usage.UpdateRetentionPeriodDefined(DataOptions.YES);
+            usage.UpdateNextDataRetentionEvaluationDate(A<DateTime>());
+            usage.UpdateDPIAConducted(DataOptions.YES);
+            usage.UpdateDPIADate(A<DateTime>());
+            usage.UpdateUserSupervisionDocumentation(A<string>(), A<string>());
+            usage.UpdateTechnicalPrecautionsDocumentation(A<string>(), A<string>());
+            usage.UpdateRiskAssessment(DataOptions.YES);
+            usage.UpdateRiskAssessmentDate(A<DateTime>());
+            usage.UpdatePlannedRiskAssessmentDate(A<DateTime>());
+            usage.UpdateRiskAssessmentLevel(A<RiskLevel>());
+            return usage;
         }
     }
 }

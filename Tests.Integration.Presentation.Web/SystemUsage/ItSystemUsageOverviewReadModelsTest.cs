@@ -112,12 +112,19 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var concluded = DateTime.UtcNow.AddDays(-A<int>());
             var systemUsageExpirationDate = DateTime.UtcNow.AddDays(A<int>());
             var archiveDuty = A<ArchiveDutyChoice>();
+
             var riskAssessment = A<YesNoDontKnowChoice>();
-            var riskAssessmentDate = A<DateTime>();
-            var linkToDirectoryUrl = A<string>();
-            var linkToDirectoryUrlName = A<string>();
+            var riskAssessmentDate = A<DateTime?>();
             var riskSupervisionDocumentationUrl = A<string>();
             var riskSupervisionDocumentationUrlName = A<string>();
+            if (riskAssessment != YesNoDontKnowChoice.Yes)
+            {
+                riskAssessmentDate = null;
+                riskSupervisionDocumentationUrl = null;
+                riskSupervisionDocumentationUrlName = null;
+            }
+            var linkToDirectoryUrl = A<string>();
+            var linkToDirectoryUrlName = A<string>();
             var generalPurpose = A<string>();
             var hostedAt = A<HostedAt>();
             var userCount = A<UserCount>();

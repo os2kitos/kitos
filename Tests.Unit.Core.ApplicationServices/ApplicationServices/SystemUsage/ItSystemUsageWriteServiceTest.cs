@@ -1475,21 +1475,21 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var technicalPrecautionsInPlace = A<DataOptions?>();
             var technicalPrecautions = Many<TechnicalPrecaution>().Distinct().ToList();
             var technicalPrecautionsDocumentation = A<NamedLink>();
-            var userSupervision = A<DataOptions?>();
+            DataOptions? userSupervision = DataOptions.YES;
             var supervisionDate = A<DateTime?>();
             var supervisionDoc = A<NamedLink>();
-            var riskAssessmentConducted = A<DataOptions?>();
+            DataOptions? riskAssessmentConducted = DataOptions.YES;
             var riskAssessmentDate = A<DateTime?>();
             var riskAssessmentDoc = A<NamedLink>();
             var riskAssessmentNotes = A<string>();
             var plannedRiskAssessmentDate = A<DateTime?>();
             var riskAssessmentResult = A<RiskLevel?>();
-            var dpiaConducted = A<DataOptions?>();
+            DataOptions? dpiaConducted = DataOptions.YES;
             var dpiaDate = A<DateTime?>();
             var dpiaDoc = A<NamedLink>();
-            var retentionPeriod = A<DataOptions?>();
             var nextEvaluationDate = A<DateTime?>();
             var evaluationFrequency = A<int?>();
+            DataOptions? retentionPeriodDefined = DataOptions.YES;
             var gdprInput = new UpdatedSystemUsageGDPRProperties
             {
                 Purpose = purpose.AsChangedValue(),
@@ -1514,7 +1514,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 DPIAConducted = dpiaConducted.AsChangedValue(),
                 DPIADate = dpiaDate.AsChangedValue(),
                 DPIADocumentation = dpiaDoc.FromNullable().AsChangedValue(),
-                RetentionPeriodDefined = retentionPeriod.AsChangedValue(),
+                RetentionPeriodDefined = retentionPeriodDefined.AsChangedValue(),
                 NextDataRetentionEvaluationDate = nextEvaluationDate.AsChangedValue(),
                 DataRetentionEvaluationFrequencyInMonths = evaluationFrequency.AsChangedValue()
             };
@@ -1539,6 +1539,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(technicalPrecautionsInPlace, itSystemUsage.precautions);
             Assert.Equal(technicalPrecautions.OrderBy(x => x), itSystemUsage.GetTechnicalPrecautions().OrderBy(x => x));
             AssertLink(technicalPrecautionsDocumentation, itSystemUsage.TechnicalSupervisionDocumentationUrlName, itSystemUsage.TechnicalSupervisionDocumentationUrl);
+            Assert.NotNull(itSystemUsage.UserSupervision);
             Assert.Equal(userSupervision, itSystemUsage.UserSupervision);
             Assert.Equal(supervisionDate, itSystemUsage.UserSupervisionDate);
             AssertLink(supervisionDoc, itSystemUsage.UserSupervisionDocumentationUrlName, itSystemUsage.UserSupervisionDocumentationUrl);
@@ -1550,7 +1551,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(dpiaConducted, itSystemUsage.DPIA);
             Assert.Equal(dpiaDate, itSystemUsage.DPIADateFor);
             AssertLink(dpiaDoc, itSystemUsage.DPIASupervisionDocumentationUrlName, itSystemUsage.DPIASupervisionDocumentationUrl);
-            Assert.Equal(retentionPeriod, itSystemUsage.answeringDataDPIA);
+            Assert.Equal(retentionPeriodDefined, itSystemUsage.answeringDataDPIA);
             Assert.Equal(nextEvaluationDate, itSystemUsage.DPIAdeleteDate);
             Assert.Equal(evaluationFrequency, itSystemUsage.numberDPIA);
         }
@@ -1588,8 +1589,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             var precautions = Many<TechnicalPrecaution>().Distinct().ToList();
             precautions.Add(precautions.First()); //Add duplicate
+            DataOptions? technicalPrecautionsInPlace = DataOptions.YES;
             var gdprInput = new UpdatedSystemUsageGDPRProperties
             {
+                TechnicalPrecautionsInPlace = technicalPrecautionsInPlace.AsChangedValue(),
                 TechnicalPrecautionsApplied = precautions.FromNullable<IEnumerable<TechnicalPrecaution>>().AsChangedValue(),
             };
 
@@ -2972,6 +2975,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithSimpleParametersAdded()
         {
+            DataOptions? userSupervision = DataOptions.YES;
+            DataOptions? technicalPrecautionsInPlace = DataOptions.YES;
+            DataOptions? riskAssessment = DataOptions.YES;
+            DataOptions? dpiaConcluded = DataOptions.YES;
+            DataOptions? retentionPeriodDefined = DataOptions.YES;
             return new SystemUsageUpdateParameters
             {
                 GeneralProperties = new UpdatedSystemUsageGeneralProperties
@@ -2999,21 +3007,21 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     BusinessCritical = A<DataOptions?>().AsChangedValue(),
                     HostedAt = A<HostedAt?>().AsChangedValue(),
                     DirectoryDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
-                    TechnicalPrecautionsInPlace = A<DataOptions?>().AsChangedValue(),
+                    TechnicalPrecautionsInPlace = technicalPrecautionsInPlace.AsChangedValue(),
                     TechnicalPrecautionsDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
-                    UserSupervision = A<DataOptions?>().AsChangedValue(),
+                    UserSupervision = userSupervision.AsChangedValue(),
                     UserSupervisionDate = A<DateTime?>().AsChangedValue(),
                     UserSupervisionDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
-                    RiskAssessmentConducted = A<DataOptions?>().AsChangedValue(),
+                    RiskAssessmentConducted = riskAssessment.AsChangedValue(),
                     RiskAssessmentConductedDate = A<DateTime?>().AsChangedValue(),
                     RiskAssessmentDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
                     RiskAssessmentNotes = A<string>().AsChangedValue(),
                     PlannedRiskAssessmentDate = A<DateTime?>().AsChangedValue(),
                     RiskAssessmentResult = A<RiskLevel?>().AsChangedValue(),
-                    DPIAConducted = A<DataOptions?>().AsChangedValue(),
+                    DPIAConducted = dpiaConcluded.AsChangedValue(),
                     DPIADate = A<DateTime?>().AsChangedValue(),
                     DPIADocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
-                    RetentionPeriodDefined = A<DataOptions?>().AsChangedValue(),
+                    RetentionPeriodDefined = retentionPeriodDefined.AsChangedValue(),
                     NextDataRetentionEvaluationDate = A<DateTime?>().AsChangedValue(),
                     DataRetentionEvaluationFrequencyInMonths = A<int?>().AsChangedValue()
                 }
@@ -3057,7 +3065,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     RiskAssessmentConducted = new ChangedValue<DataOptions?>(null),
                     RiskAssessmentConductedDate = new ChangedValue<DateTime?>(null),
                     RiskAssessmentDocumentation = new ChangedValue<Maybe<NamedLink>>(Maybe<NamedLink>.None),
-                    RiskAssessmentNotes = "".AsChangedValue(),
+                    RiskAssessmentNotes = new ChangedValue<string>(null),
                     PlannedRiskAssessmentDate = new ChangedValue<DateTime?>(null),
                     RiskAssessmentResult = new ChangedValue<RiskLevel?>(null),
                     DPIAConducted = new ChangedValue<DataOptions?>(null),

@@ -228,11 +228,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Concluded = A<DateTime>(),
                 ArchiveDuty = A<ArchiveDutyTypes>(),
                 Registertype = A<bool>(),
-                riskAssessment = DataOptions.YES,
-                riskAssesmentDate = A<DateTime>(),
-                RiskSupervisionDocumentationUrlName = A<string>(),
-                RiskSupervisionDocumentationUrl = A<string>(),
-                PlannedRiskAssessmentDate = A<DateTime>(),
                 LinkToDirectoryUrlName = A<string>(),
                 LinkToDirectoryUrl = A<string>(),
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>
@@ -252,6 +247,11 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 },
                 LifeCycleStatus = A<LifeCycleStatusType>()
             };
+
+            systemUsage.UpdateRiskAssessment(DataOptions.YES);
+            systemUsage.UpdateRiskAssessmentDate(A<DateTime>());
+            systemUsage.UpdateRiskAssessmentDocumentation(A<string>(), A<string>());
+            systemUsage.UpdatePlannedRiskAssessmentDate(A<DateTime>());
 
             systemUsage.ContainsAITechnology = A<YesNoUndecidedOption>();
 
@@ -605,12 +605,12 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 ObjectOwner = DefaultTestUser,
                 LastChangedByUser = DefaultTestUser,
                 LastChanged = A<DateTime>(),
-                riskAssessment = DataOptions.DONTKNOW,
-                RiskSupervisionDocumentationUrlName = A<string>(),
-                RiskSupervisionDocumentationUrl = A<string>(),
-                PlannedRiskAssessmentDate = A<DateTime>(),
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
             };
+
+            systemUsage.UpdateRiskAssessment(DataOptions.DONTKNOW);
+            systemUsage.UpdateRiskAssessmentDocumentation(A<string>(), A<string>());
+            systemUsage.UpdatePlannedRiskAssessmentDate(A<DateTime>());
 
             var readModel = new ItSystemUsageOverviewReadModel();
 
@@ -669,10 +669,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 ObjectOwner = DefaultTestUser,
                 LastChangedByUser = DefaultTestUser,
                 LastChanged = A<DateTime>(),
-                riskAssessment = DataOptions.DONTKNOW,
-                RiskSupervisionDocumentationUrlName = A<string>(),
-                RiskSupervisionDocumentationUrl = A<string>(),
-                PlannedRiskAssessmentDate = A<DateTime>(),
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
                 {
                     dpr1,
@@ -682,6 +678,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                     dpr5
                 }
             };
+            systemUsage.UpdateRiskAssessment(DataOptions.DONTKNOW);
+            systemUsage.UpdateRiskAssessmentDate(A<DateTime>());
+            systemUsage.UpdateRiskAssessmentDocumentation(A<string>(), A<string>());
+            systemUsage.UpdatePlannedRiskAssessmentDate(A<DateTime>());
 
             var readModel = new ItSystemUsageOverviewReadModel();
 
