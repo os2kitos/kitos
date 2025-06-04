@@ -361,6 +361,7 @@
   <ItemGroup>
     <Compile Include="Controllers\API\V1\Auth\AuthorizeController.cs" />
     <Compile Include="Controllers\API\V1\ExtendedApiController.cs" />
+    <Compile Include="Controllers\API\V1\HealthCheckController.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\GlobalOptionTypeWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\IGlobalOptionTypeWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\Common\Mapping\ILocalOptionTypeWriteModelMapper.cs" />
