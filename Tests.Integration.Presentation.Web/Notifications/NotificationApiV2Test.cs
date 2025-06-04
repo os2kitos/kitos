@@ -7,21 +7,19 @@ using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
 using Presentation.Web.Models.API.V2.Internal.Response.Notifications;
+using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.Notifications;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Internal.Notifications;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Notifications
 {
-    public class NotificationApiV2Test : WithAutoFixture
+    public class NotificationApiV2Test : BaseTest
     {
         [Fact]
         public async Task Can_Create_And_Get_ImmediateNotification()
@@ -95,8 +93,8 @@ namespace Tests.Integration.Presentation.Web.Notifications
             var (relationUuid, organization, cookie) = await CreatePrerequisitesAsync(ownerResourceType);
 
             var notification1 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid, CreateScheduledNotificationWriteRequest(ownerResourceType), cookie);
-            var notification2 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid,  CreateScheduledNotificationWriteRequest(ownerResourceType), cookie);
-            var notification3 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, relationUuid,  CreateImmediateNotificationWriteRequest(ownerResourceType), cookie);
+            var notification2 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid, CreateScheduledNotificationWriteRequest(ownerResourceType), cookie);
+            var notification3 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, relationUuid, CreateImmediateNotificationWriteRequest(ownerResourceType), cookie);
             var notification4 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, relationUuid, CreateImmediateNotificationWriteRequest(ownerResourceType), cookie);
 
             //Act
@@ -118,9 +116,9 @@ namespace Tests.Integration.Presentation.Web.Notifications
             var ownerResourceType = A<OwnerResourceType>();
             var (relationUuid, organization, cookie) = await CreatePrerequisitesAsync(ownerResourceType);
 
-            var notification1 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid,  CreateScheduledNotificationWriteRequest(ownerResourceType), cookie);
-            var notification2 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid,  CreateScheduledNotificationWriteRequest(ownerResourceType), cookie);
-            var notification3 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, relationUuid,  CreateImmediateNotificationWriteRequest(ownerResourceType), cookie);
+            var notification1 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid, CreateScheduledNotificationWriteRequest(ownerResourceType), cookie);
+            var notification2 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid, CreateScheduledNotificationWriteRequest(ownerResourceType), cookie);
+            var notification3 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, relationUuid, CreateImmediateNotificationWriteRequest(ownerResourceType), cookie);
             var notification4 = await NotificationV2Helper.CreateImmediateNotificationAsync(ownerResourceType, relationUuid, CreateImmediateNotificationWriteRequest(ownerResourceType), cookie);
 
             //Act
@@ -145,12 +143,12 @@ namespace Tests.Integration.Presentation.Web.Notifications
             //Arrange
             var ownerResourceType = A<OwnerResourceType>();
             var (relationUuid, organization, cookie) = await CreatePrerequisitesAsync(ownerResourceType);
-            var relation2Uuid = await SetupRelatedResourceAsync(ownerResourceType, organization.Id);
+            var relation2Uuid = await SetupRelatedResourceAsync(ownerResourceType, organization.Uuid);
 
             var notificationRequest1 = CreateScheduledNotificationWriteRequest(ownerResourceType);
             var notificationRequest2 = CreateScheduledNotificationWriteRequest(ownerResourceType);
             var notificationRequest3 = CreateScheduledNotificationWriteRequest(ownerResourceType);
-            
+
             var notification1 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid, notificationRequest1, cookie);
             var notification2 = await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relationUuid, notificationRequest2, cookie);
             await NotificationV2Helper.CreateScheduledNotificationAsync(ownerResourceType, relation2Uuid, notificationRequest3, cookie);
@@ -245,7 +243,7 @@ namespace Tests.Integration.Presentation.Web.Notifications
             AssertBaseNotification(expected, actual, notificationType, relationUuid, notificationUuid);
         }
 
-        private static void AssertBaseNotification<T>(T expected, NotificationResponseDTO actual, NotificationSendType notificationType, Guid relationUuid, Guid notificationUuid) where T: class, IHasBaseWriteProperties
+        private static void AssertBaseNotification<T>(T expected, NotificationResponseDTO actual, NotificationSendType notificationType, Guid relationUuid, Guid notificationUuid) where T : class, IHasBaseWriteProperties
         {
             Assert.Equal(notificationUuid, actual.Uuid);
             Assert.Equal(notificationType, actual.NotificationType);
@@ -402,66 +400,64 @@ namespace Tests.Integration.Presentation.Web.Notifications
         private void CreateBaseProperties<TModel>(TModel model, OwnerResourceType ownerResourceType) where TModel : class, IHasBaseWriteProperties, new()
         {
             model.BaseProperties = new BaseNotificationPropertiesWriteRequestDTO
+            {
+                Subject = A<string>(),
+                Body = A<string>(),
+                Ccs = new RecipientWriteRequestDTO
                 {
-                    Subject = A<string>(),
-                    Body = A<string>(),
-                    Ccs = new RecipientWriteRequestDTO
-                    {
-                        EmailRecipients = new List<EmailRecipientWriteRequestDTO>
+                    EmailRecipients = new List<EmailRecipientWriteRequestDTO>
                         {
                             new() {Email = CreateEmail()}
                         },
-                        RoleRecipients = new List<RoleRecipientWriteRequestDTO>
+                    RoleRecipients = new List<RoleRecipientWriteRequestDTO>
                         {
                             new() {RoleUuid = CreateNewRole(ownerResourceType).Uuid}
                         }
-                    },
-                    Receivers = new RecipientWriteRequestDTO
-                    {
-                        EmailRecipients = new List<EmailRecipientWriteRequestDTO>
+                },
+                Receivers = new RecipientWriteRequestDTO
+                {
+                    EmailRecipients = new List<EmailRecipientWriteRequestDTO>
                         {
                             new() {Email = CreateEmail()}
                         },
-                        RoleRecipients = new List<RoleRecipientWriteRequestDTO>
+                    RoleRecipients = new List<RoleRecipientWriteRequestDTO>
                         {
                             new() {RoleUuid = CreateNewRole(ownerResourceType).Uuid}
                         }
-                    }
-                };
+                }
+            };
         }
 
-        private async Task<(Guid relationUuid, OrganizationDTO organization, Cookie cookie)> CreatePrerequisitesAsync(OwnerResourceType ownerResourceType, OrganizationRole role = OrganizationRole.GlobalAdmin)
+        private async Task<(Guid relationUuid, ShallowOrganizationResponseDTO organization, Cookie cookie)> CreatePrerequisitesAsync(OwnerResourceType ownerResourceType, OrganizationRole role = OrganizationRole.GlobalAdmin)
         {
             var organization = await SetupOrganizationAsync();
-            var relationUuid = await SetupRelatedResourceAsync(ownerResourceType, organization.Id);
-            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(CreateEmail(), role, organization.Id);
+            var relationUuid = await SetupRelatedResourceAsync(ownerResourceType, organization.Uuid);
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(CreateEmail(), role, organization.Uuid);
             return (relationUuid, organization, cookie);
         }
 
-        private async Task<Guid> SetupRelatedResourceAsync(OwnerResourceType ownerResourceType, int organizationId)
+        private async Task<Guid> SetupRelatedResourceAsync(OwnerResourceType ownerResourceType, Guid organizationUuid)
         {
             switch (ownerResourceType)
             {
                 case OwnerResourceType.ItContract:
-                    var result = await ItContractHelper.CreateContract(A<string>(), organizationId);
+                    var result = await CreateItContractAsync(organizationUuid);
                     return result.Uuid;
                 case OwnerResourceType.ItSystemUsage:
-                    var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-                    var usageResult = ItSystemUsageHelper.CreateItSystemUsage(new ItSystemUsage { ItSystemId = system.Id, OrganizationId = organizationId });
+                    var system = await CreateItSystemAsync(organizationUuid);
+                    var usageResult = await TakeSystemIntoUsageAsync(system.Uuid, organizationUuid);
                     return usageResult.Uuid;
                 case OwnerResourceType.DataProcessingRegistration:
-                    var dpr = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+                    var dpr = await CreateDPRAsync(organizationUuid);
                     return dpr.Uuid;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(ownerResourceType), ownerResourceType, null);
             }
         }
 
-        private async Task<OrganizationDTO> SetupOrganizationAsync()
+        private async Task<ShallowOrganizationResponseDTO> SetupOrganizationAsync()
         {
-            var organizationName = CreateName();
-            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
-                organizationName, "11224455", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var organization = await CreateOrganizationAsync();
             return organization;
         }
 
@@ -513,11 +509,6 @@ namespace Tests.Integration.Presentation.Web.Notifications
         private string CreateName()
         {
             return nameof(NotificationApiV2Test) + A<string>();
-        }
-
-        private string CreateEmail()
-        {
-            return $"{A<string>()}@test.dk";
         }
     }
 }

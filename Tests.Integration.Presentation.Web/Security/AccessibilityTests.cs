@@ -3,13 +3,12 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.Internal.Users;
 using Xunit;
-using Tests.Integration.Presentation.Web.Tools.Model;
-using Tests.Toolkit.Patterns;
 
 namespace Tests.Integration.Presentation.Web.Security
 {
-    public class AccessibilityTests : WithAutoFixture
+    public class AccessibilityTests : BaseTest
     {
         private readonly string _defaultPassword;
 
@@ -20,7 +19,6 @@ namespace Tests.Integration.Presentation.Web.Security
 
         [Theory]
         [InlineData("api/v2/organizations", HttpStatusCode.OK)]
-        [InlineData("api/organization", HttpStatusCode.Forbidden)] //v1 not allowed with token
         public async Task Api_Get_Requests_Using_Token(string apiUrl, HttpStatusCode httpCode)
         {
             //Arrange
@@ -47,37 +45,30 @@ namespace Tests.Integration.Presentation.Web.Security
         {
             //Arrange
             var email = CreateEmail();
-            var userDto = ObjectCreateHelper.MakeSimpleApiUserDto(email, true);
-            var createdUserId = await HttpApi.CreateOdataUserAsync(userDto, OrganizationRole.User);
+            var createdUser = await CreateUserAsync(DefaultOrgUuid, email, true);
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(email, _defaultPassword);
             var token = await HttpApi.GetTokenAsync(loginDto);
             using (var requestResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("api/v2/organizations"), token.Token))
             {
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.OK, requestResponse.StatusCode);
-            };
+            }
 
             //Act
-            await DisableApiAccessForUserAsync(userDto, createdUserId);
+            await DisableApiAccessForUserAsync(DefaultOrgUuid, createdUser.Uuid);
 
             //Assert
             using (var requestResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("api/v2/organizations"), token.Token))
             {
                 Assert.NotNull(requestResponse);
                 Assert.Equal(HttpStatusCode.Forbidden, requestResponse.StatusCode);
-            };
-            await UserHelper.SendDeleteUserAsync(createdUserId).DisposeAsync();
+            }
+            await UsersV2Helper.DeleteUserGlobally(createdUser.Uuid);
         }
 
-        private static string CreateEmail()
+        private static async Task DisableApiAccessForUserAsync(Guid organizationUuid, Guid userUuid)
         {
-            return $"{Guid.NewGuid():N}@test.dk";
-        }
-
-        private static async Task DisableApiAccessForUserAsync(ApiUserDTO userDto, int id)
-        {
-            userDto.HasApiAccess = false;
-            await HttpApi.PatchOdataUserAsync(userDto, id);
+            await UsersV2Helper.PatchUserAsync(organizationUuid, userUuid, x => x.HasApiAccess, false);
         }
 
     }

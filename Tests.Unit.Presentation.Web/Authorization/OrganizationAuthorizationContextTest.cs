@@ -468,20 +468,20 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(null,false,false)]
-        [InlineData(null,true,false)]
-        [InlineData(OrganizationRole.GlobalAdmin,false,true)]
-        [InlineData(OrganizationRole.GlobalAdmin,true,true)]
-        [InlineData(OrganizationRole.LocalAdmin, false,false)]
-        [InlineData(OrganizationRole.LocalAdmin, true,true)]
-        [InlineData(OrganizationRole.OrganizationModuleAdmin, false,false)]
-        [InlineData(OrganizationRole.OrganizationModuleAdmin, true,false)]
-        [InlineData(OrganizationRole.SystemModuleAdmin, true,false)]
-        [InlineData(OrganizationRole.SystemModuleAdmin, false,false)]
-        [InlineData(OrganizationRole.ContractModuleAdmin, true,false)]
-        [InlineData(OrganizationRole.ContractModuleAdmin, false,false)]
-        [InlineData(OrganizationRole.RightsHolderAccess, false,false)]
-        [InlineData(OrganizationRole.RightsHolderAccess, true,false)]
+        [InlineData(null, false, false)]
+        [InlineData(null, true, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, false, true)]
+        [InlineData(OrganizationRole.GlobalAdmin, true, true)]
+        [InlineData(OrganizationRole.LocalAdmin, false, false)]
+        [InlineData(OrganizationRole.LocalAdmin, true, true)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, true, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, true, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, true, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, false, false)]
+        [InlineData(OrganizationRole.RightsHolderAccess, false, false)]
+        [InlineData(OrganizationRole.RightsHolderAccess, true, false)]
         public void HasPermission_With_DeleteAnyUserPermission_Returns(OrganizationRole? role, bool hasOrg, bool expectedResult)
         {
             //Arrange
@@ -679,7 +679,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         {
             //Arrange
             var orgId = A<int>();
-            var inputEntity = new OrganizationUnit() {OrganizationId = orgId};
+            var inputEntity = new OrganizationUnit() { OrganizationId = orgId };
 
             ExpectUserIsGlobalAdmin(isGlobalAdmin);
             ExpectHasRoleReturns(orgId, OrganizationRole.LocalAdmin, isLocalAdmin);
@@ -752,6 +752,46 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             //Assert
             Assert.Equal(expectedResult, result);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Allow_Legal_Properties_Change_Only_If_User_Is_System_Integrator(bool isSystemIntegrator)
+        {
+            _userContextMock.Setup(x => x.IsSystemIntegrator()).Returns(isSystemIntegrator);
+
+            var result = _sut.HasPermission(new ChangeLegalSystemPropertiesPermission());
+
+            Assert.Equal(isSystemIntegrator, result);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Stakeholders_Can_Read_Any_Local_ItSystem(bool hasRoleInOrganization)
+        {
+            var localSystem = new ItSystem { OrganizationId = A<int>(), AccessModifier = AccessModifier.Local };
+            ExpectUserHasStakeHolderAccess(true);
+            ExpectUserHasRoleIn(localSystem.OrganizationId, hasRoleInOrganization);
+
+            var canReadLocalSystem = _sut.AllowReads(localSystem);
+
+            Assert.True(canReadLocalSystem);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Stakeholders_Can_Read_Any_Local_ItInterface(bool hasRoleInOrganization)
+        {
+            var localInterface = new ItInterface { OrganizationId = A<int>(), AccessModifier = AccessModifier.Local };
+            ExpectUserHasStakeHolderAccess(true);
+            ExpectHasRoleInSameOrganizationAsReturns(localInterface, hasRoleInOrganization);
+
+            var canReadLocalInterface = _sut.AllowReads(localInterface);
+
+            Assert.True(canReadLocalInterface);
         }
 
         private void Allow_Create_Returns<T>(bool expectedResult)

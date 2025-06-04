@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.SystemUsage;

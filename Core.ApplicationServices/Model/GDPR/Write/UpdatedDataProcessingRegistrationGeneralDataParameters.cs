@@ -21,5 +21,7 @@ namespace Core.ApplicationServices.Model.GDPR.Write
         public OptionalValueChange<YesNoUndecidedOption?> HasSubDataProcessors { get; set; } = OptionalValueChange<YesNoUndecidedOption?>.None;
         public OptionalValueChange<Maybe<IEnumerable<SubDataProcessorParameter>>> SubDataProcessors { get; set; } = OptionalValueChange<Maybe<IEnumerable<SubDataProcessorParameter>>>.None;
         public OptionalValueChange<Guid?> MainContractUuid { get; set; } = OptionalValueChange<Guid?>.None;
+
+        public OptionalValueChange<Guid?> ResponsibleUnitUuid { get; set; } = OptionalValueChange<Guid?>.None;
     }
 }

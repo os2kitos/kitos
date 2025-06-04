@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
@@ -138,6 +139,10 @@ namespace Core.DomainModel.ItSystem
 
         public string ArchiveDutyComment { get; set; }
 
+        public string LegalName { get; set; }
+
+        public string LegalDataProcessorName { get; set; }
+
         public bool TryGetInterfaceExhibit(out ItInterfaceExhibit interfaceExhibit, int interfaceId)
         {
             interfaceExhibit = ItInterfaceExhibits.FirstOrDefault(i => i.ItInterface.Id == interfaceId);
@@ -157,6 +162,11 @@ namespace Core.DomainModel.ItSystem
             if (BelongsTo != null)
                 return BelongsTo.Id;
             return Maybe<int>.None;
+        }
+
+        public Maybe<Organization.Organization> GetRightsHolder()
+        {
+            return BelongsTo.FromNullable();
         }
 
         public void AddTaskRef(TaskRef taskRef)
@@ -279,6 +289,25 @@ namespace Core.DomainModel.ItSystem
             ArchiveDuty = recommendation;
             ArchiveDutyComment = comment;
             return Maybe<OperationError>.None;
+        }
+
+        public void UpdateLegalName(string legalName)
+        {
+            LegalName = legalName;
+        }
+
+        public void UpdateLegalDataProcessorName(string legalDataProcessorName)
+        {
+            LegalDataProcessorName = legalDataProcessorName;
+        }
+
+        public ItSystemSnapshot Snapshot()
+        {
+
+            return new ItSystemSnapshot
+            {
+                Name = Name
+            };
         }
     }
 }

@@ -12,7 +12,6 @@ using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
 using Infrastructure.STS.Common.Model.Token;
-using Kombit.InfrastructureSamples;
 using Kombit.InfrastructureSamples.OrganisationService;
 using Kombit.InfrastructureSamples.Token;
 using Serilog;
@@ -62,6 +61,7 @@ namespace Infrastructure.STS.Organization.DomainServices
                         ResolveOrganizationUuidError.MissingServiceAgreement => CheckConnectionError.MissingServiceAgreement,
                         ResolveOrganizationUuidError.ExistingServiceAgreementIssue => CheckConnectionError.ExistingServiceAgreementIssue,
                         ResolveOrganizationUuidError.UserContextDoesNotExistOnSystem => CheckConnectionError.UserContextDoesNotExistOnSystem,
+                        ResolveOrganizationUuidError.FailedToLookupOrganizationCompany => CheckConnectionError.FailedToLookupOrganizationCompany,
                         _ => CheckConnectionError.Unknown
                     };
                     return new DetailedOperationError<CheckConnectionError>(error.FailureType, connectionError, error.Message.GetValueOrFallback(string.Empty));

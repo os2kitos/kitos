@@ -5,6 +5,7 @@ using AutoFixture;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.System;
@@ -461,6 +462,7 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
             //Assert
             Assert.True(result.Ok);
             transaction.Verify(x => x.Commit(), Times.Once);
+            _domainEventsMock.Verify(x => x.Raise(It.IsAny<EntityUpdatedEventWithSnapshot<ItSystem, ItSystemSnapshot>>()), Times.Once);
         }
 
         [Fact]
@@ -1001,6 +1003,46 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(operationFailure, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_Update_Legal_Properties()
+        {
+            var systemUuid = A<Guid>();
+            var system = new ItSystem { Uuid = systemUuid };
+            var parameters = A<LegalUpdateParameters>();
+            ExpectSystemServiceGetSystemReturns(systemUuid, system);
+            ExpectHasLegalChangePermissionReturns(true);
+            var transaction = ExpectTransactionBegins();
+
+            var result = _sut.LegalPropertiesUpdate(systemUuid, parameters);
+
+            Assert.True(result.Ok);
+            Assert.Equal(parameters.SystemName.NewValue, result.Value.LegalName);
+            Assert.Equal(parameters.DataProcessorName.NewValue, result.Value.LegalDataProcessorName);
+            transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Can_Only_Update_Legal_Properties_With_Permission(bool hasPermission)
+        {
+            var systemUuid = A<Guid>();
+            var system = new ItSystem { Uuid = systemUuid };
+            ExpectSystemServiceGetSystemReturns(systemUuid, system);
+            ExpectHasLegalChangePermissionReturns(hasPermission);
+            ExpectTransactionBegins();
+
+            var result = _sut.LegalPropertiesUpdate(systemUuid, A<LegalUpdateParameters>());
+
+            Assert.Equal(hasPermission, result.Ok);
+        }
+
+        private void ExpectHasLegalChangePermissionReturns(bool hasPermission)
+        {
+            _authorizationContextMock.Setup(x => x.HasPermission(It.IsAny<ChangeLegalSystemPropertiesPermission>()))
+                .Returns(hasPermission);
         }
 
         private ExternalReferenceProperties CreateExternalReferenceProperties()

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using Core.Abstractions.Types;
+﻿using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.KendoConfig;
 

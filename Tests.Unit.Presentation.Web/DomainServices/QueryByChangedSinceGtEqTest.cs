@@ -19,7 +19,7 @@ namespace Tests.Unit.Presentation.Web.DomainServices
 
             var tooOld = CreateEntity(referenceTime.AddTicks(-1));
             var equalTo = CreateEntity(referenceTime);
-            var greaterThan = CreateEntity(referenceTime.AddTicks(1)); ;
+            var greaterThan = CreateEntity(referenceTime.AddTicks(1));
 
             //Act
             var result = sut.Apply(new[] { tooOld, equalTo, greaterThan }.AsQueryable());

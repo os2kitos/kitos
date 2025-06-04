@@ -13,7 +13,9 @@ using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
 using System.Web.Http.Results;
 using System.Collections.Generic;
 using Core.DomainModel.Organization;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 {
@@ -128,7 +130,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 
         [HttpPost]
         [Route("{organizationUnitUuid}/roles/create")]
-        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationUnitRoleAssignmentResponseDTO))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -141,6 +143,23 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
             return _organizationUnitService.CreateRoleAssignment(organizationUnitUuid, request.RoleUuid,
                     request.UserUuid)
                 .Select(MapToRoleAssignmentResponse)
+                .Match(Ok, FromOperationError);
+        }
+
+        [HttpPost]
+        [Route("{organizationUnitUuid}/roles/bulk/create")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationUnitResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public IHttpActionResult CreateBulkRoleAssignment(
+            [NonEmptyGuid] Guid organizationUnitUuid, [FromBody] BulkRoleAssignmentRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _organizationUnitService.CreateBulkRoleAssignment(organizationUnitUuid, request.ToUserRolePairs())
+                .Select(_responseMapper.ToUnitDto)
                 .Match(Ok, FromOperationError);
         }
 

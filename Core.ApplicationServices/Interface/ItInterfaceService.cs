@@ -6,7 +6,6 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.Interface;
-using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
@@ -120,17 +119,8 @@ namespace Core.ApplicationServices.Interface
         public IQueryable<ItInterface> GetAvailableInterfaces(params IDomainQuery<ItInterface>[] conditions)
         {
             var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
-            var refinement = Maybe<IDomainQuery<ItInterface>>.None;
 
-            if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
-            {
-                var rightsHolderOrgs = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
-                refinement = new QueryByRightsHolderIdsOrOwnOrganizationIds(rightsHolderOrgs, _userContext.OrganizationIds);
-            }
-            else
-            {
-                refinement = new QueryAllByRestrictionCapabilities<ItInterface>(accessLevel, _userContext.OrganizationIds);
-            }
+            var refinement = GetQueryRefinement(accessLevel);
 
             var mainQuery = _interfaceRepository.GetInterfaces();
 
@@ -139,6 +129,20 @@ namespace Core.ApplicationServices.Interface
                 .GetValueOrFallback(mainQuery);
 
             return conditions.Any() ? new IntersectionQuery<ItInterface>(conditions).Apply(refinedResult) : refinedResult;
+        }
+
+        private Maybe<IDomainQuery<ItInterface>> GetQueryRefinement(CrossOrganizationDataReadAccessLevel accessLevel)
+        {
+            if (_userContext.HasStakeHolderAccess())
+            {
+                return Maybe<IDomainQuery<ItInterface>>.None;
+            }
+            if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
+            {
+                var rightsHolderOrgs = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
+                return new QueryByRightsHolderIdsOrOwnOrganizationIds(rightsHolderOrgs, _userContext.OrganizationIds);
+            }
+            return new QueryAllByRestrictionCapabilities<ItInterface>(accessLevel, _userContext.OrganizationIds);
         }
 
         public Result<ItInterface, OperationError> GetInterface(Guid uuid)

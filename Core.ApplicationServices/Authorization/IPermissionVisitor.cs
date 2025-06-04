@@ -16,5 +16,7 @@ namespace Core.ApplicationServices.Authorization
         bool Visit(ImportHierarchyFromStsOrganizationPermission permission);
         bool Visit(BulkAdministerOrganizationUnitRegistrations permission);
         bool Visit(DeleteAnyUserPermission permission);
+
+        bool Visit(ChangeLegalSystemPropertiesPermission permission);
     }
 }

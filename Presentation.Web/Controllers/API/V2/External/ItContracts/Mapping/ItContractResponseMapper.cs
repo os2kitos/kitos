@@ -196,6 +196,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                     Valid = contract.IsActive,
                     ValidFrom = contract.Concluded,
                     ValidTo = contract.ExpirationDate,
+                    RequireValidParent = contract.RequireValidParent,
                     ValidationErrors = contract.Validate().ValidationErrors.Select(x => x.ToItContractValidationErrorChoice()).ToList()
                 }
             };

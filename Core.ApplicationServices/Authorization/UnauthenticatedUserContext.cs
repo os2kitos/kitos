@@ -52,6 +52,11 @@ namespace Core.ApplicationServices.Authorization
             return false;
         }
 
+        public bool IsSystemIntegrator()
+        {
+            return false;
+        }
+
         public bool HasAssignedWriteAccess(IEntity entity)
         {
             return false;

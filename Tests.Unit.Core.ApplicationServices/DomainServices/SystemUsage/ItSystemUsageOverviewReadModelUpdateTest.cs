@@ -166,7 +166,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = A<int>(),
                 Name = A<string>(),
                 Disabled = A<bool>(),
-                Usages = new List<ItSystemUsage>(){ parentItSystemUsage },
+                Usages = new List<ItSystemUsage>() { parentItSystemUsage },
             };
             var system = new ItSystem
             {
@@ -175,7 +175,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Name = A<string>(),
                 Description = A<string>(),
                 Disabled = A<bool>(),
-                PreviousName= A<string>(),
+                PreviousName = A<string>(),
                 Parent = parentSystem,
                 Uuid = A<Guid>(),
                 BelongsTo = new Organization
@@ -196,7 +196,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                         TaskKey = A<string>(),
                         Description = A<string>()
                     }
-                }
+                },
+                ArchiveDuty = A<ArchiveDutyRecommendationTypes>(),
+                ArchiveDutyComment = A<string>(),
             };
             var systemUsage = new ItSystemUsage
             {
@@ -226,11 +228,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Concluded = A<DateTime>(),
                 ArchiveDuty = A<ArchiveDutyTypes>(),
                 Registertype = A<bool>(),
-                riskAssessment = DataOptions.YES,
-                riskAssesmentDate = A<DateTime>(),
-                RiskSupervisionDocumentationUrlName = A<string>(),
-                RiskSupervisionDocumentationUrl = A<string>(),
-                PlannedRiskAssessmentDate = A<DateTime>(),
                 LinkToDirectoryUrlName = A<string>(),
                 LinkToDirectoryUrl = A<string>(),
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>
@@ -250,6 +247,13 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 },
                 LifeCycleStatus = A<LifeCycleStatusType>()
             };
+
+            systemUsage.UpdateRiskAssessment(DataOptions.YES);
+            systemUsage.UpdateRiskAssessmentDate(A<DateTime>());
+            systemUsage.UpdateRiskAssessmentDocumentation(A<string>(), A<string>());
+            systemUsage.UpdatePlannedRiskAssessmentDate(A<DateTime>());
+
+            systemUsage.ContainsAITechnology = A<YesNoUndecidedOption>();
 
             // Add ResponsibleOrganizationUnit
             var responsibleOrgUnitUsage = CreateOrganizationUnitUsage(systemUsage);
@@ -292,7 +296,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             systemUsage.ArchivePeriods = archivePeriods;
 
             systemUsage.ItSystemCategories = new ItSystemCategories
-                { Id = A<int>(), Uuid = A<Guid>(), Name = A<string>() };
+            { Id = A<int>(), Uuid = A<Guid>(), Name = A<string>() };
+            systemUsage.WebAccessibilityCompliance = A<YesNoPartiallyOption>();
+            systemUsage.LastWebAccessibilityCheck = A<DateTime>();
+            systemUsage.WebAccessibilityNotes = A<string>();
 
             var readModel = new ItSystemUsageOverviewReadModel();
 
@@ -333,6 +340,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(systemUsage.ItSystem.Description, readModel.SystemDescription);
             Assert.Equal(systemUsage.DPIA, readModel.DPIAConducted);
             Assert.Equal(systemUsage.isBusinessCritical, readModel.IsBusinessCritical);
+            Assert.Equal(systemUsage.ContainsAITechnology, readModel.ContainsAITechnology);
+            Assert.Equal(systemUsage.WebAccessibilityCompliance, readModel.WebAccessibilityCompliance);
+            Assert.Equal(systemUsage.LastWebAccessibilityCheck, readModel.LastWebAccessibilityCheck);
+            Assert.Equal(systemUsage.WebAccessibilityNotes, readModel.WebAccessibilityNotes);
 
             // Sensitive data levels
             var rmSensitiveDataLevel = Assert.Single(readModel.SensitiveDataLevels);
@@ -352,6 +363,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(system.BusinessType.Id, readModel.ItSystemBusinessTypeId);
             Assert.Equal(system.BusinessType.Uuid, readModel.ItSystemBusinessTypeUuid);
             Assert.Equal(system.BusinessType.Name, readModel.ItSystemBusinessTypeName);
+            Assert.Equal(system.ArchiveDuty, readModel.CatalogArchiveDuty);
+            Assert.Equal(system.ArchiveDutyComment, readModel.CatalogArchiveDutyComment);
 
             //Parent System
             Assert.Equal(parentSystem.Name, readModel.ParentItSystemName);
@@ -592,12 +605,12 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 ObjectOwner = DefaultTestUser,
                 LastChangedByUser = DefaultTestUser,
                 LastChanged = A<DateTime>(),
-                riskAssessment = DataOptions.DONTKNOW,
-                RiskSupervisionDocumentationUrlName = A<string>(),
-                RiskSupervisionDocumentationUrl = A<string>(),
-                PlannedRiskAssessmentDate = A<DateTime>(),
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
             };
+
+            systemUsage.UpdateRiskAssessment(DataOptions.DONTKNOW);
+            systemUsage.UpdateRiskAssessmentDocumentation(A<string>(), A<string>());
+            systemUsage.UpdatePlannedRiskAssessmentDate(A<DateTime>());
 
             var readModel = new ItSystemUsageOverviewReadModel();
 
@@ -656,10 +669,6 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 ObjectOwner = DefaultTestUser,
                 LastChangedByUser = DefaultTestUser,
                 LastChanged = A<DateTime>(),
-                riskAssessment = DataOptions.DONTKNOW,
-                RiskSupervisionDocumentationUrlName = A<string>(),
-                RiskSupervisionDocumentationUrl = A<string>(),
-                PlannedRiskAssessmentDate = A<DateTime>(),
                 AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>()
                 {
                     dpr1,
@@ -669,6 +678,10 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                     dpr5
                 }
             };
+            systemUsage.UpdateRiskAssessment(DataOptions.DONTKNOW);
+            systemUsage.UpdateRiskAssessmentDate(A<DateTime>());
+            systemUsage.UpdateRiskAssessmentDocumentation(A<string>(), A<string>());
+            systemUsage.UpdatePlannedRiskAssessmentDate(A<DateTime>());
 
             var readModel = new ItSystemUsageOverviewReadModel();
 

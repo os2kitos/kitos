@@ -3,7 +3,6 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.UIConfiguration;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
-using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 
 namespace Presentation.Web.Controllers.API.V2.Common.Mapping;

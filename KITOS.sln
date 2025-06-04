@@ -33,26 +33,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Unit.Presentation.Web
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{098F0368-603B-4AF3-80A4-569EAB468147}"
 	ProjectSection(SolutionItems) = preProject
-		.eslintrc = .eslintrc
 		.gitignore = .gitignore
-		bundle.config.js = bundle.config.js
-		gulpfile.js = gulpfile.js
 		InstallSelfSignedCert.ps1 = InstallSelfSignedCert.ps1
-		package.json = package.json
-		paths.config.js = paths.config.js
-		protractor.conf.js = protractor.conf.js
-		protractor.headless.conf.js = protractor.headless.conf.js
-		protractor.headless.parallel.conf.js = protractor.headless.parallel.conf.js
 		README.md = README.md
-		tsconfig.json = tsconfig.json
-		tslint.json = tslint.json
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gulp", "gulp", "{8E3F47CB-D523-461B-A4EE-10CC6650DE8C}"
-	ProjectSection(SolutionItems) = preProject
-		gulp\deploy.js = gulp\deploy.js
-		gulp\linting.js = gulp\linting.js
-		gulp\ui-test.js = gulp\ui-test.js
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{F9AC0D85-511A-4B8A-A7B0-02763A1BC618}"
@@ -75,6 +58,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "Deploy
 		DeploymentScripts\CheckWebsiteVersion.ps1 = DeploymentScripts\CheckWebsiteVersion.ps1
 		DeploymentScripts\DbMigrations.ps1 = DeploymentScripts\DbMigrations.ps1
 		DeploymentScripts\DeploymentSetup.ps1 = DeploymentScripts\DeploymentSetup.ps1
+		DeploymentScripts\DeployPubsubToEnvironment.ps1 = DeploymentScripts\DeployPubsubToEnvironment.ps1
 		DeploymentScripts\DeployWebsite.ps1 = DeploymentScripts\DeployWebsite.ps1
 		DeploymentScripts\DeployWebsiteToEnvironment.ps1 = DeploymentScripts\DeployWebsiteToEnvironment.ps1
 		DeploymentScripts\PrepareCleanDeveloperDatabase.ps1 = DeploymentScripts\PrepareCleanDeveloperDatabase.ps1
@@ -82,11 +66,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "Deploy
 		DeploymentScripts\PrepareLocalDatabase.ps1 = DeploymentScripts\PrepareLocalDatabase.ps1
 		DeploymentScripts\PreparePackage.ps1 = DeploymentScripts\PreparePackage.ps1
 		DeploymentScripts\PrepareProductionDatabase.ps1 = DeploymentScripts\PrepareProductionDatabase.ps1
+		DeploymentScripts\PreparePubsubDatabase.ps1 = DeploymentScripts\PreparePubsubDatabase.ps1
 		DeploymentScripts\PrepareTestDatabase.ps1 = DeploymentScripts\PrepareTestDatabase.ps1
-		DeploymentScripts\RunE2ETests.ps1 = DeploymentScripts\RunE2ETests.ps1
-		DeploymentScripts\RunE2ETestsLocally.ps1 = DeploymentScripts\RunE2ETestsLocally.ps1
-		DeploymentScripts\RunE2ETestsOnIntegration.ps1 = DeploymentScripts\RunE2ETestsOnIntegration.ps1
-		DeploymentScripts\runE2ETestsSingle.ps1 = DeploymentScripts\runE2ETestsSingle.ps1
+		DeploymentScripts\SetupPubsubEnviroment.ps1 = DeploymentScripts\SetupPubsubEnviroment.ps1
 		DeploymentScripts\VpnCli.ps1 = DeploymentScripts\VpnCli.ps1
 	EndProjectSection
 EndProject
@@ -249,7 +231,6 @@ Global
 		{6CD15363-5401-43C5-9479-02FDDFA881DC} = {500B4C1D-B871-49A0-94E7-BD0623101EF6}
 		{5AE358F5-4F11-47FE-94BE-1588F357DCDC} = {500B4C1D-B871-49A0-94E7-BD0623101EF6}
 		{73EA6CFE-4B6A-4F83-BA3F-93F83A08E73A} = {8FD29D91-1CAC-4A14-B085-7631FA4E81DB}
-		{8E3F47CB-D523-461B-A4EE-10CC6650DE8C} = {098F0368-603B-4AF3-80A4-569EAB468147}
 		{F9AC0D85-511A-4B8A-A7B0-02763A1BC618} = {098F0368-603B-4AF3-80A4-569EAB468147}
 		{46D252DC-0BC6-4EA6-B1B8-3896B9F00471} = {8FD29D91-1CAC-4A14-B085-7631FA4E81DB}
 		{4B2D1B6A-F8E5-46EF-BD07-BBD0D3343913} = {1755BABD-3C1F-497A-AB69-9D643B576506}

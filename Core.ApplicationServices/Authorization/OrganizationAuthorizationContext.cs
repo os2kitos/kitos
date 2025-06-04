@@ -111,6 +111,11 @@ namespace Core.ApplicationServices.Authorization
             };
         }
 
+        private bool IsItSystemOrInterface(Type entityType)
+        {
+            return entityType == typeof(ItSystem) || entityType == typeof(ItInterface);
+        }
+
         private bool IsRightsHolderFor(IEntity entity)
         {
             var result = false;
@@ -154,6 +159,11 @@ namespace Core.ApplicationServices.Authorization
         {
             var globalRead = _globalReadAccessPolicy.Allow(entityType) || IsGlobalAdmin();
             if (globalRead)
+            {
+                return EntityReadAccessLevel.All;
+            }
+
+            if (IsItSystemOrInterface(entityType) && HasStakeHolderAccess())
             {
                 return EntityReadAccessLevel.All;
             }
@@ -476,6 +486,11 @@ namespace Core.ApplicationServices.Authorization
         {
             var organization = permission.OptionalOrganizationScopeId;
             return IsGlobalAdmin() || organization.Select(IsLocalAdmin).GetValueOrFallback(false);
+        }
+
+        public bool Visit(ChangeLegalSystemPropertiesPermission permission)
+        {
+            return _activeUserContext.IsSystemIntegrator();
         }
 
         #endregion PERMISSIONS

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel.ItSystem.DataTypes;
+using Core.DomainModel.Shared;
 
 namespace Core.DomainModel.ItSystemUsage.Read
 {
@@ -69,6 +70,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public bool? ParentItSystemDisabled { get; set; }
         public Guid? ParentItSystemUsageUuid { get; set; }
         public string Version { get; set; }
+        public YesNoUndecidedOption? ContainsAITechnology { get; set; }
         public string LocalCallName { get; set; }
         public string LocalSystemId { get; set; }
         public virtual ICollection<ItSystemUsageOverviewRoleAssignmentReadModel> RoleAssignments { get; set; }
@@ -133,5 +135,12 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public DataOptions? DPIAConducted { get; set; }
 
         public DataOptions? IsBusinessCritical { get; set; }
+
+        public ArchiveDutyRecommendationTypes? CatalogArchiveDuty { get; set; }
+        public string CatalogArchiveDutyComment { get; set; }
+
+        public YesNoPartiallyOption? WebAccessibilityCompliance { get; set; }
+        public DateTime? LastWebAccessibilityCheck { get; set; }
+        public string WebAccessibilityNotes { get; set; }
     }
 }

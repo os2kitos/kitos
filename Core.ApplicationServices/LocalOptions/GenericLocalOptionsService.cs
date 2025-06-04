@@ -14,7 +14,7 @@ using Core.DomainServices.Generic;
 namespace Core.ApplicationServices.LocalOptions
 {
     public class GenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType> : IGenericLocalOptionsService<TLocalOptionType, TReferenceType, TOptionType>
-    where TLocalOptionType : LocalOptionEntity<TOptionType>, new ()
+    where TLocalOptionType : LocalOptionEntity<TOptionType>, new()
     where TOptionType : OptionEntity<TReferenceType>
     {
         private readonly IGenericRepository<TOptionType> _optionsRepository;
@@ -25,7 +25,7 @@ namespace Core.ApplicationServices.LocalOptions
 
         public GenericLocalOptionsService(IGenericRepository<TOptionType> optionsRepository,
             IGenericRepository<TLocalOptionType> localOptionRepository,
-            IAuthorizationContext authorizationContext, 
+            IAuthorizationContext authorizationContext,
             IEntityIdentityResolver identityResolver,
             IDomainEvents domainEvents)
         {
@@ -41,15 +41,16 @@ namespace Core.ApplicationServices.LocalOptions
         {
             var globalOptions = GetEnabledGlobalOptionsAsQueryable()
                 .ToList();
-            
-           var localOptions = GetLocalOptionsAsQueryable(organizationUuid)
-                .ToDictionary(x => x.OptionId);
 
-            return IncludeLocalChangesToGlobalOptions(globalOptions, localOptions);
+            var localOptions = GetLocalOptionsAsQueryable(organizationUuid)
+                 .ToDictionary(x => x.OptionId);
+
+            return IncludeLocalChangesToGlobalOptions(globalOptions, localOptions)
+                     .OrderByDescending(x => x.Priority);
         }
 
         private IEnumerable<TOptionType> IncludeLocalChangesToGlobalOptions(IEnumerable<TOptionType> globalOptions, IDictionary<int, TLocalOptionType> localOptions)
-        { 
+        {
             return globalOptions
                 .Select(optionToAdd =>
               {
@@ -116,7 +117,7 @@ namespace Core.ApplicationServices.LocalOptions
                 });
         }
 
-        public Result<TOptionType, OperationError> PatchLocalOption(Guid organizationUuid, Guid globalOptionUuid, LocalOptionUpdateParameters parameters) 
+        public Result<TOptionType, OperationError> PatchLocalOption(Guid organizationUuid, Guid globalOptionUuid, LocalOptionUpdateParameters parameters)
         {
             return GetLocalOptionMaybe(organizationUuid, globalOptionUuid)
                 .Match(localOption => ValidateModify(localOption)
@@ -225,7 +226,7 @@ namespace Core.ApplicationServices.LocalOptions
         }
 
         private IEnumerable<TLocalOptionType> GetLocalOptionsAsQueryable(Guid organizationUuid)
-        { 
+        {
             return _localOptionRepository
                 .AsQueryable()
                 .ByOrganizationUuid(organizationUuid);

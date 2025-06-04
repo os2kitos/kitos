@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Core.ApplicationServices.Model.Authentication;
 using Microsoft.Owin;
 using Owin;
 using Hangfire;
@@ -10,11 +11,11 @@ using Infrastructure.Services.Http;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Web.Hangfire;
 using Presentation.Web.Infrastructure.Middleware;
-using Presentation.Web.Infrastructure.Model.Authentication;
 using Presentation.Web.Ninject;
 using Presentation.Web.Infrastructure.Filters;
 using Presentation.Web.Infrastructure;
 using Infrastructure.DataAccess.Tools;
+using Presentation.Web.Properties;
 
 [assembly: OwinStartup(typeof(Presentation.Web.Startup))]
 namespace Presentation.Web
@@ -32,7 +33,7 @@ namespace Presentation.Web
                 TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateAudience = false,
-                    ValidIssuer = BearerTokenConfig.Issuer,
+                    ValidIssuer = Settings.Default.BaseUrl,
                     ValidateIssuer = true,
                     IssuerSigningKey = BearerTokenConfig.SecurityKey,
                     ValidateIssuerSigningKey = true,
@@ -78,19 +79,19 @@ namespace Presentation.Web
             recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchUpdateStaleSystemUsageRmAsync(CancellationToken.None)),
-                cronExpression: Cron.Daily(), // Every night at 00:00
+                cronExpression: Cron.Daily(2), // Every night at 02:00 (if job runs a 00:00 - date validity check doesn't update correctly)
                 timeZone: TimeZoneInfo.Local);
 
             recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchUpdateStaleContractRmAsync(CancellationToken.None)),
-                cronExpression: Cron.Daily(), // Every night at 00:00
+                cronExpression: Cron.Daily(2), // Every night at 02:00
                 timeZone: TimeZoneInfo.Local);
 
             recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.ScheduleUpdatesForDataProcessingReadModelsWhichChangesActiveState,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchUpdateStaleDataProcessingRegistrationReadModels(CancellationToken.None)),
-                cronExpression: Cron.Daily(), // Every night at 00:00
+                cronExpression: Cron.Daily(2), // Every night at 02:00
                 timeZone: TimeZoneInfo.Local);
 
             recurringJobManager.AddOrUpdate(
@@ -124,6 +125,18 @@ namespace Presentation.Web
             recurringJobManager.AddOrUpdate(
                 recurringJobId: StandardJobIds.PurgeOrphanedHangfireJobs,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchPurgeOrphanedHangfireJobs(CancellationToken.None)),
+                cronExpression: Cron.Never(), //On demand
+                timeZone: TimeZoneInfo.Local);
+
+            recurringJobManager.AddOrUpdate(
+                recurringJobId: StandardJobIds.CreateInitialPublicMessages,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchCreatePublicMessagesTask(CancellationToken.None)),
+                cronExpression: Cron.Never(), //On demand
+                timeZone: TimeZoneInfo.Local);
+
+            recurringJobManager.AddOrUpdate(
+                recurringJobId: StandardJobIds.CreateMainPublicMessage,
+                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchCreateMainPublicMessageTask(CancellationToken.None)),
                 cronExpression: Cron.Never(), //On demand
                 timeZone: TimeZoneInfo.Local);
         }

@@ -8,16 +8,6 @@ namespace Presentation.Web.Extensions
 {
     public static class AutoMapperExtensions
     {
-        public static IMappingExpression<TSource, TDestination> IgnoreDestinationValueFor<TSource, TDestination, TMember>(this IMappingExpression<TSource, TDestination> expr, Expression<Func<TDestination, TMember>> pickMember)
-            where TDestination : IEntity
-        {
-            return expr
-                .ForMember(
-                    destinationMember: pickMember,
-                    memberOptions: options => options.Ignore()
-                );
-        }
-
         /// <summary>
         /// Ensures that IEntity fields are not automatically created by AutoMapper when an input DTO is provided
         /// </summary>

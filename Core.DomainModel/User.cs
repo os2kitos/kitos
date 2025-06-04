@@ -226,6 +226,9 @@ namespace Core.DomainModel
         #region Authentication
 
         public bool IsGlobalAdmin { get; set; }
+
+        public bool IsSystemIntegrator { get; set; }
+
         public Guid Uuid { get; set; }
         public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEvents { get; set; }
 
@@ -233,6 +236,15 @@ namespace Core.DomainModel
         {
             //User can edit themselves
             return Id == user.Id;
+        }
+
+        public void SetSystemIntegratorStatus(bool systemIntegratorStatus)
+        {
+            IsSystemIntegrator = systemIntegratorStatus;
+        }
+        public void SetGlobalAdminStatus(bool globalAdminStatus)
+        {
+            IsGlobalAdmin = globalAdminStatus;
         }
 
         #endregion

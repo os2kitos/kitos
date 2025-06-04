@@ -60,11 +60,32 @@
     <Reference Include="Fare, Version=2.2.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
       <HintPath>..\packages\Fare.2.2.1\lib\net35\Fare.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.6.0.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.4, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.9.0.4\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.HashCode.1.1.1\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.Memory, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.Memory.9.0.0\lib\net462\Microsoft.Bcl.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.TimeProvider, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.TimeProvider.8.0.1\lib\net462\Microsoft.Bcl.TimeProvider.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=2.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.2.1.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Abstractions, Version=8.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Abstractions.8.9.0\lib\net472\Microsoft.IdentityModel.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=8.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.8.9.0\lib\net472\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Logging, Version=8.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Logging.8.9.0\lib\net472\Microsoft.IdentityModel.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.IdentityModel.Tokens, Version=8.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.8.9.0\lib\net472\Microsoft.IdentityModel.Tokens.dll</HintPath>
     </Reference>
     <Reference Include="Moq, Version=4.18.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.18.2\lib\net462\Moq.dll</HintPath>
@@ -82,6 +103,15 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.8.0.0\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=8.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.8.9.0\lib\net472\System.IdentityModel.Tokens.Jwt.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Pipelines, Version=9.0.0.4, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Pipelines.9.0.4\lib\net462\System.IO.Pipelines.dll</HintPath>
+    </Reference>
     <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
     </Reference>
@@ -91,6 +121,12 @@
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=9.0.0.4, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.9.0.4\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=9.0.0.4, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.9.0.4\lib\net462\System.Text.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
@@ -124,13 +160,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Advice\AdviceSequentialTest.cs" />
-    <Compile Include="Advice\AdviceTest.cs" />
-    <Compile Include="Advice\AdviceTestBase.cs" />
-    <Compile Include="Authorization\GetOrganizationsTests.cs" />
+    <Compile Include="Authorization\TokenV2Tests.cs" />
     <Compile Include="Contract\ItContractOverviewReadModelsApiTest.cs" />
-    <Compile Include="Contract\ItContractSequentialTest.cs" />
-    <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Contract\V2\ItContractsInternalApiV2Test.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
     <Compile Include="GDPR\V2\DataProcessingRegistrationInternalAPIV2Test.cs" />
@@ -143,6 +174,8 @@
     <Compile Include="Internal\GdprReport\GdprReportApiV2Test.cs" />
     <Compile Include="Internal\Messages\PublicMessagesApiV2Test.cs" />
     <Compile Include="ItSystem\V2\BaseItSystemsApiV2Test.cs" />
+    <Compile Include="SystemUsage\V2\BaseItSystemUsageApiV2Test.cs" />
+    <Compile Include="ItSystem\V2\LegalPropertiesV2ApiTest.cs" />
     <Compile Include="ItSystem\V2\ItSystemLocalOptionTypesInternalV2ApiTest.cs" />
     <Compile Include="ItSystem\V2\ItSystemsInternalApiV2Test.cs" />
     <Compile Include="ItSystem\V2\ItSystemsApiV2RightsHoldersTest.cs" />
@@ -150,18 +183,20 @@
     <Compile Include="ItSystem\V2\ItSystemUsageMigrationApiV2Test.cs" />
     <Compile Include="Notifications\AlertsApiV2Test.cs" />
     <Compile Include="Notifications\NotificationApiV2Test.cs" />
-    <Compile Include="Options\V1\OptionApiTests.cs" />
     <Compile Include="Organizations\V2\LocalOrganizationUnitRoleOptionTypesInternalV2ApiTest.cs" />
     <Compile Include="Organizations\V2\OrganizationApiV2TestBase.cs" />
     <Compile Include="Organizations\V2\OrganizationGridApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationInternalApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationUnitRegistrationApiV2Test.cs" />
+    <Compile Include="References\ExternalReferenceInternalApiV2Test.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Tools\BaseTest.cs" />
     <Compile Include="Tools\Extensions\StringExtensions.cs" />
+    <Compile Include="Tools\External\LegalItSystemPropertiesV2Helper.cs" />
     <Compile Include="Tools\HelpTextsInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\DPR\DataProcessingRegistrationInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\GdprReportV2Helper.cs" />
@@ -172,17 +207,14 @@
     <Compile Include="Tools\Internal\Notifications\NotificationV2Helper.cs" />
     <Compile Include="Tools\Internal\Organizations\OrganizationInternalV2Helper.cs" />
     <Compile Include="Tools\Internal\Organizations\OrganizationUnitRegistrationV2Helper.cs" />
+    <Compile Include="Tools\Internal\References\ExternalReferencesInternalV2Helper.cs" />
+    <Compile Include="Tools\Internal\References\ExternalReferencesV2Helper.cs" />
     <Compile Include="Tools\Internal\Users\PasswordResetV2Helper.cs" />
     <Compile Include="Tools\Internal\Users\UsersV2Helper.cs" />
-    <Compile Include="Tools\OrganizationGridTestHelper.cs" />
-    <Compile Include="Users\OrganizationRightApiTest.cs" />
-    <Compile Include="Organizations\OrganizationUnitTests.cs" />
-    <Compile Include="Organizations\OrganizationUnitRegistrationTests.cs" />
-    <Compile Include="Organizations\OrganizationSequentialTests.cs" />
+    <Compile Include="Tools\OrganizationGridConfigV2Helper.cs" />
     <Compile Include="Organizations\StsOrganizationSynchronizationApiTest.cs" />
     <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
     <Compile Include="GDPR\V2\DataProcessingRegistrationApiV2Test.cs" />
-    <Compile Include="Tools\LocalOptionHelper.cs" />
     <Compile Include="Tools\External\DeltaFeedV2Helper.cs" />
     <Compile Include="Tools\External\ApiV2HelperPatchPayloadExtensions.cs" />
     <Compile Include="Tools\External\DataProcessingRegistrationV2Helper.cs" />
@@ -191,39 +223,23 @@
     <Compile Include="Options\V2\OptionV2ApiTests.cs" />
     <Compile Include="Interfaces\V2\ItInterfaceApiV2Test.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelsTest.cs" />
-    <Compile Include="GDPR\DataProcessingRegistrationsTest.cs" />
-    <Compile Include="ItSystem\ItSystemUsageGDPRTest.cs" />
-    <Compile Include="ItSystem\SystemRelationsTest.cs" />
     <Compile Include="ItSystem\V2\ItSystemsApiV2Test.cs" />
-    <Compile Include="Kendo\KendoOverviewConfigurationTest.cs" />
     <Compile Include="KLE\KLEDataBridgeTest.cs" />
-    <Compile Include="KLE\KleUpdateIntegrationTests.cs" />
     <Compile Include="KLE\TaskRefIntegrityInput.cs" />
     <Compile Include="Organizations\V2\OrganizationApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationUnitsApiV2Test.cs" />
     <Compile Include="Organizations\V2\OrganizationUserApiV2Test.cs" />
-    <Compile Include="ItSystem\ItSystemTests.cs" />
-    <Compile Include="Interfaces\ItInterfacesTest.cs" />
-    <Compile Include="ItSystem\ItSystemUsageTests.cs" />
-    <Compile Include="LocalAdminArea\LocalConfigTest.cs" />
-    <Compile Include="Organizations\OrganizationTest.cs" />
-    <Compile Include="ItSystem\UsingOrganizationsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Qa\BrokenExternalReferencesReportTest.cs" />
-    <Compile Include="References\ExternalReferencesTest.cs" />
     <Compile Include="Security\AccessibilityTests.cs" />
     <Compile Include="Security\AuthorizationTests.cs" />
     <Compile Include="Security\CSRFProtectionTest.cs" />
     <Compile Include="Swagger\SwaggerDocumentationTest.cs" />
     <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelsTest.cs" />
     <Compile Include="TestEnvironmentValidation\TestEnvironmentTest.cs" />
-    <Compile Include="Tools\AdviceHelper.cs" />
-    <Compile Include="Tools\AuthorizationHelper.cs" />
     <Compile Include="Tools\BrokenExternalReferencesReportHelper.cs" />
     <Compile Include="Tools\DatabaseAccess.cs" />
-    <Compile Include="Tools\DataProcessingRegistrationHelper.cs" />
     <Compile Include="Tools\DisposableExtensions.cs" />
-    <Compile Include="Tools\EntityOptionHelper.cs" />
     <Compile Include="Tools\External\ItContractV2Helper.cs" />
     <Compile Include="Tools\External\ItSystemUsageV2Helper.cs" />
     <Compile Include="Tools\External\KleOptionV2Helper.cs" />
@@ -231,43 +247,20 @@
     <Compile Include="Tools\External\InterfaceV2Helper.cs" />
     <Compile Include="Tools\External\OrganizationUnitV2Helper.cs" />
     <Compile Include="Tools\External\OrganizationUserV2Helper.cs" />
-    <Compile Include="Tools\External\Rights\RightsType.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\HttpCommandAssertionHelper.cs" />
-    <Compile Include="Tools\InterfaceExhibitHelper.cs" />
-    <Compile Include="Tools\InterfaceHelper.cs" />
-    <Compile Include="Tools\Internal\UI_Configuration\UIConfigurationHelper.cs" />
-    <Compile Include="Tools\ItContractHelper.cs" />
-    <Compile Include="Tools\ItSystemHelper.cs" />
-    <Compile Include="Tools\ItSystemUsageHelper.cs" />
-    <Compile Include="Tools\KendoOverviewConfigurationHelper.cs" />
-    <Compile Include="Tools\KitosApiConstants.cs" />
-    <Compile Include="Tools\LocalConfigHelper.cs" />
     <Compile Include="Tools\Model\ApiUserDTO.cs" />
     <Compile Include="Tools\Model\CreateUserDTO.cs" />
     <Compile Include="Tools\Model\CSRFTokenDTO.cs" />
     <Compile Include="Tools\Model\KitosCredentials.cs" />
     <Compile Include="Tools\Model\KitosTestEnvironment.cs" />
     <Compile Include="Tools\Model\OrgRightDTO.cs" />
-    <Compile Include="Tools\Model\RightDTO.cs" />
     <Compile Include="Tools\ObjectCreateHelper.cs" />
-    <Compile Include="Tools\OrganizationHelper.cs" />
-    <Compile Include="Tools\OrganizationRegistrationHelper.cs" />
-    <Compile Include="Tools\OrganizationUnitHelper.cs" />
     <Compile Include="Tools\ReadModelTestTools.cs" />
-    <Compile Include="Tools\ReferencesHelper.cs" />
-    <Compile Include="Tools\External\Rights\RightsHelper.cs" />
-    <Compile Include="Tools\SsoIdentityHelper.cs" />
-    <Compile Include="Tools\SystemRelationHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
     <Compile Include="Tools\External\ItSystemV2Helper.cs" />
     <Compile Include="Tools\External\OrganizationV2Helper.cs" />
-    <Compile Include="Tools\UserHelper.cs" />
     <Compile Include="Tools\XUnit\SequentialTestGroup.cs" />
-    <Compile Include="UI_Configuration\UIConfigurationTests.cs" />
-    <Compile Include="Users\UserPermissionsAPITest.cs" />
-    <Compile Include="Users\UserRolesManagementApiTest.cs" />
-    <Compile Include="Users\UserTest.cs" />
     <Compile Include="Users\V2\PasswordResetInternalApiV2Test.cs" />
     <Compile Include="Users\V2\UserInternalApiV2Test.cs" />
   </ItemGroup>
@@ -283,7 +276,7 @@
       <Name>Core.Abstractions</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
-      <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
+      <Project>{F0986888-8F35-4559-8FBA-428BC9EC9ADD}</Project>
       <Name>Core.ApplicationServices</Name>
     </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
@@ -319,11 +312,10 @@
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Tools\Internal\ItSystem\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

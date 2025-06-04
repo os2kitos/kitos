@@ -2,23 +2,22 @@
 using System.Linq;
 using System.Net;
 using Core.DomainModel.Organization;
-using Core.DomainModel;
-using Presentation.Web.Models.API.V1;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Internal.Response.User;
 using Presentation.Web.Models.API.V2.Request.User;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Internal.Users;
-using Tests.Toolkit.Patterns;
 using Xunit;
 using System;
 using Presentation.Web.Models.API.V2.Internal.Request.User;
 using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
+using Presentation.Web.Models.API.V2.Response.Organization;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Presentation.Web.Models.API.V2.Types.Organization;
 
 namespace Tests.Integration.Presentation.Web.Users.V2
 {
-    public class UserInternalApiV2Test : WithAutoFixture
+    public class UserInternalApiV2Test : BaseTest
     {
         [Fact]
         public async Task Can_Create_User()
@@ -42,7 +41,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var user = await CreateUserAsync(organization.Uuid); ;
+            var user = await CreateUserAsync(organization.Uuid);
 
             //Act
             var response = await UsersV2Helper.SendNotification(organization.Uuid, user.Uuid);
@@ -71,9 +70,9 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var (_, _, token)= await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.GlobalAdmin, organization.Id, true);
+            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.GlobalAdmin, organization.Uuid, true);
             var user = await CreateUserAsync(organization.Uuid);
-            
+
             var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid);
             var parentUnit = Assert.Single(units);
 
@@ -84,6 +83,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             //Act
             var updateRequest = A<UpdateUserRequestDTO>();
             updateRequest.DefaultOrganizationUnitUuid = unit.Uuid;
+            updateRequest.Email = CreateEmail();
             var response = await UsersV2Helper.UpdateUser(organization.Uuid, user.Uuid, updateRequest);
 
             //Assert
@@ -98,7 +98,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             Assert.Equal(request.Email, response.Email);
             Assert.Equal(request.FirstName, response.FirstName);
             Assert.Equal(request.LastName, response.LastName);
-            
+
             AssertBaseUserRequestMatches(request, response);
         }
 
@@ -108,7 +108,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             //Arrange
             var organization = await CreateOrganizationAsync();
             var organization2 = await CreateOrganizationAsync();
-            var user = await CreateUserAsync(organization.Uuid); ;
+            var user = await CreateUserAsync(organization.Uuid);
 
             //Act
             var response = await UsersV2Helper.GetUserByEmail(organization2.Uuid, user.Email);
@@ -139,7 +139,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var result = await UsersV2Helper.CopyRoles(organization.Uuid, fromUser.Uuid, toUser.Uuid, request);
 
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-            
+
         }
 
         [Fact]
@@ -180,7 +180,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var organization2 = await CreateOrganizationAsync();
             var userRequest = CreateCreateUserRequest();
             var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
-            var userUpdateRequest = new 
+            var userUpdateRequest = new
             {
                 Roles = new List<OrganizationRoleChoice> { OrganizationRoleChoice.User }
             };
@@ -207,7 +207,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             var organization2 = await CreateOrganizationAsync();
             var userRequest = CreateCreateUserRequest();
             var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
-            var userUpdateRequest = new 
+            var userUpdateRequest = new
             {
                 Roles = new List<OrganizationRoleChoice> { OrganizationRoleChoice.User }
             };
@@ -250,7 +250,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             //Arrange
             var organization = await CreateOrganizationAsync();
             var userRequest = CreateCreateUserRequest();
-            var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest); 
+            var user = await UsersV2Helper.CreateUser(organization.Uuid, userRequest);
 
             //Act
             var users = await UsersV2Helper.GetUsers(user.Email);
@@ -318,8 +318,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         [Fact]
         public async Task Cannot_Remove_Yourself_As_Global_Admin()
         {
-            var (userId, _, cookie) = await HttpApi.CreateUserAndLogin(A<string>(), OrganizationRole.GlobalAdmin);
-            var userUuid = DatabaseAccess.GetEntityUuid<User>(userId);
+            var (userUuid, _, cookie) = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.GlobalAdmin, DefaultOrgUuid);
 
             var response = await UsersV2Helper.RemoveGlobalAdmin(userUuid, cookie);
 
@@ -362,7 +361,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         [Theory]
         [InlineData(OrganizationRole.User)]
         [InlineData(OrganizationRole.LocalAdmin)]
-        [InlineData(OrganizationRole.GlobalAdmin)] 
+        [InlineData(OrganizationRole.GlobalAdmin)]
         public async Task Only_Global_Admin_Can_Add_Any_Local_Admin(OrganizationRole role)
         {
             var org = await CreateOrganizationAsync();
@@ -400,7 +399,55 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             Assert.True(result.IsSuccessStatusCode);
         }
 
-        private async Task<(OrganizationDTO, UserResponseDTO)> CreateOrgAndUser()
+        [Theory]
+        [InlineData(OrganizationRole.User)]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        public async Task Can_Only_Patch_System_Integrators_As_Global_Admin(OrganizationRole role)
+        {
+            var (_, user) = await CreateOrgAndUser();
+
+            var result = await UsersV2Helper.UpdateSystemIntegrator(user.Uuid, A<bool>(), role);
+
+            var isGlobalAdmin = role == OrganizationRole.GlobalAdmin;
+            Assert.Equal(isGlobalAdmin, result.IsSuccessStatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Get_System_Integrators()
+        {
+            var (_, user) = await CreateOrgAndUser();
+            await UsersV2Helper.UpdateSystemIntegrator(user.Uuid, true);
+
+            var result = await UsersV2Helper.GetSystemIntegrators();
+
+            Assert.Contains(user.Uuid, result.Select(x => x.Uuid));
+        }
+
+        [Fact]
+        public async Task Can_Set_Default_Unit()
+        {
+            var (organization, user) = await CreateOrgAndUser();
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token.Token, organization.Uuid);
+            var parentUnit = Assert.Single(units);
+
+            var unit = await OrganizationUnitV2Helper.CreateUnitAsync(organization.Uuid, new CreateOrganizationUnitRequestDTO
+            {
+                Name = A<string>(),
+                Origin = A<OrganizationUnitOriginChoice>(),
+                ParentUuid = parentUnit.Uuid,
+                LocalId = A<string>()
+            });
+
+            await UsersV2Helper.SetDefaultUnit(organization.Uuid, user.Uuid, unit.Uuid);
+
+            var defaultUnit = await UsersV2Helper.GetDefaultUnit(organization.Uuid, user.Uuid);
+
+            Assert.Equal(unit.Uuid, defaultUnit.Uuid);
+        }
+
+        private async Task<(ShallowOrganizationResponseDTO, UserResponseDTO)> CreateOrgAndUser()
         {
             var org = await CreateOrganizationAsync();
             var user = await CreateUserAsync(org.Uuid);
@@ -413,7 +460,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             Assert.Equal(request.FirstName, response.FirstName);
             Assert.Equal(request.LastName, response.LastName);
             Assert.Equal(unitUuid, response.DefaultOrganizationUnit.Uuid);
-            
+
             AssertBaseUserRequestMatches(request, response);
         }
 
@@ -438,28 +485,9 @@ namespace Tests.Integration.Presentation.Web.Users.V2
             }
         }
 
-        private async Task<UserResponseDTO> CreateUserAsync(Guid organizationUuid)
-        {
-            return await UsersV2Helper.CreateUser(organizationUuid, CreateCreateUserRequest());
-        }
-        
-
-        private async Task<OrganizationDTO> CreateOrganizationAsync()
-        {
-            var organizationName = CreateName();
-            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
-                organizationName, "11224455", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
-            return organization;
-        }
-
         private string CreateName()
         {
             return $"{nameof(UserInternalApiV2Test)}{A<string>()}";
-        }
-
-        private string CreateEmail()
-        {
-            return $"{CreateName()}@kitos.dk";
         }
 
         private async Task<UserResponseDTO> CreateUserWithRoleAsync(Guid organizationUuid, OrganizationRoleChoice role)

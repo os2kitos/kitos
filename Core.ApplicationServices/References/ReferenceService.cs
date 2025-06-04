@@ -66,7 +66,7 @@ namespace Core.ApplicationServices.References
         {
             return GetRootEntityAndCheckWriteAccess(rootId, rootType)
                 .Bind(root => root
-                    .AddExternalReference(new ExternalReference {Created = _operationClock.Now}
+                    .AddExternalReference(new ExternalReference { Created = _operationClock.Now }
                         .Transform(x => MapPropertiesToExternalReference(x, externalReferenceProperties))
                     )
                     .Match<Result<ExternalReference, OperationError>>
@@ -223,16 +223,13 @@ namespace Core.ApplicationServices.References
                     {
                         var masterReferencesCount = referenceList.Count(x => x.MasterReference);
 
-                        switch (masterReferencesCount)
+                        if(masterReferencesCount > 1)
                         {
-                            case < 1:
-                                return new OperationError("A master reference must be defined", OperationFailure.BadInput);
-                            case > 1:
-                                return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
+                            return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
                         }
-
+                        
                         //Order to make sure the first update occurs on the future master reference. In that way, we cannot get into a situation where we temporarily have no master ref (update will fail)
-                        var referencesWithMasterAsHead = referenceList.OrderByDescending(r=>r.MasterReference).ToList();
+                        var referencesWithMasterAsHead = referenceList.OrderByDescending(r => r.MasterReference).ToList();
                         foreach (var externalReferenceProperties in referencesWithMasterAsHead)
                         {
                             //Replace references, which are identified by the update using uuids

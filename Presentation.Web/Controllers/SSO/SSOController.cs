@@ -54,7 +54,7 @@ namespace Presentation.Web.Controllers.SSO
             //Redirect to front page
             var uriBuilder = new UriBuilder(Request.RequestUri)
             {
-                Path = "Home/SsoAuthenticated"
+                Path = "ui"
             };
             return Redirect(uriBuilder.Uri);
         }
@@ -63,7 +63,7 @@ namespace Presentation.Web.Controllers.SSO
         {
             var uriBuilder = new UriBuilder(Request.RequestUri)
             {
-                Path = "Home/SsoError",
+                Path = "ui",
                 Query = $"ssoErrorCode={error:G}"
             };
             return Redirect(uriBuilder.Uri);

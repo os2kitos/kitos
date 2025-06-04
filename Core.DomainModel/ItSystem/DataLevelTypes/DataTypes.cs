@@ -30,5 +30,6 @@
         UNDECIDED = 0,
         ONPREMISE = 1,
         EXTERNAL = 2,
+        HYBRID = 3,
     }
 }

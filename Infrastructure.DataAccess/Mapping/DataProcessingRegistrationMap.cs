@@ -69,6 +69,10 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.Uuid)
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_DataProcessingRegistration_Uuid", 0);
+
+            HasOptional(x => x.ResponsibleOrganizationUnit)
+                .WithMany(x => x.ResponsibleForDataProcessingRegistrations)
+                .HasForeignKey(t => t.ResponsibleOrganizationUnitId);
         }
     }
 }

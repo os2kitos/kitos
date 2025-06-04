@@ -27,6 +27,7 @@ using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Events;
+using Core.DomainServices.Generic;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -49,6 +50,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IItInterfaceService> _interfaceServiceMock;
         private readonly Mock<IItSystemUsageService> _systemUsageServiceMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
+        private readonly Mock<IEntityIdentityResolver> _entityIdentityResolver;
 
         public ItSystemServiceTest()
         {
@@ -66,6 +68,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _interfaceServiceMock = new Mock<IItInterfaceService>();
             _systemUsageServiceMock = new Mock<IItSystemUsageService>();
             _organizationServiceMock = new Mock<IOrganizationService>();
+            _entityIdentityResolver = new Mock<IEntityIdentityResolver>();
             _sut = new ItSystemService(
                 _systemRepository.Object,
                 _authorizationContext.Object,
@@ -80,7 +83,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 Mock.Of<IOperationClock>(),
                 _interfaceServiceMock.Object,
                 _systemUsageServiceMock.Object,
-                _organizationServiceMock.Object
+                _organizationServiceMock.Object,
+                _entityIdentityResolver.Object
                 );
         }
 
@@ -1297,6 +1301,56 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
+        public void Can_Get_Hierarchy_By_Uuid()
+        {
+            //Arrange
+            var (root, createdItSystems) = CreateHierarchy();
+
+            ExpectAllowReadsReturns(root, true);
+            ExpectGetSystemReturns(root.Id, root);
+            ExpectResolveIdReturns<ItSystem>(root.Uuid, root.Id);
+
+            //Act
+            var result = _sut.GetCompleteHierarchyByUuid(root.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var hierarchy = result.Value.ToList();
+            Assert.Equal(createdItSystems.Count, hierarchy.Count);
+
+            foreach (var node in hierarchy)
+            {
+                var system = createdItSystems.FirstOrDefault(x => x.Id == node.Id);
+                Assert.NotNull(system);
+                if (node.Id == root.Id)
+                {
+                    Assert.Null(node.Parent);
+                }
+                else
+                {
+                    Assert.NotNull(node.Parent);
+                    Assert.Equal(node.Parent.Id, system.Parent.Id);
+                }
+            }
+        }
+
+        [Fact]
+        public void Get_Hierarchy_By_Uuid_Return_NotFound()
+        {
+            //Arrange
+            var (root, _) = CreateHierarchy();
+
+            ExpectResolveIdReturns<ItSystem>(root.Uuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.GetCompleteHierarchyByUuid(root.Uuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
         public void Activate_Returns_Ok()
         {
             //Arrange
@@ -1439,7 +1493,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var uuid = A<Guid>();
-            var itSystem = new ItSystem { Uuid = uuid, AccessModifier = AccessModifier.Public};
+            var itSystem = new ItSystem { Uuid = uuid, AccessModifier = AccessModifier.Public };
             ExpectGetSystemReturns(uuid, itSystem);
             ExpectAllowReadsReturns(itSystem, read);
             ExpectAllowModifyReturns(itSystem, modify);
@@ -1462,14 +1516,12 @@ namespace Tests.Unit.Presentation.Web.Services
         [InlineData(true, false, false, true, true)]
         [InlineData(true, false, true, false, true)]
         [InlineData(true, true, false, false, true)]
-        [InlineData(true, true, true, true, true)]
-        [InlineData(true, true, true, true, false)]
         [InlineData(true, true, true, true, false)]
         public void Can_Get_Permissions_With_Deletion_Conflicts_And_Visibility(bool allowDelete, bool withUsages, bool withChildren, bool withExposures, bool withEditVisibilityPermission)
         {
             //Arrange
             var uuid = A<Guid>();
-            var itSystem = new ItSystem { Uuid = uuid, AccessModifier = AccessModifier.Public};
+            var itSystem = new ItSystem { Uuid = uuid, AccessModifier = AccessModifier.Public };
             ExpectGetSystemReturns(uuid, itSystem);
             ExpectAllowReadsReturns(itSystem, true);
             ExpectAllowModifyReturns(itSystem, true);
@@ -1547,6 +1599,21 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(error.FailureType, result.Error.FailureType);
         }
 
+        [Fact]
+        public void Stakeholders_Can_Read_All_ItSystems()
+        {
+            var localSystem = new ItSystem { Organization = CreateOrganization(), AccessModifier = AccessModifier.Local };
+            var publicSystem = new ItSystem { Organization = CreateOrganization(), AccessModifier = AccessModifier.Public };
+            var systems = new List<ItSystem> { localSystem, publicSystem };
+            ExpectGetSystemsReturns(systems);
+            ExpectGetUserOrganizationIdsReturns(A<int>());
+            ExpectUserIsStakeholder();
+
+            var result = _sut.GetAvailableSystems();
+
+            Assert.Equal(2, result.Count());
+        }
+
         private (ItSystem root, IReadOnlyList<ItSystem> createdItSystems) CreateHierarchy()
         {
             var root = CreateSystem();
@@ -1560,6 +1627,12 @@ namespace Tests.Unit.Presentation.Web.Services
             child.Parent = root;
 
             return (root, new List<ItSystem> { root, child, grandchild });
+        }
+
+        private void ExpectUserIsStakeholder()
+        {
+            ExpectGetCrossLevelOrganizationAccessReturns(CrossOrganizationDataReadAccessLevel.Public); //Access level of stakeholders
+            _userContext.Setup(x => x.HasStakeHolderAccess()).Returns(true);
         }
 
         private void UpdateName_Fails_With_BadInput(string newName)
@@ -1626,7 +1699,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private Organization CreateOrganization()
         {
-            return new() { Id = A<int>(), Name = A<string>() };
+            return new() { Id = A<int>(), Uuid = A<Guid>(), Name = A<string>() };
         }
 
         private ItSystem CreateSystem(int? organizationId = null, AccessModifier accessModifier = AccessModifier.Local, int? belongsToId = null, string name = null)
@@ -1655,7 +1728,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private ItSystemUsage CreateSystemUsage(Organization organization)
         {
-            return new() { Id = A<int>(), Organization = organization, ItSystem = new ItSystem{Name = A<string>()}};
+            return new() { Id = A<int>(), Organization = organization, ItSystem = new ItSystem { Name = A<string>() } };
         }
 
         private ItInterfaceExhibit CreateInterfaceExhibit()
@@ -1687,6 +1760,11 @@ namespace Tests.Unit.Presentation.Web.Services
         private void ExpectGetSystemReturns(int id, ItSystem system)
         {
             _systemRepository.Setup(x => x.GetSystem(id)).Returns(system);
+        }
+
+        private void ExpectResolveIdReturns<T>(Guid uuid, Maybe<int> result) where T : class, IHasUuid, IHasId
+        {
+            _entityIdentityResolver.Setup(x => x.ResolveDbId<T>(uuid)).Returns(result);
         }
 
         private void ExpectGetSystemReturns(Guid id, Maybe<ItSystem> system)

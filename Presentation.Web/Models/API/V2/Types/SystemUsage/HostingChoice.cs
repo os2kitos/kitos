@@ -8,5 +8,6 @@
         /// Cloud etc.
         /// </summary>
         External = 2,
+        Hybrid = 3,
     }
 }

@@ -5,6 +5,7 @@ using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
+using System.Collections.Generic;
 
 namespace Core.ApplicationServices.SystemUsage.Write
 {

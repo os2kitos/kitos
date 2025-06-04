@@ -11,6 +11,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
+using Core.DomainModel.Shared;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
@@ -18,6 +19,7 @@ using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
@@ -398,6 +400,21 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 ValidTo = rule.MustUpdate(x => x.General.Validity.ValidTo)
                     ? (source.Validity?.ValidTo?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<DateTime>>.None,
+
+                ContainsAITechnology = rule.MustUpdate(x => x.General.ContainsAITechnology)
+                    ? (source.ContainsAITechnology?.ToYesNoUndecidedOption() ?? Maybe<YesNoUndecidedOption>.None).AsChangedValue()
+                    : OptionalValueChange<Maybe<YesNoUndecidedOption>>.None,
+                WebAccessibilityCompliance = rule.MustUpdate(x => x.General.WebAccessibilityCompliance)
+                    ? source.WebAccessibilityCompliance.FromNullableValueType().Select(x => x.ToYesNoPartiallyOption()).AsChangedValue()
+                    : OptionalValueChange<Maybe<YesNoPartiallyOption>>.None,
+
+                LastWebAccessibilityCheck = rule.MustUpdate(x => x.General.LastWebAccessibilityCheck)
+                    ? source.LastWebAccessibilityCheck.FromNullableValueType().AsChangedValue()
+                    : OptionalValueChange<Maybe<DateTime>>.None,
+
+                WebAccessibilityNotes = rule.MustUpdate(x => x.General.WebAccessibilityNotes)
+                    ? source.WebAccessibilityNotes.AsChangedValue()
+                    : OptionalValueChange<string>.None,
             };
         }
 

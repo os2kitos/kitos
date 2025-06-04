@@ -26,6 +26,11 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// </summary>
         public DateTime? ValidTo { get; set; }
         /// <summary>
+        /// Determines if the parent contract should be part of the contracts validation
+        /// </summary>
+        [Required]
+        public bool RequireValidParent { get; set; }
+        /// <summary>
         /// Reasons as to why the contract is considered to be invalid
         /// </summary>
         public IEnumerable<ItContractValidationErrorChoice> ValidationErrors { get; set; }

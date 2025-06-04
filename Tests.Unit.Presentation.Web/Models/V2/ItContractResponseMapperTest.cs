@@ -84,6 +84,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.False(validity.EnforcedValid);
             Assert.Null(validity.ValidFrom);
             Assert.Null(validity.ValidTo);
+            Assert.Equal(contract.RequireValidParent, validity.RequireValidParent);
 
             var procurement = dto.Procurement;
             Assert.Null(procurement.ProcurementStrategy);
@@ -512,7 +513,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             {
                 Id = A<int>(),
                 Name = A<string>(),
-                Uuid = A<Guid>()
+                Uuid = A<Guid>(),
+                RequireValidParent = A<bool>()
             };
         }
 

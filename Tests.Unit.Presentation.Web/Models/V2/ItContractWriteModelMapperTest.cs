@@ -98,7 +98,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedGeneralDataPropertiesInput()
         {
-            return CreateGetUndefinedSectionsInput(9);
+            return CreateGetUndefinedSectionsInput(10);
         }
 
         public static IEnumerable<object[]> GetUndefinedProcurementPropertiesInput()
@@ -223,11 +223,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noEnforceValid,
             bool noValidFrom,
             bool noValidTo,
-            bool noCriticalityTypeUuid)
+            bool noCriticalityTypeUuid,
+            bool noRequireValidParent)
         {
             //Arrange
             var input = new CreateNewContractRequestDTO();
-            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo, noCriticalityTypeUuid);
+            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo, noCriticalityTypeUuid, noRequireValidParent);
 
             //Act
             var output = _sut.FromPOST(input).General.Value;
@@ -241,6 +242,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noEnforceValid, output.EnforceValid.IsUnchanged);
             Assert.Equal(noValidFrom, output.ValidFrom.IsUnchanged);
             Assert.Equal(noValidTo, output.ValidTo.IsUnchanged);
+            Assert.Equal(noRequireValidParent, output.RequireValidParent.IsUnchanged);
             Assert.Equal(noCriticalityTypeUuid, output.CriticalityUuid.IsUnchanged);
         }
 
@@ -255,11 +257,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noEnforceValid,
             bool noValidFrom,
             bool noValidTo,
-            bool noCriticalityTypeUuid)
+            bool noCriticalityTypeUuid, bool noRequireValidParent)
         {
             //Arrange
             var input = new UpdateContractRequestDTO();
-            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo, noCriticalityTypeUuid);
+            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo, noCriticalityTypeUuid, noRequireValidParent);
 
             //Act
             var output = _sut.FromPATCH(input).General.Value;
@@ -287,11 +289,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noEnforceValid,
             bool noValidFrom,
             bool noValidTo,
-            bool noCriticalityTypeUuid)
+            bool noCriticalityTypeUuid, bool noRequireValidParent)
         {
             //Arrange
             var input = new UpdateContractRequestDTO();
-            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo, noCriticalityTypeUuid);
+            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo, noCriticalityTypeUuid, noRequireValidParent);
 
             //Act
             var output = _sut.FromPUT(input).General.Value;
@@ -1433,6 +1435,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.Validity.ValidFrom, AssertPropertyContainsDataChange(output.ValidFrom));
             Assert.Equal(input.Validity.ValidTo, AssertPropertyContainsDataChange(output.ValidTo));
             Assert.Equal(input.Validity.EnforcedValid, AssertPropertyContainsDataChange(output.EnforceValid));
+            Assert.Equal(input.Validity.RequireValidParent, AssertPropertyContainsDataChange(output.RequireValidParent));
             Assert.Equal(input.CriticalityUuid, AssertPropertyContainsDataChange(output.CriticalityUuid));
         }
 
@@ -1511,7 +1514,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noEnforceValid,
             bool noValidFrom,
             bool noValidTo,
-            bool noCriticalityTypeUuid)
+            bool noCriticalityTypeUuid,
+            bool noRequireValidParent)
         {
             var sectionProperties = GetAllInputPropertyNames<ContractGeneralDataWriteRequestDTO>();
             var validitySectionProperties = GetAllInputPropertyNames<ContractValidityWriteRequestDTO>();
@@ -1526,12 +1530,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noEnforceValid) validitySectionProperties.Remove(nameof(ContractValidityWriteRequestDTO.EnforcedValid));
             if (noValidFrom) validitySectionProperties.Remove(nameof(ContractValidityWriteRequestDTO.ValidFrom));
             if (noValidTo) validitySectionProperties.Remove(nameof(ContractValidityWriteRequestDTO.ValidTo));
+            if (noRequireValidParent) validitySectionProperties.Remove(nameof(ContractValidityWriteRequestDTO.RequireValidParent));
 
             _currentHttpRequestMock
                 .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.General).WrapAsEnumerable().AsParameterMatch()))
                 .Returns(sectionProperties);
             _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateContractRequestDTO.General), nameof(ContractWriteRequestDTO.General.Validity)}.AsParameterMatch()))
+                .Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateContractRequestDTO.General), nameof(ContractWriteRequestDTO.General.Validity) }.AsParameterMatch()))
                 .Returns(validitySectionProperties);
         }
 
@@ -1648,7 +1653,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination).WrapAsEnumerable().AsParameterMatch()))
                 .Returns(sectionProperties);
             _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateContractRequestDTO.Termination), nameof(UpdateContractRequestDTO.Termination.Terms)}.AsParameterMatch()))
+                .Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateContractRequestDTO.Termination), nameof(UpdateContractRequestDTO.Termination.Terms) }.AsParameterMatch()))
                 .Returns(termsSectionProperties);
         }
     }

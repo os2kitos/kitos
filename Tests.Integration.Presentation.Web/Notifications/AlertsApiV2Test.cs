@@ -1,26 +1,21 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
-using Core.DomainModel;
-using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models.API.V2.Request.User;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Internal.Notifications;
 using Tests.Integration.Presentation.Web.Tools.Internal.Users;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Notifications
 {
-    public class AlertsApiV2Test : WithAutoFixture
+    public class AlertsApiV2Test : BaseTest
     {
         [Fact]
         public async Task Can_Not_Get_User_Alerts_If_Not_Current_User()
         {
-            var org = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
-                A<string>(),
-                "12345678", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var org = await CreateOrganizationAsync();
             var userRequest = A<CreateUserRequestDTO>();
             userRequest.Email = $"{A<string>()}@{A<string>()}.dk";
             var user = await UsersV2Helper.CreateUser(org.Uuid, userRequest);

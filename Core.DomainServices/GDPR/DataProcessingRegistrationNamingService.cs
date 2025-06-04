@@ -61,7 +61,6 @@ namespace Core.DomainServices.GDPR
                         .GetValueOrFallback(inputQuery)
                     )
                 .Any();
-            ;
         }
     }
 }

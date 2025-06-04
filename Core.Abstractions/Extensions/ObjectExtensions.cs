@@ -11,7 +11,7 @@ namespace Core.Abstractions.Extensions
             return src == null ? Maybe<T>.None : Maybe<T>.Some(src);
         }
 
-        public static Maybe<T> FromNullableValueType<T>(this T? src) where T:struct
+        public static Maybe<T> FromNullableValueType<T>(this T? src) where T : struct
         {
             return src == null ? Maybe<T>.None : Maybe<T>.Some(src.Value);
         }
@@ -33,6 +33,11 @@ namespace Core.Abstractions.Extensions
         public static IEnumerable<T> WrapAsEnumerable<T>(this T source)
         {
             yield return source;
+        }
+
+        public static T? GetValueOrNull<T>(this Maybe<T> source) where T : struct
+        {
+            return source.HasValue ? source.Value : null;
         }
     }
 }

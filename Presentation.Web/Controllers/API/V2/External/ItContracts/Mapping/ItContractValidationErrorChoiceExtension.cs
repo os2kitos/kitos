@@ -13,7 +13,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             (
                 (ItContractValidationErrorChoice.EndDatePassed, ItContractValidationError.EndDatePassed),
                 (ItContractValidationErrorChoice.StartDateNotPassed, ItContractValidationError.StartDateNotPassed),
-                (ItContractValidationErrorChoice.TerminationPeriodExceeded, ItContractValidationError.TerminationPeriodExceeded)
+                (ItContractValidationErrorChoice.TerminationPeriodExceeded, ItContractValidationError.TerminationPeriodExceeded),
+                (ItContractValidationErrorChoice.InvalidParentContract, ItContractValidationError.InvalidParentContract)
             );
         }
 

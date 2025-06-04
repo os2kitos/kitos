@@ -20,6 +20,7 @@ using Core.DomainModel.KLE;
 using Core.DomainModel.Qa.References;
 using Core.DomainModel.SSO;
 using Core.DomainModel.Notification;
+using Core.DomainModel.PublicMessage;
 using Core.DomainModel.Tracking;
 using Core.DomainModel.UIConfiguration;
 using Infrastructure.DataAccess.Tools;
@@ -83,6 +84,7 @@ namespace Infrastructure.DataAccess
         public DbSet<TerminationDeadlineType> TerminationDeadlineTypes { get; set; }
         public DbSet<TaskRef> TaskRefs { get; set; }
         public DbSet<Text> Texts { get; set; }
+        public DbSet<PublicMessage> PublicMessages { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<ArchivePeriod> ArchivePeriods { get; set; }
         public DbSet<LocalAgreementElementType> LocalAgreementElementTypes { get; set; }
@@ -213,6 +215,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new TaskRefMap());
             modelBuilder.Configurations.Add(new TextMap());
+            modelBuilder.Configurations.Add(new PublicMessageMap());
             modelBuilder.Configurations.Add(new TerminationDeadlineTypeMap());
             modelBuilder.Configurations.Add(new UserMap());
             modelBuilder.Configurations.Add(new ArchivePeriodMap());

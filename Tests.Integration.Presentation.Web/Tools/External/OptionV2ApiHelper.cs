@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Options;
+using Tests.Toolkit.Extensions;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
@@ -77,6 +78,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             using var response = await HttpApi.GetWithTokenAsync(url, token.Token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<RoleOptionExtendedResponseDTO>();
+        }
+
+        public static async Task<IdentityNamePairResponseDTO> GetRandomOptionAsync(string resource, Guid organizationUuid)
+        {
+            var options = await GetOptionsAsync(resource, organizationUuid, 25, 0);
+            return options.RandomItem();
         }
     }
 }

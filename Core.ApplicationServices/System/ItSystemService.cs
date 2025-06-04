@@ -20,6 +20,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
@@ -50,6 +51,7 @@ namespace Core.ApplicationServices.System
         private readonly IItInterfaceService _interfaceService;
         private readonly IItSystemUsageService _systemUsageService;
         private readonly IOrganizationService _organizationService;
+        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
         public ItSystemService(
             IItSystemRepository itSystemRepository,
@@ -65,7 +67,8 @@ namespace Core.ApplicationServices.System
             IOperationClock operationClock,
             IItInterfaceService interfaceService,
             IItSystemUsageService systemUsageService,
-            IOrganizationService organizationService)
+            IOrganizationService organizationService,
+            IEntityIdentityResolver entityIdentityResolver)
         {
             _itSystemRepository = itSystemRepository;
             _authorizationContext = authorizationContext;
@@ -81,6 +84,7 @@ namespace Core.ApplicationServices.System
             _interfaceService = interfaceService;
             _systemUsageService = systemUsageService;
             _organizationService = organizationService;
+            _entityIdentityResolver = entityIdentityResolver;
         }
 
         public Result<ItSystem, OperationError> GetSystem(Guid uuid)
@@ -109,18 +113,8 @@ namespace Core.ApplicationServices.System
         public IQueryable<ItSystem> GetAvailableSystems(params IDomainQuery<ItSystem>[] conditions)
         {
             var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
-            var refinement = Maybe<IDomainQuery<ItSystem>>.None;
 
-            if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
-            {
-                var rightsHoldingOrganizations = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
-
-                refinement = new QueryByRightsHolderIdOrOwnOrganizationIds(rightsHoldingOrganizations, _userContext.OrganizationIds);
-            }
-            else if (accessLevel < CrossOrganizationDataReadAccessLevel.All)
-            {
-                refinement = new QueryAllByRestrictionCapabilities<ItSystem>(accessLevel, _userContext.OrganizationIds);
-            }
+            var refinement = GetQueryRefinement(accessLevel);
 
             var mainQuery = _itSystemRepository.GetSystems();
 
@@ -129,6 +123,23 @@ namespace Core.ApplicationServices.System
                 .GetValueOrFallback(mainQuery);
 
             return conditions.Any() ? new IntersectionQuery<ItSystem>(conditions).Apply(refinedResult) : refinedResult;
+        }
+
+        private Maybe<IDomainQuery<ItSystem>> GetQueryRefinement(CrossOrganizationDataReadAccessLevel accessLevel)
+        {
+
+            if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
+            {
+                var rightsHoldingOrganizations = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
+
+                return new QueryByRightsHolderIdOrOwnOrganizationIds(rightsHoldingOrganizations, _userContext.OrganizationIds);
+            }
+            if (accessLevel < CrossOrganizationDataReadAccessLevel.All && !_userContext.HasStakeHolderAccess())
+            {
+                return new QueryAllByRestrictionCapabilities<ItSystem>(accessLevel, _userContext.OrganizationIds);
+            }
+
+            return Maybe<IDomainQuery<ItSystem>>.None;
         }
 
         public IQueryable<ItSystem> GetAvailableSystems(int organizationId, string optionalNameSearch = null)
@@ -149,6 +160,15 @@ namespace Core.ApplicationServices.System
             return itSystems;
         }
 
+        public Result<IEnumerable<ItSystem>, OperationError> GetCompleteHierarchyByUuid(Guid systemUuid)
+        {
+            return _entityIdentityResolver.ResolveDbId<ItSystem>(systemUuid)
+                .Match
+                (
+                    GetCompleteHierarchy,
+                    () => new OperationError($"System with uuid: {systemUuid} was not found", OperationFailure.NotFound)
+                );
+        }
         public Result<IEnumerable<ItSystem>, OperationError> GetCompleteHierarchy(int systemId)
         {
             return GetSystem(systemId)
@@ -329,7 +349,7 @@ namespace Core.ApplicationServices.System
             return GetSystem(uuid).Transform(GetPermissions);
         }
 
-        private Result<SystemPermissions, OperationError> GetPermissions(Result<ItSystem,OperationError> systemResult)
+        private Result<SystemPermissions, OperationError> GetPermissions(Result<ItSystem, OperationError> systemResult)
         {
             return systemResult
                 .Transform

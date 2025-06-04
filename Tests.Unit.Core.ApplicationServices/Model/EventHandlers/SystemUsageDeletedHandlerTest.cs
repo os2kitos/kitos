@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Core.DomainModel.Events;
+﻿using Core.DomainModel.Events;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Model.EventHandlers;

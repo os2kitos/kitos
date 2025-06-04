@@ -7,7 +7,8 @@ using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
-using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Internal.Response.OrganizationUnit;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
@@ -15,12 +16,11 @@ using Presentation.Web.Models.API.V2.Types.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Extensions;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Organizations.V2
 {
-    public class OrganizationUnitsApiV2Test : WithAutoFixture
+    public class OrganizationUnitsApiV2Test : BaseTest
     {
         [Fact]
         public async Task GET_OrganizationUnits()
@@ -29,9 +29,9 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var organization = await CreateOrganizationAsync();
             var taskRef = DatabaseAccess.MapFromEntitySet<TaskRef, TaskRef>(refs => refs.AsQueryable().First());
             var (_, token) = await CreateApiUser(organization);
-            var unit1 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName());
-            var unit1_1 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName(), unit1.Id);
-            var unit2 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName());
+            var unit1 = await CreateOrganizationUnitAsync(organization.Uuid);
+            var unit1_1 = await CreateOrganizationUnitAsync(organization.Uuid, parentUnitUuid: unit1.Uuid);
+            var unit2 = await CreateOrganizationUnitAsync(organization.Uuid);
 
             //Act
             var units = (await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid)).ToList();
@@ -50,12 +50,12 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var rootUnitUnfo = DatabaseAccess.MapFromEntitySet<OrganizationUnit, (Guid, string)>(units => units.AsQueryable().ByOrganizationId(organization.Id).First(x => x.Parent == null).Transform(root => (root.Uuid, root.Name)));
+            var rootUnitUnfo = DatabaseAccess.MapFromEntitySet<OrganizationUnit, (Guid, string)>(units => units.AsQueryable().ByOrganizationUuid(organization.Uuid).First(x => x.Parent == null).Transform(root => (root.Uuid, root.Name)));
             var (_, token) = await CreateApiUser(organization);
             var nameContent = $"_S_{A<uint>() % 10000}_E_";
-            var matched1 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, $"{nameContent}{CreateName()}");
-            await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName(), matched1.Id); //unmatched
-            var matched2 = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, $"{CreateName()}{nameContent}");
+            var matched1 = await CreateOrganizationUnitAsync(organization.Uuid, $"{nameContent}/{CreateName()}");
+            await CreateOrganizationUnitAsync(organization.Uuid, CreateName(), matched1.Uuid); //unmatched
+            var matched2 = await CreateOrganizationUnitAsync(organization.Uuid, $"{CreateName()}/{nameContent}");
 
             //Act
             var units = (await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid, nameQuery: nameContent)).ToList();
@@ -100,9 +100,9 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var rootUnitUnfo = DatabaseAccess.MapFromEntitySet<OrganizationUnit, (Guid, string)>(units => units.AsQueryable().ByOrganizationId(organization.Id).First(x => x.Parent == null).Transform(root => (root.Uuid, root.Name)));
+            var rootUnitUnfo = DatabaseAccess.MapFromEntitySet<OrganizationUnit, (Guid, string)>(units => units.AsQueryable().ByOrganizationUuid(organization.Uuid).First(x => x.Parent == null).Transform(root => (root.Uuid, root.Name)));
             var (_, token) = await CreateApiUser(organization);
-            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, CreateName());
+            var unit = await CreateOrganizationUnitAsync(organization.Uuid);
 
             //Act
             var dto = await OrganizationUnitV2Helper.GetOrganizationUnitAsync(token, organization.Uuid, unit.Uuid);
@@ -118,13 +118,13 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var organization1 = await CreateOrganizationAsync();
             var organization2 = await CreateOrganizationAsync();
             var (_, token) = await CreateApiUser(organization2);
-            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization1.Id, CreateName());
+            var unit = await CreateOrganizationUnitAsync(organization1.Uuid);
 
             //Act - try to get unit from organization where I have no access
             using var response = await OrganizationUnitV2Helper.SendGetOrganizationUnitAsync(token, organization1.Uuid, unit.Uuid);
 
             //Assert
-            Assert.Equal(HttpStatusCode.Forbidden,response.StatusCode);
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
         [Fact]
@@ -164,8 +164,8 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             //Arrange
             var organization = await CreateOrganizationAsync();
             var email = CreateEmail();
-            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, role, organization.Id);
-            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, A<string>());
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, role, organization.Uuid);
+            var unit = await CreateOrganizationUnitAsync(organization.Uuid);
 
             //Act
             var accessRights = await OrganizationV2Helper.GetUnitAccessRights(organization.Uuid, unit.Uuid, cookie);
@@ -192,8 +192,8 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             //Arrange
             var organization = await CreateOrganizationAsync();
             var email = CreateEmail();
-            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, role, organization.Id);
-            var unit = await OrganizationHelper.CreateOrganizationUnitAsync(organization.Id, A<string>());
+            var (_, _, cookie) = await HttpApi.CreateUserAndLogin(email, role, organization.Uuid);
+            var unit = await CreateOrganizationUnitAsync(organization.Uuid);
 
             //Act
             var accessRightsList = await OrganizationV2Helper.GetUnitAccessRightsForOrganization(organization.Uuid, cookie);
@@ -288,7 +288,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var testUnit = await OrganizationUnitV2Helper.CreateUnitAsync(organization.Uuid, createRequest);
 
             //Act
-            var deleteResult = await OrganizationUnitV2Helper.DeleteUnitAsync(organization.Uuid, testUnit.Uuid);
+            using var deleteResult = await OrganizationUnitV2Helper.SendDeleteUnitAsync(organization.Uuid, testUnit.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, deleteResult.StatusCode);
@@ -304,14 +304,14 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
             var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token.Token, organization.Uuid);
             var unit = Assert.Single(units);
-             
-            var user = await CreateUser(organization.Id);
-            var orgUnitRoles =  await GetOrganizationUnitRoleTypesAsync(organization.Uuid);
+
+            var user = await CreateUser(organization.Uuid);
+            var orgUnitRoles = await GetOrganizationUnitRoleTypesAsync(organization.Uuid);
             var role = orgUnitRoles.RandomItem();
-            var createRequest = new CreateOrganizationUnitRoleAssignmentRequestDTO { UserUuid = user.Uuid, RoleUuid = role.Uuid};
-            
+            var createRequest = new CreateOrganizationUnitRoleAssignmentRequestDTO { UserUuid = user.Uuid, RoleUuid = role.Uuid };
+
             //Act
-            var createResponse = await OrganizationUnitV2Helper.CreateRoleAssignmentAsync(organization.Uuid, unit.Uuid, createRequest);
+            using var createResponse = await OrganizationUnitV2Helper.SendCreateRoleAssignmentAsync(organization.Uuid, unit.Uuid, createRequest);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, createResponse.StatusCode);
@@ -324,14 +324,82 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             //Step2 Delete Role
             //Arrange
             var deleteRequest = new DeleteOrganizationUnitRoleAssignmentRequestDTO
-                { UserUuid = user.Uuid, RoleUuid = role.Uuid };
+            { UserUuid = user.Uuid, RoleUuid = role.Uuid };
 
             //Act
-            var deleteResponse =
-                await OrganizationUnitV2Helper.DeleteRoleAssignmentAsync(organization.Uuid, unit.Uuid, deleteRequest);
+            using var deleteResponse =
+                await OrganizationUnitV2Helper.SendDeleteRoleAssignmentAsync(organization.Uuid, unit.Uuid, deleteRequest);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Create_Bulk_Role_Assignment()
+        {
+            //Step 1 Create Role
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token.Token, organization.Uuid);
+            var unit = Assert.Single(units);
+
+            var user1 = await CreateUser(organization.Uuid);
+            var user2 = await CreateUser(organization.Uuid);
+            var orgUnitRoles = await GetOrganizationUnitRoleTypesAsync(organization.Uuid);
+            var role1 = orgUnitRoles.RandomItem();
+            var assignment = new BulkRoleAssignmentRequestDTO
+            { RoleUuid = role1.Uuid, UserUuids = new List<Guid> { user1.Uuid, user2.Uuid } };
+
+            //Act
+            using var createResponse = await OrganizationUnitV2Helper.SendCreateBulkRoleAssignmentAsync(organization.Uuid, unit.Uuid, assignment);
+            using var duplicateResponse = await OrganizationUnitV2Helper.SendCreateBulkRoleAssignmentAsync(organization.Uuid, unit.Uuid, assignment);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, duplicateResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, createResponse.StatusCode);
+            var getRightsResult = await OrganizationUnitV2Helper.GetUnitRolesAsync(organization.Uuid, unit.Uuid);
+            var roles = getRightsResult.ToList();
+            Assert.Equal(2, roles.Count);
+            foreach (var role in roles)
+            {
+                Assert.True(MatchExpectedBulkAssignment(role, assignment));
+            }
+        }
+
+        [Fact]
+        public async Task Consecutive_Bulk_Role_Assignments_Does_Not_Override_Previous_Role_Assignments()
+        {
+            var organization = await CreateOrganizationAsync();
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var units = await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token.Token, organization.Uuid);
+            var unit = Assert.Single(units);
+
+            var user1 = await CreateUser(organization.Uuid);
+            var user2 = await CreateUser(organization.Uuid);
+            var userUuids = new List<Guid> { user1.Uuid, user2.Uuid };
+            var orgUnitRoles = await GetOrganizationUnitRoleTypesAsync(organization.Uuid);
+            var role1 = orgUnitRoles.First();
+            var role2 = orgUnitRoles.Last();
+            var assignment1 = new BulkRoleAssignmentRequestDTO { RoleUuid = role1.Uuid, UserUuids = userUuids };
+            var assignment2 = new BulkRoleAssignmentRequestDTO { RoleUuid = role2.Uuid, UserUuids = userUuids };
+
+            //Act
+            using var firstCreation = await OrganizationUnitV2Helper.SendCreateBulkRoleAssignmentAsync(organization.Uuid, unit.Uuid, assignment1);
+            using var secondCreation =
+                await OrganizationUnitV2Helper.SendCreateBulkRoleAssignmentAsync(organization.Uuid, unit.Uuid,
+                    assignment2);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, firstCreation.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, secondCreation.StatusCode);
+            var getRightsResult = await OrganizationUnitV2Helper.GetUnitRolesAsync(organization.Uuid, unit.Uuid);
+            Assert.Equal(4, getRightsResult.Count());
+        }
+
+        private static bool MatchExpectedBulkAssignment(OrganizationUnitRolesResponseDTO actual, BulkRoleAssignmentRequestDTO expected)
+        {
+            return actual.RoleAssignment.Role.Uuid == expected.RoleUuid && expected.UserUuids.Contains(actual.RoleAssignment.User.Uuid);
         }
 
         private async Task<IEnumerable<IdentityNamePairResponseDTO>> GetOrganizationUnitRoleTypesAsync(Guid orgUuid)
@@ -340,24 +408,18 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                 orgUuid, 10, 0);
         }
 
-        private async Task<User> CreateUser(int orgId)
+        private async Task<User> CreateUser(Guid organizationUuid)
         {
-            var userId = await HttpApi.CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(CreateEmail(), false), OrganizationRole.User, orgId);
-            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userId));
+            var userResponse = await CreateUserAsync(organizationUuid);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userResponse.Uuid));
             return user;
         }
 
-        private async Task<(User user, string token)> CreateApiUser(OrganizationDTO organization)
+        private async Task<(User user, string token)> CreateApiUser(ShallowOrganizationResponseDTO organization)
         {
-            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
-            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
+            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Uuid, true, false);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userAndGetToken.userUuid));
             return (user, userAndGetToken.token);
-        }
-
-        private async Task<OrganizationDTO> CreateOrganizationAsync()
-        {
-            var organizationName = CreateName();
-            return await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, organizationName, null, A<OrganizationTypeKeys>(), AccessModifier.Public);
         }
 
         private CreateOrganizationUnitRequestDTO CreateCreateRequest(Guid parentUuid)
@@ -376,23 +438,18 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             return $"{nameof(OrganizationUnitsApiV2Test)}æøå{A<Guid>():N}";
         }
 
-        private string CreateEmail()
-        {
-            return $"{CreateName()}{DateTime.Now.Ticks}@kitos.dk";
-        }
-
-        private static void AssertCreatedOrganizationUnit(IEnumerable<OrganizationUnitResponseDTO> allUnits, OrgUnitDTO expectedUnit, (Guid Uuid, string Name) expectedRoot, params TaskRef[] kle)
+        private static void AssertCreatedOrganizationUnit(IEnumerable<OrganizationUnitResponseDTO> allUnits, OrganizationUnitResponseDTO expectedUnit, (Guid Uuid, string Name) expectedRoot, params TaskRef[] kle)
         {
             var dto = Assert.Single(allUnits.Where(x => x.Uuid == expectedUnit.Uuid));
             AssertCreatedOrganizationUnit(dto, expectedUnit, expectedRoot);
         }
 
-        private static void AssertCreatedOrganizationUnit(OrganizationUnitResponseDTO dto, OrgUnitDTO expectedUnit, (Guid Uuid, string Name) expectedRoot)
+        private static void AssertCreatedOrganizationUnit(OrganizationUnitResponseDTO dto, OrganizationUnitResponseDTO expectedUnit, (Guid Uuid, string Name) expectedRoot)
         {
             Assert.Equal(expectedRoot.Uuid, dto.ParentOrganizationUnit?.Uuid);
             Assert.Equal(expectedRoot.Name, dto.ParentOrganizationUnit?.Name);
             Assert.Equal(expectedUnit.Ean, dto.Ean);
-            Assert.Equal(expectedUnit.LocalId, dto.UnitId);
+            Assert.Equal(expectedUnit.UnitId, dto.UnitId);
         }
     }
 }

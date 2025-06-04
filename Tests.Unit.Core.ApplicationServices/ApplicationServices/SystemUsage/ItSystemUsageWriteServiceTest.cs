@@ -26,6 +26,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
@@ -1474,21 +1475,21 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var technicalPrecautionsInPlace = A<DataOptions?>();
             var technicalPrecautions = Many<TechnicalPrecaution>().Distinct().ToList();
             var technicalPrecautionsDocumentation = A<NamedLink>();
-            var userSupervision = A<DataOptions?>();
+            DataOptions? userSupervision = DataOptions.YES;
             var supervisionDate = A<DateTime?>();
             var supervisionDoc = A<NamedLink>();
-            var riskAssessmentConducted = A<DataOptions?>();
+            DataOptions? riskAssessmentConducted = DataOptions.YES;
             var riskAssessmentDate = A<DateTime?>();
             var riskAssessmentDoc = A<NamedLink>();
             var riskAssessmentNotes = A<string>();
             var plannedRiskAssessmentDate = A<DateTime?>();
             var riskAssessmentResult = A<RiskLevel?>();
-            var dpiaConducted = A<DataOptions?>();
+            DataOptions? dpiaConducted = DataOptions.YES;
             var dpiaDate = A<DateTime?>();
             var dpiaDoc = A<NamedLink>();
-            var retentionPeriod = A<DataOptions?>();
             var nextEvaluationDate = A<DateTime?>();
             var evaluationFrequency = A<int?>();
+            DataOptions? retentionPeriodDefined = DataOptions.YES;
             var gdprInput = new UpdatedSystemUsageGDPRProperties
             {
                 Purpose = purpose.AsChangedValue(),
@@ -1513,7 +1514,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 DPIAConducted = dpiaConducted.AsChangedValue(),
                 DPIADate = dpiaDate.AsChangedValue(),
                 DPIADocumentation = dpiaDoc.FromNullable().AsChangedValue(),
-                RetentionPeriodDefined = retentionPeriod.AsChangedValue(),
+                RetentionPeriodDefined = retentionPeriodDefined.AsChangedValue(),
                 NextDataRetentionEvaluationDate = nextEvaluationDate.AsChangedValue(),
                 DataRetentionEvaluationFrequencyInMonths = evaluationFrequency.AsChangedValue()
             };
@@ -1538,6 +1539,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(technicalPrecautionsInPlace, itSystemUsage.precautions);
             Assert.Equal(technicalPrecautions.OrderBy(x => x), itSystemUsage.GetTechnicalPrecautions().OrderBy(x => x));
             AssertLink(technicalPrecautionsDocumentation, itSystemUsage.TechnicalSupervisionDocumentationUrlName, itSystemUsage.TechnicalSupervisionDocumentationUrl);
+            Assert.NotNull(itSystemUsage.UserSupervision);
             Assert.Equal(userSupervision, itSystemUsage.UserSupervision);
             Assert.Equal(supervisionDate, itSystemUsage.UserSupervisionDate);
             AssertLink(supervisionDoc, itSystemUsage.UserSupervisionDocumentationUrlName, itSystemUsage.UserSupervisionDocumentationUrl);
@@ -1549,7 +1551,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(dpiaConducted, itSystemUsage.DPIA);
             Assert.Equal(dpiaDate, itSystemUsage.DPIADateFor);
             AssertLink(dpiaDoc, itSystemUsage.DPIASupervisionDocumentationUrlName, itSystemUsage.DPIASupervisionDocumentationUrl);
-            Assert.Equal(retentionPeriod, itSystemUsage.answeringDataDPIA);
+            Assert.Equal(retentionPeriodDefined, itSystemUsage.answeringDataDPIA);
             Assert.Equal(nextEvaluationDate, itSystemUsage.DPIAdeleteDate);
             Assert.Equal(evaluationFrequency, itSystemUsage.numberDPIA);
         }
@@ -1587,8 +1589,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             var precautions = Many<TechnicalPrecaution>().Distinct().ToList();
             precautions.Add(precautions.First()); //Add duplicate
+            DataOptions? technicalPrecautionsInPlace = DataOptions.YES;
             var gdprInput = new UpdatedSystemUsageGDPRProperties
             {
+                TechnicalPrecautionsInPlace = technicalPrecautionsInPlace.AsChangedValue(),
                 TechnicalPrecautionsApplied = precautions.FromNullable<IEnumerable<TechnicalPrecaution>>().AsChangedValue(),
             };
 
@@ -1731,7 +1735,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var organizationUuid = A<Guid>();
             var error = A<OperationError>();
 
-            ExpectGetSystemReturns(systemUuid, new ItSystem{Uuid = systemUuid, Id = A<int>()});
+            ExpectGetSystemReturns(systemUuid, new ItSystem { Uuid = systemUuid, Id = A<int>() });
             ExpectGetOrganizationReturns(organizationUuid, error);
             //Act
             var resultError = _sut.DeleteByItSystemAndOrganizationUuids(systemUuid, organizationUuid);
@@ -1750,7 +1754,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var usageUuid = A<Guid>();
             var system = new ItSystem { Uuid = systemUuid, Id = A<int>() };
             var organization = new Organization { Uuid = organizationUuid, Id = A<int>() };
-            var usage = new ItSystemUsage { Uuid = usageUuid, Id= A<int>() };
+            var usage = new ItSystemUsage { Uuid = usageUuid, Id = A<int>() };
             var error = A<OperationError>();
 
             ExpectGetSystemReturns(systemUuid, system);
@@ -1775,7 +1779,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var usageUuid = A<Guid>();
             var system = new ItSystem { Uuid = systemUuid, Id = A<int>() };
             var organization = new Organization { Uuid = organizationUuid, Id = A<int>() };
-            var usage = new ItSystemUsage { Uuid = usageUuid, Id= A<int>() };
+            var usage = new ItSystemUsage { Uuid = usageUuid, Id = A<int>() };
 
             ExpectGetSystemReturns(systemUuid, system);
             ExpectGetOrganizationReturns(organizationUuid, organization);
@@ -1788,7 +1792,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(resultError.IsNone);
         }
-        
+
         [Fact]
         public void Can_Update_All_On_Empty_ItSystemUsage()
         {
@@ -2002,7 +2006,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden,result.Error.FailureType);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]
@@ -2019,7 +2023,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectUpdateArchivePeriodReturns(itSystemUsage.Id, periodUuid, updatedProperties.StartDate, updatedProperties.EndDate, updatedProperties.ArchiveId, updatedProperties.Approved, new ArchivePeriod());
 
             //Act
-            var result = _sut.UpdateJournalPeriod(itSystemUsage.Uuid, periodUuid,updatedProperties);
+            var result = _sut.UpdateJournalPeriod(itSystemUsage.Uuid, periodUuid, updatedProperties);
 
             //Assert
             Assert.True(result.Ok);
@@ -2804,6 +2808,58 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(expectedFailure, result.Error.FailureType);
         }
 
+        [Fact]
+        public void Can_Update_Web_Accessibility_Properties()
+        {
+            var usage = new ItSystemUsage { Uuid = A<Guid>() };
+            var org = new Organization { Uuid = A<Guid>() };
+            SetupSimpleUpdate(usage, org);
+            var parameters = new SystemUsageUpdateParameters { GeneralProperties = new UpdatedSystemUsageGeneralProperties { WebAccessibilityCompliance = A<YesNoPartiallyOption>().FromNullable().AsChangedValue(), LastWebAccessibilityCheck = A<DateTime>().FromNullable().AsChangedValue(), WebAccessibilityNotes = A<string>().AsChangedValue() } };
+
+            var result = _sut.Update(usage.Uuid, parameters);
+
+            Assert.True(result.Ok);
+            var updatedSystem = result.Value;
+            var generalProperties = parameters.GeneralProperties.Value;
+            Assert.Equal(generalProperties.WebAccessibilityCompliance.NewValue, updatedSystem.WebAccessibilityCompliance);
+            Assert.Equal(generalProperties.LastWebAccessibilityCheck.NewValue, updatedSystem.LastWebAccessibilityCheck);
+            Assert.Equal(generalProperties.WebAccessibilityNotes.NewValue, updatedSystem.WebAccessibilityNotes);
+        }
+
+        [Fact]
+        public void Can_Reset_Web_Accessibility_Properties()
+        {
+            var usage = new ItSystemUsage { Uuid = A<Guid>(), WebAccessibilityCompliance = A<YesNoPartiallyOption>(), LastWebAccessibilityCheck = A<DateTime>(), WebAccessibilityNotes = A<string>() };
+            var org = new Organization { Uuid = A<Guid>() };
+            SetupSimpleUpdate(usage, org);
+            var parameters = new SystemUsageUpdateParameters
+            {
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
+                {
+                    WebAccessibilityCompliance = Maybe<YesNoPartiallyOption>.None.AsChangedValue(),
+                    LastWebAccessibilityCheck = Maybe<DateTime>.None.AsChangedValue(),
+                    WebAccessibilityNotes =
+                ((string)null).AsChangedValue()
+                }
+            };
+
+            var result = _sut.Update(usage.Uuid, parameters);
+
+            Assert.True(result.Ok);
+            var updatedSystem = result.Value;
+            Assert.Null(updatedSystem.WebAccessibilityCompliance);
+            Assert.Null(updatedSystem.LastWebAccessibilityCheck);
+            Assert.Null(updatedSystem.WebAccessibilityNotes);
+        }
+
+        private void SetupSimpleUpdate(ItSystemUsage usage, Organization org)
+        {
+            ExpectGetOrganizationReturns(org.Uuid, org);
+            ExpectGetSystemUsageReturns(usage.Uuid, usage);
+            ExpectAllowModifyReturns(usage, true);
+            ExpectTransaction();
+        }
+
         private void ExpectAddExternalReferenceReturns(int usageId, ExternalReferenceProperties properties, Result<ExternalReference, OperationError> result)
         {
             _referenceServiceMock.Setup(x => x.AddReference(usageId, ReferenceRootType.SystemUsage, properties)).Returns(result);
@@ -2851,15 +2907,18 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(generalProperties.LocalSystemId.NewValue, actual.LocalSystemId);
             Assert.Equal(generalProperties.SystemVersion.NewValue, actual.Version);
             Assert.Equal(generalProperties.Notes.NewValue, actual.Note);
+
             if (shouldBeEmpty)
             {
                 Assert.Null(actual.Concluded);
                 Assert.Null(actual.ExpirationDate);
+                Assert.Null(actual.ContainsAITechnology);
             }
             else
             {
                 Assert.Equal(generalProperties.ValidFrom.NewValue.Value.Date, actual.Concluded);
                 Assert.Equal(generalProperties.ValidTo.NewValue.Value.Date, actual.ExpirationDate);
+                Assert.Equal(generalProperties.ContainsAITechnology.NewValue, actual.ContainsAITechnology);
             }
 
             //Archiving
@@ -2916,6 +2975,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithSimpleParametersAdded()
         {
+            DataOptions? userSupervision = DataOptions.YES;
+            DataOptions? technicalPrecautionsInPlace = DataOptions.YES;
+            DataOptions? riskAssessment = DataOptions.YES;
+            DataOptions? dpiaConcluded = DataOptions.YES;
+            DataOptions? retentionPeriodDefined = DataOptions.YES;
             return new SystemUsageUpdateParameters
             {
                 GeneralProperties = new UpdatedSystemUsageGeneralProperties
@@ -2926,7 +2990,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     Notes = A<string>().AsChangedValue(),
                     LifeCycleStatus = A<LifeCycleStatusType?>().AsChangedValue(),
                     ValidFrom = Maybe<DateTime>.Some(DateTime.Now).AsChangedValue(),
-                    ValidTo = Maybe<DateTime>.Some(DateTime.Now.AddDays(Math.Abs(A<short>()))).AsChangedValue()
+                    ValidTo = Maybe<DateTime>.Some(DateTime.Now.AddDays(Math.Abs(A<short>()))).AsChangedValue(),
+                    ContainsAITechnology = Maybe<YesNoUndecidedOption>.Some(A<YesNoUndecidedOption>()).AsChangedValue(),
                 },
                 Archiving = new UpdatedSystemUsageArchivingParameters
                 {
@@ -2942,21 +3007,21 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     BusinessCritical = A<DataOptions?>().AsChangedValue(),
                     HostedAt = A<HostedAt?>().AsChangedValue(),
                     DirectoryDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
-                    TechnicalPrecautionsInPlace = A<DataOptions?>().AsChangedValue(),
+                    TechnicalPrecautionsInPlace = technicalPrecautionsInPlace.AsChangedValue(),
                     TechnicalPrecautionsDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
-                    UserSupervision = A<DataOptions?>().AsChangedValue(),
+                    UserSupervision = userSupervision.AsChangedValue(),
                     UserSupervisionDate = A<DateTime?>().AsChangedValue(),
                     UserSupervisionDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
-                    RiskAssessmentConducted = A<DataOptions?>().AsChangedValue(),
+                    RiskAssessmentConducted = riskAssessment.AsChangedValue(),
                     RiskAssessmentConductedDate = A<DateTime?>().AsChangedValue(),
                     RiskAssessmentDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
                     RiskAssessmentNotes = A<string>().AsChangedValue(),
                     PlannedRiskAssessmentDate = A<DateTime?>().AsChangedValue(),
                     RiskAssessmentResult = A<RiskLevel?>().AsChangedValue(),
-                    DPIAConducted = A<DataOptions?>().AsChangedValue(),
+                    DPIAConducted = dpiaConcluded.AsChangedValue(),
                     DPIADate = A<DateTime?>().AsChangedValue(),
                     DPIADocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
-                    RetentionPeriodDefined = A<DataOptions?>().AsChangedValue(),
+                    RetentionPeriodDefined = retentionPeriodDefined.AsChangedValue(),
                     NextDataRetentionEvaluationDate = A<DateTime?>().AsChangedValue(),
                     DataRetentionEvaluationFrequencyInMonths = A<int?>().AsChangedValue()
                 }
@@ -2975,7 +3040,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     Notes = "".AsChangedValue(),
                     LifeCycleStatus = new ChangedValue<LifeCycleStatusType?>(null),
                     ValidFrom = new ChangedValue<Maybe<DateTime>>(Maybe<DateTime>.None),
-                    ValidTo = new ChangedValue<Maybe<DateTime>>(Maybe<DateTime>.None)
+                    ValidTo = new ChangedValue<Maybe<DateTime>>(Maybe<DateTime>.None),
+                    ContainsAITechnology = new ChangedValue<Maybe<YesNoUndecidedOption>>(Maybe<YesNoUndecidedOption>.None)
                 },
                 Archiving = new UpdatedSystemUsageArchivingParameters
                 {
@@ -2999,7 +3065,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     RiskAssessmentConducted = new ChangedValue<DataOptions?>(null),
                     RiskAssessmentConductedDate = new ChangedValue<DateTime?>(null),
                     RiskAssessmentDocumentation = new ChangedValue<Maybe<NamedLink>>(Maybe<NamedLink>.None),
-                    RiskAssessmentNotes = "".AsChangedValue(),
+                    RiskAssessmentNotes = new ChangedValue<string>(null),
                     PlannedRiskAssessmentDate = new ChangedValue<DateTime?>(null),
                     RiskAssessmentResult = new ChangedValue<RiskLevel?>(null),
                     DPIAConducted = new ChangedValue<DataOptions?>(null),
@@ -3204,17 +3270,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 Name = A<string>(),
                 OrganizationId = organization.Id,
                 Organization = organization
-            };
-        }
-
-        private static SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithoutData()
-        {
-            return new SystemUsageUpdateParameters
-            {
-                Roles = new UpdatedSystemUsageRoles()
-                {
-                    UserRolePairs = Maybe<IEnumerable<UserRolePair>>.None.AsChangedValue()
-                }.FromNullable()
             };
         }
 

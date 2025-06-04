@@ -1,4 +1,4 @@
-Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $mailSuffix, $baseUrl, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost, $stsIssuer, $stsCertificateEndpoint, $serviceCertificateAliasOrg, $stsCertificateAlias, $stsCertificateThumbprint, $orgService6EntityId, $stsAdressePort, $stsBrugerPort, $stsPersonPort, $stsVirksomhedPort, $stsOrganisationPort, $stsOrganisationSystemPort, $stsOrganisationCertificateThumbprint, $robotsFileName, $smtpNetworkPort, $smtpNetworkUsername, $smtpNetworkPassword) {
+Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $mailSuffix, $baseUrl, $kitosEnvName, $buildNumber, $kitosDbConnectionString, $hangfireConnectionString, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost, $stsIssuer, $stsCertificateEndpoint, $serviceCertificateAliasOrg, $stsCertificateAlias, $stsCertificateThumbprint, $orgService6EntityId, $stsAdressePort, $stsBrugerPort, $stsPersonPort, $stsVirksomhedPort, $stsOrganisationPort, $stsOrganisationSystemPort, $stsOrganisationCertificateThumbprint, $robotsFileName, $smtpNetworkPort, $smtpNetworkUsername, $smtpNetworkPassword, $pubSubBaseUrl) {
     
     $msdeploy = "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe";
 
@@ -19,7 +19,6 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
                     "-skip:objectname=`"dirPath`",absolutepath=`"Default Web \Site\\App_Data$`" " + 
                     "-setParamFile:`"{1}\Presentation.Web.SetParameters.xml`" -allowUntrusted " + 
                     "-setParam:name=`"serilog:minimum-level`",value=`"{5}`" " + 
-                    "-setParam:name=`"serilog:write-to:Elasticsearch.nodeUris`",value=`"{6}`" " + 
                     "-setParam:name=`"SecurityKeyString`",value=`"{7}`" " + 
                     "-setParam:name=`"SmtpFromEmail`",value=`"{8}`" " + 
                     "-setParam:name=`"SmtpNetworkHost`",value=`"{9}`" " + 
@@ -53,8 +52,9 @@ Function Deploy-Website($packageDirectory, $msDeployUrl, $msDeployUser, $msDeplo
                     "-setParam:name=`"StsVirksomhedPort`",value=`"{37}`" " +
                     "-setParam:name=`"StsOrganisationPort`",value=`"{38}`" " +
                     "-setParam:name=`"StsOrganisationSystemPort`",value=`"{39}`" " +
-                    "-setParam:name=`"StsOrganisationCertificateThumbprint`",value=`"{40}`" ") `
-    -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $kitosContext, $hangfireContext, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost, $robotsFileName, $smtpNetworkPort, $smtpNetworkUsername, $smtpNetworkPassword, $stsIssuer, $stsCertificateEndpoint, $serviceCertificateAliasOrg, $stsCertificateAlias, $stsCertificateThumbprint, $orgService6EntityId, $stsAdressePort, $stsBrugerPort, $stsPersonPort, $stsVirksomhedPort, $stsOrganisationPort, $stsOrganisationSystemPort, $stsOrganisationCertificateThumbprint)
+                    "-setParam:name=`"StsOrganisationCertificateThumbprint`",value=`"{40}`" " +
+                    "-setParam:name=`"PubSubBaseUrl`",value=`"{41}`" ") `
+    -f $msdeploy, $packageDirectory, $msDeployUrl, $msDeployUser, $msDeployPassword, $logLevel, $esUrl, $securityKeyString, $smtpFromMail, $smtpNwHost, $resetPwTtl, $baseUrl, $mailSuffix, $kitosEnvName, $buildNumber, $kitosContext, $hangfireContext, $defaultUserPassword, $useDefaultUserPassword, $ssoServiceProviderServer, $ssoIDPEndPoints, $ssoServiceProviderId, $ssoCertificateThumbPrint, $stsOrganisationEndpointHost, $robotsFileName, $smtpNetworkPort, $smtpNetworkUsername, $smtpNetworkPassword, $stsIssuer, $stsCertificateEndpoint, $serviceCertificateAliasOrg, $stsCertificateAlias, $stsCertificateThumbprint, $orgService6EntityId, $stsAdressePort, $stsBrugerPort, $stsPersonPort, $stsVirksomhedPort, $stsOrganisationPort, $stsOrganisationSystemPort, $stsOrganisationCertificateThumbprint, $pubSubBaseUrl)
     
     & cmd.exe /C $fullCommand
  

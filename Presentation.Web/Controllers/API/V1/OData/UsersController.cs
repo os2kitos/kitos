@@ -145,7 +145,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdUser = _userService.AddUser(user, sendMailOnCreation, organizationId, false);
+            var createdUser = _userService.AddUser(user, sendMailOnCreation, organizationId);
 
             return Created(createdUser);
         }

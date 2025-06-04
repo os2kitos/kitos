@@ -121,7 +121,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 
         [HttpPost]
         [Route("create")]
-        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(IdentityNamePairResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ShallowOrganizationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -129,7 +129,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         {
             var parameters = _organizationWriteModelMapper.ToOrganizationCreateParameters(request);
             return _organizationWriteService.CreateOrganization(parameters)
-                .Select(org => new IdentityNamePairResponseDTO(org.Uuid, org.Name))
+                .Select(x => x.MapShallowOrganizationResponseDTO())
                 .Match(MapOrgCreatedResponse, FromOperationError);
         }
 
@@ -186,7 +186,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         public IHttpActionResult PatchOrganizationMasterData([FromUri] [NonEmptyGuid] Guid organizationUuid, OrganizationMasterDataRequestDTO requestDto)
         {
             if (!ModelState.IsValid) return BadRequest();
-            
+
             var updateParameters = _organizationWriteModelMapper.ToMasterDataUpdateParameters(requestDto);
             return _organizationWriteService.PatchMasterData(organizationUuid, updateParameters)
                 .Select(_organizationResponseMapper.ToMasterDataDTO)

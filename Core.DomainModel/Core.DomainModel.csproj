@@ -38,9 +38,25 @@
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.8.0.0\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
@@ -60,17 +76,20 @@
     <Compile Include="Constants\ExternalConnectionConstants.cs" />
     <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
     <Compile Include="Commands\RemoveUserFromOrganizationCommand.cs" />
+    <Compile Include="Events\EntityUpdatedEventWithSnapshot.cs" />
     <Compile Include="Extensions\CommandBusExtensions.cs" />
     <Compile Include="Extensions\ExternalOrganizationUnitExtensions.cs" />
     <Compile Include="Extensions\HierarchyExtensions.cs" />
     <Compile Include="Extensions\StsOrganizationUnitExtensions.cs" />
     <Compile Include="GDPR\ChangeHasSubDataProcessorsResult.cs" />
+    <Compile Include="GDPR\DprSnapshot.cs" />
     <Compile Include="GDPR\SubDataProcessor.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationValidationError.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationValidationResult.cs" />
     <Compile Include="GDPR\Events\DataProcessingRegistrationRemovedFromItContractEvent.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
     <Compile Include="IHasReadonlyName.cs" />
+    <Compile Include="ISnapshot.cs" />
     <Compile Include="ISupportsUserSpecificAccessControl.cs" />
     <Compile Include="ItContract\CriticalityType.cs" />
     <Compile Include="ItContract\ItContractValidationCategory.cs" />
@@ -99,6 +118,7 @@
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewItContractReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewRelevantOrgUnitReadModel.cs" />
     <Compile Include="ItSystemUsage\TechnicalPrecaution.cs" />
+    <Compile Include="ItSystem\ItSystemSnapshot.cs" />
     <Compile Include="KendoConfig\KendoColumnConfiguration.cs" />
     <Compile Include="LocalOptions\LocalCriticalityType.cs" />
     <Compile Include="Notification\IEntityWithUserNotification.cs" />
@@ -130,13 +150,15 @@
     <Compile Include="Organization\StsOrganizationConsequenceLog.cs" />
     <Compile Include="Organization\UnitAccessRights.cs" />
     <Compile Include="Organization\UnitAccessRightsWithUnitData.cs" />
+    <Compile Include="PublicMessage\PublicMessage.cs" />
+    <Compile Include="PublicMessage\PublicMessageStatus.cs" />
+    <Compile Include="PublicMessage\PublicMessageIconType.cs" />
     <Compile Include="Shared\LifeCycleEventType.cs" />
     <Compile Include="Shared\RelatedEntityType.cs" />
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />
     <Compile Include="ArchiveDutyTypes.cs" />
     <Compile Include="AttachedOption.cs" />
     <Compile Include="BackgroundJobs\PendingReadModelUpdate.cs" />
-    <Compile Include="Constants\EntityConstants.cs" />
     <Compile Include="ContactPerson.cs" />
     <Compile Include="Events\EnabledStatusChanged.cs" />
     <Compile Include="ExternalReference.cs" />
@@ -295,11 +317,12 @@
     <Compile Include="References\AddReferenceCommand.cs" />
     <Compile Include="References\ReferenceRootType.cs" />
     <Compile Include="GDPR\YearMonthIntervalOption.cs" />
+    <Compile Include="Shared\YesNoPartiallyOption.cs" />
     <Compile Include="Shared\YesNoUndecidedOption.cs" />
     <Compile Include="Shared\YesNoIrrelevantOption.cs" />
     <Compile Include="Organization\StsOrganizationIdentity.cs" />
     <Compile Include="SSO\SsoUserIdentity.cs" />
-    <Compile Include="Text.cs" />
+    <Compile Include="PublicMessage\Text.cs" />
     <Compile Include="Tracking\LifeCycleTrackingEvent.cs" />
     <Compile Include="Tracking\TrackedEntityType.cs" />
     <Compile Include="Tracking\BaseTrackingEvent.cs" />
@@ -317,6 +340,7 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">

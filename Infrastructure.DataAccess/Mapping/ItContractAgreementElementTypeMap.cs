@@ -1,6 +1,5 @@
 using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItContract;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Infrastructure.DataAccess.Mapping
 {

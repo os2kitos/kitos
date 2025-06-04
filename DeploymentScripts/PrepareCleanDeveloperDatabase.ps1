@@ -12,7 +12,9 @@
     [Parameter(Mandatory=$true)][string]$apiUserUserName,
     [Parameter(Mandatory=$true)][string]$apiUserPw,
     [Parameter(Mandatory=$true)][string]$apiGlobalAdminUserName,
-    [Parameter(Mandatory=$true)][string]$apiGlobalAdminPw
+    [Parameter(Mandatory=$true)][string]$apiGlobalAdminPw,
+    [Parameter(Mandatory=$true)][string]$systemIntegratorEmail,
+    [Parameter(Mandatory=$true)][string]$systemIntegratorPw
     )
     
 #-------------------------------------------------------------
@@ -49,6 +51,7 @@ Write-Host "Creating test database"
                     "$localAdminUserName" "$localAdminPw"  `
                     "$normalUserUserName" "$normalUserPw"  `
                     "$apiUserUserName" "$apiUserPw"  `
-                    "$apiGlobalAdminUserName" "$apiGlobalAdminPw"
+                    "$apiGlobalAdminUserName" "$apiGlobalAdminPw"  `
+                    "$systemIntegratorEmail" "$systemIntegratorPw"
 
 if($LASTEXITCODE -ne 0)	{ Throw "FAILED TO CREATE TEST DATABASE" }

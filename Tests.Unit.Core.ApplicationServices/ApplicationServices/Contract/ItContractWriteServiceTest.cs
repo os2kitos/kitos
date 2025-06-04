@@ -73,20 +73,20 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _roleAssignmentService = new Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>>();
             _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
             _entityTreeUuidCollector = new Mock<IEntityTreeUuidCollector>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, 
-                _identityResolverMock.Object, 
-                _optionResolverMock.Object, 
-                _transactionManagerMock.Object, 
-                _domainEventsMock.Object, 
-                _databaseControlMock.Object, 
-                _agreementElementTypeRepository.Object, 
-                _authContext.Object, 
-                _organizationServiceMock.Object, 
-                _referenceServiceMock.Object, 
-                _assignmentUpdateServiceMock.Object, 
-                _usageServiceMock.Object, 
-                _roleAssignmentService.Object, 
-                _dprServiceMock.Object, 
+            _sut = new ItContractWriteService(_itContractServiceMock.Object,
+                _identityResolverMock.Object,
+                _optionResolverMock.Object,
+                _transactionManagerMock.Object,
+                _domainEventsMock.Object,
+                _databaseControlMock.Object,
+                _agreementElementTypeRepository.Object,
+                _authContext.Object,
+                _organizationServiceMock.Object,
+                _referenceServiceMock.Object,
+                _assignmentUpdateServiceMock.Object,
+                _usageServiceMock.Object,
+                _roleAssignmentService.Object,
+                _dprServiceMock.Object,
                 Mock.Of<IGenericRepository<EconomyStream>>(),
                 _entityTreeUuidCollector.Object);
         }
@@ -152,6 +152,62 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(error.HasValue);
             Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
             Assert.Equal("Invalid contract uuid", error.Value.Message.Value);
+        }
+
+        [Fact]
+        public void Can_Delete_With_Children()
+        {
+            //Arrange
+            var parentUuid = A<Guid>();
+            var childUuid = A<Guid>();
+            var parentId = A<int>();
+            var childId = A<int>();
+
+            var child = new ItContract { Id = childId, Uuid = childUuid, ParentId = parentId};
+            var parent = new ItContract { Id = parentId, Uuid = parentUuid, Children = new List<ItContract>{child}};
+            child.Parent = parent;
+
+            ExpectGetReturns(parentUuid, parent);
+            ExpectGetReturns(childUuid, child);
+            _itContractServiceMock.Setup(x => x.Delete(parentId)).Returns(new ItContract());
+            _itContractServiceMock.Setup(x => x.Delete(childId)).Returns(new ItContract());
+
+            ExpectTransaction();
+
+            //Act
+            var error = _sut.DeleteContractWithChildren(parentUuid);
+
+            //Assert
+            Assert.True(error.IsNone);
+        }
+
+        [Fact]
+        public void Can_Transfer_Multiple()
+        {
+            //Arrange
+            var contractUuid = A<Guid>();
+            var contractUuid2 = A<Guid>();
+
+            var request = new List<Guid> { contractUuid, contractUuid2 };
+            var (_, _, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var contract1 = new ItContract{Organization = createdContract.Organization, OrganizationId = createdContract.OrganizationId};
+            var contract2 = new ItContract{ Organization = createdContract.Organization, OrganizationId = createdContract.OrganizationId };
+
+            ExpectGetReturns(createdContract.Uuid, createdContract);
+            ExpectGetReturns(contractUuid, contract1);
+            ExpectGetReturns(contractUuid2, contract2);
+            ExpectAllowModifySuccess(createdContract);
+            ExpectAllowModifySuccess(contract1);
+            ExpectAllowModifySuccess(contract2);
+            _entityTreeUuidCollector.Setup(x => x.CollectSelfAndDescendantUuids(contract1)).Returns(new List<Guid?>());
+            _entityTreeUuidCollector.Setup(x => x.CollectSelfAndDescendantUuids(contract2)).Returns(new List<Guid?>());
+
+            //Act
+            var result = _sut.TransferContracts(createdContract.Uuid, request);
+
+            //Assert
+            Assert.True(result.IsNone);
+            AssertTransactionCommitted(transaction);
         }
 
         [Fact]
@@ -327,7 +383,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(result.Ok);
             AssertTransactionCommitted(transaction);
             var contract = result.Value;
-            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract);
+            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract, false);
         }
 
         [Fact]
@@ -1399,7 +1455,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             Assert.Equal(parent, contract.Parent);
 
-            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract);
+            AssertGeneralSection(contractId, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract, false);
 
             AssertProcurement(parameters.Procurement.Value, contract);
 
@@ -1432,7 +1488,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertPayments(parameters.Payments.Value, contract);
         }
 
-
         [Fact]
         public void Can_Add_Role()
         {
@@ -1460,6 +1515,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transaction);
         }
+
         [Fact]
         public void Cannot_Add_Duplicate_Role_Assignment()
         {
@@ -1529,6 +1585,70 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(createResult.Failed);
             Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
             AssertTransactionNotCommitted(transaction);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Can_Set_RequireValidContract_When_Parent_Exists(bool requireValidParent)
+        {
+            var newParentContract = new ItContract { Uuid = A<Guid>() };
+            var contract = new ItContract { Uuid = A<Guid>() };
+            var parameters = new ItContractModificationParameters
+            {
+                ParentContractUuid = ((Guid?)newParentContract.Uuid).AsChangedValue(),
+                General = new ItContractGeneralDataModificationParameters
+                {
+                    RequireValidParent = requireValidParent.FromNullable().AsChangedValue(),
+                }
+            };
+            ExpectTransaction();
+            ExpectGetReturns(newParentContract.Uuid, newParentContract);
+            ExpectGetReturns(contract.Uuid, contract);
+            ExpectAllowModifySuccess(contract);
+
+            var result = _sut.Update(contract.Uuid, parameters);
+
+            Assert.True(result.Ok);
+            Assert.Equal(requireValidParent, result.Value.RequireValidParent);
+        }
+
+        [Fact]
+        public void Can_Not_Set_RequireValidParent_To_True_When_No_Parent_Exists()
+        {
+            var contract = new ItContract { Uuid = A<Guid>() };
+            var parameters = new ItContractModificationParameters
+            {
+                General = new ItContractGeneralDataModificationParameters
+                {
+                    RequireValidParent = true.FromNullable().AsChangedValue(),
+                }
+            };
+            ExpectTransaction();
+            ExpectGetReturns(contract.Uuid, contract);
+            ExpectAllowModifySuccess(contract);
+
+            var result = _sut.Update(contract.Uuid, parameters);
+
+            Assert.True(result.Failed);
+        }
+
+        [Fact]
+        public void RequireValidParent_Is_Set_To_False_If_Parent_Is_Cleared()
+        {
+            var contract = new ItContract { Uuid = A<Guid>(), Parent = new ItContract(), RequireValidParent = true };
+            var parameters = new ItContractModificationParameters
+            {
+                ParentContractUuid = ((Guid?)null).AsChangedValue(),
+            };
+            ExpectTransaction();
+            ExpectGetReturns(contract.Uuid, contract);
+            ExpectAllowModifySuccess(contract);
+
+            var result = _sut.Update(contract.Uuid, parameters);
+
+            Assert.True(result.Ok);
+            Assert.False(result.Value.RequireValidParent);
         }
 
         private static void AssertPayments(ItContractPaymentDataModificationParameters input, ItContract updatedContract)
@@ -1692,7 +1812,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable(),
                 PaymentModel = paymentModel.FromNullable(),
                 AgreementPeriod = agreementPeriod.FromNullable(),
-                Payments = payments.FromNullable()
+                Payments = payments.FromNullable(),
             };
             var createdContract = new ItContract
             {
@@ -1760,13 +1880,15 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             bool expectedEnforceValid,
             Dictionary<Guid, AgreementElementType> expectedAgreementElementTypes,
             List<Guid> expectedAgreementElementUuids,
-            ItContract actualContract)
+            ItContract actualContract,
+            bool expectedRequireValidParent)
         {
             Assert.Equal(expectedContractId, actualContract.ItContractId);
             Assert.Equal(expectedValidFrom, actualContract.Concluded);
             Assert.Equal(expectedValidTo, actualContract.ExpirationDate);
             Assert.Equal(expectedEnforceValid, actualContract.Active);
             Assert.Equal(expectedAgreementElementTypes.Count, actualContract.AssociatedAgreementElementTypes.Count);
+            Assert.Equal(expectedRequireValidParent, actualContract.RequireValidParent);
             var agreementElementsDiff = expectedAgreementElementUuids
                 .Except(actualContract.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType.Uuid)).ToList();
             Assert.Empty(agreementElementsDiff);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel.Extensions;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 // ReSharper disable VirtualMemberCallInConstructor
@@ -81,6 +82,8 @@ namespace Core.DomainModel.Organization
         /// This Organization Unit is responsible for these IT ItContracts
         /// </summary>
         public virtual ICollection<ItContract.ItContract> ResponsibleForItContracts { get; set; }
+
+        public virtual ICollection<DataProcessingRegistration> ResponsibleForDataProcessingRegistrations { get; set; }
 
         /// <summary>
         /// The Organization Unit is listed in these economy streams

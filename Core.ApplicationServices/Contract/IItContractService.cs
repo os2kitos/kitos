@@ -6,7 +6,6 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Contracts;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.Organization;
 using Core.DomainServices.Queries;
 
 

@@ -1,10 +1,6 @@
 ﻿using Core.Abstractions.Types;
 using Core.DomainModel.Advice;
 using Presentation.Web.Models.API.V2.Types.Notifications;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 {

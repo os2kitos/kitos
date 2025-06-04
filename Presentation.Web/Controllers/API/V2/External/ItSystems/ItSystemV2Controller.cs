@@ -5,11 +5,9 @@ using System.Net;
 using System.Web.Http;
 using System.Web.Http.Results;
 using Core.Abstractions.Extensions;
-using Core.Abstractions.Types;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
-using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Presentation.Web.Controllers.API.V2.Common.Helpers;
 using Presentation.Web.Controllers.API.V2.External.Generic;
@@ -20,7 +18,6 @@ using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
-using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 using Presentation.Web.Models.API.V2.Response.System;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Swashbuckle.Swagger.Annotations;
@@ -29,6 +26,7 @@ using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 {
@@ -41,7 +39,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         private readonly IItSystemService _itSystemService;
         private readonly IRightsHolderSystemService _rightsHolderSystemService;
         private readonly IItSystemWriteModelMapper _writeModelMapper;
-        private readonly IEntityIdentityResolver _entityIdentityResolver;
         private readonly IItSystemWriteService _writeService;
         private readonly IItSystemResponseMapper _systemResponseMapper;
         private readonly IExternalReferenceResponseMapper _referenceResponseMapper;
@@ -50,7 +47,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         public ItSystemV2Controller(IItSystemService itSystemService,
             IRightsHolderSystemService rightsHolderSystemService,
             IItSystemWriteModelMapper writeModelMapper,
-            IEntityIdentityResolver entityIdentityResolver,
             IItSystemWriteService writeService,
             IItSystemResponseMapper systemResponseMapper,
             IExternalReferenceResponseMapper referenceResponseMapper,
@@ -59,7 +55,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             _itSystemService = itSystemService;
             _rightsHolderSystemService = rightsHolderSystemService;
             _writeModelMapper = writeModelMapper;
-            _entityIdentityResolver = entityIdentityResolver;
             _writeService = writeService;
             _systemResponseMapper = systemResponseMapper;
             _referenceResponseMapper = referenceResponseMapper;
@@ -207,8 +202,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 .Select(_systemResponseMapper.ToSystemResponseDTO)
                 .Match(Ok, FromOperationError);
         }
-
-
+        
         /// <summary>
         /// Returns hierarchy for the specified IT-System
         /// </summary>
@@ -225,12 +219,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _entityIdentityResolver.ResolveDbId<ItSystem>(uuid)
-                .Match
-                (
-                    id => _itSystemService.GetCompleteHierarchy(id),
-                    () => new OperationError($"System with uuid: {uuid} was not found", OperationFailure.NotFound)
-                )
+            return _itSystemService.GetCompleteHierarchyByUuid(uuid)
                 .Select(RegistrationHierarchyNodeMapper.MapHierarchyToDtosWithDisabledStatus)
                 .Match(Ok, FromOperationError);
         }

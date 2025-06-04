@@ -9,10 +9,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Request.Notifications
         /// </summary>
         [Required]
         public string Subject { get; set; }
-        /// <summary>
-        /// Body of the Notification
-        /// </summary>
-        [Required]
+
         public string Body { get; set; }
 
         /// <summary>

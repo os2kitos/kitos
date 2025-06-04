@@ -11,11 +11,11 @@ namespace Core.ApplicationServices
 {
     public interface IUserService : IDisposable
     {
-        User AddUser(User user, bool sendMailOnCreation, int orgId, bool newUI);
+        User AddUser(User user, bool sendMailOnCreation, int orgId);
 
-        void UpdateUser(User user, bool? sendMailOnUpdate, int? scopedToOrganizationId, bool newUI);
-        void IssueAdvisMail(User user, bool reminder, int orgId, bool newUI);
-        PasswordResetRequest IssuePasswordReset(User user, string subject, string content, bool newUI);
+        void UpdateUser(User user, bool? sendMailOnUpdate, int? scopedToOrganizationId);
+        void IssueAdvisMail(User user, bool reminder, int orgId);
+        PasswordResetRequest IssuePasswordReset(User user, string subject, string content);
         PasswordResetRequest GetPasswordReset(string hash);
         void ResetPassword(PasswordResetRequest passwordResetRequest, string newPassword);
         Result<IQueryable<User>, OperationError> GetUsersWithCrossOrganizationPermissions();
@@ -36,5 +36,7 @@ namespace Core.ApplicationServices
         bool IsEmailInUse(string email);
         Result<User, OperationError> GetUserByEmail(Guid organizationUuid, string email);
         Result<User, OperationError> GetUserByUuid(Guid userUuid);
+        Result<User, OperationError> GetGlobalAdmin();
+        Result<OrganizationUnit, OperationError> GetDefaultOrganizationUnit(Guid organizationUuid, Guid userUuid);
     }
 }

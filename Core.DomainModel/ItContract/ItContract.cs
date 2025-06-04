@@ -44,7 +44,7 @@ namespace Core.DomainModel.ItContract
         {
             var enforcedActive = Active;
             var errors = new List<ItContractValidationError>();
-            
+
             var today = todayReference.Date;
             var startDate = (Concluded ?? today).Date;
             var endDate = DateTime.MaxValue;
@@ -79,7 +79,13 @@ namespace Core.DomainModel.ItContract
                 }
             }
 
-            return new ItContractValidationResult(enforcedActive, errors);
+            var parentIsValid = Parent != null && Parent.IsActive;
+            if (RequireValidParent && !parentIsValid)
+            {
+                errors.Add(ItContractValidationError.InvalidParentContract);
+            }
+
+            return new ItContractValidationResult(enforcedActive, RequireValidParent, parentIsValid, errors);
         }
         public ItContractValidationResult Validate()
         {
@@ -339,6 +345,8 @@ namespace Core.DomainModel.ItContract
         ///     The parent.
         /// </value>
         public virtual ItContract Parent { get; set; }
+
+        public bool RequireValidParent { get; set; }
 
         /// <summary>
         ///     Gets or sets the contract children.
@@ -646,6 +654,7 @@ namespace Core.DomainModel.ItContract
         {
             Parent?.Track();
             Parent = null;
+            RequireValidParent = false;
         }
 
         public Maybe<OperationError> SetParent(ItContract newParent)
@@ -850,8 +859,8 @@ namespace Core.DomainModel.ItContract
 
         public Maybe<OperationError> ResetEconomyStreamOrganizationUnit(int id, bool isInternal)
         {
-            return isInternal 
-                ? ResetEconomyStreamOrganizationUnit(id, InternEconomyStreams) 
+            return isInternal
+                ? ResetEconomyStreamOrganizationUnit(id, InternEconomyStreams)
                 : ResetEconomyStreamOrganizationUnit(id, ExternEconomyStreams);
         }
 
@@ -930,6 +939,16 @@ namespace Core.DomainModel.ItContract
         public void MarkAsDirty()
         {
             LastChanged = DateTime.UtcNow;
+        }
+
+        public Maybe<OperationError> SetRequireValidParent(bool requireValidParent)
+        {
+            if (requireValidParent && Parent == null)
+            {
+                return new OperationError("Cannot require valid parent, with no parent unit set", OperationFailure.BadInput);
+            }
+            RequireValidParent = requireValidParent;
+            return Maybe<OperationError>.None;
         }
     }
 }

@@ -88,6 +88,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(general.MainContract);
             Assert.Empty(general.AssociatedContracts);
             Assert.True(general.Valid);
+            Assert.Null(general.ResponsibleOrganizationUnit);
 
             var oversight = dto.Oversight;
             Assert.Empty(oversight.OversightOptions);
@@ -129,6 +130,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertIdentity(dpr.MainContract, general.MainContract);
             AssertOptionalIdentities(dpr.AssociatedContracts, general.AssociatedContracts);
             Assert.Equal(dpr.IsActiveAccordingToMainContract, general.Valid);
+            Assert.Equal(dpr.ResponsibleOrganizationUnit.Uuid, general.ResponsibleOrganizationUnit.Uuid);
+            Assert.Equal(dpr.ResponsibleOrganizationUnit.Name, general.ResponsibleOrganizationUnit.Name);
         }
 
         private void AssertSubDataProcessors(IEnumerable<SubDataProcessor> assignedSubDataProcessors, IEnumerable<DataProcessorRegistrationSubDataProcessorResponseDTO> mappedSubDataProcessors)
@@ -391,6 +394,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 CreateSubDataProcessor(dpr,true,true,false)
             };
             dpr.MainContract = new ItContract() { Uuid = A<Guid>(), Name = A<string>() };
+            dpr.ResponsibleOrganizationUnit = new OrganizationUnit { Uuid = A<Guid>(), Name = A<string>() };
         }
 
         private void AssignRoles(DataProcessingRegistration dpr)

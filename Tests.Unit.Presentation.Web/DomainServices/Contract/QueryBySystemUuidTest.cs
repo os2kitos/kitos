@@ -3,7 +3,6 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries.Contract;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Tests.Toolkit.Patterns;
 using Xunit;

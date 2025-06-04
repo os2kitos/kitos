@@ -2,7 +2,6 @@
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Shared;
-using Presentation.Web.Models.API.V1.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 
 namespace Presentation.Web.Extensions
@@ -10,21 +9,6 @@ namespace Presentation.Web.Extensions
     public static class QueryablePaginationExtensions
     {
         public static IQueryable<T> Page<T>(this IQueryable<T> src, BoundedPaginationQuery pagination)
-        {
-            var paginationPageSize = GetPaginationPageSize(pagination);
-            var page = GetPaginationPage(pagination);
-
-            return src.Skip(page * paginationPageSize).Take(paginationPageSize);
-        }
-        public static IQueryable<T> Page<T>(this IQueryable<T> src, V1BoundedPaginationQuery pagination)
-        {
-            var paginationPageSize = GetPaginationPageSize(pagination);
-            var page = GetPaginationPage(pagination);
-
-            return src.Skip(page * paginationPageSize).Take(paginationPageSize);
-        }
-
-        public static IEnumerable<T> Page<T>(this IEnumerable<T> src, BoundedPaginationQuery pagination)
         {
             var paginationPageSize = GetPaginationPageSize(pagination);
             var page = GetPaginationPage(pagination);
@@ -76,16 +60,6 @@ namespace Presentation.Web.Extensions
         }
 
         private static int GetPaginationPage(IStandardPaginationQueryParameters pagination)
-        {
-            return pagination?.Page.GetValueOrDefault(0) ?? 0;
-        }
-
-        private static int GetPaginationPageSize(V1BoundedPaginationQuery pagination)
-        {
-            return pagination?.PageSize.GetValueOrDefault(PagingContraints.MaxPageSize) ?? PagingContraints.MaxPageSize;
-        }
-
-        private static int GetPaginationPage(IV1StandardPaginationQueryParameters pagination)
         {
             return pagination?.Page.GetValueOrDefault(0) ?? 0;
         }

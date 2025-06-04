@@ -2,7 +2,6 @@
 using Core.DomainModel;
 using Core.DomainServices.Repositories.Kendo;
 using System.Collections.Generic;
-using System.Data;
 using Core.Abstractions.Types;
 using Core.DomainModel.KendoConfig;
 using Infrastructure.Services.DataAccess;

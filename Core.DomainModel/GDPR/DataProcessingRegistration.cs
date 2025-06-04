@@ -7,6 +7,7 @@ using Core.DomainModel.Extensions;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Notification;
+using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Shared;
 
@@ -334,6 +335,10 @@ namespace Core.DomainModel.GDPR
 
         public string OversightIntervalRemark { get; set; }
 
+        public int? ResponsibleOrganizationUnitId { get; set; }
+
+        public virtual OrganizationUnit ResponsibleOrganizationUnit { get; set; } 
+
         public void SetIsAgreementConcluded(YesNoIrrelevantOption concluded)
         {
             IsAgreementConcluded = concluded;
@@ -478,9 +483,35 @@ namespace Core.DomainModel.GDPR
             return OversightDates.FirstOrDefault(x => x.Id == oversightId).FromNullable();
         }
 
+        public Maybe<OperationError> SetResponsibleOrganizationUnit(Guid organizationUnitUuid)
+        {
+            var unit = Organization.GetOrganizationUnit(organizationUnitUuid);
+            if (unit.IsNone)
+            {
+                return new OperationError($"Could not find Organization Unit with uuid {organizationUnitUuid}", OperationFailure.BadInput);
+            }
+
+            ResponsibleOrganizationUnit = unit.Value;
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetResponsibleOrganizationUnit()
+        {
+            ResponsibleOrganizationUnit?.Track();
+            ResponsibleOrganizationUnit = null;
+        }
+
         public void MarkAsDirty()
         {
             LastChanged = DateTime.UtcNow;
+        }
+
+        public DprSnapshot Snapshot()
+        {
+            return new DprSnapshot
+            {
+                DataProcessorUuids = DataProcessors.Select(x => x.Uuid).ToHashSet()
+            };
         }
     }
 }

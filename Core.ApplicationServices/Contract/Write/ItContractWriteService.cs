@@ -8,6 +8,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Generic;
 using Core.ApplicationServices.Generic.Write;
+using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
@@ -17,6 +18,7 @@ using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
@@ -139,15 +141,48 @@ namespace Core.ApplicationServices.Contract.Write
 
         public Maybe<OperationError> Delete(Guid itContractUuid)
         {
-            var dbId = _entityIdentityResolver.ResolveDbId<ItContract>(itContractUuid);
-
-            if (dbId.IsNone)
-                return new OperationError("Invalid contract uuid", OperationFailure.NotFound);
-
-            return _contractService
-                .Delete(dbId.Value)
-                .Match(_ => Maybe<OperationError>.None, failure => new OperationError("Failed deleting contract", failure));
+            return ResolveContractId(itContractUuid)
+                .Match
+                (
+                    id => _contractService.Delete(id)
+                        .Match
+                        (
+                            _ => Maybe<OperationError>.None,
+                            failure => new OperationError("Failed deleting contract", failure)
+                        ),
+                    error => error);
         }
+
+        public Maybe<OperationError> DeleteContractWithChildren(Guid itContractUuid)
+        {
+            return _contractService.GetContract(itContractUuid)
+                .Select(contract => contract.FlattenHierarchy())
+                .Match(DeleteRange,
+                    error => error);
+        }
+
+        public Maybe<OperationError> TransferContracts(Guid? parentUuid, IEnumerable<Guid> itContractUuids)
+        {
+            var parameters = new ItContractModificationParameters
+            {
+                ParentContractUuid = parentUuid.AsChangedValue()
+            };
+
+            using var transaction = _transactionManager.Begin();
+            foreach (var itContractUuid in itContractUuids)
+            {
+                var result = Update(itContractUuid, parameters);
+                if (result.Failed)
+                {
+                    transaction.Rollback();
+                    return result.Error;
+                }
+            }
+            transaction.Commit();
+
+            return Maybe<OperationError>.None;
+        }
+
 
         public Result<ExternalReference, OperationError> AddExternalReference(Guid contractUuid, ExternalReferenceProperties externalReferenceProperties)
         {
@@ -181,25 +216,14 @@ namespace Core.ApplicationServices.Contract.Write
 
         public Result<ItContract, OperationError> AddRole(Guid contractUuid, UserRolePair assignment)
         {
-            return _contractService
-                .GetContract(contractUuid)
-                .Select(ExtractAssignedRoles)
-                .Bind<ItContractModificationParameters>(existingRoles =>
-                {
-                    if (existingRoles.Contains(assignment))
-                    {
-                        return new OperationError("Role assignment exists", OperationFailure.Conflict);
-                    }
-                    return CreateRoleAssignmentUpdate(existingRoles.Append(assignment));
-                })
-                .Bind(update => Update(contractUuid, update));
+            return AddRoles(contractUuid, assignment.WrapAsEnumerable());
         }
 
         public Result<ItContract, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair assignment)
         {
             return _contractService
                 .GetContract(systemUsageUuid)
-                .Select(ExtractAssignedRoles)
+                .Select(RoleMappingHelper.ExtractAssignedRoles)
                 .Bind<ItContractModificationParameters>(existingRoles =>
                 {
                     if (!existingRoles.Contains(assignment))
@@ -211,6 +235,28 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(update => Update(systemUsageUuid, update));
         }
 
+        private Result<ItContract, OperationError> AddRoles(Guid contractUuid,
+            IEnumerable<UserRolePair> assignments)
+        {
+            return _contractService
+                .GetContract(contractUuid)
+                .Bind(contract => GetRoleAssignmentUpdates(contract, assignments))
+                .Bind(update => Update(contractUuid, update));
+        }
+
+
+        private Maybe<OperationError> DeleteRange(IEnumerable<ItContract> contracts)
+        {
+            foreach (var contract in contracts)
+            {
+                var result = _contractService.Delete(contract.Id);
+                if (result.Failed)
+                    return new OperationError($"Failed deleting contract with Uuid: {contract.Uuid}", result.Error);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
         private Result<ItContract, OperationError> WithWriteAccess(ItContract contract)
         {
             if (!_authorizationContext.AllowModify(contract))
@@ -219,6 +265,16 @@ namespace Core.ApplicationServices.Contract.Write
             }
 
             return contract;
+        }
+
+        private Result<int, OperationError> ResolveContractId(Guid uuid)
+        {
+            var dbId = _entityIdentityResolver.ResolveDbId<ItContract>(uuid);
+
+            if (dbId.IsNone)
+                return new OperationError("Invalid contract uuid", OperationFailure.NotFound);
+
+            return dbId.Value;
         }
 
         private Result<ItContract, OperationError> ApplyUpdates(ItContract contract, ItContractModificationParameters parameters)
@@ -495,7 +551,8 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.EnforceValid, (c, newValue) => c.Active = newValue.GetValueOrFallback(false)))
                 .Bind(itContract => UpdateValidityPeriod(itContract, generalData).Match<Result<ItContract, OperationError>>(error => error, () => itContract))
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.AgreementElementUuids, UpdateAgreementElements))
-                .Bind(itContract => itContract.WithOptionalUpdate(generalData.CriticalityUuid, UpdateContractCriticality));
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.CriticalityUuid, UpdateContractCriticality))
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.RequireValidParent, UpdateRequireValidParent));
         }
 
         private Maybe<OperationError> UpdateAgreementElements(ItContract contract, IEnumerable<Guid> agreementElements)
@@ -638,6 +695,12 @@ namespace Core.ApplicationServices.Contract.Write
                 );
         }
 
+        private Maybe<OperationError> UpdateRequireValidParent(ItContract itContract, Maybe<bool> requireValidParent)
+        {
+            if (requireValidParent.IsNone) return Maybe<OperationError>.None;
+            return itContract.SetRequireValidParent(requireValidParent.Value);
+        }
+
         private Maybe<OperationError> UpdateName(ItContract contract, string newName)
         {
             var error = _contractService.ValidateNewName(contract.Id, newName);
@@ -667,10 +730,19 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(WithWriteAccess);
         }
 
-        private static IReadOnlyList<UserRolePair> ExtractAssignedRoles(ItContract contract)
+        private static Result<ItContractModificationParameters, OperationError> GetRoleAssignmentUpdates(ItContract contract, IEnumerable<UserRolePair> assignments)
         {
-            return contract.Rights.Select(right => new UserRolePair(right.User.Uuid, right.Role.Uuid)).ToList();
+            var existingRoles = RoleMappingHelper.ExtractAssignedRoles(contract);
+            var newRoles = assignments.ToList();
+
+            if (existingRoles.Any(newRoles.Contains))
+            {
+                return new OperationError("Role assignment exists", OperationFailure.Conflict);
+            }
+            
+            return CreateRoleAssignmentUpdate(existingRoles.Concat(newRoles));
         }
+
 
         private static ItContractModificationParameters CreateRoleAssignmentUpdate(IEnumerable<UserRolePair> existingRoles)
         {

@@ -1,32 +1,39 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Core.DomainModel;
 using System.Threading.Tasks;
+using Core.Abstractions.Extensions;
+using Core.DomainModel.ItContract;
 using Tests.Integration.Presentation.Web.Tools;
-using Tests.Toolkit.Patterns;
 using Xunit;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Shared;
-using Presentation.Web.Models.API.V1;
-using Presentation.Web.Models.API.V1.SystemRelations;
-using Tests.Integration.Presentation.Web.Tools.External.Rights;
-using Tests.Integration.Presentation.Web.Tools.Model;
+using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Request.DataProcessing;
+using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Request.SystemUsage;
+using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Types.Contract;
+using Presentation.Web.Models.API.V2.Types.Shared;
+using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Extensions;
 
 namespace Tests.Integration.Presentation.Web.Contract
 {
     [Collection(nameof(SequentialTestGroup))]
-    public class ItContractOverviewReadModelsApiTest : WithAutoFixture, IAsyncLifetime
+    public class ItContractOverviewReadModelsApiTest : BaseTest, IAsyncLifetime
     {
-        private OrganizationDTO _organization;
-        private OrganizationDTO _supplier;
+        private ShallowOrganizationResponseDTO _organization;
+        private ShallowOrganizationResponseDTO _supplier;
 
         public async Task InitializeAsync()
         {
-            _organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
-            _supplier = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            _organization = await CreateOrganizationAsync();
+            _supplier = await CreateOrganizationAsync();
 
         }
 
@@ -40,19 +47,19 @@ namespace Tests.Integration.Presentation.Web.Contract
         public async Task Can_Query_And_Page_ReadModels()
         {
             ////Arrange
-            var organizationId = _organization.Id;
+            var organizationUuid = _organization.Uuid;
             var suffix = A<Guid>().ToString("N");
             var name1 = $"1_{suffix}";
             var name2 = $"2_{suffix}";
             var name3 = $"3_{suffix}";
 
-            await ItContractHelper.CreateContract(name1, organizationId);
-            await ItContractHelper.CreateContract(name2, organizationId);
-            await ItContractHelper.CreateContract(name3, organizationId);
+            await CreateItContractAsync(organizationUuid, name1);
+            await CreateItContractAsync(organizationUuid, name2);
+            await CreateItContractAsync(organizationUuid, name3);
 
             //Act
-            var page1 = (await ItContractHelper.QueryReadModelByNameContent(organizationId, suffix, 2, 0)).ToList();
-            var page2 = (await ItContractHelper.QueryReadModelByNameContent(organizationId, suffix, 2, 2)).ToList();
+            var page1 = (await ItContractV2Helper.QueryReadModelByNameContent(organizationUuid, suffix, 2, 0)).ToList();
+            var page2 = (await ItContractV2Helper.QueryReadModelByNameContent(organizationUuid, suffix, 2, 2)).ToList();
 
             //Assert
             Assert.Equal(2, page1.Count);
@@ -67,133 +74,208 @@ namespace Tests.Integration.Presentation.Web.Contract
         public async Task ReadModels_Contain_Correct_Content()
         {
             //Arrange
-            var organizationId = _organization.Id;
+            var organizationUuid = _organization.Uuid;
             var name = CreateName();
-            var itSystem1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organizationId, AccessModifier.Public);
-            var itSystem2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organizationId, AccessModifier.Public);
-            var usage1 = await ItSystemHelper.TakeIntoUseAsync(itSystem1.Id, organizationId);
-            var usage2 = await ItSystemHelper.TakeIntoUseAsync(itSystem2.Id, organizationId);
+            var itSystem1 = await CreateItSystemAsync(organizationUuid);
+            var itSystem2 = await CreateItSystemAsync(organizationUuid);
+            var usage1 = await TakeSystemIntoUsageAsync(itSystem1.Uuid, organizationUuid);
+            var usage2 = await TakeSystemIntoUsageAsync(itSystem2.Uuid, organizationUuid);
+            var contractSigner = A<string>();
+            var procurementInitiated = A<YesNoUndecidedChoice>();
+            var irrevocableTo = A<DateTime>();
+            var terminated = A<DateTime>();
+            var concluded = A<DateTime>();
+            var expirationDate = concluded.AddDays(2);
+            var procurementPlan = A<ProcurementPlanDTO>();
 
-            var dpr1 = await DataProcessingRegistrationHelper.CreateAsync(organizationId, CreateName());
-            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dpr1.Id, YesNoIrrelevantOption.YES).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
-            var dpr2 = await DataProcessingRegistrationHelper.CreateAsync(organizationId, CreateName());
-            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dpr2.Id, YesNoIrrelevantOption.YES).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
-            await DataProcessingRegistrationHelper.CreateAsync(organizationId, CreateName()); //not included since it is not an agreement
-            var parentContract = await ItContractHelper.CreateContract(CreateName(), organizationId);
-            var itContract = await ItContractHelper.CreateContract(name, organizationId);
-            var organizationUnit = await OrganizationUnitHelper.GetOrganizationUnitsAsync(organizationId);
-            var criticality = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.CriticalityTypes, organizationId)).RandomItem();
-            var contractType = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.ContractTypes, organizationId)).RandomItem();
-            var contractTemplate = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.ContractTemplateTypes, organizationId)).RandomItem();
-            var purchaseForm = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.PurchaseTypes, organizationId)).RandomItem();
-            var procurementStrategy = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.ProcurementStrategyTypes, organizationId)).RandomItem();
-            var paymentModel = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.PaymentModelTypes, organizationId)).RandomItem();
-            var paymentFrequency = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.PaymentFrequencyTypes, organizationId)).RandomItem();
-            var optionExtend = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.OptionExtendTypes, organizationId)).RandomItem();
-            var terminationDeadline = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.TerminationDeadlineTypes, organizationId)).RandomItem();
-            var referenceDto = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), $"https//a{A<int>()}b.dk", setTargetId: x => x.ItContract_Id = itContract.Id);
-            var economy = await ItContractHelper.CreateExternEconomyStream(itContract.Id, organizationUnit.Id, A<int>(), A<int>(), A<int>(), A<DateTime>(), A<TrafficLight>());
-            var changes = new
+            var dpr1 = await CreateDPRAsync(_organization.Uuid);
+            var dpr2 = await CreateDPRAsync(_organization.Uuid);
+
+            await DataProcessingRegistrationV2Helper.SendPatchGeneralDataAsync(await GetGlobalToken(),
+                dpr1.Uuid, new DataProcessingRegistrationGeneralDataWriteRequestDTO
+                {
+                    IsAgreementConcluded = YesNoIrrelevantChoice.Yes,
+                }).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationV2Helper.SendPatchGeneralDataAsync(await GetGlobalToken(),
+                dpr2.Uuid, new DataProcessingRegistrationGeneralDataWriteRequestDTO
+                {
+                    IsAgreementConcluded = YesNoIrrelevantChoice.Yes,
+                }).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            await CreateDPRAsync(_organization.Uuid, CreateName()); //not included since it is not an agreement
+            var parentContract = await CreateItContractAsync(organizationUuid);
+            var itContract = await CreateItContractAsync(organizationUuid, name);
+            var organizationUnit =
+                (await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(await GetGlobalToken(), organizationUuid)).RandomItem();
+
+            var criticality = await OptionV2ApiHelper.GetRandomOptionAsync(OptionV2ApiHelper.ResourceName.CriticalityTypes, organizationUuid);
+            var contractType = await OptionV2ApiHelper.GetRandomOptionAsync(OptionV2ApiHelper.ResourceName.ItContractContractTypes, organizationUuid);
+            var contractTemplate = await OptionV2ApiHelper.GetRandomOptionAsync(OptionV2ApiHelper.ResourceName.ItContractContractTemplateTypes, organizationUuid);
+            var purchaseForm = await OptionV2ApiHelper.GetRandomOptionAsync(OptionV2ApiHelper.ResourceName.ItContractPurchaseTypes, organizationUuid);
+            var procurementStrategy = await OptionV2ApiHelper.GetRandomOptionAsync(OptionV2ApiHelper.ResourceName.ItContractProcurementStrategyTypes, organizationUuid);
+            var paymentModel = await OptionV2ApiHelper.GetRandomOptionAsync(OptionV2ApiHelper.ResourceName.ItContractPaymentModelTypes, organizationUuid);
+            var paymentFrequency = await OptionV2ApiHelper.GetRandomOptionAsync(OptionV2ApiHelper.ResourceName.ItContractPaymentFrequencyTypes, organizationUuid);
+            var optionExtend = await OptionV2ApiHelper.GetRandomOptionAsync(OptionV2ApiHelper.ResourceName.ItContractAgreementExtensionOptionTypes, organizationUuid);
+            var terminationDeadline = await OptionV2ApiHelper.GetRandomOptionAsync(OptionV2ApiHelper.ResourceName.ItContractNoticePeriodMonthTypes, organizationUuid);
+
+            var referenceRequest = new UpdateExternalReferenceDataWriteRequestDTO
             {
-                ItContractId = A<string>(),
-                ContractSigner = A<string>(),
-                ProcurementInitiated = A<YesNoUndecidedOption>(),
-                OperationRemunerationBegun = A<DateTime>(),
-                IrrevocableTo = A<DateTime>(),
-                Terminated = A<DateTime>(),
-                Concluded = A<DateTime>(),
-                ExpirationDate = A<DateTime>(),
-                SupplierId = _supplier.Id,
-                ParentId = parentContract.Id,
-                CriticalityId = criticality.Id,
-                ResponsibleOrganizationUnitId = organizationUnit.Id,
-                ContractTypeId = contractType.Id,
-                ContractTemplateId = contractTemplate.Id,
-                PurchaseFormId = purchaseForm.Id,
-                ProcurementStrategyId = procurementStrategy.Id,
-                ProcurementPlanYear = A<int>(),
-                ProcurementPlanQuarter = A<int>(),
-                PaymentModelId = paymentModel.Id,
-                PaymentFreqencyId = paymentFrequency.Id,
-                OptionExtendId = optionExtend.Id,
-                TerminationDeadlineId = terminationDeadline.Id,
-                DurationOngoing = true
+                Title = A<string>(),
+                DocumentId = A<string>(),
+                Url = $"https//a{A<int>()}b.dk"
             };
-            await ItContractHelper.PatchContract(itContract.Id, organizationId, changes);
-            await ItContractHelper.SendAssignDataProcessingRegistrationAsync(itContract.Id, dpr1.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
-            await ItContractHelper.SendAssignDataProcessingRegistrationAsync(itContract.Id, dpr2.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
-            await SystemRelationHelper.PostRelationAsync(new CreateSystemRelationDTO
-            {
-                ContractId = itContract.Id,
-                FromUsageId = usage2.Id,
-                ToUsageId = usage1.Id
-            });
-            await SystemRelationHelper.PostRelationAsync(new CreateSystemRelationDTO
-            {
-                ContractId = itContract.Id,
-                FromUsageId = usage1.Id,
-                ToUsageId = usage2.Id
-            });
-            await ItContractHelper.AddItSystemUsage(itContract.Id, usage1.Id, organizationId);
-            await ItContractHelper.AddItSystemUsage(itContract.Id, usage2.Id, organizationId);
+            await ItContractV2Helper.SendPatchExternalReferences(await GetGlobalToken(), itContract.Uuid,
+                new List<UpdateExternalReferenceDataWriteRequestDTO> { referenceRequest });
 
-            var user1Id = await HttpApi.CreateOdataUserAsync(new ApiUserDTO() { Email = $"{A<Guid>():N}@kitos.dk", Name = A<string>(), LastName = A<string>() }, OrganizationRole.User, organizationId);
-            var user2Id = await HttpApi.CreateOdataUserAsync(new ApiUserDTO() { Email = $"{A<Guid>():N}@kitos.dk", Name = A<string>(), LastName = A<string>() }, OrganizationRole.User, organizationId);
-            var role1 = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.ContractRoles, organizationId)).RandomItem();
-            var role2 = (await EntityOptionHelper.GetOptionsAsync(EntityOptionHelper.ResourceNames.ContractRoles, organizationId)).RandomItem();
-            await RightsHelper.AddUserRole(user1Id, organizationId, RightsType.ItContractRights, idOfRoleToUse: role1.Id, objectId: itContract.Id);
-            await RightsHelper.AddUserRole(user2Id, organizationId, RightsType.ItContractRights, idOfRoleToUse: role2.Id, objectId: itContract.Id);
+            var externalPaymentRequest = A<PaymentRequestDTO>();
+            externalPaymentRequest.OrganizationUnitUuid = organizationUnit.Uuid;
+            await ItContractV2Helper.SendPatchPayments(await GetGlobalToken(), itContract.Uuid, new ContractPaymentsDataWriteRequestDTO { External = externalPaymentRequest.WrapAsEnumerable() });
+
+            await ItContractV2Helper.SendPatchContractSupplierAsync(await GetGlobalToken(), itContract.Uuid,
+                new ContractSupplierDataWriteRequestDTO()
+                {
+                    OrganizationUuid = _supplier.Uuid,
+                }).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            await ItContractV2Helper.SendPatchContractResponsibleAsync(await GetGlobalToken(), itContract.Uuid,
+                new ContractResponsibleDataWriteRequestDTO
+                {
+                    OrganizationUnitUuid = organizationUnit.Uuid,
+                    SignedBy = contractSigner
+                }).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            await ItContractV2Helper.SendPatchPaymentModelAsync(await GetGlobalToken(), itContract.Uuid,
+                new ContractPaymentModelDataWriteRequestDTO
+                {
+                    PaymentFrequencyUuid = paymentFrequency.Uuid,
+                    PaymentModelUuid = paymentModel.Uuid,
+                });
+
+            await ItContractV2Helper.SendPatchProcurementAsync(await GetGlobalToken(), itContract.Uuid,
+                new ContractProcurementDataWriteRequestDTO
+                {
+                    ProcurementInitiated = procurementInitiated,
+                    ProcurementPlan = procurementPlan,
+                    ProcurementStrategyUuid = procurementStrategy.Uuid,
+                    PurchaseTypeUuid = purchaseForm.Uuid
+                });
+
+            await ItContractV2Helper.SendPatchAgreementPeriodAsync(await GetGlobalToken(), itContract.Uuid,
+                new ContractAgreementPeriodDataWriteRequestDTO
+                {
+                    ExtensionOptionsUuid = optionExtend.Uuid,
+                    IrrevocableUntil = irrevocableTo,
+                    IsContinuous = true
+                });
+
+            await ItContractV2Helper.SendPatchTerminationAsync(await GetGlobalToken(), itContract.Uuid,
+                new ContractTerminationDataWriteRequestDTO
+                {
+                    TerminatedAt = terminated,
+                    Terms = new ContractTerminationTermsRequestDTO
+                    {
+                        NoticePeriodMonthsUuid = terminationDeadline.Uuid,
+                    }
+                });
+
+            await ItContractV2Helper.SendPatchContractGeneralDataAsync(await GetGlobalToken(), itContract.Uuid,
+                new ContractGeneralDataWriteRequestDTO
+                {
+                    CriticalityUuid = criticality.Uuid,
+                    ContractTemplateUuid = contractTemplate.Uuid,
+                    ContractTypeUuid = contractType.Uuid,
+                    Validity = new ContractValidityWriteRequestDTO
+                    {
+                        ValidFrom = concluded,
+                        ValidTo = expirationDate
+                    }
+                }).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            await ItContractV2Helper.SendPatchParentContractAsync(await GetGlobalToken(), itContract.Uuid,
+                parentContract.Uuid);
+
+            await ItContractV2Helper.SendPatchDataProcessingRegistrationsAsync(await GetGlobalToken(), itContract.Uuid, new[] { dpr1.Uuid, dpr2.Uuid });
+
+            await ItSystemUsageV2Helper.PostRelationAsync(await GetGlobalToken(), usage2.Uuid,
+                new SystemRelationWriteRequestDTO
+                {
+                    AssociatedContractUuid = itContract.Uuid,
+                    ToSystemUsageUuid = usage1.Uuid
+                });
+            await ItSystemUsageV2Helper.PostRelationAsync(await GetGlobalToken(), usage1.Uuid,
+                new SystemRelationWriteRequestDTO
+                {
+                    AssociatedContractUuid = itContract.Uuid,
+                    ToSystemUsageUuid = usage2.Uuid
+                });
+
+            await ItContractV2Helper.SendPatchSystemUsagesAsync(await GetGlobalToken(), itContract.Uuid, new[] { usage1.Uuid, usage2.Uuid });
+
+            var user1 = await CreateUserAsync(organizationUuid);
+            var user1Id = DatabaseAccess.GetEntityId<User>(user1.Uuid);
+            var user2 = await CreateUserAsync(organizationUuid);
+            var user2Id = DatabaseAccess.GetEntityId<User>(user2.Uuid);
+            var roles = await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractRoles,
+                organizationUuid, 25, 0);
+            var role1 = roles.RandomItem();
+            var role2 = roles.RandomItem();
+            await ItContractV2Helper.SendPatchAddRoleAssignment(itContract.Uuid,
+                new RoleAssignmentRequestDTO
+                { RoleUuid = role1.Uuid, UserUuid = user1.Uuid });
+            await ItContractV2Helper.SendPatchAddRoleAssignment(itContract.Uuid,
+                new RoleAssignmentRequestDTO
+                { RoleUuid = role2.Uuid, UserUuid = user2.Uuid });
 
             //Act
             await ReadModelTestTools.WaitForReadModelQueueDepletion();
 
-            var queryResult = (await ItContractHelper.QueryReadModelByNameContent(organizationId, name, 1, 0)).ToList();
+            var queryResult = (await ItContractV2Helper.QueryReadModelByNameContent(organizationUuid, name, 1, 0)).ToList();
 
             //Assert
             var readModel = Assert.Single(queryResult);
             Assert.Equal(name, readModel.Name);
-            Assert.Equal(changes.ItContractId, readModel.ContractId);
-            Assert.Equal(changes.ContractSigner, readModel.ContractSigner);
-            Assert.Equal(changes.ProcurementInitiated, readModel.ProcurementInitiated);
-            Assert.Equal(changes.IrrevocableTo.Date, readModel.IrrevocableTo);
-            Assert.Equal(changes.Terminated.Date, readModel.TerminatedAt);
-            Assert.Equal(changes.Concluded.Date, readModel.Concluded);
-            Assert.Equal(changes.ExpirationDate.Date, readModel.ExpirationDate);
-            AssertReferencedEntity(_supplier.Id, _supplier.Name, readModel.SupplierId, readModel.SupplierName);
-            AssertReferencedEntity(parentContract.Id, parentContract.Name, readModel.ParentContractId, readModel.ParentContractName, parentContract.Uuid, readModel.ParentContractUuid);
-            AssertReferencedEntity(criticality.Id, criticality.Name, readModel.CriticalityId, readModel.CriticalityName, criticality.Uuid, readModel.CriticalityUuid);
-            AssertReferencedEntity(organizationUnit.Id, organizationUnit.Name, readModel.ResponsibleOrgUnitId, readModel.ResponsibleOrgUnitName);
-            AssertReferencedEntity(contractType.Id, contractType.Name, readModel.ContractTypeId, readModel.ContractTypeName, contractType.Uuid, readModel.ContractTypeUuid);
-            AssertReferencedEntity(contractTemplate.Id, contractTemplate.Name, readModel.ContractTemplateId, readModel.ContractTemplateName, contractTemplate.Uuid, readModel.ContractTemplateUuid);
-            AssertReferencedEntity(purchaseForm.Id, purchaseForm.Name, readModel.PurchaseFormId, readModel.PurchaseFormName, purchaseForm.Uuid, readModel.PurchaseFormUuid);
-            AssertReferencedEntity(procurementStrategy.Id, procurementStrategy.Name, readModel.ProcurementStrategyId, readModel.ProcurementStrategyName, procurementStrategy.Uuid, readModel.ProcurementStrategyUuid);
-            Assert.Equal(changes.ProcurementPlanQuarter, readModel.ProcurementPlanQuarter);
-            Assert.Equal(changes.ProcurementPlanYear, readModel.ProcurementPlanYear);
-            AssertReferencedEntity(paymentModel.Id, paymentModel.Name, readModel.PaymentModelId, readModel.PaymentModelName, paymentModel.Uuid, readModel.PaymentModelUuid);
-            AssertReferencedEntity(paymentFrequency.Id, paymentFrequency.Name, readModel.PaymentFrequencyId, readModel.PaymentFrequencyName, paymentFrequency.Uuid, readModel.PaymentFrequencyUuid);
-            AssertReferencedEntity(optionExtend.Id, optionExtend.Name, readModel.OptionExtendId, readModel.OptionExtendName, optionExtend.Uuid, readModel.OptionExtendUuid);
-            AssertReferencedEntity(terminationDeadline.Id, terminationDeadline.Name, readModel.TerminationDeadlineId, readModel.TerminationDeadlineName, terminationDeadline.Uuid, readModel.TerminationDeadlineUuid);
+            Assert.Equal(itContract.Uuid, readModel.SourceEntityUuid);
+            Assert.Equal(contractSigner, readModel.ContractSigner); //Need to figure out why this fails
+            Assert.Equal(procurementInitiated.ToYesNoUndecidedOption(), readModel.ProcurementInitiated);
+            Assert.Equal(irrevocableTo.Date, readModel.IrrevocableTo);
+            Assert.Equal(terminated.Date, readModel.TerminatedAt);
+            Assert.Equal(concluded.Date, readModel.Concluded);
+            Assert.Equal(expirationDate.Date, readModel.ExpirationDate);
+            AssertReferencedEntity(_supplier.Name, readModel.SupplierName, _supplier.Uuid, DatabaseAccess.GetEntityUuid<Organization>(readModel.SupplierId ?? 0));
+            AssertReferencedEntity(parentContract.Name, readModel.ParentContractName, parentContract.Uuid, readModel.ParentContractUuid);
+            AssertReferencedEntity(criticality.Name, readModel.CriticalityName, criticality.Uuid, readModel.CriticalityUuid);
+            AssertReferencedEntity(organizationUnit.Name, readModel.ResponsibleOrgUnitName, organizationUnit.Uuid, DatabaseAccess.GetEntityUuid<OrganizationUnit>(readModel.ResponsibleOrgUnitId ?? 0));
+            AssertReferencedEntity(contractType.Name, readModel.ContractTypeName, contractType.Uuid, readModel.ContractTypeUuid);
+            AssertReferencedEntity(contractTemplate.Name, readModel.ContractTemplateName, contractTemplate.Uuid, readModel.ContractTemplateUuid);
+            AssertReferencedEntity(purchaseForm.Name, readModel.PurchaseFormName, purchaseForm.Uuid, readModel.PurchaseFormUuid);
+            AssertReferencedEntity(procurementStrategy.Name, readModel.ProcurementStrategyName, procurementStrategy.Uuid, readModel.ProcurementStrategyUuid);
+            Assert.Equal(procurementPlan.QuarterOfYear, readModel.ProcurementPlanQuarter);
+            Assert.Equal(procurementPlan.Year, readModel.ProcurementPlanYear);
+            AssertReferencedEntity(paymentModel.Name, readModel.PaymentModelName, paymentModel.Uuid, readModel.PaymentModelUuid);
+            AssertReferencedEntity(paymentFrequency.Name, readModel.PaymentFrequencyName, paymentFrequency.Uuid, readModel.PaymentFrequencyUuid);
+            AssertReferencedEntity(optionExtend.Name, readModel.OptionExtendName, optionExtend.Uuid, readModel.OptionExtendUuid);
+            AssertReferencedEntity(terminationDeadline.Name, readModel.TerminationDeadlineName, terminationDeadline.Uuid, readModel.TerminationDeadlineUuid);
             Assert.Equal("Løbende", readModel.Duration);
-            Assert.Equal(referenceDto.ExternalReferenceId, readModel.ActiveReferenceExternalReferenceId);
-            Assert.Equal(referenceDto.Title, readModel.ActiveReferenceTitle);
-            Assert.Equal(referenceDto.URL, readModel.ActiveReferenceUrl);
+            Assert.Equal(referenceRequest.DocumentId, readModel.ActiveReferenceExternalReferenceId);
+            Assert.Equal(referenceRequest.Title, readModel.ActiveReferenceTitle);
+            Assert.Equal(referenceRequest.Url, readModel.ActiveReferenceUrl);
             Assert.NotNull(readModel.LastEditedByUserId);
             Assert.NotNull(readModel.LastEditedByUserName);
             Assert.NotNull(readModel.LastEditedAtDate);
             AssertCsv(readModel.DataProcessingAgreementsCsv, dpr1.Name, dpr2.Name);
-            Assert.Equal(economy.Acquisition, readModel.AccumulatedAcquisitionCost);
-            Assert.Equal(economy.Operation, readModel.AccumulatedOperationCost);
-            Assert.Equal(economy.Other, readModel.AccumulatedOtherCost);
-            Assert.Equal(economy.AuditDate?.Date, readModel.LatestAuditDate);
-            Assert.Equal(economy.AuditStatus == TrafficLight.Green ? 1 : 0, readModel.AuditStatusGreen);
-            Assert.Equal(economy.AuditStatus == TrafficLight.White ? 1 : 0, readModel.AuditStatusWhite);
-            Assert.Equal(economy.AuditStatus == TrafficLight.Red ? 1 : 0, readModel.AuditStatusRed);
-            Assert.Equal(economy.AuditStatus == TrafficLight.Yellow ? 1 : 0, readModel.AuditStatusYellow);
+            Assert.Equal(externalPaymentRequest.Acquisition, readModel.AccumulatedAcquisitionCost);
+            Assert.Equal(externalPaymentRequest.Operation, readModel.AccumulatedOperationCost);
+            Assert.Equal(externalPaymentRequest.Other, readModel.AccumulatedOtherCost);
+            Assert.Equal(externalPaymentRequest.AuditDate?.Date, readModel.LatestAuditDate);
+            Assert.Equal(externalPaymentRequest.AuditStatus == PaymentAuditStatus.Green ? 1 : 0, readModel.AuditStatusGreen);
+            Assert.Equal(externalPaymentRequest.AuditStatus == PaymentAuditStatus.White ? 1 : 0, readModel.AuditStatusWhite);
+            Assert.Equal(externalPaymentRequest.AuditStatus == PaymentAuditStatus.Red ? 1 : 0, readModel.AuditStatusRed);
+            Assert.Equal(externalPaymentRequest.AuditStatus == PaymentAuditStatus.Yellow ? 1 : 0, readModel.AuditStatusYellow);
             Assert.Equal(2, readModel.NumberOfAssociatedSystemRelations);
             AssertCsv(readModel.ItSystemUsagesCsv, itSystem1.Name, itSystem2.Name);
             Assert.Equal(2, readModel.RoleAssignments.Count);
-            Assert.Contains(readModel.RoleAssignments, ra => ra.RoleId == role1.Id && ra.UserId == user1Id);
-            Assert.Contains(readModel.RoleAssignments, ra => ra.RoleId == role2.Id && ra.UserId == user2Id);
+            Assert.Contains(readModel.RoleAssignments, ra => DatabaseAccess.GetEntityUuid<ItContractRole>(ra.RoleId) == role1.Uuid && ra.UserId == user1Id);
+            Assert.Contains(readModel.RoleAssignments, ra => DatabaseAccess.GetEntityUuid<ItContractRole>(ra.RoleId) == role2.Uuid && ra.UserId == user2Id);
         }
 
         private static void AssertCsv(string csv, params string[] expectedNames)
@@ -205,23 +287,13 @@ namespace Tests.Integration.Presentation.Web.Contract
                 Assert.Contains(expectedName, dpas);
         }
 
-        private static void AssertReferencedEntity(int idFromModel, string nameFromModel, int? idFromReadModel, string nameFromReadModel, Guid? uuidFromModel = null, Guid? uuidFromReadModel = null)
+        private static void AssertReferencedEntity(string nameFromModel, string nameFromReadModel, Guid? uuidFromModel, Guid? uuidFromReadModel)
         {
-            Assert.Equal(idFromModel, idFromReadModel);
             Assert.Equal(nameFromModel, nameFromReadModel);
             if (uuidFromModel != null)
             {
                 Assert.Equal(uuidFromModel, uuidFromReadModel);
-
             }
-        }
-
-        private async Task<OrganizationDTO> CreateOrganizationAsync(OrganizationTypeKeys orgType)
-        {
-            var organizationName = CreateName();
-            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
-                organizationName, string.Empty, orgType, AccessModifier.Public);
-            return organization;
         }
 
         private string CreateName()

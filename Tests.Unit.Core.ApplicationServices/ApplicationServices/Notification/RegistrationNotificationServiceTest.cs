@@ -327,7 +327,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var id = A<int>();
-            var notification = new Advice{Id = id, IsActive = false};
+            var notification = new Advice{Id = id, IsActive = false, AdviceType = AdviceType.Repeat};
             var root = CreateEntityWithAdvices(relatedEntityType);
 
             var transaction = ExpectDatabaseTransaction();
@@ -355,7 +355,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         {
             //Arrange
             var id = A<int>();
-            var notification = new Advice{Id = id, IsActive = true};
+            var notification = new Advice{Id = id, IsActive = true, AdviceType = AdviceType.Repeat};
             var root = CreateEntityWithAdvices(relatedEntityType);
 
             ExpectDatabaseTransaction();

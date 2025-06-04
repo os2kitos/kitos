@@ -1,5 +1,4 @@
-﻿using Core.ApplicationServices;
-using Core.DomainModel;
+﻿using Core.DomainModel;
 using Infrastructure.Services.Cryptography;
 
 namespace Tools.Test.Database.Model.Extensions

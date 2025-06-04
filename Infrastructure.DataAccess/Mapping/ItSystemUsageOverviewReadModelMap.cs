@@ -119,6 +119,13 @@ namespace Infrastructure.DataAccess.Mapping
                .IsOptional()
                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ArchiveDuty", 0);
 
+            Property(x => x.CatalogArchiveDuty)
+                .IsOptional()
+                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_CatalogArchiveDuty", 0);
+
+            Property(x => x.ContainsAITechnology)
+                .IsOptional();
+
             Property(x => x.IsHoldingDocument)
                 .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_IsHoldingDocument", 0);
 
@@ -175,6 +182,14 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.LastChangedAt)
                 .HasIndexAnnotation("IX_LastChangedAt");
+
+            Property(x => x.WebAccessibilityCompliance)
+                .IsOptional()
+                .HasIndexAnnotation("IX_WebAccessibilityCompliance");
+
+            Property(x => x.LastWebAccessibilityCheck)
+                .IsOptional()
+                .HasIndexAnnotation("IX_LastWebAccessibilityCheck");
 
             //No index bc we don't know how long it might be
             Property(x => x.ItSystemKLEIdsAsCsv).IsOptional();

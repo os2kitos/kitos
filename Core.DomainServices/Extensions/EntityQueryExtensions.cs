@@ -42,7 +42,7 @@ namespace Core.DomainServices.Extensions
             IHasAccessModifier,
             IOwnedByOrganization
         {
-            return new QueryByPublicAccessOrOrganizationId<T>(organizationId).Apply(result); ;
+            return new QueryByPublicAccessOrOrganizationId<T>(organizationId).Apply(result);
         }
 
         public static IQueryable<T> ByOrganizationDataAndPublicDataFromOtherOrganizations<T>(

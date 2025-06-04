@@ -105,6 +105,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.DataProcessingRegistratio
                 .Select(rights => rights.Select(right => right.MapExtendedRoleAssignmentResponse()))
                 .Match(Ok, FromOperationError);
         }
+
         /// Add role assignment to the data processing registration
         /// Constraint: Duplicates are not allowed (existing assignment of the same user/role)
         /// </summary>

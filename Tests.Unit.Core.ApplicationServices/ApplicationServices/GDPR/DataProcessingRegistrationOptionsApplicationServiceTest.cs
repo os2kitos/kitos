@@ -5,7 +5,6 @@ using Core.ApplicationServices.GDPR;
 using Core.DomainModel.GDPR;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Model.Options;
-using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.GDPR;
 using Moq;
 using Tests.Toolkit.Patterns;

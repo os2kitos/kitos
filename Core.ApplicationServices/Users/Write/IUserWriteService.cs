@@ -29,6 +29,10 @@ namespace Core.ApplicationServices.Users.Write
 
         Maybe<OperationError> RemoveLocalAdmin(Guid organizationUuid, Guid userUuid);
 
-        void RequestPasswordReset(string email, bool newUi);
+        Result<User, OperationError> UpdateSystemIntegrator(Guid userUuid, bool systemIntegratorStatus);
+
+        void RequestPasswordReset(string email);
+
+        Maybe<OperationError> SetDefaultOrgUnit(Guid userUuid, Guid organizationUuid, Guid organizationUnitUuid);
     }
 }

@@ -35,7 +35,7 @@ namespace Core.ApplicationServices.Authorization
                 .ToDictionary(x => x.Key, x => x.Category);
 
 
-            return new OrganizationalUserContext(user.Id, organizationRoles, organizationCategories, user.HasStakeHolderAccess);
+            return new OrganizationalUserContext(user.Id, organizationRoles, organizationCategories, user.HasStakeHolderAccess, user.IsSystemIntegrator);
         }
     }
 }

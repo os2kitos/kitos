@@ -136,9 +136,10 @@ namespace Tools.Test.Database
                         LocalAdmin = new Credentials(GetArgument(additionalArgs, 3), GetArgument(additionalArgs, 4)),
                         NormalUser = new Credentials(GetArgument(additionalArgs, 5), GetArgument(additionalArgs, 6)),
                         ApiUser = new Credentials(GetArgument(additionalArgs, 7), GetArgument(additionalArgs, 8)),
-                        GlobalAdminApiUser = new Credentials(GetArgument(additionalArgs, 9), GetArgument(additionalArgs, 10))
+                        GlobalAdminApiUser = new Credentials(GetArgument(additionalArgs, 9), GetArgument(additionalArgs, 10)),
+                        SystemIntegrator = new Credentials(GetArgument(additionalArgs, 11), GetArgument(additionalArgs, 12))
                     };
-                    return new CreateFullTestDatabaseTask(options.GlobalAdmin, options.LocalAdmin, options.NormalUser, options.ApiUser, options.GlobalAdminApiUser);
+                    return new CreateFullTestDatabaseTask(options.GlobalAdmin, options.LocalAdmin, options.NormalUser, options.ApiUser, options.GlobalAdminApiUser, options.SystemIntegrator);
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(task), task, "Unknown task provided");

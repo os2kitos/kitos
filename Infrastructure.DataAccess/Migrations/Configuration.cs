@@ -1,5 +1,3 @@
-using System;
-using System.Data.Entity;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -7,9 +5,12 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Infrastructure.Services.Cryptography;
+using System;
+using System.Data.Entity;
 
 namespace Infrastructure.DataAccess.Migrations
 {
+    using Core.DomainModel.PublicMessage;
     using System.Data.Entity.Migrations;
     using System.Linq;
 
@@ -196,12 +197,6 @@ namespace Infrastructure.DataAccess.Migrations
 
                 try
                 {
-                    var count = context.OrganizationUnitRoles.Count();
-                    foreach (var organizationUnitRole in context.OrganizationUnitRoles)
-                    {
-                        organizationUnitRole.Priority = count;
-                        count--;
-                    }
                     context.OrganizationUnitRoles.AddOrUpdate(role => role.Name, boss, resourcePerson, employee, digitalConsultant, itConsultant, leader, director);
                     context.SaveChanges();
                 }
@@ -317,13 +312,6 @@ namespace Infrastructure.DataAccess.Migrations
 
                 context.ItSystemRoles.AddOrUpdate(x => x.Name, systemOwnerRole, systemResponsibleRole, businessOwnerRole, superuserResponsibleRole, superuserRole, securityResponsibleRole, chanceManagerRole, dataOwnerRole, systemAdminRole);
 
-                var itSystemRolesCount = context.ItSystemRoles.Count();
-                foreach (var role in context.ItSystemRoles)
-                {
-                    role.Priority = itSystemRolesCount;
-                    itSystemRolesCount--;
-                }
-
                 context.SaveChanges();
 
                 #endregion
@@ -387,13 +375,6 @@ namespace Infrastructure.DataAccess.Migrations
                     Priority = 1
                 });
 
-                var itContractRolesCount = context.ItContractRoles.Count();
-                foreach (var role in context.ItContractRoles)
-                {
-                    role.Priority = itContractRolesCount;
-                    itContractRolesCount--;
-                }
-
                 context.SaveChanges();
 
                 #endregion
@@ -421,13 +402,6 @@ namespace Infrastructure.DataAccess.Migrations
                     Priority = 2
                 });
 
-                var dpaRolesCount = context.DataProcessingRegistrationRoles.Count();
-                foreach (var role in context.ItContractRoles)
-                {
-                    role.Priority = dpaRolesCount;
-                    dpaRolesCount--;
-                }
-
                 context.SaveChanges();
 
                 #endregion
@@ -450,7 +424,7 @@ namespace Infrastructure.DataAccess.Migrations
                 context.Organizations.AddOrUpdate(x => x.Name, commonOrganization/*, muni1, muni2*/);
                 context.SaveChanges();
 
-                
+
 
 
                 #endregion
@@ -493,6 +467,101 @@ namespace Infrastructure.DataAccess.Migrations
                     context.Texts.AddOrUpdate(new Text()
                     {
                         Value = @"Kontaktinformationer",
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
+                const string longDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer tortor ligula, malesuada nec molestie sit amet, tempor quis elit. Suspendisse porttitor imperdiet lacus, sed ultrices augue pharetra sed. Maecenas rutrum metus non dui blandit, vel dignissim lacus pellentesque. Etiam magna nunc, lacinia blandit diam in, laoreet gravida urna. Suspendisse potenti. Nunc ornare sapien sit amet faucibus eleifend. Nunc eros sapien, hendrerit in lacus sit amet, posuere auctor augue. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Integer imperdiet ante id nunc tincidunt lacinia. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vivamus pharetra lorem ut libero fringilla iaculis. Curabitur et suscipit leo, non fermentum nibh. Proin id leo vehicula, dignissim felis vitae, imperdiet leo.";
+
+                if (!context.PublicMessages.Any(x => x.Id == 1))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage()
+                    {
+                        Title = @"Vejledninger",
+                        LongDescription = longDescription,
+                        ShortDescription = "Skabeloner til brug ved oprettelse af IT-Systemer, leverandører og snitflader finder du her.",
+                        Link = "https://google.com",
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
+                if (!context.PublicMessages.Any(x => x.Id == 2))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage()
+                    {
+                        Title = @"Skabeloner",
+                        LongDescription = longDescription,
+                        ShortDescription = "Brugerklubben i Kitos har et filarkiv, hvor du og dine kolleger kan tilgå materiale om Kitos.",
+                        Link = "https://google.com",
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
+                if (!context.PublicMessages.Any(x => x.Id == 4))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage()
+                    {
+                        Title = @"Driftsstatus",
+                        LongDescription = longDescription,
+                        ShortDescription = "Hvis der opleves fejl i Kitos vil du kunne se en begrundelse på denne side.",
+                        Link = "https://google.com",
+                        Status = PublicMessageStatus.Active,
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
+                if (!context.PublicMessages.Any(x => x.Id == 3))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage()
+                    {
+                        Title = @"Arrangementer",
+                        LongDescription = longDescription,
+                        ShortDescription = "Brugerklubben holder løbende arrangementer, som du har mulighed for at tilmelde dig.",
+                        Link = "https://google.com",
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
+
+                if (!context.PublicMessages.Any(x => x.Id == 5))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage()
+                    {
+                        Title = @"OS2Kitos kontaktpersoner",
+                        LongDescription = longDescription,
+                        ShortDescription = "Se hvem, der er Kitos kontaktpersoner i kommunerne og spar med hinanden.",
+                        Link = "https://google.com",
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
+                if (!context.PublicMessages.Any(x => x.Id == 6))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage()
+                    {
+                        Title = @"Kontakt",
+                        LongDescription = longDescription,
+                        ShortDescription = "Har du nogen spørgsmål til Kitos? Kontakt os og vi vil hjælpe dig hurtigst muligt.",
+                        Link = "https://google.com",
+                        ObjectOwnerId = globalAdmin.Id,
+                        LastChangedByUserId = globalAdmin.Id
+                    });
+                }
+
+                if (!context.PublicMessages.Any(x => x.Id == 7))
+                {
+                    context.PublicMessages.AddOrUpdate(new PublicMessage
+                    {
+                        Title = "Kitos er Kommunernes IT Overblikssystem",
+                        ShortDescription = "Kitos er en open-source web-baseret løsning, der anvendes af 76 kommuner. Kitos skaber overblik over den samlede kommunale IT-portefølje.",
+                        Link = "https://www.os2.eu/os2kitos",
+                        IsMain = true,
                         ObjectOwnerId = globalAdmin.Id,
                         LastChangedByUserId = globalAdmin.Id
                     });
@@ -545,6 +614,12 @@ namespace Infrastructure.DataAccess.Migrations
         private static void AddOptions<T, TReference>(IDbSet<T> dbSet, User objectOwner, params string[] names) where T : OptionEntity<TReference>, new()
         {
             var options = names.Select(name => CreateOption<T, TReference>(name, objectOwner)).ToList();
+            var i = options.Count;
+            foreach (var option in options)
+            {
+                option.Priority = i;
+                i--;
+            }
             try
             {
                 dbSet.AddOrUpdate(x => x.Name, options.ToArray());
@@ -553,12 +628,6 @@ namespace Infrastructure.DataAccess.Migrations
             {
                 // we don't really care about duplicates
                 // just do nothing
-            }
-            var i = dbSet.Count();
-            foreach (var option in dbSet)
-            {
-                option.Priority = i;
-                i--;
             }
         }
 
@@ -584,7 +653,7 @@ namespace Infrastructure.DataAccess.Migrations
 
             return org;
         }
-       
+
         #endregion
     }
 }

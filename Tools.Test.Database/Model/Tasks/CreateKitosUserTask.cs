@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Data.Entity.Migrations;
-using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Infrastructure.DataAccess;
@@ -15,21 +14,23 @@ namespace Tools.Test.Database.Model.Tasks
         private readonly string _password;
         private readonly OrganizationRole _role;
         private readonly bool _apiAccess;
+        private readonly bool _systemIntegrator;
         private readonly string _salt;
         private readonly string[] _organizationNames;
 
-        public CreateKitosUserTask(string email, string password, OrganizationRole role, string organizationNames, bool apiAccess = false)
+        public CreateKitosUserTask(string email, string password, OrganizationRole role, string organizationNames, bool apiAccess = false, bool systemIntegrator = false)
         {
             _email = email ?? throw new ArgumentNullException(nameof(email));
             _password = password ?? throw new ArgumentNullException(nameof(password));
             _role = role;
             _organizationNames = ParseOrganizationNames(organizationNames ?? throw new ArgumentNullException(nameof(organizationNames)));
             _apiAccess = apiAccess;
+            _systemIntegrator = systemIntegrator;
             _salt = string.Format("{0:N}{0:N}", Guid.NewGuid());
         }
 
-        public CreateKitosUserTask(Credentials credentials, OrganizationRole role, string organizationNames, bool apiAccess = false)
-        : this(credentials.Email, credentials.Password, role, organizationNames, apiAccess)
+        public CreateKitosUserTask(Credentials credentials, OrganizationRole role, string organizationNames, bool apiAccess = false, bool systemIntegrator = false)
+        : this(credentials.Email, credentials.Password, role, organizationNames, apiAccess, systemIntegrator)
         {
 
         }
@@ -57,16 +58,18 @@ namespace Tools.Test.Database.Model.Tasks
         {
             var globalAdmin = context.GetGlobalAdmin();
             var apiUser = "Api ";
+            var systemIntegrator = "Systemintegrator ";
             var newUser = new User
             {
                 Name = "Automatisk oprettet testbruger",
-                LastName = $"({((_apiAccess) ? apiUser : "")}{_role:G})",
+                LastName = $"({((_apiAccess) ? apiUser : "")}{(_systemIntegrator ? systemIntegrator : "")}{_role:G})",
                 Salt = _salt,
                 Email = _email,
                 ObjectOwnerId = globalAdmin.Id,
                 LastChangedByUserId = globalAdmin.Id,
                 IsGlobalAdmin = _role == OrganizationRole.GlobalAdmin,
-                HasApiAccess = _apiAccess
+                HasApiAccess = _apiAccess,
+                IsSystemIntegrator = _systemIntegrator
             };
             newUser.SetPassword(_password);
 

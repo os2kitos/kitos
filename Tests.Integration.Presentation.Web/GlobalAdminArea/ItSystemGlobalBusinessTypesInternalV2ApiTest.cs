@@ -14,17 +14,15 @@ using Presentation.Web.Models.API.V2.Internal.Response.GlobalOptions;
 
 namespace Tests.Integration.Presentation.Web.GlobalAdminArea
 {
-    public class ItSystemGlobalBusinessTypesInternalV2ApiTest: WithAutoFixture
+    public class ItSystemGlobalBusinessTypesInternalV2ApiTest : WithAutoFixture
     {
-        private const string BusinessTypesUrlSuffix = "business-types";
-        private const string ItSystemsApiPrefix = "api/v2/internal/it-systems";
 
         [Fact]
         public async Task Can_Get_Global_Business_Types()
         {
             var expectedGlobalOption = SetupCreateGlobalBusinessTypeInDatabase();
 
-            using var response = await GlobalOptionTypeV2Helper.GetGlobalOptionTypes(BusinessTypesUrlSuffix, ItSystemsApiPrefix);
+            using var response = await GlobalOptionTypeV2Helper.GetGlobalOptionTypes(GlobalOptionTypeV2Helper.BusinessTypes);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDtos = await response.ReadResponseBodyAsAsync<IEnumerable<GlobalRegularOptionResponseDTO>>();
@@ -39,7 +37,7 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
         {
             var dto = A<GlobalRegularOptionCreateRequestDTO>();
 
-            using var response = await GlobalOptionTypeV2Helper.CreateGlobalOptionType(BusinessTypesUrlSuffix, dto, ItSystemsApiPrefix);
+            using var response = await GlobalOptionTypeV2Helper.CreateGlobalOptionType(GlobalOptionTypeV2Helper.BusinessTypes, dto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDto = await response.ReadResponseBodyAsAsync<GlobalRegularOptionResponseDTO>();
@@ -55,7 +53,7 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
 
             var dto = A<GlobalRegularOptionUpdateRequestDTO>();
 
-            using var response = await GlobalOptionTypeV2Helper.PatchGlobalOptionType(globalOption.Uuid, BusinessTypesUrlSuffix, dto, ItSystemsApiPrefix);
+            using var response = await GlobalOptionTypeV2Helper.PatchGlobalOptionType(globalOption.Uuid, GlobalOptionTypeV2Helper.BusinessTypes, dto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var responseDto = await response.ReadResponseBodyAsAsync<GlobalRegularOptionResponseDTO>();

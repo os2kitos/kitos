@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
@@ -45,7 +44,7 @@ public class OrganizationWriteService : IOrganizationWriteService {
         _dataProtectionAdvisorRepository = dataProtectionAdvisorRepository;
         _countryCodeRepository = countryCodeRepository;
     }
-
+    
     public Result<Organization, OperationError> PatchMasterData(Guid organizationUuid, OrganizationMasterDataUpdateParameters parameters)
     {
         using var transaction = _transactionManager.Begin();

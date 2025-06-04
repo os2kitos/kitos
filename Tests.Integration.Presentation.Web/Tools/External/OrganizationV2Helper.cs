@@ -36,8 +36,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             if (onlyWhereUserHasMembership)
                 queryParameters.Add(new KeyValuePair<string, string>("onlyWhereUserHasMembership", true.ToString()));
 
-            if(cvrContent != null)
-                queryParameters.Add(new KeyValuePair<string, string>("cvrContent",cvrContent));
+            if (cvrContent != null)
+                queryParameters.Add(new KeyValuePair<string, string>("cvrContent", cvrContent));
 
             if (nameOrCvrContent != null)
                 queryParameters.Add(new KeyValuePair<string, string>("nameOrCvrContent", nameOrCvrContent));
@@ -96,6 +96,16 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<List<UnitAccessRightsWithUnitDataResponseDTO>>();
+        }
+
+        public static async Task<List<OrganizationUserResponseDTO>> GetUsersInOrganization(Guid organizationUuid)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v2/organizations/{organizationUuid}/users");
+            using var response = await HttpApi.GetWithCookieAsync(url, cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<List<OrganizationUserResponseDTO>>();
         }
     }
 }

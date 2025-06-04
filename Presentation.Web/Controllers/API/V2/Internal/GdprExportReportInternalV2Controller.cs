@@ -1,6 +1,5 @@
 ﻿using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.GDPR;
-using Core.DomainServices.Generic;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Response;
@@ -72,7 +71,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal
                 TechnicalSupervisionDocumentationUrlName = gdprReport.TechnicalSupervisionDocumentationUrlName,
                 UserSupervision = gdprReport.UserSupervision?.ToYesNoDontKnowChoice(),
                 UserSupervisionDocumentationUrl = gdprReport.UserSupervisionDocumentationUrl,
-                UserSupervisionDocumentationUrlName = gdprReport.TechnicalSupervisionDocumentationUrlName,
+                UserSupervisionDocumentationUrlName = gdprReport.UserSupervisionDocumentationUrlName,
                 NextDataRetentionEvaluationDate = gdprReport.NextDataRetentionEvaluationDate,
                 InsecureCountriesSubjectToDataTransfer = gdprReport.InsecureCountriesSubjectToDataTransfer
             };

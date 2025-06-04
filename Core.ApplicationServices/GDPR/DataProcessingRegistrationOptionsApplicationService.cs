@@ -1,6 +1,5 @@
 ﻿
 using System;
-using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.GDPR;

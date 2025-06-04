@@ -19,7 +19,6 @@ using Infrastructure.Services.DataAccess;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using Core.ApplicationServices.Model.Organizations;
-using Core.DomainServices.Generic;
 
 namespace Tests.Unit.Core.ApplicationServices
 {
@@ -39,7 +38,6 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IOrganizationalUserContext> _organizationalUserContextMock;
         private readonly Mock<ICommandBus> _commandBusMock;
-        private readonly Mock<IEntityIdentityResolver> _identityResolver;
 
 
         public UserServiceTest()
@@ -54,7 +52,6 @@ namespace Tests.Unit.Core.ApplicationServices
             _domainEventsMock = new Mock<IDomainEvents>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _organizationalUserContextMock = new Mock<IOrganizationalUserContext>();
-            _identityResolver = new Mock<IEntityIdentityResolver>();
 
             _organizationServiceMock = new Mock<IOrganizationService>();
             _commandBusMock = new Mock<ICommandBus>();
@@ -75,9 +72,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 _organizationServiceMock.Object,
                 _transactionManagerMock.Object,
                 _organizationalUserContextMock.Object,
-                _commandBusMock.Object,
-                _identityResolver.Object
-                );
+                _commandBusMock.Object);
         }
 
         [Fact]

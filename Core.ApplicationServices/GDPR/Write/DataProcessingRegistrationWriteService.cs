@@ -5,6 +5,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Generic.Write;
+using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
 using Core.ApplicationServices.Model.Shared;
@@ -79,7 +80,7 @@ namespace Core.ApplicationServices.GDPR.Write
 
             var creationResult = _applicationService
                 .Create(orgId.Value, name)
-                .Bind(createdSystemUsage => Update(() => createdSystemUsage, parameters));
+                .Bind(createdDpr => Update(() => createdDpr, parameters));
 
             if (creationResult.Ok)
             {
@@ -100,28 +101,17 @@ namespace Core.ApplicationServices.GDPR.Write
 
         public Result<DataProcessingRegistration, OperationError> AddRole(Guid dprUuid, UserRolePair assignment)
         {
-            return _applicationService
-                .GetByUuid(dprUuid)
-                .Select(ExtractAssignedRoles)
-                .Bind<DataProcessingRegistrationModificationParameters>(existingRoles =>
-                {
-                    if (existingRoles.Contains(assignment))
-                    {
-                        return new OperationError("Role assignment exists", OperationFailure.Conflict);
-                    }
-                    return CreateRoleAssignmentUpdate(existingRoles.Append(assignment));
-                })
-                .Bind(update => Update(dprUuid, update));
+            return AddRoles(dprUuid, assignment.WrapAsEnumerable());
         }
 
         public Result<DataProcessingRegistration, OperationError> RemoveRole(Guid dprUuid, UserRolePair assignment)
         {
             return _applicationService
                 .GetByUuid(dprUuid)
-                .Select(ExtractAssignedRoles)
+                .Select(RoleMappingHelper.ExtractAssignedRoles)
                 .Bind<DataProcessingRegistrationModificationParameters>(existingRoles =>
                 {
-                     if (!existingRoles.Contains(assignment))
+                    if (!existingRoles.Contains(assignment))
                     {
                         return new OperationError("Assignment does not exist", OperationFailure.BadInput);
                     }
@@ -130,16 +120,34 @@ namespace Core.ApplicationServices.GDPR.Write
                 .Bind(update => Update(dprUuid, update));
         }
 
+        private Result<DataProcessingRegistration, OperationError> AddRoles(Guid dprUuid,
+            IEnumerable<UserRolePair> assignments)
+        {
+            return _applicationService
+                .GetByUuid(dprUuid)
+                .Bind(dpr => GetRoleAssignmentUpdates(dpr, assignments))
+                .Bind(update => Update(dprUuid, update));
+        }
+
         private Result<DataProcessingRegistration, OperationError> Update(Func<Result<DataProcessingRegistration, OperationError>> getDpr, DataProcessingRegistrationModificationParameters parameters)
         {
             using var transaction = _transactionManager.Begin();
 
-            var result = getDpr()
-                .Bind(systemUsage => PerformUpdates(systemUsage, parameters));
+            var dprResult = getDpr();
+
+            if (dprResult.Failed)
+            {
+                return dprResult.Error;
+            }
+
+            var dpr = dprResult.Value;
+            var snapshot = dpr.Snapshot();
+
+            var result = PerformUpdates(dpr, parameters);
 
             if (result.Ok)
             {
-                _domainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(result.Value));
+                _domainEvents.Raise(new EntityUpdatedEventWithSnapshot<DataProcessingRegistration, DprSnapshot>(result.Value, snapshot.FromNullable()));
                 _databaseControl.SaveChanges();
                 transaction.Commit();
             }
@@ -172,9 +180,9 @@ namespace Core.ApplicationServices.GDPR.Write
             return dpr;
         }
 
-        private Result<DataProcessingRegistration, OperationError> UpdateRolesData(DataProcessingRegistration dpr, UpdatedDataProcessingRegistrationRoles usageRoles)
+        private Result<DataProcessingRegistration, OperationError> UpdateRolesData(DataProcessingRegistration dpr, UpdatedDataProcessingRegistrationRoles dprRoles)
         {
-            return dpr.WithOptionalUpdate(usageRoles.UserRolePairs, UpdateRoles);
+            return dpr.WithOptionalUpdate(dprRoles.UserRolePairs, UpdateRoles);
         }
 
         private Result<DataProcessingRegistration, OperationError> UpdateRoles(DataProcessingRegistration dpr, Maybe<IEnumerable<UserRolePair>> userRolePairs)
@@ -185,7 +193,7 @@ namespace Core.ApplicationServices.GDPR.Write
                 return new OperationError($"Duplicates of 'User Role Pairs' are not allowed", OperationFailure.BadInput);
             }
 
-            var existingRightsList = dpr.Rights.Select(x => new UserRolePair(x.User.Uuid,x.Role.Uuid)).ToList();
+            var existingRightsList = dpr.Rights.Select(x => new UserRolePair(x.User.Uuid, x.Role.Uuid)).ToList();
 
             foreach (var (delta, item) in existingRightsList.ComputeDelta(newRightsList, x => x))
             {
@@ -286,7 +294,20 @@ namespace Core.ApplicationServices.GDPR.Write
                 .Bind(r => r.WithOptionalUpdate(parameters.DataProcessorUuids, UpdateDataProcessors))
                 .Bind(r => r.WithOptionalUpdate(parameters.HasSubDataProcessors, (registration, newValue) => _applicationService.SetSubDataProcessorsState(registration.Id, newValue ?? YesNoUndecidedOption.Undecided)))
                 .Bind(r => r.WithOptionalUpdate(parameters.SubDataProcessors, UpdateSubDataProcessors))
-                .Bind(r => r.WithOptionalUpdate(parameters.MainContractUuid, UpdateMainContract));
+                .Bind(r => r.WithOptionalUpdate(parameters.MainContractUuid, UpdateMainContract))
+                .Bind(r => r.WithOptionalUpdate(parameters.ResponsibleUnitUuid, UpdateResponsibleUnit));
+        }
+
+        private Result<DataProcessingRegistration, OperationError> UpdateResponsibleUnit(DataProcessingRegistration dpr, Guid? orgUnitUuid)
+        {
+            if (orgUnitUuid == null)
+            {
+                dpr.ResetResponsibleOrganizationUnit();
+                return dpr;
+            }
+            var updateResult = dpr.SetResponsibleOrganizationUnit(orgUnitUuid.Value);
+            return updateResult.Match<Result<DataProcessingRegistration, OperationError>>(err => err, () => dpr);
+
         }
 
         private Result<DataProcessingRegistration, OperationError> UpdateSystemAssignments(DataProcessingRegistration dpr, IEnumerable<Guid> systemUsageUuids)
@@ -468,12 +489,20 @@ namespace Core.ApplicationServices.GDPR.Write
                 .Delete(dbId.Value)
                 .Match(_ => Maybe<OperationError>.None, error => error);
         }
-
-
-        private static IReadOnlyList<UserRolePair> ExtractAssignedRoles(DataProcessingRegistration dpr)
+        
+        private static Result<DataProcessingRegistrationModificationParameters, OperationError> GetRoleAssignmentUpdates(DataProcessingRegistration dpr, IEnumerable<UserRolePair> assignments)
         {
-            return dpr.Rights.Select(right => new UserRolePair(right.User.Uuid, right.Role.Uuid)).ToList();
+            var existingRoles = RoleMappingHelper.ExtractAssignedRoles(dpr);
+            var newRoles = assignments.ToList();
+
+            if (existingRoles.Any(newRoles.Contains))
+            {
+                return new OperationError("Role assignment exists", OperationFailure.Conflict);
+            }
+            
+            return CreateRoleAssignmentUpdate(existingRoles.Concat(newRoles));
         }
+
 
         private static DataProcessingRegistrationModificationParameters CreateRoleAssignmentUpdate(IEnumerable<UserRolePair> existingRoles)
         {
@@ -482,7 +511,7 @@ namespace Core.ApplicationServices.GDPR.Write
                 Roles = new UpdatedDataProcessingRegistrationRoles
                 {
                     UserRolePairs = existingRoles.FromNullable().AsChangedValue()
-                } 
+                }
             };
         }
     }

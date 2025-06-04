@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
@@ -26,6 +27,511 @@ namespace Tests.Unit.Core.Model
             };
         }
 
+
+        [Theory]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        [InlineData(DataOptions.YES)]
+        public void UpdateRetentionPeriodDefined_Only_Clears_Related_Fields_If_Not_Yes(DataOptions retentionPeriodDefined)
+        {
+            var nextDataRetentionEvaluationDate = A<DateTime>();
+            var DataRetentionEvaluationFrequencyInMonths = A<int>();
+            _sut.UpdateRetentionPeriodDefined(DataOptions.YES);
+            _sut.UpdateNextDataRetentionEvaluationDate(nextDataRetentionEvaluationDate);
+            _sut.UpdateDataRetentionEvaluationFrequencyInMonths(DataRetentionEvaluationFrequencyInMonths);
+
+            _sut.UpdateRetentionPeriodDefined(retentionPeriodDefined);
+
+            Assert.Equal(retentionPeriodDefined, _sut.answeringDataDPIA);
+            if (retentionPeriodDefined == DataOptions.YES)
+            {
+                Assert.Equal(retentionPeriodDefined, _sut.answeringDataDPIA);
+                Assert.Equal(nextDataRetentionEvaluationDate, _sut.DPIAdeleteDate);
+                Assert.Equal(DataRetentionEvaluationFrequencyInMonths, _sut.numberDPIA);
+            }
+            else
+            {
+                Assert.Null(_sut.DPIADateFor);
+                Assert.Null(_sut.DPIASupervisionDocumentationUrl);
+                Assert.Null(_sut.DPIASupervisionDocumentationUrlName);
+            }
+        }
+
+        [Theory]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateNextDataRetentionEvaluationDate_Updates_If_Retention_Period_Defined_Is_Yes(DataOptions retentionPeriodDefined)
+        {
+            _sut.UpdateRetentionPeriodDefined(retentionPeriodDefined);
+            var date = A<DateTime>();
+
+            _sut.UpdateNextDataRetentionEvaluationDate(date);
+
+            if (retentionPeriodDefined == DataOptions.YES)
+            {
+                Assert.Equal(date, _sut.DPIAdeleteDate);
+            }
+            else
+            {
+                Assert.Null(_sut.DPIAdeleteDate);
+            }
+        }
+
+        [Theory]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateDataRetentionEvaluationFrequencyInMonths_Updates_If_Retention_Period_Defined_Is_Yes(DataOptions retentionPeriodDefined)
+        {
+            _sut.UpdateRetentionPeriodDefined(retentionPeriodDefined);
+            var frequency = A<int>();
+
+            var result = _sut.UpdateDataRetentionEvaluationFrequencyInMonths(frequency);
+
+            if (retentionPeriodDefined == DataOptions.YES)
+            {
+                Assert.True(result.IsNone);
+                Assert.Equal(frequency, _sut.numberDPIA);
+            }
+            else
+            {
+                Assert.True(result.HasValue);
+                Assert.Equal(result.Value.FailureType, OperationFailure.BadInput);
+            }
+        }
+
+        [Theory]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateDPIADocumentation_Updates_If_DPIA_Is_Yes(DataOptions dpia)
+        {
+            _sut.UpdateDPIAConducted(dpia);
+            var url = A<string>();
+            var name = A<string>();
+
+            _sut.UpdateDPIADocumentation(url, name);
+
+            if (dpia == DataOptions.YES)
+            {
+                Assert.Equal(url, _sut.DPIASupervisionDocumentationUrl);
+                Assert.Equal(name, _sut.DPIASupervisionDocumentationUrlName);
+            }
+            else
+            {
+                Assert.Null(_sut.DPIASupervisionDocumentationUrl);
+                Assert.Null(_sut.DPIASupervisionDocumentationUrlName);
+            }
+        }
+
+        [Theory]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateDPIADate_Updates_If_DPIA_Is_Yes(DataOptions dpia)
+        {
+            _sut.UpdateDPIAConducted(dpia);
+            var date = A<DateTime>();
+
+            _sut.UpdateDPIADate(date);
+
+            if (dpia == DataOptions.YES)
+            {
+                Assert.Equal(date, _sut.DPIADateFor);
+            }
+            else
+            {
+                Assert.Null(_sut.DPIADateFor);
+            }
+        }
+
+
+        [Theory]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        [InlineData(DataOptions.YES)]
+        public void UpdateDPIAConducted_Only_Clears_Related_Fields_If_Not_Yes(DataOptions dpia)
+        {
+            var dpiaDateFor = A<DateTime>();
+            var dpiaSupervisionDocumentationUrl = A<string>();
+            var dpiaSupervisionDocumentationUrlName = A<string>();
+            _sut.UpdateDPIAConducted(DataOptions.YES);
+            _sut.UpdateDPIADate(dpiaDateFor);
+            _sut.UpdateDPIADocumentation(dpiaSupervisionDocumentationUrl, dpiaSupervisionDocumentationUrlName);
+
+            _sut.UpdateDPIAConducted(dpia);
+
+            Assert.Equal(dpia, _sut.DPIA);
+            if (dpia == DataOptions.YES)
+            {
+                Assert.Equal(dpiaDateFor, _sut.DPIADateFor);
+                Assert.Equal(dpiaSupervisionDocumentationUrl, _sut.DPIASupervisionDocumentationUrl);
+                Assert.Equal(dpiaSupervisionDocumentationUrlName, _sut.DPIASupervisionDocumentationUrlName);
+            }
+            else
+            {
+                Assert.Null(_sut.DPIADateFor);
+                Assert.Null(_sut.DPIASupervisionDocumentationUrl);
+                Assert.Null(_sut.DPIASupervisionDocumentationUrlName);
+            }
+        }
+
+        [Theory]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateRiskAssessmentDate_Updates_If_RiskAssessment_Is_Yes(DataOptions riskAssessment)
+        {
+            _sut.UpdateRiskAssessment(riskAssessment);
+            var date = A<DateTime>();
+
+            _sut.UpdateRiskAssessmentDate(date);
+
+            if (riskAssessment == DataOptions.YES)
+            {
+                Assert.Equal(date, _sut.riskAssesmentDate);
+            }
+            else
+            {
+                Assert.Null(_sut.riskAssesmentDate);
+            }
+        }
+
+        [Theory]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateRiskAssessmentNotes_Updates_If_RiskAssessment_Is_Yes(DataOptions riskAssessment)
+        {
+            _sut.UpdateRiskAssessment(riskAssessment);
+            var notes = A<string>();
+
+            _sut.UpdateRiskAssessmentNotes(notes);
+
+            if (riskAssessment == DataOptions.YES)
+            {
+                Assert.Equal(notes, _sut.noteRisks);
+            }
+            else
+            {
+                Assert.Null(_sut.noteRisks);
+            }
+        }
+
+        [Fact]
+        public void UpdatePlannedRiskAssessmentDate_Updates()
+        {
+            var date = A<DateTime>();
+
+            _sut.UpdatePlannedRiskAssessmentDate(date);
+
+            Assert.Equal(date, _sut.PlannedRiskAssessmentDate);
+        }
+
+        [Theory]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateRiskAssessmentLevel_Updates_If_RiskAssessment_Is_Yes(DataOptions riskAssessment)
+        {
+            _sut.UpdateRiskAssessment(riskAssessment);
+            var level = A<RiskLevel>();
+
+            _sut.UpdateRiskAssessmentLevel(level);
+
+            if (riskAssessment == DataOptions.YES)
+            {
+                Assert.Equal(level, _sut.preriskAssessment);
+            }
+            else
+            {
+                Assert.Null(_sut.preriskAssessment);
+            }
+        }
+
+        [Theory]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateRiskAssessmentNote_Updates_If_RiskAssessment_Is_Yes(DataOptions riskAssessment)
+        {
+            _sut.UpdateRiskAssessment(riskAssessment);
+            var note = A<string>();
+
+            _sut.UpdateRiskAssessmentNotes(note);
+
+            if (riskAssessment == DataOptions.YES)
+            {
+                Assert.Equal(note, _sut.noteRisks);
+            }
+            else
+            {
+                Assert.Null(_sut.noteRisks);
+            }
+        }
+
+        [Theory]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateRiskAssessmentDocumentation_Updates_If_RiskAssessment_Is_Yes(DataOptions riskAssessment)
+        {
+            _sut.UpdateRiskAssessment(riskAssessment);
+            var url = A<string>();
+            var name = A<string>();
+
+
+            _sut.UpdateRiskAssessmentDocumentation(url, name);
+
+            if (riskAssessment == DataOptions.YES)
+            {
+                Assert.Equal(url, _sut.RiskSupervisionDocumentationUrl);
+                Assert.Equal(name, _sut.RiskSupervisionDocumentationUrlName);
+            }
+            else
+            {
+                Assert.Null(_sut.RiskSupervisionDocumentationUrl);
+                Assert.Null(_sut.RiskSupervisionDocumentationUrlName);
+            }
+        }
+
+
+        [Theory]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateRiskAssessment_Only_Clears_Related_Fields_If_Not_Yes(DataOptions riskAssessment)
+        {
+            var level = A<RiskLevel>();
+            var riskAssessmentDate = A<DateTime>();
+            var url = A<string>();
+            var urlName = A<string>();
+            var notes = A<string>();
+
+            _sut.UpdateRiskAssessment(DataOptions.YES);
+            _sut.UpdateRiskAssessmentLevel(level);
+            _sut.UpdateRiskAssessmentDate(riskAssessmentDate);
+            _sut.UpdateRiskAssessmentDocumentation(url, urlName);
+            _sut.UpdateRiskAssessmentNotes(notes);
+
+            _sut.UpdateRiskAssessment(riskAssessment);
+
+            Assert.Equal(riskAssessment, _sut.riskAssessment);
+            if (riskAssessment == DataOptions.YES)
+            {
+                Assert.Equal(level, _sut.preriskAssessment);
+                Assert.Equal(riskAssessmentDate, _sut.riskAssesmentDate);
+                Assert.Equal(url, _sut.RiskSupervisionDocumentationUrl);
+                Assert.Equal(urlName, _sut.RiskSupervisionDocumentationUrlName);
+                Assert.Equal(notes, _sut.noteRisks);
+            }
+            else
+            {
+                Assert.Null(_sut.preriskAssessment);
+                Assert.Null(_sut.riskAssesmentDate);
+                Assert.Null(_sut.RiskSupervisionDocumentationUrl);
+                Assert.Null(_sut.RiskSupervisionDocumentationUrlName);
+                Assert.Null(_sut.noteRisks);
+            }
+
+        }
+
+        [Theory]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateTechnicalPrecautionsInPlace_Only_Clears_Related_Fields_If_Not_Yes(DataOptions precautionsInPlace)
+        {
+            var technicalPrecautions = A<List<TechnicalPrecaution>>();
+            var url = A<string>();
+            var name = A<string>();
+            _sut.UpdateTechnicalPrecautionsInPlace(precautionsInPlace);
+            _sut.UpdateTechnicalPrecautions(technicalPrecautions);
+            _sut.UpdateTechnicalPrecautionsDocumentation(url, name);
+
+            _sut.UpdateTechnicalPrecautionsInPlace(precautionsInPlace);
+
+            if (precautionsInPlace == DataOptions.YES)
+            {
+                Assert.Equal(precautionsInPlace, _sut.precautions);
+                AssertListsContainSameElements(technicalPrecautions, _sut.GetTechnicalPrecautions().ToList());
+                Assert.Equal(url, _sut.TechnicalSupervisionDocumentationUrl);
+                Assert.Equal(name, _sut.TechnicalSupervisionDocumentationUrlName);
+            }
+            else
+            {
+                Assert.Equal(precautionsInPlace, _sut.precautions);
+                Assert.Empty(_sut.GetTechnicalPrecautions());
+                Assert.Null(_sut.TechnicalSupervisionDocumentationUrlName);
+                Assert.Null(_sut.TechnicalSupervisionDocumentationUrl);
+            }
+        }
+
+        [Fact]
+        public void UpdateTechnicalPrecautionsInPlace_Does_Not_Clear_Related_Fields_If_Yes()
+        {
+            const DataOptions precautionsInPlace = DataOptions.YES;
+            var technicalPrecautions = A<List<TechnicalPrecaution>>();
+            var url = A<string>();
+            var name = A<string>();
+            _sut.UpdateTechnicalPrecautionsInPlace(precautionsInPlace);
+            _sut.UpdateTechnicalPrecautions(technicalPrecautions);
+            _sut.UpdateTechnicalPrecautionsDocumentation(url, name);
+
+            _sut.UpdateTechnicalPrecautionsInPlace(precautionsInPlace);
+
+            Assert.Equal(precautionsInPlace, _sut.precautions);
+            AssertListsContainSameElements(technicalPrecautions, _sut.GetTechnicalPrecautions().ToList());
+            Assert.Equal(url, _sut.TechnicalSupervisionDocumentationUrl);
+            Assert.Equal(name, _sut.TechnicalSupervisionDocumentationUrlName);
+        }
+        private static void AssertListsContainSameElements<T>(IList<T> expected, IList<T> actual)
+        {
+            if (expected.Count != actual.Count) Assert.Fail("Lists have different counts");
+            var listsEqual = expected.OrderBy(x => x)
+                .SequenceEqual(actual.OrderBy(x => x));
+            Assert.True(listsEqual);
+        }
+
+        [Theory]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateTechnicalPrecautions_Updates_If_Precautions_Is_Yes(DataOptions technicalPrecautionsInPlace)
+        {
+            _sut.UpdateTechnicalPrecautionsInPlace(technicalPrecautionsInPlace);
+            var technicalPrecautions = A<List<TechnicalPrecaution>>();
+
+            _sut.UpdateTechnicalPrecautions(technicalPrecautions);
+
+            var actual = _sut.GetTechnicalPrecautions().ToList();
+            if (technicalPrecautionsInPlace == DataOptions.YES)
+            {
+                AssertListsContainSameElements(technicalPrecautions, actual);
+            }
+            else
+            {
+                Assert.Empty(actual);
+            }
+        }
+
+
+        [Theory]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateTechnicalPrecautionsDocumentation_Updates_If_Precautions_Is_Yes(DataOptions technicalPrecautions)
+        {
+            _sut.UpdateTechnicalPrecautionsInPlace(technicalPrecautions);
+            var url = A<string>();
+            var name = A<string>();
+
+            _sut.UpdateTechnicalPrecautionsDocumentation(url, name);
+
+            if (technicalPrecautions == DataOptions.YES)
+            {
+                Assert.Equal(url, _sut.TechnicalSupervisionDocumentationUrl);
+                Assert.Equal(name, _sut.TechnicalSupervisionDocumentationUrlName);
+            }
+            else
+            {
+                Assert.Null(_sut.TechnicalSupervisionDocumentationUrl);
+                Assert.Null(_sut.TechnicalSupervisionDocumentationUrlName);
+            }
+        }
+
+        [Theory]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateUserSupervision_Clears_Related_Fields_If_Not_Yes(DataOptions userSupervision)
+        {
+            _sut.UpdateUserSupervisionDate(A<DateTime>());
+            _sut.UpdateTechnicalPrecautionsDocumentation(A<string>(), A<string>());
+
+            _sut.UpdateUserSupervision(userSupervision);
+
+            Assert.Equal(userSupervision, _sut.UserSupervision);
+            Assert.Null(_sut.UserSupervisionDate);
+            Assert.Null(_sut.UserSupervisionDocumentationUrl);
+            Assert.Null(_sut.UserSupervisionDocumentationUrlName);
+        }
+
+        [Fact]
+        public void UpdateUserSupervision_Does_Not_Clear_Related_Fields_If_Yes()
+        {
+            const DataOptions userSupervision = DataOptions.YES;
+            var userSupervisionDate = A<DateTime?>();
+            var userSupervisionDocumentation = A<NamedLink>();
+            _sut.UpdateUserSupervision(userSupervision);
+            _sut.UpdateUserSupervisionDate(userSupervisionDate);
+            _sut.UpdateUserSupervisionDocumentation(userSupervisionDocumentation.Url, userSupervisionDocumentation.Name);
+
+            _sut.UpdateUserSupervision(userSupervision);
+
+            Assert.Equal(userSupervision, _sut.UserSupervision);
+            Assert.Equal(userSupervisionDate, _sut.UserSupervisionDate);
+            Assert.Equal(userSupervisionDocumentation.Url, _sut.UserSupervisionDocumentationUrl);
+            Assert.Equal(userSupervisionDocumentation.Name, _sut.UserSupervisionDocumentationUrlName);
+        }
+
+        [Theory]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateUserSupervisionDate_Updates_If_User_Supervision_Is_Yes(DataOptions userSupervision)
+        {
+            _sut.UpdateUserSupervision(userSupervision);
+            var date = A<DateTime>();
+
+            _sut.UpdateUserSupervisionDate(date);
+
+            if (userSupervision == DataOptions.YES) Assert.Equal(date, _sut.UserSupervisionDate);
+            else Assert.Null(_sut.UserSupervisionDate);
+        }
+
+        [Theory]
+        [InlineData(DataOptions.YES)]
+        [InlineData(DataOptions.DONTKNOW)]
+        [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.UNDECIDED)]
+        public void UpdateUserSupervisionDocumentation_Updates_If_User_Supervision_Is_Yes(DataOptions userSupervision)
+        {
+            _sut.UpdateUserSupervision(userSupervision);
+            var url = A<string>();
+            var name = A<string>();
+
+            _sut.UpdateUserSupervisionDocumentation(url, name);
+
+            if (userSupervision == DataOptions.YES)
+            {
+                Assert.Equal(url, _sut.UserSupervisionDocumentationUrl);
+                Assert.Equal(name, _sut.UserSupervisionDocumentationUrlName);
+            }
+            else
+            {
+                Assert.Null(_sut.UserSupervisionDocumentationUrl);
+                Assert.Null(_sut.UserSupervisionDocumentationUrlName);
+            }
+        }
+
         [Fact]
         public void AddUsageRelationTo_Throws_If_Destination_Is_Null()
         {
@@ -36,7 +542,7 @@ namespace Tests.Unit.Core.Model
         [Fact]
         public void Cannot_Add_Local_TaskRef_That_Is_Already_On_System()
         {
-            var someKle = new TaskRef(){ Uuid = A<Guid>()};
+            var someKle = new TaskRef() { Uuid = A<Guid>() };
             var kleAdditions = new List<TaskRef>() { someKle };
             _sut.ItSystem = new ItSystem()
             {
@@ -321,9 +827,9 @@ namespace Tests.Unit.Core.Model
             };
             _sut.SensitiveDataLevels.Add(preAddedSensitiveDataLevel);
 
-            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData{PersonalData= GDPRPersonalDataOption.CprNumber});
-            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData(){PersonalData=GDPRPersonalDataOption.OtherPrivateMatters});
-            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData(){PersonalData = GDPRPersonalDataOption.SocialProblems});
+            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData { PersonalData = GDPRPersonalDataOption.CprNumber });
+            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData() { PersonalData = GDPRPersonalDataOption.OtherPrivateMatters });
+            _sut.PersonalDataOptions.Add(new ItSystemUsagePersonalData() { PersonalData = GDPRPersonalDataOption.SocialProblems });
 
             //Act
             var result = _sut.RemoveSensitiveDataLevel(sensitiveDataLevel);
@@ -350,10 +856,10 @@ namespace Tests.Unit.Core.Model
         public void Can_Remove_OrganizationalUsage()
         {
             var unitId = A<int>();
-            var responsibleUsage = new ItSystemUsageOrgUnitUsage() {OrganizationUnitId = unitId, OrganizationUnit = new OrganizationUnit{ Id = unitId }};
+            var responsibleUsage = new ItSystemUsageOrgUnitUsage() { OrganizationUnitId = unitId, OrganizationUnit = new OrganizationUnit { Id = unitId } };
             var usage = new ItSystemUsage()
             {
-                UsedBy = new List<ItSystemUsageOrgUnitUsage>{ responsibleUsage },
+                UsedBy = new List<ItSystemUsageOrgUnitUsage> { responsibleUsage },
                 ResponsibleUsage = responsibleUsage,
             };
 
@@ -367,13 +873,13 @@ namespace Tests.Unit.Core.Model
         public void Can_Remove_UsedByUnit()
         {
             var unitUuid = A<Guid>();
-            var unit = new OrganizationUnit {Uuid = unitUuid};
+            var unit = new OrganizationUnit { Uuid = unitUuid };
             var usage = new ItSystemUsage
             {
-                UsedBy = new List<ItSystemUsageOrgUnitUsage>{ new() { OrganizationUnit = unit } },
+                UsedBy = new List<ItSystemUsageOrgUnitUsage> { new() { OrganizationUnit = unit } },
                 Organization = new Organization
                 {
-                    OrgUnits = new List<OrganizationUnit>{ unit }
+                    OrgUnits = new List<OrganizationUnit> { unit }
                 }
             };
 
@@ -388,14 +894,14 @@ namespace Tests.Unit.Core.Model
         {
             var unitUuid = A<Guid>();
             var targetUnitUuid = A<Guid>();
-            var unit = new OrganizationUnit {Uuid = unitUuid};
-            var targetUnit = new OrganizationUnit {Uuid = targetUnitUuid};
+            var unit = new OrganizationUnit { Uuid = unitUuid };
+            var targetUnit = new OrganizationUnit { Uuid = targetUnitUuid };
             var responsibleUsage = new ItSystemUsageOrgUnitUsage { OrganizationUnit = unit };
             var usage = new ItSystemUsage
             {
                 UsedBy = new List<ItSystemUsageOrgUnitUsage> { responsibleUsage },
                 ResponsibleUsage = responsibleUsage,
-                Organization = new Organization {OrgUnits = new List<OrganizationUnit> { unit, targetUnit }}
+                Organization = new Organization { OrgUnits = new List<OrganizationUnit> { unit, targetUnit } }
             };
 
             var result = usage.TransferResponsibleOrganizationalUnit(targetUnitUuid);
@@ -409,13 +915,13 @@ namespace Tests.Unit.Core.Model
         {
             var unitUuid = A<Guid>();
             var targetUnitUuid = A<Guid>();
-            var unit = new OrganizationUnit { Uuid = unitUuid};
-            var targetUnit = new OrganizationUnit { Uuid = targetUnitUuid};
+            var unit = new OrganizationUnit { Uuid = unitUuid };
+            var targetUnit = new OrganizationUnit { Uuid = targetUnitUuid };
             var usage = new ItSystemUsage
             {
                 Organization = new Organization()
                 {
-                    OrgUnits = new List<OrganizationUnit>{unit, targetUnit} 
+                    OrgUnits = new List<OrganizationUnit> { unit, targetUnit }
                 },
                 UsedBy = new List<ItSystemUsageOrgUnitUsage> { new() { OrganizationUnit = unit } }
             };
@@ -477,7 +983,7 @@ namespace Tests.Unit.Core.Model
             Assert.False(validity.Result);
             Assert.Equal(expectedErrors, validity.ValidationErrors);
         }
-        
+
         [Theory]
         [MemberData(nameof(ValidationValidData))]
         public void Valid_When_All_Valid(LifeCycleStatusType lifeCycleStatus, DateTime concluded, DateTime expirationDate, ItContractItSystemUsage mainContract)
@@ -627,7 +1133,7 @@ namespace Tests.Unit.Core.Model
             new object[] {null, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), new ItContractItSystemUsage{ ItContract = new ItContract{ Active = true} }},
             new object[] { LifeCycleStatusType.PhasingOut, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), new ItContractItSystemUsage{ ItContract = new ItContract{ Active = true} }},
         };
-        
+
         private static void AssertErrorResult<T>(Result<T, OperationError> result, string message, OperationFailure error)
         {
             Assert.False(result.Ok);
@@ -649,7 +1155,7 @@ namespace Tests.Unit.Core.Model
 
             if (personalDataOption.HasValue)
             {
-                usage.PersonalDataOptions = new List<ItSystemUsagePersonalData>{ new (){PersonalData = personalDataOption.Value}};
+                usage.PersonalDataOptions = new List<ItSystemUsagePersonalData> { new() { PersonalData = personalDataOption.Value } };
             }
 
             return usage;

@@ -217,7 +217,7 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
 
             var updatedOrganization = result.Value;
-            Assert.Null(updatedOrganization.Cvr); ;
+            Assert.Null(updatedOrganization.Cvr);
             Assert.Null(updatedOrganization.Phone);
             Assert.Null(updatedOrganization.Adress);
             Assert.Null(updatedOrganization.Email);

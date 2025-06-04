@@ -6,11 +6,6 @@
         </parameterentry>
     </parameter>
 
-    <parameter name="serilog:write-to:Elasticsearch.nodeUris" description="" defaultvalue="__ElasticSearchNodeUri__" tags="">
-        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='serilog:write-to:Elasticsearch.nodeUris']/@value">
-        </parameterentry>
-    </parameter>
-
     <!-- Kitos token configuration -->
     <parameter name="SecurityKeyString" description="" defaultvalue="__SecurityKeyString__" tags="">
         <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='SecurityKeyString']/@value">
@@ -87,7 +82,7 @@
     </parameter>
 
     <parameter name="SsoIDPEndPoints" defaultvalue="__SSO_KOMBIT_Proxy__">
-        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://saml.adgangsstyring.eksterntest-stoettesystemerne.dk']/@id"/>
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://saml.n2adgangsstyring.eksterntest-stoettesystemerne.dk']/@id"/>
     </parameter>
 
     <parameter name="SsoServiceProviderId" defaultvalue="__SSO_ServiceProvider_Id__">
@@ -162,6 +157,11 @@
     <parameter name="StsOrganisationCertificateThumbprint" defaultvalue="__STS_ORGANISATION_CERTIFICATE_THUMBPRINT">
         <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/behaviors/endpointBehaviors/behavior/clientCredentials/serviceCertificate/defaultCertificate/@findValue"/>
         <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='StsOrganisationCertificateThumbprint']/value/text()"/>
+    </parameter>
+
+    <parameter name="PubSubBaseUrl" description="" defaultvalue="__PubSubBaseUrl__" tags="">
+	    <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/applicationSettings/Presentation.Web.Properties.Settings/setting[@name='PubSubBaseUrl']/value/text()">
+	    </parameterentry>
     </parameter>
 
 </parameters>

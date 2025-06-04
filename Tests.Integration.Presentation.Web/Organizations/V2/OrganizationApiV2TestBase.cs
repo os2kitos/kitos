@@ -1,23 +1,16 @@
-﻿using Core.DomainModel.Organization;
-using Core.DomainModel;
-using Presentation.Web.Models.API.V1;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Types.Organization;
 using Tests.Integration.Presentation.Web.Tools;
-using Tests.Toolkit.Patterns;
 
 namespace Tests.Integration.Presentation.Web.Organizations.V2
 {
-    public class OrganizationApiV2TestBase: WithAutoFixture
+    public class OrganizationApiV2TestBase : BaseTest
     {
-        protected async Task<OrganizationDTO> CreateOrganizationAsync(OrganizationTypeKeys orgType)
+        protected async Task<ShallowOrganizationResponseDTO> CreateOrganizationAsync(OrganizationType orgType)
         {
             var organizationName = CreateName();
-            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
-                organizationName, "V2" + string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), orgType, AccessModifier.Public);
+            var organization = await CreateOrganizationAsync(organizationName, type: orgType);
             return organization;
         }
 

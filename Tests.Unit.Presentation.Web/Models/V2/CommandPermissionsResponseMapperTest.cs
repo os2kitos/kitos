@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Core.ApplicationServices.Authorization;
+﻿using Core.ApplicationServices.Authorization;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Tests.Toolkit.Patterns;
 using Xunit;

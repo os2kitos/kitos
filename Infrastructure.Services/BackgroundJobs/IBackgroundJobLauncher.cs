@@ -19,5 +19,7 @@ namespace Infrastructure.Services.BackgroundJobs
         Task LaunchUpdateItContractOverviewReadModels(CancellationToken token = default);
         Task LaunchUpdateStaleContractRmAsync(CancellationToken token = default);
         Task LaunchUpdateFkOrgSync(CancellationToken token = default);
+        Task LaunchCreatePublicMessagesTask(CancellationToken token = default);
+        Task LaunchCreateMainPublicMessageTask(CancellationToken token = default);
     }
 }

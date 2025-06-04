@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace Infrastructure.Services.DataAccess
+﻿namespace Infrastructure.Services.DataAccess
 {
     public interface ITransactionManager
     {

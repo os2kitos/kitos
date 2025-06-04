@@ -1,5 +1,4 @@
-﻿using Core.DomainModel;
-using Core.DomainModel.ItSystem;
+﻿using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V2.Request;
@@ -9,8 +8,9 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.Abstractions.Extensions;
-using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Interface;
+using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
@@ -30,12 +30,14 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var pageSize = 2;
             var pageNumber = 0; //Always takes the first page;
 
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local, A<string>()));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local, A<string>()));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface1.Id).DisposeAsync();
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface2.Id).DisposeAsync();
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, org.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
+            var system = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface1 = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface2 = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface1.Uuid, system.Uuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface2.Uuid, system.Uuid);
+
+            await ItSystemV2Helper.PatchRightsHolderAsync(system.Uuid, org.Uuid).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Act
             var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber);
@@ -59,17 +61,19 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var pageSize = 2;
             var pageNumber = 0; //Always takes the first page;
 
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface1.Id).DisposeAsync();
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface2.Id).DisposeAsync();
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, org.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
+            var system = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface1 = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface2 = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface1.Uuid, system.Uuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface2.Uuid, system.Uuid);
+
+            await ItSystemV2Helper.PatchRightsHolderAsync(system.Uuid, org.Uuid).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             // Disable second interface
             DatabaseAccess.MutateDatabase(db =>
             {
-                var dbInterface = db.ItInterfaces.AsQueryable().ById(itInterface2.Id);
+                var dbInterface = db.ItInterfaces.AsQueryable().ByUuid(itInterface2.Uuid);
                 dbInterface.Disabled = true;
                 db.SaveChanges();
             });
@@ -105,14 +109,19 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var pageSize = 2;
             var pageNumber = 0; //Always takes the first page;
 
-            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system1.Id, itInterface1.Id).DisposeAsync();
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system2.Id, itInterface2.Id).DisposeAsync();
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system1.Id, org1.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system2.Id, org2.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
+            var system1 = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var system2 = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface1 = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface2 = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface1.Uuid, system1.Uuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface2.Uuid, system2.Uuid);
+
+
+            await ItSystemV2Helper.PatchRightsHolderAsync(system1.Uuid, org1.Uuid)
+                .WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemV2Helper.PatchRightsHolderAsync(system2.Uuid, org2.Uuid)
+                .WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Act
             var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber);
@@ -126,17 +135,18 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, organization) = await CreateRightsHolderUserInNewOrganizationAsync();
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            var itInterface3 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            var system = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface1 = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface2 = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface3 = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
 
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organization.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
+            await ItSystemV2Helper.PatchRightsHolderAsync(system.Uuid, organization.Uuid)
+                .WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Change all in a specific order
             foreach (var interfaceDto in new[] { itInterface2, itInterface3, itInterface1 })
             {
-                await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, interfaceDto.Id).DisposeAsync();
+                await InterfaceV2Helper.PatchExposedBySystemAsync(interfaceDto.Uuid, system.Uuid);
             }
 
             var interface3LastModified = DatabaseAccess.MapFromEntitySet<ItInterface, DateTime>(x => x.AsQueryable().ByUuid(itInterface3.Uuid).LastChanged.Transform(dt => DateTime.SpecifyKind(dt, DateTimeKind.Utc)));
@@ -158,14 +168,14 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var pageSize = 2;
             var pageNumber = 0; //Always takes the first page;
 
-            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system1.Id, itInterface1.Id).DisposeAsync();
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system2.Id, itInterface2.Id).DisposeAsync();
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system1.Id, org1.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system2.Id, org2.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
+            var system1 = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var system2 = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface1 = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface2 = await CreateItInterfaceAsync(org1.Uuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface1.Uuid, system1.Uuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface2.Uuid, system2.Uuid);
+            await ItSystemV2Helper.PatchRightsHolderAsync(system1.Uuid, org1.Uuid).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemV2Helper.PatchRightsHolderAsync(system2.Uuid, org2.Uuid).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Act
             var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber, org1.Uuid);
@@ -181,11 +191,12 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
 
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id).DisposeAsync();
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, org.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
+            var system = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
 
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface.Uuid, system.Uuid);
+            await ItSystemV2Helper.PatchRightsHolderAsync(system.Uuid, org.Uuid)
+                .WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             //Act
             var result = await InterfaceV2Helper.GetRightsholderInterfaceAsync(token, itInterface.Uuid);
 
@@ -199,14 +210,15 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
 
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id).DisposeAsync();
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, org.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
+            var system = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface.Uuid, system.Uuid);
+            await ItSystemV2Helper.PatchRightsHolderAsync(system.Uuid, org.Uuid)
+                .WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             DatabaseAccess.MutateDatabase(db =>
             {
-                var dbInterface = db.ItInterfaces.AsQueryable().ById(itInterface.Id);
+                var dbInterface = db.ItInterfaces.AsQueryable().ByUuid(itInterface.Uuid);
 
                 dbInterface.Description = A<string>();
                 dbInterface.ItInterfaceId = A<string>();
@@ -225,7 +237,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.NotNull(itInterfaceDTO);
             DatabaseAccess.MapFromEntitySet<ItInterface, bool>(x =>
             {
-                var dbInterface = x.AsQueryable().ById(itInterface.Id);
+                var dbInterface = x.AsQueryable().ByUuid(itInterface.Uuid);
                 BaseItInterfaceResponseDTODBCheck(dbInterface, itInterfaceDTO);
 
                 return true;
@@ -254,10 +266,11 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
 
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id).DisposeAsync();
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, null, TestEnvironment.DefaultOrganizationId).DisposeAsync();
+            var system = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface.Uuid, system.Uuid);
+            await ItSystemV2Helper.PatchRightsHolderAsync(system.Uuid, null).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Act
             using var result = await InterfaceV2Helper.SendGetRightsholderInterfaceAsync(token, itInterface.Uuid);
@@ -272,10 +285,10 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
 
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id).DisposeAsync();
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, TestEnvironment.SecondOrganizationId, TestEnvironment.DefaultOrganizationId).DisposeAsync();
+            var system = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            var itInterface = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(itInterface.Uuid, system.Uuid);
+            await ItSystemV2Helper.PatchRightsHolderAsync(system.Uuid, DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.SecondOrganizationId));
 
             //Act
             using var result = await InterfaceV2Helper.SendGetRightsholderInterfaceAsync(token, itInterface.Uuid);
@@ -291,7 +304,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
-            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+            var exposingSystem = await CreateItSystemAsync(org.Uuid);
 
             var input = new RightsHolderCreateItInterfaceRequestDTO()
             {
@@ -333,7 +346,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
-            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+            var exposingSystem = await CreateItSystemAsync(org.Uuid);
 
             var input = new RightsHolderCreateItInterfaceRequestDTO()
             {
@@ -356,12 +369,11 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
-            var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
-            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+            var exposingSystem = await CreateItSystemAsync(org.Uuid);
 
             var input = new RightsHolderCreateItInterfaceRequestDTO()
             {
-                RightsHolderUuid = defaultOrgUuid,
+                RightsHolderUuid = DefaultOrgUuid,
                 ExposedBySystemUuid = exposingSystem.Uuid,
                 Name = A<string>(),
                 Description = A<string>(),
@@ -381,7 +393,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
             var otherOrg = await CreateOrganization();
-            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), otherOrg.Id, AccessModifier.Public);
+            var exposingSystem = await CreateItSystemAsync(otherOrg.Uuid);
 
             var input = new RightsHolderCreateItInterfaceRequestDTO()
             {
@@ -407,7 +419,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
-            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+            var exposingSystem = await CreateItSystemAsync(org.Uuid);
 
             var input = new RightsHolderCreateItInterfaceRequestDTO()
             {
@@ -437,7 +449,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(withProvidedUuid, org);
             var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token, creationDTO);
 
-            var newExposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+            var newExposingSystem = await CreateItSystemAsync(org.Uuid);
 
             var updateParameters = new RightsHolderWritableItInterfacePropertiesDTO()
             {
@@ -488,7 +500,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
 
-            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+            var exposingSystem = await CreateItSystemAsync(org.Uuid);
 
             var updateParameters = A<RightsHolderWritableItInterfacePropertiesDTO>();
             updateParameters.ExposedBySystemUuid = exposingSystem.Uuid;
@@ -541,7 +553,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org);
             var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token, creationDTO);
 
-            var newExposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+            var newExposingSystem = await CreateItSystemAsync(org.Uuid);
 
             var input = new RightsHolderWritableItInterfacePropertiesDTO()
             {
@@ -569,7 +581,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org);
             var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token, creationDTO);
 
-            var newExposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+            var newExposingSystem = await CreateItSystemAsync(org.Uuid);
 
             var input = new RightsHolderWritableItInterfacePropertiesDTO()
             {
@@ -615,7 +627,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             if (withInterfaceId) changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.InterfaceId), A<string>());
             if (withExposedBySystem)
             {
-                var newExposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+                var newExposingSystem = await CreateItSystemAsync(org.Uuid);
                 changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.ExposedBySystemUuid), newExposingSystem.Uuid);
             }
             if (withVersion) changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Version), A<string>().Substring(0, 20));
@@ -739,9 +751,9 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
-        private async Task<RightsHolderCreateItInterfaceRequestDTO> CreateRightsHolderItInterfaceRequestDTO(bool withProvidedUuid, OrganizationDTO rightsHolderOrganization)
+        private async Task<RightsHolderCreateItInterfaceRequestDTO> CreateRightsHolderItInterfaceRequestDTO(bool withProvidedUuid, ShallowOrganizationResponseDTO rightsHolderOrganization)
         {
-            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), rightsHolderOrganization.Id, AccessModifier.Public);
+            var exposingSystem = await CreateItSystemAsync(DefaultOrgUuid, rightsHolderUuid: rightsHolderOrganization.Uuid);
 
             return new RightsHolderCreateItInterfaceRequestDTO()
             {
@@ -756,20 +768,20 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             };
         }
 
-        private async Task<(string token, OrganizationDTO createdOrganization)> CreateRightsHolderUserInNewOrganizationAsync()
+        private async Task<(string token, ShallowOrganizationResponseDTO createdOrganization)> CreateRightsHolderUserInNewOrganizationAsync()
         {
-            var org = await CreateOrganization();
-            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org.Id, true);
+            var org = await CreateOrganizationAsync();
+            var (userId, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org.Uuid, true);
             return (token, org);
         }
 
-        private async Task<(string token, OrganizationDTO createdOrganization1, OrganizationDTO createdOrganization2)> CreateRightsHolderUserInMultipleNewOrganizationsAsync()
+        private async Task<(string token, ShallowOrganizationResponseDTO createdOrganization1, ShallowOrganizationResponseDTO createdOrganization2)> CreateRightsHolderUserInMultipleNewOrganizationsAsync()
         {
             var org1 = await CreateOrganization();
             var org2 = await CreateOrganization();
 
-            var (userId, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org1.Id, true);
-            await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.RightsHolderAccess, org2.Id).DisposeAsync();
+            var (userId, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org1.Uuid, true);
+            await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.RightsHolderAccess, org2.Uuid).DisposeAsync();
 
             return (token, org1, org2);
         }
