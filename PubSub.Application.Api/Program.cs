@@ -12,6 +12,20 @@ builder.Configuration
     .AddJsonFile($"appsettings.{environment}.json")
     .AddEnvironmentVariables();
 
+builder.WebHost.ConfigureKestrel((context, options) =>
+{
+    if (context.HostingEnvironment.IsDevelopment() || IsLocal(context.HostingEnvironment))
+    {
+        return;
+    }
+
+    options.ListenAnyIP(443, listenOptions =>
+    {
+        var certPassword = Environment.GetEnvironmentVariable(Constants.Config.Certificate.CertPassword);
+        listenOptions.UseHttps(Constants.Config.Certificate.CertFilePath, certPassword);
+    });
+});
+
 builder.Services.AddControllers(options =>
 {
     options.Conventions.Insert(0, new ApiVersioningConvention());
@@ -48,6 +62,11 @@ using (var scope = app.Services.CreateScope())
                 $"Pending database migrations detected ({migrationList}). Apply migrations before startup or set {Constants.Config.Database.AutoMigrate}=true to opt in to automatic migrations.");
         }
     }
+}
+
+if (!app.Environment.IsDevelopment() && !IsLocal(app.Environment))
+{
+    app.UseHttpsRedirection();
 }
 
 app.UseSwagger();

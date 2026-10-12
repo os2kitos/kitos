@@ -32,6 +32,12 @@
                 public const string PubSubApiKey = "PUBSUB_API_KEY";
             }
 
+            public static class Certificate
+            {
+                public const string CertPassword = "CERT_PASSWORD";
+                public const string CertFilePath = "/etc/ssl/certs/kitos-pubsub.pfx";
+            }
+
             public static class Database
             {
                 public const string AutoMigrate = "PUBSUB_AUTO_MIGRATE";
