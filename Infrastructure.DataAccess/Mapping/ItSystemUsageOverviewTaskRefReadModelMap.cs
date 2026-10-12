@@ -1,26 +1,27 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemUsageOverviewTaskRefReadModelMap : EntityTypeConfiguration<ItSystemUsageOverviewTaskRefReadModel>
+    public class ItSystemUsageOverviewTaskRefReadModelMap : IEntityTypeConfiguration<ItSystemUsageOverviewTaskRefReadModel>
     {
-        public ItSystemUsageOverviewTaskRefReadModelMap()
+        public void Configure(EntityTypeBuilder<ItSystemUsageOverviewTaskRefReadModel> builder)
         {
-            HasKey(x => x.Id);
-            HasRequired(x => x.Parent)
+            builder.HasKey(x => x.Id);
+
+            builder.HasOne(x => x.Parent)
                 .WithMany(x => x.ItSystemTaskRefs)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(true);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
-            Property(x => x.KLEId)
-                .HasMaxLength(TaskRef.MaxTaskKeyLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewTaskRefReadModel_Index_KLEId", 0);
+            builder.Property(x => x.KLEId).HasMaxLength(TaskRef.MaxTaskKeyLength);
+            builder.HasIndex(x => x.KLEId).HasDatabaseName("ItSystemUsageOverviewTaskRefReadModel_Index_KLEId");
 
-            Property(x => x.KLEName)
-                .HasMaxLength(TaskRef.MaxDescriptionLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewTaskRefReadModel_Index_KLEName", 0);
+            builder.Property(x => x.KLEName).HasMaxLength(TaskRef.MaxDescriptionLength);
+            builder.HasIndex(x => x.KLEName).HasDatabaseName("ItSystemUsageOverviewTaskRefReadModel_Index_KLEName");
         }
     }
 }

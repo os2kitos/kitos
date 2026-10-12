@@ -1,11 +1,13 @@
-﻿using Core.DomainModel.Advice;
+﻿using System.Diagnostics.CodeAnalysis;
+using Core.DomainModel.Advice;
 using Core.DomainModel.Shared;
 
 namespace Core.ApplicationServices.Model.Notification
 {
     public class BaseNotificationPropertiesModel
     {
-        public BaseNotificationPropertiesModel(string subject, string body, RelatedEntityType type, AdviceType adviceType, int relationId)
+        [SetsRequiredMembers]
+        public BaseNotificationPropertiesModel(string subject, string? body, RelatedEntityType type, AdviceType adviceType, int relationId)
         {
             Subject = subject;
             Body = body;
@@ -14,8 +16,8 @@ namespace Core.ApplicationServices.Model.Notification
             RelationId = relationId;
         }
 
-        public string Subject { get; }
-        public string Body { get; }
+        public required string Subject { get; init; }
+        public string? Body { get; }
         public RelatedEntityType Type { get; }
         public AdviceType AdviceType { get; }
 

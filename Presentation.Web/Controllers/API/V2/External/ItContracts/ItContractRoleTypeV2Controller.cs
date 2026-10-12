@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Web.Http;
 using Core.ApplicationServices.OptionTypes;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Response.Options;
-using Swashbuckle.Swagger.Annotations;
+using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 {
-    [RoutePrefix("api/v2/it-contract-role-types")]
+    [Route("api/v2/it-contract-role-types")]
     public class ItContractRoleTypeV2Controller : BaseRoleOptionTypeV2Controller<ItContractRight, ItContractRole>
     {
-        public ItContractRoleTypeV2Controller(IOptionsApplicationService<ItContractRight, ItContractRole> optionService)
-            : base(optionService)
+        public ItContractRoleTypeV2Controller(IOptionsApplicationService<ItContractRight, ItContractRole> optionService, IRoleOptionsApplicationService<ItContractRight, ItContractRole> roleOptionsApplicationService)
+            : base(optionService, roleOptionsApplicationService)
         {
         }
 
@@ -23,14 +23,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// Returns It Contract role types which are available for new registrations within the organization
         /// </summary>
         /// <param name="organizationUuid">organization context for the It Contract role availability</param>
+        /// <param name="pagination">Optional pagination query</param>
         /// <returns>A list of available It Contract role option types</returns>
         [HttpGet]
-        [Route]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RoleOptionResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get([NonEmptyGuid] Guid organizationUuid, [FromUri] UnboundedPaginationQuery pagination = null)
+        [Route("")]
+        [ApiResponse(typeof(IEnumerable<RoleOptionResponseDTO>), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult Get([NonEmptyGuid] Guid organizationUuid, [FromQuery] UnboundedPaginationQuery? pagination = null)
         {
             return GetAll(organizationUuid, pagination);
         }
@@ -43,14 +44,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// <returns>A detailed description of the It Contract role type and it's availability</returns>
         [HttpGet]
         [Route("{contractRoleTypeUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RoleOptionExtendedResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get([NonEmptyGuid] Guid contractRoleTypeUuid, [NonEmptyGuid] Guid organizationUuid)
+        [ApiResponse(typeof(RoleOptionExtendedResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult Get([NonEmptyGuid] Guid contractRoleTypeUuid, [NonEmptyGuid] Guid organizationUuid)
         {
             return GetSingle(contractRoleTypeUuid, organizationUuid);
         }
     }
 }
+

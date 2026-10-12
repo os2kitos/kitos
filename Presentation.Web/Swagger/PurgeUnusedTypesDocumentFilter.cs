@@ -1,31 +1,42 @@
-﻿using System.Linq;
-using System.Web.Http.Description;
-using Swashbuckle.Swagger;
+using System;
+using System.Linq;
+using Microsoft.OpenApi;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Presentation.Web.Swagger
 {
     public class PurgeUnusedTypesDocumentFilter : IDocumentFilter
     {
-        public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
+        private readonly Predicate<OpenApiDocument> _applyTo;
+
+        public PurgeUnusedTypesDocumentFilter(Predicate<OpenApiDocument> applyTo)
         {
-            var listOfSchemaWithReference = swaggerDoc.paths
-                .SelectMany(x => x.Value.EnumerateOperations()) //Find operation by path
-                .SelectMany(x => x.EnumerateSchema()) //Find schema by operation
-                .SelectMany(x => x.StartSchemaEnumeration(swaggerDoc.definitions)) //Find Schema by schema (dependent schema)
-                .Where(x => x.GetRootSchemaOrNull() != null) //I only want the schema that reference a definition.
-                .Select(x => x.GetSchemaTypeKey()) //remove the path and keep the Model name
+            _applyTo = applyTo;
+        }
+
+        public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
+        {
+            if (!_applyTo(swaggerDoc)) return;
+
+            if (swaggerDoc.Components?.Schemas == null) return;
+
+            var referencedSchemaKeys = swaggerDoc.Paths
+                .SelectMany(p => p.Value.EnumerateOperations())
+                .SelectMany(op => op.EnumerateSchemas())
+                .SelectMany(s => s.StartSchemaEnumeration(swaggerDoc.Components.Schemas))
+                .Where(s => s.GetRootSchemaOrNull() != null)
+                .Select(s => s.GetSchemaTypeKey())
+                .Where(k => k != null)
                 .Distinct()
                 .ToHashSet();
 
-            //Not finding a definition in the built list of references means its unreferenced and can be removed.
-            var listOfUnreferencedDefinition = swaggerDoc.definitions
-                .Where(x => !listOfSchemaWithReference.Contains(x.Key))
+            var unreferenced = swaggerDoc.Components.Schemas
+                .Where(x => !referencedSchemaKeys.Contains(x.Key))
+                .Select(x => x.Key)
                 .ToList();
 
-            foreach (var unreferencedDefinition in listOfUnreferencedDefinition)
-            {
-                swaggerDoc.definitions.Remove(unreferencedDefinition.Key);
-            }
+            foreach (var key in unreferenced)
+                swaggerDoc.Components.Schemas.Remove(key);
         }
     }
 }

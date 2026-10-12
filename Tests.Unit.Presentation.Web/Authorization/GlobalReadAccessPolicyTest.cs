@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
-using Fasterflect;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Authorization
@@ -60,7 +60,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         private ISet<Type> GetKnownTypes()
         {
-            return (ISet<Type>)_sut.GetFieldValue("TypesWithGlobalReadAccess");
+            var field = typeof(GlobalReadAccessPolicy).GetField("TypesWithGlobalReadAccess", BindingFlags.NonPublic | BindingFlags.Static);
+            return (ISet<Type>)field!.GetValue(_sut)!;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Model.Notification;
@@ -12,6 +12,7 @@ using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
 using Presentation.Web.Models.API.V2.Internal.Response.Notifications;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 {
@@ -93,7 +94,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
             };
         }
 
-        private static IdentityNamePairResponseDTO MapIEntityWithAdvicesToResponseDTO(NotificationResultModel notification)
+        private static IdentityNamePairResponseDTO? MapIEntityWithAdvicesToResponseDTO(NotificationResultModel notification)
         {
             return notification.RelatedEntityType switch
             {

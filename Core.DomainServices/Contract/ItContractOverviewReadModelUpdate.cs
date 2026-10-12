@@ -9,6 +9,7 @@ using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Shared;
 using Core.DomainModel.Users;
+using Core.DomainServices.Extensions;
 using Core.DomainServices.Mapping;
 using Core.DomainServices.Model;
 
@@ -51,10 +52,14 @@ namespace Core.DomainServices.Contract
             destination.LastEditedByUserId = source.LastChangedByUserId;
             destination.Concluded = source.Concluded?.Date;
             destination.ExpirationDate = source.ExpirationDate?.Date;
+            destination.Note = source.Note;
+            destination.ByEnding = source.ByEnding;
 
             //Supplier
             destination.SupplierId = source.Supplier?.Id;
             destination.SupplierName = source.Supplier?.Name;
+            destination.SupplierCvr = source.Supplier?.Cvr;
+            destination.IsSupplierDisabled = source.Supplier?.Disabled ?? false;
 
             //Parent contract
             destination.ParentContractUuid = source.Parent?.Uuid;
@@ -119,6 +124,10 @@ namespace Core.DomainServices.Contract
             destination.PaymentFrequencyId = source.PaymentFreqency?.Id;
             destination.PaymentFrequencyUuid = source.PaymentFreqency?.Uuid;
             destination.PaymentFrequencyName = source.PaymentFreqency?.Name;
+
+            //Payment organization units
+            destination.ExternalPaymentOrganizationUnitsCsv = ToCommaSeparatedOrganizationUnitNames(source.ExternEconomyStreams);
+            destination.InternalPaymentOrganizationUnitsCsv = ToCommaSeparatedOrganizationUnitNames(source.InternEconomyStreams);
 
             //Duration
             MapDuration(source, destination);
@@ -269,12 +278,13 @@ namespace Core.DomainServices.Contract
             var itSystemUsages = source
                 .AssociatedSystemUsages
                 .Select(x => x.ItSystemUsage)
-                .GroupBy(x => x.Id)
+                .Where(x => x != null)
+                .GroupBy(x => x!.Id)
                 .Select(x => x.First()) //guard against any duplicates
                 .ToList();
 
-            destination.ItSystemUsagesCsv = string.Join(", ", itSystemUsages.Select(MapSystemName));
-            destination.ItSystemUsagesSystemUuidCsv = string.Join(", ", itSystemUsages.Select(x => x.ItSystem.Uuid.ToString("D")));
+            destination.ItSystemUsagesCsv = itSystemUsages.Select(MapSystemName).ToStringWithDelimiter();
+            destination.ItSystemUsagesSystemUuidCsv = itSystemUsages.Where(x => x.ItSystem != null).Select(x => x.ItSystem!.Uuid.ToString("D")).ToStringWithDelimiter();
 
             var actionContexts = itSystemUsages
                 .ComputeMirrorActions
@@ -323,9 +333,14 @@ namespace Core.DomainServices.Contract
 
         private static void PatchItSystemUsage(ItContractOverviewReadModelItSystemUsage readModel, ItSystemUsage newItem)
         {
-            readModel.ItSystemUsageName = newItem.ItSystem.Name;
-            readModel.ItSystemUsageSystemUuid = newItem.ItSystem.Uuid.ToString("D");
-            readModel.ItSystemIsDisabled = newItem.ItSystem.Disabled;
+            readModel.ItSystemUsageUuid = newItem.Uuid;
+            var itSystem = newItem.ItSystem;
+            if (itSystem != null)
+            {
+                readModel.ItSystemUsageName = itSystem.Name;
+                readModel.ItSystemUsageSystemUuid = itSystem.Uuid.ToString("D");
+                readModel.ItSystemIsDisabled = itSystem.Disabled;
+            }
         }
 
         private void MapDataProcessingAgreements(ItContract source, ItContractOverviewReadModel destination)
@@ -338,7 +353,7 @@ namespace Core.DomainServices.Contract
                 .ToList();
 
             //CSV field
-            destination.DataProcessingAgreementsCsv = string.Join(", ", dataProcessingAgreements.Select(x => x.Name));
+            destination.DataProcessingAgreementsCsv = dataProcessingAgreements.Select(x => x.Name).ToStringWithDelimiter();
 
             var mirrorActionContexts = dataProcessingAgreements
                 .ComputeMirrorActions
@@ -426,7 +441,7 @@ namespace Core.DomainServices.Contract
             }
         }
 
-        private static string GetUserFullName(User user)
+        private static string? GetUserFullName(User user)
         {
             var fullName = user?.GetFullName()?.TrimEnd();
             return fullName?.Substring(0, Math.Min(fullName.Length, UserConstraints.MaxNameLength));
@@ -446,6 +461,11 @@ namespace Core.DomainServices.Contract
             destination.OrganizationId = source.OrganizationId;
             destination.SourceEntityId = source.Id;
             destination.SourceEntityUuid = source.Uuid;
+        }
+
+        private static string ToCommaSeparatedOrganizationUnitNames(IEnumerable<EconomyStream> economyStreams)
+        {
+            return economyStreams.Where(x => x.OrganizationUnit != null).Select(x => x.OrganizationUnit.Name).ToStringWithDelimiter();
         }
     }
 }

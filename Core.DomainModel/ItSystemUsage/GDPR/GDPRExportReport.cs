@@ -12,11 +12,10 @@ namespace Core.DomainModel.ItSystemUsage.GDPR
         public bool PersonalData { get; set; }
         public bool SensitiveData { get; set; }
         public bool LegalData { get; set; }
-        public DataOptions? BusinessCritical { get; set; }
         public bool DataProcessingAgreementConcluded { get; set; }
         public bool LinkToDirectory { get; set; }
         public IEnumerable<string> SensitiveDataTypes { get; set; }
-        public DataOptions? RiskAssessment { get; set; }
+        public YesNoDontKnowIrrelevant? RiskAssessment { get; set; }
         public DateTime? RiskAssessmentDate { get; set; }
         public DateTime? PlannedRiskAssessmentDate { get; set; }
         public RiskLevel? PreRiskAssessment { get; set; }
@@ -26,7 +25,6 @@ namespace Core.DomainModel.ItSystemUsage.GDPR
         public bool PersonalDataSocialOtherPrivateMatters { get; set; }
         public DataOptions? DPIA { get; set; }
         public DateTime? DPIADate { get; set; }
-        public HostedAt? HostedAt { get; set; }
         public string TechnicalSupervisionDocumentationUrlName { get; set; }
         public string TechnicalSupervisionDocumentationUrl { get; set; }
         public DataOptions? UserSupervision { get; set; }

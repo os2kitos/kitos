@@ -47,6 +47,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             Assert.Equal(dpr.Uuid, dto.Uuid);
             Assert.Equal(dpr.LastChanged, dto.LastModified);
+            Assert.NotNull(dto.CreatedBy);
+            Assert.NotNull(dto.LastModifiedBy);
+            Assert.NotNull(dto.OrganizationContext);
             AssertUser(dpr.ObjectOwner, dto.CreatedBy);
             AssertUser(dpr.LastChangedByUser, dto.LastModifiedBy);
             AssertOrganization(dpr.Organization, dto.OrganizationContext);
@@ -57,6 +60,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var dpr = new DataProcessingRegistration();
+            dpr.EnforceInvalidity = A<bool>();
 
             //Act
             var dto = _sut.MapDataProcessingRegistrationDTO(dpr);
@@ -87,7 +91,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Empty(general.SubDataProcessors);
             Assert.Null(general.MainContract);
             Assert.Empty(general.AssociatedContracts);
-            Assert.True(general.Valid);
+            Assert.False(general.Validity.Valid);
+            Assert.Equal(dpr.EnforceInvalidity, dto.General.Validity.EnforceInvalidity);
             Assert.Null(general.ResponsibleOrganizationUnit);
 
             var oversight = dto.Oversight;
@@ -129,7 +134,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertSubDataProcessors(dpr.AssignedSubDataProcessors, general.SubDataProcessors);
             AssertIdentity(dpr.MainContract, general.MainContract);
             AssertOptionalIdentities(dpr.AssociatedContracts, general.AssociatedContracts);
-            Assert.Equal(dpr.IsActiveAccordingToMainContract, general.Valid);
+            Assert.Equal(dpr.IsActiveAccordingToMainContract, general.Validity.Valid);
+            Assert.NotNull(general.ResponsibleOrganizationUnit);
             Assert.Equal(dpr.ResponsibleOrganizationUnit.Uuid, general.ResponsibleOrganizationUnit.Uuid);
             Assert.Equal(dpr.ResponsibleOrganizationUnit.Name, general.ResponsibleOrganizationUnit.Name);
         }
@@ -145,6 +151,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.True(actualSubDataProcessors.TryGetValue(expectedSubDataProcessor.Key, out _));
                 var actualSubDataProcessor = actualSubDataProcessors[expectedSubDataProcessor.Key];
                 AssertOrganization(expectedSubDataProcessor.Value.Organization, actualSubDataProcessor.DataProcessorOrganization);
+                Assert.Equal(expectedSubDataProcessor.Value.Organization.Disabled, actualSubDataProcessor.DataProcessorOrganization.Disabled);
                 AssertOptionalIdentity(expectedSubDataProcessor.Value.SubDataProcessorBasisForTransfer, actualSubDataProcessor.BasisForTransfer);
                 AssertYesNoUndecided(expectedSubDataProcessor.Value.TransferToInsecureCountry, actualSubDataProcessor.TransferToInsecureThirdCountry);
                 AssertOptionalIdentity(expectedSubDataProcessor.Value.InsecureCountry, actualSubDataProcessor.InsecureThirdCountrySubjectToDataProcessing);
@@ -296,7 +303,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private Organization CreateOrganization()
         {
-            return new Organization { Name = A<string>(), Cvr = A<string>(), Uuid = A<Guid>() };
+            return new Organization { Name = A<string>(), Cvr = A<string>(), Uuid = A<Guid>(), Disabled = A<bool>() };
         }
 
         private SubDataProcessor CreateSubDataProcessor(DataProcessingRegistration dataProcessingRegistration, bool withBasisForTransfer, bool withTransferToInsecureThirdCountry, bool withCountry)
@@ -338,7 +345,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                     ParentId = dpr.Id,
                     Id = A<int>(),
                     OversightDate = A<DateTime>(),
-                    OversightRemark = A<string>()
+                    OversightRemark = A<string>(),
+                    OversightReportLink = A<string>(),
+                    OversightReportLinkName = A<string>(),
+                    OversightOption = withOptionalCrossReferences ? new DataProcessingOversightOption { Uuid = A<Guid>(), Name = A<string>() } : null
                 },
                 new()
                 {
@@ -346,7 +356,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                     ParentId = dpr.Id,
                     Id = A<int>(),
                     OversightDate = A<DateTime>(),
-                    OversightRemark = A<string>()
+                    OversightRemark = A<string>(),
+                    OversightReportLink = A<string>(),
+                    OversightReportLinkName = A<string>(),
+                    OversightOption = withOptionalCrossReferences ? new DataProcessingOversightOption { Uuid = A<Guid>(), Name = A<string>() } : null
                 }
             };
         }
@@ -437,25 +450,29 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(comparison.expected.Uuid, comparison.actual.Uuid);
                 Assert.Equal(comparison.expected.OversightDate, comparison.actual.CompletedAt);
                 Assert.Equal(comparison.expected.OversightRemark, comparison.actual.Remark);
+                Assert.Equal(comparison.expected.OversightReportLink, comparison.actual.OversightReportLink!.Url);
+                Assert.Equal(comparison.expected.OversightReportLinkName, comparison.actual.OversightReportLink!.Name);
+                AssertOptionalIdentity(comparison.expected.OversightOption, comparison.actual.OversightOption);
             }
         }
 
-        private void AssertSystemUsages(DataProcessingRegistration dpr, List<IdentityNamePairResponseDTO> actual)
+        private void AssertSystemUsages(DataProcessingRegistration dpr, List<ShallowItSystemUsageResponseDTO> actual)
         {
             Assert.Equal(dpr.SystemUsages.Count, actual.Count);
 
             foreach (var comparison in dpr.SystemUsages.OrderBy(x => x.Uuid)
-                .Zip(actual.OrderBy(x => x.Uuid), (expected, actual) => new { expected, actual })
+                .Zip(actual.OrderBy(x => x.Uuid), (expected, actualDto) => new { expected, actual = actualDto })
                 .ToList())
             {
                 AssertSystemUsage(comparison.expected, comparison.actual);
             }
         }
 
-        private static void AssertSystemUsage(ItSystemUsage expected, IdentityNamePairResponseDTO actual)
+        private static void AssertSystemUsage(ItSystemUsage expected, ShallowItSystemUsageResponseDTO actual)
         {
             Assert.Equal(expected.Uuid, actual.Uuid);
             Assert.Equal(expected.ItSystem.Name, actual.Name);
+            Assert.Equal(expected.CheckSystemValidity().Result, actual.Valid);
         }
 
         private static void AssertOversightInterval(YearMonthIntervalOption? expectedFromSource, OversightIntervalChoice? actual)
@@ -465,6 +482,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 YearMonthIntervalOption.Half_yearly => OversightIntervalChoice.BiYearly,
                 YearMonthIntervalOption.Yearly => OversightIntervalChoice.Yearly,
                 YearMonthIntervalOption.Every_second_year => OversightIntervalChoice.EveryOtherYear,
+                YearMonthIntervalOption.Every_third_year => OversightIntervalChoice.EveryThirdYear,
                 YearMonthIntervalOption.Other => OversightIntervalChoice.Other,
                 YearMonthIntervalOption.Undecided => OversightIntervalChoice.Undecided,
                 null => null,
@@ -500,7 +518,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected, actual);
         }
 
-        private static void AssertOptionalIdentities<T>(IEnumerable<T> optionalExpectedIdentities, IEnumerable<IdentityNamePairResponseDTO> actualIdentities) where T : IHasUuid, IHasName
+        private static void AssertOptionalIdentities<T>(IEnumerable<T>? optionalExpectedIdentities, IEnumerable<IdentityNamePairResponseDTO> actualIdentities) where T : IHasUuid, IHasName
         {
             if (optionalExpectedIdentities == null)
             {
@@ -522,7 +540,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }
         }
 
-        private static void AssertOptionalIdentity<T>(T optionalExpectedIdentity, IdentityNamePairResponseDTO actualIdentity) where T : IHasUuid, IHasName
+        private static void AssertOptionalIdentity<T>(T? optionalExpectedIdentity, IdentityNamePairResponseDTO? actualIdentity) where T : IHasUuid, IHasName
         {
             if (optionalExpectedIdentity == null)
                 Assert.Null(actualIdentity);
@@ -555,10 +573,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(organization.Cvr, shallowOrganizationDTO.Cvr);
         }
 
-        private static void AssertIdentity<T>(T sourceIdentity, IdentityNamePairResponseDTO dto) where T : IHasUuid, IHasName
+        private static void AssertIdentity<T>(T sourceIdentity, IdentityNamePairResponseDTO? dto) where T : IHasUuid, IHasName
         {
-            Assert.Equal(sourceIdentity.Name, dto.Name);
-            Assert.Equal(sourceIdentity.Uuid, dto.Uuid);
+            Assert.Equal(sourceIdentity.Name, dto?.Name);
+            Assert.Equal(sourceIdentity.Uuid, dto?.Uuid);
         }
 
         #endregion

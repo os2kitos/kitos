@@ -19,9 +19,10 @@
     public enum UserCount
     {
         BELOWTEN = 0,
-        TENTOFIFTY = 1,
-        FIFTYTOHUNDRED = 2,
-        HUNDREDPLUS = 3,
+        TENTOFORTYNINE = 1,
+        FIFTYTONINETYNINE = 2,
+        HUNDREDTOFOURHUNDREDNINETYNINE = 3,
+        FIVEHUNDREDPLUS = 5,
         UNDECIDED = 4
     }
 

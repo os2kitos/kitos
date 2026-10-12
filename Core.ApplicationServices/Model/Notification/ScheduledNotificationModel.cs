@@ -1,13 +1,13 @@
-﻿using Core.DomainModel.Advice;
-using System;
-using Core.ApplicationServices.Model.Notification.Write;
+﻿using Core.ApplicationServices.Model.Notification.Write;
 using Core.DomainModel;
+using Core.DomainModel.Advice;
+using System;
 
 namespace Core.ApplicationServices.Model.Notification
 {
     public class ScheduledNotificationModel : IHasBaseNotificationPropertiesModel, IHasRecipientModels, IHasReadonlyName, IHasReadonlyToDate
     {
-        public ScheduledNotificationModel(string name, DateTime? toDate, Scheduling repetitionFrequency, DateTime fromDate, BaseNotificationPropertiesModel baseProperties, RecipientModel ccs, RecipientModel receivers)
+        public ScheduledNotificationModel(string? name, DateTime? toDate, Scheduling repetitionFrequency, DateTime fromDate, BaseNotificationPropertiesModel baseProperties, RecipientModel ccs, RecipientModel receivers)
         {
             Name = name;
             ToDate = toDate;
@@ -18,7 +18,7 @@ namespace Core.ApplicationServices.Model.Notification
             Receivers = receivers;
         }
 
-        public string Name { get; }
+        public string? Name { get; init; }
         public DateTime? ToDate { get; }
         public Scheduling RepetitionFrequency { get; }
         public DateTime FromDate { get; }

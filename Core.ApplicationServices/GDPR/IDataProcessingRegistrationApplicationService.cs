@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Core.Abstractions.Types;
+﻿using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.GDPR;
 using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
+using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Queries;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 
 namespace Core.ApplicationServices.GDPR
@@ -26,18 +26,18 @@ namespace Core.ApplicationServices.GDPR
         Result<ExternalReference, OperationError> SetMasterReference(int id, int referenceId);
         Result<Maybe<ExternalReference>, OperationError> ClearMasterReference(int id);
         Result<(DataProcessingRegistration registration, IEnumerable<DataProcessingRegistrationRole> roles), OperationError> GetAvailableRoles(int id);
-        Result<IEnumerable<User>, OperationError> GetUsersWhichCanBeAssignedToRole(int id, int roleId, string nameEmailQuery, int pageSize);
+        Result<IEnumerable<User>, OperationError> GetUsersWhichCanBeAssignedToRole(int id, int roleId, string? nameEmailQuery, int pageSize);
         Result<DataProcessingRegistrationRight, OperationError> AssignRole(int id, int roleId, int userId);
         Result<DataProcessingRegistrationRight, OperationError> RemoveRole(int id, int roleId, int userId);
-        Result<IEnumerable<ItSystemUsage>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
+        Result<IEnumerable<ItSystemUsage>, OperationError> GetSystemsWhichCanBeAssigned(int id, string? nameQuery, int pageSize);
         Result<ItSystemUsage, OperationError> AssignSystem(int id, int systemId);
         Result<ItSystemUsage, OperationError> RemoveSystem(int id, int systemId);
         Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id, YearMonthIntervalOption oversightInterval);
         Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalRemark(int id, string remark);
-        Result<IEnumerable<Organization>, OperationError> GetDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
+        Result<IEnumerable<Organization>, OperationError> GetDataProcessorsWhichCanBeAssigned(int id, string? nameQuery, int pageSize);
         Result<Organization, OperationError> AssignDataProcessor(int id, int organizationId);
         Result<Organization, OperationError> RemoveDataProcessor(int id, int organizationId);
-        Result<IEnumerable<Organization>, OperationError> GetSubDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
+        Result<IEnumerable<Organization>, OperationError> GetSubDataProcessorsWhichCanBeAssigned(int id, string? nameQuery, int pageSize);
         Result<DataProcessingRegistration, OperationError> SetSubDataProcessorsState(int id, YesNoUndecidedOption state);
         Result<SubDataProcessor, OperationError> AssignSubDataProcessor(int id, int organizationId, Maybe<SubDataProcessorDetailsParameters> details);
         Result<SubDataProcessor, OperationError> UpdateSubDataProcessor(int id, int organizationId, SubDataProcessorDetailsParameters details);
@@ -61,8 +61,7 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompleted(int id, YesNoUndecidedOption completed);
         Result<DataProcessingRegistration, OperationError> UpdateOversightScheduledInspectionDate(int id, DateTime? oversightScheduledInspectionDate);
         Result<DataProcessingRegistration, OperationError> UpdateOversightCompletedRemark(int id, string remark);
-        Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(int id, DateTime oversightDate, string oversightRemark);
-        Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int id, int oversightDateId, DateTime oversightDate, string oversightRemark);
+        Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(int id, DateTime oversightDate, string? oversightRemark, string? oversightReportLink, string? oversightReportLinkName, Guid? oversightOptionUuid);
         Result<DataProcessingRegistrationOversightDate, OperationError> RemoveOversightDate(int id, int oversightDateId);
         Result<DataProcessingRegistration, OperationError> UpdateMainContract(int id, int contractId);
         Result<DataProcessingRegistration, OperationError> RemoveMainContract(int id);
@@ -70,7 +69,7 @@ namespace Core.ApplicationServices.GDPR
         IQueryable<DataProcessingRegistration> Query(params IDomainQuery<DataProcessingRegistration>[] conditions);
         Result<DataProcessingRegistration, OperationError> GetByUuid(Guid uuid);
 
-        Result<DataProcessingRegistrationPermissions, OperationError> GetPermissions(Guid uuid);
+        Result<CombinedPermissionsResult, OperationError> GetPermissions(Guid uuid);
         Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid);
     }
 }

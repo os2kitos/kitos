@@ -17,7 +17,7 @@ namespace Tests.Unit.Core.ApplicationServices.KitosEvents
         private readonly Mock<IKitosHttpClient> _httpClientMock;
         private readonly Mock<IKitosInternalTokenIssuer> _tokenIssuerMock;
         private readonly HttpEventPublisher _sut;
-        private readonly string _pubSubBaseUrl = "http://localhost/";
+        private readonly string _pubSubBaseUrl = "http://localhost";
 
         public HttpEventPublisherTest()
         {

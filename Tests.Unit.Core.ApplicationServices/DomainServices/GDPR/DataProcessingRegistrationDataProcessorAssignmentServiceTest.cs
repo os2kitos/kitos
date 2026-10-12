@@ -193,24 +193,6 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         }
 
         [Fact]
-        public void Cannot_AssignSubDataProcessor_If_Not_Using_Sub_Data_Processors()
-        {
-            //Arrange
-            var existingProcessor = CreateSubDataProcessor(new Organization { Id = A<int>() });
-            var validCandidate = new Organization { Id = A<int>() };
-            var dataProcessingRegistration = new DataProcessingRegistration() { AssignedSubDataProcessors = { existingProcessor }, HasSubDataProcessors = YesNoUndecidedOption.No };
-
-            ExpectGetOrganizationByIdReturns(validCandidate.Id, validCandidate);
-
-            //Act
-            var result = _sut.AssignSubDataProcessor(dataProcessingRegistration, validCandidate.Id);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-        }
-
-        [Fact]
         public void Cannot_AssignSubDataProcessor_If_Not_Applicable()
         {
             //Arrange

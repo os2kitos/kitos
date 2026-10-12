@@ -9,6 +9,6 @@ namespace PubSub.Application.Api.DTOs.Response
         [JsonPropertyName("expiration")]
         public DateTime Expiration { get; set; }
         [JsonPropertyName("claims")]
-        public IEnumerable<ClaimResponseDTO> Claims { get; set; }
+        public required IEnumerable<ClaimResponseDTO> Claims { get; set; }
     }
 }

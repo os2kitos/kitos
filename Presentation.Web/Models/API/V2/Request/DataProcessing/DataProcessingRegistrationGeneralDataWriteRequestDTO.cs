@@ -17,7 +17,7 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         /// <summary>
         /// Additional remark related to the data responsible
         /// </summary>
-        public string DataResponsibleRemark { get; set; }
+        public string? DataResponsibleRemark { get; set; }
         /// <summary>
         /// Determines if a data processing agreement has been concluded
         /// </summary>
@@ -25,7 +25,7 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         /// <summary>
         /// Remark related to whether or not an agreement has been concluded
         /// </summary>
-        public string IsAgreementConcludedRemark { get; set; }
+        public string? IsAgreementConcludedRemark { get; set; }
         /// <summary>
         /// Describes the date when the data processing agreement was concluded
         /// Constraints:
@@ -50,13 +50,13 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         ///     - Duplicates are not allowed
         ///     - If changed from existing value, the options must currently be available in the organization
         /// </summary>
-        public IEnumerable<Guid> InsecureCountriesSubjectToDataTransferUuids { get; set; }
+        public IEnumerable<Guid>? InsecureCountriesSubjectToDataTransferUuids { get; set; }
         /// <summary>
         /// UUID's of the organization entities selected as data processors
         /// Constraints:
         ///     - No duplicates
         /// </summary>
-        public IEnumerable<Guid> DataProcessorUuids { get; set; }
+        public IEnumerable<Guid>? DataProcessorUuids { get; set; }
         /// <summary>
         /// Determines if the data processing involves sub data processors
         /// </summary>
@@ -67,7 +67,7 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         ///     - HasSubDataProcesors equals 'yes'
         ///     - No duplicates allowed
         /// </summary>
-        public IEnumerable<DataProcessorRegistrationSubDataProcessorWriteRequestDTO> SubDataProcessors { get; set; }
+        public IEnumerable<DataProcessorRegistrationSubDataProcessorWriteRequestDTO>? SubDataProcessors { get; set; }
 
         /// <summary>
         /// Defines the master contract for this Data Processing Registration (many contracts can point to a DPR but only one can be the master contract)
@@ -80,5 +80,10 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         /// </summary>
         [NonEmptyGuid]
         public Guid? ResponsibleOrganizationUnitUuid { get; set; }
+
+        /// <summary>
+        /// Whether this registration should be considered invalid regardless of other properties.
+        /// </summary>
+        public bool? EnforceInvalidity { get; set; }
     }
 }

@@ -9,13 +9,13 @@ namespace Core.DomainServices.Repositories.System
 {
     public interface IItSystemRepository
     {
-        IQueryable<ItSystem> GetSystems(OrganizationDataQueryParameters parameters = null);
+        IQueryable<ItSystem> GetSystems(OrganizationDataQueryParameters? parameters = null);
 
         IQueryable<ItSystem> GetUnusedSystems(OrganizationDataQueryParameters parameters);
 
         IQueryable<ItSystem> GetSystemsInUse(int organizationId);
 
-        ItSystem GetSystem(int systemId);
+        ItSystem? GetSystem(int systemId);
 
         Maybe<ItSystem> GetSystem(Guid systemId);
 

@@ -14,8 +14,7 @@ namespace Core.ApplicationServices.Users.Write
 
         Maybe<OperationError> SendNotification(Guid organizationUuid, Guid userUuid);
 
-        Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(
-            Guid organizationUuid);
+        Result<UserCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid);
 
         Maybe<OperationError> CopyUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid, UserRightsChangeParameters parameters);
         Maybe<OperationError> TransferUserRights(Guid organizationUuid, Guid fromUserUuid, Guid toUserUuid, UserRightsChangeParameters parameters);

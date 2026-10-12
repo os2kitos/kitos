@@ -71,7 +71,7 @@ namespace Core.BackgroundJobs.Model.ExternalLinks
                     if (!validation.Success)
                     {
                         var item = new BrokenLinkInInterface();
-                        SetResults(item, itInterface, validation.Error, url);
+                        SetResults(item, itInterface, validation.Error!, url);
                         results.Add(item);
                     }
                 }
@@ -93,7 +93,7 @@ namespace Core.BackgroundJobs.Model.ExternalLinks
                     if (!validation.Success)
                     {
                         var item = new BrokenLinkInExternalReference();
-                        SetResults(item, systemReference, validation.Error, url);
+                        SetResults(item, systemReference, validation.Error!, url);
                         results.Add(item);
                     }
                 }

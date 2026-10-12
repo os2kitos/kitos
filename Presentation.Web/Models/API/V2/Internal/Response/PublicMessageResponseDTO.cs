@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Core.DomainModel.PublicMessage;
 using Presentation.Web.Controllers.API.V2.Internal.Messages.Mapping;
 
@@ -8,6 +9,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Response
     {
         public PublicMessageResponseDTO() {}
 
+        [SetsRequiredMembers]
         public PublicMessageResponseDTO(PublicMessage publicMessageModel)
         {
             Uuid = publicMessageModel.Uuid;
@@ -21,11 +23,11 @@ namespace Presentation.Web.Models.API.V2.Internal.Response
         }
 
         public Guid Uuid { get; set; }
-        public string Title { get; set; }
-        public string LongDescription { get; set; }
-        public string ShortDescription { get; set; }
+        public required string Title { get; set; }
+        public required string LongDescription { get; set; }
+        public required string ShortDescription { get; set; }
         public PublicMessageStatusChoice? Status { get; set; }
-        public string Link { get; set; }
+        public required string Link { get; set; }
         public PublicMessageIconTypeChoice? IconType { get; set; }
         public bool IsMain { get; set; }
     }

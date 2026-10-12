@@ -40,8 +40,6 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private readonly Mock<ITaskRefRepository> _taskRefRepositoryMock;
         private readonly Mock<IGlobalAdminNotificationService> _globalAdminNotificationServiceMock;
         private readonly Mock<IUserRepository> _userRepositoryMock;
-        private readonly Mock<IDatabaseControl> _dbControlMock;
-        private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IItSystemWriteService> _writeServiceMock;
 
         public RightsHolderSystemServiceTest()
@@ -53,8 +51,8 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _taskRefRepositoryMock = new Mock<ITaskRefRepository>();
             _globalAdminNotificationServiceMock = new Mock<IGlobalAdminNotificationService>();
             _userRepositoryMock = new Mock<IUserRepository>();
-            _dbControlMock = new Mock<IDatabaseControl>();
-            _domainEventsMock = new Mock<IDomainEvents>();
+            var dbControlMock = new Mock<IDatabaseControl>();
+            var domainEventsMock = new Mock<IDomainEvents>();
             _writeServiceMock = new Mock<IItSystemWriteService>();
             _sut = new RightsHolderSystemService(
                 _userContextMock.Object,
@@ -65,8 +63,8 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
                 _userRepositoryMock.Object,
                 Mock.Of<IOperationClock>(x => x.Now == DateTime.Now),
                 Mock.Of<ILogger>(),
-                _dbControlMock.Object,
-                _domainEventsMock.Object,
+                dbControlMock.Object,
+                domainEventsMock.Object,
                 _writeServiceMock.Object);
         }
 
@@ -113,10 +111,9 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             ExpectUserHasRightsHolderAccessReturns(false);
-            var refinements = new List<IDomainQuery<ItSystem>>();
 
             //Act
-            var result = _sut.GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(refinements);
+            var result = _sut.GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(new List<IDomainQuery<ItSystem>>());
 
             //Assert
             Assert.True(result.Failed);
@@ -131,10 +128,9 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var expectedResponse = Mock.Of<IQueryable<ItSystem>>();
             _userContextMock.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(Many<int>());
             _itSystemServiceMock.Setup(x => x.GetAvailableSystems(It.IsAny<IDomainQuery<ItSystem>[]>())).Returns(expectedResponse);
-            var refinements = new List<IDomainQuery<ItSystem>>();
 
             //Act
-            var result = _sut.GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(refinements);
+            var result = _sut.GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(new List<IDomainQuery<ItSystem>>());
 
             //Assert
             Assert.True(result.Ok);
@@ -234,12 +230,10 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var itSystem = new ItSystem { Id = A<int>() };
             var parentSystem = new ItSystem() { Id = A<int>(), OrganizationId = A<int>(), BelongsToId = A<int>() };
 
-            var taskRefs = new Dictionary<string, TaskRef>();
             foreach (var uuid in inputParameters.TaskRefUuids.NewValue)
             {
                 var taskRef = new TaskRef { Id = A<int>() };
                 _taskRefRepositoryMock.Setup(x => x.GetTaskRef(uuid)).Returns(taskRef);
-                taskRefs[uuid.ToString()] = taskRef;
             }
 
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
@@ -672,7 +666,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
 
         private void ExpectHasSpecificAccessReturns(ItSystem itSystem, bool value)
         {
-            _userContextMock.Setup(x => x.HasRole(itSystem.BelongsToId.Value, OrganizationRole.RightsHolderAccess))
+            _userContextMock.Setup(x => x.HasRole(itSystem.BelongsToId!.Value, OrganizationRole.RightsHolderAccess))
                 .Returns(value);
         }
 

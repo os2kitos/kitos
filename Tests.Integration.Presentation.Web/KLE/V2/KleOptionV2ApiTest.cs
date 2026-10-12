@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -27,7 +26,7 @@ namespace Tests.Integration.Presentation.Web.KLE.V2
         {
             //Arrange
             var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var date = A<DateTime>().Date;
+            var date = NormalizeTimestamp(A<DateTime>().Date);
             SetLatestUpdatedDate(date);
 
             //Act
@@ -149,6 +148,7 @@ namespace Tests.Integration.Presentation.Web.KLE.V2
             //Assert
             Assert.Equal(child.Uuid, response.Payload.Uuid);
             Assert.Equal(child.TaskKey, response.Payload.KleNumber);
+            Assert.NotNull(response.Payload.ParentKle);
             Assert.Equal(child.Parent.Uuid, response.Payload.ParentKle.Uuid);
             Assert.Equal(child.Parent.TaskKey, response.Payload.ParentKle.Name);
             Assert.Equal(child.Description, response.Payload.Description);
@@ -167,7 +167,7 @@ namespace Tests.Integration.Presentation.Web.KLE.V2
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-        private TaskRef CreateTaskRefInDb(int mainGroup, int? @group = null, int? subject = null, string description = null, int? parentId = null)
+        private TaskRef CreateTaskRefInDb(int mainGroup, int? @group = null, int? subject = null, string? description = null, int? parentId = null)
         {
             if (subject.HasValue && !group.HasValue)
                 throw new ArgumentException($"{nameof(@group)} must be defined if {nameof(subject)} is defined.");
@@ -189,7 +189,24 @@ namespace Tests.Integration.Presentation.Web.KLE.V2
                 Uuid = Guid.NewGuid()
             }));
 
-            return DatabaseAccess.MapFromEntitySet<TaskRef, TaskRef>(refs => refs.AsQueryable().Include(x => x.Parent).AsNoTracking().Single(x => x.TaskKey == key));
+            return DatabaseAccess.MapFromEntitySet<TaskRef, TaskRef>(refs =>
+                refs.AsQueryable()
+                    .Where(x => x.TaskKey == key)
+                    .Select(x => new TaskRef
+                    {
+                        Id = x.Id,
+                        Uuid = x.Uuid,
+                        TaskKey = x.TaskKey,
+                        Description = x.Description,
+                        ParentId = x.ParentId,
+                        Parent = x.Parent == null ? null : new TaskRef
+                        {
+                            Id = x.Parent.Id,
+                            Uuid = x.Parent.Uuid,
+                            TaskKey = x.Parent.TaskKey
+                        }
+                    })
+                    .Single());
         }
 
         private static void PurgePreviousTestData()
@@ -207,10 +224,23 @@ namespace Tests.Integration.Presentation.Web.KLE.V2
         {
             DatabaseAccess.MutateEntitySet<KLEUpdateHistoryItem>(items =>
             {
-                items.AsQueryable().ToList().ForEach(existing => items.DeleteByKey(existing.Id));
+                items.AsQueryable().Select(existing => existing.Id).ToList().ForEach(id => items.DeleteByKey(id));
                 items.Save();
-                items.Insert(new KLEUpdateHistoryItem(date));
+                items.Insert(new KLEUpdateHistoryItem(NormalizeTimestamp(date)));
             });
+        }
+
+        private static DateTime NormalizeTimestamp(DateTime value)
+        {
+            var utcValue = value.Kind switch
+            {
+                DateTimeKind.Utc => value,
+                DateTimeKind.Local => value.ToUniversalTime(),
+                _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
+            };
+
+            var truncatedTicks = utcValue.Ticks - (utcValue.Ticks % 10);
+            return new DateTime(truncatedTicks, DateTimeKind.Utc);
         }
 
         private string CreateDescription(string content)

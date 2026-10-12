@@ -1,4 +1,5 @@
-﻿using Core.DomainServices;
+using Core.DomainServices;
+using System.Net;
 using System.Net.Mail;
 using Core.Abstractions.Types;
 
@@ -14,11 +15,16 @@ namespace Core.ApplicationServices
         private readonly Factory<SmtpClient> _clientFactory;
 
         /// <summary>
-        /// Construct a smtp client with configuration from web.config
+        /// Initializes a client that drops mail to a local pickup directory (e.g. for local development).
         /// </summary>
-        public SingleThreadedMailClient()
+        /// <param name="pickupDirectoryLocation">Path where .eml files are written.</param>
+        public SingleThreadedMailClient(string pickupDirectoryLocation)
         {
-            _clientFactory = () => new SmtpClient();
+            _clientFactory = () => new SmtpClient
+            {
+                DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory,
+                PickupDirectoryLocation = pickupDirectoryLocation
+            };
         }
 
         /// <summary>
@@ -27,9 +33,17 @@ namespace Core.ApplicationServices
         /// <param name="host">The host.</param>
         /// <param name="port">The port.</param>
         /// <param name="enableSsl">if set to <c>true</c> [enable SSL].</param>
-        public SingleThreadedMailClient(string host, int port, bool enableSsl = false)
+        /// <param name="userName">Optional SMTP username for authentication.</param>
+        /// <param name="password">Optional SMTP password for authentication.</param>
+        public SingleThreadedMailClient(string host, int port, bool enableSsl = false, string? userName = null, string? password = null)
         {
-            _clientFactory = () => new SmtpClient(host, port) { EnableSsl = enableSsl };
+            _clientFactory = () =>
+            {
+                var client = new SmtpClient(host, port) { EnableSsl = enableSsl };
+                if (!string.IsNullOrWhiteSpace(userName))
+                    client.Credentials = new NetworkCredential(userName, password);
+                return client;
+            };
         }
 
         /// <summary>

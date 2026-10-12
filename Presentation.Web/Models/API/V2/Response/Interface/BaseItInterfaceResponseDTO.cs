@@ -16,38 +16,38 @@ namespace Presentation.Web.Models.API.V2.Response.Interface
         /// <summary>
         /// IT-System exposing this IT-Interface
         /// </summary>
-        public IdentityNamePairResponseDTO ExposedBySystem { get; set; }
+        public IdentityNamePairResponseDTO? ExposedBySystem { get; set; }
 
         /// <summary>
         /// Name of IT-Interface
         /// </summary>
         [Required]
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         /// <summary>
         /// Identifier for IT-Interface
         /// </summary>
-        public string InterfaceId { get; set; }
+        public string? InterfaceId { get; set; }
 
         /// <summary>
         /// Version signifier for IT-Interface
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
 
         /// <summary>
         /// General description of the IT-Interface
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Internal notes regarding the IT-System (usually written by Global Admin)
         /// </summary>
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
 
         /// <summary>
         /// Url reference for further information
         /// </summary>
-        public string UrlReference { get; set; }
+        public string? UrlReference { get; set; }
 
         /// <summary>
         /// Active status
@@ -65,6 +65,6 @@ namespace Presentation.Web.Models.API.V2.Response.Interface
         /// Responsible for creation
         /// </summary>
         [Required]
-        public IdentityNamePairResponseDTO CreatedBy { get; set; }
+        public IdentityNamePairResponseDTO? CreatedBy { get; set; }
     }
 }

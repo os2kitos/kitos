@@ -176,13 +176,13 @@ namespace Core.ApplicationServices
                 var contractRow = new ContractRow
                 {
                     RowIndex = rowIndex,
-                    Name = row.Field<string>(1),
-                    ItContractId = row.Field<string>(2),
-                    Note = row.Field<string>(3),
-                    ConcludedText = row.Field<string>(4),
-                    IrrevocableToText = row.Field<string>(5),
-                    ExpirationDateText = row.Field<string>(6),
-                    TerminatedText = row.Field<string>(7),
+                    Name = row.Field<string>(1) ?? "",
+                    ItContractId = row.Field<string>(2) ?? "",
+                    Note = row.Field<string>(3) ?? "",
+                    ConcludedText = row.Field<string>(4) ?? "",
+                    IrrevocableToText = row.Field<string>(5) ?? "",
+                    ExpirationDateText = row.Field<string>(6) ?? "",
+                    TerminatedText = row.Field<string>(7) ?? "",
                 };
 
                 // validate that name exists
@@ -214,7 +214,7 @@ namespace Core.ApplicationServices
                 {
                     // is something entered?
                     if (!String.IsNullOrEmpty(contractRow.ConcludedText) && !String.IsNullOrWhiteSpace(contractRow.ConcludedText))
-                        contractRow.Concluded = DateTime.FromOADate(Double.Parse(contractRow.ConcludedText)).Date;
+                        contractRow.Concluded = SpecifyUtcKind(DateTime.FromOADate(Double.Parse(contractRow.ConcludedText)).Date);
                 }
                 catch (Exception)
                 {
@@ -233,7 +233,7 @@ namespace Core.ApplicationServices
                 {
                     // is something entered?
                     if (!String.IsNullOrEmpty(contractRow.IrrevocableToText) && !String.IsNullOrWhiteSpace(contractRow.IrrevocableToText))
-                        contractRow.IrrevocableTo = DateTime.FromOADate(Double.Parse(contractRow.IrrevocableToText)).Date;
+                        contractRow.IrrevocableTo = SpecifyUtcKind(DateTime.FromOADate(Double.Parse(contractRow.IrrevocableToText)).Date);
                 }
                 catch (Exception)
                 {
@@ -252,7 +252,7 @@ namespace Core.ApplicationServices
                 {
                     // is something entered?
                     if (!String.IsNullOrEmpty(contractRow.ExpirationDateText) && !String.IsNullOrWhiteSpace(contractRow.ExpirationDateText))
-                        contractRow.ExpirationDate = DateTime.FromOADate(Double.Parse(contractRow.ExpirationDateText)).Date;
+                        contractRow.ExpirationDate = SpecifyUtcKind(DateTime.FromOADate(Double.Parse(contractRow.ExpirationDateText)).Date);
                 }
                 catch (Exception)
                 {
@@ -271,7 +271,7 @@ namespace Core.ApplicationServices
                 {
                     // is something entered?
                     if (!String.IsNullOrEmpty(contractRow.TerminatedText) && !String.IsNullOrWhiteSpace(contractRow.TerminatedText))
-                        contractRow.Terminated = DateTime.FromOADate(Double.Parse(contractRow.TerminatedText)).Date;
+                        contractRow.Terminated = SpecifyUtcKind(DateTime.FromOADate(Double.Parse(contractRow.TerminatedText)).Date);
                 }
                 catch (Exception)
                 {
@@ -362,7 +362,7 @@ namespace Core.ApplicationServices
             foreach (var row in newUsers)
             {
                 // a row is new if the first column, the id, is empty
-                var id = StringToId(row.Field<string>(0));
+                var id = StringToId(row.Field<string>(0)!);
                 var isNew = (id == null);
 
                 var userRow = new UserRow()
@@ -370,10 +370,10 @@ namespace Core.ApplicationServices
                     RowIndex = rowIndex, // needed for error reporting
                     IsNew = isNew,
                     Id = id,
-                    Name = row.Field<string>(1),
-                    LastName = row.Field<string>(2),
-                    Email = row.Field<string>(3),
-                    Phone = String.IsNullOrWhiteSpace(row.Field<string>(4)) ? null : row.Field<string>(4)
+                    Name = row.Field<string>(1)!,
+                    LastName = row.Field<string>(2)!,
+                    Email = row.Field<string>(3)!,
+                    Phone = (String.IsNullOrWhiteSpace(row.Field<string>(4)) ? null : row.Field<string>(4))!
                 };
 
                 var foundError = false;
@@ -568,7 +568,7 @@ namespace Core.ApplicationServices
             foreach (var row in orgTable.AsEnumerable())
             {
                 // a row is new if the first column, the id, is empty
-                var id = StringToId(row.Field<string>(0));
+                var id = StringToId(row.Field<string>(0)!);
                 var isNew = (id == null);
 
                 var orgUnitRow = new OrgUnitRow
@@ -576,9 +576,9 @@ namespace Core.ApplicationServices
                     RowIndex = rowIndex, // needed for error reporting
                     IsNew = isNew,
                     Id = id,
-                    Parent = row.Field<string>(1),
-                    Name = row.Field<string>(2),
-                    Ean = StringToEan(row.Field<string>(3))
+                    Parent = row.Field<string>(1)!,
+                    Name = row.Field<string>(2)!,
+                    Ean = StringToEan(row.Field<string>(3)!)
                 };
 
                 rowIndex++;
@@ -590,7 +590,7 @@ namespace Core.ApplicationServices
                     errors.Add(new ExcelImportOrgUnitNoNameError(orgUnitRow.RowIndex));
                 }
                 // ean must be valid
-                else if (isNew && !String.IsNullOrWhiteSpace(row.Field<string>(3)) && !(orgUnitRow.Ean.HasValue && orgUnitRow.Ean.ToString().Length == 13))
+                else if (isNew && !String.IsNullOrWhiteSpace(row.Field<string>(3)) && !(orgUnitRow.Ean.HasValue && orgUnitRow.Ean.ToString()!.Length == 13))
                 {
                     var error = new ExcelImportError()
                     {
@@ -669,7 +669,7 @@ namespace Core.ApplicationServices
 
                     foreach (var orgUnitRow in resolvedInThisPass)
                     {
-                        orgUnitRow.Id = orgUnitRow.Proxy.Id;
+                        orgUnitRow.Id = orgUnitRow.Proxy?.Id;
                         resolvedRows.Add(orgUnitRow.Name, orgUnitRow);
                     }
                 }
@@ -681,6 +681,17 @@ namespace Core.ApplicationServices
             // at this point, if there's is any unresolvedRows, we should report some errors
             errors.AddRange(unresolvedRows.Select(orgUnitRow => new ExcelImportOrgUnitBadParentError(orgUnitRow.RowIndex)));
             return errors;
+        }
+
+        /// <summary>
+        /// Ensures a DateTime has Kind=UTC for PostgreSQL compatibility.
+        /// Npgsql requires UTC Kind when writing to timestamp with time zone columns.
+        /// </summary>
+        private static DateTime SpecifyUtcKind(DateTime value)
+        {
+            return value.Kind == DateTimeKind.Utc
+                ? value
+                : new DateTime(value.Ticks, DateTimeKind.Utc);
         }
 
         public class ExcelImportOrgUnitBadParentError : ExcelImportError
@@ -732,10 +743,10 @@ namespace Core.ApplicationServices
             public int RowIndex { get; set; }
             public bool IsNew { get; set; }
             public int? Id { get; set; }
-            public string Name { get; set; }
-            public string LastName { get; set; }
-            public string Phone { get; set; }
-            public string Email { get; set; }
+            public required string Name { get; set; }
+            public required string LastName { get; set; }
+            public required string Phone { get; set; }
+            public required string Email { get; set; }
         }
 
         private class OrgUnitRow
@@ -743,26 +754,26 @@ namespace Core.ApplicationServices
             public int RowIndex { get; set; }
             public bool IsNew { get; set; }
             public int? Id { get; set; }
-            public string Name { get; set; }
+            public required string Name { get; set; }
             public long? Ean { get; set; }
-            public string Parent { get; set; }
-            public OrganizationUnit Proxy { get; set; }
+            public required string Parent { get; set; }
+            public OrganizationUnit? Proxy { get; set; }
         }
 
         private class ContractRow
         {
-            public int RowIndex { get; set; }
-            public string Name { get; set; }
-            public string ItContractId { get; set; }
-            public string Note { get; set; }
+            public required int RowIndex { get; set; }
+            public required string Name { get; set; }
+            public required string ItContractId { get; set; }
+            public required string Note { get; set; }
             public DateTime? Concluded { get; set; }
             public DateTime? IrrevocableTo { get; set; }
             public DateTime? ExpirationDate { get; set; }
             public DateTime? Terminated { get; set; }
-            public string ConcludedText { get; set; }
-            public string IrrevocableToText { get; set; }
-            public string ExpirationDateText { get; set; }
-            public string TerminatedText { get; set; }
+            public required string ConcludedText { get; set; }
+            public required string IrrevocableToText { get; set; }
+            public required string ExpirationDateText { get; set; }
+            public required string TerminatedText { get; set; }
         }
 
         #region Table Helpers

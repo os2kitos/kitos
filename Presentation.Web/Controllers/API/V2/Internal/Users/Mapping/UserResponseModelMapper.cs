@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Organizations;
@@ -21,7 +21,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
         {
             return _organizationService.GetOrganization(organizationUuid)
                 .Bind(organization =>
-                    Result<OrganizationUnit, OperationError>.Success(
+                    Result<OrganizationUnit?, OperationError>.Success(
                         _organizationService.GetDefaultUnit(organization, user)))
                 .Select(defaultUnit =>
                 {
@@ -45,7 +45,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
                 });
         }
 
-        public UserIsPartOfCurrentOrgResponseDTO ToUserWithIsPartOfCurrentOrgResponseDTO(Guid organizationUuid, User user)
+        public UserIsPartOfCurrentOrgResponseDTO? ToUserWithIsPartOfCurrentOrgResponseDTO(Guid organizationUuid, User? user)
         {
             if (user == null)
             {

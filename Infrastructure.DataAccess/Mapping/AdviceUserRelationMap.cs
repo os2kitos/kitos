@@ -1,23 +1,27 @@
 ﻿using Core.DomainModel.Advice;
 
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 namespace Infrastructure.DataAccess.Mapping
 {
     internal class AdviceUserRelationMap : EntityMap<AdviceUserRelation>
     {
-        public AdviceUserRelationMap()
+        public override void Configure(EntityTypeBuilder<AdviceUserRelation> builder)
         {
-            this.ToTable("AdviceUserRelations");
-            HasOptional(x => x.ItContractRole)
+            base.Configure(builder);
+            builder.ToTable("AdviceUserRelations");
+            builder.HasOne(x => x.ItContractRole)
                 .WithMany(x => x.AdviceUserRelations)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasOptional(x => x.DataProcessingRegistrationRole)
+            builder.HasOne(x => x.DataProcessingRegistrationRole)
                 .WithMany(x => x.AdviceUserRelations)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasOptional(x => x.ItSystemRole)
+            builder.HasOne(x => x.ItSystemRole)
                 .WithMany(x => x.AdviceUserRelations)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

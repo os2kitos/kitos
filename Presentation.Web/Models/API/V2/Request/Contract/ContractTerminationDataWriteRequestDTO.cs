@@ -11,6 +11,6 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// <summary>
         /// Contract termination terms
         /// </summary>
-        public ContractTerminationTermsRequestDTO Terms { get; set; }
+        public ContractTerminationTermsRequestDTO? Terms { get; set; }
     }
 }

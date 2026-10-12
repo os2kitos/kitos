@@ -1,23 +1,18 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
-using Microsoft.Owin;
+using Microsoft.AspNetCore.Http;
 using Serilog.Context;
 
 namespace Presentation.Web.Infrastructure.Middleware
 {
-    public class CorrelationIdMiddleware : OwinMiddleware
+    public class CorrelationIdMiddleware : IMiddleware
     {
-        public CorrelationIdMiddleware(OwinMiddleware next) : base(next)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-        }
-
-        public override async Task Invoke(IOwinContext context)
-        {
-            var kernel = context.GetNinjectKernel();
             var correlationId = Guid.NewGuid();
             using (LogContext.PushProperty("CorrelationId", correlationId.ToString()))
             {
-                await Next.Invoke(context);
+                await next(context);
             }
         }
     }

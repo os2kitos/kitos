@@ -1,23 +1,23 @@
-﻿using System.Collections.Concurrent;
-using Swashbuckle.Swagger;
+using System.Collections.Concurrent;
+using Microsoft.OpenApi;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace Presentation.Web.Swagger
 {
     public class CustomCachingSwaggerProvider : ISwaggerProvider
     {
-            private static readonly ConcurrentDictionary<string, SwaggerDocument> Cache = new();
+        private static readonly ConcurrentDictionary<string, OpenApiDocument> Cache = new();
+        private readonly ISwaggerProvider _swaggerProvider;
 
-            private readonly ISwaggerProvider _swaggerProvider;
+        public CustomCachingSwaggerProvider(ISwaggerProvider swaggerProvider)
+        {
+            _swaggerProvider = swaggerProvider;
+        }
 
-            public CustomCachingSwaggerProvider(ISwaggerProvider swaggerProvider)
-            {
-                _swaggerProvider = swaggerProvider;
-            }
-
-            public SwaggerDocument GetSwagger(string rootUrl, string apiVersion)
-            {
-                var cacheKey = $"{rootUrl}_{apiVersion}";
-                return Cache.GetOrAdd(cacheKey, (key) => _swaggerProvider.GetSwagger(rootUrl, apiVersion));
-            }
+        public OpenApiDocument GetSwagger(string documentName, string host, string basePath)
+        {
+            var cacheKey = $"{documentName}_{host}_{basePath}";
+            return Cache.GetOrAdd(cacheKey, _ => _swaggerProvider.GetSwagger(documentName, host, basePath));
+        }
     }
 }

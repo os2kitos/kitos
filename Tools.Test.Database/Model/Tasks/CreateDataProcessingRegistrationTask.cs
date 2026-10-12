@@ -30,7 +30,7 @@ namespace Tools.Test.Database.Model.Tasks
                 LastChangedByUserId = globalAdmin.Id
             };
 
-            agreement = dbContext.DataProcessingRegistrations.Add(agreement);
+            dbContext.DataProcessingRegistrations.Add(agreement);
             dbContext.SaveChanges();
 
             var readModel = new DataProcessingRegistrationReadModel();

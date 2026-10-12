@@ -175,6 +175,17 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     return systemUsage;
                 }
 
+                // If target system already has a usage in this organization, bail out
+                var conflictingUsage = _systemUsageRepository
+                    .GetBySystemId(toSystemId)
+                    .FirstOrDefault(x => x.OrganizationId == systemUsage.OrganizationId);
+                if (conflictingUsage != null)
+                {
+                    return new OperationError(
+                        $"Target system with id: {toSystemId} already has a usage in organization with id: {systemUsage.OrganizationId}",
+                        OperationFailure.Conflict);
+                }
+
                 // *************************
                 // *** Perform migration ***
                 // *************************

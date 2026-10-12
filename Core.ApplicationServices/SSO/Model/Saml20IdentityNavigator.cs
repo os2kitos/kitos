@@ -25,7 +25,7 @@ namespace Core.ApplicationServices.SSO.Model
             return
                 GetAttribute(StsAdgangsStyringConstants.Attributes.PrivilegeKey)
                     .Select(ToXml)
-                    .Select(xml => xml.SelectNodes("//Privilege")?.OfType<XmlNode>())
+                    .Select(xml => xml.SelectNodes("//Privilege")?.OfType<XmlNode>() ?? Enumerable.Empty<XmlNode>())
                     .GetValueOrFallback(Enumerable.Empty<XmlNode>());
         }
 

@@ -12,14 +12,14 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// <summary>
         /// Optionally assigned payment frequency
         /// </summary>
-        public IdentityNamePairResponseDTO PaymentFrequency { get; set; }
+        public IdentityNamePairResponseDTO? PaymentFrequency { get; set; }
         /// <summary>
         /// Optionally assigned payment model
         /// </summary>
-        public IdentityNamePairResponseDTO PaymentModel { get; set; }
+        public IdentityNamePairResponseDTO? PaymentModel { get; set; }
         /// <summary>
         /// Optionally assigned price regulation
         /// </summary>
-        public IdentityNamePairResponseDTO PriceRegulation { get; set; }
+        public IdentityNamePairResponseDTO? PriceRegulation { get; set; }
     }
 }

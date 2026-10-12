@@ -99,7 +99,7 @@ namespace Core.ApplicationServices.Interface.Write
 
         private Result<ItInterface, OperationError> UpdateExposingSystem(ItInterface itInterface, Guid? exposingSystemUuid)
         {
-            ItSystem exposingSystem = null;
+            ItSystem? exposingSystem = null;
 
             if (exposingSystemUuid.HasValue)
             {

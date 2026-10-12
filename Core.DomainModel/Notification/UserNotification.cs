@@ -29,13 +29,13 @@ namespace Core.DomainModel.Notification
         public string NotificationMessage { get; set; }
         public NotificationType NotificationType { get; set; }
 
-        public User NotificationRecipient { get; set; }
+        public virtual User NotificationRecipient { get; set; }
         public int NotificationRecipientId { get; set; }
 
         public DateTime Created { get; set; }
 
         public int OrganizationId { get; set; }
-        public Organization.Organization Organization { get; set; }
+        public virtual Organization.Organization Organization { get; set; }
 
         public int? Itcontract_Id { get; set; }
         public virtual ItContract.ItContract ItContract { get; set; }

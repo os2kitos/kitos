@@ -16,6 +16,7 @@
             {
                 public const string CurrentEnvironment = "ASPNETCORE_ENVIRONMENT";
                 public const string Production = "Production";
+                public const string Local = "Local";
             }
 
             public static class MessageBus
@@ -35,6 +36,11 @@
             {
                 public const string CertPassword = "CERT_PASSWORD";
                 public const string CertFilePath = "/etc/ssl/certs/kitos-pubsub.pfx";
+            }
+
+            public static class Database
+            {
+                public const string AutoMigrate = "PUBSUB_AUTO_MIGRATE";
             }
         }
 

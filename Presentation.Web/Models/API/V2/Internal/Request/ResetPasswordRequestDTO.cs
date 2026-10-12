@@ -6,6 +6,6 @@ namespace Presentation.Web.Models.API.V2.Internal.Request
     {
         [Required]
         [MinLength(6)]
-        public string Password { get; set; }
+        public required string Password { get; set; }
     }
 }

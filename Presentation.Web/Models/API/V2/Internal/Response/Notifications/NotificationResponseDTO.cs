@@ -17,7 +17,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
         /// <summary>
         /// Name of the notification (different field than Subject)
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
         /// <summary>
         /// Date when the notification was sent last time
         /// </summary>
@@ -33,11 +33,11 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
         /// <summary>
         /// Subject of the email
         /// </summary>
-        public string Subject { get; set; }
+        public required string Subject { get; set; }
         /// <summary>
         /// Body of the email
         /// </summary>
-        public string Body { get; set; }
+        public required string Body { get; set; }
         /// <summary>
         /// Resource owning the notification (e.g. ItContract)
         /// </summary>
@@ -49,7 +49,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
         /// <summary>
         /// Resource owning the notification
         /// </summary>
-        public IdentityNamePairResponseDTO OwnerResource { get; set; }
+        public IdentityNamePairResponseDTO? OwnerResource { get; set; }
         /// <summary>
         /// Indicates how often should a scheduled notification be repeated
         /// </summary>
@@ -58,10 +58,10 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
         /// <summary>
         /// List of recipients
         /// </summary>
-        public RecipientResponseDTO Receivers { get; set; }
+        public RecipientResponseDTO? Receivers { get; set; }
         /// <summary>
         /// List of CCs
         /// </summary>
-        public RecipientResponseDTO CCs { get; set; }
+        public RecipientResponseDTO? CCs { get; set; }
     }
 }

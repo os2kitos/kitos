@@ -17,6 +17,7 @@ using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
+using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.Events;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.GDPR;
@@ -26,6 +27,7 @@ using Core.DomainModel.References;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
+using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
 
@@ -49,6 +51,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
         private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
         private readonly IEntityTreeUuidCollector _entityTreeUuidCollector;
+        private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -66,7 +69,8 @@ namespace Core.ApplicationServices.Contract.Write
             IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> roleAssignmentService,
             IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
             IGenericRepository<EconomyStream> economyStreamRepository,
-            IEntityTreeUuidCollector entityTreeUuidCollector)
+            IEntityTreeUuidCollector entityTreeUuidCollector,
+            IPendingReadModelUpdateRepository pendingReadModelUpdateRepository)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -84,6 +88,7 @@ namespace Core.ApplicationServices.Contract.Write
             _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
             _economyStreamRepository = economyStreamRepository;
             _entityTreeUuidCollector = entityTreeUuidCollector;
+            _pendingReadModelUpdateRepository = pendingReadModelUpdateRepository;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -110,6 +115,8 @@ namespace Core.ApplicationServices.Contract.Write
 
             if (result.Ok)
             {
+                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(result.Value.Id,
+                    PendingReadModelUpdateSourceCategory.ItSystemUsage_Contract));
                 _databaseControl.SaveChanges();
                 transaction.Commit();
             }
@@ -419,9 +426,15 @@ namespace Core.ApplicationServices.Contract.Write
         {
             return contract
                 .WithOptionalUpdate(parameters.OrganizationUuid, UpdateSupplierOrganization)
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.IsInternal, (c, newValue) => c.SetInternalSupplier(newValue)))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.OrganizationUnitUuid, UpdateSupplierOrganizationUnit))
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.Signed, (c, newValue) => c.HasSupplierSigned = newValue))
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedAt, (c, newValue) => c.SupplierSignedDate = newValue?.Date))
-                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedBy, (c, newValue) => c.SupplierContractSigner = newValue));
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedBy, (c, newValue) => c.SupplierContractSigner = newValue))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.ContactPerson, (c, newValue) => c.SupplierContactPerson = newValue))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.UseSignedByForContact, (c, newValue) => c.UseSupplierContractSignerAsContactPerson = newValue))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.ContactPhoneNumber, (c, newValue) => c.SupplierContactPhoneNumber = newValue))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.ContactEmail, (c, newValue) => c.SupplierContactEmail = newValue));
         }
 
         private Maybe<OperationError> UpdateSupplierOrganization(ItContract contract, Guid? organizationId)
@@ -441,6 +454,22 @@ namespace Core.ApplicationServices.Contract.Write
                 return contract.SetSupplierOrganization(organizationResult.Value);
             }
             return Maybe<OperationError>.None;
+        }
+
+        private static Maybe<OperationError> UpdateSupplierOrganizationUnit(ItContract contract, Guid? organizationUnitUuid)
+        {
+            if (!organizationUnitUuid.HasValue)
+            {
+                contract.ResetSupplierOrganizationUnit();
+                return Maybe<OperationError>.None;
+            }
+
+            if (contract.HasInternalSupplier != true)
+            {
+                return new OperationError("Supplier organization unit can only be set for internal suppliers", OperationFailure.BadInput);
+            }
+
+            return contract.SetSupplierOrganizationUnit(organizationUnitUuid.Value);
         }
 
         private static Result<ItContract, OperationError> UpdateResponsibleData(ItContract contract, ItContractResponsibleDataModificationParameters parameters)
@@ -534,7 +563,7 @@ namespace Core.ApplicationServices.Contract.Write
                  "system usage",
                  contract,
                  systemUsageUuids.FromNullable(),
-                 (systemUsageUuid) => _usageService.GetReadableItSystemUsageByUuid(systemUsageUuid),
+                 (systemUsageUuid) => _usageService.GetItSystemUsageByUuidAndAuthorizeRead(systemUsageUuid),
                  itContract => itContract.AssociatedSystemUsages.Select(x => x.ItSystemUsage).ToList(),
                  (itContract, usage) => itContract.AssignSystemUsage(usage),
                  (itContract, usage) => itContract.RemoveSystemUsage(usage)

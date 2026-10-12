@@ -14,6 +14,29 @@ namespace Tests.Unit.Core.Model
 {
     public class ItContractTest : WithAutoFixture
     {
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void SetSupplierOrganization_Sets_Internal_If_Same_As_Organization(bool isSame)
+        {
+            var orgUuid = A<Guid>();
+            var organization = new Organization() { Uuid = orgUuid };
+            var supplierOrganization = isSame ? organization : new Organization()
+            {
+                Uuid = A<Guid>()
+            };
+            var sut = new ItContract()
+            {
+                Organization = organization,
+                Supplier =  supplierOrganization
+            };
+
+            sut.SetSupplierOrganization(supplierOrganization);
+
+            Assert.Equal(supplierOrganization, sut.Supplier);
+            Assert.Equal(isSame, sut.HasInternalSupplier);
+        }
+
         [Fact]
         public void Can_ResetContractType()
         {

@@ -8,6 +8,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -15,7 +16,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
-
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -30,6 +30,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         private readonly Mock<IGlobalReadAccessPolicy> _globalAccessPolicy;
         private readonly Mock<IModuleCreationPolicy> _creationPolicy;
         private readonly Mock<IUserRepository> _userRepository;
+        private readonly Mock<IAuthorizationModelFactory> _authorizationModelFactory;
         private readonly int _userId;
 
         public OrganizationAuthorizationContextTest()
@@ -45,7 +46,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _creationPolicy.Setup(x => x.AllowCreation(It.IsAny<int>(), It.IsAny<Type>())).Returns(true);
             _userRepository = new Mock<IUserRepository>();
             _userRepository.Setup(x => x.GetById(_userId)).Returns(new User { Id = _userId });
-            _sut = new OrganizationAuthorizationContext(_userContextMock.Object, typeResolver.Object, _moduleLevelAccessPolicy.Object, _globalAccessPolicy.Object, _creationPolicy.Object, _userRepository.Object);
+            _authorizationModelFactory = new Mock<IAuthorizationModelFactory>();
+            _sut = new OrganizationAuthorizationContext(_userContextMock.Object, typeResolver.Object, _moduleLevelAccessPolicy.Object, _globalAccessPolicy.Object, _creationPolicy.Object, _userRepository.Object, _authorizationModelFactory.Object);
         }
 
         [Theory]
@@ -419,14 +421,14 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(OrganizationRole.User, OrganizationRole.LocalAdmin, true)]
         [InlineData(OrganizationRole.User, OrganizationRole.GlobalAdmin, true)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.User, false)]
-        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.ContractModuleAdmin, true)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.LocalAdmin, true)]
         [InlineData(OrganizationRole.ContractModuleAdmin, OrganizationRole.GlobalAdmin, true)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.User, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.ContractModuleAdmin, false)]
-        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.SystemModuleAdmin, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.SystemModuleAdmin, true)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.LocalAdmin, true)]
         [InlineData(OrganizationRole.SystemModuleAdmin, OrganizationRole.GlobalAdmin, true)]
@@ -578,6 +580,87 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void Allow_Create_User_Returns(bool expectedResult)
         {
             Allow_Create_Returns<User>(expectedResult);
+        }
+
+        [Fact]
+        public void GivenNonSupplierAssociatedEntityType_GetAuthorizationModel_ReturnsCrudAuthorizationModel()
+        {
+            var crudAuthorizationModel = new CrudAuthorizationModel(_sut);
+            _authorizationModelFactory.Setup(_ => _.CreateCrudAuthorizationModel(It.IsAny<IAuthorizationContext>())).Returns(crudAuthorizationModel);
+            var organization = new Organization();
+            var entity = new ItContract()
+            {
+                Organization = organization
+            };
+
+            var result = _sut.GetAuthorizationModel(entity);
+
+            Assert.IsType<CrudAuthorizationModel>(result);
+        }
+
+        [Fact]
+        public void GivenNoSuppliersInOrganization_GetAuthorizationModel_ReturnsCrudAuthorizationModel()
+        {
+            var crudAuthorizationModel = new CrudAuthorizationModel(_sut);
+            _authorizationModelFactory.Setup(_ => _.CreateCrudAuthorizationModel(It.IsAny<IAuthorizationContext>())).Returns(crudAuthorizationModel);
+            var organization = new Organization();
+            var entity = new DataProcessingRegistration()
+            {
+                Organization = organization
+            };
+
+            var result = _sut.GetAuthorizationModel(entity);
+
+            Assert.IsType<CrudAuthorizationModel>(result);
+        }
+
+        [Fact]
+        public void GivenSuppliesForOrganization_GetAuthorizationModel_ReturnsFieldAuthorizationModel()
+        {
+            var fieldAuthorizationModel = new FieldAuthorizationModel(_userContextMock.Object,
+                new Mock<ISupplierAssociatedFieldsService>().Object, _sut);
+            _authorizationModelFactory.Setup(_ => _.CreateFieldAuthorizationModel(It.IsAny<IAuthorizationContext>())).Returns(fieldAuthorizationModel);
+            var supplierId = A<int>();
+            var organization = new Organization()
+            {
+                Suppliers = new List<OrganizationSupplier>(){ new OrganizationSupplier(){ SupplierId = supplierId} }
+            };
+            var entity = new DataProcessingRegistration()
+            {
+                Organization = organization
+            };
+
+            var result = _sut.GetAuthorizationModel(entity);
+
+            Assert.IsType<FieldAuthorizationModel>(result);
+        }
+
+        [Fact]
+        public void
+            GivenTargetObjectIsNotOfTypeThatSuppliersCanEdit_GetAuthorizationModel_ReturnsCrudAuthorizationModel()
+        {
+            var crudAuthorizationModel = new CrudAuthorizationModel(_sut);
+            _authorizationModelFactory.Setup(_ => _.CreateCrudAuthorizationModel(It.IsAny<IAuthorizationContext>())).Returns(crudAuthorizationModel);
+            var supplierId = A<int>();
+            var supplierApiUser = new User
+            {
+                Id = A<int>(),
+                HasApiAccess = true,
+            };
+            _userRepository.Setup(_ => _.GetUsersInOrganization(supplierId)).Returns(new List<User>() { supplierApiUser }.AsQueryable());
+            _userContextMock.Setup(_ => _.UserId).Returns(supplierApiUser.Id);
+            var organization = new Organization()
+            {
+                Suppliers = new List<OrganizationSupplier>() { new(){ SupplierId = supplierId } }
+            };
+            var entity = new ItContract()
+            {
+                Organization = organization
+            };
+
+            var result = _sut.GetAuthorizationModel(entity);
+
+            Assert.IsType<CrudAuthorizationModel>(result);
         }
 
         [Theory]

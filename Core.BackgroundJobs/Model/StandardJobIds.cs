@@ -7,12 +7,15 @@
         public static readonly string UpdateDataProcessingRegistrationReadModels = $"{NamePrefix}update-dpr-read-models";
         public static readonly string ScheduleDataProcessingRegistrationReadModelUpdates = $"{NamePrefix}schedule-dpr-read-model-updates";
         public static readonly string ScheduleItContractReadModelUpdates = $"{NamePrefix}schedule-contract-read-model-updates";
+        public static readonly string ScheduleItContractSupplierOverviewReadModelUpdates = $"{NamePrefix}schedule-contract-supplier-overview-read-model-updates";
         public static readonly string ScheduleItSystemUsageOverviewReadModelUpdates = $"{NamePrefix}schedule-it-system-usage-overview-read-model-updates";
         public static readonly string UpdateItSystemUsageOverviewReadModels = $"{NamePrefix}update-it-system-usage-overview-read-models";
         public static readonly string UpdateItContractOverviewReadModels = $"{NamePrefix}update-it-contract-overview-read-models";
+        public static readonly string UpdateItContractSupplierOverviewReadModels = $"{NamePrefix}update-it-contract-supplier-overview-read-models";
         public static readonly string RebuildDataProcessingReadModels = $"{NamePrefix}rebuild-dpr-read-models";
         public static readonly string RebuildItSystemUsageReadModels = $"{NamePrefix}rebuild-it-system-usage-read-models";
         public static readonly string RebuildItContractReadModels = $"{NamePrefix}rebuild-it-contract-read-models";
+        public static readonly string RebuildItContractSupplierReadModels = $"{NamePrefix}rebuild-it-contract-supplier-read-models";
         public static readonly string PurgeDuplicatePendingReadModelUpdates = $"{NamePrefix}purge-duplicate-read-model-updates";
         public static readonly string ScheduleUpdatesForDataProcessingReadModelsWhichChangesActiveState = $"{NamePrefix}fix-stale-dpr-rms";
         public static readonly string ScheduleUpdatesForItSystemUsageReadModelsWhichChangesActiveState = $"{NamePrefix}fix-stale-itsystem-usage-rms";

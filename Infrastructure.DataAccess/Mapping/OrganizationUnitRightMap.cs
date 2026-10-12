@@ -1,14 +1,20 @@
-﻿using Core.DomainModel.Organization;
+using Core.DomainModel.Organization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class OrganizationUnitRightMap : RightMap<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>
     {
-        public OrganizationUnitRightMap()
+        public override void Configure(EntityTypeBuilder<OrganizationUnitRight> builder)
         {
-            this.HasRequired(x => x.User)
+            base.Configure(builder);
+
+            builder.HasOne(x => x.User)
                 .WithMany(x => x.OrganizationUnitRights)
-                .HasForeignKey(x => x.UserId);
+                .HasForeignKey(x => x.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

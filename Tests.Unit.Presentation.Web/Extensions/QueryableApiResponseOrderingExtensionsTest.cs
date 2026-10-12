@@ -15,7 +15,7 @@ namespace Tests.Unit.Presentation.Web.Extensions
     {
         public class GenericEntityClass : Entity, IHasName
         {
-            public string Name { get; set; }
+            public string? Name { get; set; }
         }
 
         private int _nextId;
@@ -286,7 +286,7 @@ namespace Tests.Unit.Presentation.Web.Extensions
             Assert.Equal(expected.Select(x => x.Id).ToList(), orderedResult.Select(x => x.Id).ToList());
         }
 
-        private GenericEntityClass CreateGenericEntityClass(int? id = null, DateTime? lastChanged = null, string name = null)
+        private GenericEntityClass CreateGenericEntityClass(int? id = null, DateTime? lastChanged = null, string? name = null)
         {
             var entity = new GenericEntityClass();
             AssignCommonFields(id, lastChanged, entity);
@@ -294,7 +294,7 @@ namespace Tests.Unit.Presentation.Web.Extensions
             return entity;
         }
 
-        private User CreateUser(int? id = null, DateTime? lastChanged = null, string name = null, string lastName = null)
+        private User CreateUser(int? id = null, DateTime? lastChanged = null, string? name = null, string? lastName = null)
         {
             var entity = new User();
             AssignCommonFields(id, lastChanged, entity);
@@ -303,7 +303,7 @@ namespace Tests.Unit.Presentation.Web.Extensions
             return entity;
         }
 
-        private ItSystemUsage CreateSystemUsage(int? id = null, DateTime? lastChanged = null, string name = null, string lastName = null)
+        private ItSystemUsage CreateSystemUsage(int? id = null, DateTime? lastChanged = null, string? name = null, string? lastName = null)
         {
             var entity = new ItSystemUsage() { ItSystem = new ItSystem() };
             AssignCommonFields(id, lastChanged, entity);

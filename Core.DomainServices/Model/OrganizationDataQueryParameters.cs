@@ -27,7 +27,7 @@ namespace Core.DomainServices.Model
             return ActiveOrganizationId == other.ActiveOrganizationId && Breadth == other.Breadth && Equals(DataAccessLevel, other.DataAccessLevel);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

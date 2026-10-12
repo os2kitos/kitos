@@ -8,6 +8,6 @@ namespace Presentation.Web.Models.API.V2.Internal.Request.Notifications
         /// Common Notification properties
         /// </summary>
         [Required] 
-        public BaseNotificationPropertiesWriteRequestDTO BaseProperties { get; set; }
+        public required BaseNotificationPropertiesWriteRequestDTO BaseProperties { get; set; }
     }
 }

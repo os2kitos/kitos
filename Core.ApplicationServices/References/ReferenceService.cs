@@ -168,19 +168,19 @@ namespace Core.ApplicationServices.References
         public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemId(int systemId)
         {
             var system = _itSystemRepository.GetSystem(systemId);
-            return DeleteExternalReferencesByRoot(system);
+            return system != null ? DeleteExternalReferencesByRoot(system) : OperationFailure.NotFound;
         }
 
         public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemUsageId(int usageId)
         {
             var itSystemUsage = _systemUsageRepository.GetSystemUsage(usageId);
-            return DeleteExternalReferencesByRoot(itSystemUsage);
+            return itSystemUsage != null ? DeleteExternalReferencesByRoot(itSystemUsage) : OperationFailure.NotFound;
         }
 
         public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByContractId(int contractId)
         {
             var contract = _contractRepository.GetById(contractId);
-            return DeleteExternalReferencesByRoot(contract);
+            return contract !=null ? DeleteExternalReferencesByRoot(contract) : OperationFailure.NotFound;
         }
 
         public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByDataProcessingRegistrationId(int id)

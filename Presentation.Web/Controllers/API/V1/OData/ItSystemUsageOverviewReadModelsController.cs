@@ -1,16 +1,12 @@
-﻿using System;
-using System.Net;
-using System.Web.Http;
+using System.Linq;
+using System;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.SystemUsage.ReadModels;
-using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
-using Microsoft.AspNet.OData;
-using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
-using Swashbuckle.OData;
-using Swashbuckle.Swagger.Annotations;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
@@ -27,9 +23,8 @@ namespace Presentation.Web.Controllers.API.V1.OData
         }
 
         [EnableQuery]
-        [SwaggerResponse(HttpStatusCode.OK, type:typeof(ODataListResponse<ItSystemUsageOverviewReadModel>))]
-        [ODataRoute("Organizations({organizationId})/ItSystemUsageOverviewReadModels")]
-        public IHttpActionResult Get([FromODataUri] int organizationId, int? responsibleOrganizationUnitId = null)
+        [Route("odata/Organizations({organizationId})/ItSystemUsageOverviewReadModels")]
+        public IActionResult GetByOrganizationId([FromRoute] int organizationId, int? responsibleOrganizationUnitId = null)
         {
             return GetOverviewReadModels(organizationId, responsibleOrganizationUnitId);
         }
@@ -41,9 +36,8 @@ namespace Presentation.Web.Controllers.API.V1.OData
         /// <param name="responsibleOrganizationUnitUuid"></param>
         /// <returns></returns>
         [EnableQuery(MaxAnyAllExpressionDepth = 3, MaxNodeCount = 300)]
-        [SwaggerResponse(HttpStatusCode.OK, type:typeof(ODataListResponse<ItSystemUsageOverviewReadModel>))]
-        [ODataRoute("ItSystemUsageOverviewReadModels")]
-        public IHttpActionResult GetByUuid(Guid organizationUuid, Guid? responsibleOrganizationUnitUuid = null)
+        [Route("odata/ItSystemUsageOverviewReadModels")]
+        public IActionResult Get(Guid organizationUuid, Guid? responsibleOrganizationUnitUuid = null)
         {
             var orgDbId = _identityResolver.ResolveDbId<Organization>(organizationUuid);
             if (orgDbId.IsNone)
@@ -59,7 +53,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 : GetOverviewReadModels(orgDbId.Value, unitDbId.Value);
         }
 
-        private IHttpActionResult GetOverviewReadModels(int organizationId, int? responsibleOrganizationUnitId)
+        private IActionResult GetOverviewReadModels(int organizationId, int? responsibleOrganizationUnitId)
         {
             var byOrganizationId = responsibleOrganizationUnitId == null
                 ? _readModelsService.GetByOrganizationId(organizationId)
@@ -67,7 +61,10 @@ namespace Presentation.Web.Controllers.API.V1.OData
                     responsibleOrganizationUnitId.Value);
             return
                 byOrganizationId
-                    .Match(onSuccess: Ok, onFailure: FromOperationError);
+                    .Match(onSuccess: q => Ok(q.ToList()), onFailure: FromOperationError);
         }
     }
 }
+
+
+

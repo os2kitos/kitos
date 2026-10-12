@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Presentation.Web.Models.API.V2.Internal.Response.ItContract
 {
     public class LocalItContractRolesResponseDTO
     {
+        [SetsRequiredMembers]
         public LocalItContractRolesResponseDTO(int id, Guid uuid, string name)
         {
             Id = id;
@@ -16,8 +18,8 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.ItContract
             
         }
 
-        public int Id { get; set; }
-        public Guid Uuid { get; set; }
-        public string Name { get; set; }
+        public required int Id { get; set; }
+        public required Guid Uuid { get; set; }
+        public required string Name { get; set; }
     }
 }

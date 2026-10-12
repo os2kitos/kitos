@@ -5,7 +5,7 @@ namespace Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles
 {
     public class OrganizationMasterDataRoleUpdateParameters
     {
-        public OptionalValueChange<Maybe<string>> Name { get; set; }
-        public OptionalValueChange<Maybe<string>> Email { get; set; }
+        public required OptionalValueChange<Maybe<string>> Name { get; set; }
+        public required OptionalValueChange<Maybe<string>> Email { get; set; }
     }
 }

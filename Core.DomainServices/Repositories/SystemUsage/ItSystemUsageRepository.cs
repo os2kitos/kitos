@@ -20,7 +20,7 @@ namespace Core.DomainServices.Repositories.SystemUsage
             _itSystemUsageRepository.Save();
         }
 
-        public ItSystemUsage GetSystemUsage(int systemUsageId)
+        public ItSystemUsage? GetSystemUsage(int systemUsageId)
         {
             return _itSystemUsageRepository.AsQueryable().ById(systemUsageId);
         }

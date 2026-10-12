@@ -24,6 +24,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private readonly IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel> _updater;
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
         private readonly IItSystemUsageRepository _sourceRepository;
+        private readonly IItSystemUsageBatchLoadRepository _batchLoadRepository;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<ItSystemUsageOverviewReadModel> _lowLevelReadModelRepository;
         private readonly IGenericRepository<PendingReadModelUpdate> _lowLevelPendingReadModelRepository;
@@ -37,6 +38,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
             IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel> updater,
             IItSystemUsageOverviewReadModelRepository readModelRepository,
             IItSystemUsageRepository sourceRepository,
+            IItSystemUsageBatchLoadRepository batchLoadRepository,
             ITransactionManager transactionManager,
             IGenericRepository<ItSystemUsageOverviewReadModel> lowLevelReadModelRepository, //NOTE: Using the primitive repositories on purpose since we want to reduce the amount of calls to SaveChanges as much as possible
             IGenericRepository<PendingReadModelUpdate> lowLevelPendingReadModelRepository,
@@ -47,6 +49,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
             _updater = updater;
             _readModelRepository = readModelRepository;
             _sourceRepository = sourceRepository;
+            _batchLoadRepository = batchLoadRepository;
             _transactionManager = transactionManager;
             _lowLevelReadModelRepository = lowLevelReadModelRepository;
             _lowLevelPendingReadModelRepository = lowLevelPendingReadModelRepository;
@@ -59,14 +62,20 @@ namespace Core.BackgroundJobs.Model.ReadModels
             try
             {
                 var pendingReadModelUpdates = _pendingReadModelUpdateRepository.GetMany(PendingReadModelUpdateSourceCategory.ItSystemUsage, BatchSize).ToList();
+                var sourceIds = pendingReadModelUpdates.Select(x => x.SourceId).ToList();
+                var sourcesById = _batchLoadRepository.GetForReadModelRebuild(sourceIds);
+                var existingReadModelsById = _readModelRepository.GetBySourceIds(sourceIds);
+
                 foreach (var pendingReadModelUpdate in pendingReadModelUpdates)
                 {
                     if (token.IsCancellationRequested)
                         break;
                     using var transaction = _transactionManager.Begin();
                     _logger.Debug("Rebuilding read model for {category}:{sourceId}", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
-                    var source = _sourceRepository.GetSystemUsage(pendingReadModelUpdate.SourceId).FromNullable();
-                    var readModelResult = _readModelRepository.GetBySourceId(pendingReadModelUpdate.SourceId);
+                    sourcesById.TryGetValue(pendingReadModelUpdate.SourceId, out var sourceEntity);
+                    var source = sourceEntity.FromNullable();
+                    existingReadModelsById.TryGetValue(pendingReadModelUpdate.SourceId, out var existingReadModel);
+                    var readModelResult = existingReadModel.FromNullable();
                     if (source.HasValue)
                     {
                         var sourceValue = source.Value;

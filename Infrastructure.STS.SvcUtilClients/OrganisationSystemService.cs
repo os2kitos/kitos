@@ -8667,22 +8667,7 @@ namespace Kombit.InfrastructureSamples.OrganisationSystemService
         {
         }
         
-        public OrganisationSystemPortTypeClient(string endpointConfigurationName) : 
-                base(endpointConfigurationName)
-        {
-        }
-        
-        public OrganisationSystemPortTypeClient(string endpointConfigurationName, string remoteAddress) : 
-                base(endpointConfigurationName, remoteAddress)
-        {
-        }
-        
-        public OrganisationSystemPortTypeClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
-                base(endpointConfigurationName, remoteAddress)
-        {
-        }
-        
-        public OrganisationSystemPortTypeClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public OrganisationSystemPortTypeClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
                 base(binding, remoteAddress)
         {
         }

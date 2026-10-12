@@ -1,14 +1,15 @@
-﻿using Core.DomainModel.Advice;
+using Core.DomainModel.Advice;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-   public class AdviceSentMap : EntityMap<AdviceSent>
+    public class AdviceSentMap : EntityMap<AdviceSent>
     {
-        public AdviceSentMap() {
-            this.ToTable("AdviceSent");
-
-
-
+        public override void Configure(EntityTypeBuilder<AdviceSent> builder)
+        {
+            base.Configure(builder);
+            builder.ToTable("AdviceSents");
         }
     }
 }

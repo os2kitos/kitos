@@ -27,7 +27,6 @@ namespace Tests.Unit.Presentation.Web.Services
     {
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<ITransactionManager> _transactionManager;
-        private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<IOrganizationRepository> _organizationRepository;
         private readonly Mock<IOrganizationService> _organizationService;
         private readonly Mock<IEntityIdentityResolver> _identityResolver;
@@ -42,7 +41,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             _authorizationContext = new Mock<IAuthorizationContext>();
             _transactionManager = new Mock<ITransactionManager>();
-            _domainEvents = new Mock<IDomainEvents>();  
+            var domainEvents = new Mock<IDomainEvents>();  
             _organizationRepository = new Mock<IOrganizationRepository>();
             _organizationService = new Mock<IOrganizationService>();
             _identityResolver = new Mock<IEntityIdentityResolver>();
@@ -52,7 +51,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _countryCodeRepository = new Mock<IGenericRepository<CountryCode>>();
 
             _sut = new OrganizationWriteService(_transactionManager.Object,
-                _domainEvents.Object,
+                domainEvents.Object,
                 _organizationService.Object,
                 _authorizationContext.Object,
                 _organizationRepository.Object,
@@ -66,9 +65,9 @@ namespace Tests.Unit.Presentation.Web.Services
         [Fact]
         public void Can_Patch_UI_Root_Config()
         {
-            var (org, updateParameters) = SetupPatchUIRootConfigTest();
-            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
-            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
+            var (org, updateParameters) = SetupPatchUiRootConfigTest();
+            _organizationService.Setup(service => service.GetOrganization(org.Uuid, null)).Returns(org);
+            _authorizationContext.Setup(context => context.AllowModify(org)).Returns(true);
 
             var result = _sut.PatchUIRootConfig(org.Uuid, updateParameters);
 
@@ -77,16 +76,16 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(updateParameters.ShowDataProcessing.NewValue.Value, uiRootConfig.ShowDataProcessing);
             Assert.Equal(updateParameters.ShowItSystemModule.NewValue.Value, uiRootConfig.ShowItSystemModule);
             Assert.Equal(updateParameters.ShowItContractModule.NewValue.Value, uiRootConfig.ShowItContractModule);
-            _organizationRepository.Verify(_ => _.Update(It.IsAny<Organization>()));
+            _organizationRepository.Verify(repository => repository.Update(It.IsAny<Organization>()));
         }
 
         [Fact]
         public void Patch_UI_Root_Config_Returns_Not_Found_If_No_Org()
         {
-            var (org, updateParameters) = SetupPatchUIRootConfigTest();
+            var (org, updateParameters) = SetupPatchUiRootConfigTest();
 
-            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(new OperationError(OperationFailure.NotFound));
-            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
+            _organizationService.Setup(service => service.GetOrganization(org.Uuid, null)).Returns(new OperationError(OperationFailure.NotFound));
+            _authorizationContext.Setup(context => context.AllowModify(org)).Returns(true);
 
             var result = _sut.PatchUIRootConfig(org.Uuid, updateParameters);
 
@@ -97,9 +96,9 @@ namespace Tests.Unit.Presentation.Web.Services
         [Fact]
         public void Patch_UI_Root_Config_Returns_Forbidden_If_Missing_Write_Access()
         {
-            var (org, updateParameters) = SetupPatchUIRootConfigTest();
-            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
-            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(false);
+            var (org, updateParameters) = SetupPatchUiRootConfigTest();
+            _organizationService.Setup(service => service.GetOrganization(org.Uuid, null)).Returns(org);
+            _authorizationContext.Setup(context => context.AllowModify(org)).Returns(false);
 
             var result = _sut.PatchUIRootConfig(org.Uuid, updateParameters);
 
@@ -107,7 +106,7 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
-        private (Organization, UIRootConfigUpdateParameters) SetupPatchUIRootConfigTest()
+        private (Organization, UIRootConfigUpdateParameters) SetupPatchUiRootConfigTest()
         {
             var orgUuid = A<Guid>();
             var org = new Organization() { Uuid = orgUuid, Config = Config.Default(new User()) };
@@ -126,14 +125,17 @@ namespace Tests.Unit.Presentation.Web.Services
             var organizationUuid = A<Guid>();
             var organization = new Mock<Organization>();
             _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(false);
-            _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
-            _organizationService.Setup(_ => _.GetOrganization(organizationUuid, null)).Returns(organization.Object);
+            _authorizationContext.Setup(context => context.AllowReads(It.IsAny<Organization>())).Returns(true);
+            _organizationService.Setup(service => service.GetOrganization(organizationUuid, null)).Returns(organization.Object);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             var newCvr = OptionalValueChange<Maybe<string>>.With(A<Maybe<string>>());
             var updateParameters = new OrganizationMasterDataUpdateParameters
             {
                 Cvr = newCvr,
+                Phone = OptionalValueChange<Maybe<string>>.With(A<string>()),
+                Address = OptionalValueChange<Maybe<string>>.With(A<string>()),
+                Email = OptionalValueChange<Maybe<string>>.With(A<string>()),
             };
 
             var result = _sut.PatchMasterData(organizationUuid, updateParameters);
@@ -146,14 +148,17 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Cannot_Update_Master_Data_If_No_Invalid_Uuid()
         {
             var invalidOrganizationUuid = A<Guid>();
-            _organizationService.Setup(_ => _.GetOrganization(invalidOrganizationUuid, null)).Returns(new OperationError(OperationFailure.NotFound));
+            _organizationService.Setup(service => service.GetOrganization(invalidOrganizationUuid, null)).Returns(new OperationError(OperationFailure.NotFound));
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object); _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
-            _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object); _authorizationContext.Setup(context => context.AllowModify(It.IsAny<Organization>())).Returns(true);
+            _authorizationContext.Setup(context => context.AllowReads(It.IsAny<Organization>())).Returns(true);
             var newCvr = OptionalValueChange<Maybe<string>>.With(A<Maybe<string>>());
             var updateParameters = new OrganizationMasterDataUpdateParameters
             {
                 Cvr = newCvr,
+                Phone = OptionalValueChange<Maybe<string>>.With(A<string>()),
+                Address = OptionalValueChange<Maybe<string>>.With(A<string>()),
+                Email = OptionalValueChange<Maybe<string>>.With(A<string>()),
             };
 
             var result = _sut.PatchMasterData(invalidOrganizationUuid, updateParameters);
@@ -166,11 +171,11 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             var organizationUuid = A<Guid>();
             var organization = new Mock<Organization>();
-            _organizationService.Setup(_ => _.GetOrganization(organizationUuid, null)).Returns(organization.Object);
+            _organizationService.Setup(service => service.GetOrganization(organizationUuid, null)).Returns(organization.Object);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object); _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
-            _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
-            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(It.IsAny<Guid>())).Returns(true);
+            _authorizationContext.Setup(context => context.AllowReads(It.IsAny<Organization>())).Returns(true);
+            _organizationService.Setup(service => service.CanActiveUserModifyCvr(It.IsAny<Guid>())).Returns(true);
             var newCvr = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(A<string>()));
             var newPhone = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(A<string>()));
             var newAddress = OptionalValueChange<Maybe<string>>.With(Maybe<string>.Some(A<string>()));
@@ -191,7 +196,7 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(newPhone.NewValue.Value, updatedOrganization.Phone);
             Assert.Equal(newAddress.NewValue.Value, updatedOrganization.Adress);
             Assert.Equal(newEmail.NewValue.Value, updatedOrganization.Email);
-            _organizationRepository.Verify(_ => _.Update(organization.Object));
+            _organizationRepository.Verify(repository => repository.Update(organization.Object));
         }
 
         [Fact]
@@ -199,10 +204,10 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             var organizationUuid = A<Guid>();
             var organization = new Mock<Organization>();
-            _authorizationContext.Setup(x => x.AllowModify(It.IsAny<Organization>())).Returns(true);
-            _authorizationContext.Setup(_ => _.AllowReads(It.IsAny<Organization>())).Returns(true);
-            _organizationService.Setup(_ => _.GetOrganization(organizationUuid, null)).Returns(organization.Object);
-            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(It.IsAny<Guid>())).Returns(true);
+            _authorizationContext.Setup(context => context.AllowModify(It.IsAny<Organization>())).Returns(true);
+            _authorizationContext.Setup(context => context.AllowReads(It.IsAny<Organization>())).Returns(true);
+            _organizationService.Setup(service => service.GetOrganization(organizationUuid, null)).Returns(organization.Object);
+            _organizationService.Setup(service => service.CanActiveUserModifyCvr(It.IsAny<Guid>())).Returns(true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             var updateParameters = new OrganizationMasterDataUpdateParameters()
@@ -221,22 +226,27 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Null(updatedOrganization.Phone);
             Assert.Null(updatedOrganization.Adress);
             Assert.Null(updatedOrganization.Email);
-            _organizationRepository.Verify(_ => _.Update(organization.Object));
+            _organizationRepository.Verify(repository => repository.Update(organization.Object));
         }
 
         [Fact]
         public void Update_Master_Data_Roles_Returns_Not_Found_If_Invalid_Uuid()
         {
             var invalidOrganizationUuid = A<Guid>();
-            _identityResolver.Setup(_ =>
-                    _.ResolveDbId<Organization>(invalidOrganizationUuid))
+            _identityResolver.Setup(identityResolver =>
+                    identityResolver.ResolveDbId<Organization>(invalidOrganizationUuid))
                 .Returns(Maybe<int>.None);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
-            _organizationService.Setup(_ => _.GetOrganization(invalidOrganizationUuid, null)).Returns(new OperationError(OperationFailure.NotFound));
+            _organizationService.Setup(service => service.GetOrganization(invalidOrganizationUuid, null)).Returns(new OperationError(OperationFailure.NotFound));
 
             var result =
-                _sut.PatchOrganizationMasterDataRoles(invalidOrganizationUuid, new OrganizationMasterDataRolesUpdateParameters());
+                _sut.PatchOrganizationMasterDataRoles(invalidOrganizationUuid, new OrganizationMasterDataRolesUpdateParameters
+                {
+                    ContactPerson = Maybe<ContactPersonUpdateParameters>.None,
+                    DataResponsible = Maybe<DataResponsibleUpdateParameters>.None,
+                    DataProtectionAdvisor = Maybe<DataProtectionAdvisorUpdateParameters>.None
+                });
 
             Assert.True(result.Failed);
             var error = result.Error;
@@ -249,9 +259,9 @@ namespace Tests.Unit.Presentation.Web.Services
             var org = GetOrgAndSetupForVerifyUnauthorized();
             var orgId = org.Id;
             var updateParameters = SetupUpdateMasterDataRoles(orgId);
-            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<Organization>()))
+            _organizationService.Setup(service => service.GetOrganization(org.Uuid, null)).Returns(org);
+            _authorizationContext.Setup(context =>
+                    context.AllowModify(It.IsAny<Organization>()))
                 .Returns(false);
 
             var result =
@@ -267,14 +277,14 @@ namespace Tests.Unit.Presentation.Web.Services
             var org = CreateOrganization();
             var orgId = org.Id;
             var dataProtectionAdvisor = new DataProtectionAdvisor();
-            _identityResolver.Setup(_ =>
-                    _.ResolveDbId<Organization>(org.Uuid))
+            _identityResolver.Setup(identityResolver =>
+                    identityResolver.ResolveDbId<Organization>(org.Uuid))
                 .Returns(orgId);
-            _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(dataProtectionAdvisor);
+            _organizationService.Setup(service => service.GetDataProtectionAdvisor(orgId)).Returns(dataProtectionAdvisor);
             var dataResponsible = new DataResponsible();
-            _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(dataResponsible);
+            _organizationService.Setup(service => service.GetDataResponsible(orgId)).Returns(dataResponsible);
             var contactPerson = new ContactPerson();
-            _organizationService.Setup(_ => _.GetContactPerson(orgId))
+            _organizationService.Setup(service => service.GetContactPerson(orgId))
                 .Returns(contactPerson);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
@@ -291,17 +301,17 @@ namespace Tests.Unit.Presentation.Web.Services
             var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
             var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
             var updateParameters = SetupUpdateMasterDataRoles(orgId, expectedContactPerson, expectedDataResponsible, expectedDataProtectionAdvisor);
-            _identityResolver.Setup(_ =>
-                    _.ResolveDbId<Organization>(org.Uuid))
-                .Returns(expectedContactPerson.OrganizationId);
+            _identityResolver.Setup(identityResolver =>
+                    identityResolver.ResolveDbId<Organization>(org.Uuid))
+                .Returns(expectedContactPerson.OrganizationId!);
 
-            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<Organization>()))
+            _organizationService.Setup(service => service.GetOrganization(org.Uuid, null)).Returns(org);
+            _authorizationContext.Setup(context =>
+                    context.AllowModify(It.IsAny<Organization>()))
                 .Returns(true);
-            _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(expectedContactPerson);
-            _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(expectedDataResponsible);
-            _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(expectedDataProtectionAdvisor);
+            _organizationService.Setup(service => service.GetContactPerson(orgId)).Returns(expectedContactPerson);
+            _organizationService.Setup(service => service.GetDataResponsible(orgId)).Returns(expectedDataResponsible);
+            _organizationService.Setup(service => service.GetDataProtectionAdvisor(orgId)).Returns(expectedDataProtectionAdvisor);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
@@ -325,32 +335,32 @@ namespace Tests.Unit.Presentation.Web.Services
             var updateParameters = GetRolesUpdateParameters(expectedContactPerson, expectedDataResponsible,
                 expectedDataProtectionAdvisor);
 
-            _identityResolver.Setup(_ =>
-                    _.ResolveDbId<Organization>(org.Uuid))
-                .Returns(expectedContactPerson.OrganizationId);
+            _identityResolver.Setup(identityResolver =>
+                    identityResolver.ResolveDbId<Organization>(org.Uuid))
+                .Returns(expectedContactPerson.OrganizationId!);
 
-            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<Organization>()))
+            _organizationService.Setup(service => service.GetOrganization(org.Uuid, null)).Returns(org);
+            _authorizationContext.Setup(context =>
+                    context.AllowModify(It.IsAny<Organization>()))
                 .Returns(true);
-            _authorizationContext.Setup(_ =>
-                    _.AllowModify(It.IsAny<DataProtectionAdvisor>()))
+            _authorizationContext.Setup(context =>
+                    context.AllowModify(It.IsAny<DataProtectionAdvisor>()))
                 .Returns(true);
-            _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(Maybe<ContactPerson>.None);
-            _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(Maybe<DataResponsible>.None);
-            _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(Maybe<DataProtectionAdvisor>.None);
+            _organizationService.Setup(service => service.GetContactPerson(orgId)).Returns(Maybe<ContactPerson>.None);
+            _organizationService.Setup(service => service.GetDataResponsible(orgId)).Returns(Maybe<DataResponsible>.None);
+            _organizationService.Setup(service => service.GetDataProtectionAdvisor(orgId)).Returns(Maybe<DataProtectionAdvisor>.None);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
-            _authorizationContext.Setup(_ => _.AllowCreate<ContactPerson>(orgId)).Returns(true);
-            _authorizationContext.Setup(_ => _.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
-            _authorizationContext.Setup(_ => _.AllowCreate<DataResponsible>(orgId)).Returns(true);
+            _authorizationContext.Setup(context => context.AllowCreate<ContactPerson>(orgId)).Returns(true);
+            _authorizationContext.Setup(context => context.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
+            _authorizationContext.Setup(context => context.AllowCreate<DataResponsible>(orgId)).Returns(true);
 
             var result = _sut.PatchOrganizationMasterDataRoles(org.Uuid, updateParameters);
 
             Assert.True(result.Ok);
-            _contactPersonRepository.Verify(_ => _.Insert(It.IsAny<ContactPerson>()));
-            _dataResponsibleRepository.Verify(_ => _.Insert(It.IsAny<DataResponsible>()));
-            _dataProtectionAdvisorRepository.Verify(_ => _.Insert(It.IsAny<DataProtectionAdvisor>()));
+            _contactPersonRepository.Verify(repository => repository.Insert(It.IsAny<ContactPerson>()));
+            _dataResponsibleRepository.Verify(repository => repository.Insert(It.IsAny<DataResponsible>()));
+            _dataProtectionAdvisorRepository.Verify(repository => repository.Insert(It.IsAny<DataProtectionAdvisor>()));
             var value = result.Value;
             AssertContactPerson(expectedContactPerson, value.ContactPerson);
             AssertDataResponsible(expectedDataResponsible, value.DataResponsible);
@@ -365,11 +375,11 @@ namespace Tests.Unit.Presentation.Web.Services
             var expectedContactPerson = SetupGetMasterDataRolesContactPerson(orgId);
             var expectedDataResponsible = SetupGetMasterDataRolesDataResponsible(orgId);
             var expectedDataProtectionAdvisor = SetupGetMasterDataRolesDataProtectionAdvisor(orgId);
-            _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(expectedContactPerson);
-            _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(expectedDataResponsible);
-            _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(expectedDataProtectionAdvisor);
-            _identityResolver.Setup(_ =>
-                    _.ResolveDbId<Organization>(org.Uuid))
+            _organizationService.Setup(service => service.GetContactPerson(orgId)).Returns(expectedContactPerson);
+            _organizationService.Setup(service => service.GetDataResponsible(orgId)).Returns(expectedDataResponsible);
+            _organizationService.Setup(service => service.GetDataProtectionAdvisor(orgId)).Returns(expectedDataProtectionAdvisor);
+            _identityResolver.Setup(resolver =>
+                    resolver.ResolveDbId<Organization>(org.Uuid))
                 .Returns(orgId);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
@@ -389,25 +399,24 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             var org = CreateOrganization();
             var orgId = org.Id;
-            _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(Maybe<ContactPerson>.None);
-            _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(Maybe<DataResponsible>.None);
-            _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(Maybe<DataProtectionAdvisor>.None);
-            _identityResolver.Setup(_ =>
-                    _.ResolveDbId<Organization>(org.Uuid))
+            _organizationService.Setup(service => service.GetContactPerson(orgId)).Returns(Maybe<ContactPerson>.None);
+            _organizationService.Setup(service => service.GetDataResponsible(orgId)).Returns(Maybe<DataResponsible>.None);
+            _organizationService.Setup(service => service.GetDataProtectionAdvisor(orgId)).Returns(Maybe<DataProtectionAdvisor>.None);
+            _identityResolver.Setup(resolver =>
+                    resolver.ResolveDbId<Organization>(org.Uuid))
                 .Returns(orgId);
-            _authorizationContext.Setup(_ => _.AllowCreate<ContactPerson>(orgId)).Returns(true);
-            _authorizationContext.Setup(_ => _.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
-            _authorizationContext.Setup(_ => _.AllowCreate<DataResponsible>(orgId)).Returns(true);
+            _authorizationContext.Setup(context => context.AllowCreate<ContactPerson>(orgId)).Returns(true);
+            _authorizationContext.Setup(context => context.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
+            _authorizationContext.Setup(context => context.AllowCreate<DataResponsible>(orgId)).Returns(true);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             var rolesResult = _sut.GetOrCreateOrganizationMasterDataRoles(org.Uuid);
 
             Assert.True(rolesResult.Ok);
-            var value = rolesResult.Value;
-            _contactPersonRepository.Verify(_ => _.Insert(It.IsAny<ContactPerson>()));
-            _dataResponsibleRepository.Verify(_ => _.Insert(It.IsAny<DataResponsible>()));
-            _dataProtectionAdvisorRepository.Verify(_ => _.Insert(It.IsAny<DataProtectionAdvisor>()));
+            _contactPersonRepository.Verify(repository => repository.Insert(It.IsAny<ContactPerson>()));
+            _dataResponsibleRepository.Verify(repository => repository.Insert(It.IsAny<DataResponsible>()));
+            _dataProtectionAdvisorRepository.Verify(repository => repository.Insert(It.IsAny<DataProtectionAdvisor>()));
             Assert.Equal(org.Uuid, rolesResult.Value.OrganizationUuid);
         }
 
@@ -415,8 +424,8 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Get_Master_Data_Roles_Returns_Bad_Input_If_Invalid_Uuid()
         {
             var invalidOrganizationUuid = A<Guid>();
-            _identityResolver.Setup(_ =>
-                    _.ResolveDbId<Organization>(invalidOrganizationUuid))
+            _identityResolver.Setup(identityResolver =>
+                    identityResolver.ResolveDbId<Organization>(invalidOrganizationUuid))
                 .Returns(Maybe<int>.None);
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
@@ -432,11 +441,12 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Can_Update_Organization()
         {
             var org = CreateOrganization();
-            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
-            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
-            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
-            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
+            _organizationService.Setup(service => service.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(manager => manager.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _authorizationContext.Setup(context => context.AllowModify(org)).Returns(true);
+            _organizationService.Setup(service => service.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
             var updateParams = A<OrganizationBaseParameters>();
+            updateParams.IsSupplier = OptionalValueChange<bool>.None;
             SetupRepositoryReturnsCountryCode(updateParams.ForeignCountryCodeUuid.NewValue);
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
@@ -453,15 +463,19 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Update_Organization_Returns_Forbidden_If_Unauthorized_To_Modify_Cvr()
         {
             var org = CreateOrganization();
-            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
-            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
-            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
-            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(false);
+            _organizationService.Setup(service => service.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(manager => manager.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _authorizationContext.Setup(context => context.AllowModify(org)).Returns(true);
+            _organizationService.Setup(service => service.CanActiveUserModifyCvr(org.Uuid)).Returns(false);
             SetupRepositoryReturnsCountryCode();
-            var updateParams = new OrganizationBaseParameters()
+            var updateParams = new OrganizationBaseParameters
             {
-                Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
-                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
+                Cvr = OptionalValueChange<Maybe<string>>.With(A<string>()
+                    .AsCvr()),
+                Name = OptionalValueChange<Maybe<string>>.With(A<string>()),
+                TypeId = OptionalValueChange<int>.With(A<int>()),
+                ForeignCountryCodeUuid = OptionalValueChange<Guid?>.With(A<Guid>()),
+                IsSupplier = OptionalValueChange<bool>.With(A<bool>())
             };
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
@@ -474,15 +488,18 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Update_Organization_Returns_Forbidden_If_Unauthorized_For_Org()
         {
             var org = CreateOrganization();
-            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
-            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
-            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
-            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(false);
+            _organizationService.Setup(service => service.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(manager => manager.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _organizationService.Setup(service => service.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
+            _authorizationContext.Setup(context => context.AllowModify(org)).Returns(false);
             SetupRepositoryReturnsCountryCode();
             var updateParams = new OrganizationBaseParameters()
             {
                 Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
-                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
+                Name = OptionalValueChange<Maybe<string>>.With(A<string>()),
+                TypeId = OptionalValueChange<int>.With(A<int>()),
+                ForeignCountryCodeUuid = OptionalValueChange<Guid?>.With(A<Guid>()),
+                IsSupplier = OptionalValueChange<bool>.With(A<bool>())
             };
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
@@ -495,12 +512,13 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Update_Organization_Only_Checks_Cvr_Modify_Permission_If_Cvr_Has_Change()
         {
             var org = CreateOrganization();
-            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
-            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
-            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
-            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
+            _organizationService.Setup(service => service.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(manager => manager.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _organizationService.Setup(service => service.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
+            _authorizationContext.Setup(context => context.AllowModify(org)).Returns(true);
             var updateParams = A<OrganizationBaseParameters>();
             updateParams.Cvr = OptionalValueChange<Maybe<string>>.None;
+            updateParams.IsSupplier = OptionalValueChange<bool>.None;
             SetupRepositoryReturnsCountryCode(updateParams.ForeignCountryCodeUuid.NewValue);
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
@@ -514,12 +532,12 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Update_Organization_Returns_Not_Found_If_Requested_CountryCode_Not_Found()
         {
             var org = CreateOrganization();
-            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(org);
-            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
-            _authorizationContext.Setup(_ => _.AllowModify(org)).Returns(true);
-            _organizationService.Setup(_ => _.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
+            _organizationService.Setup(service => service.GetOrganization(org.Uuid, null)).Returns(org);
+            _transactionManager.Setup(manager => manager.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _authorizationContext.Setup(context => context.AllowModify(org)).Returns(true);
+            _organizationService.Setup(service => service.CanActiveUserModifyCvr(org.Uuid)).Returns(true);
             var updateParams = A<OrganizationBaseParameters>();
-            _countryCodeRepository.Setup(_ => _.AsQueryable()).Returns(
+            _countryCodeRepository.Setup(repository => repository.AsQueryable()).Returns(
                 new List<CountryCode>().AsQueryable());
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
@@ -532,12 +550,15 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Update_Organization_Returns_Not_Found_If_No_Org()
         {
             var org = CreateOrganization();
-            _organizationService.Setup(_ => _.GetOrganization(org.Uuid, null)).Returns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound));
-            _transactionManager.Setup(_ => _.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
+            _organizationService.Setup(service => service.GetOrganization(org.Uuid, null)).Returns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound));
+            _transactionManager.Setup(manager => manager.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
             var updateParams = new OrganizationBaseParameters()
             {
                 Cvr = OptionalValueChange<Maybe<string>>.With(A<string>().AsCvr()),
-                Name = OptionalValueChange<Maybe<string>>.With(A<string>())
+                Name = OptionalValueChange<Maybe<string>>.With(A<string>()),
+                TypeId = OptionalValueChange<int>.With(A<int>()),
+                ForeignCountryCodeUuid = OptionalValueChange<Guid?>.With(A<Guid>()),
+                IsSupplier = OptionalValueChange<bool>.With(A<bool>())
             };
 
             var result = _sut.PatchOrganization(org.Uuid, updateParams);
@@ -561,31 +582,31 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             var org = CreateOrganization();
             var orgId = org.Id;
-            _organizationService.Setup(_ => _.GetContactPerson(orgId)).Returns(Maybe<ContactPerson>.None);
-            _organizationService.Setup(_ => _.GetDataResponsible(orgId)).Returns(Maybe<DataResponsible>.None);
-            _organizationService.Setup(_ => _.GetDataProtectionAdvisor(orgId)).Returns(Maybe<DataProtectionAdvisor>.None);
+            _organizationService.Setup(service => service.GetContactPerson(orgId)).Returns(Maybe<ContactPerson>.None);
+            _organizationService.Setup(service => service.GetDataResponsible(orgId)).Returns(Maybe<DataResponsible>.None);
+            _organizationService.Setup(service => service.GetDataProtectionAdvisor(orgId)).Returns(Maybe<DataProtectionAdvisor>.None);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
-            _identityResolver.Setup(_ =>
-                    _.ResolveDbId<Organization>(org.Uuid))
+            _transactionManager.Setup(manager => manager.Begin()).Returns(transaction.Object);
+            _identityResolver.Setup(resolver =>
+                    resolver.ResolveDbId<Organization>(org.Uuid))
                 .Returns(orgId);
             switch (roleType)
             {
                 case RoleType.ContactPerson:
-                    _authorizationContext.Setup(_ => _.AllowCreate<ContactPerson>(orgId)).Returns(false);
-                    _authorizationContext.Setup(_ => _.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
-                    _authorizationContext.Setup(_ => _.AllowCreate<DataResponsible>(orgId)).Returns(true);
+                    _authorizationContext.Setup(context => context.AllowCreate<ContactPerson>(orgId)).Returns(false);
+                    _authorizationContext.Setup(context => context.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
+                    _authorizationContext.Setup(context => context.AllowCreate<DataResponsible>(orgId)).Returns(true);
                     break;
                 case RoleType.DataResponsible:
-                    _authorizationContext.Setup(_ => _.AllowCreate<DataResponsible>(orgId)).Returns(false);
-                    _authorizationContext.Setup(_ => _.AllowCreate<ContactPerson>(orgId)).Returns(true);
-                    _authorizationContext.Setup(_ => _.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
+                    _authorizationContext.Setup(context => context.AllowCreate<DataResponsible>(orgId)).Returns(false);
+                    _authorizationContext.Setup(context => context.AllowCreate<ContactPerson>(orgId)).Returns(true);
+                    _authorizationContext.Setup(context => context.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(true);
 
                     break;
                 case RoleType.DataProtectionAdvisor:
-                    _authorizationContext.Setup(_ => _.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(false);
-                    _authorizationContext.Setup(_ => _.AllowCreate<ContactPerson>(orgId)).Returns(true);
-                    _authorizationContext.Setup(_ => _.AllowCreate<DataResponsible>(orgId)).Returns(true);
+                    _authorizationContext.Setup(context => context.AllowCreate<DataProtectionAdvisor>(orgId)).Returns(false);
+                    _authorizationContext.Setup(context => context.AllowCreate<ContactPerson>(orgId)).Returns(true);
+                    _authorizationContext.Setup(context => context.AllowCreate<DataResponsible>(orgId)).Returns(true);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(roleType), roleType, null);
@@ -601,6 +622,7 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Can_Create_Organization()
         {
             var parameters = A<OrganizationBaseParameters>();
+            parameters.IsSupplier = false.AsChangedValue();
             _organizationService
                 .Setup(service => service.CreateNewOrganization(It.IsAny<Organization>()))
                 .Returns(Result<Organization, OperationFailure>.Success);
@@ -618,14 +640,14 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             var expectedCountryCode = new CountryCode()
             {
-                Uuid = uuid ?? new Guid()
+                Uuid = uuid ?? Guid.NewGuid()
             };
             _countryCodeRepository.Setup(_ => _.AsQueryable()).Returns(
                 new List<CountryCode>() { expectedCountryCode }.AsQueryable());
         }
 
         private OrganizationMasterDataRolesUpdateParameters SetupUpdateMasterDataRoles(int orgId,
-            ContactPerson cp = null, DataResponsible dr = null, DataProtectionAdvisor dpa = null)
+            ContactPerson? cp = null, DataResponsible? dr = null, DataProtectionAdvisor? dpa = null)
         {
             var expectedContactPerson = cp ?? SetupGetMasterDataRolesContactPerson(orgId);
             var expectedDataResponsible = dr ?? SetupGetMasterDataRolesDataResponsible(orgId);

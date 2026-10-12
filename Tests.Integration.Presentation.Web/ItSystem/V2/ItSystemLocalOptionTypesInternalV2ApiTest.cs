@@ -96,7 +96,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(HttpStatusCode.OK, createLocalOptionResponse.StatusCode);
             var createContent = await createLocalOptionResponse.Content.ReadAsStringAsync();
             var createResponseDto = JsonConvert.DeserializeObject<LocalRegularOptionResponseDTO>(createContent);
-            Assert.Equal(globalOption.Uuid, createResponseDto.Uuid);
+            Assert.Equal(globalOption.Uuid, createResponseDto?.Uuid);
 
             using var response = await LocalOptionTypeV2Helper.DeleteLocalOptionType(organization.Uuid, globalOption.Uuid, BusinessTypesUrlSuffix, ItSystemsApiPrefix);
 
@@ -130,10 +130,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var globalOption = new BusinessType()
             {
                 Uuid = A<Guid>(),
-                Id = A<int>(),
                 Name = A<string>(),
                 IsObligatory = false,
                 IsEnabled = isEnabled,
+                ObjectOwnerId = TestEnvironment.DefaultUserId,
+                LastChangedByUserId = TestEnvironment.DefaultUserId
             };
             DatabaseAccess.MutateEntitySet<BusinessType>(repository =>
             {

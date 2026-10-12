@@ -49,9 +49,9 @@ namespace Tests.Unit.Presentation.Web.DomainServices.DPR
             else
             {
                 Assert.Equal(2, result.Count());
-                var other = Assert.Single(result.Where(x => x.Id == otherMatch.Id));
+                var other = Assert.Single(result, x => x.Id == otherMatch.Id);
                 Assert.Same(otherMatch, other);
-                var empty = Assert.Single(result.Where(x => x.Id == emptyMatch.Id));
+                var empty = Assert.Single(result, x => x.Id == emptyMatch.Id);
                 Assert.Same(emptyMatch, empty);
             }
         }

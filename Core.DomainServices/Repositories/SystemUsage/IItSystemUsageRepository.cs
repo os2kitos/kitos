@@ -8,7 +8,7 @@ namespace Core.DomainServices.Repositories.SystemUsage
     {
         void Update(ItSystemUsage systemUsage);
 
-        ItSystemUsage GetSystemUsage(int systemUsageId);
+        ItSystemUsage? GetSystemUsage(int systemUsageId);
 
         IQueryable<ItSystemUsage> GetSystemUsagesFromOrganization(int organizationId);
         IQueryable<ItSystemUsage> GetBySystemId(int systemId);

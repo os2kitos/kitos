@@ -31,7 +31,7 @@ namespace Core.DomainServices.Repositories.Interface
             return _interfaceRepository.AsQueryable().Where(x => x.Url != null && x.Url != "");
         }
 
-        public void Add(ItInterface newItInterface)
+        public void Add(ItInterface? newItInterface)
         {
             if (newItInterface == null)
                 throw new ArgumentNullException(nameof(newItInterface));
@@ -40,7 +40,7 @@ namespace Core.DomainServices.Repositories.Interface
             _interfaceRepository.Save();
         }
 
-        public void Update(ItInterface itInterface)
+        public void Update(ItInterface? itInterface)
         {
             if (itInterface == null)
                 throw new ArgumentNullException(nameof(itInterface));

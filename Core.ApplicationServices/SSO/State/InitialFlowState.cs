@@ -87,10 +87,9 @@ namespace Core.ApplicationServices.SSO.State
         {
             // For local testing using Korsbaek Kommune users, uncomment the following line
             //return true;
-
             return _parser
-            .MatchPrivilege(_samlKitosReadAccessRoleIdentifier)
-            .HasValue;
+                .MatchPrivilege(_samlKitosReadAccessRoleIdentifier)
+                .HasValue;
         }
     }
 }

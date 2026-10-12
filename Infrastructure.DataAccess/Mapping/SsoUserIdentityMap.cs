@@ -1,16 +1,20 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.SSO;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class SsoUserIdentityMap : EntityTypeConfiguration<SsoUserIdentity>
+    public class SsoUserIdentityMap : IEntityTypeConfiguration<SsoUserIdentity>
     {
-        public SsoUserIdentityMap()
+        public void Configure(EntityTypeBuilder<SsoUserIdentity> builder)
         {
-            Property(x => x.ExternalUuid).HasUniqueIndexAnnotation("UX_" + nameof(SsoUserIdentity.ExternalUuid), 0);
-            HasRequired(x => x.User)
+            builder.HasIndex(x => x.ExternalUuid).IsUnique().HasDatabaseName("UX_" + nameof(SsoUserIdentity.ExternalUuid));
+
+            builder.HasOne(x => x.User)
                 .WithMany(x => x.SsoIdentities)
-                .WillCascadeOnDelete(true);
+                .HasForeignKey("User_Id")
+                .IsRequired()
+                .OnDelete(DeleteBehavior.ClientCascade);
         }
     }
 }

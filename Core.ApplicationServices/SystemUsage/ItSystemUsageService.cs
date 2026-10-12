@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System;
-using System.Linq;
-using Core.Abstractions.Extensions;
+﻿using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
@@ -18,6 +16,9 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 
 namespace Core.ApplicationServices.SystemUsage
@@ -36,6 +37,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IGenericRepository<ArchivePeriod> _archivePeriodRepository;
         private readonly IGenericRepository<ItSystemUsagePersonalData> _personalDataRepository;
         private readonly IOrganizationService _organizationService;
+        private readonly IFieldAuthorizationModel _fieldAuthorizationModel;
 
         public ItSystemUsageService(
             IGenericRepository<ItSystemUsage> usageRepository,
@@ -49,7 +51,7 @@ namespace Core.ApplicationServices.SystemUsage
             IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
             IGenericRepository<ArchivePeriod> archivePeriodRepository,
             IGenericRepository<ItSystemUsagePersonalData> personalDataRepository, 
-            IOrganizationService organizationService)
+            IOrganizationService organizationService, IFieldAuthorizationModel fieldAuthorizationModel)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;
@@ -63,6 +65,7 @@ namespace Core.ApplicationServices.SystemUsage
             _archivePeriodRepository = archivePeriodRepository;
             _personalDataRepository = personalDataRepository;
             _organizationService = organizationService;
+            _fieldAuthorizationModel = fieldAuthorizationModel;
         }
 
         public IQueryable<ItSystemUsage> Query(params IDomainQuery<ItSystemUsage>[] conditions)
@@ -161,6 +164,8 @@ namespace Core.ApplicationServices.SystemUsage
                 return new OperationError($"Not allowed to delete it system usage with Id: {id}", OperationFailure.Forbidden);
             }
 
+            DeleteAssociationsToOrganizationUnits(itSystemUsage);
+
             // delete it system usage
             var deleteBySystemUsageId = _referenceService.DeleteBySystemUsageId(id);
             if (deleteBySystemUsageId.Failed)
@@ -178,7 +183,7 @@ namespace Core.ApplicationServices.SystemUsage
             return itSystemUsage;
         }
 
-        public ItSystemUsage GetByOrganizationAndSystemId(int organizationId, int systemId)
+        public ItSystemUsage? GetByOrganizationAndSystemId(int organizationId, int systemId)
         {
             return _usageRepository
                 .AsQueryable()
@@ -186,7 +191,7 @@ namespace Core.ApplicationServices.SystemUsage
                 .FirstOrDefault(u => u.ItSystemId == systemId);
         }
 
-        public ItSystemUsage GetById(int usageId)
+        public ItSystemUsage? GetById(int usageId)
         {
             return _usageRepository.GetByKey(usageId);
         }
@@ -199,19 +204,32 @@ namespace Core.ApplicationServices.SystemUsage
                 .Match(WithReadAccess, () => new OperationError(OperationFailure.NotFound));
         }
 
-        public Result<ItSystemUsage, OperationError> GetReadableItSystemUsageByUuid(Guid uuid)
+        public Result<ItSystemUsage, OperationError> GetItSystemUsageByUuidAndAuthorizeRead(Guid uuid)
+        {
+            return GetItSystemUsageByUuid(uuid)
+                .Bind(WithReadAccess);
+        }
+
+        public Result<ItSystemUsage, OperationError> GetItSystemUsageByUuid(Guid uuid)
         {
             return _usageRepository
                 .AsQueryable()
                 .ByUuid(uuid)
                 .FromNullable()
-                .Match(WithReadAccess, () => new OperationError(OperationFailure.NotFound));
+                .Match<Result<ItSystemUsage, OperationError>>(usage => usage, () => new OperationError(OperationFailure.NotFound));
         }
 
-        public Result<ResourcePermissionsResult, OperationError> GetPermissions(Guid uuid)
+        public Result<CombinedPermissionsResult, OperationError> GetPermissions(Guid uuid)
         {
-            return GetReadableItSystemUsageByUuid(uuid)
-                .Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext));
+            return GetItSystemUsageByUuidAndAuthorizeRead(uuid)
+                .Transform(result => ResourcePermissionsResult.FromResolutionResult(result, _authorizationContext).Bind(permissions =>
+                {
+                    return ModuleFieldsPermissionsResult
+                        .CreateFromUsageResult(_fieldAuthorizationModel, result)
+                        .Select(fieldPermissions =>
+                            new CombinedPermissionsResult(permissions, fieldPermissions)
+                        );
+                }));
         }
 
         public Result<ResourceCollectionPermissionsResult, OperationError> GetCollectionPermissions(Guid organizationUuid)
@@ -446,6 +464,11 @@ namespace Core.ApplicationServices.SystemUsage
             }
 
             return mutationResult;
+        }
+
+        private void DeleteAssociationsToOrganizationUnits(ItSystemUsage itSystemUsage)
+        {
+            itSystemUsage.UsedBy.Clear();
         }
     }
 }

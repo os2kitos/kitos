@@ -1,22 +1,27 @@
 ﻿using Core.DomainModel.BackgroundJobs;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Threading;
-using System;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class ReadModelTestTools
     {
-        public static async Task WaitForReadModelQueueDepletion()
+        public static async Task WaitForReadModelQueueDepletion(DateTime? createdAfter = null)
         {
             await WaitForAsync(
                 () =>
                 {
                     return Task.FromResult(
-                        DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x => !x.AsQueryable().Any()));
+                        DatabaseAccess.MapFromEntitySet<PendingReadModelUpdate, bool>(x =>
+                        {
+                            var query = x.AsQueryable();
+                            if (createdAfter.HasValue)
+                                query = query.Where(u => u.CreatedAt >= createdAfter.Value);
+                            return !query.Any();
+                        }));
                 }, TimeSpan.FromSeconds(120));
         }
 
@@ -27,7 +32,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             stopwatch.Start();
             do
             {
-                Thread.Sleep(TimeSpan.FromMilliseconds(500));
+                await Task.Delay(TimeSpan.FromMilliseconds(500));
                 conditionMet = await check();
             } while (conditionMet == false && stopwatch.Elapsed <= howLong);
 

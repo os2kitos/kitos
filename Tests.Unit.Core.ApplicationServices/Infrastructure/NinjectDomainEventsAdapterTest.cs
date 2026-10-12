@@ -1,6 +1,7 @@
-﻿using Core.DomainModel.Events;
+using System;
+using Core.DomainModel.Events;
 using Infrastructure.Ninject.DomainServices;
-using Ninject;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Tests.Unit.Core.Infrastructure
@@ -9,11 +10,11 @@ namespace Tests.Unit.Core.Infrastructure
     {
         private const int ExpectedDomainEventId = 1;
 
-        private readonly StandardKernel _kernel;
-
-        public NinjectDomainEventsAdapterTest()
+        private static IServiceProvider BuildServiceProvider(Action<IServiceCollection> configure)
         {
-            _kernel = new StandardKernel();
+            var services = new ServiceCollection();
+            configure(services);
+            return services.BuildServiceProvider();
         }
 
         [Fact]
@@ -21,9 +22,12 @@ namespace Tests.Unit.Core.Infrastructure
         {
             // Arrange
             var resultHolder = new ResultHolder();
-            _kernel.Bind<IResultHolder>().ToConstant(resultHolder);
-            _kernel.Bind<IDomainEventHandler<MyDomainEvent>>().To<MyHandler>().InThreadScope();
-            var sut = new NinjectDomainEventHandlerMediator(_kernel);
+            var provider = BuildServiceProvider(s =>
+            {
+                s.AddSingleton<IResultHolder>(resultHolder);
+                s.AddScoped<IDomainEventHandler<MyDomainEvent>, MyHandler>();
+            });
+            var sut = new NinjectDomainEventHandlerMediator(provider);
 
             // Act
             sut.Raise(new MyDomainEvent { Id = ExpectedDomainEventId });
@@ -36,12 +40,14 @@ namespace Tests.Unit.Core.Infrastructure
         private void Raise_GivenMultipleRegisteredHandlersOnSameEvent_ThenAllhandlersAreCalledOnRaisedEvent()
         {
             // Arrange
-            _kernel.Bind<IResultHolder>().To<ResultHolder>().InThreadScope();
             var firstHandlerResult = new ResultHolder();
             var secondHandlerResult = new ResultHolder();
-            _kernel.Bind<IDomainEventHandler<MyDomainEvent>>().ToConstant(new MyHandler(firstHandlerResult)).InThreadScope();
-            _kernel.Bind<IDomainEventHandler<MyDomainEvent>>().ToConstant(new MyHandler(secondHandlerResult)).InThreadScope();
-            var sut = new NinjectDomainEventHandlerMediator(_kernel);
+            var provider = BuildServiceProvider(s =>
+            {
+                s.AddSingleton<IDomainEventHandler<MyDomainEvent>>(new MyHandler(firstHandlerResult));
+                s.AddSingleton<IDomainEventHandler<MyDomainEvent>>(new MyHandler(secondHandlerResult));
+            });
+            var sut = new NinjectDomainEventHandlerMediator(provider);
 
             // Act
             sut.Raise(new MyDomainEvent { Id = ExpectedDomainEventId });
@@ -55,7 +61,7 @@ namespace Tests.Unit.Core.Infrastructure
 
         public interface IResultHolder
         {
-            int ResultingValue { get; set; }  
+            int ResultingValue { get; set; }
         }
 
         public class ResultHolder : IResultHolder

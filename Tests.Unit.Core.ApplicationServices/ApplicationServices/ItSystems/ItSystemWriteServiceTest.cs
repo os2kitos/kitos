@@ -7,6 +7,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.References;
@@ -31,31 +32,29 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
     public class ItSystemWriteServiceTest : WithAutoFixture
     {
         private readonly ItSystemWriteService _sut;
-        private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
         private readonly Mock<IItSystemService> _itSystemServiceMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<ITaskRefRepository> _taskRefRepositoryMock;
         private readonly Mock<IReferenceService> _referenceServiceMock;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
-        private readonly Mock<IDatabaseControl> _dbControlMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IEntityIdentityResolver> _identityResolverMock;
 
         public ItSystemWriteServiceTest()
         {
-            _userContextMock = new Mock<IOrganizationalUserContext>();
+            var userContextMock = new Mock<IOrganizationalUserContext>();
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();
             _itSystemServiceMock = new Mock<IItSystemService>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _taskRefRepositoryMock = new Mock<ITaskRefRepository>();
             _referenceServiceMock = new Mock<IReferenceService>();
             _authorizationContextMock = new Mock<IAuthorizationContext>();
-            _dbControlMock = new Mock<IDatabaseControl>();
+            var dbControlMock = new Mock<IDatabaseControl>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _identityResolverMock = new Mock<IEntityIdentityResolver>();
             _sut = new ItSystemWriteService(
-                _userContextMock.Object,
+                userContextMock.Object,
                 _organizationRepositoryMock.Object,
                 _itSystemServiceMock.Object,
                 _taskRefRepositoryMock.Object,
@@ -63,7 +62,7 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
                 Mock.Of<ILogger>(),
                 _referenceServiceMock.Object,
                 _authorizationContextMock.Object,
-                _dbControlMock.Object,
+                dbControlMock.Object,
                 _domainEventsMock.Object,
                 _identityResolverMock.Object
                 );
@@ -122,6 +121,33 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
             //Assert
             Assert.True(result.Ok);
             transactionMock.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void CreateNewSystem_Can_Clear_KLE_Refs_With_Null_Change_Value()
+        {
+            //Arrange
+            var organizationUuid = A<Guid>();
+            var inputParameters = new SystemUpdateParameters
+            {
+                Name = A<string>().AsChangedValue(),
+                TaskRefUuids = OptionalValueChange<IEnumerable<Guid>>.With(null!)
+            };
+            var transactionMock = ExpectTransactionBegins();
+            var orgDbId = A<int>();
+            var itSystem = new ItSystem { Id = A<int>() };
+
+            ExpectGetOrganizationReturns(organizationUuid, new Organization { Id = orgDbId });
+            ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
+            ExpectUpdateTaskRefsReturns(itSystem.Id, new List<int>(), itSystem);
+
+            //Act
+            var result = _sut.CreateNewSystem(organizationUuid, inputParameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            transactionMock.Verify(x => x.Commit(), Times.Once);
+            _taskRefRepositoryMock.Verify(x => x.GetTaskRef(It.IsAny<Guid>()), Times.Never);
         }
 
         [Fact]
@@ -476,12 +502,10 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
             };
             var itSystem = new ItSystem { Id = A<int>(), BelongsToId = A<int>() };
 
-            var taskRefs = new Dictionary<string, TaskRef>();
             foreach (var uuid in parameters.TaskRefUuids.NewValue)
             {
                 var taskRef = new TaskRef { Id = 1 };
                 _taskRefRepositoryMock.Setup(x => x.GetTaskRef(uuid)).Returns(taskRef);
-                taskRefs[uuid.ToString()] = taskRef;
             }
 
             var transaction = ExpectTransactionBegins();
@@ -913,7 +937,7 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
 
             ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
-            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ExternalReference>(referenceUuid, referenceId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId(referenceUuid, referenceId);
             ExpectRemoveExternalReferenceReturns(referenceId, externalReference);
 
             //Act
@@ -936,7 +960,7 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
 
             ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
-            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ExternalReference>(referenceUuid, referenceId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId(referenceUuid, referenceId);
             ExpectRemoveExternalReferenceReturns(referenceId, expectedFailure);
 
             //Act
@@ -957,7 +981,7 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
 
             ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
-            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ExternalReference>(referenceUuid, Maybe<int>.None);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId(referenceUuid, Maybe<int>.None);
 
             //Act
             var result = _sut.DeleteExternalReference(systemUuid, referenceUuid);
@@ -1087,7 +1111,7 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
 
         private void ExpectBatchUpdateReferencesReturns(int systemId, SharedSystemUpdateParameters inputParameters, Maybe<OperationError> error)
         {
-            _referenceServiceMock.Setup(x => x.UpdateExternalReferences(ReferenceRootType.System, systemId, inputParameters.ExternalReferences.GetValueOrDefault())).Returns(error);
+            _referenceServiceMock.Setup(x => x.UpdateExternalReferences(ReferenceRootType.System, systemId, inputParameters.ExternalReferences.GetValueOrDefault()!)).Returns(error);
         }
 
         private void ExpectUpdateDescriptionReturns(int systemId, SharedSystemUpdateParameters inputParameters, Result<ItSystem, OperationError> result)
@@ -1135,7 +1159,7 @@ namespace Tests.Unit.Core.ApplicationServices.ItSystems
             _authorizationContextMock.Setup(x => x.AllowModify(itSystem)).Returns(val);
         }
 
-        private void ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<T>(Guid referenceUuid, Maybe<int> referenceId)
+        private void ExpectIfUuidHasValueResolveIdentityDbIdReturnsId(Guid referenceUuid, Maybe<int> referenceId)
         {
             _identityResolverMock.Setup(x => x.ResolveDbId<ExternalReference>(referenceUuid)).Returns(referenceId);
         }

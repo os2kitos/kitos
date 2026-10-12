@@ -1,4 +1,6 @@
-﻿using Core.DomainModel;
+using Core.DomainModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -7,19 +9,27 @@ namespace Infrastructure.DataAccess.Mapping
         where TObject : HasRightsEntity<TObject, TRight, TRole>
         where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
     {
-        protected RightMap()
+        public override void Configure(EntityTypeBuilder<TRight> builder)
         {
-            this.HasRequired(right => right.Object)
+            base.Configure(builder);
+
+            builder.HasOne(right => right.Object)
                 .WithMany(obj => obj.Rights)
-                .HasForeignKey(right => right.ObjectId);
+                .HasForeignKey(right => right.ObjectId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
-            this.HasRequired(right => right.Role)
+            builder.HasOne(right => right.Role)
                 .WithMany(role => role.References)
-                .HasForeignKey(right => right.RoleId);
+                .HasForeignKey(right => right.RoleId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            this.HasRequired(right => right.User)
+            builder.HasOne(right => right.User)
                 .WithMany()
-                .HasForeignKey(right => right.UserId);
+                .HasForeignKey(right => right.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

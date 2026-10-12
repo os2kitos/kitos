@@ -9,11 +9,11 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// External payments
         /// </summary>
         [Required]
-        public IEnumerable<PaymentResponseDTO> External { get; set; }
+        public required IEnumerable<PaymentResponseDTO> External { get; set; }
         /// <summary>
         /// Internal payments
         /// </summary>
         [Required]
-        public IEnumerable<PaymentResponseDTO> Internal { get; set; }
+        public required IEnumerable<PaymentResponseDTO> Internal { get; set; }
     }
 }

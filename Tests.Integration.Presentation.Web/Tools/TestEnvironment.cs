@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Infrastructure.Interception;
-using Core.Abstractions.Types;
-using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Context;
-using Core.DomainServices.Time;
 using Infrastructure.DataAccess;
-using Infrastructure.DataAccess.Interceptors;
-using Moq;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Npgsql;
 using Tests.Integration.Presentation.Web.Tools.Model;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -17,6 +13,10 @@ namespace Tests.Integration.Presentation.Web.Tools
     {
         private static readonly IReadOnlyDictionary<OrganizationRole, KitosCredentials> UsersFromEnvironment;
         private static readonly IReadOnlyDictionary<OrganizationRole, KitosCredentials> ApiUsersFromEnvironment;
+        private static readonly IConfiguration AppSettings = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+            .Build();
         private static readonly KitosTestEnvironment ActiveEnvironment;
         private static readonly string DefaultUserPassword;
         public const int DefaultOrganizationId = 1;
@@ -24,13 +24,15 @@ namespace Tests.Integration.Presentation.Web.Tools
         public const int SecondOrganizationId = 2;
         public const int DefaultUserId = 1;
         private static readonly string ConnectionString;
+        private static readonly string DatabaseProvider;
+        private static readonly string BaseUrl;
 
         static TestEnvironment()
         {
-            //Fake the interception for EF in the text context
-            DbInterception.Add(new EFEntityInterceptor(() => new OperationClock(), () => Maybe<ActiveUserIdContext>.None, () => Mock.Of<IFallbackUserResolver>(x => x.Resolve() == new User() { Id = DefaultUserId })));
+            // Configure Npgsql timestamp compatibility as early as possible in the test process.
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-            var testEnvironment = GetEnvironmentVariable("KitosTestEnvironment", false);
+            var testEnvironment = GetEnvironmentVariable("KitosTestEnvironment", false, allowAppSettingsFallback: false);
             if (string.IsNullOrWhiteSpace(testEnvironment))
             {
                 ActiveEnvironment = KitosTestEnvironment.Local;
@@ -46,7 +48,9 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Console.Out.WriteLine("Running locally. Loading all configuration in-line");
                 const string localDevUserPassword = "localNoSecret";
                 DefaultUserPassword = "arne123";
-                ConnectionString = @"Server=.\SQLEXPRESS;Integrated Security=true;Initial Catalog=Kitos;MultipleActiveResultSets=True";
+                DatabaseProvider = GetEnvironmentVariable("KitosDbProvider", false,
+                    GetEnvironmentVariable("Database__Provider", false, "PostgreSql"));
+                ConnectionString = ResolveLocalConnectionString();
                 UsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
                 {
                     {
@@ -84,12 +88,16 @@ namespace Tests.Integration.Presentation.Web.Tools
                     }
                 };
 
+                Console.Out.WriteLine($"[TestEnvironment] ActiveEnvironment={ActiveEnvironment}, DatabaseProvider={DatabaseProvider}");
+                BaseUrl = "https://localhost:44300";
             }
             else
             {
                 //Loading users from environment
                 Console.Out.WriteLine("Tests running towards remote target. Loading configuration from environment.");
                 DefaultUserPassword = GetEnvironmentVariable("DefaultUserPassword");
+                DatabaseProvider = GetEnvironmentVariable("KitosDbProvider", false,
+                    GetEnvironmentVariable("Database__Provider", false, "PostgreSql"));
                 ConnectionString = GetEnvironmentVariable("KitosDbConnectionStringForTeamCity");
                 UsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
                 {
@@ -103,6 +111,9 @@ namespace Tests.Integration.Presentation.Web.Tools
                     {OrganizationRole.User, LoadUserFromEnvironment(OrganizationRole.User, true)},
                     {OrganizationRole.GlobalAdmin, LoadUserFromEnvironment(OrganizationRole.GlobalAdmin, true)}
                 };
+
+                BaseUrl = $"https://{GetEnvironmentVariable("KitosHostName")}";
+                Console.Out.WriteLine($"[TestEnvironment] ActiveEnvironment={ActiveEnvironment}, DatabaseProvider={DatabaseProvider}");
             }
         }
 
@@ -136,23 +147,51 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
         public static KitosContext GetDatabase()
         {
-            return new KitosContext(ConnectionString);
+            var optionsBuilder = new DbContextOptionsBuilder<KitosContext>()
+                .UseLazyLoadingProxies();
+
+            var pgCsb = new NpgsqlConnectionStringBuilder(ConnectionString) { SearchPath = "dbo,public" };
+            optionsBuilder.UseNpgsql(pgCsb.ConnectionString,
+                npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "dbo"));
+
+            var options = optionsBuilder.Options;
+            return new KitosContext(options);
         }
 
-        private static string GetEnvironmentVariable(string name, bool mandatory = true, string defaultValue = null)
+
+        private static string ResolveLocalConnectionString()
+        {
+            return GetEnvironmentVariable("ConnectionStrings__KitosContext", false,
+                @"Host=localhost;Port=5432;Database=kitos;Username=postgres;Password=localNoSecret");
+        }
+
+        private static string GetEnvironmentVariable(string name, bool mandatory = true, string? defaultValue = null, bool allowAppSettingsFallback = true)
         {
             var variableName = name;
 
             var variable = Environment.GetEnvironmentVariable(variableName, EnvironmentVariableTarget.Process);
+            var source = "process-env";
+            if (allowAppSettingsFallback && string.IsNullOrWhiteSpace(variable))
+            {
+                // Fall back to appsettings.json — double underscore (__) maps to colon (:) for hierarchy
+                var configKey = name.Replace("__", ":");
+                variable = AppSettings[configKey];
+                source = "appsettings.json";
+            }
+
             if (string.IsNullOrWhiteSpace(variable))
             {
                 if (mandatory)
                 {
-                    throw new ArgumentException($"Error: No environment variable value found for mandatory variable '{variable}'");
+                    Console.Out.WriteLine($"[TestEnvironment] '{name}' missing (mandatory). allowAppSettingsFallback={allowAppSettingsFallback}");
+                    throw new ArgumentException($"Error: No environment variable value found for mandatory variable '{name}'");
                 }
 
-                return defaultValue;
+                Console.Out.WriteLine($"[TestEnvironment] '{name}' not set. Using default. allowAppSettingsFallback={allowAppSettingsFallback}");
+                return defaultValue!;
             }
+
+            Console.Out.WriteLine($"[TestEnvironment] '{name}' loaded from {source}. allowAppSettingsFallback={allowAppSettingsFallback}");
             return variable;
         }
 
@@ -174,7 +213,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 case KitosTestEnvironment.Local:
                     return "https://localhost:44300";
                 case KitosTestEnvironment.Integration:
-                    return $"https://{GetEnvironmentVariable("KitosHostName")}";
+                    return BaseUrl;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

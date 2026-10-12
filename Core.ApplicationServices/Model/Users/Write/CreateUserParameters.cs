@@ -6,8 +6,8 @@ namespace Core.ApplicationServices.Model.Users.Write
 {
     public class CreateUserParameters
     {
-        public User User { get; set; }
+        public required User User { get; set; }
         public bool SendMailOnCreation { get; set; }
-        public IEnumerable<OrganizationRole> Roles { get; set; }
+        public required IEnumerable<OrganizationRole> Roles { get; set; }
     }
 }

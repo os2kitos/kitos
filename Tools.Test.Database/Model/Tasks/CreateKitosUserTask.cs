@@ -1,5 +1,6 @@
-﻿using System;
-using System.Data.Entity.Migrations;
+using System;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Infrastructure.DataAccess;
@@ -73,7 +74,21 @@ namespace Tools.Test.Database.Model.Tasks
             };
             newUser.SetPassword(_password);
 
-            context.Users.AddOrUpdate(x => x.Email, newUser);
+            var existing = context.Users.FirstOrDefault(x => x.Email == newUser.Email);
+            if (existing == null)
+            {
+                context.Users.Add(newUser);
+            }
+            else
+            {
+                existing.Name = newUser.Name;
+                existing.LastName = newUser.LastName;
+                existing.Salt = newUser.Salt;
+                existing.IsGlobalAdmin = newUser.IsGlobalAdmin;
+                existing.HasApiAccess = newUser.HasApiAccess;
+                existing.IsSystemIntegrator = newUser.IsSystemIntegrator;
+                newUser = existing;
+            }
             context.SaveChanges();
             return newUser;
         }

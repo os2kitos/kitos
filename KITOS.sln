@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.3.32901.215
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11415.280
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{2AC4CFA8-D99E-4DF2-9E2D-202E3A7BD29E}"
 EndProject
@@ -55,6 +55,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "DeploymentScripts", "{99BC9B21-B4D9-4344-9393-FFAE60AA0283}"
 	ProjectSection(SolutionItems) = preProject
 		DeploymentScripts\AwsApi.ps1 = DeploymentScripts\AwsApi.ps1
+		DeploymentScripts\Baseline.PostgreSql.FullModel.sql = DeploymentScripts\Baseline.PostgreSql.FullModel.sql
+		DeploymentScripts\Baseline.PostgreSql.sql = DeploymentScripts\Baseline.PostgreSql.sql
+		DeploymentScripts\Baseline.sql = DeploymentScripts\Baseline.sql
 		DeploymentScripts\CheckWebsiteVersion.ps1 = DeploymentScripts\CheckWebsiteVersion.ps1
 		DeploymentScripts\DbMigrations.ps1 = DeploymentScripts\DbMigrations.ps1
 		DeploymentScripts\DeploymentSetup.ps1 = DeploymentScripts\DeploymentSetup.ps1
@@ -62,6 +65,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "Deploy
 		DeploymentScripts\DeployWebsite.ps1 = DeploymentScripts\DeployWebsite.ps1
 		DeploymentScripts\DeployWebsiteToEnvironment.ps1 = DeploymentScripts\DeployWebsiteToEnvironment.ps1
 		DeploymentScripts\PrepareCleanDeveloperDatabase.ps1 = DeploymentScripts\PrepareCleanDeveloperDatabase.ps1
+		DeploymentScripts\PrepareDbMigrationsBundle.ps1 = DeploymentScripts\PrepareDbMigrationsBundle.ps1
 		DeploymentScripts\PrepareIntegrationDatabase.ps1 = DeploymentScripts\PrepareIntegrationDatabase.ps1
 		DeploymentScripts\PrepareLocalDatabase.ps1 = DeploymentScripts\PrepareLocalDatabase.ps1
 		DeploymentScripts\PreparePackage.ps1 = DeploymentScripts\PreparePackage.ps1
@@ -113,6 +117,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.STS.SvcUtilClients", "Infrastructure.STS.SvcUtilClients\Infrastructure.STS.SvcUtilClients.csproj", "{2DC50C99-0A51-4FAC-B53B-54401B72D699}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.SAMLResponseDecryptor", "Tools.SAMLResponseDecryptor\Tools.SAMLResponseDecryptor.csproj", "{F300C204-7DD8-40A7-9465-CF1EA6A9DCB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Digst.OioIdws.Common", "Digst.OioIdws.Common\Digst.OioIdws.Common.csproj", "{10E0A9EA-2EBB-65F3-41D0-0D44172A62C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools.MigrateSQLServer2Postgres", "Tools.MigrateSQLServer2Postgres\Tools.MigrateSQLServer2Postgres.csproj", "{83055890-BBD9-474C-855F-B8E9098B76FA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04_Infrastructure", "04_Infrastructure", "{390148C1-9CB3-4B95-A444-0F082082FDE5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Container", "Tests.Container\Tests.Container.csproj", "{2BF30CC7-827C-4F5D-9B05-C9DE2A5C20F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -220,6 +232,18 @@ Global
 		{F300C204-7DD8-40A7-9465-CF1EA6A9DCB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F300C204-7DD8-40A7-9465-CF1EA6A9DCB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F300C204-7DD8-40A7-9465-CF1EA6A9DCB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{10E0A9EA-2EBB-65F3-41D0-0D44172A62C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10E0A9EA-2EBB-65F3-41D0-0D44172A62C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10E0A9EA-2EBB-65F3-41D0-0D44172A62C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10E0A9EA-2EBB-65F3-41D0-0D44172A62C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83055890-BBD9-474C-855F-B8E9098B76FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83055890-BBD9-474C-855F-B8E9098B76FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83055890-BBD9-474C-855F-B8E9098B76FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83055890-BBD9-474C-855F-B8E9098B76FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2BF30CC7-827C-4F5D-9B05-C9DE2A5C20F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2BF30CC7-827C-4F5D-9B05-C9DE2A5C20F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2BF30CC7-827C-4F5D-9B05-C9DE2A5C20F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2BF30CC7-827C-4F5D-9B05-C9DE2A5C20F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -256,6 +280,10 @@ Global
 		{2BF23085-9552-4354-B070-7F1715ED5976} = {3F0ABEAA-2F6E-4385-8BB1-71695E633E0A}
 		{2DC50C99-0A51-4FAC-B53B-54401B72D699} = {EF9D5FB5-3C0D-45C0-88D4-6619D2905EFB}
 		{F300C204-7DD8-40A7-9465-CF1EA6A9DCB2} = {1755BABD-3C1F-497A-AB69-9D643B576506}
+		{10E0A9EA-2EBB-65F3-41D0-0D44172A62C6} = {3F0ABEAA-2F6E-4385-8BB1-71695E633E0A}
+		{83055890-BBD9-474C-855F-B8E9098B76FA} = {1755BABD-3C1F-497A-AB69-9D643B576506}
+		{390148C1-9CB3-4B95-A444-0F082082FDE5} = {42678F6A-7BFE-40AF-A659-0726A06DCE29}
+		{2BF30CC7-827C-4F5D-9B05-C9DE2A5C20F5} = {390148C1-9CB3-4B95-A444-0F082082FDE5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4890FA32-C82F-4C98-AC7A-2F4EE7F21687}

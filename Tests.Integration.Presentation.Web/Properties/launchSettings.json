@@ -1,0 +1,22 @@
+{
+  "profiles": {
+    "Tests.Integration.Presentation.Web": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "KitosTestEnvironment": "Local",
+        "KitosDbProvider": "PostgreSql",
+        "Database__Provider": "PostgreSql",
+        "ConnectionStrings__KitosContext": "Host=localhost;Port=5432;Database=kitos;Username=kitos;Password=kitos"
+      }
+    },
+    "Tests.Integration.Presentation.Web (PostgreSql)": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "KitosTestEnvironment": "Local",
+        "KitosDbProvider": "PostgreSql",
+        "Database__Provider": "PostgreSql",
+        "ConnectionStrings__KitosContext": "Host=localhost;Port=5432;Database=kitos;Username=postgres;Password=localNoSecret"
+      }
+    }
+  }
+}

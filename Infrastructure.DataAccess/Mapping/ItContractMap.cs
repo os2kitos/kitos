@@ -1,100 +1,92 @@
-using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItContract;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItContractMap : EntityTypeConfiguration<ItContract>
+    public class ItContractMap : IEntityTypeConfiguration<ItContract>
     {
-        public ItContractMap()
+        public void Configure(EntityTypeBuilder<ItContract> builder)
         {
-            // Properties
+            builder.Property(x => x.Name).HasMaxLength(ItContractConstraints.MaxNameLength).IsRequired();
 
-            this.Property(x => x.Name)
-                .HasMaxLength(ItContractConstraints.MaxNameLength)
-                .IsRequired();
+            builder.HasIndex(x => new { x.OrganizationId, x.Name }).IsUnique().HasDatabaseName("UX_NameUniqueToOrg");
+            builder.HasIndex(x => x.OrganizationId).HasDatabaseName("IX_OrganizationId");
+            builder.HasIndex(x => x.Name).HasDatabaseName("IX_Name");
+            builder.HasIndex(x => x.ProcurementInitiated).HasDatabaseName("IX_ProcurementInitiated");
 
-            HasIndex(x => new { x.OrganizationId, x.Name })
-                .IsUnique(true)
-                .HasName("UX_NameUniqueToOrg");
+            builder.ToTable("ItContract");
 
-            HasIndex(x => x.OrganizationId)
-                .IsUnique(false)
-                .HasName("IX_OrganizationId");
-
-            HasIndex(x => x.Name)
-                .IsUnique(false)
-                .HasName("IX_Name");
-
-            HasIndex(x => x.ProcurementInitiated)
-                .IsUnique(false)
-                .HasName("IX_ProcurementInitiated");
-
-            // Table & Column Mappings
-            ToTable("ItContract");
-
-            HasOptional(t => t.Reference);
-            HasMany(t => t.ExternalReferences)
-                .WithOptional(d => d.ItContract)
+            builder.HasMany(t => t.ExternalReferences)
+                .WithOne(d => d.ItContract)
                 .HasForeignKey(d => d.Itcontract_Id)
-                .WillCascadeOnDelete(true);
+                .OnDelete(DeleteBehavior.Cascade);
 
-            HasOptional(t => t.ContractTemplate)
+            builder.HasOne(t => t.ContractTemplate)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ContractTemplateId);
 
-            HasOptional(t => t.ContractType)
+            builder.HasOne(t => t.ContractType)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ContractTypeId);
 
-            HasOptional(t => t.PurchaseForm)
+            builder.HasOne(t => t.PurchaseForm)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.PurchaseFormId);
 
-            HasOptional(t => t.Supplier)
+            builder.HasOne(t => t.Supplier)
                 .WithMany(t => t.Supplier)
                 .HasForeignKey(d => d.SupplierId);
 
-            HasOptional(t => t.ProcurementStrategy)
+            builder.HasOne(t => t.ProcurementStrategy)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ProcurementStrategyId);
 
-            HasOptional(t => t.Parent)
+            builder.HasOne(t => t.Parent)
                 .WithMany(t => t.Children)
                 .HasForeignKey(d => d.ParentId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasOptional(t => t.Criticality)
+            builder.HasOne(t => t.Criticality)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.CriticalityId);
 
-            HasMany(t => t.AssociatedAgreementElementTypes)
-               .WithRequired(t => t.ItContract)
-               .HasForeignKey(t=> t.ItContract_Id);
+            builder.HasMany(t => t.AssociatedAgreementElementTypes)
+                .WithOne(t => t.ItContract)
+                .HasForeignKey(t => t.ItContract_Id)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
-            HasOptional(t => t.ResponsibleOrganizationUnit)
+            builder.HasOne(t => t.ResponsibleOrganizationUnit)
                 .WithMany(t => t.ResponsibleForItContracts)
                 .HasForeignKey(d => d.ResponsibleOrganizationUnitId);
 
-            HasMany(t => t.AssociatedSystemUsages)
-                .WithRequired(t => t.ItContract)
-                .HasForeignKey(d => d.ItContractId);
+            builder.HasMany(t => t.AssociatedSystemUsages)
+                .WithOne(t => t.ItContract)
+                .HasForeignKey(d => d.ItContractId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
-            HasRequired(t => t.Organization)
+            builder.HasOne(t => t.Organization)
                 .WithMany(t => t.ItContracts)
                 .HasForeignKey(d => d.OrganizationId)
-                .WillCascadeOnDelete(false);
-
-            HasMany(x => x.DataProcessingRegistrations)
-                .WithMany(x => x.AssociatedContracts);
-
-            HasMany(t => t.DataProcessingRegistrationsWhereContractIsMainContract)
-                .WithOptional(t => t.MainContract)
-                .HasForeignKey(d => d.MainContractId)
-                .WillCascadeOnDelete(false);
-                
-            Property(x => x.Uuid)
                 .IsRequired()
-                .HasUniqueIndexAnnotation("UX_Contract_Uuid", 0);
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(x => x.DataProcessingRegistrations)
+                .WithMany(x => x.AssociatedContracts)
+                .UsingEntity(
+                    l => l.HasOne(typeof(Core.DomainModel.GDPR.DataProcessingRegistration)).WithMany().HasForeignKey("DataProcessingRegistration_Id"),
+                    r => r.HasOne(typeof(ItContract)).WithMany().HasForeignKey("ItContract_Id"),
+                    j => { j.ToTable("ItContractDataProcessingRegistrations"); j.HasKey("ItContract_Id", "DataProcessingRegistration_Id"); });
+
+            builder.HasMany(t => t.DataProcessingRegistrationsWhereContractIsMainContract)
+                .WithOne(t => t.MainContract)
+                .HasForeignKey(d => d.MainContractId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Property(x => x.Uuid).IsRequired();
+            builder.HasIndex(x => x.Uuid).IsUnique().HasDatabaseName("UX_Contract_Uuid");
         }
     }
 }

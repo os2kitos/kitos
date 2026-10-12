@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.KLE;
 using Core.DomainModel.Organization;
@@ -13,14 +12,14 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Response.KLE;
-using Swashbuckle.Swagger.Annotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.API.V2.External.KLE
 {
     /// <summary>
     /// Returns the available KLE options in KITOS
     /// </summary>
-    [RoutePrefix("api/v2/kle-options")]
+    [Route("api/v2/kle-options")]
     public class KleOptionV2Controller : ExternalBaseController
     {
         private readonly IKLEApplicationService _kleApplicationService;
@@ -37,19 +36,19 @@ namespace Presentation.Web.Controllers.API.V2.External.KLE
         /// <param name="parentKleNumber">Query by parent KLE number (exact match)</param>
         /// <param name="kleNumberPrefix">Query by KLE number prefix</param>
         /// <param name="kleDescriptionContent">Query by KLE description content</param>
-        /// <param name="kleCategory">Query by KLE category</param>
+        /// <param name="pagination">Pagination parameters</param>
         /// <returns></returns>
         [HttpGet]
-        [Route]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(VersionedKLEResponseDTO<IEnumerable<KLEDetailsDTO>>))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult Get(
+        [Route("")]
+        [ApiResponse(typeof(VersionedKLEResponseDTO<IEnumerable<KLEDetailsDTO>>), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        public IActionResult Get(
             [NonEmptyGuid] Guid? parentKleUuid = null,
-            string parentKleNumber = null,
-            string kleNumberPrefix = null,
-            string kleDescriptionContent = null,
-            [FromUri] UnboundedPaginationQuery pagination = null)
+            string? parentKleNumber = null,
+            string? kleNumberPrefix = null,
+            string? kleDescriptionContent = null,
+            [FromQuery] UnboundedPaginationQuery? pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -86,11 +85,11 @@ namespace Presentation.Web.Controllers.API.V2.External.KLE
         /// <returns></returns>
         [HttpGet]
         [Route("{kleUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(VersionedKLEResponseDTO<KLEDetailsDTO>))]
-        [SwaggerResponse(HttpStatusCode.BadRequest, "kleUuid is invalid")]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get([NonEmptyGuid] Guid kleUuid)
+        [ApiResponse(typeof(VersionedKLEResponseDTO<KLEDetailsDTO>), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult Get([NonEmptyGuid] Guid kleUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -114,3 +113,5 @@ namespace Presentation.Web.Controllers.API.V2.External.KLE
         }
     }
 }
+
+

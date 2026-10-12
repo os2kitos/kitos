@@ -1,30 +1,30 @@
 using Core.DomainModel.ItContract;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class EconomyStreamMap : EntityMap<EconomyStream>
     {
-        public EconomyStreamMap()
+        public override void Configure(EntityTypeBuilder<EconomyStream> builder)
         {
-            // Properties
-            // Table & Column Mappings
-            this.ToTable("EconomyStream");
+            base.Configure(builder);
+            builder.ToTable("EconomyStream");
 
-            // Relationships
-            this.HasOptional(t => t.ExternPaymentFor) 
+            builder.HasOne(t => t.ExternPaymentFor)
                 .WithMany(d => d.ExternEconomyStreams)
                 .HasForeignKey(t => t.ExternPaymentForId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            this.HasOptional(t => t.InternPaymentFor) 
+            builder.HasOne(t => t.InternPaymentFor)
                 .WithMany(d => d.InternEconomyStreams)
                 .HasForeignKey(t => t.InternPaymentForId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            this.HasOptional(t => t.OrganizationUnit)
+            builder.HasOne(t => t.OrganizationUnit)
                 .WithMany(d => d.EconomyStreams)
                 .HasForeignKey(t => t.OrganizationUnitId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

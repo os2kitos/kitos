@@ -1,23 +1,18 @@
-﻿using Core.DomainModel.ItContract.Read;
-using System.Data.Entity.ModelConfiguration;
+using Core.DomainModel.ItContract.Read;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    internal class
-        ItContractOverviewReadModelSystemRelationMap : EntityTypeConfiguration<ItContractOverviewReadModelSystemRelation>
+    internal class ItContractOverviewReadModelSystemRelationMap : IEntityTypeConfiguration<ItContractOverviewReadModelSystemRelation>
     {
-        public ItContractOverviewReadModelSystemRelationMap()
+        public void Configure(EntityTypeBuilder<ItContractOverviewReadModelSystemRelation> builder)
         {
-            HasKey(x => x.Id);
+            builder.HasKey(x => x.Id);
 
-            Property(x => x.RelationId)
-                .HasIndexAnnotation("IX_RelationId");
-
-            Property(x => x.FromSystemUsageId)
-                .HasIndexAnnotation("IX_FromSystemUsageId");
-
-            Property(x => x.ToSystemUsageId)
-                .HasIndexAnnotation("IX_ToSystemUsageId");
+            builder.HasIndex(x => x.RelationId).HasDatabaseName("IX_RelationId");
+            builder.HasIndex(x => x.FromSystemUsageId).HasDatabaseName("IX_FromSystemUsageId");
+            builder.HasIndex(x => x.ToSystemUsageId).HasDatabaseName("IX_ToSystemUsageId");
         }
     }
 }

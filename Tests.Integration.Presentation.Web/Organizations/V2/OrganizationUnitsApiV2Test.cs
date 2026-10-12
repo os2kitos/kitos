@@ -38,7 +38,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             //Assert
             Assert.Equal(4, units.Count); //Organizational hierarchy always contains at least 1 (the root created with the organization and then comes the user defined units)
-            var root = Assert.Single(units.Where(x => x.Name == organization.Name));
+            var root = Assert.Single(units, x => x.Name == organization.Name);
             Assert.Null(root.ParentOrganizationUnit);
             AssertCreatedOrganizationUnit(units, unit1, (root.Uuid, root.Name));
             AssertCreatedOrganizationUnit(units, unit1_1, (unit1.Uuid, unit1.Name));
@@ -214,6 +214,36 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
+        public async Task GET_OrganizationUnit_Returns_ExternalOriginUuid()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync();
+            var (_, token) = await CreateApiUser(organization);
+            var unit = await CreateOrganizationUnitAsync(organization.Uuid);
+            var externalOriginUuid = A<Guid>();
+            
+            // Update the unit to have an ExternalOriginUuid (simulating a unit from STS)
+            DatabaseAccess.MutateEntitySet<OrganizationUnit>(units =>
+            {
+                var unitToUpdate = units.AsQueryable().FirstOrDefault(x => x.Uuid == unit.Uuid);
+                if (unitToUpdate != null)
+                {
+                    unitToUpdate.ExternalOriginUuid = externalOriginUuid;
+                    unitToUpdate.Origin = OrganizationUnitOrigin.STS_Organisation;
+                }
+            });
+
+            //Act
+            var dto = await OrganizationUnitV2Helper.GetOrganizationUnitAsync(token, organization.Uuid, unit.Uuid);
+
+            //Assert
+            Assert.Equal(externalOriginUuid, dto.ExternalOriginUuid);
+            Assert.Equal(unit.Uuid, dto.Uuid);
+            Assert.Equal(unit.Name, dto.Name);
+            Assert.Equal(OrganizationUnitOriginChoice.STSOrganisation, dto.Origin);
+        }
+
+        [Fact]
         public async Task Can_Create_OrganizationUnit()
         {
             //Arrange
@@ -229,6 +259,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var result = await OrganizationUnitV2Helper.CreateUnitAsync(organization.Uuid, request);
 
             Assert.Equal(request.Name, result.Name);
+            Assert.NotNull(result.ParentOrganizationUnit);
             Assert.Equal(parentUnit.Name, result.ParentOrganizationUnit.Name);
             Assert.Equal(parentUnit.Uuid, result.ParentOrganizationUnit.Uuid);
             Assert.Equal(parentUnit.Origin, result.Origin);
@@ -269,6 +300,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             //Assert
             Assert.Equal(patchRequest.Name, result.Name);
             Assert.Equal(patchRequest.Origin, result.Origin);
+            Assert.NotNull(result.ParentOrganizationUnit);
             Assert.Equal(patchRequest.ParentUuid, result.ParentOrganizationUnit.Uuid);
             Assert.Equal(patchRequest.LocalId, result.UnitId);
         }
@@ -378,7 +410,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var user1 = await CreateUser(organization.Uuid);
             var user2 = await CreateUser(organization.Uuid);
             var userUuids = new List<Guid> { user1.Uuid, user2.Uuid };
-            var orgUnitRoles = await GetOrganizationUnitRoleTypesAsync(organization.Uuid);
+            var orgUnitRoles = (await GetOrganizationUnitRoleTypesAsync(organization.Uuid)).ToList();
             var role1 = orgUnitRoles.First();
             var role2 = orgUnitRoles.Last();
             var assignment1 = new BulkRoleAssignmentRequestDTO { RoleUuid = role1.Uuid, UserUuids = userUuids };
@@ -411,14 +443,14 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         private async Task<User> CreateUser(Guid organizationUuid)
         {
             var userResponse = await CreateUserAsync(organizationUuid);
-            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userResponse.Uuid));
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userResponse.Uuid)!);
             return user;
         }
 
         private async Task<(User user, string token)> CreateApiUser(ShallowOrganizationResponseDTO organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Uuid, true, false);
-            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userAndGetToken.userUuid));
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userAndGetToken.userUuid)!);
             return (user, userAndGetToken.token);
         }
 
@@ -438,18 +470,33 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             return $"{nameof(OrganizationUnitsApiV2Test)}æøå{A<Guid>():N}";
         }
 
-        private static void AssertCreatedOrganizationUnit(IEnumerable<OrganizationUnitResponseDTO> allUnits, OrganizationUnitResponseDTO expectedUnit, (Guid Uuid, string Name) expectedRoot, params TaskRef[] kle)
+        private static void AssertCreatedOrganizationUnit(IEnumerable<ExternalOrganizationUnitResponseDTO> allUnits, OrganizationUnitResponseDTO expectedUnit, (Guid Uuid, string Name) expectedRoot, params TaskRef[] kle)
         {
-            var dto = Assert.Single(allUnits.Where(x => x.Uuid == expectedUnit.Uuid));
+            var dto = Assert.Single(allUnits, x => x.Uuid == expectedUnit.Uuid);
             AssertCreatedOrganizationUnit(dto, expectedUnit, expectedRoot);
         }
 
-        private static void AssertCreatedOrganizationUnit(OrganizationUnitResponseDTO dto, OrganizationUnitResponseDTO expectedUnit, (Guid Uuid, string Name) expectedRoot)
+        private static void AssertCreatedOrganizationUnit(ExternalOrganizationUnitResponseDTO dto, OrganizationUnitResponseDTO expectedUnit, (Guid Uuid, string Name) expectedRoot)
         {
             Assert.Equal(expectedRoot.Uuid, dto.ParentOrganizationUnit?.Uuid);
             Assert.Equal(expectedRoot.Name, dto.ParentOrganizationUnit?.Name);
             Assert.Equal(expectedUnit.Ean, dto.Ean);
             Assert.Equal(expectedUnit.UnitId, dto.UnitId);
+        }
+
+        private static void AssertCreatedOrganizationUnit(IEnumerable<ExternalOrganizationUnitResponseDTO> allUnits, ExternalOrganizationUnitResponseDTO expectedUnit, (Guid Uuid, string Name) expectedRoot, params TaskRef[] kle)
+        {
+            var dto = Assert.Single(allUnits, x => x.Uuid == expectedUnit.Uuid);
+            AssertCreatedOrganizationUnit(dto, expectedUnit, expectedRoot);
+        }
+
+        private static void AssertCreatedOrganizationUnit(ExternalOrganizationUnitResponseDTO dto, ExternalOrganizationUnitResponseDTO expectedUnit, (Guid Uuid, string Name) expectedRoot)
+        {
+            Assert.Equal(expectedRoot.Uuid, dto.ParentOrganizationUnit?.Uuid);
+            Assert.Equal(expectedRoot.Name, dto.ParentOrganizationUnit?.Name);
+            Assert.Equal(expectedUnit.Ean, dto.Ean);
+            Assert.Equal(expectedUnit.UnitId, dto.UnitId);
+            Assert.Equal(expectedUnit.ExternalOriginUuid, dto.ExternalOriginUuid);
         }
     }
 }

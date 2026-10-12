@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
+using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Core.DomainModel;
 using Infrastructure.DataAccess;
 
@@ -16,7 +17,9 @@ namespace Tools.Test.Database.Model.Tasks
             foreach (var optionType in optionTypes)
             {
                 Console.Out.WriteLine("Enabling all options of type:" + optionType.Name);
-                var dbSet = context.Set(optionType).ToListAsync().GetAwaiter().GetResult();
+                var setMethod = typeof(DbContext).GetMethod(nameof(DbContext.Set), Array.Empty<Type>())!;
+                var typedDbSet = setMethod.MakeGenericMethod(optionType).Invoke(context, null)!;
+                var dbSet = ((IQueryable)typedDbSet).Cast<object>().ToList();
                 EnableAllLocalOptions(dbSet);
                 context.SaveChanges();
             }

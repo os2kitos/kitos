@@ -13,7 +13,7 @@ namespace Presentation.Web.Infrastructure.Attributes
             _maxLength = maxLength;
         }
 
-        public override bool IsValid(object value)
+        public override bool IsValid(object? value)
         {
             //If nullable and it is null, bypass the value check
             if (value is null)

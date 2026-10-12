@@ -37,7 +37,7 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// <summary>
         /// Archiving notes
         /// </summary>
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         /// <summary>
         /// Determines the frequency of the archiving activity
         /// </summary>

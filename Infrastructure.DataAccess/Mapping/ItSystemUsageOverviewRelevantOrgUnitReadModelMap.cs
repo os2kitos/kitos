@@ -1,29 +1,30 @@
-﻿using Core.DomainModel.ItSystemUsage.Read;
-using System.Data.Entity.ModelConfiguration;
+using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemUsageOverviewRelevantOrgUnitReadModelMap: EntityTypeConfiguration<ItSystemUsageOverviewRelevantOrgUnitReadModel>
+    public class ItSystemUsageOverviewRelevantOrgUnitReadModelMap : IEntityTypeConfiguration<ItSystemUsageOverviewRelevantOrgUnitReadModel>
     {
-        public ItSystemUsageOverviewRelevantOrgUnitReadModelMap()
+        public void Configure(EntityTypeBuilder<ItSystemUsageOverviewRelevantOrgUnitReadModel> builder)
         {
-            HasKey(x => x.Id);
-            HasRequired(x => x.Parent)
+            builder.HasKey(x => x.Id);
+
+            builder.HasOne(x => x.Parent)
                 .WithMany(x => x.RelevantOrganizationUnits)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(true);
-            Property(x => x.OrganizationUnitName)
                 .IsRequired()
-                .HasMaxLength(OrganizationUnit.MaxNameLength)
-                .HasIndexAnnotation("IX_Name");
-            Property(x => x.OrganizationUnitId)
-                .IsRequired()
-                .HasIndexAnnotation("IX_OrgUnitId");
+                .OnDelete(DeleteBehavior.Cascade);
 
-            Property(x => x.OrganizationUnitUuid)
-                .IsRequired()
-                .HasIndexAnnotation("IX_OrgUnitUuid");
+            builder.Property(x => x.OrganizationUnitName).IsRequired().HasMaxLength(OrganizationUnit.MaxNameLength);
+            builder.HasIndex(x => x.OrganizationUnitName).HasDatabaseName("IX_Name");
+
+            builder.Property(x => x.OrganizationUnitId).IsRequired();
+            builder.HasIndex(x => x.OrganizationUnitId).HasDatabaseName("IX_OrgUnitId");
+
+            builder.Property(x => x.OrganizationUnitUuid).IsRequired();
+            builder.HasIndex(x => x.OrganizationUnitUuid).HasDatabaseName("IX_OrgUnitUuid");
         }
     }
 }

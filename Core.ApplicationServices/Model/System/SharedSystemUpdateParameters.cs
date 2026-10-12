@@ -3,6 +3,7 @@ using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.Shared;
 using System.Collections.Generic;
 using System;
+using Core.DomainModel.ItSystem;
 
 namespace Core.ApplicationServices.Model.System
 {

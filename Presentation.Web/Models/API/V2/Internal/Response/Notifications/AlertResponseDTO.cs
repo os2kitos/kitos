@@ -12,11 +12,11 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
         [Required]
         public Guid EntityUuid { get; set; }
 
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         public AlertType AlertType { get; set; }
         
-        public string Message { get; set; }
+        public required string Message { get; set; }
 
         public DateTime? Created { get; set; }
     }

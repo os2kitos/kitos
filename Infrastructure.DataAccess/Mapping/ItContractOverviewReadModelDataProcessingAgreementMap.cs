@@ -1,19 +1,20 @@
-﻿using Core.DomainModel.ItContract.Read;
-using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract.Read;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItContractOverviewReadModelDataProcessingAgreementMap : EntityTypeConfiguration<ItContractOverviewReadModelDataProcessingAgreement>
+    public class ItContractOverviewReadModelDataProcessingAgreementMap : IEntityTypeConfiguration<ItContractOverviewReadModelDataProcessingAgreement>
     {
-        public ItContractOverviewReadModelDataProcessingAgreementMap()
+        public void Configure(EntityTypeBuilder<ItContractOverviewReadModelDataProcessingAgreement> builder)
         {
-            HasKey(x => x.Id);
-            Property(x => x.DataProcessingRegistrationName)
-                .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)
-                .HasIndexAnnotation("IX_ItContract_Read_Dpr_Name");
-            Property(x => x.DataProcessingRegistrationUuid)
-                .HasIndexAnnotation("IX_ItContract_Read_Dpr_Uuid");
+            builder.HasKey(x => x.Id);
+
+            builder.Property(x => x.DataProcessingRegistrationName).HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength);
+            builder.HasIndex(x => x.DataProcessingRegistrationName).HasDatabaseName("IX_ItContract_Read_Dpr_Name");
+
+            builder.HasIndex(x => x.DataProcessingRegistrationUuid).HasDatabaseName("IX_ItContract_Read_Dpr_Uuid");
         }
     }
 }

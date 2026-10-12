@@ -1,52 +1,47 @@
-﻿using Swashbuckle.Swagger;
-using System.Collections.Generic;
-using System.Web.Http.Description;
 using System;
 using System.Linq;
+using Microsoft.OpenApi;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Presentation.Web.Swagger
 {
     public class RemoveUnneededMutatingCallsFilter : IDocumentFilter
     {
-        private readonly Predicate<SwaggerDocument> _applyTo;
+        private readonly Predicate<OpenApiDocument> _applyTo;
 
-        public RemoveUnneededMutatingCallsFilter(Predicate<SwaggerDocument> applyTo)
+        public RemoveUnneededMutatingCallsFilter(Predicate<OpenApiDocument> applyTo)
         {
             _applyTo = applyTo;
         }
 
-        public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
+        public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
-            if (_applyTo(swaggerDoc))
+            if (!_applyTo(swaggerDoc)) return;
+
+            foreach (var path in swaggerDoc.Paths.ToList())
             {
-                foreach (var swaggerDocPath in swaggerDoc.paths.ToList())
-                {
-                    if (IsExternalEndpointDocs(swaggerDocPath.Key))
-                        continue;
-                    if (IsNeeded(swaggerDocPath.Key))
-                        continue;
-                    NukeWriteOperationDocs(swaggerDocPath);
-                }
+                if (IsExternalEndpointDocs(path.Key) || IsNeeded(path.Key))
+                    continue;
+                NukeWriteOperationDocs(path.Value);
             }
         }
 
-        private static bool IsNeeded(string path)
-        {
-            return path.ToLowerInvariant().Contains(@"api/authorize") || path.ToLowerInvariant().Contains(@"api/passwordresetrequest");
-        }
+        private static bool IsNeeded(string path) =>
+            path.ToLowerInvariant().Contains("api/authorize") ||
+            path.ToLowerInvariant().Contains("api/passwordresetrequest");
 
-        private static bool IsExternalEndpointDocs(string path)
-        {
-            return path.Contains(@"/api/v2");
-        }
+        private static bool IsExternalEndpointDocs(string path) =>
+            path.Contains("/api/v2");
 
-        private static void NukeWriteOperationDocs(KeyValuePair<string, PathItem> swaggerDocPath)
+        private static void NukeWriteOperationDocs(IOpenApiPathItem pathItem)
         {
-            var pathItem = swaggerDocPath.Value;
-            pathItem.delete = null;
-            pathItem.post = null;
-            pathItem.patch = null;
-            pathItem.put = null;
+            if (pathItem.Operations == null)
+                return;
+
+            pathItem.Operations.Remove(System.Net.Http.HttpMethod.Delete);
+            pathItem.Operations.Remove(System.Net.Http.HttpMethod.Post);
+            pathItem.Operations.Remove(System.Net.Http.HttpMethod.Patch);
+            pathItem.Operations.Remove(System.Net.Http.HttpMethod.Put);
         }
     }
 }

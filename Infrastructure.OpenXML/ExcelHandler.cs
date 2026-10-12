@@ -23,16 +23,16 @@ namespace Infrastructure.OpenXML
             var workbookPart = spreadsheetDocument.WorkbookPart;
 
             // open Sheets
-            var sheets = workbookPart.Workbook.GetFirstChild<Sheets>().Elements<Sheet>();
+            var sheets = workbookPart!.Workbook!.GetFirstChild<Sheets>()!.Elements<Sheet>();
 
             foreach (var sheet in sheets)
             {
                 var dataTable = new DataTable { TableName = sheet.Name };
-                var relationshipId = sheet.Id.Value;
-                var worksheetPart = (WorksheetPart)workbookPart.GetPartById(relationshipId);
+                var relationshipId = sheet.Id!.Value;
+                var worksheetPart = (WorksheetPart)workbookPart.GetPartById(relationshipId!);
                 var workSheet = worksheetPart.Worksheet;
-                var sheetData = workSheet.GetFirstChild<SheetData>();
-                var rows = sheetData.Descendants<Row>().ToList();
+                var sheetData = workSheet!.GetFirstChild<SheetData>();
+                var rows = sheetData!.Descendants<Row>().ToList();
                 var numColumns = rows.Max(x => x.Descendants<Cell>().Count());
 
                 for (var i = 0; i < numColumns; i++)
@@ -43,7 +43,7 @@ namespace Infrastructure.OpenXML
                 foreach (var row in rows)
                 {
                     // skip header row
-                    if (row.RowIndex < 2)
+                    if (row.RowIndex! < 2)
                         continue;
 
                     var dataRow = dataTable.NewRow();
@@ -95,7 +95,7 @@ namespace Infrastructure.OpenXML
             var i = 0;
             foreach (var cell in row.Descendants<Cell>())
             {
-                var columnName = GetColumnName(cell.CellReference);
+                var columnName = GetColumnName(cell.CellReference!);
                 // column index is the real index of the cell
                 var columnIndex = ConvertColumnNameToNumber(columnName);
 
@@ -162,11 +162,11 @@ namespace Infrastructure.OpenXML
             return convertedValue;
         }
 
-        private static string GetCellValue(SpreadsheetDocument document, Cell cell)
+        private static string GetCellValue(SpreadsheetDocument document, Cell? cell)
         {
             if (cell == null) return "";
 
-            var stringTablePart = document.WorkbookPart.SharedStringTablePart;
+            var stringTablePart = document.WorkbookPart!.SharedStringTablePart;
             var value = "";
 
             if (cell.CellValue != null)
@@ -174,7 +174,7 @@ namespace Infrastructure.OpenXML
 
             if (cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
             {
-                return stringTablePart.SharedStringTable.ChildElements[Int32.Parse(value)].InnerText;
+                return stringTablePart!.SharedStringTable!.ChildElements[Int32.Parse(value)].InnerText;
             }
             return value;
         }
@@ -190,21 +190,21 @@ namespace Infrastructure.OpenXML
             // loop through data
             foreach (DataTable table in data.Tables)
             {
-                var id = workbookPart.Workbook.Descendants<Sheet>().First(x => x.Name == table.TableName).Id;
-                var workSheetPart = (WorksheetPart)workbookPart.GetPartById(id);
-                var sheetData = workSheetPart.Worksheet.GetFirstChild<SheetData>();
+                var id = workbookPart!.Workbook!.Descendants<Sheet>().First(x => x.Name == table.TableName).Id;
+                var workSheetPart = (WorksheetPart)workbookPart.GetPartById(id!);
+                var sheetData = workSheetPart.Worksheet!.GetFirstChild<SheetData>();
 
                 // append the locked cell format to the stylesheet
                 var stylesPart = workbookPart.GetPartsOfType<WorkbookStylesPart>().FirstOrDefault() ?? workbookPart.AddNewPart<WorkbookStylesPart>();
                 var stylesheet = stylesPart.Stylesheet;
 
-                var fonts = stylesheet.GetFirstChild<Fonts>();
-                fonts.AppendChild(new Font
+                var fonts = stylesheet!.GetFirstChild<Fonts>();
+                fonts!.AppendChild(new Font
                 {
                     Italic = new Italic(),
                     Color = new Color() {Rgb = "FF7F7F7F"}
                 });
-                fonts.Count++;
+                fonts.Count!++;
 
                 // we just appended a lock cell style, ergo it must be the last!
                 var fontId = fonts.Count - 1; // the fonts index starts at 0 so subtract 1
@@ -216,14 +216,14 @@ namespace Infrastructure.OpenXML
                 };
 
                 var cellFormats = stylesheet.GetFirstChild<CellFormats>();
-                cellFormats.AppendChild(lockFormat);
-                cellFormats.Count++;
+                cellFormats!.AppendChild(lockFormat);
+                cellFormats.Count!++;
 
                 // we just appended a lock cell style, ergo it must be the last!
                 var cellLockStyleIndex = cellFormats.Count - 1; // the style index starts at 0 so subtract 1
 
                 // delete all rows except for the header row
-                var headerRow = sheetData.Elements<Row>().FirstOrDefault();
+                var headerRow = sheetData!.Elements<Row>().FirstOrDefault();
                 sheetData.RemoveAllChildren();
                 sheetData.AppendChild(headerRow);
 
@@ -235,7 +235,7 @@ namespace Infrastructure.OpenXML
                     {
                         var newCell = new Cell
                         {
-                            CellValue = new CellValue(row[column].ToString()),
+                            CellValue = new CellValue(row[column].ToString()!),
                             DataType = CellValues.String,
                             StyleIndex = cellLockStyleIndex //locked style
                         };
@@ -248,7 +248,7 @@ namespace Infrastructure.OpenXML
                     sheetData.AppendChild(newRow);
                 }
             }
-            spreadsheetDocument.Close();
+            spreadsheetDocument.Dispose();
 
             return stream;
         }

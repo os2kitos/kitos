@@ -25,7 +25,7 @@ namespace Infrastructure.Services.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://api.kle-online.dk/resources/kle")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://api.kle-online.dk/resources/kle")]
         public string KLEOnlineUrl {
             get {
                 return ((string)(this["KLEOnlineUrl"]));

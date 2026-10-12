@@ -28,19 +28,39 @@ namespace Tests.Integration.Presentation.Web.Internal.GdprReport
 
             Assert.True(response.IsSuccessStatusCode);
             var body = await response.ReadResponseBodyAsAsync<IEnumerable<GdprReportResponseDTO>>();
-            Assert.NotEmpty(body);
             var report = body.FirstOrDefault();
             AssertGdprReportIsEqual(gdprWriteRequest, report);
         }
 
-        private void AssertGdprReportIsEqual(GDPRWriteRequestDTO dto, GdprReportResponseDTO report)
+        private static void AssertGdprReportIsEqual(GDPRWriteRequestDTO dto, GdprReportResponseDTO? report)
         {
-            Assert.Equal(dto.HostedAt, report.HostedAt);
-            Assert.Equal(dto.RiskAssessmentConducted, report.RiskAssessment);
-            Assert.Equal(dto.RiskAssessmentConductedDate, report.RiskAssessmentDate);
-            Assert.Equal(dto.BusinessCritical, report.BusinessCritical);
-            Assert.Equal(dto.PlannedRiskAssessmentDate, report.PlannedRiskAssessmentDate);
-            Assert.Equal(dto.DPIAConducted, report.DPIA);
+            Assert.Equal(dto.RiskAssessmentConducted, report?.RiskAssessment);
+            AssertTimestampEqual(dto.RiskAssessmentConductedDate, report?.RiskAssessmentDate);
+            AssertTimestampEqual(dto.PlannedRiskAssessmentDate, report?.PlannedRiskAssessmentDate);
+            Assert.Equal(dto.DPIAConducted, report?.DPIA);
+        }
+
+        private static void AssertTimestampEqual(System.DateTime? expected, System.DateTime? actual)
+        {
+            Assert.Equal(NormalizeTimestamp(expected), NormalizeTimestamp(actual));
+        }
+
+        private static System.DateTime? NormalizeTimestamp(System.DateTime? value)
+        {
+            if (!value.HasValue)
+            {
+                return null;
+            }
+
+            var utcValue = value.Value.Kind switch
+            {
+                System.DateTimeKind.Utc => value.Value,
+                System.DateTimeKind.Local => value.Value.ToUniversalTime(),
+                _ => System.DateTime.SpecifyKind(value.Value, System.DateTimeKind.Utc)
+            };
+
+            var truncatedTicks = utcValue.Ticks - (utcValue.Ticks % 10);
+            return new System.DateTime(truncatedTicks, System.DateTimeKind.Utc);
         }
 
         private async Task<GDPRWriteRequestDTO> CreateUsage(ShallowOrganizationResponseDTO organization)

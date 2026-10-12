@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -26,12 +27,12 @@ namespace Infrastructure.DataAccess
             return _context.Users.AsQueryable().Where(x => x.IsGlobalAdmin);
         }
 
-        public User GetByEmail(string email)
+        public User? GetByEmail(string email)
         {
             return _context.Users.SingleOrDefault(u => u.Email == email);
         }
 
-        public User GetById(int id)
+        public User? GetById(int id)
         {
             return _context.Users.SingleOrDefault(u => u.Id == id);
         }
@@ -72,6 +73,15 @@ namespace Infrastructure.DataAccess
         public Maybe<User> GetByUuid(Guid uuid)
         {
             return AsQueryable().ByUuid(uuid);
+        }
+
+        public User? GetByIdWithRoles(int id)
+        {
+            return _context.Users
+                .Include(u => u.OrganizationRights)
+                    .ThenInclude(r => r.Organization)
+                    .ThenInclude(o => o.Type)
+                .SingleOrDefault(u => u.Id == id);
         }
     }
 }

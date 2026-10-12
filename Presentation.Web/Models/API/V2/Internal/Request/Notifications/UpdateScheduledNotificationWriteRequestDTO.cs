@@ -10,7 +10,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Request.Notifications
         /// <summary>
         /// Name of the notification (different from the Subject)
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
         /// <summary>
         /// Date on which the notification expires
         /// </summary>
@@ -20,6 +20,6 @@ namespace Presentation.Web.Models.API.V2.Internal.Request.Notifications
         /// Common Notification properties
         /// </summary>
         [Required]
-        public BaseNotificationPropertiesWriteRequestDTO BaseProperties { get; set; }
+        public required BaseNotificationPropertiesWriteRequestDTO BaseProperties { get; set; }
     }
 }

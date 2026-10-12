@@ -5,10 +5,10 @@
         /// <summary>
         /// Name displayed to the user in kitos
         /// </summary>
-        public string Name { get; set; }
+        public string? Name { get; set; }
         /// <summary>
         /// External link
         /// </summary>
-        public string Url { get; set; }
+        public string? Url { get; set; }
     }
 }

@@ -10,6 +10,7 @@ using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
+using Core.DomainModel.SupplierAssociatedFields;
 using Core.DomainModel.Tracking;
 using Core.DomainModel.UIConfiguration;
 
@@ -51,6 +52,7 @@ namespace Core.DomainModel.Organization
             UIModuleCustomizations = new List<UIModuleCustomization>();
             ArchiveSupplierForItSystems = new List<ItSystemUsage.ItSystemUsage>();
             StsOrganizationIdentities = new List<StsOrganizationIdentity>();
+            SupplierAssociatedFieldConfigurations = new List<SupplierAssociatedFieldConfiguration>();
         }
         public string Name { get; set; }
         public string Phone { get; set; }
@@ -58,6 +60,26 @@ namespace Core.DomainModel.Organization
         public string Email { get; set; }
         public int TypeId { get; set; }
         public virtual OrganizationType Type { get; set; }
+
+        public void UpdateOrganizationTypeId(int typeId)
+        {
+            ToggleOffIsSupplierIfNotCompanyType(typeId);
+            TypeId = typeId;
+        }
+
+        public void UpdateOrganizationType(OrganizationType organizationType){
+            ToggleOffIsSupplierIfNotCompanyType(organizationType.Id);
+            Type = organizationType;
+        }
+
+        private void ToggleOffIsSupplierIfNotCompanyType(int typeId)
+        {
+            if (!IsOrganizationSupplierEligible(typeId))
+            {
+                IsSupplier = false;
+            }
+        }
+
         /// <summary>
         /// Cvr number
         /// </summary>
@@ -75,6 +97,7 @@ namespace Core.DomainModel.Organization
 
         public AccessModifier AccessModifier { get; set; }
         public Guid Uuid { get; set; }
+        public bool Disabled { get; set; }
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
 
         public virtual ICollection<LocalOptionEntity<Entity>> OrganizationOptions { get; set; }
@@ -133,6 +156,7 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<ItSystemUsage.ItSystemUsage> ArchiveSupplierForItSystems { get; set; }
         public virtual StsOrganizationConnection StsOrganizationConnection { get; set; }
 
+        public virtual ICollection<SupplierAssociatedFieldConfiguration> SupplierAssociatedFieldConfigurations { get; set; }
 
         /// <summary>
         /// Determines if this is the "Default" organization in KITOS
@@ -140,6 +164,72 @@ namespace Core.DomainModel.Organization
         public bool? IsDefaultOrganization { get; set; }
 
         public virtual ICollection<ItContractOverviewReadModel> ItContractOverviewReadModels { get; set; }
+
+        /// <summary>
+        /// Determines if the Organization of type "Company" is a supplier
+        /// </summary>
+        public bool IsSupplier { get; set; }
+
+        public virtual ICollection<OrganizationSupplier> UsedAsSupplierByOrganizations { get; set; }
+        public virtual ICollection<OrganizationSupplier> Suppliers { get; set; }
+
+        public void ClearUsedAsSupplierByOrganizations()
+        {
+            UsedAsSupplierByOrganizations?.Clear();
+        }
+
+        public void ClearSuppliers()
+        {
+            Suppliers?.Clear();
+        }
+
+        public Result<ISet<SupplierAssociatedFieldConfiguration>, OperationError> UpdateFieldConfigurations(
+            IEnumerable<KeyValuePair<string, FieldControlState>> configurations)
+        {
+            if (configurations == null)
+                return new OperationError($"No field configuration was provided", OperationFailure.BadInput);
+
+            var incomingConfigurations = configurations.ToList();
+            if (incomingConfigurations.Any(x => string.IsNullOrWhiteSpace(x.Key)))
+                return new OperationError("FieldKey is required", OperationFailure.BadInput);
+
+            if (incomingConfigurations.GroupBy(x => x.Key).Any(x => x.Count() > 1))
+                return new OperationError("Duplicate fieldKey values are not allowed", OperationFailure.BadInput);
+
+            var currentConfigurations = SupplierAssociatedFieldConfigurations?.ToList()
+                ?? new List<SupplierAssociatedFieldConfiguration>();
+
+            foreach (var configuration in incomingConfigurations)
+            {
+                var existingConfiguration = GetFieldConfiguration(configuration.Key);
+                if (existingConfiguration.IsNone)
+                {
+                    currentConfigurations.Add(new SupplierAssociatedFieldConfiguration
+                    {
+                        FieldKey = configuration.Key,
+                        ControlState = configuration.Value
+                    });
+                    continue;
+                }
+                var existingConfigurationValue = existingConfiguration.GetValueOrDefault();
+
+                existingConfigurationValue.ControlState = configuration.Value;
+            }
+
+            SupplierAssociatedFieldConfigurations = currentConfigurations;
+            return currentConfigurations.ToHashSet();
+        }
+
+        public Maybe<SupplierAssociatedFieldConfiguration> GetFieldConfiguration(string fieldKey)
+        {
+            var configuration = SupplierAssociatedFieldConfigurations?.FirstOrDefault(c => c.FieldKey == fieldKey);
+            return configuration.FromNullable();
+        }
+
+        public bool HasSuppliers()
+        {
+            return Suppliers is { Count: > 0 };
+        }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently
@@ -555,9 +645,20 @@ namespace Core.DomainModel.Organization
             ForeignCvr = foreignCvr.HasValue ? foreignCvr.Value : null;
         }
 
-        public void UpdateType(int typeId)
+        public Maybe<OperationError> UpdateIsSupplier(bool isSupplier)
         {
-            TypeId = typeId;
+            if (!IsOrganizationSupplierEligible(TypeId) && isSupplier)
+            {
+                return new OperationError(
+                    $"Only organizations of {OrganizationTypeKeys.Virksomhed} or {OrganizationTypeKeys.Interessefællesskab} type can be marked as a supplier", OperationFailure.BadInput);
+            }
+            IsSupplier = isSupplier;
+            return Maybe<OperationError>.None;
+        }
+
+        private bool IsOrganizationSupplierEligible(int typeId)
+        {
+            return (OrganizationTypeKeys)typeId is (OrganizationTypeKeys.Virksomhed or OrganizationTypeKeys.Interessefællesskab);
         }
 
         public void UpdateShowDataProcessing(Maybe<bool> showDataProcessing)
@@ -643,6 +744,35 @@ namespace Core.DomainModel.Organization
                 taskRef.OwnedByOrganizationUnit = newRoot;
             });
             return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> CheckIfAlreadyHasSupplier(Guid supplierUuid)
+        {
+            var existingSupplier = Suppliers?.FirstOrDefault(x => x.Supplier?.Uuid == supplierUuid);
+            if (existingSupplier == null)
+                return Maybe<OperationError>.None;
+
+            return new OperationError($"Organization has the Supplier with uuid: {supplierUuid} already assigned", OperationFailure.BadState);
+        }
+
+        public Maybe<OperationError> CheckCanBeDeleted()
+        {
+            if (IsDefaultOrganization == true)
+            {
+                return new OperationError("Cannot delete default organization", OperationFailure.BadInput);
+            }
+
+            if (Disabled == false)
+            {
+                return new OperationError("Cannot delete an active organization", OperationFailure.BadInput);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void UpdateDisabledStatus(bool disabled)
+        {
+            Disabled = disabled;
         }
     }
 }

@@ -1,25 +1,29 @@
 ﻿using Core.DomainModel.Organization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class StsOrganizationConnectionMap : EntityMap<StsOrganizationConnection>
     {
-        public StsOrganizationConnectionMap()
+        public override void Configure(EntityTypeBuilder<StsOrganizationConnection> builder)
         {
-            HasRequired(x => x.Organization)
-                .WithOptional(x => x.StsOrganizationConnection);
+            base.Configure(builder);
+            base.Configure(builder);
 
-            Property(x => x.Connected)
+            builder.HasOne(x => x.Organization)
+                .WithOne(x => x.StsOrganizationConnection)
+                .HasForeignKey<StsOrganizationConnection>(x => x.OrganizationId)
                 .IsRequired()
-                .HasIndexAnnotation("IX_Connected");
+                .OnDelete(DeleteBehavior.Restrict);
 
-            Property(x => x.SubscribeToUpdates)
-                .IsRequired()
-                .HasIndexAnnotation("IX_Required");
+            builder.Property(x => x.Connected).IsRequired();
+            builder.HasIndex(x => x.Connected).HasDatabaseName("IX_Connected");
 
-            Property(x => x.DateOfLatestCheckBySubscription)
-                .IsOptional()
-                .HasIndexAnnotation("IX_DateOfLatestCheckBySubscription");
+            builder.Property(x => x.SubscribeToUpdates).IsRequired();
+            builder.HasIndex(x => x.SubscribeToUpdates).HasDatabaseName("IX_Required");
+
+            builder.HasIndex(x => x.DateOfLatestCheckBySubscription).HasDatabaseName("IX_DateOfLatestCheckBySubscription");
         }
     }
 }

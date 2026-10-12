@@ -2,8 +2,8 @@
 {
     public class ValueWithOptionalRemarkDTO<T>
     {
-        public T Value { get; set; }
+        public T? Value { get; set; }
 
-        public string Remark { get; set; }
+        public string? Remark { get; set; }
     }
 }

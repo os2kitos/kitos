@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Linq;
-using System.Net.Http;
-using System.Web.Http;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel;
 using Core.DomainServices.Authorization;
-using Ninject;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
@@ -17,24 +17,17 @@ namespace Presentation.Web.Controllers.API.V1
     [Authorize]
     public abstract class BaseApiController : ExtendedApiController
     {
-        [Inject]
-        public IOrganizationalUserContext UserContext { get; set; }
+        protected IOrganizationalUserContext UserContext => HttpContext.RequestServices.GetRequiredService<IOrganizationalUserContext>();
+        protected IAuthorizationContext AuthorizationContext => HttpContext.RequestServices.GetRequiredService<IAuthorizationContext>();
 
-        [Inject]
-        public IAuthorizationContext AuthorizationContext { get; set; }
+        private IControllerAuthorizationStrategy CreateAuthorizationStrategy() =>
+            new ContextBasedAuthorizationStrategy(AuthorizationContext);
 
-        //Lazy to make sure auth service is available when resolved
-        private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
-        private readonly Lazy<IControllerCrudAuthorization> _crudAuthorization;
-
-        protected IControllerAuthorizationStrategy AuthorizationStrategy => _authorizationStrategy.Value;
-
-        protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
+        protected IControllerAuthorizationStrategy AuthorizationStrategy => CreateAuthorizationStrategy();
+        protected IControllerCrudAuthorization CrudAuthorization => GetCrudAuthorization();
 
         protected BaseApiController()
         {
-            _authorizationStrategy = new Lazy<IControllerAuthorizationStrategy>(() => new ContextBasedAuthorizationStrategy(AuthorizationContext));
-            _crudAuthorization = new Lazy<IControllerCrudAuthorization>(GetCrudAuthorization);
         }
 
         protected virtual IControllerCrudAuthorization GetCrudAuthorization()
@@ -57,52 +50,33 @@ namespace Presentation.Web.Controllers.API.V1
             return AuthorizationStrategy.GetOrganizationReadAccessLevel(organizationId);
         }
 
-        protected bool AllowRead(IEntity entity)
-        {
-            return CrudAuthorization.AllowRead(entity);
-        }
-
-        protected bool AllowModify(IEntity entity)
-        {
-            return CrudAuthorization.AllowModify(entity);
-        }
+        protected bool AllowRead(IEntity entity) => CrudAuthorization.AllowRead(entity);
+        protected bool AllowModify(IEntity entity) => CrudAuthorization.AllowModify(entity);
 
         protected virtual bool AllowCreate<T>(int organizationId, IEntity entity)
-        {
-            return CrudAuthorization.AllowCreate<T>(organizationId, entity);
-        }
+            => CrudAuthorization.AllowCreate<T>(organizationId, entity);
 
         protected bool AllowCreate<T>(int organizationId)
-        {
-            return AuthorizationStrategy.AllowCreate<T>(organizationId);
-        }
+            => AuthorizationStrategy.AllowCreate<T>(organizationId);
 
-        protected bool AllowDelete(IEntity entity)
-        {
-            return CrudAuthorization.AllowDelete(entity);
-        }
+        protected bool AllowDelete(IEntity entity) => CrudAuthorization.AllowDelete(entity);
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
-        {
-            return AuthorizationStrategy.HasPermission(new VisibilityControlPermission(entity));
-        }
+            => AuthorizationStrategy.HasPermission(new VisibilityControlPermission(entity));
 
-        protected virtual IEntity GetEntity(int id) => throw new NotSupportedException("This endpoint does not support access rights");
+        protected virtual IEntity GetEntity(int id) =>
+            throw new NotSupportedException("This endpoint does not support access rights");
 
-        protected virtual bool AllowCreateNewEntity(int organizationId) => throw new NotSupportedException("This endpoint does not support generic creation rights");
+        protected virtual bool AllowCreateNewEntity(int organizationId) =>
+            throw new NotSupportedException("This endpoint does not support generic creation rights");
 
         [HttpGet]
         [InternalApi]
-        /// <summary>
-        /// GET api/T/GetAccessRights
-        /// Checks what access rights the user has for the given entities
-        /// </summary>
-        public virtual HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights, int organizationId)
+        public virtual IActionResult GetAccessRights(bool? getEntitiesAccessRights, int organizationId)
         {
             if (GetOrganizationReadAccessLevel(organizationId) == OrganizationDataReadAccessLevel.None)
-            {
                 return Forbidden();
-            }
+
             return Ok(new EntitiesAccessRightsDTO
             {
                 CanCreate = AllowCreateNewEntity(organizationId),
@@ -112,22 +86,16 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpGet]
         [InternalApi]
-        /// <summary>
-        /// GET api/T/id?GetAccessRightsForEntity
-        /// Checks what access rights the user has for the given entity
-        /// </summary>
-        /// <param name="id">The id of the object</param>
-        public virtual HttpResponseMessage GetAccessRightsForEntity(int id, bool? getEntityAccessRights)
+        public virtual IActionResult GetAccessRightsForEntity(int id, bool? getEntityAccessRights)
         {
             var item = GetEntity(id);
             if (item == null)
-            {
                 return NotFound();
-            }
-            return Ok(GetAccessRightsForEntity(item));
+
+            return Ok(GetAccessRightsForEntityItem(item));
         }
 
-        private EntityAccessRightsDTO GetAccessRightsForEntity(IEntity item)
+        private EntityAccessRightsDTO GetAccessRightsForEntityItem(IEntity item)
         {
             return new EntityAccessRightsDTO
             {
@@ -140,25 +108,17 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpPost]
         [InternalApi]
-        /// <summary>
-        /// POST api/T/idListAsCsv?getEntityListAccessRights
-        /// Uses POST verb to allow use of body for potentially long list of ids
-        /// Checks what access rights the user has for the given entities identified by the <see cref=""/> list
-        /// </summary>
-        /// <param name="ids">The ids of the objects</param>
-        public virtual HttpResponseMessage PostSearchAccessRightsForEntityList([FromBody] int[] ids, bool? getEntityListAccessRights)
+        public virtual IActionResult PostSearchAccessRightsForEntityList([FromBody] int[] ids, bool? getEntityListAccessRights)
         {
             if (ids == null || ids.Length == 0)
-            {
                 return BadRequest();
-            }
 
             return Ok(
                 ids
                     .Distinct()
                     .Select(GetEntity)
                     .Where(entity => entity != null)
-                    .Select(GetAccessRightsForEntity)
+                    .Select(GetAccessRightsForEntityItem)
                     .ToList()
             );
         }

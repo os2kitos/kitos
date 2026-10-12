@@ -138,7 +138,11 @@ namespace Core.ApplicationServices.RightsHolders
                     _logger.Information("User {userId} deactivated It-Interface with uuid: {uuid} due to reason: {reason}", _userContext.UserId, interfaceUuid, reason);
                     transaction.Commit();
 
-                    var currentUserEmail = _userRepository.GetById(_userContext.UserId).Email;
+                    var user = _userRepository.GetById(_userContext.UserId);
+                    if(user == null)
+                        return new OperationError($"User with id {_userContext.UserId} not found", OperationFailure.NotFound);
+
+                    var currentUserEmail = user.Email;
                     var deactivatedItInterface = result.Value;
                     const string subject = "Snitflade blev deaktiveret af rettighedshaver";
                     var content =

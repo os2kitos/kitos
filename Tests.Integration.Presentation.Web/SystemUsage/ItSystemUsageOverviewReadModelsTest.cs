@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -72,9 +72,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var system2 = await CreateItSystemAsync(organizationUuid, name: name2);
             var system3 = await CreateItSystemAsync(organizationUuid, name: name3);
 
+            var before = DateTime.UtcNow;
             await TakeSystemIntoUsageAsync(system1.Uuid, organizationUuid);
             await TakeSystemIntoUsageAsync(system2.Uuid, organizationUuid);
             await TakeSystemIntoUsageAsync(system3.Uuid, organizationUuid);
+            await WaitForReadModelQueueDepletion(before);
 
 
             //Act
@@ -113,19 +115,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemUsageExpirationDate = DateTime.UtcNow.AddDays(A<int>());
             var archiveDuty = A<ArchiveDutyChoice>();
 
-            var riskAssessment = A<YesNoDontKnowChoice>();
-            var riskAssessmentDate = A<DateTime?>();
-            var riskSupervisionDocumentationUrl = A<string>();
-            var riskSupervisionDocumentationUrlName = A<string>();
-            if (riskAssessment != YesNoDontKnowChoice.Yes)
-            {
-                riskAssessmentDate = null;
-                riskSupervisionDocumentationUrl = null;
-                riskSupervisionDocumentationUrlName = null;
-            }
+            var riskAssessment = A<YesNoDontKnowIrrelevantChoice>();
+            var hasRiskAssessment = riskAssessment == YesNoDontKnowIrrelevantChoice.Yes;
+            var riskAssessmentDate = hasRiskAssessment ? A<DateTime?>(): null;
+            var riskAssessmentResult = hasRiskAssessment ? A<RiskLevel?>() : null;
+            var riskSupervisionDocumentationUrl = hasRiskAssessment ? A<string>(): null;
+            var riskSupervisionDocumentationUrlName = hasRiskAssessment ? A<string>(): null;
+
             var linkToDirectoryUrl = A<string>();
             var linkToDirectoryUrlName = A<string>();
             var generalPurpose = A<string>();
+            var processingPurpose = A<string>();
             var hostedAt = A<HostedAt>();
             var userCount = A<UserCount>();
 
@@ -141,6 +141,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemUsage = await TakeSystemIntoUsageAsync(system.Uuid, organizationUuid);
 
             // Role assignment
+            var before = DateTime.UtcNow;
             var role = await OptionV2ApiHelper.GetRandomOptionAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageRoles,
                 organizationUuid);
             var availableUsers = await OrganizationV2Helper.GetUsersInOrganization(organizationUuid);
@@ -151,18 +152,22 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var businessType = await OptionV2ApiHelper.GetRandomOptionAsync(OptionV2ApiHelper.ResourceName.BusinessType, organizationUuid);
 
             var refs = await KleOptionV2Helper.GetKleNumbersAsync(await GetGlobalToken());
-            var taskRef = refs.Payload.RandomItem();
+            // Pick a KLE item that has a non-null description so the CSV assertion is deterministic.
+            // Some KLE entries in the database have null descriptions; using one of those would cause
+            // the assertion to compare null == null, which is trivially true and doesn't verify propagation.
+            var taskRef = refs.Payload.First(r => r.Description != null);
             var sensitiveDataLevel = A<DataSensitivityLevelChoice>();
 
             // System changes
             var systemChanges = new KeyValuePair<string, object>[] {
-                new KeyValuePair<string, object>(nameof(UpdateItSystemRequestDTO.Deactivated), systemDisabled),
-                new KeyValuePair<string, object>(nameof(UpdateItSystemRequestDTO.ParentUuid), systemParent.Uuid),
-                new KeyValuePair<string, object>(nameof(UpdateItSystemRequestDTO.RightsHolderUuid), organizationUuid),
-                new KeyValuePair<string, object>(nameof(UpdateItSystemRequestDTO.BusinessTypeUuid), businessType.Uuid),
-                new KeyValuePair<string, object>(nameof(UpdateItSystemRequestDTO.KLEUuids), taskRef.Uuid.WrapAsEnumerable())
+                new(nameof(UpdateItSystemRequestDTO.Deactivated), systemDisabled),
+                new(nameof(UpdateItSystemRequestDTO.ParentUuid), systemParent.Uuid),
+                new(nameof(UpdateItSystemRequestDTO.RightsHolderUuid), organizationUuid),
+                new(nameof(UpdateItSystemRequestDTO.BusinessTypeUuid), businessType.Uuid),
+                new(nameof(UpdateItSystemRequestDTO.KLEUuids), taskRef.Uuid.WrapAsEnumerable())
             };
             await ItSystemV2Helper.PatchSystemAsync(await GetGlobalToken(), system.Uuid, systemChanges);
+            var newRightsHolder = await OrganizationV2Helper.GetOrganizationAsync(await GetGlobalToken(), organizationUuid);
 
             // Parent system 
             await ItSystemV2Helper.PatchSystemAsync(await GetGlobalToken(), systemParent.Uuid, new KeyValuePair<string, object>(nameof(UpdateItSystemRequestDTO.Deactivated), systemParentDisabled));
@@ -170,15 +175,18 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var dataClassification = await
                 OptionV2ApiHelper.GetRandomOptionAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageDataClassification,
                     organizationUuid);
+            var criticalityLevel = await
+                OptionV2ApiHelper.GetRandomOptionAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageCriticalityTypes,
+                    organizationUuid);
 
             await ItSystemUsageV2Helper.SendPatchGDPR(await GetGlobalToken(), systemUsage.Uuid, new GDPRWriteRequestDTO
             {
-                Purpose = generalPurpose,
+                ProcessingPurpose = processingPurpose,
                 DirectoryDocumentation = new SimpleLinkDTO { Name = linkToDirectoryUrlName, Url = linkToDirectoryUrl },
                 UserSupervisionDocumentation = new SimpleLinkDTO { Name = riskSupervisionDocumentationUrlName, Url = riskSupervisionDocumentationUrl },
                 RiskAssessmentConducted = riskAssessment,
                 PlannedRiskAssessmentDate = riskAssessmentDate,
-                DataSensitivityLevels = sensitiveDataLevel.WrapAsEnumerable()
+                DataSensitivityLevels = sensitiveDataLevel.WrapAsEnumerable(),
 
             }).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
@@ -233,6 +241,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                     },
                     NumberOfExpectedUsers = UserIntervalDtoFromUerCount(userCount),
                     DataClassificationUuid = dataClassification.Uuid,
+                    SystemUsageCriticalityLevelUuid = criticalityLevel.Uuid,
+                    Purpose = generalPurpose,
                 }).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             // ArchivePeriods
@@ -257,7 +267,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var outgoingRelationSystemName = A<string>();
             var incomingRelationSystemName = A<string>();
             var relationInterfaceName = A<string>();
-            var relationInterfaceId = A<string>();
 
             var incomingRelationSystem = await CreateItSystemAsync(organizationUuid, name: incomingRelationSystemName);
             var incomingRelationSystemUsage = await TakeSystemIntoUsageAsync(incomingRelationSystem.Uuid, organizationUuid);
@@ -269,7 +278,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             {
                 OrganizationUuid = organizationUuid,
                 Name = relationInterfaceName,
-                ExposedBySystemUuid = outGoingRelationSystem.Uuid
+                ExposedBySystemUuid = outGoingRelationSystem.Uuid,
+                Description = A<string>(),
+                UrlReference = A<string>()
             });
 
             await ItSystemUsageV2Helper.PostRelationAsync(await GetGlobalToken(), incomingRelationSystemUsage.Uuid, new SystemRelationWriteRequestDTO
@@ -285,7 +296,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 });
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before);
             Console.Out.WriteLine("Read models are up to date");
 
             //Get current system usage
@@ -303,6 +314,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(organizationId, readModel.OrganizationId);
             Assert.Equal(systemUsageVersion, readModel.Version);
             Assert.Equal(systemUsageLocalCallName, readModel.LocalCallName);
+            Assert.NotNull(updatedSystemUsage.CreatedBy);
+            Assert.NotNull(updatedSystemUsage.LastModifiedBy);
             Assert.Equal(updatedSystemUsage.CreatedBy.Name, readModel.ObjectOwnerName);
             Assert.Equal(updatedSystemUsage.LastModifiedBy.Name, readModel.LastChangedByName);
             Assert.Equal(concluded.Date, readModel.Concluded?.Date);
@@ -316,20 +329,26 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(linkToDirectoryUrlName, readModel.LinkToDirectoryName);
             Assert.Equal(linkToDirectoryUrl, readModel.LinkToDirectoryUrl);
             Assert.Equal(generalPurpose, readModel.GeneralPurpose);
+            Assert.Equal(processingPurpose, readModel.ProcessingPurpose);
             Assert.Equal(hostedAt, readModel.HostedAt);
             Assert.Equal(userCount, readModel.UserCount);
+            Assert.Equal(criticalityLevel.Uuid, readModel.SystemUsageCriticalityLevelUuid);
+            Assert.Equal(criticalityLevel.Name, readModel.SystemUsageCriticalityLevelName);
+            Assert.Equal(riskAssessment.FromChoice(), readModel.RiskAssessmentConducted);
 
-            if (riskAssessment == YesNoDontKnowChoice.Yes)
+            if (riskAssessment == YesNoDontKnowIrrelevantChoice.Yes)
             {
                 Assert.Equal(riskSupervisionDocumentationUrlName, readModel.RiskSupervisionDocumentationName);
                 Assert.Equal(riskSupervisionDocumentationUrl, readModel.RiskSupervisionDocumentationUrl);
                 Assert.Equal(riskAssessmentDate, readModel.RiskAssessmentDate);
+                Assert.Equal(riskAssessmentResult, readModel.RiskAssessmentResult);
             }
             else
             {
                 Assert.Null(readModel.RiskSupervisionDocumentationName);
                 Assert.Null(readModel.RiskSupervisionDocumentationUrl);
                 Assert.Null(readModel.RiskAssessmentDate);
+                Assert.Null(readModel.RiskAssessmentResult);
             }
 
             // Sensitive Data Level
@@ -348,7 +367,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(dataClassification.Uuid, readModel.ItSystemCategoriesUuid);
             Assert.Equal(dataClassification.Name, readModel.ItSystemCategoriesName);
             Assert.Equal(organizationId, readModel.ItSystemRightsHolderId);
-            Assert.Equal(organizationName, readModel.ItSystemRightsHolderName);
+            Assert.Equal(newRightsHolder.Name, readModel.ItSystemRightsHolderName);
+           Assert.Equal(newRightsHolder.Cvr, readModel.ItSystemRightsHolderCvr);
             Assert.Equal(taskRef.Description, readModel.ItSystemKLENamesAsCsv);
             var readTaskRef = Assert.Single(readModel.ItSystemTaskRefs);
             Assert.Equal(taskRef.KleNumber, readTaskRef.KLEId);
@@ -383,8 +403,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // Main Contract
             Assert.Equal(contract1.Uuid, DatabaseAccess.GetEntityUuid<ItContract>(readModel.MainContractId ?? 0)); //also MainContractUuid
             Assert.Equal(organizationId, readModel.MainContractSupplierId);
-            Assert.Equal(organizationName, readModel.MainContractSupplierName);
-            Assert.True(readModel.MainContractIsActive);
+            Assert.Equal(newRightsHolder.Name, readModel.MainContractSupplierName);
+            Assert.Equal(MainContractState.Active, readModel.MainContractIsActive);
 
             // Associated contracts
             var expectedContracts = new[] { contract1, contract2 }.ToList();
@@ -434,10 +454,11 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var organizationUuid = DatabaseAccess.GetEntityUuid<Organization>(organizationId);
 
             var system = await CreateItSystemAsync(organizationUuid, name: systemName);
+            var before = DateTime.UtcNow;
             await TakeSystemIntoUsageAsync(system.Uuid, organizationUuid);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before);
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
@@ -463,17 +484,19 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var system = await CreateItSystemAsync(organizationUuid, name: systemName);
             var systemParent = await CreateItSystemAsync(organizationUuid, name: systemParentName);
             await ItSystemV2Helper.PatchSystemAsync(await GetGlobalToken(), system.Uuid, new KeyValuePair<string, object>(nameof(UpdateItSystemRequestDTO.ParentUuid), systemParent.Uuid));
+            var before1 = DateTime.UtcNow;
             await TakeSystemIntoUsageAsync(system.Uuid, organizationUuid);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before1);
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
+            var before2 = DateTime.UtcNow;
             await ItSystemV2Helper.SendPatchSystemNameAsync(await GetGlobalToken(), systemParent.Uuid,
                 newSystemParentName).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before2);
             Console.Out.WriteLine("Read models are up to date");
             var readModels = (await ItSystemUsageV2Helper.QueryReadModelByNameContent(organizationUuid, systemName, 1, 0)).ToList();
 
@@ -508,10 +531,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 }).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            var before1 = DateTime.UtcNow;
+            await WaitForReadModelQueueDepletion(before1);
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
+            var before2 = DateTime.UtcNow;
             await ItSystemUsageV2Helper.SendPatchOrganizationalUsage(await GetGlobalToken(), systemUsage.Uuid,
                 new OrganizationUsageWriteRequestDTO
                 {
@@ -519,7 +544,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                     ResponsibleOrganizationUnitUuid = organizationUnit2.Uuid
                 }).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before2);
             Console.Out.WriteLine("Read models are up to date");
             var readModels = (await ItSystemUsageV2Helper.QueryReadModelByNameContent(organizationUuid, systemName, 1, 0)).ToList();
 
@@ -545,17 +570,19 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             var organization1 = await CreateOrganizationAsync(organizationName1);
 
+            var before1 = DateTime.UtcNow;
             await ItSystemV2Helper.SendPatchRightsHolderAsync(await GetGlobalToken(), system.Uuid, organization1.Uuid).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before1);
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
+            var before2 = DateTime.UtcNow;
             await OrganizationInternalV2Helper.PatchOrganization(organization1.Uuid,
                 new OrganizationUpdateRequestDTO { Name = organizationName2, Type = OrganizationType.Municipality }).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before2);
             Console.Out.WriteLine("Read models are up to date");
             var readModels = (await ItSystemUsageV2Helper.QueryReadModelByNameContent(organizationUuid, systemName, 1, 0)).ToList();
 
@@ -564,6 +591,45 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read model found");
 
             Assert.Equal(organizationName2, readModel.ItSystemRightsHolderName);
+        }
+
+        [Fact]
+        public async Task ReadModels_ItSystemRightsHolderCvr_Is_Updated_When_OrganizationCvr_Is_Changed()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var organizationName1 = A<string>();
+            var cvr1 = CreateCvr();
+            var cvr2 = CreateCvr();
+            Assert.NotEqual(cvr1, cvr2);
+            var organizationUuid = DefaultOrgUuid;
+
+            var system = await CreateItSystemAsync(organizationUuid, name: systemName);
+            await TakeSystemIntoUsageAsync(system.Uuid, organizationUuid);
+
+            var organization1 = await CreateOrganizationAsync(organizationName1, cvr1);
+
+            var before1 = DateTime.UtcNow;
+            await ItSystemV2Helper.SendPatchRightsHolderAsync(await GetGlobalToken(), system.Uuid, organization1.Uuid).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion(before1);
+            Console.Out.WriteLine("Read models are up to date");
+
+            //Act 
+            var before2 = DateTime.UtcNow;
+            await OrganizationInternalV2Helper.PatchOrganization(organization1.Uuid,
+                new OrganizationUpdateRequestDTO { Cvr = cvr2, Type = OrganizationType.Municipality }).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion(before2);
+            Console.Out.WriteLine("Read models are up to date");
+            var readModels = (await ItSystemUsageV2Helper.QueryReadModelByNameContent(organizationUuid, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal(cvr2, readModel.ItSystemRightsHolderCvr);
         }
 
         [Fact]
@@ -582,10 +648,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             await ItSystemV2Helper.SendPatchBusinessTypeAsync(await GetGlobalToken(), system.Uuid, businessType.Uuid);
 
             //Wait for read model to rebuild (wait for the LAST mutation)k
-            await WaitForReadModelQueueDepletion();
+            var before1 = DateTime.UtcNow;
+            await WaitForReadModelQueueDepletion(before1);
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
+            var before2 = DateTime.UtcNow;
             await GlobalOptionTypeV2Helper.PatchGlobalOptionType(businessType.Uuid,
                 GlobalOptionTypeV2Helper.BusinessTypes, new GlobalRegularOptionUpdateRequestDTO
                 {
@@ -594,7 +662,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                     IsObligatory = true
                 });
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before2);
             Console.Out.WriteLine("Read models are up to date");
             var readModels = (await ItSystemUsageV2Helper.QueryReadModelByNameContent(organizationUuid, systemName, 1, 0)).ToList();
 
@@ -627,14 +695,16 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 new GeneralDataUpdateRequestDTO { MainContractUuid = contract.Uuid });
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            var before1 = DateTime.UtcNow;
+            await WaitForReadModelQueueDepletion(before1);
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
+            var before2 = DateTime.UtcNow;
             await ItContractV2Helper.DeleteContractAsync(await GetGlobalToken(), contract.Uuid);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before2);
             Console.Out.WriteLine("Read models are up to date");
             var readModels = (await ItSystemUsageV2Helper.QueryReadModelByNameContent(organizationUuid, systemName, 1, 0)).ToList();
 
@@ -646,7 +716,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Null(readModel.MainContractId);
             Assert.Null(readModel.MainContractSupplierId);
             Assert.Null(readModel.MainContractSupplierName);
-            Assert.True(readModel.MainContractIsActive);
+            Assert.Equal(MainContractState.NoContract, readModel.MainContractIsActive);
         }
 
         [Fact]
@@ -667,16 +737,18 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             await DataProcessingRegistrationV2Helper.PatchSystemsAsync(dataProcessingRegistration.Uuid, systemUsage.Uuid.WrapAsEnumerable()).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            var before1 = DateTime.UtcNow;
+            await WaitForReadModelQueueDepletion(before1);
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
+            var before2 = DateTime.UtcNow;
             await DataProcessingRegistrationV2Helper.SendPatchName(await GetGlobalToken(),
                 dataProcessingRegistration.Uuid, newDataProcessingRegistrationName).DisposeAsync();
             await DataProcessingRegistrationV2Helper.PatchIsAgreementConcludedAsync(dataProcessingRegistration.Uuid, yesNoIrrelevantOption);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before2);
             Console.Out.WriteLine("Read models are up to date");
             var readModels = (await ItSystemUsageV2Helper.QueryReadModelByNameContent(organizationUuid, systemName, 1, 0)).ToList();
 
@@ -701,6 +773,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var relationInterfaceName = A<string>();
             var newRelationInterfaceName = A<string>();
             var organizationUuid = DefaultOrgUuid;
+            var before1 = DateTime.UtcNow;
 
             var system = await CreateItSystemAsync(organizationUuid, systemName);
             var systemUsage = await TakeSystemIntoUsageAsync(system.Uuid, organizationUuid);
@@ -721,16 +794,16 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 });
 
 
-            //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before1);
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
+            var before2 = DateTime.UtcNow;
             await InterfaceV2Helper.SendPatchInterfaceAsync(await GetGlobalToken(), relationInterface.Uuid, x => x.Name,
                 newRelationInterfaceName);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before2);
             Console.Out.WriteLine("Read models are up to date");
 
 
@@ -783,15 +856,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            var before1 = DateTime.UtcNow;
+            await WaitForReadModelQueueDepletion(before1);
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
+            var before2 = DateTime.UtcNow;
             await ItSystemUsageV2Helper.SendDeleteRelationAsync(await GetGlobalToken(), systemUsage.Uuid,
                 relation.Uuid);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before2);
             Console.Out.WriteLine("Read models are up to date");
 
             //Assert
@@ -846,10 +921,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            var before1 = DateTime.UtcNow;
+            await WaitForReadModelQueueDepletion(before1);
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
+            var before2 = DateTime.UtcNow;
             await ItSystemUsageV2Helper.PutRelationAsync(await GetGlobalToken(), systemUsage.Uuid,
                 relation.Uuid, new SystemRelationWriteRequestDTO
                 {
@@ -858,7 +935,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 });
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before2);
             Console.Out.WriteLine("Read models are up to date");
 
             //Assert
@@ -923,14 +1000,16 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 });
 
             //Await first update
-            await WaitForReadModelQueueDepletion();
+            var before1 = DateTime.UtcNow;
+            await WaitForReadModelQueueDepletion(before1);
 
             //Act - Second update should blank out the relation fields since the affected usage has been killed
+            var before2 = DateTime.UtcNow;
             using var removeUsage = await ItSystemUsageV2Helper.SendDeleteAsync(await GetGlobalToken(), relationSystemUsage.Uuid);
             Assert.Equal(HttpStatusCode.NoContent, removeUsage.StatusCode);
 
             //Assert
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before2);
             var mainSystemReadModels = (await ItSystemUsageV2Helper.QueryReadModelByNameContent(organizationUuid, systemName, 1, 0)).ToList();
             var mainSystemReadModel = Assert.Single(mainSystemReadModels);
             Console.Out.WriteLine("Read model found");
@@ -964,6 +1043,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 await CreateItSystemAsync(organizationUuid, incomingRelationSystemNameInitial);
             var incomingRelationSystemUsage = await TakeSystemIntoUsageAsync(incomingRelationSystem.Uuid, organizationUuid);
 
+            var before1 = DateTime.UtcNow;
             await ItSystemUsageV2Helper.PostRelationAsync(await GetGlobalToken(), systemUsage.Uuid,
                 new SystemRelationWriteRequestDTO
                 {
@@ -976,23 +1056,25 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 });
 
             //Await first update
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before1);
 
             //Act + assert - Rename the system used in incoming relation and verify that the readmodel is updated
+            var before2 = DateTime.UtcNow;
             using var renameIncomingSystem = await ItSystemV2Helper.SendPatchSystemNameAsync(await GetGlobalToken(),
                 incomingRelationSystem.Uuid, incomingRelationSystemNameChanged);
             Assert.Equal(HttpStatusCode.OK, renameIncomingSystem.StatusCode);
 
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before2);
             var mainSystemReadModels = (await ItSystemUsageV2Helper.QueryReadModelByNameContent(organizationUuid, systemName, 1, 0)).ToList();
             var mainSystemReadModel = Assert.Single(mainSystemReadModels);
             Assert.Equal(incomingRelationSystemNameChanged, mainSystemReadModel.IncomingRelatedItSystemUsagesNamesAsCsv);
 
             //Act + assert - Rename the system used in outgoing relation and verify that the readmodel is updated
+            var before3 = DateTime.UtcNow;
             using var renameOutgoingSystem = await ItSystemV2Helper.SendPatchSystemNameAsync(await GetGlobalToken(),
                 outGoingRelationSystem.Uuid, outgoingRelationSystemNameChanged);
             Assert.Equal(HttpStatusCode.OK, renameOutgoingSystem.StatusCode);
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before3);
 
             mainSystemReadModels = (await ItSystemUsageV2Helper.QueryReadModelByNameContent(organizationUuid, systemName, 1, 0)).ToList();
             mainSystemReadModel = Assert.Single(mainSystemReadModels);
@@ -1006,6 +1088,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var organizationUuid = DefaultOrgUuid;
 
             var systemName = A<string>();
+            var before1 = DateTime.UtcNow;
             var system = await CreateItSystemAsync(organizationUuid, systemName);
             var systemUsage = await TakeSystemIntoUsageAsync(system.Uuid, organizationUuid);
 
@@ -1024,7 +1107,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
 
             //Wait for read model to rebuild (wait for the LAST mutation)
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before1);
             await Console.Out.WriteLineAsync("Read models are up to date");
 
             //Act 
@@ -1038,11 +1121,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             //Act - remove the right using the odata api
             var rightUuid = DatabaseAccess.MapFromEntitySet<ItSystemRight, Guid>(rights => rights.AsQueryable().Single(x => x.ObjectId == readModel.SourceEntityId).Role.Uuid);
+            var before2 = DateTime.UtcNow;
             await LocalOptionTypeV2Helper.DeleteLocalOptionType(organizationUuid, rightUuid, "it-systems-roles",
                 "api/v2/internal/it-systems").WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
-            await WaitForReadModelQueueDepletion();
+            await WaitForReadModelQueueDepletion(before2);
             await Console.Out.WriteLineAsync("Read models are up to date");
 
             readModels = (await ItSystemUsageV2Helper.QueryReadModelByNameContent(organizationUuid, systemName, 1, 0)).ToList();
@@ -1050,9 +1134,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             //Assert.Empty(readModel.RoleAssignments); todo: New endpoints don't seem to have this effect?
         }
 
-        private static async Task WaitForReadModelQueueDepletion()
+        private static async Task WaitForReadModelQueueDepletion(DateTime? createdAfter = null)
         {
-            await ReadModelTestTools.WaitForReadModelQueueDepletion();
+            await ReadModelTestTools.WaitForReadModelQueueDepletion(createdAfter);
         }
 
         private static bool MatchExpectedOrgUnit(ItSystemUsageOverviewRelevantOrgUnitReadModel x, OrganizationUnitResponseDTO organizationUnit1)
@@ -1069,12 +1153,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 OrganizationUuid = organization.Uuid,
                 Name = systemName,
                 PreviousName = systemPreviousName,
-                Description = systemDescription
+                Description = systemDescription,
             });
             return system;
         }
 
-        private static ExpectedUsersIntervalDTO UserIntervalDtoFromUerCount(UserCount count)
+        private static ExpectedUsersIntervalDTO? UserIntervalDtoFromUerCount(UserCount count)
         {
             int lower = 0;
             int? upper = null;
@@ -1085,16 +1169,20 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                     lower = 0;
                     upper = 9;
                     break;
-                case UserCount.TENTOFIFTY:
+                case UserCount.TENTOFORTYNINE:
                     lower = 10;
-                    upper = 50;
+                    upper = 49;
                     break;
-                case UserCount.FIFTYTOHUNDRED:
+                case UserCount.FIFTYTONINETYNINE:
                     lower = 50;
-                    upper = 100;
+                    upper = 99;
                     break;
-                case UserCount.HUNDREDPLUS:
+                case UserCount.HUNDREDTOFOURHUNDREDNINETYNINE:
                     lower = 100;
+                    upper = 499;
+                    break;
+                case UserCount.FIVEHUNDREDPLUS:
+                    lower = 500;
                     break;
                 case UserCount.UNDECIDED:
                     return null;

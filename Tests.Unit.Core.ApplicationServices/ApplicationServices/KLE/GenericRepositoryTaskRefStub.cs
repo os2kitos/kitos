@@ -11,7 +11,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
     {
         private readonly Dictionary<string, TaskRef> _taskRefs = new Dictionary<string, TaskRef>();
 
-        public IEnumerable<TaskRef> Get(Expression<Func<TaskRef, bool>> filter = null, Func<IQueryable<TaskRef>, IOrderedQueryable<TaskRef>> orderBy = null, string includeProperties = "")
+        public IEnumerable<TaskRef> Get(Expression<Func<TaskRef, bool>>? filter = null, Func<IQueryable<TaskRef>, IOrderedQueryable<TaskRef>>? orderBy = null, string includeProperties = "")
         {
             return filter != null ? _taskRefs.Values.Where(filter.Compile()) : _taskRefs.Values;
         }

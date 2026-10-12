@@ -5,8 +5,8 @@ namespace Core.ApplicationServices.Model.Organizations.Write
 {
     public class OrganizationMasterDataUpdateParameters: OrganizationCvrUpdateParameter
     {
-        public OptionalValueChange<Maybe<string>> Phone { get; set; }
-        public OptionalValueChange<Maybe<string>> Address { get; set; }
-        public OptionalValueChange<Maybe<string>> Email { get; set; }
+        public required OptionalValueChange<Maybe<string>> Phone { get; set; }
+        public required OptionalValueChange<Maybe<string>> Address { get; set; }
+        public required OptionalValueChange<Maybe<string>> Email { get; set; }
     }
 }

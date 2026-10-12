@@ -1,78 +1,74 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.GDPR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class DataProcessingRegistrationMap : EntityTypeConfiguration<DataProcessingRegistration>
+    public class DataProcessingRegistrationMap : IEntityTypeConfiguration<DataProcessingRegistration>
     {
-        public DataProcessingRegistrationMap()
+        public void Configure(EntityTypeBuilder<DataProcessingRegistration> builder)
         {
-            //Simple properties
-            Property(x => x.Name)
-                .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)
-                .IsRequired();
+            builder.Property(x => x.Name).HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength).IsRequired();
 
-            HasIndex(x => new { x.OrganizationId, x.Name })
-                .IsUnique(true)
-                .HasName("UX_NameUniqueToOrg");
+            builder.HasIndex(x => new { x.OrganizationId, x.Name }).IsUnique().HasDatabaseName("UX_NameUniqueToOrg");
+            builder.HasIndex(x => x.OrganizationId).HasDatabaseName("IX_OrganizationId");
+            builder.HasIndex(x => x.Name).HasDatabaseName("IX_Name");
 
-            HasIndex(x => x.OrganizationId)
-                .IsUnique(false)
-                .HasName("IX_OrganizationId");
-
-            HasIndex(x => x.Name)
-                .IsUnique(false)
-                .HasName("IX_Name");
-
-            Property(x => x.HasSubDataProcessors).IsOptional();
-
-            //Organization relationship
-            HasRequired(t => t.Organization)
+            builder.HasOne(t => t.Organization)
                 .WithMany(t => t.DataProcessingRegistrations)
                 .HasForeignKey(d => d.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            //External references
-            HasOptional(t => t.Reference);
-            HasMany(t => t.ExternalReferences)
-                .WithOptional(d => d.DataProcessingRegistration)
+            builder.HasMany(t => t.ExternalReferences)
+                .WithOne(d => d.DataProcessingRegistration)
                 .HasForeignKey(d => d.DataProcessingRegistration_Id)
-                .WillCascadeOnDelete(true);
+                .OnDelete(DeleteBehavior.Cascade);
 
-            //It-systems
-            HasMany(x => x.SystemUsages)
-                .WithMany(x => x.AssociatedDataProcessingRegistrations);
+            builder.HasMany(x => x.SystemUsages)
+                .WithMany(x => x.AssociatedDataProcessingRegistrations)
+                .UsingEntity(
+                    l => l.HasOne(typeof(Core.DomainModel.ItSystemUsage.ItSystemUsage)).WithMany().HasForeignKey("ItSystemUsage_Id"),
+                    r => r.HasOne(typeof(DataProcessingRegistration)).WithMany().HasForeignKey("DataProcessingRegistration_Id"),
+                    j => { j.ToTable("DataProcessingRegistrationItSystemUsages"); j.HasKey("DataProcessingRegistration_Id", "ItSystemUsage_Id"); });
 
-            //Data processors
-            HasMany(x => x.DataProcessors)
-                .WithMany(x => x.DataProcessorForDataProcessingRegistrations);
+            builder.HasMany(x => x.DataProcessors)
+                .WithMany(x => x.DataProcessorForDataProcessingRegistrations)
+                .UsingEntity(
+                    l => l.HasOne(typeof(Core.DomainModel.Organization.Organization)).WithMany().HasForeignKey("Organization_Id"),
+                    r => r.HasOne(typeof(DataProcessingRegistration)).WithMany().HasForeignKey("DataProcessingRegistration_Id"),
+                    j => { j.ToTable("DataProcessingRegistrationOrganizations"); j.HasKey("DataProcessingRegistration_Id", "Organization_Id"); });
 
-            //Transfer to insecure countries
-            HasMany(x => x.InsecureCountriesSubjectToDataTransfer)
-                .WithMany(x => x.References);
-            Property(x => x.TransferToInsecureThirdCountries).IsOptional();
+            builder.HasMany(x => x.InsecureCountriesSubjectToDataTransfer)
+                .WithMany(x => x.References)
+                .UsingEntity(
+                    l => l.HasOne(typeof(DataProcessingCountryOption)).WithMany().HasForeignKey("DataProcessingCountryOption_Id"),
+                    r => r.HasOne(typeof(DataProcessingRegistration)).WithMany().HasForeignKey("DataProcessingRegistration_Id"),
+                    j => { j.ToTable("DataProcessingRegistrationDataProcessingCountryOptions"); j.HasKey("DataProcessingRegistration_Id", "DataProcessingCountryOption_Id"); });
 
-            //Basis for transfer
-            HasOptional(x => x.BasisForTransfer)
+            builder.HasOne(x => x.BasisForTransfer)
                 .WithMany(x => x.References)
                 .HasForeignKey(x => x.BasisForTransferId);
 
-            //Data responsible
-            HasOptional(x => x.DataResponsible)
+            builder.HasOne(x => x.DataResponsible)
                 .WithMany(x => x.References)
                 .HasForeignKey(x => x.DataResponsible_Id);
 
-            //Oversight options
-            HasMany(x => x.OversightOptions)
-                .WithMany(x => x.References);
+            builder.HasMany(x => x.OversightOptions)
+                .WithMany(x => x.References)
+                .UsingEntity(
+                    l => l.HasOne(typeof(DataProcessingOversightOption)).WithMany().HasForeignKey("DataProcessingOversightOption_Id"),
+                    r => r.HasOne(typeof(DataProcessingRegistration)).WithMany().HasForeignKey("DataProcessingRegistration_Id"),
+                    j => { j.ToTable("DataProcessingRegistrationDataProcessingOversightOptions"); j.HasKey("DataProcessingRegistration_Id", "DataProcessingOversightOption_Id"); });
 
-            Property(x => x.Uuid)
-                .IsRequired()
-                .HasUniqueIndexAnnotation("UX_DataProcessingRegistration_Uuid", 0);
+            builder.Property(x => x.Uuid).IsRequired();
+            builder.HasIndex(x => x.Uuid).IsUnique().HasDatabaseName("UX_DataProcessingRegistration_Uuid");
 
-            HasOptional(x => x.ResponsibleOrganizationUnit)
+            builder.HasOne(x => x.ResponsibleOrganizationUnit)
                 .WithMany(x => x.ResponsibleForDataProcessingRegistrations)
                 .HasForeignKey(t => t.ResponsibleOrganizationUnitId);
+
+            builder.Property(x => x.EnforceInvalidity).HasColumnType("boolean");
         }
     }
 }

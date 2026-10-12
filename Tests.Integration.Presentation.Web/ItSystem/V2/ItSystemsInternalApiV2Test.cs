@@ -83,6 +83,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             DatabaseAccess.MutateDatabase(db =>
             {
                 var dbSystem = db.ItSystems.AsQueryable().ByUuid(inactive);
+                Assert.NotNull(dbSystem);
                 dbSystem.Disabled = true;
                 db.SaveChanges();
             });
@@ -275,6 +276,24 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Assert
             Assert.Equal(2, dtos.Count);
             Assert.Equal(new[] { system2.Uuid, system3.Uuid }, dtos.Select(x => x.Uuid).ToArray());
+        }
+
+        [Fact]
+        public async Task GET_Many_Internal_As_StakeHolder_With_NameContains_Filter_Is_Case_Insensitive()
+        {
+            //Arrange
+            var (cookie, organization) = await CreateCookieStakeHolderUserInNewOrganizationAsync();
+            await CreateItSystemAsync(organization.Uuid, "Unrelated");
+            var system2 = await CreateItSystemAsync(organization.Uuid, "Ballerup");
+            var system3 = await CreateItSystemAsync(organization.Uuid, "BALLERUP service");
+
+            //Act
+            var dtos = (await ItSystemV2Helper.GetManyInternalAsync(cookie, nameContains: "ballerup", page: 0, pageSize: 10)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            Assert.Contains(dtos, dto => dto.Uuid == system2.Uuid);
+            Assert.Contains(dtos, dto => dto.Uuid == system3.Uuid);
         }
 
         protected async Task<(Cookie cookie, ShallowOrganizationResponseDTO createdOrganization)> CreateCookieStakeHolderUserInNewOrganizationAsync()

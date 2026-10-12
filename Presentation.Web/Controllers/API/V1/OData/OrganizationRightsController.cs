@@ -1,13 +1,15 @@
-﻿using System;
+using System.Linq;
+using System;
 using System.Net;
-using System.Web.Http;
-using Microsoft.AspNet.OData;
-using Microsoft.AspNet.OData.Routing;
 using Core.ApplicationServices.Organizations;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API.V1.OData
@@ -27,8 +29,8 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
         // GET /Organizations(1)/Rights
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/Rights")]
-        public IHttpActionResult GetRights(int orgKey)
+        [HttpGet("odata/Organizations({orgKey})/Rights")]
+        public IActionResult GetRights(int orgKey)
         {
             if (GetOrganizationReadAccessLevel(orgKey) != OrganizationDataReadAccessLevel.All)
             {
@@ -38,12 +40,12 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 .AsQueryable()
                 .ByOrganizationId(orgKey);
 
-            return Ok(result);
+            return Ok(result.ToList());
         }
 
         // POST /Organizations(1)/Rights
-        [ODataRoute("Organizations({orgKey})/Rights")]
-        public IHttpActionResult PostRights(int orgKey, OrganizationRight entity)
+        [HttpPost("odata/Organizations({orgKey})/Rights")]
+        public IActionResult PostRights(int orgKey, [FromBody] OrganizationRight entity)
         {
             if (!ModelState.IsValid)
             {
@@ -62,27 +64,27 @@ namespace Presentation.Web.Controllers.API.V1.OData
             }
             catch (Exception e)
             {
-                Logger.ErrorException("Failed to add right", e);
-                return InternalServerError();
+                return StatusCode(500, e.Message);
             }
         }
 
         /// <summary>
         /// Always Use 405 - POST /Organizations(orgKey)/Rights instead
         /// </summary>
+        /// <param name="organizationId"></param>
         /// <param name="entity"></param>
         /// <returns></returns>
         [NonAction]
-        public override IHttpActionResult Post(int organizationId, OrganizationRight entity) => throw new NotSupportedException();
+        public override IActionResult Post(int organizationId, OrganizationRight entity) => throw new NotSupportedException();
 
         // DELETE /Organizations(1)/Rights(1)
-        [ODataRoute("Organizations({orgKey})/Rights({key})")]
-        public IHttpActionResult DeleteRights(int orgKey, int key)
+        [HttpDelete("odata/Organizations({orgKey})/Rights({key})")]
+        public IActionResult DeleteRights(int orgKey, int key)
         {
             return PerformDelete(key);
         }
 
-        public override IHttpActionResult Delete(int key)
+        public override IActionResult Delete(int key)
         {
             var entity = Repository.GetByKey(key);
 
@@ -91,7 +93,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 PerformDelete(entity.Id);
         }
 
-        private IHttpActionResult PerformDelete(int key)
+        private IActionResult PerformDelete(int key)
         {
             try
             {
@@ -99,18 +101,21 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
                 if (result.Ok)
                 {
-                    return StatusCode(HttpStatusCode.NoContent);
+                    return StatusCode((int)HttpStatusCode.NoContent);
                 }
 
                 return FromOperationFailure(result.Error);
             }
-            catch (Exception e)
+            catch
             {
-                return StatusCode(HttpStatusCode.InternalServerError);
+                return StatusCode((int)HttpStatusCode.InternalServerError);
             }
         }
 
         [NonAction]
-        public override IHttpActionResult Patch(int key, Delta<OrganizationRight> delta) => throw new NotSupportedException();
+        public override IActionResult Patch(int key, Delta<OrganizationRight> delta) => throw new NotSupportedException();
     }
 }
+
+
+

@@ -1,4 +1,6 @@
-﻿namespace Presentation.Web.Models.API.V1
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Presentation.Web.Models.API.V1
 {
     public class BusinessRoleDTO : NamedEntityWithExpirationStatusDTO
     {
@@ -6,6 +8,7 @@
         
         public string Note { get; set; }
 
+        [SetsRequiredMembers]
         public BusinessRoleDTO(int id, string name, bool expired, bool hasWriteAccess, string note) 
             : base(id, name, expired)
         {

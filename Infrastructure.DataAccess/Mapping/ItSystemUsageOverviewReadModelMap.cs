@@ -1,227 +1,133 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Users;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemUsageOverviewReadModelMap : EntityTypeConfiguration<ItSystemUsageOverviewReadModel>
+    public class ItSystemUsageOverviewReadModelMap : IEntityTypeConfiguration<ItSystemUsageOverviewReadModel>
     {
-        public ItSystemUsageOverviewReadModelMap()
+        public void Configure(EntityTypeBuilder<ItSystemUsageOverviewReadModel> builder)
         {
-            Property(x => x.SystemName)
-                .HasMaxLength(ItSystem.MaxNameLength)
-                .IsRequired()
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_Name", 0);
+            builder.Property(x => x.SystemName).HasMaxLength(ItSystem.MaxNameLength).IsRequired();
+            builder.HasIndex(x => x.SystemName).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_Name");
 
-            Property(x => x.SystemDescription)
-                .IsOptional();
+            builder.Property(x => x.ItSystemDisabled).IsRequired();
+            builder.HasIndex(x => x.ItSystemDisabled).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ItSystemDisabled");
 
-            Property(x => x.ItSystemDisabled)
-                .IsRequired()
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemDisabled", 0);
+            builder.Property(x => x.Version).HasMaxLength(ItSystemUsage.DefaultMaxLength);
+            builder.HasIndex(x => x.Version).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_Version");
 
-            Property(x => x.Version)
-                .HasMaxLength(ItSystemUsage.DefaultMaxLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_Version", 0);
+            builder.Property(x => x.LocalCallName).HasMaxLength(ItSystemUsage.DefaultMaxLength);
+            builder.HasIndex(x => x.LocalCallName).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_LocalCallName");
 
-            Property(x => x.LocalCallName)
-                .HasMaxLength(ItSystemUsage.DefaultMaxLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalCallName", 0);
+            builder.Property(x => x.LocalSystemId).HasMaxLength(ItSystemUsage.LongProperyMaxLength);
+            builder.HasIndex(x => x.LocalSystemId).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_LocalSystemId");
 
-            Property(x => x.LocalSystemId)
-                .HasMaxLength(ItSystemUsage.LongProperyMaxLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalSystemId", 0);
+            builder.Property(x => x.ItSystemUuid).HasMaxLength(50);
+            builder.HasIndex(x => x.ItSystemUuid).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ItSystemUuid");
 
-            Property(x => x.ItSystemUuid)
-                .HasMaxLength(50)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemUuid", 0);
+            builder.HasIndex(x => x.ParentItSystemUsageUuid).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ParentItSystemUsageUuid");
 
-            Property(x => x.ParentItSystemUuid).IsOptional();
+            builder.Property(x => x.ParentItSystemName).HasMaxLength(ItSystem.MaxNameLength);
+            builder.HasIndex(x => x.ParentItSystemName).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ItSystemParentName");
 
-            Property(x => x.ParentItSystemUsageUuid).IsOptional()
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ParentItSystemUsageUuid", 0);
+            builder.HasIndex(x => x.ResponsibleOrganizationUnitId).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationId");
+            builder.HasIndex(x => x.ResponsibleOrganizationUnitUuid).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationUuid");
 
-            Property(x => x.ParentItSystemName)
-                .HasMaxLength(ItSystem.MaxNameLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemParentName", 0);
+            builder.Property(x => x.ResponsibleOrganizationUnitName).HasMaxLength(OrganizationUnit.MaxNameLength);
+            builder.HasIndex(x => x.ResponsibleOrganizationUnitName).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationName");
 
-            Property(x => x.ResponsibleOrganizationUnitId)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationId", 0);
+            builder.HasIndex(x => x.ItSystemBusinessTypeUuid).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeUuid");
+            builder.HasIndex(x => x.ItSystemBusinessTypeId).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeId");
 
-            Property(x => x.ResponsibleOrganizationUnitUuid)
-                .IsOptional()
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationUuid", 0);
+            builder.Property(x => x.ItSystemBusinessTypeName).HasMaxLength(OptionEntity<ItSystem>.MaxNameLength);
+            builder.HasIndex(x => x.ItSystemBusinessTypeName).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeName");
 
-            Property(x => x.ResponsibleOrganizationUnitName)
-                .HasMaxLength(OrganizationUnit.MaxNameLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ResponsibleOrganizationName", 0);
+            builder.HasIndex(x => x.ItSystemRightsHolderId).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId");
 
-            Property(x => x.ItSystemBusinessTypeUuid)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeUuid", 0);
+            builder.Property(x => x.ItSystemRightsHolderName).HasMaxLength(Organization.MaxNameLength);
+            builder.HasIndex(x => x.ItSystemRightsHolderName).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName");
 
-            Property(x => x.ItSystemBusinessTypeId)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeId", 0);
+            builder.HasIndex(x => x.ItSystemCategoriesUuid).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ItSystemCategoriesUuid");
+            builder.HasIndex(x => x.ItSystemCategoriesId).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ItSystemCategoriesId");
 
-            Property(x => x.ItSystemBusinessTypeName)
-                .HasMaxLength(OptionEntity<ItSystem>.MaxNameLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemBusinessTypeName", 0);
+            builder.Property(x => x.ItSystemCategoriesName).HasMaxLength(Organization.MaxNameLength);
+            builder.HasIndex(x => x.ItSystemCategoriesName).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ItSystemCategoriesName");
 
-            Property(x => x.ItSystemRightsHolderId)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToId", 0);
+            builder.Property(x => x.LocalReferenceTitle).HasMaxLength(ItSystemUsageOverviewReadModel.MaxReferenceTitleLength);
+            builder.HasIndex(x => x.LocalReferenceTitle).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_LocalReferenceTitle");
 
-            Property(x => x.ItSystemRightsHolderName)
-                .HasMaxLength(Organization.MaxNameLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemBelongsToName", 0);
+            builder.HasIndex(x => x.ObjectOwnerId).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ObjectOwnerId");
 
-            Property(x => x.ItSystemCategoriesUuid)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemCategoriesUuid", 0);
+            builder.Property(x => x.ObjectOwnerName).HasMaxLength(UserConstraints.MaxNameLength);
+            builder.HasIndex(x => x.ObjectOwnerName).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ObjectOwnerName");
 
-            Property(x => x.ItSystemCategoriesId)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemCategoriesId", 0);
+            builder.HasIndex(x => x.LastChangedById).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_LastChangedById");
 
-            Property(x => x.ItSystemCategoriesName)
-                .HasMaxLength(Organization.MaxNameLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ItSystemCategoriesName", 0);
+            builder.Property(x => x.LastChangedByName).HasMaxLength(UserConstraints.MaxNameLength);
+            builder.HasIndex(x => x.LastChangedByName).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_LastChangedByName");
 
-            Property(x => x.LocalReferenceTitle)
-                .HasMaxLength(ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LocalReferenceTitle", 0);
+            builder.HasIndex(x => x.MainContractId).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_MainContractId");
+            builder.HasIndex(x => x.MainContractSupplierId).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_MainContractSupplierId");
 
-            Property(x => x.ObjectOwnerId)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ObjectOwnerId", 0);
+            builder.Property(x => x.MainContractSupplierName).HasMaxLength(Organization.MaxNameLength);
+            builder.HasIndex(x => x.MainContractSupplierName).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_MainContractSupplierName");
 
-            Property(x => x.ObjectOwnerName)
-                .HasMaxLength(UserConstraints.MaxNameLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ObjectOwnerName", 0);
+            builder.HasIndex(x => x.ArchiveDuty).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ArchiveDuty");
+            builder.HasIndex(x => x.CatalogArchiveDuty).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_CatalogArchiveDuty");
+            builder.HasIndex(x => x.IsHoldingDocument).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_IsHoldingDocument");
 
-            Property(x => x.LastChangedById)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LastChangedById", 0);
+            builder.Property(x => x.RiskSupervisionDocumentationName).HasMaxLength(ItSystemUsage.LinkNameMaxLength);
+            builder.HasIndex(x => x.RiskSupervisionDocumentationName).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_RiskSupervisionDocumentationName");
 
-            Property(x => x.LastChangedByName)
-                .HasMaxLength(UserConstraints.MaxNameLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LastChangedByName", 0);
+            builder.Property(x => x.LinkToDirectoryName).HasMaxLength(ItSystemUsage.LinkNameMaxLength);
+            builder.HasIndex(x => x.LinkToDirectoryName).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_LinkToDirectoryName");
 
-            Property(x => x.MainContractId)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_MainContractId", 0);
+            builder.Property(x => x.GeneralPurpose).HasMaxLength(ItSystemUsage.LongProperyMaxLength);
+            builder.HasIndex(x => x.GeneralPurpose).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_GeneralPurpose");
 
-            Property(x => x.MainContractSupplierId)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_MainContractSupplierId", 0);
+            builder.Property(x => x.ProcessingPurpose).HasMaxLength(ItSystemUsage.LongProperyMaxLength);
+            builder.HasIndex(x => x.ProcessingPurpose).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ProcessingPurpose");
 
-            Property(x => x.MainContractSupplierName)
-                .HasMaxLength(Organization.MaxNameLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_MainContractSupplierName", 0);
+            builder.HasIndex(x => x.HostedAt).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_HostedAt");
+            builder.HasIndex(x => x.UserCount).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_UserCount");
+            builder.HasIndex(x => x.DPIAConducted).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_DPIAConducted");
+            builder.HasIndex(x => x.IsBusinessCritical).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_IsBusinessCritical");
+            builder.HasIndex(x => x.ActiveAccordingToValidityPeriod).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ActiveAccordingToValidityPeriod");
+            builder.HasIndex(x => x.ActiveAccordingToLifeCycle).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_ActiveAccordingToLifeCycle");
+            builder.HasIndex(x => x.LifeCycleStatus).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_LifeCycleStatus");
+            builder.HasIndex(x => x.Concluded).HasDatabaseName("IX_Concluded");
+            builder.HasIndex(x => x.ExpirationDate).HasDatabaseName("IX_ExpirationDate");
+            builder.HasIndex(x => x.SystemUsageCriticalityLevelUuid).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_SystemUsageCriticalityLevelUuid");
+            builder.HasIndex(x => x.SystemActive).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_SystemActive");
+            builder.HasIndex(x => x.RiskAssessmentDate).HasDatabaseName("IX_RiskAssessmentDate");
+            builder.HasIndex(x => x.PlannedRiskAssessmentDate).HasDatabaseName("IX_PlannedRiskAssessmentDate");
+            builder.HasIndex(x => x.LastChangedAt).HasDatabaseName("IX_LastChangedAt");
+            builder.HasIndex(x => x.WebAccessibilityCompliance).HasDatabaseName("IX_WebAccessibilityCompliance");
+            builder.HasIndex(x => x.LastWebAccessibilityCheck).HasDatabaseName("IX_LastWebAccessibilityCheck");
 
-            Property(x => x.ArchiveDuty)
-               .IsOptional()
-               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ArchiveDuty", 0);
-
-            Property(x => x.CatalogArchiveDuty)
-                .IsOptional()
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_CatalogArchiveDuty", 0);
-
-            Property(x => x.ContainsAITechnology)
-                .IsOptional();
-
-            Property(x => x.IsHoldingDocument)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_IsHoldingDocument", 0);
-
-            Property(x => x.RiskSupervisionDocumentationName)
-                .HasMaxLength(ItSystemUsage.LinkNameMaxLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_RiskSupervisionDocumentationName", 0);
-
-            Property(x => x.LinkToDirectoryName)
-                .HasMaxLength(ItSystemUsage.LinkNameMaxLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LinkToDirectoryName", 0);
-
-            Property(x => x.GeneralPurpose)
-                .HasMaxLength(ItSystemUsage.LongProperyMaxLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_GeneralPurpose", 0);
-
-            Property(x => x.HostedAt)
-               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_HostedAt", 0);
-
-            Property(x => x.UserCount)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_UserCount");
-
-            Property(x => x.DPIAConducted)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_DPIAConducted");
-
-            Property(x => x.IsBusinessCritical)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_IsBusinessCritical");
-
-            Property(x => x.ActiveAccordingToValidityPeriod)
-               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ActiveAccordingToValidityPeriod", 0);
-
-            Property(x => x.ActiveAccordingToLifeCycle)
-               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_ActiveAccordingToLifeCycle", 0);
-
-            Property(x => x.LifeCycleStatus)
-               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LifeCycleStatus", 0);
-
-            Property(x => x.Concluded)
-                .IsOptional()
-                .HasIndexAnnotation("IX_Concluded");
-
-            Property(x => x.ExpirationDate)
-                .IsOptional()
-                .HasIndexAnnotation("IX_ExpirationDate");
-
-            Property(x => x.SystemActive)
-               .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_SystemActive", 0);
-
-            Property(x => x.RiskAssessmentDate)
-                .IsOptional()
-               .HasIndexAnnotation("IX_RiskAssessmentDate", 0);
-
-            Property(x => x.PlannedRiskAssessmentDate)
-                .HasIndexAnnotation("IX_PlannedRiskAssessmentDate");
-
-            Property(x => x.LastChangedAt)
-                .HasIndexAnnotation("IX_LastChangedAt");
-
-            Property(x => x.WebAccessibilityCompliance)
-                .IsOptional()
-                .HasIndexAnnotation("IX_WebAccessibilityCompliance");
-
-            Property(x => x.LastWebAccessibilityCheck)
-                .IsOptional()
-                .HasIndexAnnotation("IX_LastWebAccessibilityCheck");
-
-            //No index bc we don't know how long it might be
-            Property(x => x.ItSystemKLEIdsAsCsv).IsOptional();
-            Property(x => x.ItSystemKLENamesAsCsv).IsOptional();
-
-            Property(x => x.LocalReferenceTitle).IsOptional();
-            Property(x => x.LocalReferenceUrl).IsOptional();
-
-            Property(x => x.SensitiveDataLevelsAsCsv).IsOptional();
-
-            Property(x => x.RiskSupervisionDocumentationUrl).IsOptional();
-            Property(x => x.LinkToDirectoryUrl).IsOptional();
-
-            Property(x => x.DataProcessingRegistrationsConcludedAsCsv).IsOptional();
-            Property(x => x.DataProcessingRegistrationNamesAsCsv).IsOptional();
-
-            Property(x => x.DependsOnInterfacesNamesAsCsv).IsOptional();
-            Property(x => x.IncomingRelatedItSystemUsagesNamesAsCsv).IsOptional();
-            Property(x => x.OutgoingRelatedItSystemUsagesNamesAsCsv).IsOptional();
-
-            HasRequired(t => t.Organization)
+            builder.HasOne(t => t.Organization)
                 .WithMany(t => t.ItSystemUsageOverviewReadModels)
                 .HasForeignKey(d => d.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasRequired(x => x.SourceEntity)
+            builder.HasOne(x => x.SourceEntity)
                 .WithMany(x => x.OverviewReadModels)
                 .HasForeignKey(x => x.SourceEntityId)
-                .WillCascadeOnDelete(false);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            Property(x => x.SourceEntityUuid).IsRequired();
-            Property(x => x.AssociatedContractsNamesCsv).IsOptional();
+            builder.Property(x => x.SourceEntityUuid).IsRequired();
+
+            // LicensingAndCodeModels is persisted as a string but exposed as a collection via the entity property
+            // Ignore the navigation property to prevent EF from trying to map it as an array
+            builder.Ignore(x => x.LicensingAndCodeModels);
         }
     }
 }

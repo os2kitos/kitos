@@ -1,7 +1,7 @@
-﻿using System.Net.Http;
-using System.Web.Http;
 using Core.Abstractions.Types;
-using Microsoft.AspNet.OData;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Presentation.Web.Extensions;
 
 namespace Presentation.Web.Controllers.API.V1.OData
@@ -9,16 +9,15 @@ namespace Presentation.Web.Controllers.API.V1.OData
     [Authorize]
     public class BaseOdataController : ODataController
     {
-        protected IHttpActionResult FromOperationFailure(OperationFailure failure)
+        protected IActionResult FromOperationFailure(OperationFailure failure)
         {
             return FromOperationError(failure);
         }
 
-        protected IHttpActionResult FromOperationError(OperationError failure)
+        protected IActionResult FromOperationError(OperationError failure)
         {
             var statusCode = failure.FailureType.ToHttpStatusCode();
-
-            return ResponseMessage(new HttpResponseMessage(statusCode) {Content = new StringContent(failure.Message.GetValueOrFallback(statusCode.ToString("G")))});
+            return StatusCode((int)statusCode, failure.Message.GetValueOrFallback(statusCode.ToString("G")));
         }
     }
 }

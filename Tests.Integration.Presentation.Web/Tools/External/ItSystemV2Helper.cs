@@ -155,13 +155,13 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int? pageSize = null,
             Guid? rightsHolderId = null,
             Guid? businessTypeId = null,
-            string kleKey = null,
+            string? kleKey = null,
             Guid? kleUuid = null,
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
-            string nameEquals = null,
-            string nameContains = null
+            string? nameEquals = null,
+            string? nameContains = null
         )
         {
             using var response = await SendGetManyAsync($"{BaseItSystemInternalPath}/search",
@@ -188,13 +188,13 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int? pageSize = null,
             Guid? rightsHolderId = null,
             Guid? businessTypeId = null,
-            string kleKey = null,
+            string? kleKey = null,
             Guid? kleUuid = null,
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             Guid? usedInOrganizationUuid = null,
-            string nameContains = null
+            string? nameContains = null
             )
         {
             using var response = await SendGetManyAsync(BaseItSystemPath,
@@ -221,16 +221,16 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int? pageSize = null,
             Guid? rightsHolderId = null,
             Guid? businessTypeId = null,
-            string kleKey = null,
+            string? kleKey = null,
             Guid? kleUuid = null,
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             Guid? usedInOrganizationUuid = null,
-            string nameEquals = null,
-            string nameContains = null,
-            string token = null,
-            Cookie cookie = null
+            string? nameEquals = null,
+            string? nameContains = null,
+            string? token = null,
+            Cookie? cookie = null
             )
         {
             var queryParameters = new List<KeyValuePair<string, string>>();
@@ -393,7 +393,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
                 throw new ArgumentException("Selector must be a simple member access", nameof(propertySelector));
 
             var propertyName = m.Member.Name;
-            var kvp = new KeyValuePair<string, object>(propertyName, value);
+            var kvp = new KeyValuePair<string, object>(propertyName, value!);
             return await SendPatchSystemAsync(token, uuid, kvp);
         }
     }

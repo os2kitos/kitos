@@ -1,56 +1,55 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.Users;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class UserMap : EntityMap<User>
     {
-        public UserMap()
+        public override void Configure(EntityTypeBuilder<User> builder)
         {
-            // User does NOT require an ObjectOwner!
-            // Otherwise, we cannot add the first user to the system
-            // this is a limitation of EF
-            this.HasOptional(t => t.ObjectOwner)
+            base.Configure(builder);
+            base.Configure(builder);
+
+            // Override base required relationships - User allows null ObjectOwner/LastChangedByUser
+            builder.HasOne(t => t.ObjectOwner)
                 .WithMany()
-                .HasForeignKey(d => d.ObjectOwnerId);
-            // same as above
-            this.HasOptional(t => t.LastChangedByUser)
+                .HasForeignKey(d => d.ObjectOwnerId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(t => t.LastChangedByUser)
                 .WithMany()
-                .HasForeignKey(d => d.LastChangedByUserId);
+                .HasForeignKey(d => d.LastChangedByUserId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Properties
-            this.Property(t => t.Name)
+            builder.Property(t => t.Name)
                 .HasMaxLength(UserConstraints.MaxNameLength)
-                .IsRequired()
-                .HasIndexAnnotation("User_Index_Name", 0);
-            this.Property(t => t.LastName)
-                .HasMaxLength(UserConstraints.MaxNameLength)
-                .IsOptional()
-                .HasIndexAnnotation("User_Index_Name", 1);
-            this.Property(t => t.Email)
+                .IsRequired();
+            builder.HasIndex(x => new { x.Name, x.LastName }).HasDatabaseName("User_Index_Name");
+
+            builder.Property(t => t.LastName)
+                .HasMaxLength(UserConstraints.MaxNameLength);
+
+            builder.Property(t => t.Email)
                 .HasMaxLength(UserConstraints.MaxEmailLength)
-                .IsRequired()
-                .HasUniqueIndexAnnotation("User_Index_Email", 2);
-            this.Property(t => t.Password)
                 .IsRequired();
-            this.Property(t => t.Salt)
-                .IsRequired();
-            this.Property(t => t.IsGlobalAdmin)
-                .IsRequired();
-            this.Property(x => x.Uuid)
-                .IsRequired()
-                .HasUniqueIndexAnnotation("UX_User_Uuid", 0);
+            builder.HasIndex(x => x.Email).IsUnique().HasDatabaseName("User_Index_Email");
 
-            // Table & Column Mappings
-            this.ToTable("User");
+            builder.Property(t => t.Password).IsRequired();
+            builder.Property(t => t.Salt).IsRequired();
+            builder.Property(t => t.IsGlobalAdmin).IsRequired();
 
-            Property(t => t.Uuid)
-                .IsRequired()
-                .HasUniqueIndexAnnotation("UX_User_Uuid", 0);
+            builder.Property(x => x.Uuid).IsRequired();
+            builder.HasIndex(x => x.Uuid).IsUnique().HasDatabaseName("UX_User_Uuid");
 
-            Property(t => t.IsSystemIntegrator)
-                .IsRequired()
-                .HasIndexAnnotation("IX_User_IsSystemIntegrator");
+            builder.ToTable("User");
+
+            builder.Property(t => t.IsSystemIntegrator).IsRequired();
+            builder.HasIndex(x => x.IsSystemIntegrator).HasDatabaseName("IX_User_IsSystemIntegrator");
         }
     }
 }

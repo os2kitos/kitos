@@ -24,7 +24,7 @@
       <Value Profile="(Default)">true</Value>
     </Setting>
     <Setting Name="SsoCertificateThumbprint" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">5a96f4868fb67ef4829a91588a0cf0de4d2290ea</Value>
+      <Value Profile="(Default)">f5da8a1c97205b48385ce637e06438e9888e2ab2</Value>
     </Setting>
     <Setting Name="SsoServiceProviderId" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://kitos-local.strongminds.dk</Value>

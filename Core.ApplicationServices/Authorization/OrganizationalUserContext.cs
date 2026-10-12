@@ -17,12 +17,13 @@ namespace Core.ApplicationServices.Authorization
         private readonly HashSet<OrganizationCategory> _membershipCategories;
         private readonly bool _isGlobalAdmin;
         private readonly bool _isSystemIntegrator;
+        private readonly bool _apiAccess;
 
         public OrganizationalUserContext(
             int userId,
             IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> roles,
             IReadOnlyDictionary<int, OrganizationCategory> categoriesOfMemberOrganizations,
-            bool stakeHolderAccess, bool systemIntegrator)
+            bool stakeHolderAccess, bool systemIntegrator, bool? apiAccess)
         {
             UserId = userId;
             _categoriesOfMemberOrganizations = categoriesOfMemberOrganizations;
@@ -33,7 +34,7 @@ namespace Core.ApplicationServices.Authorization
                 .AsReadOnly();
             _isGlobalAdmin = _roles.Values.Any(x => x.Contains(OrganizationRole.GlobalAdmin));
             _isSystemIntegrator = systemIntegrator;
-
+            _apiAccess = apiAccess ?? false;
         }
 
         public int UserId { get; }
@@ -95,6 +96,11 @@ namespace Core.ApplicationServices.Authorization
         public bool IsSystemIntegrator()
         {
             return _isSystemIntegrator;
+        }
+
+        public bool IsSupplierApiUserForOrganizationWithSuppliers(IEnumerable<int> supplierIds)
+        {
+            return _apiAccess && OrganizationIds.Intersect(supplierIds).Any();
         }
     }
 }

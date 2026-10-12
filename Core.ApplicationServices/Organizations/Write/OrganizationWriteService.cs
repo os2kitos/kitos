@@ -140,7 +140,8 @@ public class OrganizationWriteService : IOrganizationWriteService {
         return organization.WithOptionalUpdate(parameters.Cvr, (org, cvr) => org.UpdateCvr(cvr))
             .Bind(org => org.WithOptionalUpdate(parameters.Name, (org, name) => org.UpdateName(name)))
             .Bind(org => org.WithOptionalUpdate(parameters.ForeignCountryCodeUuid, PerformForeignCountryCodeUpdate))
-            .Bind(org => org.WithOptionalUpdate(parameters.TypeId, (org, typeId) => org.UpdateType(typeId)));
+            .Bind(org => org.WithOptionalUpdate(parameters.TypeId, (org, typeId) => org.UpdateOrganizationTypeId(typeId)))
+            .Bind(org => org.WithOptionalUpdate(parameters.IsSupplier, (org, isSupplier) => org.UpdateIsSupplier(isSupplier)));
     }
 
     private Result<Organization, OperationError> PerformForeignCountryCodeUpdate(Organization organization,

@@ -270,11 +270,13 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             await ItContractV2Helper.TransferMultipleAsync(request);
 
             //Assert
-            var contract2Response = await ItContractV2Helper.GetItContractAsync(globalToken, contract2.Uuid);
-            var contract3Response = await ItContractV2Helper.GetItContractAsync(globalToken, contract3.Uuid);
+            var contractResponse2 = await ItContractV2Helper.GetItContractAsync(globalToken, contract2.Uuid);
+            var contractResponse3 = await ItContractV2Helper.GetItContractAsync(globalToken, contract3.Uuid);
 
-            Assert.Equal(contract.Uuid, contract2Response.ParentContract.Uuid);
-            Assert.Equal(contract.Uuid, contract3Response.ParentContract.Uuid);
+            Assert.NotNull(contractResponse2.ParentContract);
+            Assert.NotNull(contractResponse3.ParentContract);
+            Assert.Equal(contract.Uuid, contractResponse2.ParentContract.Uuid);
+            Assert.Equal(contract.Uuid, contractResponse3.ParentContract.Uuid);
         }
 
         [Fact]
@@ -352,7 +354,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         private async Task<(User user, string token)> CreateApiUserAsync(ShallowOrganizationResponseDTO organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.LocalAdmin, organization.Uuid, true, false);
-            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userAndGetToken.userUuid));
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userAndGetToken.userUuid)!);
             return (user, userAndGetToken.token);
         }
 

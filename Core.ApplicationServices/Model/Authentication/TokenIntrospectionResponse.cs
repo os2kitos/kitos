@@ -7,6 +7,6 @@ namespace Core.ApplicationServices.Model.Authentication
     {
         public bool Active { get; set; }
         public DateTime Expiration { get; set; }
-        public IEnumerable<ClaimResponse> Claims { get; set; }
+        public required IEnumerable<ClaimResponse> Claims { get; set; }
     }
 }

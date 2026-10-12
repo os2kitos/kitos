@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
-using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -18,10 +17,10 @@ namespace Tests.Unit.Presentation.Web.Authorization
         private int _userId;
         private int _otherOrgTypeOrganizationId;
         private int _municipalityOrganizationId;
-        private OrganizationalUserContext _sut;
+        private OrganizationalUserContext _sut = null!;
         private int _unknownOrganizationId;
-        private IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> _rolesPerOrganizationId;
-        private IReadOnlyDictionary<int, OrganizationCategory> _categoryPerOrganizationId;
+        private IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> _rolesPerOrganizationId = null!;
+        private IReadOnlyDictionary<int, OrganizationCategory> _categoryPerOrganizationId = null!;
 
         protected override void OnFixtureCreated(Fixture fixture)
         {
@@ -30,9 +29,9 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         private void SetupSut(
-            IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> roleMap = null,
-            IReadOnlyDictionary<int, OrganizationCategory> categoryMap = null,
-            bool isStakeHolder = true, bool isSystemIntegrator = true)
+            IReadOnlyDictionary<int, IEnumerable<OrganizationRole>>? roleMap = null,
+            IReadOnlyDictionary<int, OrganizationCategory>? categoryMap = null,
+            bool isStakeHolder = true, bool isSystemIntegrator = true, bool apiAccess = true)
         {
             _userId = A<int>();
             _municipalityOrganizationId = A<int>();
@@ -55,8 +54,49 @@ namespace Tests.Unit.Presentation.Web.Authorization
                 _rolesPerOrganizationId,
                 _categoryPerOrganizationId,
                 isStakeHolder,
-                isSystemIntegrator
+                isSystemIntegrator,
+                apiAccess
             );
+        }
+
+        [Fact]
+        public void GivenNoApiAccess_IsSupplierApiUserForOrganizationWithSuppliers_Returns_False()
+        {
+            SetupSut(null, null, true, true, false);
+            var result = _sut.IsSupplierApiUserForOrganizationWithSuppliers(new[] { 1, 2, 3 });
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void
+            GivenApiAccessAndMatchBetweenOrganizationIdsAndSupplierIds_IsSupplierApiUserForOrganizationWithSuppliers_Returns_True()
+        {
+            var id = A<int>();
+            SetupSut(new Dictionary<int, IEnumerable<OrganizationRole>>()
+            {
+                { id, new List<OrganizationRole>() }
+            });
+            var matchingIds = new[] { id };
+            var result = _sut.IsSupplierApiUserForOrganizationWithSuppliers(matchingIds);
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void
+            GivenApiAccessAndNoMatchBetweenOrganizationIdsAndSupplierIds_IsSupplierApiUserForOrganizationWithSuppliers_Returns_False()
+        {
+            var id1 = A<int>();
+            var id2 = id1 + 1;
+            SetupSut(new Dictionary<int, IEnumerable<OrganizationRole>>()
+            {
+                { id1, new List<OrganizationRole>() }
+            });
+            var matchingIds = new[] { id2 };
+            var result = _sut.IsSupplierApiUserForOrganizationWithSuppliers(matchingIds);
+
+            Assert.False(result);
         }
 
         [Theory]

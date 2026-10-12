@@ -10,41 +10,52 @@ namespace Core.ApplicationServices.ScheduledJobs
 {
     public class HangfireApi : IHangfireApi
     {
+        private readonly IBackgroundJobClient _backgroundJobClient;
+        private readonly IRecurringJobManager _recurringJobManager;
+        private readonly JobStorage _jobStorage;
+
+        public HangfireApi(IBackgroundJobClient backgroundJobClient, IRecurringJobManager recurringJobManager, JobStorage jobStorage)
+        {
+            _backgroundJobClient = backgroundJobClient;
+            _recurringJobManager = recurringJobManager;
+            _jobStorage = jobStorage;
+        }
+
         public JobList<ScheduledJobDto> GetScheduledJobs(int fromIndex, int maxResponseLength)
         {
-            return JobStorage.Current.GetMonitoringApi().ScheduledJobs(fromIndex, maxResponseLength);
+            return _jobStorage.GetMonitoringApi().ScheduledJobs(fromIndex, maxResponseLength);
         }
 
         public List<RecurringJobDto> GetRecurringJobs()
         {
-            return JobStorage.Current.GetConnection().GetRecurringJobs();
+            return _jobStorage.GetConnection().GetRecurringJobs();
         }
 
         public void DeleteScheduledJob(string jobId)
         {
-            BackgroundJob.Delete(jobId);
+            _backgroundJobClient.Delete(jobId);
         }
 
         public void RemoveRecurringJobIfExists(string jobId)
         {
-            RecurringJob.RemoveIfExists(jobId);
+            _recurringJobManager.RemoveIfExists(jobId);
         }
 
-        public void Schedule([InstantHandle, NotNull]  Expression<Action> action, DateTimeOffset? runAt)
+        public void Schedule([InstantHandle, NotNull] Expression<Action> action, DateTimeOffset? runAt)
         {
             if (runAt.HasValue)
             {
-                BackgroundJob.Schedule(action, runAt.Value);
+                _backgroundJobClient.Schedule(action, runAt.Value);
             }
             else
             {
-                BackgroundJob.Enqueue(action);
+                _backgroundJobClient.Enqueue(action);
             }
         }
 
         public void AddOrUpdateRecurringJob(string jobId, [InstantHandle, NotNull] Expression<Action> func, string cron)
         {
-            RecurringJob.AddOrUpdate(jobId, func, cron);
+            _recurringJobManager.AddOrUpdate(jobId, func, cron);
         }
     }
 }

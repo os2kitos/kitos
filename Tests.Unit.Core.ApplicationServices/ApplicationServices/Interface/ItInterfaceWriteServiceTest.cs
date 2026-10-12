@@ -30,10 +30,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         private readonly Mock<IItSystemService> _itSystemServiceMock;
         private readonly Mock<IItInterfaceService> _interfaceServiceMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
-        private readonly Mock<ILogger> _logger;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
-        private readonly Mock<IDatabaseControl> _databaseControlMock;
-        private readonly Mock<IDomainEvents> _domainEventsMock;
 
         public ItInterfaceWriteServiceTest()
         {
@@ -41,19 +38,19 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             _itSystemServiceMock = new Mock<IItSystemService>();
             _interfaceServiceMock = new Mock<IItInterfaceService>();
             _transactionManagerMock = new Mock<ITransactionManager>();
-            _logger = new Mock<ILogger>();
+            var logger = new Mock<ILogger>();
             _authorizationContextMock = new Mock<IAuthorizationContext>();
-            _databaseControlMock = new Mock<IDatabaseControl>();
-            _domainEventsMock = new Mock<IDomainEvents>();
+            var databaseControlMock = new Mock<IDatabaseControl>();
+            var domainEventsMock = new Mock<IDomainEvents>();
             _sut = new ItInterfaceWriteService(
                 _organizationRepositoryMock.Object,
                 _itSystemServiceMock.Object,
                 _interfaceServiceMock.Object,
                 _transactionManagerMock.Object,
-                _logger.Object,
+                logger.Object,
                 _authorizationContextMock.Object,
-                _databaseControlMock.Object,
-                _domainEventsMock.Object);
+                databaseControlMock.Object,
+                domainEventsMock.Object);
         }
 
         [Fact]
@@ -365,7 +362,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
             var transactionMock = ExpectTransactionBegins();
             var originalExposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
             var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = originalExposingSystem }, ItInterfaceId = A<string>() };
-            var newExposingSystem = new ItSystem { Id = A<int>(), Uuid = withExposingSystemChange ? inputParameters.ExposingSystemUuid.NewValue.Value : A<Guid>(), BelongsToId = A<int>() };
+            var newExposingSystem = new ItSystem { Id = A<int>(), Uuid = withExposingSystemChange ? inputParameters.ExposingSystemUuid.NewValue!.Value : A<Guid>(), BelongsToId = A<int>() };
 
             ExpectHasWriteAccess(itInterface, true);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
@@ -1037,7 +1034,6 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
         {
             //Arrange
             var itInterface = new ItInterface() { Id = A<int>() };
-            var writeModel = A<ItInterfaceDataWriteModel>();
             ExpectTransactionBegins();
             ExpectGetItInterfaceReturns(itInterface.Uuid, A<OperationError>());
 
@@ -1089,7 +1085,7 @@ namespace Tests.Unit.Core.ApplicationServices.Interface
 
         private void ExpectGetSystemReturns(Guid? systemUuid, Result<ItSystem, OperationError> system)
         {
-            _itSystemServiceMock.Setup(x => x.GetSystem(systemUuid.Value)).Returns(system);
+            _itSystemServiceMock.Setup(x => x.GetSystem(systemUuid!.Value)).Returns(system);
         }
 
         private void ExpectGetOrganizationReturns(Guid organizationUuid, Maybe<Organization> organization)

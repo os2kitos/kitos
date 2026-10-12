@@ -1,30 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Shared;
 
 namespace Core.DomainModel.ItSystemUsage.Read
 {
     public class ItSystemUsageOverviewReadModel : IOwnedByOrganization, IReadModel<ItSystemUsage>
     {
-
-        public static int MaxReferenceTitleLenght = 100;
-
-        public ItSystemUsageOverviewReadModel()
-        {
-            RoleAssignments = new List<ItSystemUsageOverviewRoleAssignmentReadModel>();
-            ItSystemTaskRefs = new List<ItSystemUsageOverviewTaskRefReadModel>();
-            SensitiveDataLevels = new List<ItSystemUsageOverviewSensitiveDataLevelReadModel>();
-            ArchivePeriods = new List<ItSystemUsageOverviewArchivePeriodReadModel>();
-            DataProcessingRegistrations = new List<ItSystemUsageOverviewDataProcessingRegistrationReadModel>();
-            DependsOnInterfaces = new List<ItSystemUsageOverviewInterfaceReadModel>();
-            IncomingRelatedItSystemUsages = new List<ItSystemUsageOverviewUsedBySystemUsageReadModel>();
-            OutgoingRelatedItSystemUsages = new List<ItSystemUsageOverviewUsingSystemUsageReadModel>();
-            RelevantOrganizationUnits = new List<ItSystemUsageOverviewRelevantOrgUnitReadModel>();
-            AssociatedContracts = new List<ItSystemUsageOverviewItContractReadModel>();
-        }
-
-
+        public const int MaxReferenceTitleLength = 100;
         public DateTime? ActiveArchivePeriodEndDate
         {
             get
@@ -50,12 +35,12 @@ namespace Core.DomainModel.ItSystemUsage.Read
         }
 
         public int OrganizationId { get; set; }
-        public Organization.Organization Organization { get; set; }
+        public virtual Organization.Organization Organization { get; set; }
         public int Id { get; set; }
         public int SourceEntityId { get; set; }
         public Guid SourceEntityUuid { get; set; }
         public Guid? ExternalSystemUuid { get; set; }
-        public ItSystemUsage SourceEntity { get; set; }
+        public virtual ItSystemUsage SourceEntity { get; set; }
         public string SystemName { get; set; }
         public string SystemPreviousName { get; set; }
         public string SystemDescription { get; set; }
@@ -73,7 +58,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public YesNoUndecidedOption? ContainsAITechnology { get; set; }
         public string LocalCallName { get; set; }
         public string LocalSystemId { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewRoleAssignmentReadModel> RoleAssignments { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewRoleAssignmentReadModel> RoleAssignments { get; set; } = [];
         public string ItSystemUuid { get; set; }
         public Guid? ResponsibleOrganizationUnitUuid { get; set; }
         public int? ResponsibleOrganizationUnitId { get; set; }
@@ -83,12 +68,16 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string ItSystemBusinessTypeName { get; set; }
         public int? ItSystemRightsHolderId { get; set; }
         public string ItSystemRightsHolderName { get; set; }
+        public string ItSystemRightsHolderCvr { get; set; }
         public int? ItSystemCategoriesId { get; set; }
         public Guid? ItSystemCategoriesUuid { get; set; }
         public string ItSystemCategoriesName { get; set; }
         public string ItSystemKLEIdsAsCsv { get; set; }
         public string ItSystemKLENamesAsCsv { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewTaskRefReadModel> ItSystemTaskRefs { get; set; } // Adding TaskRefs as collection to enable indexed search
+        public virtual ICollection<ItSystemUsageOverviewTaskRefReadModel> ItSystemTaskRefs { get; set; } = []; // Adding TaskRefs as collection to enable indexed search
+        public string LocalKleIdsAsCsv { get; set; }
+        public string LocalKleNamesAsCsv { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewLocalTaskRefReadModel> LocalItSystemTaskRefs { get; set; } = []; // Local KLE deviations on the system usage
         public string LocalReferenceDocumentId { get; set; }
         public string LocalReferenceUrl { get; set; }
         public string LocalReferenceTitle { get; set; }
@@ -102,14 +91,16 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public int? MainContractId { get; set; }
         public int? MainContractSupplierId { get; set; }
         public string MainContractSupplierName { get; set; }
-        public bool MainContractIsActive { get; set; }
+        public MainContractState MainContractIsActive { get; set; }
         public string SensitiveDataLevelsAsCsv { get; set; }
         public DateTime? RiskAssessmentDate { get; set; }
         public DateTime? PlannedRiskAssessmentDate { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewSensitiveDataLevelReadModel> SensitiveDataLevels { get; set; }
+        public RiskLevel? RiskAssessmentResult { get; set; }
+        public YesNoDontKnowIrrelevant? RiskAssessmentConducted { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewSensitiveDataLevelReadModel> SensitiveDataLevels { get; set; } = [];
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
         public bool IsHoldingDocument { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewArchivePeriodReadModel> ArchivePeriods { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewArchivePeriodReadModel> ArchivePeriods { get; set; } = [];
         public string RiskSupervisionDocumentationName { get; set; }
         public string RiskSupervisionDocumentationUrl { get; set; }
         public string LinkToDirectoryName { get; set; }
@@ -117,20 +108,27 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public LifeCycleStatusType? LifeCycleStatus { get; set; }
         public string DataProcessingRegistrationsConcludedAsCsv { get; set; }
         public string DataProcessingRegistrationNamesAsCsv { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewDataProcessingRegistrationReadModel> DataProcessingRegistrations { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewDataProcessingRegistrationReadModel> DataProcessingRegistrations { get; set; } = [];
         public string GeneralPurpose { get; set; }
+        public string ProcessingPurpose { get; set; }
         public HostedAt HostedAt { get; set; }
         public UserCount UserCount { get; set; }
+        public Guid? SystemUsageCriticalityLevelUuid { get; set; }
+        public string SystemUsageCriticalityLevelName { get; set; }
+        public string CriticalityLevelDocumentationUrl { get; set; }
+        public string CriticalityLevelDocumentationName { get; set; }
+        public string TechnicalSystemTypeNamesAsCsv { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewTechnicalSystemTypeReadModel> TechnicalSystemTypes { get; set; } = [];
         public string DependsOnInterfacesNamesAsCsv { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewInterfaceReadModel> DependsOnInterfaces { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewInterfaceReadModel> DependsOnInterfaces { get; set; } = [];
         public string IncomingRelatedItSystemUsagesNamesAsCsv { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewUsedBySystemUsageReadModel> IncomingRelatedItSystemUsages { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewUsedBySystemUsageReadModel> IncomingRelatedItSystemUsages { get; set; } = [];
         public string OutgoingRelatedItSystemUsagesNamesAsCsv { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewUsingSystemUsageReadModel> OutgoingRelatedItSystemUsages { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewUsingSystemUsageReadModel> OutgoingRelatedItSystemUsages { get; set; } = [];
         public string RelevantOrganizationUnitNamesAsCsv { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewRelevantOrgUnitReadModel> RelevantOrganizationUnits { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewRelevantOrgUnitReadModel> RelevantOrganizationUnits { get; set; } = [];
         public string AssociatedContractsNamesCsv { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewItContractReadModel> AssociatedContracts { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewItContractReadModel> AssociatedContracts { get; set; } = [];
 
         public DataOptions? DPIAConducted { get; set; }
 
@@ -142,5 +140,11 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public YesNoPartiallyOption? WebAccessibilityCompliance { get; set; }
         public DateTime? LastWebAccessibilityCheck { get; set; }
         public string WebAccessibilityNotes { get; set; }
+        public DataOptions? IsSociallyCritical { get; set; }
+        public DateTime? CriticalityFieldsLastChanged { get; set; }
+        public IsDataProcessingAgreementRequired? IsDataProcessingAgreementRequired { get; set; }
+        public string ItInterfaceIdsAsCsv { get; set; }
+        public string ItInterfaceVersionsAsCsv { get; set; }
+        public ICollection<LicensingAndCodeModel> LicensingAndCodeModels { get; set; }
     }
 }

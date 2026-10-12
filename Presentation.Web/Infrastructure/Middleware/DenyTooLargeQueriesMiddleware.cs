@@ -1,78 +1,65 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Shared;
-
-using Microsoft.Owin;
-using Ninject;
+using Microsoft.AspNetCore.Http;
 
 namespace Presentation.Web.Infrastructure.Middleware
 {
-    public class DenyTooLargeQueriesMiddleware : OwinMiddleware
+    public class DenyTooLargeQueriesMiddleware : IMiddleware
     {
-        public DenyTooLargeQueriesMiddleware(OwinMiddleware next) : base(next)
-        {
-        }
-
         private const int MinPageSize = PagingContraints.MinPageSize;
         private const int MaxPageSize = PagingContraints.MaxPageSize;
         private const string TopQuery = "$top";
         private const string TakeQuery = "take";
 
-        public override async Task Invoke(IOwinContext context)
+        private readonly IAuthenticationContext _authenticationContext;
+
+        public DenyTooLargeQueriesMiddleware(IAuthenticationContext authenticationContext)
         {
-            var kernel = context.GetNinjectKernel();
-            var authenticationContext = kernel.Get<IAuthenticationContext>();
-            if (authenticationContext.Method == AuthenticationMethod.KitosToken)
+            _authenticationContext = authenticationContext;
+        }
+
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        {
+            if (_authenticationContext.Method == AuthenticationMethod.KitosToken)
             {
                 var query = context.Request.Query;
                 var pageSizeQuery = MatchPageSizeQuery(query);
                 var validRequest = pageSizeQuery
                     .Select(queryParam => MatchValidPageSize(query, queryParam))
-                    .GetValueOrFallback(true); //Fallback to true of no query param
+                    .GetValueOrFallback(true);
 
                 if (!validRequest)
                 {
-                    RejectRequest(context, pageSizeQuery.Value);
+                    context.Response.StatusCode = 400;
+                    await context.Response.WriteAsync($"The value of the '{pageSizeQuery.Value}' parameter must be a number between {MinPageSize} and {MaxPageSize}");
                     return;
                 }
             }
 
-            await Next.Invoke(context);
-
+            await next(context);
         }
 
-        private static void RejectRequest(IOwinContext context, string queryParameter)
-        {
-            context.Response.StatusCode = 400;
-            context.Response.Write($"The value of the '{queryParameter}' parameter must be a number between {MinPageSize} and {MaxPageSize}");
-        }
-
-        private static bool MatchValidPageSize(IReadableStringCollection query, string key)
+        private static bool MatchValidPageSize(IQueryCollection query, string key)
         {
             return ParseIntegerFrom(query, key)
                 .Select(take => take is >= MinPageSize and <= MaxPageSize)
                 .GetValueOrFallback(false);
         }
 
-        private static Maybe<string> MatchPageSizeQuery(IReadableStringCollection collection)
+        private static Maybe<string> MatchPageSizeQuery(IQueryCollection collection)
         {
-            if (collection.Get(TakeQuery) != null)
-            {
+            if (collection.ContainsKey(TakeQuery))
                 return TakeQuery;
-            }
-
-            if (collection.Get(TopQuery) != null)
-            {
+            if (collection.ContainsKey(TopQuery))
                 return TopQuery;
-            }
-
             return Maybe<string>.None;
         }
 
-        private static Maybe<int> ParseIntegerFrom(IReadableStringCollection collection, string key)
+        private static Maybe<int> ParseIntegerFrom(IQueryCollection collection, string key)
         {
-            return int.TryParse(collection.Get(key), out var intValue) ? intValue : Maybe<int>.None;
+            return int.TryParse(collection[key], out var intValue) ? intValue : Maybe<int>.None;
         }
     }
 }

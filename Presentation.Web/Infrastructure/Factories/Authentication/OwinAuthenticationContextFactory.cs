@@ -1,42 +1,48 @@
-﻿using System.Security.Principal;
+using System.Security.Claims;
+using System.Security.Principal;
 using Core.Abstractions.Extensions;
-using Core.Abstractions.Types;
 using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
 using Core.DomainServices;
-
-using Microsoft.Owin;
+using Infrastructure.Services.Http;
+using Microsoft.AspNetCore.Http;
 using Serilog;
 
 namespace Presentation.Web.Infrastructure.Factories.Authentication
 {
     public class OwinAuthenticationContextFactory : IAuthenticationContextFactory
     {
-        private static readonly IAuthenticationContext AnonymousAuthentication = new AuthenticationContext(AuthenticationMethod.Anonymous, false);
+        private static readonly IAuthenticationContext AnonymousAuthentication =
+            new AuthenticationContext(AuthenticationMethod.Anonymous, false);
+
         private readonly ILogger _logger;
-        private readonly Maybe<IOwinContext> _owinContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserRepository _userRepository;
 
-        public OwinAuthenticationContextFactory(ILogger logger, Maybe<IOwinContext> owinContext, IUserRepository userRepository)
+        public OwinAuthenticationContextFactory(
+            ILogger logger,
+            IHttpContextAccessor httpContextAccessor,
+            IUserRepository userRepository)
         {
             _logger = logger;
-            _owinContext = owinContext;
+            _httpContextAccessor = httpContextAccessor;
             _userRepository = userRepository;
         }
 
         public IAuthenticationContext Create()
         {
-            return
-                _owinContext
-                    .Select(x => x.Authentication)
-                    .Select(x => x.User)
-                    .Match(onValue: principal =>
-                    {
-                        return GetAuthenticatedUser(principal).FromNullable()
-                            .Select(user => new AuthenticationContext(MapAuthenticationMethod(principal), MapApiAccess(user), user.Id))
-                            .Match(authUser => authUser,
-                                () => AnonymousAuthentication);
-                    }, onNone: () => AnonymousAuthentication);
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
+                return AnonymousAuthentication;
+
+            var principal = httpContext.User;
+            if (principal?.Identity?.IsAuthenticated != true)
+                return AnonymousAuthentication;
+
+            return GetAuthenticatedUser(principal)
+                .FromNullable()
+                .Select(user => new AuthenticationContext(MapAuthenticationMethod(principal), MapApiAccess(user), user.Id))
+                .Match(authUser => (IAuthenticationContext)authUser, () => AnonymousAuthentication);
         }
 
         private static bool MapApiAccess(User user)
@@ -46,48 +52,54 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
 
         private AuthenticationMethod MapAuthenticationMethod(IPrincipal user)
         {
-            var authenticationMethod = user.Identity.AuthenticationType;
-            switch (authenticationMethod)
+            var authenticationMethod = user.Identity?.AuthenticationType;
+            return authenticationMethod switch
             {
-                case "JWT":
-                    return AuthenticationMethod.KitosToken;
-                case "Forms":
-                    return AuthenticationMethod.Forms;
-                default:
-                    _logger.Error("Unknown authentication method {authenticationMethod}", authenticationMethod);
-                    return AuthenticationMethod.Anonymous;
-            }
+                AuthenticationSchemes.Bearer => AuthenticationMethod.KitosToken,
+                "JWT" => AuthenticationMethod.KitosToken,
+                "Cookies" => AuthenticationMethod.Forms,
+                _ => LogUnknownAndReturnAnonymous(authenticationMethod)
+            };
         }
 
-        private User GetAuthenticatedUser(IPrincipal user)
+        private AuthenticationMethod LogUnknownAndReturnAnonymous(string? authMethod)
         {
-            if (user.Identity.IsAuthenticated)
+            _logger.Error("Unknown authentication method {authenticationMethod}", authMethod);
+            return AuthenticationMethod.Anonymous;
+        }
+
+        private User? GetAuthenticatedUser(IPrincipal user)
+        {
+            if (user.Identity?.IsAuthenticated == true)
             {
                 var id = GetUserId(user);
                 if (id.HasValue)
-                {
                     return _userRepository.GetById(id.Value);
-                }
             }
-
             return null;
         }
 
         private int? ParseUserIdInteger(string toParse)
         {
             if (int.TryParse(toParse, out var asInt))
-            {
                 return asInt;
-            }
             _logger.Debug("Could not parse user id to int: {toParse}", toParse);
             return null;
         }
 
         private int? GetUserId(IPrincipal user)
         {
-            var userId = user.Identity.Name;
-            var id = ParseUserIdInteger(userId);
-            return id;
+            // JsonWebTokenHandler (.NET 8+) does not apply inbound claim type mapping,
+            // so the JWT "name" claim may be stored as "name" rather than ClaimTypes.Name.
+            // Try both forms, then fall back to Identity.Name (which uses NameClaimType).
+            string? userId = null;
+            if (user is ClaimsPrincipal cp)
+            {
+                userId = cp.FindFirstValue("name")
+                    ?? cp.FindFirstValue(ClaimTypes.Name);
+            }
+            userId ??= user.Identity?.Name;
+            return userId == null ? null : ParseUserIdInteger(userId);
         }
     }
 }

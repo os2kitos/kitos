@@ -76,6 +76,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             registrationsRootAfterDeletion = await OrganizationUnitRegistrationV2Helper.GetRegistrationsAsync(organizationId, unit.Uuid);
             Assert.Single(registrationsRootAfterDeletion.Payments);
             var payment = registrationsRootAfterDeletion.Payments.FirstOrDefault();
+            Assert.NotNull(payment);
             Assert.Empty(payment.InternalPayments);
 
             //----Check External Payment deletion----
@@ -158,6 +159,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             Assert.Single(rights);
             var newRight = rights.FirstOrDefault();
+            Assert.NotNull(newRight);
             Assert.NotEqual(right.Id, newRight.Id);
 
             //----Internal payments----
@@ -167,11 +169,13 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             registrationsUnit1 = await OrganizationUnitRegistrationV2Helper.GetRegistrationsAsync(organizationId, unit1.Uuid);
             Assert.Single(registrationsUnit1.Payments);
             var payment = registrationsUnit1.Payments.FirstOrDefault();
+            Assert.NotNull(payment);
             Assert.Empty(payment.InternalPayments);
 
             registrationsUnit2 = await OrganizationUnitRegistrationV2Helper.GetRegistrationsAsync(organizationId, unit2.Uuid);
             Assert.Single(registrationsUnit2.Payments);
             var targetPayment = registrationsUnit2.Payments.FirstOrDefault();
+            Assert.NotNull(targetPayment);
             AssertRegistrationIsValid(internalEconomyStream, targetPayment.InternalPayments);
 
             //----External payments----
@@ -184,6 +188,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             registrationsUnit2 = await OrganizationUnitRegistrationV2Helper.GetRegistrationsAsync(organizationId, unit2.Uuid);
             Assert.Single(registrationsUnit2.Payments);
             targetPayment = registrationsUnit2.Payments.FirstOrDefault();
+            Assert.NotNull(targetPayment);
             AssertRegistrationIsValid(externalEconomyStream, targetPayment.ExternalPayments);
 
             //----Contract registrationsUnit----
@@ -241,7 +246,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             Assert.Single(paymentList);
             var paymentRoot = paymentList.FirstOrDefault();
-
+            Assert.NotNull(paymentRoot);
             Assert.Equal(contractUuid, paymentRoot.ItContract.Uuid);
             AssertRegistrationIsValid(externalEconomyStream, paymentRoot.ExternalPayments);
             AssertRegistrationIsValid(internalEconomyStream, paymentRoot.InternalPayments);
@@ -359,14 +364,14 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
             var newRole = new OrganizationUnitRole
             {
-                Name = A<string>()
+                Name = A<string>(),
             };
             AssignOwnership(newRole, userUuid);
 
             var right = new OrganizationUnitRight
             {
                 ObjectId = unitId,
-                UserId = userId
+                UserId = userId,
             };
             AssignOwnership(right, userUuid);
 
@@ -411,7 +416,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                     throw new Exception($"Unit with ID: {unitId} was not found!");
 
                 context.OrganizationUnitRoles.Add(newRole);
-                right.RoleId = newRole.Id;
+                right.Role = newRole;
                 context.OrganizationUnitRights.Add(right);
 
                 unitEntity.Rights = new List<OrganizationUnitRight> { right };
@@ -419,7 +424,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                 context.ItContracts.Add(contract);
 
                 context.ItSystems.Add(system);
-                usage.ItSystemId = system.Id;
+                usage.ItSystem = system;
                 context.ItSystemUsages.Add(usage);
 
                 context.SaveChanges();

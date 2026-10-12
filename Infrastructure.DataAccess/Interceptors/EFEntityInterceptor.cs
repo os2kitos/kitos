@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity.Core.Common.CommandTrees;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
-using System.Data.Entity.Core.Metadata.Edm;
-using System.Data.Entity.Infrastructure.Interception;
-using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainServices.Context;
 using Core.DomainServices.Time;
-
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Infrastructure.DataAccess.Interceptors
 {
-    public class EFEntityInterceptor : IDbCommandTreeInterceptor
+    public class EFEntityInterceptor : SaveChangesInterceptor
     {
         private readonly Factory<IOperationClock> _operationClock;
         private readonly Factory<Maybe<ActiveUserIdContext>> _userContext;
         private readonly Factory<IFallbackUserResolver> _fallbackUserResolver;
-        private const string ObjectOwnerIdColumnName = nameof(IEntity.ObjectOwnerId);
-        private const string LastChangedByUserIdColumnName = nameof(IEntity.LastChangedByUserId);
-        private const string LastChangedColumnName = nameof(IEntity.LastChanged);
 
         public EFEntityInterceptor(
             Factory<IOperationClock> operationClock,
@@ -32,87 +25,47 @@ namespace Infrastructure.DataAccess.Interceptors
             _fallbackUserResolver = fallbackUserResolver;
         }
 
-        public void TreeCreated(DbCommandTreeInterceptionContext interceptionContext)
+        public override InterceptionResult<int> SavingChanges(
+            DbContextEventData eventData,
+            InterceptionResult<int> result)
         {
-            if (ShouldHandle(interceptionContext))
-            {
-                switch (interceptionContext.OriginalResult)
-                {
-                    case DbInsertCommandTree insertCommand:
-                        interceptionContext.Result = HandleInsertCommand(insertCommand);
-                        return;
-                    case DbUpdateCommandTree updateCommand:
-                        interceptionContext.Result = HandleUpdateCommand(updateCommand);
-                        return;
-                }
-            }
+            if (eventData.Context != null)
+                ApplyAuditFields(eventData.Context);
+            return base.SavingChanges(eventData, result);
         }
 
-        private static bool ShouldHandle(DbCommandTreeInterceptionContext interceptionContext)
+        public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+            DbContextEventData eventData,
+            InterceptionResult<int> result,
+            CancellationToken cancellationToken = default)
         {
-            return interceptionContext.OriginalResult.DataSpace == DataSpace.SSpace;
+            if (eventData.Context != null)
+                ApplyAuditFields(eventData.Context);
+            return base.SavingChangesAsync(eventData, result, cancellationToken);
         }
 
-        private DbCommandTree HandleInsertCommand(DbInsertCommandTree insertCommand)
+        private void ApplyAuditFields(DbContext context)
         {
             var userId = GetActiveUserId();
             var now = _operationClock().Now;
 
-            var updates = new List<KeyValuePair<Predicate<DbSetClause>, DbExpression>>
+            foreach (var entry in context.ChangeTracker.Entries<IEntity>())
+            {
+                switch (entry.State)
                 {
-                    new(clause => MatchPropertyName(clause, ObjectOwnerIdColumnName), userId),
-                    new(clause => MatchPropertyName(clause, LastChangedByUserIdColumnName), userId),
-                    new(clause => MatchPropertyName(clause, LastChangedColumnName), DbExpression.FromDateTime(now))
+                    case EntityState.Added:
+                        entry.Entity.ObjectOwnerId = userId;
+                        entry.Entity.LastChangedByUserId = userId;
+                        entry.Entity.LastChanged = now;
+                        break;
+                    case EntityState.Modified:
+                        entry.Entity.LastChangedByUserId = userId;
+                        entry.Entity.LastChanged = now;
+                        if (entry.Entity.ObjectOwnerId == 0)
+                            entry.Entity.ObjectOwnerId = userId;
+                        break;
                 }
-                .Select(update => ("", false, update))//First two fields are only used during an update scenario, so we insert dummies here
-                .ToList();
-
-            var setClauses = insertCommand.SetClauses
-                .Select(clause => ApplyUpdates(clause, updates))
-                .ToList();
-
-            return new DbInsertCommandTree(
-                insertCommand.MetadataWorkspace,
-                insertCommand.DataSpace,
-                insertCommand.Target,
-                setClauses.AsReadOnly(),
-                insertCommand.Returning);
-        }
-
-        private DbCommandTree HandleUpdateCommand(DbUpdateCommandTree updateCommand)
-        {
-            var userId = GetActiveUserId();
-            var now = _operationClock().Now;
-
-            var pendingUpdates = new List<(string propertyName, bool addIfNotUpdated, KeyValuePair<Predicate<DbSetClause>, DbExpression> condition)>
-            {
-                new(ObjectOwnerIdColumnName, false,new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, ObjectOwnerIdColumnName) && MatchNull(clause), userId)), //Some EF updates end up in this e.g. changing an owned child on a parent
-                new(LastChangedByUserIdColumnName, true,new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, LastChangedByUserIdColumnName), userId)),
-                new(LastChangedColumnName, true,new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, LastChangedColumnName), DbExpression.FromDateTime(now)))
-            };
-
-            var setClauses = updateCommand.SetClauses
-                .Select(clause => ApplyUpdates(clause, pendingUpdates))
-                .ToList();
-
-            //Add updates which did not hit an existing change set (but only the ones which MUST be updated on each update)
-            foreach (var updateDescriptor in pendingUpdates.Where(x => x.addIfNotUpdated).ToList())
-            {
-                ApplyUnusedUpdates(updateCommand, updateDescriptor.propertyName, updateDescriptor.condition.Value, setClauses);
             }
-
-            return new DbUpdateCommandTree(
-                updateCommand.MetadataWorkspace,
-                updateCommand.DataSpace,
-                updateCommand.Target,
-                updateCommand.Predicate,
-                setClauses.AsReadOnly(),
-                updateCommand.Returning);
-        }
-
-        private static bool MatchNull(DbSetClause clause)
-        {
-            return clause.Value is DbNullExpression;
         }
 
         private int GetActiveUserId()
@@ -122,60 +75,7 @@ namespace Infrastructure.DataAccess.Interceptors
             {
                 return userContext.Value.ActiveUserId;
             }
-
-            //Fallback to first global admin
             return _fallbackUserResolver().Resolve().Id;
-        }
-
-        private static bool MatchPropertyName(DbSetClause clause, string propertyName)
-        {
-            var propertyExpression = (DbPropertyExpression)(clause).Property;
-            return propertyExpression.Property.Name == propertyName;
-        }
-
-        public static DbModificationClause ApplyUpdates(DbModificationClause clause, List<(string propertyName, bool addIfNotUpdated, KeyValuePair<Predicate<DbSetClause>, DbExpression> condition)> pendingUpdates)
-        {
-            //Only check for updates until pending updates has been depleted
-            if (pendingUpdates.Any())
-            {
-                foreach (var pendingUpdate in pendingUpdates)
-                {
-                    if (pendingUpdate.condition.Key((DbSetClause)clause))
-                    {
-                        var propertyExpression = (DbPropertyExpression)((DbSetClause)clause).Property;
-
-                        //Pending update matched - apply the update and break off
-                        pendingUpdates.Remove(pendingUpdate);
-                        return DbExpressionBuilder.SetClause(propertyExpression, pendingUpdate.condition.Value);
-                    }
-                }
-            }
-
-            //Return original
-            return clause;
-        }
-
-        private static DbSetClause GetUpdateSetClause(string column, DbExpression newValueToSetToDb, DbUpdateCommandTree updateCommand)
-        {
-            // Create the variable reference in order to create the property
-            var variableReference = updateCommand.Target.VariableType.Variable(updateCommand.Target.VariableName);
-
-            // Create the property to which will assign the correct value
-            var tenantProperty = variableReference.Property(column);
-
-            // Create the set clause, object representation of sql insert command
-            var newSetClause = DbExpressionBuilder.SetClause(tenantProperty, newValueToSetToDb);
-            return newSetClause;
-        }
-
-        private static void ApplyUnusedUpdates(DbUpdateCommandTree updateCommand, string propertyName, DbExpression updateExpression, ICollection<DbModificationClause> setClauses)
-        {
-            var edmType = updateCommand.Target.VariableType.EdmType;
-            if (edmType is not System.Data.Entity.Core.Metadata.Edm.EntityType entityType)
-                return;
-
-            if (entityType.Properties.Contains(propertyName))
-                setClauses.Add(GetUpdateSetClause(propertyName, updateExpression, updateCommand));
         }
     }
 }

@@ -1,6 +1,7 @@
-﻿using Core.Abstractions.Types;
+using Core.Abstractions.Types;
 using Core.DomainModel.ItContract;
 using Presentation.Web.Models.API.V2.Types.Contract;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
@@ -13,7 +14,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             (
                 (YearSegmentChoice.EndOfCalendarYear, YearSegmentOption.EndOfCalendarYear),
                 (YearSegmentChoice.EndOfQuarter, YearSegmentOption.EndOfQuarter),
-                (YearSegmentChoice.EndOfMonth, YearSegmentOption.EndOfMonth)
+                (YearSegmentChoice.EndOfMonth, YearSegmentOption.EndOfMonth),
+                (YearSegmentChoice.BillingPeriod, YearSegmentOption.BillingPeriod)
             );
         }
 

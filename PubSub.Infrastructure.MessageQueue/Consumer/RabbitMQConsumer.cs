@@ -14,11 +14,11 @@ namespace PubSub.Infrastructure.MessageQueue.Consumer
         private readonly IRabbitMQConnectionManager _connectionManager;
         private readonly ISubscriberNotifier _subscriberNotifierService;
         private readonly string _topic;
-        private readonly IServiceScopeFactory serviceScopeFactory;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IJsonPayloadSerializer _payloadSerializer;
-        private IConnection _connection;
-        private IChannel _channel;
-        private IAsyncBasicConsumer _consumerCallback;
+        private IConnection? _connection;
+        private IChannel? _channel;
+        private IAsyncBasicConsumer? _consumerCallback;
 
         public RabbitMQConsumer(IRabbitMQConnectionManager connectionManager,
             ISubscriberNotifier subscriberNotifierService,
@@ -29,7 +29,7 @@ namespace PubSub.Infrastructure.MessageQueue.Consumer
             _connectionManager = connectionManager;
             _subscriberNotifierService = subscriberNotifierService;
             _topic = topic;
-            this.serviceScopeFactory = serviceScopeFactory;
+            this._serviceScopeFactory = serviceScopeFactory;
             _payloadSerializer = payloadSerializer;
         }
 
@@ -46,7 +46,7 @@ namespace PubSub.Infrastructure.MessageQueue.Consumer
 
         private AsyncEventingBasicConsumer GetConsumerCallback()
         {
-            var consumer = new AsyncEventingBasicConsumer(_channel);
+            var consumer = new AsyncEventingBasicConsumer(_channel!);
             consumer.ReceivedAsync += async (_, eventArgs) => { await OnMessageAsync(eventArgs); };
             return consumer;
         }
@@ -55,7 +55,7 @@ namespace PubSub.Infrastructure.MessageQueue.Consumer
         {
             var body = args.Body.ToArray();
             var payload = _payloadSerializer.Deserialize(body);
-            using var scope = serviceScopeFactory.CreateScope();
+            using var scope = _serviceScopeFactory.CreateScope();
             var repository = scope.ServiceProvider.GetRequiredService<ISubscriptionRepository>();
             var subscriptions = await repository.GetByTopic(_topic);
             foreach (var callbackUrl in subscriptions.Select(x => x.Callback))

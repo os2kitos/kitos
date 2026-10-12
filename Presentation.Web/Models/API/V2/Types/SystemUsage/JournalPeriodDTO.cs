@@ -6,7 +6,7 @@ namespace Presentation.Web.Models.API.V2.Types.SystemUsage
     public class JournalPeriodDTO
     {
         [Required]
-        public string ArchiveId { get; set; }
+        public required string ArchiveId { get; set; }
         /// <summary>
         /// Constraint StartDate must be less than or equal to EndDate
         /// </summary>

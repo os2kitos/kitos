@@ -9,7 +9,7 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// <summary>
         /// UUIds of Organization units using this system
         /// </summary>
-        public IEnumerable<Guid> UsingOrganizationUnitUuids { get; set; }
+        public IEnumerable<Guid>? UsingOrganizationUnitUuids { get; set; }
         /// <summary>
         /// Out of all of the using organization units, this one is responsible for the system within the organization.
         /// Constraint: The uuid provided must also be present in UsingOrganizationUnitUuids

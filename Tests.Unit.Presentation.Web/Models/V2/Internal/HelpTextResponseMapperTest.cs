@@ -29,6 +29,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
 
             Assert.Single(dtos);
             var actual = dtos.FirstOrDefault();
+            Assert.NotNull(actual);
             Assert.Equal(expected.Title, actual.Title);
             Assert.Equal(expected.Description, actual.Description);
             Assert.Equal(expected.Key, actual.Key);

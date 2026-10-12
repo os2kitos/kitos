@@ -5,10 +5,10 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.OrganizationUnit
 {
     public class OrganizationUnitRolesResponseDTO
     {
-        public ExtendedRoleAssignmentResponseDTO RoleAssignment { get; set; }
+        public required ExtendedRoleAssignmentResponseDTO RoleAssignment { get; set; }
 
-        public Guid OrganizationUnitUuid { get; set; }
+        public required Guid OrganizationUnitUuid { get; set; }
 
-        public string OrganizationUnitName { get; set; }
+        public required string OrganizationUnitName { get; set; }
     }
 }

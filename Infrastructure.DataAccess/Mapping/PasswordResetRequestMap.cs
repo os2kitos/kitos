@@ -1,21 +1,24 @@
 ﻿using Core.DomainModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class PasswordResetRequestMap : EntityMap<PasswordResetRequest>
     {
-        public PasswordResetRequestMap()
+        public override void Configure(EntityTypeBuilder<PasswordResetRequest> builder)
         {
-            // Properties
-            // Table & Column Mappings
-            this.ToTable("PasswordResetRequest");
-            this.Property(t => t.Time).HasColumnName("Time");
-            this.Property(t => t.UserId).HasColumnName("UserId");
+            base.Configure(builder);
+            base.Configure(builder);
+            builder.ToTable("PasswordResetRequest");
+            builder.Property(t => t.Time).HasColumnName("Time");
+            builder.Property(t => t.UserId).HasColumnName("UserId");
 
-            // Relationships
-            this.HasRequired(t => t.User)
+            builder.HasOne(t => t.User)
                 .WithMany(t => t.PasswordResetRequests)
-                .HasForeignKey(d => d.UserId);
+                .HasForeignKey(d => d.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

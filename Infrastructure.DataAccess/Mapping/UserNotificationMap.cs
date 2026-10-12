@@ -1,36 +1,40 @@
-﻿using Core.DomainModel.Notification;
+using Core.DomainModel.Notification;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class UserNotificationMap : EntityMap<UserNotification>
     {
-        public UserNotificationMap()
+        public override void Configure(EntityTypeBuilder<UserNotification> builder)
         {
-            HasKey(x => x.Id);
+            base.Configure(builder);
+            builder.HasKey(x => x.Id);
 
-            Property(x => x.Name)
+            builder.Property(x => x.Name)
                 .IsRequired();
 
-            Property(x => x.NotificationMessage)
+            builder.Property(x => x.NotificationMessage)
                 .IsRequired();
 
-            Property(x => x.NotificationType)
+            builder.Property(x => x.NotificationType)
                 .IsRequired();
 
-            HasRequired(x => x.Organization)
+            builder.HasOne(x => x.Organization)
                 .WithMany(x => x.UserNotifications);
 
-            HasIndex(x => x.NotificationRecipientId);
+            builder.HasIndex(x => x.NotificationRecipientId);
 
-            HasOptional(x => x.ItContract)
+            builder.HasOne(x => x.ItContract)
                 .WithMany(x => x.UserNotifications)
                 .HasForeignKey(x => x.Itcontract_Id);
 
-            HasOptional(x => x.ItSystemUsage)
+            builder.HasOne(x => x.ItSystemUsage)
                 .WithMany(x => x.UserNotifications)
                 .HasForeignKey(x => x.ItSystemUsage_Id);
 
-            HasOptional(x => x.DataProcessingRegistration)
+            builder.HasOne(x => x.DataProcessingRegistration)
                 .WithMany(x => x.UserNotifications)
                 .HasForeignKey(x => x.DataProcessingRegistration_Id);
         }

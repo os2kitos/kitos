@@ -1,47 +1,44 @@
-using Core.DomainModel.Organization;
+﻿using Core.DomainModel.Organization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class OrganizationUnitMap : EntityMap<OrganizationUnit>
     {
-        public OrganizationUnitMap()
+        public override void Configure(EntityTypeBuilder<OrganizationUnit> builder)
         {
-            // Properties
-            this.Property(x => x.OrganizationId).HasUniqueIndexAnnotation("UX_LocalId", 0);
-            this.Property(x => x.LocalId).HasMaxLength(OrganizationUnit.MaxNameLength).HasUniqueIndexAnnotation("UX_LocalId", 1);
+            base.Configure(builder);
 
-            // Table & Column Mappings
-            this.ToTable("OrganizationUnit");
+            builder.Property(x => x.LocalId).HasMaxLength(OrganizationUnit.MaxNameLength);
+            builder.HasIndex(x => new { x.OrganizationId, x.LocalId }).HasDatabaseName("IX_LocalId");
 
-            // Relationships
-            this.HasOptional(o => o.Parent)
+            builder.ToTable("OrganizationUnit");
+
+            builder.HasOne(o => o.Parent)
                 .WithMany(p => p.Children)
                 .HasForeignKey(o => o.ParentId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            this.HasRequired(o => o.Organization)
+            builder.HasOne(o => o.Organization)
                 .WithMany(m => m.OrgUnits)
                 .HasForeignKey(o => o.OrganizationId)
-                .WillCascadeOnDelete(true);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
-            this.HasMany(t => t.Using)
-                .WithRequired(t => t.OrganizationUnit)
+            builder.HasMany(t => t.Using)
+                .WithOne(t => t.OrganizationUnit)
                 .HasForeignKey(d => d.OrganizationUnitId)
-                .WillCascadeOnDelete(false);
-
-            Property(x => x.Uuid)
                 .IsRequired()
-                .HasUniqueIndexAnnotation("UX_OrganizationUnit_UUID", 0);
+                .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Property(x => x.Uuid).IsRequired();
+            builder.HasIndex(x => x.Uuid).IsUnique().HasDatabaseName("UX_OrganizationUnit_UUID");
 
-            Property(x => x.ExternalOriginUuid)
-                .IsOptional()
-                //Non-unique index since it's an external origin uuid determined by an external system
-                .HasIndexAnnotation("IX_OrganizationUnit_UUID");
+            builder.HasIndex(x => x.ExternalOriginUuid).HasDatabaseName("IX_OrganizationUnit_UUID");
 
-            Property(x => x.Origin)
-                .IsRequired()
-                .HasIndexAnnotation("IX_OrganizationUnit_Origin");
+            builder.Property(x => x.Origin).IsRequired();
+            builder.HasIndex(x => x.Origin).HasDatabaseName("IX_OrganizationUnit_Origin");
         }
     }
 }

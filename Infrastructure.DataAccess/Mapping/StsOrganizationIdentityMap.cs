@@ -1,16 +1,24 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.Organization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class StsOrganizationIdentityMap : EntityTypeConfiguration<StsOrganizationIdentity>
+    public class StsOrganizationIdentityMap : IEntityTypeConfiguration<StsOrganizationIdentity>
     {
-        public StsOrganizationIdentityMap()
+        public void Configure(EntityTypeBuilder<StsOrganizationIdentity> builder)
         {
-            Property(x => x.ExternalUuid).HasUniqueIndexAnnotation("UX_" + nameof(StsOrganizationIdentity.ExternalUuid), 0);
-            HasRequired(x => x.Organization)
+            builder.ToTable("StsOrganizationIdentities");
+
+            builder.HasIndex(x => x.ExternalUuid).IsUnique().HasDatabaseName("UX_" + nameof(StsOrganizationIdentity.ExternalUuid));
+
+            builder.Property<int>("Organization_Id").HasColumnName("OrganizationId");
+
+            builder.HasOne(x => x.Organization)
                 .WithMany(x => x.StsOrganizationIdentities)
-                .WillCascadeOnDelete(true);
+                .HasForeignKey("Organization_Id")
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

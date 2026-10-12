@@ -6,10 +6,10 @@ namespace Core.ApplicationServices.Model.GlobalOptions
 {
     public class GlobalRegularOptionUpdateParameters
     {
-        public OptionalValueChange<Maybe<bool>> IsEnabled { get; set; }
-        public OptionalValueChange<Maybe<string>> Name { get; set; }
-        public OptionalValueChange<Maybe<bool>> IsObligatory { get; set; }
-        public OptionalValueChange<Maybe<string>> Description { get; set; }
-        public OptionalValueChange<Maybe<int>> Priority { get; set; }
+        public required OptionalValueChange<Maybe<bool>> IsEnabled { get; set; }
+        public required OptionalValueChange<Maybe<string>> Name { get; set; }
+        public required OptionalValueChange<Maybe<bool>> IsObligatory { get; set; }
+        public required OptionalValueChange<Maybe<string>> Description { get; set; }
+        public required OptionalValueChange<Maybe<int>> Priority { get; set; }
     }
 }

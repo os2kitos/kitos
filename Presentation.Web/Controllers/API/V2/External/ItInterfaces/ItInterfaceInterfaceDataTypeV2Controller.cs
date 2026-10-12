@@ -1,17 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Web.Http;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Response.Options;
-using Swashbuckle.Swagger.Annotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 {
-    [RoutePrefix("api/v2/it-interface-interface-data-types")]
+    [Route("api/v2/it-interface-interface-data-types")]
     public class ItInterfaceInterfaceDataTypeV2Controller : BaseRegularOptionTypeV2Controller<DataRow, DataType>
     {
         public ItInterfaceInterfaceDataTypeV2Controller(IOptionsApplicationService<DataRow, DataType> optionService)
@@ -23,15 +22,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// Returns IT-Interface 'interface data type' options which are available for new registrations within the organization
         /// </summary>
         /// <param name="organizationUuid">organization context for the archive locations availability</param>
+        /// <param name="pagination">Optional pagination query</param>
         /// <returns>A list of available IT-Interface 'interface data types'</returns>
         [HttpGet]
-        [Route]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegularOptionResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get([NonEmptyGuid] Guid organizationUuid, [FromUri] UnboundedPaginationQuery pagination = null)
+        [Route("")]
+        [ApiResponse(typeof(IEnumerable<RegularOptionResponseDTO>), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult Get([NonEmptyGuid] Guid organizationUuid, [FromQuery] UnboundedPaginationQuery? pagination = null)
         {
             return GetAll(organizationUuid, pagination);
         }
@@ -44,14 +44,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <returns>A uuid and name pair with boolean to mark if the option is available in the organization</returns>
         [HttpGet]
         [Route("{interfaceDataTypeUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RegularOptionExtendedResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get([NonEmptyGuid] Guid interfaceDataTypeUuid, [NonEmptyGuid] Guid organizationUuid)
+        [ApiResponse(typeof(RegularOptionExtendedResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult Get([NonEmptyGuid] Guid interfaceDataTypeUuid, [NonEmptyGuid] Guid organizationUuid)
         {
             return GetSingle(interfaceDataTypeUuid, organizationUuid);
         }
     }
 }
+

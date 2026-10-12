@@ -12,10 +12,15 @@ namespace Tests.Integration.Presentation.Web.Swagger
     [Collection(nameof(SequentialTestGroup))]
     public class SwaggerDocumentationTest
     {
-        public class SwaggerDoc
+        private class SwaggerDoc
         {
-            public string Swagger { get; set; }
-            public string Host { get; set; }
+            public required string OpenApi { get; set; }
+            public required SwaggerInfo Info { get; set; }
+        }
+
+        private class SwaggerInfo
+        {
+            public required int Version { get; set; }
         }
 
         [Theory]
@@ -31,9 +36,10 @@ namespace Tests.Integration.Presentation.Web.Swagger
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            var res = await result.Content.ReadAsStringAsync();
             var doc = await result.ReadResponseBodyAsAsync<SwaggerDoc>();
-            Assert.Equal("2.0", doc.Swagger);
-            Assert.Equal(url.Authority, doc.Host);
+            Assert.Equal("3.0.4", doc.OpenApi);
+            Assert.Equal(version, doc.Info.Version);
         }
 
         [Fact]
@@ -72,7 +78,7 @@ namespace Tests.Integration.Presentation.Web.Swagger
 
         private static Uri CreateUrl(int apiVersion)
         {
-            return TestEnvironment.CreateUrl($"/swagger/docs/{apiVersion}");
+            return TestEnvironment.CreateUrl($"/swagger/v{apiVersion}/swagger.json");
         }
     }
 }

@@ -3,6 +3,6 @@
     public class KLEStatusResponseDTO
     {
         public bool UpToDate { get; set; }
-        public string Version { get; set; }
+        public required string Version { get; set; }
     }
 }

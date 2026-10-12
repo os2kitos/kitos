@@ -1,48 +1,44 @@
-﻿using System.Web.Http;
-using Microsoft.AspNet.OData;
-using Core.DomainServices;
-using System.Net;
 using System;
-using Core.DomainModel;
 using System.Linq;
+using System.Net;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
-using Ninject;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.Extensions.DependencyInjection;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
+using Microsoft.AspNetCore.OData.Results;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
-using System.Net.Http;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
     public abstract class BaseEntityController<T> : BaseController<T> where T : class, IEntity
     {
-        [Inject]
-        public IDomainEvents DomainEvents { get; set; }
+        protected IDomainEvents DomainEvents => HttpContext.RequestServices.GetRequiredService<IDomainEvents>();
 
-        private readonly Lazy<IControllerAuthorizationStrategy> _authorizationStrategy;
-        private readonly Lazy<IControllerCrudAuthorization> _crudAuthorization;
-        protected IControllerCrudAuthorization CrudAuthorization => _crudAuthorization.Value;
+        protected IControllerAuthorizationStrategy AuthorizationStrategy =>
+            new ContextBasedAuthorizationStrategy(AuthorizationContext);
+        protected IControllerCrudAuthorization CrudAuthorization => GetCrudAuthorization();
 
         protected BaseEntityController(IGenericRepository<T> repository)
             : base(repository)
         {
-            _authorizationStrategy = new Lazy<IControllerAuthorizationStrategy>(() => new ContextBasedAuthorizationStrategy(AuthorizationContext));
-            _crudAuthorization = new Lazy<IControllerCrudAuthorization>(GetCrudAuthorization);
         }
 
         [EnableQuery]
         [RequireTopOnOdataThroughKitosToken]
-        public override IHttpActionResult Get()
+        public override IActionResult Get()
         {
-            var organizationIds = UserContext.OrganizationIds;
-
+            var organizationIds = UserContext!.OrganizationIds;
             var crossOrganizationReadAccess = GetCrossOrganizationReadAccessLevel();
-
             var entityAccessLevel = GetEntityTypeReadAccessLevel<T>();
 
             var refinement = entityAccessLevel == EntityReadAccessLevel.All ?
@@ -55,7 +51,9 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 .Select(x => x.Apply(mainQuery))
                 .GetValueOrFallback(mainQuery);
 
-            return Ok(result);
+            // AsEnumerable() materializes via EF6 before OData applies in-memory filtering.
+            // [EnableQuery] with IEnumerable uses LINQ-to-Objects, avoiding EF6/OData expression-tree incompatibilities.
+            return Ok(result.ToList());
         }
 
         protected virtual IQueryable<T> GetAllQuery()
@@ -64,7 +62,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]
-        public override IHttpActionResult Get(int key)
+        public override IActionResult Get(int key)
         {
             var result = Repository.AsQueryable().Where(p => p.Id == key);
 
@@ -79,18 +77,16 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 return Forbidden();
             }
 
-            return Ok(SingleResult.Create(result));
+            return Ok(entity);
         }
 
-        [System.Web.Http.Description.ApiExplorerSettings]
-        public virtual IHttpActionResult Post(int organizationId, T entity)
+        public virtual IActionResult Post(int organizationId, [FromBody] T entity)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            //Make sure organization dependent entity is assigned to the active organization if no explicit organization is provided
             if (entity is IOwnedByOrganization organization && organization.OrganizationId == 0)
             {
                 organization.OrganizationId = organizationId;
@@ -109,7 +105,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             }
             catch (Exception e)
             {
-                return InternalServerError(e);
+                return StatusCode(500, e.Message);
             }
 
             return Created(entity);
@@ -120,16 +116,14 @@ namespace Presentation.Web.Controllers.API.V1.OData
             DomainEvents.Raise(new EntityCreatedEvent<T>(entity));
         }
 
-        [System.Web.Http.Description.ApiExplorerSettings]
-        public virtual IHttpActionResult Patch(int key, Delta<T> delta)
+        public virtual IActionResult Patch(int key, Delta<T> delta)
         {
             var entity = Repository.GetByKey(key);
 
-            if (delta == null)
+            if ((Delta<T>?)delta == null)
             {
                 return BadRequest();
             }
-            // does the entity exist?
             if (entity == null)
             {
                 return NotFound();
@@ -141,38 +135,31 @@ namespace Presentation.Web.Controllers.API.V1.OData
             {
                 try
                 {
-                    // patch the entity
                     delta.Patch(entity);
                     RaiseUpdatedDomainEvent(entity);
                     Repository.Save();
                 }
                 catch (Exception e)
                 {
-                    return InternalServerError(e);
+                    return StatusCode(500, e.Message);
                 }
 
-                // add the request header "Prefer: return=representation"
-                // if you want the updated entity returned,
-                // else you'll just get 204 (No Content) returned
                 return Updated(entity);
             });
         }
 
-        protected virtual Maybe<IHttpActionResult> ValidatePatch(Delta<T> delta, T entity)
+        protected virtual Maybe<IActionResult> ValidatePatch(Delta<T> delta, T entity)
         {
-            // check if user is allowed to write to the entity
             if (AllowModify(entity) == false)
             {
-                {
-                    return Forbidden();
-                }
+                return Maybe<IActionResult>.Some(Forbidden());
             }
 
-            if (delta.TryGetPropertyValue(nameof(IHasAccessModifier.AccessModifier), out object accessModifier) && accessModifier.Equals(AccessModifier.Public) && AllowEntityVisibilityControl(entity) == false)
+            if (delta.TryGetPropertyValue(nameof(IHasAccessModifier.AccessModifier), out object accessModifier) &&
+                accessModifier.Equals(AccessModifier.Public) &&
+                AllowEntityVisibilityControl(entity) == false)
             {
-                {
-                    return Forbidden();
-                }
+                return Maybe<IActionResult>.Some(Forbidden());
             }
 
             if (entity is IHasUuid hasUuid &&
@@ -180,18 +167,15 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 delta.TryGetPropertyValue(nameof(IHasUuid.Uuid), out var uuid) &&
                 ((Guid)uuid) != hasUuid.Uuid)
             {
-                return BadRequest("UUID cannot be changed");
+                return Maybe<IActionResult>.Some(BadRequest("UUID cannot be changed"));
             }
 
-            // check model state
             if (!ModelState.IsValid)
             {
-                {
-                    return BadRequest(ModelState);
-                }
+                return Maybe<IActionResult>.Some(BadRequest(ModelState));
             }
 
-            return Maybe<IHttpActionResult>.None;
+            return Maybe<IActionResult>.None;
         }
 
         protected virtual void RaiseUpdatedDomainEvent(T entity)
@@ -199,7 +183,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             DomainEvents.Raise(new EntityUpdatedEvent<T>(entity));
         }
 
-        public virtual IHttpActionResult Delete(int key)
+        public virtual IActionResult Delete(int key)
         {
             var entity = Repository.GetByKey(key);
             if (entity == null)
@@ -220,10 +204,10 @@ namespace Presentation.Web.Controllers.API.V1.OData
             }
             catch (Exception e)
             {
-                return InternalServerError(e);
+                return StatusCode(500, e.Message);
             }
 
-            return StatusCode(HttpStatusCode.NoContent);
+            return StatusCode((int)HttpStatusCode.NoContent);
         }
 
         protected virtual void RaiseDeletedDomainEvent(T entity)
@@ -233,17 +217,17 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
         protected CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccessLevel()
         {
-            return _authorizationStrategy.Value.GetCrossOrganizationReadAccess();
+            return AuthorizationStrategy.GetCrossOrganizationReadAccess();
         }
 
-        protected EntityReadAccessLevel GetEntityTypeReadAccessLevel<T>()
+        protected EntityReadAccessLevel GetEntityTypeReadAccessLevel<TEntity>()
         {
-            return _authorizationStrategy.Value.GetEntityTypeReadAccessLevel<T>();
+            return AuthorizationStrategy.GetEntityTypeReadAccessLevel<TEntity>();
         }
 
         protected OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
         {
-            return _authorizationStrategy.Value.GetOrganizationReadAccessLevel(organizationId);
+            return AuthorizationStrategy.GetOrganizationReadAccessLevel(organizationId);
         }
 
         protected bool AllowRead(T entity)
@@ -256,9 +240,9 @@ namespace Presentation.Web.Controllers.API.V1.OData
             return CrudAuthorization.AllowModify(entity);
         }
 
-        protected bool AllowCreate<T>(int organizationId, IEntity entity)
+        protected bool AllowCreate<TEntity>(int organizationId, IEntity entity)
         {
-            return CrudAuthorization.AllowCreate<T>(organizationId, entity);
+            return CrudAuthorization.AllowCreate<TEntity>(organizationId, entity);
         }
 
         protected bool AllowDelete(IEntity entity)
@@ -268,24 +252,24 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
         protected bool AllowEntityVisibilityControl(IEntity entity)
         {
-            return _authorizationStrategy.Value.HasPermission(new VisibilityControlPermission(entity));
+            return AuthorizationStrategy.HasPermission(new VisibilityControlPermission(entity));
         }
 
         protected virtual IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new RootEntityCrudAuthorization(_authorizationStrategy.Value);
+            return new RootEntityCrudAuthorization(AuthorizationStrategy);
         }
 
-        protected IHttpActionResult FromOperationFailure(OperationFailure failure)
+        protected IActionResult FromOperationFailure(OperationFailure failure)
         {
-            return StatusCode(failure.ToHttpStatusCode());
+            return StatusCode((int)failure.ToHttpStatusCode());
         }
 
-        protected IHttpActionResult FromOperationError(OperationError failure)
+        protected IActionResult FromOperationError(OperationError failure)
         {
             var statusCode = failure.FailureType.ToHttpStatusCode();
-
-            return ResponseMessage(new HttpResponseMessage(statusCode) { Content = new StringContent(failure.Message.GetValueOrFallback(statusCode.ToString("G"))) });
+            return StatusCode((int)statusCode, failure.Message.GetValueOrFallback(statusCode.ToString("G")));
         }
     }
 }
+

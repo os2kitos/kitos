@@ -21,7 +21,7 @@ namespace Tests.Unit.Core.Extensions
             /// <summary>
             /// On Type 2 the id is on string form
             /// </summary>
-            public string IdAsString { get; set; }
+            public required string IdAsString { get; set; }
         }
 
 

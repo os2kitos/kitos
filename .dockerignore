@@ -1,0 +1,32 @@
+**/.git
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/node_modules
+**/packages
+**/TestResults
+
+# Test projects
+Tests.Unit.Core.ApplicationServices/
+Tests.Unit.Presentation.Web/
+Tests.Integration.Presentation.Web/
+Tests.Toolkit/
+
+# Tools
+Tools.SAMLResponseDecryptor/
+Tools.Test.Database.IO/
+
+# Build artifacts
+**/*.user
+**/*.suo
+**/*.cache
+**/launchSettings.json
+
+# Docker
+**/Dockerfile*
+!Dockerfile
+!Presentation.Web/Dockerfile
+!PubSub.Application.Api/Dockerfile
+**/.dockerignore
+docker-compose*.yml

@@ -9,10 +9,10 @@ namespace Presentation.Web.Models.API.V2.Response.Generic.Hierarchy
         /// Current node in the hierarchy
         /// </summary>
         [Required]
-        public IdentityNamePairResponseDTO Node { get; set; }
+        public required IdentityNamePairResponseDTO Node { get; set; }
         /// <summary>
         /// Parent of the current node
         /// </summary>
-        public IdentityNamePairResponseDTO Parent { get; set; }
+        public IdentityNamePairResponseDTO? Parent { get; set; }
     }
 }

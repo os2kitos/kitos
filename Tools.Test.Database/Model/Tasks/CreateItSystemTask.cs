@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.ItSystem;
@@ -27,7 +28,7 @@ namespace Tools.Test.Database.Model.Tasks
             var globalAdmin = context.GetGlobalAdmin();
 
             //Create the new it system
-            var systemWithSameName = GetItSystemnByName(context);
+            var systemWithSameName = GetItSystemByName(context);
             if (systemWithSameName != null)
             {
                 Console.Out.WriteLine($"Existing ITSystem with name {_name} already exists in the database.");
@@ -75,7 +76,7 @@ namespace Tools.Test.Database.Model.Tasks
             return true;
         }
 
-        private ItSystem GetItSystemnByName(KitosContext context)
+        private ItSystem? GetItSystemByName(KitosContext context)
         {
             return context.ItSystems.AsNoTracking().FirstOrDefault(x => x.Name == _name);
         }

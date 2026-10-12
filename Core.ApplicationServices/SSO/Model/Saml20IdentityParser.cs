@@ -26,7 +26,7 @@ namespace Core.ApplicationServices.SSO.Model
             var cvrNumberAttributes = Navigator
                 .GetAttribute(StsAdgangsStyringConstants.Attributes.CvrNumber)
                 .Select(x => x.AttributeValue)
-                .GetValueOrFallback(new string[0]);
+                .GetValueOrFallback([]);
 
             foreach (var cvrNumber in cvrNumberAttributes)
             {
@@ -45,7 +45,7 @@ namespace Core.ApplicationServices.SSO.Model
                     .GetPrivilegeNodes()
                     .FirstOrDefault(xml => xml.InnerText.EndsWith(privilegeId, StringComparison.OrdinalIgnoreCase))
                     .FromNullable()
-                    .Match(xml => new KitosSamlPrivilege(xml.InnerText), onNone: () => Maybe<KitosSamlPrivilege>.None);
+                    .Match(xml => new KitosSamlPrivilege(xml!.InnerText), onNone: () => Maybe<KitosSamlPrivilege>.None);
         }
 
         public Maybe<SamlUserUuid> MatchUuid()

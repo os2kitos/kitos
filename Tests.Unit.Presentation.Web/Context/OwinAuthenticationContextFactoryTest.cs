@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Infrastructure.Services.Http;
+using System.Collections.Generic;
 using System.Security.Claims;
-using Core.Abstractions.Extensions;
-using Core.Abstractions.Types;
 using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
 using Core.DomainServices;
-
-using Microsoft.Owin;
-using Microsoft.Owin.Security;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using Presentation.Web.Infrastructure.Factories.Authentication;
 using Serilog;
@@ -19,7 +16,6 @@ namespace Tests.Unit.Presentation.Web.Context
     public class OwinAuthenticationContextFactoryTest : WithAutoFixture
     {
         private readonly int _validUserId;
-        private const string TokenAuth = "JWT";
 
         public OwinAuthenticationContextFactoryTest()
         {
@@ -30,7 +26,10 @@ namespace Tests.Unit.Presentation.Web.Context
         public void Unauthenticated_User_Should_Return_AuthenticationContext_With_Anonymous_AuthenticationMethod()
         {
             //Arrange
-            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), MakeMockContext(authType: null, defaultOrg: "invalid", userId: "1", isAuthenticated: "false"), Mock.Of<IUserRepository>());
+            var authenticationContextFactory = new OwinAuthenticationContextFactory(
+                Mock.Of<ILogger>(),
+                MakeHttpContextAccessor(authType: null, userId: "1", isAuthenticated: false),
+                Mock.Of<IUserRepository>());
 
             //Act
             var authContext = authenticationContextFactory.Create();
@@ -40,15 +39,15 @@ namespace Tests.Unit.Presentation.Web.Context
         }
 
         [Theory]
-        [InlineData(AuthenticationMethod.KitosToken, "JWT", 1234)]
-        [InlineData(AuthenticationMethod.Forms, "Forms", 1337)]
-        [InlineData(AuthenticationMethod.Anonymous, "None", null)]
-        public void Authenticated_User_Should_Return_AuthenticationContext_With_AuthenticationMethod(AuthenticationMethod authMethod, string authType, int? defaultOrg)
+        [InlineData(AuthenticationMethod.KitosToken, "JWT")]
+        [InlineData(AuthenticationMethod.KitosToken, AuthenticationSchemes.Bearer)]
+        [InlineData(AuthenticationMethod.Forms, "Cookies")]
+        public void Authenticated_User_Should_Return_AuthenticationContext_With_AuthenticationMethod(AuthenticationMethod authMethod, string authType)
         {
             //Arrange
-            var owinContext = MakeMockContext(authType: authType, defaultOrg: defaultOrg?.ToString() ?? A<string>(), userId: _validUserId.ToString(), isAuthenticated: "true");
-            var userRepository = MakeMockUserRepository(false, _validUserId, defaultOrg);
-            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), owinContext, userRepository);
+            var accessor = MakeHttpContextAccessor(authType: authType, userId: _validUserId.ToString(), isAuthenticated: true);
+            var userRepository = MakeMockUserRepository(false, _validUserId);
+            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), accessor, userRepository);
 
             //Act
             var authContext = authenticationContextFactory.Create();
@@ -59,27 +58,27 @@ namespace Tests.Unit.Presentation.Web.Context
         }
 
         [Fact]
-        public void Invalid_Organization_Claim_Value_Returns_Null()
+        public void Authenticated_User_With_Unknown_AuthType_Returns_Anonymous()
         {
             //Arrange
-            var owinContext = MakeMockContext(authType: TokenAuth, defaultOrg: "invalid", userId: _validUserId.ToString(), isAuthenticated: "true");
+            var accessor = MakeHttpContextAccessor(authType: "None", userId: _validUserId.ToString(), isAuthenticated: true);
             var userRepository = MakeMockUserRepository(false, _validUserId);
-            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), owinContext, userRepository);
+            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), accessor, userRepository);
 
             //Act
             var authContext = authenticationContextFactory.Create();
 
             //Assert
-            Assert.Equal(AuthenticationMethod.KitosToken, authContext.Method);
+            Assert.Equal(AuthenticationMethod.Anonymous, authContext.Method);
         }
 
         [Fact]
         public void Invalid_UserId_Returns_Null()
         {
             //Arrange
-            var owinContext = MakeMockContext(authType: TokenAuth, defaultOrg: "1", userId: "invalid", isAuthenticated: "true");
+            var accessor = MakeHttpContextAccessor(authType: "JWT", userId: "invalid", isAuthenticated: true);
             var userRepository = MakeMockUserRepository(false, _validUserId);
-            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), owinContext, userRepository);
+            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), accessor, userRepository);
 
             //Act
             var authContext = authenticationContextFactory.Create();
@@ -94,9 +93,9 @@ namespace Tests.Unit.Presentation.Web.Context
         public void Authenticated_User_Can_Have_Api_Access(bool apiAccess)
         {
             //Arrange
-            var owinContext = MakeMockContext(authType: TokenAuth, defaultOrg: "1", userId: _validUserId.ToString(), isAuthenticated: "true");
+            var accessor = MakeHttpContextAccessor(authType: "JWT", userId: _validUserId.ToString(), isAuthenticated: true);
             var userRepository = MakeMockUserRepository(apiAccess, _validUserId);
-            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), owinContext, userRepository);
+            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), accessor, userRepository);
 
             //Act
             var authContext = authenticationContextFactory.Create();
@@ -110,7 +109,10 @@ namespace Tests.Unit.Presentation.Web.Context
         public void Unauthenticated_User_Can_Not_Have_Api_Access()
         {
             //Arrange
-            var authenticationContextFactory = new OwinAuthenticationContextFactory(Mock.Of<ILogger>(), MakeMockContext(authType: null, defaultOrg: "invalid", userId: "1", isAuthenticated: "false"), Mock.Of<IUserRepository>());
+            var authenticationContextFactory = new OwinAuthenticationContextFactory(
+                Mock.Of<ILogger>(),
+                MakeHttpContextAccessor(authType: null, userId: "1", isAuthenticated: false),
+                Mock.Of<IUserRepository>());
 
             //Act
             var authContext = authenticationContextFactory.Create();
@@ -119,31 +121,33 @@ namespace Tests.Unit.Presentation.Web.Context
             Assert.False(authContext.HasApiAccess);
         }
 
-        private static IUserRepository MakeMockUserRepository(bool apiAccess, int userId, int? defaultOrgId = null)
+        private static IUserRepository MakeMockUserRepository(bool apiAccess, int userId)
         {
-            var user = new User();
-            user.HasApiAccess = apiAccess;
-            user.Id = userId;
-
+            var user = new User { HasApiAccess = apiAccess, Id = userId };
             var userRepo = new Mock<IUserRepository>();
             userRepo.Setup(_ => _.GetById(userId)).Returns(user);
             return userRepo.Object;
         }
 
-        private Maybe<IOwinContext> MakeMockContext(string authType, string defaultOrg, string userId, string isAuthenticated)
+        private static IHttpContextAccessor MakeHttpContextAccessor(string? authType, string userId, bool isAuthenticated)
         {
-            var claims = new List<Claim>
+            var accessor = new Mock<IHttpContextAccessor>();
+
+            if (!isAuthenticated)
             {
-                new Claim(ClaimTypes.Name, userId),
-                new Claim(ClaimTypes.Authentication, isAuthenticated, ClaimValueTypes.Boolean)
-            };
+                accessor.SetupGet(a => a.HttpContext).Returns((HttpContext?)null);
+                return accessor.Object;
+            }
+
+            var claims = new List<Claim> { new(ClaimTypes.Name, userId) };
             var identity = new ClaimsIdentity(claims, authType);
-            var user = new ClaimsPrincipal(identity);
-            var authManager = new Mock<IAuthenticationManager>();
-            var context = new Mock<IOwinContext>();
-            context.SetupGet(c => c.Authentication).Returns(authManager.Object);
-            context.SetupGet(p => p.Authentication.User).Returns(user);
-            return context.Object.FromNullable();
+            var principal = new ClaimsPrincipal(identity);
+
+            var httpContext = new Mock<HttpContext>();
+            httpContext.SetupGet(c => c.User).Returns(principal);
+
+            accessor.SetupGet(a => a.HttpContext).Returns(httpContext.Object);
+            return accessor.Object;
         }
     }
 }

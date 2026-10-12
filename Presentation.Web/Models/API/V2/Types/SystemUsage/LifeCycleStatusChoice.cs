@@ -6,6 +6,7 @@
         NotInUse = 1,
         PhasingIn = 2,
         Operational = 3,
-        PhasingOut = 4
+        PhasingOut = 4,
+        Pilot = 5
     }
 }

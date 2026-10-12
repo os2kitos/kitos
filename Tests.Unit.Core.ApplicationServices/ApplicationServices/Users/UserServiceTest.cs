@@ -102,6 +102,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.True(result.Ok);
+            Assert.NotNull(result.Value);
             Assert.Equal(userEmail, result.Value.Email);
         }
 

@@ -23,5 +23,6 @@ namespace Core.ApplicationServices.Model.GDPR.Write
         public OptionalValueChange<Guid?> MainContractUuid { get; set; } = OptionalValueChange<Guid?>.None;
 
         public OptionalValueChange<Guid?> ResponsibleUnitUuid { get; set; } = OptionalValueChange<Guid?>.None;
+        public OptionalValueChange<bool?> EnforceInvalidity { get; set; } = OptionalValueChange<bool?>.None;
     }
 }

@@ -354,7 +354,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             var migration = result.Value;
-            Assert.Equal(1, migration.AffectedSystemRelations.Count);
+            Assert.Single(migration.AffectedSystemRelations);
             Assert.Equal(relation.Id, migration.AffectedSystemRelations.First().Id);
             Assert.Equal(relationInterface.Id, migration.AffectedSystemRelations.First().RelationInterfaceId);
             Assert.Equal(relation.Description, migration.AffectedSystemRelations.First().Description);
@@ -647,7 +647,7 @@ namespace Tests.Unit.Presentation.Web.Services
             transaction.Verify(x => x.Commit(), Times.Once);
 
             //Verify that updated domain event was indeed fired
-            _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<ItSystemUsage>>(x => x.Entity == systemUsage)));
+            _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<ItSystemUsage>>(updatedEvent => updatedEvent.Entity == systemUsage)));
         }
 
         private Mock<IDatabaseTransaction> ExpectBeginTransaction()
@@ -694,7 +694,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         private ItContract CreateItContract(
-            IEnumerable<int> idsOfAssociatedSystemUsages = null)
+            IEnumerable<int>? idsOfAssociatedSystemUsages = null)
         {
             return new ItContract
             {
@@ -715,7 +715,7 @@ namespace Tests.Unit.Presentation.Web.Services
             return new ItContractItSystemUsage { ItSystemUsageId = itSystemUsageId };
         }
 
-        private void ExpectGetSystemReturns(int systemId, ItSystem system)
+        private void ExpectGetSystemReturns(int systemId, ItSystem? system)
         {
             _systemRepository.Setup(x => x.GetSystem(systemId)).Returns(system);
         }
@@ -725,7 +725,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(x => x.AllowReads(systemUsage)).Returns(value);
         }
 
-        private void ExpectGetSystemUsageReturns(int usageId, ItSystemUsage systemUsage)
+        private void ExpectGetSystemUsageReturns(int usageId, ItSystemUsage? systemUsage)
         {
             _systemUsageRepository.Setup(x => x.GetSystemUsage(usageId)).Returns(systemUsage);
         }

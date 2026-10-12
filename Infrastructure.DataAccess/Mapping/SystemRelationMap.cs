@@ -1,38 +1,42 @@
-﻿using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class SystemRelationMap : EntityMap<SystemRelation>
     {
-        public SystemRelationMap()
+        public override void Configure(EntityTypeBuilder<SystemRelation> builder)
         {
-            this.HasOptional(t => t.UsageFrequency)
+            base.Configure(builder);
+            base.Configure(builder);
+
+            builder.HasOne(t => t.UsageFrequency)
                 .WithMany(d => d.References)
                 .HasForeignKey(x => x.UsageFrequencyId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            this.HasOptional(x => x.AssociatedContract)
+            builder.HasOne(x => x.AssociatedContract)
                 .WithMany(x => x.AssociatedSystemRelations)
                 .HasForeignKey(x => x.AssociatedContractId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            this.HasOptional(x => x.RelationInterface)
+            builder.HasOne(x => x.RelationInterface)
                 .WithMany(x => x.AssociatedSystemRelations)
                 .HasForeignKey(x => x.RelationInterfaceId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            this.HasRequired(x => x.ToSystemUsage)
+            builder.HasOne(x => x.ToSystemUsage)
                 .WithMany(x => x.UsedByRelations)
                 .HasForeignKey(x => x.ToSystemUsageId)
-                .WillCascadeOnDelete(false);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.ClientCascade);
 
-            this.HasRequired(x => x.FromSystemUsage)
+            builder.HasOne(x => x.FromSystemUsage)
                 .WithMany(x => x.UsageRelations)
                 .HasForeignKey(x => x.FromSystemUsageId)
-                .WillCascadeOnDelete(true);
-
-            this.Property(x => x.Reference).IsOptional();
-            this.Property(x => x.Description).IsOptional();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -8,6 +8,6 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Organizations
     {
         public Guid OrganizationUuid { get; set; }
         public OverviewType OverviewType { get; set; }
-        public IEnumerable<ColumnConfigurationResponseDTO> VisibleColumns { get; set; }
+        public required IEnumerable<ColumnConfigurationResponseDTO> VisibleColumns { get; set; }
     }
 }

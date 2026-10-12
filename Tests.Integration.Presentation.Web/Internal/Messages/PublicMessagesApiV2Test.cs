@@ -105,7 +105,7 @@ namespace Tests.Integration.Presentation.Web.Internal.Messages
             await AssertPatchSucceeded(patchResponse, patchRequest);
         }
         
-        private async Task<PublicMessageResponseDTO> SetupPublicMessage(Cookie cookie = null)
+        private async Task<PublicMessageResponseDTO> SetupPublicMessage(Cookie? cookie = null)
         {
 
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

@@ -1,0 +1,139 @@
+name: Build and deploy kitos-broker
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - "master"
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: "strongminds/kitos-kitos-broker"
+  DEPLOYMENT_MANIFEST: "infrastructure/kitos-dev/kitos/services/kitos-broker/deployment.yaml"
+
+jobs:
+  build:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    name: Build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    outputs:
+      tags: ${{ steps.meta.outputs.tags }}
+      labels: ${{ steps.meta.outputs.labels }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
+            type=sha,format=long,enable=${{ github.ref == 'refs/heads/master' }}
+            type=ref,event=pr,enable=${{ github.ref != 'refs/heads/master' }}
+
+      - name: Build and push
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          cache-to: type=inline
+          context: "./"
+          file: "PubSub.Broker/Dockerfile"
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    name: Update tag
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          ref: "master"
+          # https://github.com/orgs/community/discussions/25305#discussioncomment-10728028
+          ssh-key: ${{ secrets.WRITE_DEPLOY_KEY }}
+
+      - name: Configure git
+        run: |
+          git config --local user.email "github-actions@github.com"
+          git config --local user.name "GitHub Actions"
+
+      - name: Get version
+        id: version
+        run: |
+          echo "old=$(grep "image:" '${{ env.DEPLOYMENT_MANIFEST }}' | sed -r -e 's/.+\:(.*)/\1/g')" >> $GITHUB_OUTPUT
+          echo "new=$(echo '${{ needs.build.outputs.tags }}' | grep -v latest | sed -r -e 's/.+\:(.*)/\1/g')" >> $GITHUB_OUTPUT
+
+      - name: Get new image
+        id: image
+        run: |
+          echo "image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.new }}" >> $GITHUB_OUTPUT
+
+      - name: Replace image
+        run: |
+          sed -r 's|(image:\s*).+|\1${{ steps.image.outputs.image }}|' -i "${{ env.DEPLOYMENT_MANIFEST }}"
+
+      - name: Commit changes
+        run: |
+          git add "${{ env.DEPLOYMENT_MANIFEST }}"
+
+      - uses: qoomon/actions--create-commit@v1
+        id: commit
+        with:
+          message: "Promoted kitos-broker to version ${{ steps.version.outputs.new }}"
+          skip-empty: true
+
+      - name: Git Push
+        run: |
+          max_attempts=5
+          timeout_seconds=3
+          git config pull.ff only
+          for i in $(seq 1 $max_attempts); do
+            echo "Pull and push attempt $i"
+
+            if git pull origin master; then
+              if git push origin master; then
+                echo "Push succeeded on attempt $i"
+                break
+              else
+                echo "Push failed on attempt $i"
+              fi
+            else
+              echo "Pull failed on attempt $i"
+              echo "Git status:"
+              git status
+            fi
+
+            if [ "$i" -lt $max_attempts ]; then
+              echo "Waiting before retry..."
+              sleep $timeout_seconds
+            else
+              echo "All $max_attempts attempts failed. Giving up."
+              exit 1
+            fi
+          done

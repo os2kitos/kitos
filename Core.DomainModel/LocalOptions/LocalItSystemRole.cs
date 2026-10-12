@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.LocalOptions
 {
-    public class LocalItSystemRole : LocalOptionEntity<ItSystemRole>
+    public class LocalItSystemRole : LocalRoleOptionEntity<ItSystemRole>
     {
     }
 }

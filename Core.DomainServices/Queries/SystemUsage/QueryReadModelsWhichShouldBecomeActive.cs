@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainModel.Shared;
 
 namespace Core.DomainServices.Queries.SystemUsage
 {
@@ -30,7 +31,7 @@ namespace Core.DomainServices.Queries.SystemUsage
                             (x.SourceEntity.ExpirationDate == null || currentTime <= x.SourceEntity.ExpirationDate)
                         )
                     ) ||
-                    x.MainContractIsActive == false &&
+                    x.MainContractIsActive == MainContractState.Inactive &&
                     // Include if Main Contract is active
                     (
                         //Main Contract is null which means it's valid

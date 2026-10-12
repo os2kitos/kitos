@@ -38,6 +38,7 @@ namespace Tools.Test.Database.Model.Tasks
 
             _tasks = new List<DatabaseTask>
             {
+                new SeedDatabaseTask(),
                 new CreateSensitivePersonalDataTypeTask("TestSensitiveData1"),
                 new CreateSensitivePersonalDataTypeTask("TestSensitiveData2"),
                 new CreateDprOptionTypesTask(),

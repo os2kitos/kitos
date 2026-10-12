@@ -1,7 +1,3 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Model.Organizations;
@@ -10,14 +6,19 @@ using Core.DomainModel;
 using Core.DomainModel.KendoConfig;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
+using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
-using Swashbuckle.Swagger.Annotations;
+using Presentation.Web.Models.API.V2.Types.KendoGrid;
+using System;
+using System.Linq;
+using System.Net;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 {
-    [RoutePrefix("api/v2/internal/organizations/{organizationUuid}/grid")]
+    [Route("api/v2/internal/organizations/{organizationUuid}/grid")]
     public class OrganizationGridInternalV2Controller : InternalApiV2Controller
     {
 
@@ -34,35 +35,35 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 
         [HttpPost]
         [Route("{overviewType}/save")]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationGridConfigurationResponseDTO))]
-        public IHttpActionResult SaveGridConfiguration([NonEmptyGuid] Guid organizationUuid, [FromUri] OverviewType overviewType, [FromBody] OrganizationGridConfigurationRequestDTO config)
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        [ApiResponse(typeof(OrganizationGridConfigurationResponseDTO), HttpStatusCode.OK)]
+        public IActionResult SaveGridConfiguration([NonEmptyGuid] Guid organizationUuid, [FromRoute] OverviewTypeOptions overviewType, [FromBody] OrganizationGridConfigurationRequestDTO config)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return MapUuidToId(organizationUuid)
-                    .Bind(id => _kendoOrganizationalConfigurationService.CreateOrUpdate(id, overviewType, config.VisibleColumns.Select(MapColumnConfigRequestToKendoColumnConfig)))
+                    .Bind(id => _kendoOrganizationalConfigurationService.CreateOrUpdate(id, overviewType.ToDomain(), config.VisibleColumns.Select(MapColumnConfigRequestToKendoColumnConfig)))
                     .Bind(MapKendoConfigToGridConfig)
                     .Match(Ok, FromOperationError);
         }
 
         [HttpDelete]
         [Route("{overviewType}/delete")]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeleteGridConfiguration([NonEmptyGuid] Guid organizationUuid, [FromUri] OverviewType overviewType)
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult DeleteGridConfiguration([NonEmptyGuid] Guid organizationUuid, [FromRoute] OverviewTypeOptions overviewType)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return MapUuidToId(organizationUuid)
-                .Bind(id => _kendoOrganizationalConfigurationService.Delete(id, overviewType))
+                .Bind(id => _kendoOrganizationalConfigurationService.Delete(id, overviewType.ToDomain()))
                 .Bind(MapKendoConfigToGridConfig)
                 .Match(Ok, FromOperationError);
 
@@ -70,29 +71,29 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
 
         [HttpGet]
         [Route("{overviewType}/get")]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetGridConfiguration([NonEmptyGuid] Guid organizationUuid, [FromUri] OverviewType overviewType)
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult GetGridConfiguration([NonEmptyGuid] Guid organizationUuid, [FromRoute] OverviewTypeOptions overviewType)
         {
             if (!ModelState.IsValid) 
                 return BadRequest(ModelState);
 
             return MapUuidToId(organizationUuid)
-                .Bind(id => _kendoOrganizationalConfigurationService.Get(id, overviewType))
+                .Bind(id => _kendoOrganizationalConfigurationService.Get(id, overviewType.ToDomain()))
                 .Bind(MapKendoConfigToGridConfig)
                 .Match(Ok, FromOperationError);
         }
 
         [HttpGet]
         [Route("permissions")]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationGridPermissionsResponseDTO))]
-        public IHttpActionResult GetOrganizationGridPermissions([NonEmptyGuid] Guid organizationUuid)
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        [ApiResponse(typeof(OrganizationGridPermissionsResponseDTO), HttpStatusCode.OK)]
+        public IActionResult GetOrganizationGridPermissions([NonEmptyGuid] Guid organizationUuid)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
             return MapUuidToId(organizationUuid)
@@ -154,3 +155,4 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Organizations
         }
     }
 }
+

@@ -5,11 +5,11 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.ItSystemUsage
 {
     public class ItSystemUsageMigrationV2ResponseDTO
     {
-        public IdentityNamePairWithDeactivatedStatusDTO TargetUsage { get; set; }
-        public IdentityNamePairWithDeactivatedStatusDTO FromSystem { get; set; }
-        public IdentityNamePairWithDeactivatedStatusDTO ToSystem { get; set; }
-        public IEnumerable<IdentityNamePairResponseDTO> AffectedContracts { get; set; }
-        public IEnumerable<ItSystemUsageRelationMigrationV2ResponseDTO> AffectedRelations { get; set; }
-        public IEnumerable<IdentityNamePairResponseDTO> AffectedDataProcessingRegistrations { get; set; }
+        public required IdentityNamePairWithDeactivatedStatusDTO TargetUsage { get; set; }
+        public required IdentityNamePairWithDeactivatedStatusDTO FromSystem { get; set; }
+        public required IdentityNamePairWithDeactivatedStatusDTO ToSystem { get; set; }
+        public required IEnumerable<IdentityNamePairResponseDTO> AffectedContracts { get; set; }
+        public required IEnumerable<ItSystemUsageRelationMigrationV2ResponseDTO> AffectedRelations { get; set; }
+        public required IEnumerable<IdentityNamePairResponseDTO> AffectedDataProcessingRegistrations { get; set; }
     }
 }

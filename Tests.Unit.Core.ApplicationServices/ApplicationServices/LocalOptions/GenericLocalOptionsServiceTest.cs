@@ -28,7 +28,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
         private Mock<IEntityIdentityResolver> _identityResolver;
         private Mock<IDomainEvents> _domainEvents;
 
-        private GenericLocalOptionsService<TestLocalOptionEntity, TestReferenceType, TestOptionEntity> _sut;
+        private BaseGenericLocalOptionsService<TestLocalOptionEntity, TestReferenceType, TestOptionEntity> _sut;
         public GenericLocalOptionsServiceTest()
         {
             _optionsRepository = new Mock<IGenericRepository<TestOptionEntity>>();
@@ -37,13 +37,19 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             _identityResolver = new Mock<IEntityIdentityResolver>();
             _domainEvents = new Mock<IDomainEvents>();
 
-            _sut = new GenericLocalOptionsService<TestLocalOptionEntity, TestReferenceType, TestOptionEntity>(
+            _sut = new BaseGenericLocalOptionsService<TestLocalOptionEntity, TestReferenceType, TestOptionEntity>(
                 _optionsRepository.Object
                 , _localOptionsRepository.Object,
                 _authorizationContext.Object,
                 _identityResolver.Object,
                 _domainEvents.Object);
         }
+
+        private static void UpdateLocalRoleOptionValues(TestOptionEntity option, TestLocalOptionEntity localOption)
+        {
+            option.UpdateLocalOptionValues(localOption);
+        }
+
 
         [Fact]
         public void Get_By_Org_Uuid_Returns_Global_Options_If_No_Local_Changes()
@@ -59,7 +65,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             _optionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedGlobal.AsQueryable());
             _localOptionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedLocal.AsQueryable());
 
-            var options = _sut.GetLocalOptions(orgUuid);
+            var options = _sut.BaseGetLocalOptions(orgUuid, UpdateLocalRoleOptionValues);
 
             foreach (var option in options)
             {
@@ -78,7 +84,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             var expectedLocal = SetupOptionRepositories(orgUuid);
             _identityResolver.Setup(_ => _.ResolveDbId<Organization>(orgUuid)).Returns(orgDbId);
 
-            var options = _sut.GetLocalOptions(orgUuid);
+            var options = _sut.BaseGetLocalOptions(orgUuid, UpdateLocalRoleOptionValues);
 
             foreach (var option in options)
             {
@@ -96,7 +102,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             var optionId = A<int>();
             SetupResolveGlobalOptionUuid(globalOptionUuid, optionId);
             var expectedLocal = SetupOptionRepositories(orgUuid, optionId);
-            var result = _sut.GetLocalOption(orgUuid, globalOptionUuid);
+            var result = _sut.BaseGetLocalOption(orgUuid, globalOptionUuid, UpdateLocalRoleOptionValues);
             
             Assert.True(result.Ok);
             var option = result.Value;
@@ -122,7 +128,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             SetupCommonMocksForSuccessfulCreate(orgUuid, orgDbId, optionId, optionUuid);
             SetupResolveGlobalOptionUuid(optionUuid, optionId);
 
-            var result = _sut.CreateLocalOption(orgUuid, parameters);
+            var result = _sut.BaseCreateLocalOption(orgUuid, parameters, UpdateLocalRoleOptionValues);
 
             ExpectCreateSuccess(result, parameters.OptionUuid, true);
         }
@@ -146,7 +152,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             SetupCommonMocksForSuccessfulCreate(orgUuid, orgDbId, optionId, optionUuid);
             SetupResolveGlobalOptionUuid(optionUuid, optionId);
 
-            var result = _sut.CreateLocalOption(orgUuid, parameters);
+            var result = _sut.BaseCreateLocalOption(orgUuid, parameters, UpdateLocalRoleOptionValues);
 
             ExpectCreateSuccess(result, optionUuid);
         }
@@ -172,7 +178,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             SetupResolveAnyGlobalOptionUuid(optionId);
             _authorizationContext.Setup(_ => _.AllowCreate<TestLocalOptionEntity>(orgDbId)).Returns(false);
 
-            var result = _sut.CreateLocalOption(orgUuid, parameters);
+            var result = _sut.BaseCreateLocalOption(orgUuid, parameters, UpdateLocalRoleOptionValues);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
@@ -196,7 +202,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             SetupGlobalOptionsRepositoryReturnsOneOption(optionId, optionUuid);
             SetupResolveGlobalOptionUuid(optionUuid, optionId);
 
-            var result = _sut.PatchLocalOption(orgUuid, optionUuid, parameters);
+            var result = _sut.BasePatchLocalOption(orgUuid, optionUuid, parameters, UpdateLocalRoleOptionValues);
 
             Assert.True(result.Ok);
             Assert.Equal(descriptionText, result.Value.Description);
@@ -230,7 +236,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             SetupGlobalOptionsRepositoryReturnsOneOption(optionId, optionUuid);
             SetupResolveGlobalOptionUuid(optionUuid, optionId);
 
-            var result = _sut.PatchLocalOption(orgUuid, optionUuid, parameters);
+            var result = _sut.BasePatchLocalOption(orgUuid, optionUuid, parameters, UpdateLocalRoleOptionValues);
 
             Assert.True(result.Ok);
             Assert.Equal(parameters.Description.NewValue.Value, result.Value.Description);
@@ -287,7 +293,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             SetupResolveGlobalOptionUuid(optionUuid, optionId);
 
 
-            var result = _sut.PatchLocalOption(orgUuid, optionUuid, parameters);
+            var result = _sut.BasePatchLocalOption(orgUuid, optionUuid, parameters, UpdateLocalRoleOptionValues);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
@@ -306,7 +312,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             SetupGlobalOptionsRepositoryReturnsOneOption(optionId, optionUuid);
             SetupResolveGlobalOptionUuid(optionUuid, optionId);
 
-            var result = _sut.DeleteLocalOption(orgUuid, optionUuid);
+            var result = _sut.BaseDeleteLocalOption(orgUuid, optionUuid, UpdateLocalRoleOptionValues);
 
             Assert.True(result.Ok);
             Assert.False(result.Value.IsLocallyAvailable);
@@ -325,7 +331,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             SetupLocalRepositoryReturnsOneOption(optionId, orgUuid);
             SetupResolveGlobalOptionUuid(optionUuid, optionId);
 
-            var result = _sut.DeleteLocalOption(orgUuid, optionUuid);
+            var result = _sut.BaseDeleteLocalOption(orgUuid, optionUuid, UpdateLocalRoleOptionValues);
 
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
@@ -370,7 +376,7 @@ namespace Tests.Unit.Core.ApplicationServices.LocalOptions
             _optionsRepository.Setup(_ => _.AsQueryable()).Returns(expectedGlobal.AsQueryable());
 
 
-            var result = _sut.DeleteLocalOption(orgUuid, optionUuid);
+            var result = _sut.BaseDeleteLocalOption(orgUuid, optionUuid, UpdateLocalRoleOptionValues);
 
             Assert.True(result.Ok);
             Assert.False(result.Value.IsLocallyAvailable);

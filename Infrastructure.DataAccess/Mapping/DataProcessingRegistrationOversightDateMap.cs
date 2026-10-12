@@ -1,17 +1,25 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.GDPR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class DataProcessingRegistrationOversightDateMap : EntityTypeConfiguration<DataProcessingRegistrationOversightDate>
+    public class DataProcessingRegistrationOversightDateMap : IEntityTypeConfiguration<DataProcessingRegistrationOversightDate>
     {
-        public DataProcessingRegistrationOversightDateMap()
+        public void Configure(EntityTypeBuilder<DataProcessingRegistrationOversightDate> builder)
         {
-            HasKey(x => x.Id);
-            HasRequired(x => x.Parent)
+            builder.HasKey(x => x.Id);
+            builder.HasOne(x => x.Parent)
                 .WithMany(x => x.OversightDates)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(true);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(x => x.OversightOption)
+                .WithMany()
+                .HasForeignKey(x => x.OversightOptionId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

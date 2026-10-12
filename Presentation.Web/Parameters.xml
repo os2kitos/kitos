@@ -10,6 +10,178 @@
     <parameter name="SecurityKeyString" description="" defaultvalue="__SecurityKeyString__" tags="">
         <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='SecurityKeyString']/@value">
         </parameterentry>
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;SecurityKeyString&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <!-- Connection strings -->
+    <parameter name="KitosContext" description="" defaultvalue="__KitosDbConnectionString__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/connectionStrings/add[@name='KitosContext']/@connectionString"/>
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;KitosContext&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="kitos_HangfireDB" description="" defaultvalue="__HangfireDbConnectionString__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/connectionStrings/add[@name='kitos_HangfireDB']/@connectionString"/>
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;kitos_HangfireDB&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <!-- Email -->
+    <parameter name="SmtpFromEmail" description="" defaultvalue="__SmtpFromEmail__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/@from">
+        </parameterentry>
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;From&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="SmtpDeliveryMethod" description="" defaultvalue="SpecifiedPickupDirectory" tags="">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;DeliveryMethod&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="SmtpNetworkHost" description="" defaultvalue="__SmtpNetworkHost__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@host">
+        </parameterentry>
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;Host&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="SmtpPort" description="" defaultvalue="__SmtpPort__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@port">
+        </parameterentry>
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;Port&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="SmtpUserName" description="" defaultvalue="__SmtpUserName__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@userName">
+        </parameterentry>
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;UserName&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="SmtpPassword" description="" defaultvalue="__SmtpPassword__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.net/mailSettings/smtp/network/@password">
+        </parameterentry>
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;Password&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <!-- AppSettings injected into appsettings.json -->
+    <parameter name="ResetPasswordTTL" description="" defaultvalue="__ResetPasswordTTL__" tags="">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;ResetPasswordTTL&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="BaseUrl" description="" defaultvalue="__BaseUrl__" tags="">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;BaseUrl&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="MailSuffix" description="" defaultvalue="__MailSuffix__" tags="">
+        <parameterValidation kind="AllowEmpty" />
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;MailSuffix&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="Environment" description="" defaultvalue="__Environment__" tags="">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;Environment&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="DeploymentVersion" description="" defaultvalue="__DeploymentVersion__" tags="">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;DeploymentVersion&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="DefaultUserPassword" description="" defaultvalue="__DefaultUserPassword__" tags="">
+        <parameterValidation kind="AllowEmpty" />
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;DefaultUserPassword&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="UseDefaultPassword" description="" defaultvalue="__UseDefaultPassword__" tags="">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;UseDefaultUserPassword&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <!-- SSO SAML configuration -->
+    <parameter name="SsoServiceProviderServer" defaultvalue="__SSO_ServiceProvider_Server__">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://kitos-local.strongminds.dk']/@server"/>
+    </parameter>
+
+    <parameter name="SsoIDPEndPoints" defaultvalue="__SSO_KOMBIT_Proxy__">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[@id='https://saml.n2adgangsstyring.eksterntest-stoettesystemerne.dk']/@id"/>
+    </parameter>
+
+    <parameter name="SsoServiceProviderId" defaultvalue="__SSO_ServiceProvider_Id__">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SAML20Federation']//*[local-name() = 'ServiceProvider'][@id='https://kitos-local.strongminds.dk']/@id"/>
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'Federation']//*[local-name() = 'Audience']/text()"/>
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;SsoServiceProviderId&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="SsoCertificateThumbPrint" defaultvalue="__SSO_CERT_Thumb__">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="//*[local-name() = 'SigningCertificate'][@x509FindType='FindByThumbprint']/@findValue"/>
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;SsoCertificateThumbprint&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="StsOrganisationEndpointHost" defaultvalue="__STS_ORG_HOST__">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;StsOrganisationEndpointHost&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="StsIssuer" defaultvalue="__STS_ISSUER">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;StsIssuer&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="StsCertificateEndpoint" defaultvalue="__STS_CERT_ENDPOINT">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;StsCertificateEndpoint&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="ServiceCertificateAliasOrg" defaultvalue="__SERVICE_CERT_ALIAS_ORG">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;ServiceCertificateAliasOrg&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="StsCertificateAlias" defaultvalue="__STS_CERT_ALIAS">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;StsCertificateAlias&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="StsCertificateThumbprint" defaultvalue="__STS_CERT_THUMBPRINT">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;StsCertificateThumbprint&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="OrgService6EntityId" defaultvalue="__ORG_SERVICE_6_ENTITY_ID">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;OrgService6EntityId&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <parameter name="PubSubBaseUrl" description="" defaultvalue="__PubSubBaseUrl__" tags="">
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;PubSubBaseUrl&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <!-- WCF service endpoint addresses (legacy Web.config entries, kept for backward compatibility) -->
+    <parameter name="StsBrugerPort" defaultvalue="__STS_BRUGER_PORT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='BrugerPort']/@address"/>
+    </parameter>
+
+    <parameter name="StsAdressePort" defaultvalue="__STS_ADRESSE_PORT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='AdressePort']/@address"/>
+    </parameter>
+
+    <parameter name="StsPersonPort" defaultvalue="__STS_PERSON_PORT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='PersonPort']/@address"/>
+    </parameter>
+
+    <parameter name="StsVirksomhedPort" defaultvalue="__STS_VIRKSOMHED_PORT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='VirksomhedPort']/@address"/>
+    </parameter>
+
+    <parameter name="StsOrganisationPort" defaultvalue="__STS_ORGANISATION_PORT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='OrganisationPort']/@address"/>
+    </parameter>
+
+    <parameter name="StsOrganisationSystemPort" defaultvalue="__STS_ORGANISATION_SYSTEM_PORT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/client/endpoint[@name='OrganisationSystemPort']/@address"/>
+    </parameter>
+
+    <parameter name="StsOrganisationCertificateThumbprint" defaultvalue="__STS_ORGANISATION_CERTIFICATE_THUMBPRINT">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/system.serviceModel/behaviors/endpointBehaviors/behavior/clientCredentials/serviceCertificate/defaultCertificate/@findValue"/>
+        <parameterentry kind="TextFile" scope="\\appsettings\.json$" match="(?&lt;=&quot;StsOrganisationCertificateThumbprint&quot;\s*:\s*&quot;)[^&quot;]*"/>
+    </parameter>
+
+    <!-- SERILOG -->
+    <parameter name="serilog:minimum-level" description="" defaultvalue="__SerilogMinimumLogLevel__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='serilog:minimum-level']/@value">
+        </parameterentry>
+    </parameter>
+
+    <!-- Kitos token configuration -->
+    <parameter name="SecurityKeyString" description="" defaultvalue="__SecurityKeyString__" tags="">
+        <parameterentry kind="XmlFile" scope="\\web.config$" match="/configuration/appSettings/add[@key='SecurityKeyString']/@value">
+        </parameterentry>
     </parameter>
 
     <!-- Email -->

@@ -22,9 +22,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<IEnumerable<OrganizationResponseDTO>>();
         }
 
-        public static async Task<IEnumerable<OrganizationResponseDTO>> GetOrganizationsAsync(string token, int page = 0, int pageSize = 10, string nameContent = null, bool onlyWhereUserHasMembership = false, string cvrContent = null, string nameOrCvrContent = null, Guid? uuid = null)
+        public static async Task<IEnumerable<OrganizationResponseDTO>> GetOrganizationsAsync(string token, int page = 0, int pageSize = 10, string? nameContent = null, bool onlyWhereUserHasMembership = false, string? cvrContent = null, string? nameOrCvrContent = null, Guid? uuid = null)
         {
-            var queryParameters = new List<KeyValuePair<string, string>>()
+            var queryParameters = new List<KeyValuePair<string, string>>
             {
                 new("page", page.ToString("D")),
                 new("pageSize", pageSize.ToString("D")),
@@ -75,7 +75,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<OrganizationPermissionsResponseDTO>();
         }
 
-        public static async Task<UnitAccessRightsResponseDTO> GetUnitAccessRights(Guid organizationUuid, Guid unitUuid, Cookie optionalLogin = null)
+        public static async Task<UnitAccessRightsResponseDTO> GetUnitAccessRights(Guid organizationUuid, Guid unitUuid, Cookie? optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var orgUnitUrl = TestEnvironment.CreateUrl($"api/v2/internal/organizations/{organizationUuid}/organization-units/{unitUuid}/permissions");
@@ -86,7 +86,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<UnitAccessRightsResponseDTO>();
         }
 
-        public static async Task<List<UnitAccessRightsWithUnitDataResponseDTO>> GetUnitAccessRightsForOrganization(Guid organizationUuid, Cookie optionalLogin = null)
+        public static async Task<List<UnitAccessRightsWithUnitDataResponseDTO>> GetUnitAccessRightsForOrganization(Guid organizationUuid, Cookie? optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var orgUnitUrl = TestEnvironment.CreateUrl($"api/v2/internal/organizations/{organizationUuid}/organization-units/all/collection-permissions");

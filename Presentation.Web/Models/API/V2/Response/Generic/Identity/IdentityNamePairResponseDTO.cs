@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using Presentation.Web.Models.API.V2.SharedProperties;
 
 namespace Presentation.Web.Models.API.V2.Response.Generic.Identity
@@ -16,13 +17,14 @@ namespace Presentation.Web.Models.API.V2.Response.Generic.Identity
         /// Human readable name of the entity
         /// </summary>
         [Required]
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         protected IdentityNamePairResponseDTO()
         {
 
         }
 
+        [SetsRequiredMembers]
         public IdentityNamePairResponseDTO(Guid uuid, string name)
         {
             Uuid = uuid;

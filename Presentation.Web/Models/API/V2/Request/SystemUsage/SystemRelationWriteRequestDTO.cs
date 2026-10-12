@@ -31,7 +31,7 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         [NonEmptyGuid]
         public Guid? RelationFrequencyUuid { get; set; }
 
-        public string Description { get; set; }
-        public string UrlReference { get; set; }
+        public string? Description { get; set; }
+        public string? UrlReference { get; set; }
     }
 }

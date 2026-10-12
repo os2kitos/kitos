@@ -1,10 +1,10 @@
-﻿using System;
-using System.Web.Http;
+using System;
 using Core.ApplicationServices.GlobalOptions;
 using Core.DomainModel;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Controllers.API.V2.Internal.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
+using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Models.API.V2.Internal.Request.Options;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.GlobalOptionTypes
@@ -23,14 +23,14 @@ namespace Presentation.Web.Controllers.API.V2.Internal.GlobalOptionTypes
             _writeModelMapper = writeModelMapper;
         }
 
-        protected IHttpActionResult GetAll()
+        protected IActionResult GetAll()
         {
             return _globalRegularOptionsService.GetGlobalOptions()
                 .Select(_responseMapper.ToGlobalRegularOptionDTOs<TOptionType, TReferenceType>)
                 .Match(Ok, FromOperationError);
         }
 
-        protected IHttpActionResult Create(GlobalRegularOptionCreateRequestDTO dto)
+        protected IActionResult Create(GlobalRegularOptionCreateRequestDTO dto)
         {
             if (!ModelState.IsValid) return BadRequest();
 
@@ -40,7 +40,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.GlobalOptionTypes
                 .Match(Ok, FromOperationError);
         }
 
-        protected IHttpActionResult Patch([NonEmptyGuid][FromUri] Guid optionUuid, GlobalRegularOptionUpdateRequestDTO dto)
+        protected IActionResult Patch([NonEmptyGuid][FromQuery] Guid optionUuid, GlobalRegularOptionUpdateRequestDTO dto)
         {
             if (!ModelState.IsValid) return BadRequest();
 
@@ -51,3 +51,4 @@ namespace Presentation.Web.Controllers.API.V2.Internal.GlobalOptionTypes
         }
     }
 }
+

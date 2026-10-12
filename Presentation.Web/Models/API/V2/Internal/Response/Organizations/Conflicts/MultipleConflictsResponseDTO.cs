@@ -4,7 +4,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Organizations.Conflic
 {
     public class MultipleConflictsResponseDTO
     {
-        public string MainEntityName { get; set; }
-        public IEnumerable<SimpleConflictResponseDTO> Conflicts { get; set; }
+        public required string MainEntityName { get; set; }
+        public required IEnumerable<SimpleConflictResponseDTO> Conflicts { get; set; }
     }
 }

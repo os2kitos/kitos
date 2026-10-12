@@ -9,15 +9,15 @@ namespace Core.DomainServices
         where TModel : class
     {
         IEnumerable<TModel> Get(
-            Expression<Func<TModel, bool>> filter = null,
-            Func<IQueryable<TModel>, IOrderedQueryable<TModel>> orderBy = null,
+            Expression<Func<TModel, bool>>? filter = null,
+            Func<IQueryable<TModel>, IOrderedQueryable<TModel>>? orderBy = null,
             string includeProperties = "");
 
         IQueryable<TModel> GetWithReferencePreload<TProperty>(Expression<Func<TModel, TProperty>> includeExpression);
 
-        TProperty GetMax<TProperty>(Expression<Func<TModel, TProperty>> propertyExpression);
+        TProperty? GetMax<TProperty>(Expression<Func<TModel, TProperty>> propertyExpression);
 
-        TModel GetByKey(params object[] key);
+        TModel? GetByKey(params object[] key);
 
         TModel Insert(TModel entity);
 
@@ -47,8 +47,7 @@ namespace Core.DomainServices
         /// <summary>
         /// Consider using <see cref="DeleteByKeyWithReferencePreload"/> and remove any pre-delete manual loading of child refs.
         /// </summary>
-        /// <param name="entity"></param>
-
+        /// <param name="key"></param>
         void DeleteByKey(params object[] key);
 
         void Update(TModel entity);

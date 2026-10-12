@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSub.Infrastructure.Messa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PubSub.Application.Services", "PubSub.Application.Services\PubSub.Application.Services.csproj", "{A1807084-6671-4EF8-8E38-060873FBAFEC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CiscoAnyConnectTool", "DeploymentTools\CiscoAnyConnectTool\CiscoAnyConnectTool.csproj", "{FE733415-7189-4EB7-A694-8D3B2BE27549}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,10 @@ Global
 		{A1807084-6671-4EF8-8E38-060873FBAFEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A1807084-6671-4EF8-8E38-060873FBAFEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A1807084-6671-4EF8-8E38-060873FBAFEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE733415-7189-4EB7-A694-8D3B2BE27549}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE733415-7189-4EB7-A694-8D3B2BE27549}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE733415-7189-4EB7-A694-8D3B2BE27549}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE733415-7189-4EB7-A694-8D3B2BE27549}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

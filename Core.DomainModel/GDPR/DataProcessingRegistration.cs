@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -11,8 +12,6 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Shared;
 
-
-
 namespace Core.DomainModel.GDPR
 {
     public class DataProcessingRegistration :
@@ -23,27 +22,19 @@ namespace Core.DomainModel.GDPR
         IEntityWithAdvices,
         IEntityWithUserNotification,
         IHasUuid,
-        IHasDirtyMarking
+        IHasDirtyMarking,
+        IEntityOwnedByOrganization
     {
         public DataProcessingRegistration()
         {
-            ExternalReferences = new List<ExternalReference>();
-            SystemUsages = new List<ItSystemUsage.ItSystemUsage>();
-            DataProcessors = new List<Organization.Organization>();
-            InsecureCountriesSubjectToDataTransfer = new List<DataProcessingCountryOption>();
-            OversightOptions = new List<DataProcessingOversightOption>();
-            AssociatedContracts = new List<ItContract.ItContract>();
-            OversightDates = new List<DataProcessingRegistrationOversightDate>();
-            UserNotifications = new List<UserNotification>();
-            AssignedSubDataProcessors = new List<SubDataProcessor>();
             Uuid = Guid.NewGuid();
             MarkAsDirty();
         }
 
         public Guid Uuid { get; set; }
 
-        public static bool IsNameValid(string name) => !string.IsNullOrWhiteSpace(name) &&
-                                                       name.Length <= DataProcessingRegistrationConstraints.MaxNameLength;
+        public static bool IsNameValid([NotNullWhen(true)] string name) => !string.IsNullOrWhiteSpace(name) &&
+                                                                           name.Length <= DataProcessingRegistrationConstraints.MaxNameLength;
 
         public Maybe<OperationError> SetName(string newName)
         {
@@ -85,22 +76,22 @@ namespace Core.DomainModel.GDPR
             }
         }
 
-        public virtual ICollection<DataProcessingCountryOption> InsecureCountriesSubjectToDataTransfer { get; set; }
+        public virtual ICollection<DataProcessingCountryOption> InsecureCountriesSubjectToDataTransfer { get; set; } = new List<DataProcessingCountryOption>();
 
         public virtual Organization.Organization Organization { get; set; }
 
         public virtual ICollection<DataProcessingRegistrationReadModel> ReadModels { get; set; }
 
-        public virtual ICollection<ItSystemUsage.ItSystemUsage> SystemUsages { get; set; }
+        public virtual ICollection<ItSystemUsage.ItSystemUsage> SystemUsages { get; set; } = new List<ItSystemUsage.ItSystemUsage>();
 
-        public virtual ICollection<Organization.Organization> DataProcessors { get; set; }
-        public virtual ICollection<SubDataProcessor> AssignedSubDataProcessors { get; set; }
+        public virtual ICollection<Organization.Organization> DataProcessors { get; set; } = new List<Organization.Organization>();
+        public virtual ICollection<SubDataProcessor> AssignedSubDataProcessors { get; set; } = new List<SubDataProcessor>();
         public virtual DataProcessingDataResponsibleOption DataResponsible { get; set; }
         public int? DataResponsible_Id { get; set; }
 
         public string DataResponsibleRemark { get; set; }
 
-        public virtual ICollection<DataProcessingOversightOption> OversightOptions { get; set; }
+        public virtual ICollection<DataProcessingOversightOption> OversightOptions { get; set; } = new List<DataProcessingOversightOption>();
         public string OversightOptionRemark { get; set; }
 
         public Result<Organization.Organization, OperationError> AssignDataProcessor(Organization.Organization dataProcessor)
@@ -124,12 +115,12 @@ namespace Core.DomainModel.GDPR
 
             return dataProcessor;
         }
+
         public Result<SubDataProcessor, OperationError> AssignSubDataProcessor(Organization.Organization dataProcessor)
         {
             if (dataProcessor == null) throw new ArgumentNullException(nameof(dataProcessor));
 
-            if (HasSubDataProcessors != YesNoUndecidedOption.Yes)
-                return new OperationError("To Add new sub data processors, enable sub data processors", OperationFailure.BadInput);
+            SetHasSubDataProcessors(YesNoUndecidedOption.Yes);
 
             var subDataProcessor = GetSubDataProcessor(dataProcessor);
             if (subDataProcessor.HasValue)
@@ -290,9 +281,9 @@ namespace Core.DomainModel.GDPR
             };
         }
 
-        public virtual ICollection<UserNotification> UserNotifications { get; set; }
+        public virtual ICollection<UserNotification> UserNotifications { get; set; } = new List<UserNotification>();
 
-        public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
+        public virtual ICollection<ExternalReference> ExternalReferences { get; set; } = new List<ExternalReference>();
 
         public ReferenceRootType GetRootType() => ReferenceRootType.DataProcessingRegistration;
 
@@ -359,7 +350,7 @@ namespace Core.DomainModel.GDPR
             OversightScheduledInspectionDate = oversightScheduledInspectionDate;
         }
 
-        public virtual ICollection<DataProcessingRegistrationOversightDate> OversightDates { get; set; }
+        public virtual ICollection<DataProcessingRegistrationOversightDate> OversightDates { get; set; } = new List<DataProcessingRegistrationOversightDate>();
 
 
         public Maybe<IEnumerable<DataProcessingRegistrationOversightDate>> SetOversightCompleted(YesNoUndecidedOption completed)
@@ -374,7 +365,7 @@ namespace Core.DomainModel.GDPR
             return Maybe<IEnumerable<DataProcessingRegistrationOversightDate>>.None;
         }
 
-        public virtual ICollection<ItContract.ItContract> AssociatedContracts { get; set; }
+        public virtual ICollection<ItContract.ItContract> AssociatedContracts { get; set; } = new List<ItContract.ItContract>();
         public int? MainContractId { get; set; }
         public virtual ItContract.ItContract MainContract { get; set; }
         public bool IsActiveAccordingToMainContract => CheckContractValidity().IsNone;
@@ -405,9 +396,13 @@ namespace Core.DomainModel.GDPR
             return AssociatedContracts.FirstOrDefault(c => c.Id == id);
         }
 
+        public bool? EnforceInvalidity { get; set; }
+
         public DataProcessingRegistrationValidationResult CheckDprValidity()
         {
             var errors = new List<DataProcessingRegistrationValidationError>();
+
+            if (EnforceInvalidity == true) errors.Add(DataProcessingRegistrationValidationError.EnforcedInvalidity);
 
             var hasContractValidityError = CheckContractValidity();
 
@@ -419,25 +414,32 @@ namespace Core.DomainModel.GDPR
             return new DataProcessingRegistrationValidationResult(errors);
         }
 
+        public bool IsValid => CheckDprValidity().Result;
+
         private Maybe<DataProcessingRegistrationValidationError> CheckContractValidity()
         {
-            //Main contract is considered valid if it's null or if "IsActive" == true
-            return MainContract == null || MainContract.IsActive
+            return IsMainContractValid()
                 ? Maybe<DataProcessingRegistrationValidationError>.None
                 : DataProcessingRegistrationValidationError.MainContractNotActive;
         }
-
-        public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(DateTime oversightDate, string oversightRemark)
+        private bool IsMainContractValid()
+        {
+            return MainContract == null || MainContract.IsActive;
+        }
+        
+        public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(DateTime oversightDate, string oversightRemark, string oversightReportLink, string oversightReportLinkName, int? oversightOptionId)
         {
             if (IsOversightCompleted != YesNoUndecidedOption.Yes)
-                return new OperationError("Cannot assign oversight dates if 'IsOversightCompleted' is not set to 'Yes'", OperationFailure.BadState);
-            if (oversightDate == null) throw new ArgumentNullException(nameof(oversightDate));
+                IsOversightCompleted = YesNoUndecidedOption.Yes;
             if (oversightRemark == null) throw new ArgumentNullException(nameof(oversightRemark));
 
             var newOversightDate = new DataProcessingRegistrationOversightDate
             {
                 OversightDate = oversightDate,
                 OversightRemark = oversightRemark,
+                OversightReportLink = oversightReportLink,
+                OversightReportLinkName = oversightReportLinkName,
+                OversightOptionId = oversightOptionId,
                 Parent = this
             };
 
@@ -446,20 +448,45 @@ namespace Core.DomainModel.GDPR
             return newOversightDate;
         }
 
-        public Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int oversightId, DateTime oversightDate, string oversightRemark)
+        private Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int oversightId, Action<DataProcessingRegistrationOversightDate> mutation)
         {
-            if (oversightDate == null) throw new ArgumentNullException(nameof(oversightDate));
-            if (oversightRemark == null) throw new ArgumentNullException(nameof(oversightRemark));
             var existingDate = GetOversightDate(oversightId);
             if (existingDate.IsNone)
                 return new OperationError("Oversight date not assigned", OperationFailure.BadInput);
 
             var oversightDateToModify = existingDate.Value;
 
-            oversightDateToModify.OversightDate = oversightDate;
-            oversightDateToModify.OversightRemark = oversightRemark;
+            mutation(oversightDateToModify);
 
             return oversightDateToModify;
+        }
+
+        public Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDateDate(int oversightId, DateTime? oversightDate)
+        {
+            if(oversightDate == null)
+                return new OperationError("CompletedAt cannot be null when provided for oversight date update", OperationFailure.BadInput);
+
+            return ModifyOversightDate(oversightId, existingDate => existingDate.OversightDate = (DateTime)oversightDate);
+        }
+
+        public Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDateRemark(int oversightId, string oversightRemark)
+        {
+            return ModifyOversightDate(oversightId, existingDate => existingDate.OversightRemark = oversightRemark);
+        }
+
+        public Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDateReportLink(int oversightId, string oversightReportLink)
+        {
+            return ModifyOversightDate(oversightId, existingDate => existingDate.OversightReportLink = oversightReportLink);
+        }
+
+        public Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDateReportLinkName(int oversightId, string oversightReportLinkName)
+        {
+            return ModifyOversightDate(oversightId, existingDate => existingDate.OversightReportLinkName = oversightReportLinkName);
+        }
+
+        public Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDateOptionId(int oversightId, int? oversightOptionId)
+        {
+            return ModifyOversightDate(oversightId, existingDate => existingDate.OversightOptionId = oversightOptionId);
         }
 
         public Result<DataProcessingRegistrationOversightDate, OperationError> RemoveOversightDate(int oversightId)
@@ -469,6 +496,9 @@ namespace Core.DomainModel.GDPR
                 return new OperationError("Oversight date not assigned", OperationFailure.BadInput);
 
             OversightDates.Remove(oversightDate.Value);
+            
+            if(!OversightDates.Any())
+                IsOversightCompleted = YesNoUndecidedOption.No;
 
             return oversightDate.Value;
         }
@@ -478,9 +508,19 @@ namespace Core.DomainModel.GDPR
             return OversightDates.OrderByDescending(x => x.OversightDate).FirstOrNone();
         }
 
-        private Maybe<DataProcessingRegistrationOversightDate> GetOversightDate(int oversightId)
+        public Maybe<DataProcessingRegistrationOversightDate> GetOversightDate(int oversightId)
         {
             return OversightDates.FirstOrDefault(x => x.Id == oversightId).FromNullable();
+        }
+
+        public Result<DataProcessingRegistrationOversightDate, OperationError> GetOversightDate(Guid oversightDateUuid)
+        {
+            var oversightDate = OversightDates.FirstOrDefault(x => x.Uuid == oversightDateUuid);
+            if (oversightDate == null)
+                return new OperationError($"Oversight date with uuid: {oversightDateUuid} was not found",
+                    OperationFailure.NotFound);
+
+            return oversightDate;
         }
 
         public Maybe<OperationError> SetResponsibleOrganizationUnit(Guid organizationUnitUuid)

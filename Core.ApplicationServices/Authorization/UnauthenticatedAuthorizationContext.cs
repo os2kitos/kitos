@@ -1,10 +1,17 @@
-﻿using Core.DomainModel;
+﻿using System;
+using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 
 namespace Core.ApplicationServices.Authorization
 {
     public class UnauthenticatedAuthorizationContext : IAuthorizationContext
     {
+       public IAuthorizationModel GetAuthorizationModel(IEntityOwnedByOrganization entity)
+       {
+           throw new NotImplementedException();
+       }
+
         public CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess()
         {
             return CrossOrganizationDataReadAccessLevel.None;
@@ -46,6 +53,11 @@ namespace Core.ApplicationServices.Authorization
         }
 
         public bool HasPermission(Permission permission)
+        {
+            return false;
+        }
+
+        public bool AllowAdministerOrganizationRight(OrganizationRight right)
         {
             return false;
         }

@@ -2,8 +2,8 @@
 {
     public class InterfacesExposedOutsideTheOrganizationResponseDTO
     {
-        public string ExposedInterfaceName { get; set; }
-        public string ExposingSystemName { get; set; }
-        public string OrganizationName { get; set; }
+        public string? ExposedInterfaceName { get; set; }
+        public string? ExposingSystemName { get; set; }
+        public string? OrganizationName { get; set; }
     }
 }

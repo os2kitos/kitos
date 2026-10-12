@@ -4,6 +4,7 @@
     {
         EndOfCalendarYear = 0,
         EndOfQuarter = 1,
-        EndOfMonth = 2
+        EndOfMonth = 2,
+        BillingPeriod = 3
     }
 }

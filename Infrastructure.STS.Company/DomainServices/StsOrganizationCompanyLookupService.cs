@@ -1,7 +1,5 @@
-﻿using System;
+using System;
 using System.Linq;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using System.ServiceModel.Channels;
 using Core.Abstractions.Types;
@@ -9,7 +7,6 @@ using Core.DomainServices.Organizations;
 using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Common.Model.Client;
-using Infrastructure.STS.Common.Model.Token;
 using Kombit.InfrastructureSamples.Token;
 using Kombit.InfrastructureSamples.VirksomhedService;
 using Serilog;
@@ -85,21 +82,8 @@ public class StsOrganizationCompanyLookupService : IStsOrganizationCompanyLookup
 
     private VirksomhedPortType CreatePort(string cvr)
     {
-        var token = _tokenFetcher.IssueToken(_configuration.OrgService6EntityId, cvr);
-        var client = new VirksomhedPortTypeClient();
-
-        var identity = EndpointIdentity.CreateDnsIdentity(_configuration.ServiceCertificateAliasOrg);
-        var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
-        client.Endpoint.Address = endpointAddress;
-        var certificate = CertificateLoader.LoadCertificate(
-            StoreName.My,
-            StoreLocation.LocalMachine,
-            _configuration.ClientCertificateThumbprint
-        );
-        client.ClientCredentials.ClientCertificate.Certificate = certificate;
-        client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
-
-        return client.ChannelFactory.CreateChannelWithIssuedToken(token);
+        var serviceUrl = _configuration.VirksomhedServiceUrl;
+        return _tokenFetcher.CreateChannel<VirksomhedPortType>(_configuration.OrgService6EntityId, serviceUrl, cvr);
     }
 
     private static soegRequest CreateSearchByCvrRequest(Organization organization)

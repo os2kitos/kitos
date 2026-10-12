@@ -20,7 +20,7 @@ namespace Digst.OioIdws.Common.Logging
             _logger = LoggerFactory.CreateLogger();
         }
 
-        public void WriteCore(TraceEventType eventType, int eventId, object state, Exception exception, Func<object, Exception, string> formatter)
+        public void WriteCore(TraceEventType eventType, int eventId, object state, Exception? exception, Func<object, Exception, string> formatter)
         {
             _logger.WriteCore(eventType, eventId, state, exception, formatter);
         }

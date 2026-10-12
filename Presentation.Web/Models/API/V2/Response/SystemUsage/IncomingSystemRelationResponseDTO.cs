@@ -9,6 +9,6 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// Identifies the origin system usage of the incoming system relation
         /// </summary>
         [Required]
-        public IdentityNamePairResponseDTO FromSystemUsage { get; set; }
+        public IdentityNamePairResponseDTO? FromSystemUsage { get; set; }
     }
 }

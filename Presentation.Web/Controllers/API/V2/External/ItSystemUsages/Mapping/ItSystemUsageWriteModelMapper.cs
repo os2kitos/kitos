@@ -1,26 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
+using Core.ApplicationServices.Model.SystemUsage;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Shared;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Types.System;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
-using Presentation.Web.Controllers.API.V2.External.Generic;
-
+using System;
+using System.Collections.Generic;
+using System.Linq;
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
     public class ItSystemUsageWriteModelMapper : WriteModelMapperBase, IItSystemUsageWriteModelMapper
@@ -75,7 +77,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Archiving = archiving
                     .FromNullable()
                     .Select(a => MapBaseArchiving(a, enforceFallbackOnUndefinedProperties))
-                    .Select(a => MapUpdatedJournalPeriods(a, archiving, enforceFallbackOnUndefinedProperties))
+                    .Select(a => MapUpdatedJournalPeriods(a, archiving!, enforceFallbackOnUndefinedProperties))
             };
         }
 
@@ -90,109 +92,105 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
             return new UpdatedSystemUsageGDPRProperties
             {
-                Purpose = rule.MustUpdate(x => x.GDPR.Purpose)
-                    ? source.Purpose.AsChangedValue()
+                ProcessingPurpose = rule.MustUpdate(x => x.GDPR!.ProcessingPurpose)
+                    ? source.ProcessingPurpose!.AsChangedValue()
                     : OptionalValueChange<string>.None,
 
-                BusinessCritical = rule.MustUpdate(x => x.GDPR.BusinessCritical)
-                    ? MapYesNoDontKnow(source.BusinessCritical)
-                    : OptionalValueChange<DataOptions?>.None,
-
-                HostedAt = rule.MustUpdate(x => x.GDPR.HostedAt)
-                    ? MapEnumChoice(source.HostedAt, HostedAtMappingExtensions.ToHostedAt)
-                    : OptionalValueChange<HostedAt?>.None,
-
-                DirectoryDocumentation = rule.MustUpdate(x => x.GDPR.DirectoryDocumentation)
+                DirectoryDocumentation = rule.MustUpdate(x => x.GDPR!.DirectoryDocumentation)
                     ? MapLink(source.DirectoryDocumentation)
                     : OptionalValueChange<Maybe<NamedLink>>.None,
 
-                DataSensitivityLevels = rule.MustUpdate(x => x.GDPR.DataSensitivityLevels)
+                DataSensitivityLevels = rule.MustUpdate(x => x.GDPR!.DataSensitivityLevels)
                     ? MapEnumList(source.DataSensitivityLevels, SensitiveDataLevelMappingExtensions.ToSensitiveDataLevel)
                     : OptionalValueChange<Maybe<IEnumerable<SensitiveDataLevel>>>.None,
 
-                SensitivePersonDataUuids = rule.MustUpdate(x => x.GDPR.SensitivePersonDataUuids)
+                SensitivePersonDataUuids = rule.MustUpdate(x => x.GDPR!.SensitivePersonDataUuids)
                     ? MapCrossReferences(source.SensitivePersonDataUuids)
                     : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
 
-                PersonalDataOptions = rule.MustUpdate(x => x.GDPR.SpecificPersonalData)
+                PersonalDataOptions = rule.MustUpdate(x => x.GDPR!.SpecificPersonalData)
                     ? MapEnumList(source.SpecificPersonalData, GDPRPersonalDataMappingExtensions.ToGDPRPersonalDataOption)
                     : OptionalValueChange<Maybe<IEnumerable<GDPRPersonalDataOption>>>.None,
 
-                RegisteredDataCategoryUuids = rule.MustUpdate(x => x.GDPR.RegisteredDataCategoryUuids)
+                RegisteredDataCategoryUuids = rule.MustUpdate(x => x.GDPR!.RegisteredDataCategoryUuids)
                     ? MapCrossReferences(source.RegisteredDataCategoryUuids)
                     : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
 
-                TechnicalPrecautionsInPlace = rule.MustUpdate(x => x.GDPR.TechnicalPrecautionsInPlace)
+                TechnicalPrecautionsInPlace = rule.MustUpdate(x => x.GDPR!.TechnicalPrecautionsInPlace)
                     ? MapYesNoDontKnow(source.TechnicalPrecautionsInPlace)
                     : OptionalValueChange<DataOptions?>.None,
 
-                TechnicalPrecautionsApplied = rule.MustUpdate(x => x.GDPR.TechnicalPrecautionsApplied)
+                TechnicalPrecautionsApplied = rule.MustUpdate(x => x.GDPR!.TechnicalPrecautionsApplied)
                     ? MapEnumList(source.TechnicalPrecautionsApplied, TechnicalPrecautionMappingExtensions.ToTechnicalPrecaution)
                     : OptionalValueChange<Maybe<IEnumerable<TechnicalPrecaution>>>.None,
 
-                TechnicalPrecautionsDocumentation = rule.MustUpdate(x => x.GDPR.TechnicalPrecautionsDocumentation)
+                TechnicalPrecautionsDocumentation = rule.MustUpdate(x => x.GDPR!.TechnicalPrecautionsDocumentation)
                     ? MapLink(source.TechnicalPrecautionsDocumentation)
                     : OptionalValueChange<Maybe<NamedLink>>.None,
 
-                UserSupervision = rule.MustUpdate(x => x.GDPR.UserSupervision)
+                UserSupervision = rule.MustUpdate(x => x.GDPR!.UserSupervision)
                     ? MapYesNoDontKnow(source.UserSupervision)
                     : OptionalValueChange<DataOptions?>.None,
 
-                UserSupervisionDate = rule.MustUpdate(x => x.GDPR.UserSupervisionDate)
+                UserSupervisionDate = rule.MustUpdate(x => x.GDPR!.UserSupervisionDate)
                     ? source.UserSupervisionDate.AsChangedValue()
                     : OptionalValueChange<DateTime?>.None,
 
-                UserSupervisionDocumentation = rule.MustUpdate(x => x.GDPR.UserSupervisionDocumentation)
+                UserSupervisionDocumentation = rule.MustUpdate(x => x.GDPR!.UserSupervisionDocumentation)
                     ? MapLink(source.UserSupervisionDocumentation)
                     : OptionalValueChange<Maybe<NamedLink>>.None,
 
-                RiskAssessmentConducted = rule.MustUpdate(x => x.GDPR.RiskAssessmentConducted)
-                    ? MapYesNoDontKnow(source.RiskAssessmentConducted)
-                    : OptionalValueChange<DataOptions?>.None,
+                RiskAssessmentConducted = rule.MustUpdate(x => x.GDPR!.RiskAssessmentConducted)
+                    ? MapYesNoDontKnowIrrelevant(source.RiskAssessmentConducted)
+                    : OptionalValueChange<YesNoDontKnowIrrelevant?>.None,
 
-                RiskAssessmentConductedDate = rule.MustUpdate(x => x.GDPR.RiskAssessmentConductedDate)
+                RiskAssessmentConductedDate = rule.MustUpdate(x => x.GDPR!.RiskAssessmentConductedDate)
                     ? source.RiskAssessmentConductedDate.AsChangedValue()
                     : OptionalValueChange<DateTime?>.None,
 
-                RiskAssessmentResult = rule.MustUpdate(x => x.GDPR.RiskAssessmentResult)
+                RiskAssessmentResult = rule.MustUpdate(x => x.GDPR!.RiskAssessmentResult)
                     ? MapEnumChoice(source.RiskAssessmentResult, RiskLevelMappingExtensions.ToRiskLevel)
                     : OptionalValueChange<RiskLevel?>.None,
 
-                RiskAssessmentDocumentation = rule.MustUpdate(x => x.GDPR.RiskAssessmentDocumentation)
+                RiskAssessmentDocumentation = rule.MustUpdate(x => x.GDPR!.RiskAssessmentDocumentation)
                     ? MapLink(source.RiskAssessmentDocumentation)
                     : OptionalValueChange<Maybe<NamedLink>>.None,
 
-                RiskAssessmentNotes = rule.MustUpdate(x => x.GDPR.RiskAssessmentNotes)
-                    ? source.RiskAssessmentNotes.AsChangedValue()
+                RiskAssessmentNotes = rule.MustUpdate(x => x.GDPR!.RiskAssessmentNotes)
+                    ? source.RiskAssessmentNotes!.AsChangedValue()
                     : OptionalValueChange<string>.None,
 
-                PlannedRiskAssessmentDate = rule.MustUpdate(x => x.GDPR.PlannedRiskAssessmentDate)
+                PlannedRiskAssessmentDate = rule.MustUpdate(x => x.GDPR!.PlannedRiskAssessmentDate)
                     ? source.PlannedRiskAssessmentDate.AsChangedValue()
                     : OptionalValueChange<DateTime?>.None,
 
-                DPIAConducted = rule.MustUpdate(x => x.GDPR.DPIAConducted)
+                DPIAConducted = rule.MustUpdate(x => x.GDPR!.DPIAConducted)
                     ? MapYesNoDontKnow(source.DPIAConducted)
                     : OptionalValueChange<DataOptions?>.None,
 
-                DPIADate = rule.MustUpdate(x => x.GDPR.DPIADate)
+                DPIADate = rule.MustUpdate(x => x.GDPR!.DPIADate)
                     ? source.DPIADate.AsChangedValue()
                     : OptionalValueChange<DateTime?>.None,
 
-                DPIADocumentation = rule.MustUpdate(x => x.GDPR.DPIADocumentation)
+                DPIADocumentation = rule.MustUpdate(x => x.GDPR!.DPIADocumentation)
                     ? MapLink(source.DPIADocumentation)
                     : OptionalValueChange<Maybe<NamedLink>>.None,
 
-                RetentionPeriodDefined = rule.MustUpdate(x => x.GDPR.RetentionPeriodDefined)
+                RetentionPeriodDefined = rule.MustUpdate(x => x.GDPR!.RetentionPeriodDefined)
                     ? MapYesNoDontKnow(source.RetentionPeriodDefined)
                     : OptionalValueChange<DataOptions?>.None,
 
-                NextDataRetentionEvaluationDate = rule.MustUpdate(x => x.GDPR.NextDataRetentionEvaluationDate)
+                NextDataRetentionEvaluationDate = rule.MustUpdate(x => x.GDPR!.NextDataRetentionEvaluationDate)
                     ? source.NextDataRetentionEvaluationDate.AsChangedValue()
                     : OptionalValueChange<DateTime?>.None,
 
-                DataRetentionEvaluationFrequencyInMonths = rule.MustUpdate(x => x.GDPR.DataRetentionEvaluationFrequencyInMonths)
+                DataRetentionEvaluationFrequencyInMonths = rule.MustUpdate(x => x.GDPR!.DataRetentionEvaluationFrequencyInMonths)
                     ? source.DataRetentionEvaluationFrequencyInMonths.AsChangedValue()
-                    : OptionalValueChange<int?>.None
+                    : OptionalValueChange<int?>.None,
+
+                IsDataProcessingAgreementRequired = rule.MustUpdate(x => x.GDPR!.IsDataProcessingAgreementRequired)
+                ? MapEnumChoice(source.IsDataProcessingAgreementRequired, IsDataProcessingAgreementRequiredMappingExtensions.FromChoice)
+                : OptionalValueChange<IsDataProcessingAgreementRequired?>.None
             };
         }
 
@@ -202,49 +200,49 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
             return new UpdatedSystemUsageArchivingParameters()
             {
-                ArchiveDuty = rule.MustUpdate(x => x.Archiving.ArchiveDuty)
+                ArchiveDuty = rule.MustUpdate(x => x.Archiving!.ArchiveDuty)
                     ? MapEnumChoice(source.ArchiveDuty, ArchiveDutyMappingExtensions.ToArchiveDutyTypes)
                     : OptionalValueChange<ArchiveDutyTypes?>.None,
 
-                ArchiveTypeUuid = rule.MustUpdate(x => x.Archiving.TypeUuid)
+                ArchiveTypeUuid = rule.MustUpdate(x => x.Archiving!.TypeUuid)
                     ? (source.TypeUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<Guid>>.None,
 
-                ArchiveLocationUuid = rule.MustUpdate(x => x.Archiving.LocationUuid)
+                ArchiveLocationUuid = rule.MustUpdate(x => x.Archiving!.LocationUuid)
                     ? (source.LocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<Guid>>.None,
 
-                ArchiveTestLocationUuid = rule.MustUpdate(x => x.Archiving.TestLocationUuid)
+                ArchiveTestLocationUuid = rule.MustUpdate(x => x.Archiving!.TestLocationUuid)
                     ? (source.TestLocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<Guid>>.None,
 
-                ArchiveSupplierOrganizationUuid = rule.MustUpdate(x => x.Archiving.SupplierOrganizationUuid)
+                ArchiveSupplierOrganizationUuid = rule.MustUpdate(x => x.Archiving!.SupplierOrganizationUuid)
                     ? (source.SupplierOrganizationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<Guid>>.None,
 
-                ArchiveActive = rule.MustUpdate(x => x.Archiving.Active)
+                ArchiveActive = rule.MustUpdate(x => x.Archiving!.Active)
                     ? source.Active.AsChangedValue()
                     : OptionalValueChange<bool?>.None,
 
-                ArchiveNotes = rule.MustUpdate(x => x.Archiving.Notes)
-                    ? source.Notes.AsChangedValue()
+                ArchiveNotes = rule.MustUpdate(x => x.Archiving!.Notes)
+                    ? source.Notes!.AsChangedValue()
                     : OptionalValueChange<string>.None,
 
-                ArchiveFrequencyInMonths = rule.MustUpdate(x => x.Archiving.FrequencyInMonths)
+                ArchiveFrequencyInMonths = rule.MustUpdate(x => x.Archiving!.FrequencyInMonths)
                     ? source.FrequencyInMonths.AsChangedValue()
                     : OptionalValueChange<int?>.None,
 
-                ArchiveDocumentBearing = rule.MustUpdate(x => x.Archiving.DocumentBearing)
+                ArchiveDocumentBearing = rule.MustUpdate(x => x.Archiving!.DocumentBearing)
                     ? source.DocumentBearing.AsChangedValue()
                     : OptionalValueChange<bool?>.None,
             };
         }
-        private UpdatedSystemUsageArchivingParameters MapJournalPeriods(UpdatedSystemUsageArchivingParameters parameters, ArchivingCreationRequestDTO source, bool enforceFallbackIfNotProvided)
+        private UpdatedSystemUsageArchivingParameters MapJournalPeriods(UpdatedSystemUsageArchivingParameters parameters, ArchivingCreationRequestDTO? source, bool enforceFallbackIfNotProvided)
         {
             var rule = CreateChangeRule<UpdateItSystemUsageRequestDTO>(enforceFallbackIfNotProvided);
 
-            parameters.ArchiveJournalPeriods = rule.MustUpdate(x => x.Archiving.JournalPeriods)
-                ? source.JournalPeriods.FromNullable().Select(periods => periods.Select(MapNewJournalPeriod)).AsChangedValue()
+            parameters.ArchiveJournalPeriods = rule.MustUpdate(x => x.Archiving!.JournalPeriods)
+                ? source!.JournalPeriods.FromNullable().Select(periods => periods.Select(MapNewJournalPeriod)).AsChangedValue()
                 : OptionalValueChange<Maybe<IEnumerable<SystemUsageJournalPeriodUpdate>>>.None;
 
             return parameters;
@@ -253,40 +251,56 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         {
             var rule = CreateChangeRule<UpdateItSystemUsageRequestDTO>(enforceFallbackIfNotProvided);
 
-            parameters.ArchiveJournalPeriods = rule.MustUpdate(x => x.Archiving.JournalPeriods)
-                ? source.JournalPeriods.FromNullable().Select(periods => periods.Select(MapUpdatedJournalPeriod)).AsChangedValue()
+            parameters.ArchiveJournalPeriods = rule.MustUpdate(x => x.Archiving!.JournalPeriods)
+                ? source!.JournalPeriods.FromNullable().Select(periods => periods.Select(MapUpdatedJournalPeriod)).AsChangedValue()
                 : OptionalValueChange<Maybe<IEnumerable<SystemUsageJournalPeriodUpdate>>>.None;
 
             return parameters;
         }
-        private static SystemUsageJournalPeriodUpdate MapNewJournalPeriod(JournalPeriodDTO newJournalPeriod)
+        private SystemUsageJournalPeriodUpdate MapNewJournalPeriod(JournalPeriodDTO newJournalPeriod)
         {
-            var update = new SystemUsageJournalPeriodUpdate();
-            MapJournalPeriodProperties(newJournalPeriod, update);
+            var update = MapBaseJournalPeriodProperties(newJournalPeriod);
             return update;
         }
 
-        private static SystemUsageJournalPeriodUpdate MapUpdatedJournalPeriod(JournalPeriodUpdateRequestDTO journalPeriodUpdate)
+        private SystemUsageJournalPeriodUpdate MapUpdatedJournalPeriod(JournalPeriodUpdateRequestDTO journalPeriodUpdate)
         {
-            var update = new SystemUsageJournalPeriodUpdate();
+            var update = MapBaseJournalPeriodProperties(journalPeriodUpdate);
             update.Uuid = journalPeriodUpdate.Uuid;
-            MapJournalPeriodProperties(journalPeriodUpdate, update);
             return update;
+        }
+
+        public IEnumerable<SystemRelationParameters> MapRelations(IEnumerable<SystemRelationWriteRequestDTO> dtos)
+        {
+            return dtos.Select(MapRelation);
         }
 
         public SystemUsageJournalPeriodProperties MapJournalPeriodProperties(JournalPeriodDTO input)
         {
-            var properties = new SystemUsageJournalPeriodProperties();
-            MapJournalPeriodProperties(input, properties);
-            return properties;
+            return MapBaseJournalPeriodProperties(input);
         }
 
-        private static void MapJournalPeriodProperties(JournalPeriodDTO journalPeriod, SystemUsageJournalPeriodProperties update)
+        public ArchiveItSystemUsageParameters MapArchiveParameters(CreateItSystemUsageArchiveRequestDTO request)
         {
-            update.Approved = journalPeriod.Approved;
-            update.ArchiveId = journalPeriod.ArchiveId;
-            update.EndDate = journalPeriod.EndDate;
-            update.StartDate = journalPeriod.StartDate;
+            return new ArchiveItSystemUsageParameters
+            {
+                ArchivingDate = request.ArchivingDate,
+                TakenIntoUsageDate = request.TakenIntoUsageDate,
+                ReferenceName = request.ReferenceName,
+                Note = request.Note,
+                ArchiveReferences = request.ArchiveReferences?.Select(reference => new NamedLink(reference.Name ?? string.Empty, reference.Url ?? string.Empty)) ?? new List<NamedLink>()
+            };
+        }
+
+        private SystemUsageJournalPeriodUpdate MapBaseJournalPeriodProperties(JournalPeriodDTO journalPeriod)
+        {
+            return new SystemUsageJournalPeriodUpdate
+            {
+                Approved = journalPeriod.Approved,
+                ArchiveId = journalPeriod.ArchiveId,
+                EndDate = journalPeriod.EndDate,
+                StartDate = journalPeriod.StartDate,
+            };
         }
 
         private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
@@ -305,11 +319,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
             return new UpdatedSystemUsageKLEDeviationParameters
             {
-                AddedKLEUuids = rule.MustUpdate(x => x.LocalKleDeviations.AddedKLEUuids)
+                AddedKLEUuids = rule.MustUpdate(x => x.LocalKleDeviations!.AddedKLEUuids)
                     ? source.AddedKLEUuids.FromNullable().AsChangedValue()
                     : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
 
-                RemovedKLEUuids = rule.MustUpdate(x => x.LocalKleDeviations.RemovedKLEUuids)
+                RemovedKLEUuids = rule.MustUpdate(x => x.LocalKleDeviations!.RemovedKLEUuids)
                     ? source.RemovedKLEUuids.FromNullable().AsChangedValue()
                     : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None
             };
@@ -318,7 +332,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         /// <summary>
         /// Maps a complete update of the general data update request. Nulled sections are interpreted as intentionally reset
         /// </summary>
-        /// <param name="generalData"></param>
+        /// <param name="source"></param>
+        /// <param name="enforceFallbackIfNotProvided"></param>
         /// <returns></returns>
         private UpdatedSystemUsageGeneralProperties MapGeneralDataUpdate(GeneralDataUpdateRequestDTO source, bool enforceFallbackIfNotProvided)
         {
@@ -326,7 +341,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
             var generalProperties = MapGeneralData(source, enforceFallbackIfNotProvided);
 
-            generalProperties.MainContractUuid = rule.MustUpdate(x => x.General.MainContractUuid)
+            generalProperties.MainContractUuid = rule.MustUpdate(x => x.General!.MainContractUuid)
                 ? (source.MainContractUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
                 : OptionalValueChange<Maybe<Guid>>.None;
 
@@ -339,11 +354,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
             return new UpdatedSystemUsageOrganizationalUseParameters
             {
-                ResponsibleOrganizationUnitUuid = rule.MustUpdate(x => x.OrganizationUsage.ResponsibleOrganizationUnitUuid)
+                ResponsibleOrganizationUnitUuid = rule.MustUpdate(x => x.OrganizationUsage!.ResponsibleOrganizationUnitUuid)
                     ? (source.ResponsibleOrganizationUnitUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<Guid>>.None,
 
-                UsingOrganizationUnitUuids = rule.MustUpdate(x => x.OrganizationUsage.UsingOrganizationUnitUuids)
+                UsingOrganizationUnitUuids = rule.MustUpdate(x => x.OrganizationUsage!.UsingOrganizationUnitUuids)
                     ? (source.UsingOrganizationUnitUuids?.FromNullable() ?? Maybe<IEnumerable<Guid>>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None
             };
@@ -365,63 +380,94 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
             return new UpdatedSystemUsageGeneralProperties
             {
-                LocalCallName = rule.MustUpdate(x => x.General.LocalCallName)
-                    ? source.LocalCallName.AsChangedValue()
+                LocalCallName = rule.MustUpdate(x => x.General!.LocalCallName)
+                    ? source.LocalCallName!.AsChangedValue()
                     : OptionalValueChange<string>.None,
 
-                LocalSystemId = rule.MustUpdate(x => x.General.LocalSystemId)
-                    ? source.LocalSystemId.AsChangedValue()
+                LocalSystemId = rule.MustUpdate(x => x.General!.LocalSystemId)
+                    ? source.LocalSystemId!.AsChangedValue()
                     : OptionalValueChange<string>.None,
 
-                Notes = rule.MustUpdate(x => x.General.Notes) ? source.Notes.AsChangedValue() : OptionalValueChange<string>.None,
+                Notes = rule.MustUpdate(x => x.General!.Notes) ? source.Notes!.AsChangedValue() : OptionalValueChange<string>.None,
 
-                SystemVersion = rule.MustUpdate(x => x.General.SystemVersion)
-                    ? source.SystemVersion.AsChangedValue()
+                SystemVersion = rule.MustUpdate(x => x.General!.SystemVersion)
+                    ? source.SystemVersion!.AsChangedValue()
                     : OptionalValueChange<string>.None,
 
-                DataClassificationUuid = rule.MustUpdate(x => x.General.DataClassificationUuid)
+                DataClassificationUuid = rule.MustUpdate(x => x.General!.DataClassificationUuid)
                     ? (source.DataClassificationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<Guid>>.None,
 
-                NumberOfExpectedUsersInterval = rule.MustUpdate(x => x.General.NumberOfExpectedUsers)
+                NumberOfExpectedUsersInterval = rule.MustUpdate(x => x.General!.NumberOfExpectedUsers)
                     ? source.NumberOfExpectedUsers?.FromNullable().Select(interval =>
                           (interval.LowerBound, interval.UpperBound)) ??
                       Maybe<(int, int?)>.None.AsChangedValue()
                     : OptionalValueChange<Maybe<(int, int?)>>.None,
 
-                LifeCycleStatus = rule.MustUpdate(x => x.General.Validity.LifeCycleStatus)
+                LifeCycleStatus = rule.MustUpdate(x => x.General!.Validity!.LifeCycleStatus)
                     ? MapEnumChoice(source.Validity?.LifeCycleStatus, LifeCycleStatusMappingExtensions.ToLifeCycleStatusType)
                     : OptionalValueChange<LifeCycleStatusType?>.None,
 
-                ValidFrom = rule.MustUpdate(x => x.General.Validity.ValidFrom)
+                ValidFrom = rule.MustUpdate(x => x.General!.Validity!.ValidFrom)
                     ? (source.Validity?.ValidFrom?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<DateTime>>.None,
 
-                ValidTo = rule.MustUpdate(x => x.General.Validity.ValidTo)
+                ValidTo = rule.MustUpdate(x => x.General!.Validity!.ValidTo)
                     ? (source.Validity?.ValidTo?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<DateTime>>.None,
 
-                ContainsAITechnology = rule.MustUpdate(x => x.General.ContainsAITechnology)
+                ContainsAITechnology = rule.MustUpdate(x => x.General!.ContainsAITechnology)
                     ? (source.ContainsAITechnology?.ToYesNoUndecidedOption() ?? Maybe<YesNoUndecidedOption>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<YesNoUndecidedOption>>.None,
-                WebAccessibilityCompliance = rule.MustUpdate(x => x.General.WebAccessibilityCompliance)
+                WebAccessibilityCompliance = rule.MustUpdate(x => x.General!.WebAccessibilityCompliance)
                     ? source.WebAccessibilityCompliance.FromNullableValueType().Select(x => x.ToYesNoPartiallyOption()).AsChangedValue()
                     : OptionalValueChange<Maybe<YesNoPartiallyOption>>.None,
 
-                LastWebAccessibilityCheck = rule.MustUpdate(x => x.General.LastWebAccessibilityCheck)
+                LastWebAccessibilityCheck = rule.MustUpdate(x => x.General!.LastWebAccessibilityCheck)
                     ? source.LastWebAccessibilityCheck.FromNullableValueType().AsChangedValue()
                     : OptionalValueChange<Maybe<DateTime>>.None,
 
-                WebAccessibilityNotes = rule.MustUpdate(x => x.General.WebAccessibilityNotes)
-                    ? source.WebAccessibilityNotes.AsChangedValue()
+                WebAccessibilityNotes = rule.MustUpdate(x => x.General!.WebAccessibilityNotes)
+                    ? source.WebAccessibilityNotes!.AsChangedValue()
                     : OptionalValueChange<string>.None,
+
+                IsSociallyCritical = rule.MustUpdate(x => x.General!.IsSociallyCritical)
+                    ? MapYesNoDontKnow(source.IsSociallyCritical)
+                    : OptionalValueChange<DataOptions?>.None,
+
+                BusinessCritical = rule.MustUpdate(x => x.General!.IsBusinessCritical)
+                    ? MapYesNoDontKnow(source.IsBusinessCritical)
+                    : OptionalValueChange<DataOptions?>.None,
+
+                SystemUsageCriticalityLevelUuid = rule.MustUpdate(x => x.General!.SystemUsageCriticalityLevelUuid)
+                    ? (source.SystemUsageCriticalityLevelUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
+                    : OptionalValueChange<Maybe<Guid>>.None,
+
+                CriticalityLevelDocumentation = rule.MustUpdate(x => x.General!.CriticalityLevelDocumentation)
+                    ? MapLink(source.CriticalityLevelDocumentation)
+                    : OptionalValueChange<Maybe<NamedLink>>.None,
+
+                Purpose = rule.MustUpdate(x => x.General!.Purpose)
+                    ? source.Purpose!.AsChangedValue()
+                    : OptionalValueChange<string>.None,
+
+                TechnicalSystemTypeUuids = rule.MustUpdate(x => x.General!.TechnicalSystemTypeUuids)
+                    ? (source.TechnicalSystemTypeUuids != null ? Maybe<IEnumerable<Guid>>.Some(source.TechnicalSystemTypeUuids) : Maybe<IEnumerable<Guid>>.None).AsChangedValue()
+                    : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
+
+                HostedAt = rule.MustUpdate(x => x.General!.HostedAt)
+                    ? MapEnumChoice(source.HostedAt, HostedAtMappingExtensions.ToHostedAt)
+                    : OptionalValueChange<HostedAt?>.None,
+
+                LicensingAndCodeModels = rule.MustUpdate(x => x.General!.LicensingAndCodeModels) 
+                    ? (MapLicensingAndCodeModels(source?.LicensingAndCodeModels) ?? []).AsChangedValue() 
+                    : OptionalValueChange<IEnumerable<LicensingAndCodeModel>>.None
             };
         }
 
         public SystemRelationParameters MapRelation(SystemRelationWriteRequestDTO relationData)
         {
-            if (relationData == null)
-                throw new ArgumentNullException(nameof(relationData));
+            ArgumentNullException.ThrowIfNull(relationData);
 
             return new SystemRelationParameters
             (
@@ -429,8 +475,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 relationData.RelationInterfaceUuid,
                 relationData.AssociatedContractUuid,
                 relationData.RelationFrequencyUuid,
-                relationData.Description,
-                relationData.UrlReference
+                relationData.Description!,
+                relationData.UrlReference!
                 );
         }
 
@@ -439,7 +485,20 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return MapCommonReference(externalReferenceData);
         }
 
-        private static ChangedValue<Maybe<IEnumerable<TOut>>> MapEnumList<TIn, TOut>(IEnumerable<TIn> list, Func<TIn, TOut> mapWith)
+        private static IEnumerable<LicensingAndCodeModel>? MapLicensingAndCodeModels(IEnumerable<LicensingAndCodeModelChoice>? apiModels)
+        {
+            if (apiModels == null) return null;
+            return apiModels.Select(apiModel =>
+                 apiModel switch
+                 {
+                     LicensingAndCodeModelChoice.OpenSource => LicensingAndCodeModel.OpenSource,
+                     LicensingAndCodeModelChoice.Freeware => LicensingAndCodeModel.Freeware,
+                     LicensingAndCodeModelChoice.Proprietary => LicensingAndCodeModel.Proprietary,
+                     _ => throw new ArgumentOutOfRangeException(nameof(apiModel), $"Invalid value provided for enum conversion: {apiModel}"),
+                 });
+        }
+
+        private static ChangedValue<Maybe<IEnumerable<TOut>>> MapEnumList<TIn, TOut>(IEnumerable<TIn>? list, Func<TIn, TOut> mapWith)
         {
             return (list?.FromNullable().Select(dataSensitivityLevelChoices => dataSensitivityLevelChoices.Select(mapWith)) ?? Maybe<IEnumerable<TOut>>.None).AsChangedValue();
         }
@@ -449,7 +508,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return choice.HasValue ? mapWith(choice.Value) : new ChangedValue<TOut?>(null);
         }
 
-        private static ChangedValue<Maybe<IEnumerable<Guid>>> MapCrossReferences(IEnumerable<Guid> crossReferences)
+        private static ChangedValue<Maybe<IEnumerable<Guid>>> MapCrossReferences(IEnumerable<Guid>? crossReferences)
         {
             return (crossReferences?.FromNullable() ?? Maybe<IEnumerable<Guid>>.None).AsChangedValue();
         }
@@ -459,9 +518,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return MapEnumChoice(choice, DataOptionsMappingExtensions.ToDataOptions);
         }
 
-        private static ChangedValue<Maybe<NamedLink>> MapLink(SimpleLinkDTO simpleLinkDto)
+        private static ChangedValue<YesNoDontKnowIrrelevant?> MapYesNoDontKnowIrrelevant(YesNoDontKnowIrrelevantChoice? choice)
         {
-            return (simpleLinkDto?.FromNullable().Select(linkDto => new NamedLink(linkDto.Name, linkDto.Url)) ?? Maybe<NamedLink>.None).AsChangedValue();
+            return MapEnumChoice(choice, YesNoDontKnowIrrelevantMappingExtensions.FromChoice);
+        }
+
+        private static ChangedValue<Maybe<NamedLink>> MapLink(SimpleLinkDTO? simpleLinkDto)
+        {
+            return (simpleLinkDto?.FromNullable().Select(linkDto => new NamedLink(linkDto.Name!, linkDto.Url!)) ?? Maybe<NamedLink>.None).AsChangedValue();
         }
     }
 }

@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
+using Core.DomainModel.Archive;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
@@ -107,44 +108,38 @@ namespace Core.ApplicationServices.Authorization.Policies
                 return true;
             }
 
-            if (MatchType<OrganizationRight>(target))
-            {
-                return IsLocalAdmin(organizationId) ||
-                       IsOrganizationModuleAdmin(organizationId);
-            }
+            var creationRoles = GetRequiredModuleRolesForCreation(target);
+            return creationRoles.Any(role => _userContext.HasRole(organizationId, role));
+        }
 
-            if (MatchType<OrganizationUnit>(target))
-            {
-                return IsLocalAdmin(organizationId) ||
-                       IsOrganizationModuleAdmin(organizationId);
-            }
+        /// <summary>
+        /// Maps entity types to their required module admin roles for creation.
+        /// Centralizes the DRY-breaking type mappings from the old if-chain.
+        /// </summary>
+        private static IEnumerable<OrganizationRole> GetRequiredModuleRolesForCreation(Type target)
+        {
+            // Entities requiring Organization Module Admin
+            if (MatchType<OrganizationRight>(target) || MatchType<OrganizationUnit>(target) || MatchType<User>(target))
+                yield return OrganizationRole.OrganizationModuleAdmin;
 
-            if (MatchType<KendoColumnConfiguration>(target))
-            {
-                return IsLocalAdmin(organizationId);
-            }
+            // Entities requiring System Module Admin
+            if (MatchType<ItSystemUsage>(target) || MatchType<ItSystemUsageArchive>(target) || MatchType<ItInterface>(target))
+                yield return OrganizationRole.SystemModuleAdmin;
 
-            if (MatchType<ItSystemUsage>(target))
-            {
-                return IsSystemModuleAdmin(organizationId);
-            }
-
+            // Entities requiring Contract Module Admin
             if (MatchType<ItContract>(target))
-            {
-                return IsContractModuleAdmin(organizationId);
-            }
+                yield return OrganizationRole.ContractModuleAdmin;
 
-            if (MatchType<User>(target))
-            {
-                return IsOrganizationModuleAdmin(organizationId);
-            }
-
+            // Entities requiring both System and Contract Module Admin
             if (MatchType<DataProcessingRegistration>(target))
             {
-                return IsSystemModuleAdmin(organizationId) || IsContractModuleAdmin(organizationId);
+                yield return OrganizationRole.SystemModuleAdmin;
+                yield return OrganizationRole.ContractModuleAdmin;
             }
 
-            return false;
+            // Entities requiring Local Admin only
+            if (MatchType<KendoColumnConfiguration>(target))
+                yield return OrganizationRole.LocalAdmin;
         }
 
         private bool IsRightsHolder(int organizationId)

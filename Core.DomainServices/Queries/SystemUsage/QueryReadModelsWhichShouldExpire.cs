@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainModel.Shared;
 
 namespace Core.DomainServices.Queries.SystemUsage
 {
@@ -27,7 +28,7 @@ namespace Core.DomainServices.Queries.SystemUsage
                      // Expiration date has passed
                      x.SourceEntity.ExpirationDate < currentTime) ||
                     // All currently set as active in the read model
-                    (x.MainContractIsActive &&
+                    (x.MainContractIsActive == MainContractState.Active &&
                      // Main Contract is not null
                      x.SourceEntity.MainContract != null &&
                      // Remove results where the date has no effect (active overrides all other logic)

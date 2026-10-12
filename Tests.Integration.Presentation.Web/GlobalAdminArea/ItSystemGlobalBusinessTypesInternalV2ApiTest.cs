@@ -69,10 +69,11 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
             var globalOption = new BusinessType()
             {
                 Uuid = A<Guid>(),
-                Id = A<int>(),
                 Name = A<string>(),
                 IsObligatory = true,
-                IsLocallyAvailable = true
+                IsLocallyAvailable = true,
+                ObjectOwnerId = TestEnvironment.DefaultUserId,
+                LastChangedByUserId = TestEnvironment.DefaultUserId
             };
             DatabaseAccess.MutateEntitySet<BusinessType>(repository =>
             {

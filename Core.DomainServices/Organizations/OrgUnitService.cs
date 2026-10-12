@@ -19,7 +19,7 @@ namespace Core.DomainServices.Organizations
             _orgUnitRepository = orgUnitRepository;
         }
 
-        public ICollection<OrganizationUnit> GetSubTree(int orgUnitId)
+        public ICollection<OrganizationUnit?> GetSubTree(int orgUnitId)
         {
             var orgUnit = _orgUnitRepository.GetByKey(orgUnitId);
 

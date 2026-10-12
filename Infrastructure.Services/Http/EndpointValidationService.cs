@@ -26,7 +26,7 @@ namespace Infrastructure.Services.Http
         };
 
         private readonly ILogger _logger;
-
+        private readonly IEndpointValidationConfiguration _configuration;
         private static readonly HttpClient Client;
         private static readonly IEnumerable<TimeSpan> BackOffDurations = CreateDurations(1, 5, 15).ToList().AsReadOnly();
 
@@ -51,9 +51,10 @@ namespace Infrastructure.Services.Http
             Client.DefaultRequestHeaders.UserAgent.ParseAdd(ChromeUserAgent);
         }
 
-        public EndpointValidationService(ILogger logger)
+        public EndpointValidationService(ILogger logger, IEndpointValidationConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
         }
 
         public async Task<EndpointValidation> ValidateAsync(string url)
@@ -61,6 +62,10 @@ namespace Infrastructure.Services.Http
             if (string.IsNullOrWhiteSpace(url))
             {
                 return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.InvalidUriFormat));
+            }
+            if (_configuration.IgnoredProtocols.Any(protocol => url.StartsWith(protocol, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                return Success(url);
             }
             try
             {
@@ -90,7 +95,7 @@ namespace Infrastructure.Services.Http
                         case 308: //Permanent redirect: https://tools.ietf.org/html/rfc7238
                         case (int)HttpStatusCode.MovedPermanently:
                             //Will result in pages being shown - redirect might be a "short link" which redirects to the real link
-                            return new EndpointValidation(url);
+                            return Success(url);
                         default:
                             return new EndpointValidation(url, new EndpointValidationError(EndpointValidationErrorType.ErrorResponseCode, response.StatusCode));
                     }
@@ -103,6 +108,11 @@ namespace Infrastructure.Services.Http
                 //This is typically where we end up if we get a connection timeout or other type of communication error where the http client is unable to proceed
                 return new EndpointValidation(url, new EndpointValidationError(MapExceptionError(e)));
             }
+        }
+
+        private EndpointValidation Success(string url)
+        {
+            return new EndpointValidation(url);
         }
 
         private static EndpointValidationErrorType MapExceptionError(Exception exception)
@@ -151,7 +161,7 @@ namespace Infrastructure.Services.Http
             _logger.Warning("EndpointValidation: {correlationId}: Request failed exception chain: '{exnChain}'. Waiting {timeSpan} before next retry. Retry attempt {retryCount}", context.CorrelationId.ToString("D"), BuildExceptionChain(exception), timeSpan, retryCount);
         }
 
-        private static string BuildExceptionChain(Exception exception)
+        private static string BuildExceptionChain(Exception? exception)
         {
             return exception == null
                 ? "END_OF_CHAIN"

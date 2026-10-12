@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Presentation.Web.Models.API.V2.Response.Options
 {
     public class RegularOptionExtendedResponseDTO : RegularOptionResponseDTO, IOptionAvailability
     {
+        [SetsRequiredMembers]
         public RegularOptionExtendedResponseDTO(Guid uuid, string name, bool isAvailable, string description) : base(uuid, name,description)
         {
             IsAvailable = isAvailable;

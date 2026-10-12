@@ -10,6 +10,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<HttpResponseMessage> WithExpectedResponseCode(this Task<HttpResponseMessage> responseMessage, HttpStatusCode expectedStatusCode)
         {
             var httpResponseMessage = await responseMessage;
+            var test = await httpResponseMessage.Content.ReadAsStringAsync();
             Assert.Equal(expectedStatusCode,httpResponseMessage.StatusCode);
             return httpResponseMessage;
         }

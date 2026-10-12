@@ -1,21 +1,22 @@
 ﻿using Core.DomainModel.PublicMessage;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class PublicMessageMap : EntityMap<PublicMessage>
     {
-        public PublicMessageMap()
+        public override void Configure(EntityTypeBuilder<PublicMessage> builder)
         {
-            // Properties
-            // Table & Column Mappings
-            ToTable("PublicMessages");
+            base.Configure(builder);
+            base.Configure(builder);
+            builder.ToTable("PublicMessages");
 
-            Property(x => x.ShortDescription).HasMaxLength(PublicMessage.DefaultShortDescriptionMaxLength);
-            Property(x => x.Title).HasMaxLength(PublicMessage.DefaultTitleMaxLength);
+            builder.Property(x => x.ShortDescription).HasMaxLength(PublicMessage.DefaultShortDescriptionMaxLength);
+            builder.Property(x => x.Title).HasMaxLength(PublicMessage.DefaultTitleMaxLength);
 
-            Property(x => x.Uuid)
-                .IsRequired()
-                .HasUniqueIndexAnnotation("UX_PublicMessage_Uuid", 0);
+            builder.Property(x => x.Uuid).IsRequired();
+            builder.HasIndex(x => x.Uuid).IsUnique().HasDatabaseName("UX_PublicMessage_Uuid");
         }
     }
 }

@@ -14,4 +14,4 @@ Setup-Environment -environmentName "staging"
 #-------------------------------------------------------------
 Write-Host "Running migrations"
 #-------------------------------------------------------------
-Run-DB-Migrations -newDb $false -migrationsFolder "$Env:MigrationsFolder" -connectionString "$Env:KitosDbConnectionStringForTeamCity"
+Run-DB-Migrations -newDb $false -connectionString "$Env:KitosDbConnectionStringForTeamCity"

@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.Http;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel;
 using Core.DomainServices.Model.Options;
+using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 
@@ -19,19 +19,15 @@ namespace Presentation.Web.Controllers.API.V2.External
             _optionApplicationService = optionApplicationService;
         }
 
-        protected IHttpActionResult GetAll(Guid organizationUuid, [FromUri] UnboundedPaginationQuery pagination = null)
+        protected IActionResult GetAll(Guid organizationUuid, [FromQuery] UnboundedPaginationQuery? pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _optionApplicationService
-                .GetOptionTypes(organizationUuid)
-                .Select(x => x.Page(pagination))
-                .Select(ToDTOs)
-                .Match(Ok, FromOperationError);
+            return GetAvailableOptions(organizationUuid, pagination);
         }
 
-        protected IHttpActionResult GetSingle(Guid optionUuid, Guid organizationUuid)
+        protected IActionResult GetSingle(Guid optionUuid, Guid organizationUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -39,13 +35,10 @@ namespace Presentation.Web.Controllers.API.V2.External
             return _optionApplicationService
                 .GetOptionType(organizationUuid, optionUuid)
                 .Select(x => ToExtendedDTO(x.option, x.available))
-                .Match(Ok, FromOperationError);
+                .Match(x => Ok(x), FromOperationError);
         }
 
-        private List<TCollectionEntryDTO> ToDTOs(IEnumerable<OptionDescriptor<TOption>> options)
-        {
-            return options.Select(ToDTO).ToList();
-        }
+        protected abstract IActionResult GetAvailableOptions(Guid organizationUuid, [FromQuery] UnboundedPaginationQuery? pagination = null);
 
         protected abstract TCollectionEntryDTO ToDTO(OptionDescriptor<TOption> option);
 

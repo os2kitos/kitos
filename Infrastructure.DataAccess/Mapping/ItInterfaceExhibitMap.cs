@@ -1,18 +1,21 @@
-﻿using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    class ItInterfaceExhibitMap : EntityMap<ItInterfaceExhibit>
+    public class ItInterfaceExhibitMap : EntityMap<ItInterfaceExhibit>
     {
-        public ItInterfaceExhibitMap()
+        public override void Configure(EntityTypeBuilder<ItInterfaceExhibit> builder)
         {
-            // Table & Column Mappings
-            this.ToTable("Exhibit");
+            base.Configure(builder);
+            builder.ToTable("Exhibit");
 
-           // Relationships
-            this.HasRequired(t => t.ItInterface)
-                .WithOptional(t => t.ExhibitedBy)
-                .WillCascadeOnDelete(true);
+            builder.HasOne(t => t.ItInterface)
+                .WithOne(t => t.ExhibitedBy)
+                .HasForeignKey<ItInterfaceExhibit>(t => t.Id)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

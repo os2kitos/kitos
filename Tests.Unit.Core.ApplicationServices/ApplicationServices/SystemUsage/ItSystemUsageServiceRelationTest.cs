@@ -735,7 +735,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         #region Helpers
-        private void ExpectGetUsageByKeyReturns(int id, ItSystemUsage itSystemUsage)
+        private void ExpectGetUsageByKeyReturns(int id, ItSystemUsage? itSystemUsage)
         {
             _mockSystemUsageRepository.Setup(x => x.GetByKey(id)).Returns(itSystemUsage);
         }

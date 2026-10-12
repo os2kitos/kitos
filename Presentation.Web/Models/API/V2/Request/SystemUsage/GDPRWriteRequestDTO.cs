@@ -8,36 +8,35 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {
     public class GDPRWriteRequestDTO
     {
-        public string Purpose { get; set; }
-        public YesNoDontKnowChoice? BusinessCritical { get; set; }
-        public HostingChoice? HostedAt { get; set; }
+        public string? ProcessingPurpose { get; set; }
         /// <summary>
         /// Constraints: Name: 150 characters
         /// </summary>
         [SimpleLinkNameMaxLength(150)]
-        public SimpleLinkDTO DirectoryDocumentation { get; set; }
-        public IEnumerable<DataSensitivityLevelChoice> DataSensitivityLevels { get; set; }
+        public SimpleLinkDTO? DirectoryDocumentation { get; set; }
+        public IEnumerable<DataSensitivityLevelChoice>? DataSensitivityLevels { get; set; }
         /// <summary>
         /// Constraint: If an update changes this field, the option identified must be currently available in the organization context
         /// </summary>
-        public IEnumerable<Guid> SensitivePersonDataUuids { get; set; }
+        public IEnumerable<Guid>? SensitivePersonDataUuids { get; set; }
         /// <summary>
         /// Constraint: Can only be added if DataSensitivityLevelChoice.PersonData is present in DataSensitivityLevels field
         /// </summary>
-        public IEnumerable<GDPRPersonalDataChoice> SpecificPersonalData { get; set; }
+        public IEnumerable<GDPRPersonalDataChoice>? SpecificPersonalData { get; set; }
 
         /// <summary>
         /// Constraint: If an update changes this field, the option identified must be currently available in the organization context
         /// </summary>
-        public IEnumerable<Guid> RegisteredDataCategoryUuids { get; set; }
+        public IEnumerable<Guid>? RegisteredDataCategoryUuids { get; set; }
         public YesNoDontKnowChoice? TechnicalPrecautionsInPlace { get; set; }
-        public IEnumerable<TechnicalPrecautionChoice> TechnicalPrecautionsApplied { get; set; }
-        public SimpleLinkDTO TechnicalPrecautionsDocumentation { get; set; }
+        public IEnumerable<TechnicalPrecautionChoice>? TechnicalPrecautionsApplied { get; set; }
+        public SimpleLinkDTO? TechnicalPrecautionsDocumentation { get; set; }
         public YesNoDontKnowChoice? UserSupervision { get; set; }
         public DateTime? UserSupervisionDate { get; set; }
-        public SimpleLinkDTO UserSupervisionDocumentation { get; set; }
-        public YesNoDontKnowChoice? RiskAssessmentConducted { get; set; }
+        public SimpleLinkDTO? UserSupervisionDocumentation { get; set; }
+        public YesNoDontKnowIrrelevantChoice? RiskAssessmentConducted { get; set; }
         public DateTime? RiskAssessmentConductedDate { get; set; }
+        [SupplierField]
         public RiskLevelChoice? RiskAssessmentResult { get; set; }
         public DateTime? PlannedRiskAssessmentDate { get; set; }
         /// <summary>
@@ -45,13 +44,14 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// - Name: 150 characters
         /// </summary>
         [SimpleLinkNameMaxLength(150)]
-        public SimpleLinkDTO RiskAssessmentDocumentation { get; set; }
-        public string RiskAssessmentNotes { get; set; }
+        public SimpleLinkDTO? RiskAssessmentDocumentation { get; set; }
+        public string? RiskAssessmentNotes { get; set; }
         public YesNoDontKnowChoice? DPIAConducted { get; set; }
         public DateTime? DPIADate { get; set; }
-        public SimpleLinkDTO DPIADocumentation { get; set; }
+        public SimpleLinkDTO? DPIADocumentation { get; set; }
         public YesNoDontKnowChoice? RetentionPeriodDefined { get; set; }
         public DateTime? NextDataRetentionEvaluationDate { get; set; }
         public int? DataRetentionEvaluationFrequencyInMonths { get; set; }
+        public IsDataProcessingAgreementRequiredChoice? IsDataProcessingAgreementRequired { get; set; }
     }
 }

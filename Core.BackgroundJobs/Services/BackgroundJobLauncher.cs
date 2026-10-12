@@ -27,6 +27,8 @@ namespace Core.BackgroundJobs.Services
         private readonly PurgeOrphanedHangfireJobs _purgeOrphanedHangfireJobs;
         private readonly RebuildItContractOverviewReadModelsBatchJob _rebuildItContractOverviewReadModelsBatchJob;
         private readonly ScheduleItContractOverviewReadModelUpdates _scheduleItContractOverviewReadModelUpdates;
+        private readonly RebuildItContractSupplierOverviewReadModelsBatchJob _rebuildItContractSupplierOverviewReadModelsBatchJob;
+        private readonly ScheduleItContractSupplierOverviewReadModelUpdates _scheduleItContractSupplierOverviewReadModelUpdates;
         private readonly ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState _contractOverviewReadModelsWhichChangesActiveState;
         private readonly ScheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState _scheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState;
         private readonly ScheduleFkOrgUpdatesBackgroundJob _scheduleFkOrgUpdatesBackgroundJob;
@@ -46,6 +48,8 @@ namespace Core.BackgroundJobs.Services
             PurgeOrphanedHangfireJobs purgeOrphanedHangfireJobs,
             RebuildItContractOverviewReadModelsBatchJob rebuildItContractOverviewReadModelsBatchJob,
             ScheduleItContractOverviewReadModelUpdates scheduleItContractOverviewReadModelUpdates,
+            RebuildItContractSupplierOverviewReadModelsBatchJob rebuildItContractSupplierOverviewReadModelsBatchJob,
+            ScheduleItContractSupplierOverviewReadModelUpdates scheduleItContractSupplierOverviewReadModelUpdates,
             ScheduleUpdatesForItContractOverviewReadModelsWhichChangesActiveState contractOverviewReadModelsWhichChangesActiveState,
             ScheduleFkOrgUpdatesBackgroundJob scheduleFkOrgUpdatesBackgroundJob, 
             ScheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState scheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState,
@@ -64,6 +68,8 @@ namespace Core.BackgroundJobs.Services
             _purgeOrphanedHangfireJobs = purgeOrphanedHangfireJobs;
             _rebuildItContractOverviewReadModelsBatchJob = rebuildItContractOverviewReadModelsBatchJob;
             _scheduleItContractOverviewReadModelUpdates = scheduleItContractOverviewReadModelUpdates;
+            _rebuildItContractSupplierOverviewReadModelsBatchJob = rebuildItContractSupplierOverviewReadModelsBatchJob;
+            _scheduleItContractSupplierOverviewReadModelUpdates = scheduleItContractSupplierOverviewReadModelUpdates;
             _contractOverviewReadModelsWhichChangesActiveState = contractOverviewReadModelsWhichChangesActiveState;
             _scheduleFkOrgUpdatesBackgroundJob = scheduleFkOrgUpdatesBackgroundJob;
             _scheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState = scheduleUpdatesForDataProcessingRegistrationOverviewReadModelsWhichChangesActiveState;
@@ -116,9 +122,19 @@ namespace Core.BackgroundJobs.Services
             await Launch(_scheduleItContractOverviewReadModelUpdates, token);
         }
 
+        public async Task LaunchScheduleItContractSupplierOverviewReadModelUpdates(CancellationToken token = default)
+        {
+            await Launch(_scheduleItContractSupplierOverviewReadModelUpdates, token);
+        }
+
         public async Task LaunchUpdateItSystemUsageOverviewReadModels(CancellationToken token = default)
         {
             await Launch(_rebuildItSystemUsageOverviewReadModels, token);
+        }
+
+        public async Task LaunchUpdateItContractSupplierOverviewReadModels(CancellationToken token = default)
+        {
+            await Launch(_rebuildItContractSupplierOverviewReadModelsBatchJob, token);
         }
 
         public async Task LaunchFullReadModelRebuild(ReadModelRebuildScope scope, CancellationToken token)

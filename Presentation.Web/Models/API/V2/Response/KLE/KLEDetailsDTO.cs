@@ -15,15 +15,15 @@ namespace Presentation.Web.Models.API.V2.Response.KLE
         /// KLE number from KLE-Online e.g. 00.01.10
         /// </summary>
         [Required]
-        public string KleNumber { get; set; }
+        public required string KleNumber { get; set; }
         /// <summary>
         /// KLE description from KLE-Online
         /// </summary>
         [Required]
-        public string Description { get; set; }
+        public required string Description { get; set; }
         /// <summary>
         /// Optional parent KLE
         /// </summary>
-        public IdentityNamePairResponseDTO ParentKle { get; set; }
+        public IdentityNamePairResponseDTO? ParentKle { get; set; }
     }
 }

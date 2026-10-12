@@ -1,20 +1,21 @@
-﻿using Core.DomainModel.Commands;
-using Ninject;
+using System;
+using Core.DomainModel.Commands;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Ninject.DomainServices
 {
     public class NinjectCommandHandlerMediator : ICommandBus
     {
-        public TResult Execute<TCommand, TResult>(TCommand args) where TCommand : ICommand
+        private readonly IServiceProvider _serviceProvider;
+
+        public NinjectCommandHandlerMediator(IServiceProvider serviceProvider)
         {
-            return _kernel.Get<ICommandHandler<TCommand, TResult>>().Execute(args);
+            _serviceProvider = serviceProvider;
         }
 
-        private readonly IKernel _kernel;
-
-        public NinjectCommandHandlerMediator(IKernel kernel)
+        public TResult Execute<TCommand, TResult>(TCommand args) where TCommand : ICommand
         {
-            _kernel = kernel;
+            return _serviceProvider.GetRequiredService<ICommandHandler<TCommand, TResult>>().Execute(args);
         }
     }
 }

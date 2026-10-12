@@ -149,7 +149,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var userId = A<int>();
             var organizationRole = A<OrganizationRole>();
             _organizationUserContext.Setup(x => x.UserId).Returns(userId);
-            _authorizationContext.Setup(x => x.AllowCreate<OrganizationRight>(organizationId, It.IsAny<OrganizationRight>())).Returns(true);
+            _authorizationContext.Setup(x => x.AllowAdministerOrganizationRight(It.IsAny<OrganizationRight>())).Returns(true);
             _organizationRightRepository.Setup(x => x.Insert(It.IsAny<OrganizationRight>())).Returns<OrganizationRight>(right => right);
 
             //Act

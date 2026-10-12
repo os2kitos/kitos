@@ -9,10 +9,10 @@ namespace Presentation.Web.Infrastructure.Authorization.Controller.Crud
     public class ChildEntityCrudAuthorization<T, TRoot> : IControllerCrudAuthorization
         where TRoot : class, IEntity
     {
-        private readonly Func<T, TRoot> _getRoot;
+        private readonly Func<T, TRoot?> _getRoot;
         private readonly IControllerCrudAuthorization _crudAuthorization;
 
-        public ChildEntityCrudAuthorization(Func<T, TRoot> getRoot,
+        public ChildEntityCrudAuthorization(Func<T, TRoot?> getRoot,
             IControllerCrudAuthorization crudAuthorization)
         {
             _getRoot = getRoot;

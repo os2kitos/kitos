@@ -1,16 +1,14 @@
-using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItContract;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItContractItSystemUsageMap : EntityTypeConfiguration<ItContractItSystemUsage>
+    public class ItContractItSystemUsageMap : IEntityTypeConfiguration<ItContractItSystemUsage>
     {
-        public ItContractItSystemUsageMap()
+        public void Configure(EntityTypeBuilder<ItContractItSystemUsage> builder)
         {
-            HasKey(x => new
-            {
-                x.ItContractId, x.ItSystemUsageId
-            });
+            builder.HasKey(x => new { x.ItContractId, x.ItSystemUsageId });
         }
     }
 }

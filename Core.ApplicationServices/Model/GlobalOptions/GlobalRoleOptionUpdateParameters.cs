@@ -5,6 +5,6 @@ namespace Core.ApplicationServices.Model.GlobalOptions
 {
     public class GlobalRoleOptionUpdateParameters: GlobalRegularOptionUpdateParameters
     {
-        public OptionalValueChange<Maybe<bool>> WriteAccess { get; set; }
+        public required OptionalValueChange<Maybe<bool>> WriteAccess { get; set; }
     }
 }

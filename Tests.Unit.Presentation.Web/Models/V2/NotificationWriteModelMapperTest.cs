@@ -95,26 +95,26 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertRootRecipients(request.BaseProperties.Receivers, parameters.BaseProperties.Receivers);
         }
 
-        private static void AssertRootRecipients(RecipientWriteRequestDTO request, RootRecipientModificationParameters parameters)
+        private static void AssertRootRecipients(RecipientWriteRequestDTO? request, RootRecipientModificationParameters parameters)
         {
-            AssertEmailRecipients(request.EmailRecipients, parameters.EmailRecipients);
-            AssertRoleRecipients(request.RoleRecipients, parameters.RoleRecipients);
+            AssertEmailRecipients(request?.EmailRecipients, parameters.EmailRecipients);
+            AssertRoleRecipients(request?.RoleRecipients, parameters.RoleRecipients);
         }
 
-        private static void AssertEmailRecipients(IEnumerable<EmailRecipientWriteRequestDTO> request,
+        private static void AssertEmailRecipients(IEnumerable<EmailRecipientWriteRequestDTO>? request,
             IEnumerable<EmailRecipientModificationParameters> parameters)
         {
             var parametersList = parameters.ToList();
-            foreach (var dto in request)
+            foreach (var dto in request ?? [])
             {
                 Assert.Single(parametersList, x => x.Email == dto.Email);
             }
         }
-        private static void AssertRoleRecipients(IEnumerable<RoleRecipientWriteRequestDTO> request,
+        private static void AssertRoleRecipients(IEnumerable<RoleRecipientWriteRequestDTO>? request,
             IEnumerable<RoleRecipientModificationParameters> parameters)
         {
             var parametersList = parameters.ToList();
-            foreach (var dto in request)
+            foreach (var dto in request ?? [])
             {
                 Assert.Single(parametersList, x => x.RoleUuid == dto.RoleUuid);
             }

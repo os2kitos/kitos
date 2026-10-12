@@ -10,6 +10,7 @@
         /// </summary>
         public string Key { get; set; }
         public bool Enabled { get; set; }
+        public bool Recommended { get; set; }
 
         public virtual UIModuleCustomization UiModuleCustomization { get; set; }
     }

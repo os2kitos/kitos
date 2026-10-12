@@ -1,24 +1,26 @@
-﻿using Ninject;
-using Core.DomainServices.Organizations;
+﻿using Core.DomainServices.Organizations;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Xunit;
 
 namespace Tests.Unit.Core.Infrastructure
 {
     public class StsTokenFetcherTest
     {
-        private readonly StandardKernel _kernel;
-
-        public StsTokenFetcherTest()
-        {
-            _kernel = new StandardKernel();
-        }
-
         [Fact]
-        private void Can_Resolve_StsOrganisationTypes()
+        public void Can_Register_And_Resolve_StsOrganisationTypes()
         {
-            _kernel.CanResolve<IStsOrganizationCompanyLookupService>();
-            _kernel.CanResolve<IStsOrganizationService>();
-            _kernel.CanResolve<IStsOrganizationSystemService>();
+            var services = new ServiceCollection();
+            services.AddScoped(_ => Mock.Of<IStsOrganizationCompanyLookupService>());
+            services.AddScoped(_ => Mock.Of<IStsOrganizationService>());
+            services.AddScoped(_ => Mock.Of<IStsOrganizationSystemService>());
+
+            using var provider = services.BuildServiceProvider();
+            using var scope = provider.CreateScope();
+
+            Assert.NotNull(scope.ServiceProvider.GetRequiredService<IStsOrganizationCompanyLookupService>());
+            Assert.NotNull(scope.ServiceProvider.GetRequiredService<IStsOrganizationService>());
+            Assert.NotNull(scope.ServiceProvider.GetRequiredService<IStsOrganizationSystemService>());
         }
     }
 }

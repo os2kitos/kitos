@@ -561,7 +561,7 @@ namespace Tests.Unit.Core.DomainServices.Role
             ExpectAvailableOption(model, role.Id, role);
         }
 
-        private TRight CreateRight(User predefinedUser = null)
+        private TRight CreateRight(User? predefinedUser = null)
         {
             var role = CreateRole();
             var user = predefinedUser ?? CreateUser();
@@ -610,7 +610,7 @@ namespace Tests.Unit.Core.DomainServices.Role
         public abstract TModel CreateModel((int righRole, int rightUserId)? right = null);
         public abstract TRole CreateRole(int? roleId = null, Guid? roleUuid = null);
 
-        private void ExpectGetUser(int userId, User user)
+        private void ExpectGetUser(int userId, User? user)
         {
             _userRepository.Setup(x => x.GetById(userId)).Returns(user);
         }

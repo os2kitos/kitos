@@ -1,15 +1,17 @@
-﻿using System;
+using System;
 using System.Linq;
+using System.Collections.Generic;
 using Presentation.Web.Infrastructure.Attributes;
-using System.Web.Http;
 using Presentation.Web.Models.API.V2.Internal.Response.ItContract;
 using Core.ApplicationServices.OptionTypes;
+using Microsoft.AspNetCore.Mvc;
 using Core.DomainModel.ItContract;
 
+using System.Net;
 namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 {
     [InternalApi]
-    [RoutePrefix("api/v2/internal/it-contracts/grid-roles")]
+    [Route("api/v2/internal/it-contracts/grid-roles")]
     public class GridLocalItContractRolesV2Controller : InternalApiV2Controller
     {
         private readonly IOptionsApplicationService<ItContractRight, ItContractRole> _optionService;
@@ -21,7 +23,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.ItContracts
 
         [HttpGet]
         [Route("{organizationUuid}")]
-        public IHttpActionResult GetByOrganizationUuid(Guid organizationUuid)
+        [ApiResponse(typeof(IEnumerable<LocalItContractRolesResponseDTO>), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult GetByOrganizationUuid(Guid organizationUuid)
         {
             return _optionService.GetOptionTypes(organizationUuid)
                 .Select(options => options.Select(x => x.Option))

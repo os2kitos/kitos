@@ -7,8 +7,7 @@ namespace Core.ApplicationServices.UIConfiguration
 {
     public interface IUIModuleCustomizationService
     {
-        Result<UIModuleCustomization, OperationError> GetModuleCustomizationForOrganization(int organizationId, string module);
-        Maybe<OperationError> UpdateModule(UIModuleCustomizationParameters parameters);
+        Result<UIModuleCustomization, OperationError> UpdateModuleAndGet(UIModuleCustomizationParameters parameters);
         Result<UIModuleCustomization, OperationError> GetModuleCustomizationByOrganizationUuid(Guid organizationUuid, string module);
     }
 }

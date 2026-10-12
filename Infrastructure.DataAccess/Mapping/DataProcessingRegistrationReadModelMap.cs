@@ -1,116 +1,106 @@
-﻿using System.Data.Entity.ModelConfiguration;
-using Core.DomainModel.GDPR;
+﻿using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Users;
 
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class DataProcessingRegistrationReadModelMap : EntityTypeConfiguration<DataProcessingRegistrationReadModel>
+    public class DataProcessingRegistrationReadModelMap : IEntityTypeConfiguration<DataProcessingRegistrationReadModel>
     {
-        public DataProcessingRegistrationReadModelMap()
+        public void Configure(EntityTypeBuilder<DataProcessingRegistrationReadModel> builder)
         {
-            Property(x => x.Name)
+            builder.Property(x => x.Name)
                 .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)
-                .IsRequired()
-                .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_Name", 0);
+                .IsRequired();
+            builder.HasIndex(x => x.Name).HasDatabaseName("DataProcessingRegistrationReadModel_Index_Name");
 
-            Property(x => x.MainReferenceTitle)
-                .HasMaxLength(DataProcessingRegistrationConstraints.MaxReadmodelPropertyLength)
-                .IsOptional()
-                .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_MainReferenceTitle", 0);
+            builder.Property(x => x.MainReferenceTitle)
+                .HasMaxLength(DataProcessingRegistrationConstraints.MaxReadmodelPropertyLength);
+            builder.HasIndex(x => x.MainReferenceTitle).HasDatabaseName("DataProcessingRegistrationReadModel_Index_MainReferenceTitle");
 
             //No index of this, length is unknown since no bounds on system assignment.
-            Property(x => x.SystemNamesAsCsv).IsOptional();
-            Property(x => x.SystemUuidsAsCsv).IsOptional();
+            builder.Property(x => x.SystemNamesAsCsv);
+            builder.Property(x => x.SystemUuidsAsCsv);
+            builder.Property(x => x.SystemValiditiesAsCsv);
 
-            Property(x => x.MainReferenceUserAssignedId).IsOptional();
+            builder.Property(x => x.MainReferenceUserAssignedId);
 
-            Property(x => x.MainReferenceUrl).IsOptional();
+            builder.Property(x => x.MainReferenceUrl);
 
-            HasRequired(t => t.Organization)
+            builder.HasOne(t => t.Organization)
                 .WithMany(t => t.DataProcessingRegistrationReadModels)
                 .HasForeignKey(d => d.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasRequired(x => x.SourceEntity)
+            builder.HasOne(x => x.SourceEntity)
                 .WithMany(x => x.ReadModels)
                 .HasForeignKey(x => x.SourceEntityId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            Property(x => x.SourceEntityUuid).IsRequired();
+            builder.Property(x => x.SourceEntityUuid).IsRequired();
 
             //No index bc we don't know how long it might be
-            Property(x => x.DataProcessorNamesAsCsv).IsOptional();
-            Property(x => x.SubDataProcessorNamesAsCsv).IsOptional();
+            builder.Property(x => x.DataProcessorNamesAsCsv);
+            builder.Property(x => x.SubDataProcessorNamesAsCsv);
 
-            Property(x => x.IsAgreementConcluded)
-                .IsOptional()
-                .HasIndexAnnotation("IX_DPR_Concluded", 0);
+            builder.Property(x => x.IsAgreementConcluded);
+            builder.HasIndex(x => x.IsAgreementConcluded).HasDatabaseName("IX_DPR_Concluded");
 
-            Property(x => x.TransferToInsecureThirdCountries)
-                .IsOptional()
-                .HasIndexAnnotation("IX_DPR_TransferToInsecureThirdCountries", 0);
+            builder.Property(x => x.TransferToInsecureThirdCountries);
+            builder.HasIndex(x => x.TransferToInsecureThirdCountries).HasDatabaseName("IX_DPR_TransferToInsecureThirdCountries");
 
-            Property(x => x.BasisForTransfer)
-                .HasMaxLength(DataProcessingRegistrationConstraints.MaxReadmodelPropertyLength)
-                .IsOptional()
-                .HasIndexAnnotation("IX_DRP_BasisForTransfer", 0);
+            builder.Property(x => x.BasisForTransfer)
+                .HasMaxLength(DataProcessingRegistrationConstraints.MaxReadmodelPropertyLength);
+            builder.HasIndex(x => x.BasisForTransfer).HasDatabaseName("IX_DRP_BasisForTransfer");
 
-            Property(x => x.BasisForTransferUuid)
-                .IsOptional()
-                .HasIndexAnnotation("IX_DRP_BasisForTransferUuid", 0);
+            builder.Property(x => x.BasisForTransferUuid);
+            builder.HasIndex(x => x.BasisForTransferUuid).HasDatabaseName("IX_DRP_BasisForTransferUuid");
 
-            Property(x => x.OversightInterval)
-                .IsOptional()
-                .HasIndexAnnotation("IX_DPR_OversightInterval", 0);
+            builder.Property(x => x.OversightInterval);
+            builder.HasIndex(x => x.OversightInterval).HasDatabaseName("IX_DPR_OversightInterval");
 
+            builder.Property(x => x.DataResponsible)
+                .HasMaxLength(DataProcessingRegistrationConstraints.MaxReadmodelPropertyLength);
+            builder.HasIndex(x => x.DataResponsible).HasDatabaseName("IX_DPR_DataResponsible");
 
-            Property(x => x.DataResponsible)
-                .HasMaxLength(DataProcessingRegistrationConstraints.MaxReadmodelPropertyLength)
-                .IsOptional()
-                .HasIndexAnnotation("IX_DPR_DataResponsible", 0);
+            builder.Property(x => x.DataResponsibleUuid);
+            builder.HasIndex(x => x.DataResponsibleUuid).HasDatabaseName("IX_DPR_DataResponsibleUuid");
 
-            Property(x => x.DataResponsibleUuid)
-                .IsOptional()
-                .HasIndexAnnotation("IX_DPR_DataResponsibleUuid", 0);
+            builder.Property(x => x.OversightOptionNamesAsCsv);
 
-            Property(x => x.OversightOptionNamesAsCsv).IsOptional();
+            builder.Property(x => x.IsOversightCompleted);
+            builder.HasIndex(x => x.IsOversightCompleted).HasDatabaseName("IX_DPR_IsOversightCompleted");
 
-            Property(x => x.IsOversightCompleted)
-                .IsOptional()
-                .HasIndexAnnotation("IX_DPR_IsOversightCompleted", 0);
+            builder.Property(x => x.ContractNamesAsCsv);
 
-            Property(x => x.ContractNamesAsCsv).IsOptional();
+            builder.Property(x => x.LastChangedById);
+            builder.HasIndex(x => x.LastChangedById).HasDatabaseName("DataProcessingRegistrationReadModel_Index_LastChangedById");
 
-            Property(x => x.LastChangedById)
-                .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_LastChangedById", 0);
+            builder.Property(x => x.LastChangedByName)
+                .HasMaxLength(UserConstraints.MaxNameLength);
+            builder.HasIndex(x => x.LastChangedByName).HasDatabaseName("DataProcessingRegistrationReadModel_Index_LastChangedByName");
 
-            Property(x => x.LastChangedByName)
-                .HasMaxLength(UserConstraints.MaxNameLength)
-                .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_LastChangedByName", 0);
+            builder.Property(x => x.LastChangedAt);
+            builder.HasIndex(x => x.LastChangedAt).HasDatabaseName("DataProcessingRegistrationReadModel_Index_LastChangedAt");
 
-            Property(x => x.LastChangedAt)
-                .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_LastChangedAt", 0);
+            builder.Property(x => x.OversightScheduledInspectionDate);
+            builder.HasIndex(x => x.OversightScheduledInspectionDate).HasDatabaseName("IX_DPR_OversightScheduledInspectionDate");
 
-            Property(x => x.OversightScheduledInspectionDate)
-                .HasIndexAnnotation("IX_DPR_OversightScheduledInspectionDate");
+            builder.Property(x => x.IsActive);
+            builder.HasIndex(x => x.IsActive).HasDatabaseName("IX_DPR_IsActive");
 
-            Property(x => x.IsActive)
-                .HasIndexAnnotation("IX_DPR_IsActive");
+            builder.Property(x => x.ActiveAccordingToMainContract);
+            builder.HasIndex(x => x.ActiveAccordingToMainContract).HasDatabaseName("IX_DPR_MainContractIsActive");
 
-            Property(x => x.ActiveAccordingToMainContract)
-                .HasIndexAnnotation("IX_DPR_MainContractIsActive");
+            builder.Property(x => x.ResponsibleOrgUnitUuid);
+            builder.HasIndex(x => x.ResponsibleOrgUnitUuid).HasDatabaseName("IX_DPR_ResponsibleOrgUnitUuid");
 
-            Property(x => x.ResponsibleOrgUnitUuid)
-                .IsOptional()
-                .HasIndexAnnotation("IX_DPR_ResponsibleOrgUnitUuid");
+            builder.Property(x => x.ResponsibleOrgUnitId);
+            builder.HasIndex(x => x.ResponsibleOrgUnitId).HasDatabaseName("IX_DPR_ResponsibleOrgUnitId");
 
-            Property(x => x.ResponsibleOrgUnitId)
-                .IsOptional()
-                .HasIndexAnnotation("IX_DPR_ResponsibleOrgUnitId");
-
-            Property(x => x.ResponsibleOrgUnitName)
-                .IsOptional();
+            builder.Property(x => x.ResponsibleOrgUnitName);
         }
     }
 }

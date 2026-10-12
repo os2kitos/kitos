@@ -12,7 +12,7 @@ namespace Tests.Unit.Presentation.Web.Infrastructure
         [InlineData(5, "1234", true)]
         [InlineData(5, "", true)]
         [InlineData(5, null, true)]
-        public void IsValid_Returns(int maxLength, string input, bool expectedResult)
+        public void IsValid_Returns(int maxLength, string? input, bool expectedResult)
         {
             //Arrange
             var sut = new SimpleLinkNameMaxLengthAttribute(maxLength);

@@ -87,7 +87,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                             var frequency = context.Entities.Frequency;
                             var contract = context.Entities.Contract;
                             var relationInterface = context.Entities.Interface;
-                            return fromSystemUsage
+                            return fromSystemUsage!
                                 .AddUsageRelationTo(toSystemUsage, relationInterface, description, reference, frequency, contract)
                                 .Match<Result<SystemRelation, OperationError>>
                                 (
@@ -95,7 +95,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                                     {
                                         _usageRepository.Save();
                                         _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(fromSystemUsage));
-                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage!));
                                         return createdRelation;
                                     },
                                     onFailure: error => error
@@ -109,8 +109,8 @@ namespace Core.ApplicationServices.SystemUsage.Relations
             int fromSystemUsageId,
             int relationId,
             int toSystemUsageId,
-            string changedDescription,
-            string changedReference,
+            string? changedDescription,
+            string? changedReference,
             int? toInterfaceId,
             int? toContractId,
             int? toFrequencyId)
@@ -143,7 +143,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                             var contract = context.Entities.Contract;
                             var relationInterface = context.Entities.Interface;
 
-                            return fromSystemUsage
+                            return fromSystemUsage!
                                 .ModifyUsageRelation(relationId, toSystemUsage, changedDescription, changedReference, relationInterface, contract, frequency)
                                 .Match<Result<SystemRelation, OperationError>>
                                 (
@@ -154,7 +154,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                                             _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(originalToSystemUsage));
                                         }
                                         _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(fromSystemUsage));
-                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage!));
                                         _usageRepository.Save();
                                         return modifiedRelation;
                                     },
@@ -211,7 +211,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                     (
                         onSuccess: context => context
                             .Entities
-                            .FromSystemUsage
+                            .FromSystemUsage!
                             .UsageRelations
                             .ToList(),
                         onFailure: error => error
@@ -232,7 +232,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                     (
                         onSuccess: context => context
                             .Entities
-                            .FromSystemUsage
+                            .FromSystemUsage!
                             .UsedByRelations
                             .ToList(),
                         onFailure: error => error
@@ -251,19 +251,21 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                     (
                         onSuccess: context => context
                             .Entities
-                            .FromSystemUsage
+                            .FromSystemUsage!
                             .RemoveUsageRelation(relationId)
                             .Match<Result<SystemRelation, OperationError>>
                             (
                                 onSuccess: removedRelation =>
                                 {
                                     var fromSystemUsage = removedRelation.FromSystemUsage;
-                                    var toSystemUsage = removedRelation.ToSystemUsage;
+                                    var toSystemUsageId = removedRelation.ToSystemUsageId;
                                     _relationRepository.DeleteWithReferencePreload(removedRelation);
                                     _relationRepository.Save();
                                     _usageRepository.Save();
                                     _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(fromSystemUsage));
-                                    _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));
+                                    var toSystemUsage = _usageRepository.GetByKey(toSystemUsageId);
+                                    if (toSystemUsage != null)
+                                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));
                                     transaction.Commit();
                                     return removedRelation;
                                 },
@@ -287,7 +289,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                     (
                         onSuccess: context => context
                             .Entities
-                            .FromSystemUsage
+                            .FromSystemUsage!
                             .GetUsageRelation(relationId)
                             .Select<Result<SystemRelation, OperationFailure>>(relation => relation)
                             .GetValueOrFallback(OperationFailure.NotFound),
@@ -314,7 +316,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                         {
                             var fromUsage = context.Entities.FromSystemUsage;
                             var systemsInUse = _systemRepository
-                                .GetSystemsInUse(fromUsage.OrganizationId);
+                                .GetSystemsInUse(fromUsage!.OrganizationId);
 
                             var idsOfSystemsInUse = nameContent
                                 .Select(name => systemsInUse.ByPartOfName(name))
@@ -357,8 +359,8 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                             if (!fromSystemUsage.IsInSameOrganizationAs(toSystemUsage))
                                 return new OperationError("source and destination usages are from different organizations", OperationFailure.BadInput);
 
-                            var availableFrequencyTypes = _frequencyService.GetAvailableOptions(fromSystemUsage.OrganizationId).ToList();
-                            var exposedInterfaces = toSystemUsage.GetExposedInterfaces();
+                            var availableFrequencyTypes = _frequencyService.GetAvailableOptions(fromSystemUsage!.OrganizationId).ToList();
+                            var exposedInterfaces = toSystemUsage!.GetExposedInterfaces();
                             var contracts = _contractRepository.GetContractsInOrganization(fromSystemUsage.OrganizationId).OrderBy(c => c.Name).ToList();
 
                             return new RelationOptionsDTO(fromSystemUsage, toSystemUsage, exposedInterfaces, contracts, availableFrequencyTypes);
@@ -393,11 +395,11 @@ namespace Core.ApplicationServices.SystemUsage.Relations
 
         private class SystemRelationOperationEntities
         {
-            public ItSystemUsage FromSystemUsage { get; set; }
-            public ItSystemUsage ToSystemUsage { get; set; }
-            public Maybe<ItInterface> Interface { get; set; }
-            public Maybe<RelationFrequencyType> Frequency { get; set; }
-            public Maybe<ItContract> Contract { get; set; }
+            public ItSystemUsage? FromSystemUsage { get; set; }
+            public ItSystemUsage? ToSystemUsage { get; set; }
+            public Maybe<ItInterface>? Interface { get; set; }
+            public Maybe<RelationFrequencyType>? Frequency { get; set; }
+            public Maybe<ItContract>? Contract { get; set; }
         }
 
         private class SystemRelationOperationContext
@@ -434,14 +436,14 @@ namespace Core.ApplicationServices.SystemUsage.Relations
 
         private Result<SystemRelationOperationContext, OperationError> WithAuthorizedModificationAccess(SystemRelationOperationContext context)
         {
-            return !_authorizationContext.AllowModify(context.Entities.FromSystemUsage)
+            return context.Entities.FromSystemUsage != null && !_authorizationContext.AllowModify(context.Entities.FromSystemUsage)
                 ? Result<SystemRelationOperationContext, OperationError>.Failure(OperationFailure.Forbidden)
                 : context;
         }
 
         private Result<SystemRelationOperationContext, OperationError> WithAuthorizedReadAccess(SystemRelationOperationContext context)
         {
-            return !_authorizationContext.AllowReads(context.Entities.FromSystemUsage)
+            return context.Entities.FromSystemUsage != null && !_authorizationContext.AllowReads(context.Entities.FromSystemUsage)
                 ? Result<SystemRelationOperationContext, OperationError>.Failure(OperationFailure.Forbidden)
                 : context;
         }
@@ -463,7 +465,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
             var frequencyId = context.Input.FrequencyId;
             if (frequencyId.HasValue)
             {
-                toFrequency = _frequencyService.GetAvailableOption(context.Entities.FromSystemUsage.OrganizationId, frequencyId.Value);
+                toFrequency = _frequencyService.GetAvailableOption(context.Entities.FromSystemUsage!.OrganizationId, frequencyId.Value);
 
                 if (toFrequency.IsNone)
                 {
@@ -471,7 +473,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                 }
             }
 
-            context.Entities.Frequency = toFrequency.GetValueOrDefault();
+            context.Entities.Frequency = toFrequency.GetValueOrDefault()!;
             return context;
         }
 
@@ -488,7 +490,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                 }
             }
 
-            context.Entities.Interface = toInterface.GetValueOrDefault();
+            context.Entities.Interface = toInterface;
 
             return context;
         }

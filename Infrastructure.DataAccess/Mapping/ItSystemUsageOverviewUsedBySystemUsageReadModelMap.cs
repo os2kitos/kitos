@@ -1,32 +1,32 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.Read;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemUsageOverviewUsedBySystemUsageReadModelMap : EntityTypeConfiguration<ItSystemUsageOverviewUsedBySystemUsageReadModel>
+    public class ItSystemUsageOverviewUsedBySystemUsageReadModelMap : IEntityTypeConfiguration<ItSystemUsageOverviewUsedBySystemUsageReadModel>
     {
-        public ItSystemUsageOverviewUsedBySystemUsageReadModelMap()
+        public void Configure(EntityTypeBuilder<ItSystemUsageOverviewUsedBySystemUsageReadModel> builder)
         {
-            HasKey(x => x.Id);
-            HasRequired(x => x.Parent)
+            builder.ToTable("ItSystemUsageOverviewUsedBySystemUsageReadModels");
+
+            builder.HasKey(x => x.Id);
+
+            builder.HasOne(x => x.Parent)
                 .WithMany(x => x.IncomingRelatedItSystemUsages)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(true);
-
-            Property(x => x.ItSystemUsageId)
                 .IsRequired()
-                .HasIndexAnnotation("ItSystemUsageOverviewItSystemUsageReadModel_index_ItSystemUsageId", 0);
+                .OnDelete(DeleteBehavior.Cascade);
 
-            Property(x => x.ItSystemUsageUuid)
-                .IsRequired()
-                .HasIndexAnnotation("ItSystemUsageOverviewItSystemUsageReadModel_index_ItSystemUsageUuid", 0);
+            builder.Property(x => x.ItSystemUsageId).IsRequired();
+            builder.HasIndex(x => x.ItSystemUsageId).HasDatabaseName("ItSystemUsageOverviewItSystemUsageReadModel_index_ItSystemUsageId");
 
-            Property(x => x.ItSystemUsageName)
-                .IsRequired()
-                .HasMaxLength(ItSystem.MaxNameLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewItSystemUsageReadModel_index_ItSystemUsageName", 0);
+            builder.Property(x => x.ItSystemUsageUuid).IsRequired();
+            builder.HasIndex(x => x.ItSystemUsageUuid).HasDatabaseName("ItSystemUsageOverviewItSystemUsageReadModel_index_ItSystemUsageUuid");
 
+            builder.Property(x => x.ItSystemUsageName).IsRequired().HasMaxLength(ItSystem.MaxNameLength);
+            builder.HasIndex(x => x.ItSystemUsageName).HasDatabaseName("ItSystemUsageOverviewItSystemUsageReadModel_index_ItSystemUsageName");
         }
     }
 }

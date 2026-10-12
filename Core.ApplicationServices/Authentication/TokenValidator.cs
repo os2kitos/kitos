@@ -1,11 +1,11 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Authentication;
 using Core.DomainModel;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
@@ -15,10 +15,12 @@ namespace Core.ApplicationServices.Authentication
     {
         public ILogger Logger = Log.Logger;
         private readonly string _baseUrl;
+        private readonly SecurityKey _signingKey;
 
-        public TokenValidator(string baseUrl)
+        public TokenValidator(string baseUrl, SecurityKey signingKey)
         {
             _baseUrl = baseUrl;
+            _signingKey = signingKey ?? throw new ArgumentNullException(nameof(signingKey));
         }
 
         public KitosApiToken CreateToken(DomainModel.User user)
@@ -28,9 +30,7 @@ namespace Core.ApplicationServices.Authentication
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var handler = new JwtSecurityTokenHandler();
             var identity = new ClaimsIdentity(new GenericIdentity(user.Id.ToString(), "TokenAuth"));
-
             AddUserClaims(identity, user);
 
             // securityKey length should be >256b
@@ -38,15 +38,17 @@ namespace Core.ApplicationServices.Authentication
             {
                 var validFrom = DateTime.UtcNow;
                 var expires = validFrom.AddDays(1);
-                var securityToken = handler.CreateToken(new SecurityTokenDescriptor
+
+                var handler = new JsonWebTokenHandler();
+                var tokenString = handler.CreateToken(new SecurityTokenDescriptor
                 {
                     Subject = identity,
                     Issuer = _baseUrl,
                     IssuedAt = validFrom,
                     Expires = expires,
-                    SigningCredentials = new SigningCredentials(BearerTokenConfig.SecurityKey, SecurityAlgorithms.HmacSha256Signature, SecurityAlgorithms.Sha256Digest)
+                    SigningCredentials = new SigningCredentials(_signingKey, SecurityAlgorithms.HmacSha256)
                 });
-                var tokenString = handler.WriteToken(securityToken);
+
                 return new KitosApiToken(user, tokenString, expires);
             }
             catch (Exception exn)
@@ -58,12 +60,12 @@ namespace Core.ApplicationServices.Authentication
 
         public Result<TokenIntrospectionResponse, OperationError> VerifyToken(string token)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
+            var handler = new JsonWebTokenHandler();
 
             var validationParams = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = BearerTokenConfig.SecurityKey,
+                IssuerSigningKey = _signingKey,
                 ValidateIssuer = true,
                 ValidIssuer = _baseUrl,
                 ValidateLifetime = true,
@@ -72,14 +74,23 @@ namespace Core.ApplicationServices.Authentication
 
             try
             {
-                var principal = tokenHandler.ValidateToken(token, validationParams, out var validatedToken);
-                var jwtToken = (JwtSecurityToken)validatedToken;
+                var result = handler.ValidateTokenAsync(token, validationParams).GetAwaiter().GetResult();
+
+                if (!result.IsValid)
+                {
+                    Logger.Error(result.Exception, "TokenValidator: Token validation failed.");
+                    return new OperationError("Invalid token", OperationFailure.Forbidden);
+                }
+
+                var jwtToken = (JsonWebToken)result.SecurityToken;
 
                 return new TokenIntrospectionResponse
                 {
                     Active = true,
                     Expiration = jwtToken.ValidTo,
-                    Claims = principal.Claims.Select(c => new ClaimResponse { Type = c.Type, Value = c.Value }).ToList()
+                    Claims = result.ClaimsIdentity.Claims
+                        .Select(c => new ClaimResponse { Type = c.Type, Value = c.Value })
+                        .ToList()
                 };
             }
             catch (Exception ex)

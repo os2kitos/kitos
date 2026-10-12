@@ -11,6 +11,7 @@ using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Shared;
 using Core.DomainModel.Users;
+using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
 
@@ -23,6 +24,7 @@ namespace Core.DomainServices.SystemUsage
 
         private readonly IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> _roleAssignmentRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> _taskRefRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewLocalTaskRefReadModel> _localTaskRefRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel> _sensitiveDataLevelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> _archivePeriodReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> _dataProcessingRegistrationReadModelRepository;
@@ -30,10 +32,12 @@ namespace Core.DomainServices.SystemUsage
         private readonly IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel> _itSystemUsageUsedByRelationReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewUsingSystemUsageReadModel> _itSystemUsageUsingRelationReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewItContractReadModel> _itSystemUsageOverviewContractReadModelsRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewTechnicalSystemTypeReadModel> _technicalSystemTypeReadModelRepository;
 
         public ItSystemUsageOverviewReadModelUpdate(
             IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> roleAssignmentRepository,
             IGenericRepository<ItSystemUsageOverviewTaskRefReadModel> taskRefRepository,
+            IGenericRepository<ItSystemUsageOverviewLocalTaskRefReadModel> localTaskRefRepository,
             IGenericRepository<ItSystemUsageOverviewSensitiveDataLevelReadModel> sensitiveDataLevelRepository,
             IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> archivePeriodReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> dataProcessingRegistrationReadModelRepository,
@@ -42,7 +46,8 @@ namespace Core.DomainServices.SystemUsage
             IGenericRepository<ItSystemUsageOverviewUsingSystemUsageReadModel> itSystemUsageUsingRelationReadModelRepository,
             IOptionsService<ItSystem, BusinessType> businessTypeService,
             IGenericRepository<ItSystemUsageOverviewRelevantOrgUnitReadModel> relevantOrgUnitsRepository,
-            IGenericRepository<ItSystemUsageOverviewItContractReadModel> itSystemUsageOverviewContractReadModelsRepository)
+            IGenericRepository<ItSystemUsageOverviewItContractReadModel> itSystemUsageOverviewContractReadModelsRepository,
+            IGenericRepository<ItSystemUsageOverviewTechnicalSystemTypeReadModel> technicalSystemTypeReadModelRepository)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
             _taskRefRepository = taskRefRepository;
@@ -55,6 +60,8 @@ namespace Core.DomainServices.SystemUsage
             _businessTypeService = businessTypeService;
             _relevantOrgUnitsRepository = relevantOrgUnitsRepository;
             _itSystemUsageOverviewContractReadModelsRepository = itSystemUsageOverviewContractReadModelsRepository;
+            _technicalSystemTypeReadModelRepository = technicalSystemTypeReadModelRepository;
+            _localTaskRefRepository = localTaskRefRepository;
         }
 
         public void Apply(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -97,6 +104,18 @@ namespace Core.DomainServices.SystemUsage
             destination.WebAccessibilityCompliance = source.WebAccessibilityCompliance;
             destination.LastWebAccessibilityCheck = source.LastWebAccessibilityCheck;
             destination.WebAccessibilityNotes = source.WebAccessibilityNotes;
+            destination.IsSociallyCritical = source.IsSociallyCritical;
+            destination.CriticalityFieldsLastChanged = source.CriticalityFieldsLastChanged;
+            destination.SystemUsageCriticalityLevelUuid = source.SystemUsageCriticalityLevel?.Uuid;
+            destination.SystemUsageCriticalityLevelName = source.SystemUsageCriticalityLevel?.Name;
+            destination.CriticalityLevelDocumentationUrl = source.CriticalityLevelDocumentationUrl;
+            destination.CriticalityLevelDocumentationName = source.CriticalityLevelDocumentationName;
+            destination.IsDataProcessingAgreementRequired = source.IsDataProcessingAgreementRequired;
+
+            var interfaces = source.GetExposedInterfaces().ToList();
+            destination.ItInterfaceIdsAsCsv = interfaces.Select(x => x.ItInterfaceId).ToStringWithDelimiter();
+            destination.ItInterfaceVersionsAsCsv = interfaces.Select(x => x.Version).Where(x => !x.IsWhiteSpace()).ToStringWithDelimiter();
+            destination.LicensingAndCodeModels = source.LicensingAndCodeModels;
 
             PatchParentSystemInformation(source, destination);
             PatchRoleAssignments(source, destination);
@@ -105,6 +124,7 @@ namespace Core.DomainServices.SystemUsage
             PatchItSystemCategories(source, destination);
             PatchItSystemRightsHolder(source, destination);
             PatchKLE(source, destination);
+            PatchLocalKLE(source, destination);
             PatchReference(source, destination);
             PatchMainContract(source, destination);
             PatchSensitiveDataLevels(source, destination);
@@ -112,7 +132,9 @@ namespace Core.DomainServices.SystemUsage
             PatchRiskSupervisionDocumentation(source, destination);
             PatchDataProcessingRegistrations(source, destination);
             PatchGeneralPurposeRegistrations(source, destination);
+            PatchProcessingPurposeRegistrations(source, destination);
             PatchDependsOnInterfaces(source, destination);
+            PatchTechnicalSystemTypes(source, destination);
             PatchRelatedItSystemUsages(
                 () => new ItSystemUsageOverviewUsedBySystemUsageReadModel(),
                 source,
@@ -178,7 +200,7 @@ namespace Core.DomainServices.SystemUsage
             var usagesFromSource = pickSourceCollection(source)
                 .Select(pickUsageFromRelation)
                 .Where(itSystemUsage => itSystemUsage != null)
-                .Where(itSystemUsage => itSystemUsage.ItSystem != null)
+                .Where(itSystemUsage => itSystemUsage!.ItSystem != null)
                 .ToList();
             var destinationCollection = pickDestinationCollection(destination);
 
@@ -187,7 +209,7 @@ namespace Core.DomainServices.SystemUsage
                 .Select(x => x.ItSystem)
                 .Select(x => x.Name)));
 
-            static string CreateRelatedItSystemUsageKey(int Id) => $"I:{Id}";
+            static string CreateRelatedItSystemUsageKey(int id) => $"I:{id}";
 
             var usagesFromSourceByKey =
                 usagesFromSource
@@ -231,7 +253,7 @@ namespace Core.DomainServices.SystemUsage
 
             destination.DependsOnInterfacesNamesAsCsv = string.Join(", ", dependsOnInterfaces.Select(x => x.Name));
 
-            static string CreateDependsOnInterfaceKey(int Id) => $"I:{Id}";
+            static string CreateDependsOnInterfaceKey(int id) => $"I:{id}";
 
             var incomingDependsOnInterfaces = dependsOnInterfaces
                 .GroupBy(x => CreateDependsOnInterfaceKey(x.Id))
@@ -272,6 +294,12 @@ namespace Core.DomainServices.SystemUsage
             destination.GeneralPurpose = generalPurpose?.Substring(0, Math.Min(generalPurpose.Length, ItSystemUsage.LongProperyMaxLength));
         }
 
+        private static void PatchProcessingPurposeRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            var processingPurpose = source.ProcessingPurpose?.TrimEnd();
+            destination.ProcessingPurpose = processingPurpose?.Substring(0, Math.Min(processingPurpose.Length, ItSystemUsage.LongProperyMaxLength));
+        }
+
         private void PatchDataProcessingRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.DataProcessingRegistrationNamesAsCsv = string.Join(", ", source.AssociatedDataProcessingRegistrations.Select(x => x.Name));
@@ -280,12 +308,14 @@ namespace Core.DomainServices.SystemUsage
                 .Where(x => x.GetValueOrDefault(YesNoIrrelevantOption.UNDECIDED) != YesNoIrrelevantOption.UNDECIDED)
                 .ToList();
 
-            destination.DataProcessingRegistrationsConcludedAsCsv = string.Join(", ", isAgreementConcludedList.Select(x => x.Value.GetReadableName()));
+            destination.DataProcessingRegistrationsConcludedAsCsv = string.Join(", ", isAgreementConcludedList.Select(x => x!.Value.GetReadableName()));
 
             destination.RiskAssessmentDate = source.riskAssesmentDate;
             destination.PlannedRiskAssessmentDate = source.PlannedRiskAssessmentDate;
+            destination.RiskAssessmentResult = source.preriskAssessment;
+            destination.RiskAssessmentConducted = source.riskAssessment;
 
-            static string CreateDataProcessingRegistrationKey(int Id) => $"I:{Id}";
+            static string CreateDataProcessingRegistrationKey(int id) => $"I:{id}";
 
             var incomingDataProcessingRegistrations = source.AssociatedDataProcessingRegistrations.ToDictionary(x => CreateDataProcessingRegistrationKey(x.Id));
 
@@ -319,7 +349,7 @@ namespace Core.DomainServices.SystemUsage
 
         private static void PatchRiskSupervisionDocumentation(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
-            if (source.riskAssessment == DataOptions.YES)
+            if (source.riskAssessment == YesNoDontKnowIrrelevant.Yes)
             {
                 destination.RiskSupervisionDocumentationName = source.RiskSupervisionDocumentationUrlName;
                 destination.RiskSupervisionDocumentationUrl = source.RiskSupervisionDocumentationUrl;
@@ -371,7 +401,7 @@ namespace Core.DomainServices.SystemUsage
 
         private void PatchSensitiveDataLevels(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
-            destination.SensitiveDataLevelsAsCsv = string.Join(", ", source.SensitiveDataLevels.Select(x => x.SensitivityDataLevel.GetReadableName()));
+            destination.SensitiveDataLevelsAsCsv = source.SensitiveDataLevels.Select(x => x.SensitivityDataLevel.GetReadableName()).ToStringWithDelimiter();
 
             var incomingSensitiveDataLevels = source.SensitiveDataLevels.Select(x => x.SensitivityDataLevel).ToList();
 
@@ -396,18 +426,57 @@ namespace Core.DomainServices.SystemUsage
             }
         }
 
+        private void PatchTechnicalSystemTypes(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.TechnicalSystemTypeNamesAsCsv = source.TechnicalSystemTypes.Select(x => x.Name).ToStringWithDelimiter();
+
+            var incomingUuids = source.TechnicalSystemTypes.Select(x => x.Uuid).ToHashSet();
+
+            var toRemove = destination.TechnicalSystemTypes.Where(x => !incomingUuids.Contains(x.TechnicalSystemTypeUuid)).ToList();
+            toRemove.ForEach(item =>
+            {
+                destination.TechnicalSystemTypes.Remove(item);
+                _technicalSystemTypeReadModelRepository.Delete(item);
+            });
+
+            var existingUuids = destination.TechnicalSystemTypes.Select(x => x.TechnicalSystemTypeUuid).ToHashSet();
+            foreach (var technicalSystemType in source.TechnicalSystemTypes)
+            {
+                if (!existingUuids.Contains(technicalSystemType.Uuid))
+                {
+                    destination.TechnicalSystemTypes.Add(new ItSystemUsageOverviewTechnicalSystemTypeReadModel
+                    {
+                        Parent = destination,
+                        TechnicalSystemTypeUuid = technicalSystemType.Uuid,
+                        TechnicalSystemTypeName = technicalSystemType.Name
+                    });
+                }
+            }
+        }
+
         private static void PatchMainContract(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             destination.MainContractId = source.MainContract?.ItContractId;
             destination.MainContractSupplierId = source.MainContract?.ItContract?.Supplier?.Id;
             destination.MainContractSupplierName = source.MainContract?.ItContract?.Supplier?.Name;
-            destination.MainContractIsActive = source.IsActiveAccordingToMainContract;
+            
+            // Map the contract state to the new enum
+            if (source.MainContract == null)
+            {
+                destination.MainContractIsActive = MainContractState.NoContract;
+            }
+            else
+            {
+                destination.MainContractIsActive = source.IsActiveAccordingToMainContract 
+                    ? MainContractState.Active 
+                    : MainContractState.Inactive;
+            }
         }
 
         private static void PatchReference(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             var title = source.Reference?.Title;
-            destination.LocalReferenceTitle = title?.Substring(0, Math.Min(title.Length, ItSystemUsageOverviewReadModel.MaxReferenceTitleLenght));
+            destination.LocalReferenceTitle = title?.Substring(0, Math.Min(title.Length, ItSystemUsageOverviewReadModel.MaxReferenceTitleLength));
             destination.LocalReferenceUrl = source.Reference?.URL;
             destination.LocalReferenceDocumentId = source.Reference?.ExternalReferenceId;
         }
@@ -430,16 +499,21 @@ namespace Core.DomainServices.SystemUsage
         {
             destination.ItSystemRightsHolderId = source.ItSystem.BelongsTo?.Id;
             destination.ItSystemRightsHolderName = source.ItSystem.BelongsTo?.Name;
+            destination.ItSystemRightsHolderCvr = source.ItSystem.BelongsTo?.Cvr;
         }
 
         private void PatchKLE(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
-            destination.ItSystemKLEIdsAsCsv = string.Join(", ", source.ItSystem.TaskRefs.Select(x => x.TaskKey));
-            destination.ItSystemKLENamesAsCsv = string.Join(", ", source.ItSystem.TaskRefs.Select(x => x.Description));
+            var kleIds = string.Join(", ", source.ItSystem.TaskRefs.Select(x => x.TaskKey).Where(k => k != null));
+            destination.ItSystemKLEIdsAsCsv = string.IsNullOrEmpty(kleIds) ? null : kleIds;
+            var kleNames = string.Join(", ", source.ItSystem.TaskRefs.Select(x => x.Description).Where(d => d != null));
+            destination.ItSystemKLENamesAsCsv = string.IsNullOrEmpty(kleNames) ? null : kleNames;
 
-            static string CreateTaskRefKey(string KLEId) => $"I:{KLEId}";
+            static string CreateTaskRefKey(string kleId) => $"I:{kleId}";
 
-            var incomingTaskRefs = source.ItSystem.TaskRefs.ToDictionary(x => CreateTaskRefKey(x.TaskKey));
+            var incomingTaskRefs = source.ItSystem.TaskRefs
+                .Where(x => !string.IsNullOrEmpty(x.TaskKey))
+                .ToDictionary(x => CreateTaskRefKey(x.TaskKey));
 
             // Remove taskref which were removed
             var taskRefsToBeRemoved =
@@ -448,8 +522,10 @@ namespace Core.DomainServices.SystemUsage
 
             RemoveTaskRefs(destination, taskRefsToBeRemoved);
 
-            var existingTaskRefs = destination.ItSystemTaskRefs.ToDictionary(x => CreateTaskRefKey(x.KLEId));
-            foreach (var incomingTaskRef in source.ItSystem.TaskRefs.ToList())
+            var existingTaskRefs = destination.ItSystemTaskRefs
+                .Where(x => !string.IsNullOrEmpty(x.KLEId))
+                .ToDictionary(x => CreateTaskRefKey(x.KLEId));
+            foreach (var incomingTaskRef in source.ItSystem.TaskRefs.Where(x => !string.IsNullOrEmpty(x.TaskKey)).ToList())
             {
                 if (!existingTaskRefs.TryGetValue(CreateTaskRefKey(incomingTaskRef.TaskKey), out var taskRef))
                 {
@@ -459,6 +535,56 @@ namespace Core.DomainServices.SystemUsage
                         Parent = destination
                     };
                     destination.ItSystemTaskRefs.Add(taskRef);
+                }
+
+                taskRef.KLEId = incomingTaskRef.TaskKey;
+                taskRef.KLEName = incomingTaskRef.Description;
+            }
+        }
+
+        private void PatchLocalKLE(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            UpdateLocalKleCsvFields(source, destination);
+            SynchronizeLocalTaskRefs(source, destination);
+        }
+
+        private static void UpdateLocalKleCsvFields(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            var kleIds = source.TaskRefs.Select(x => x.TaskKey).Where(k => k != null).ToStringWithDelimiter();
+            destination.LocalKleIdsAsCsv = string.IsNullOrEmpty(kleIds) ? null : kleIds;
+
+            var kleNames = source.TaskRefs.Select(x => x.Description).Where(d => d != null).ToStringWithDelimiter();
+            destination.LocalKleNamesAsCsv = string.IsNullOrEmpty(kleNames) ? null : kleNames;
+        }
+
+        private void SynchronizeLocalTaskRefs(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            static string CreateLocalTaskRefKey(string kleId) => $"L:{kleId}";
+
+            var incomingTaskRefs = source.TaskRefs
+                .Where(x => !string.IsNullOrEmpty(x.TaskKey))
+                .ToDictionary(x => CreateLocalTaskRefKey(x.TaskKey));
+
+            // Remove taskref which were removed (including any stale null-key rows)
+            var taskRefsToBeRemoved =
+                destination.LocalItSystemTaskRefs
+                    .Where(x => incomingTaskRefs.ContainsKey(CreateLocalTaskRefKey(x.KLEId)) == false).ToList();
+
+            RemoveLocalTaskRefs(destination, taskRefsToBeRemoved);
+
+            var existingTaskRefs = destination.LocalItSystemTaskRefs
+                .Where(x => !string.IsNullOrEmpty(x.KLEId))
+                .ToDictionary(x => CreateLocalTaskRefKey(x.KLEId));
+
+            foreach (var incomingTaskRef in source.TaskRefs.Where(x => !string.IsNullOrEmpty(x.TaskKey)).ToList())
+            {
+                if (!existingTaskRefs.TryGetValue(CreateLocalTaskRefKey(incomingTaskRef.TaskKey), out var taskRef))
+                {
+                    taskRef = new ItSystemUsageOverviewLocalTaskRefReadModel
+                    {
+                        Parent = destination
+                    };
+                    destination.LocalItSystemTaskRefs.Add(taskRef);
                 }
 
                 taskRef.KLEId = incomingTaskRef.TaskKey;
@@ -603,6 +729,15 @@ namespace Core.DomainServices.SystemUsage
             });
         }
 
+        private void RemoveLocalTaskRefs(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewLocalTaskRefReadModel> taskRefsToBeRemoved)
+        {
+            taskRefsToBeRemoved.ForEach(taskRefToBeRemoved =>
+            {
+                destination.LocalItSystemTaskRefs.Remove(taskRefToBeRemoved);
+                _localTaskRefRepository.Delete(taskRefToBeRemoved);
+            });
+        }
+
         private void RemoveSensitiveDataLevels(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewSensitiveDataLevelReadModel> sensitiveDataLevelsToBeRemoved)
         {
             sensitiveDataLevelsToBeRemoved.ForEach(sensitiveDataLevelToBeRemoved =>
@@ -655,9 +790,9 @@ namespace Core.DomainServices.SystemUsage
             });
         }
 
-        private static string GetNameOfItSystemOption<TOption>(
+        private static string? GetNameOfItSystemOption<TOption>(
             ItSystem parent,
-            TOption optionEntity,
+            TOption? optionEntity,
             IOptionsService<ItSystem, TOption> service)
             where TOption : OptionEntity<ItSystem>
         {
@@ -674,7 +809,7 @@ namespace Core.DomainServices.SystemUsage
             return null;
         }
 
-        private static string GetUserFullName(User user)
+        private static string? GetUserFullName(User user)
         {
             var fullName = user?.GetFullName()?.TrimEnd();
             return fullName?.Substring(0, Math.Min(fullName.Length, UserConstraints.MaxNameLength));

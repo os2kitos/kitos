@@ -1,18 +1,16 @@
-﻿using System.Web.Mvc;
-using System.Web.SessionState;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.SSO.Model;
 using Core.DomainServices;
 using Presentation.Web.Models.Application.FeatureToggle;
 using Presentation.Web.Models.Application.RuntimeEnv;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace Presentation.Web.Controllers.Web.Old
 {
-    [SessionState(SessionStateBehavior.Required)]
-
-    [RoutePrefix("old")]
-    public class OldHomeController : Controller
+    [Route("old")]
+    public class OldHomeController : Microsoft.AspNetCore.Mvc.Controller
     {
         private readonly IAuthenticationContext _userContext;
         private readonly IUserRepository _userRepository;
@@ -21,15 +19,15 @@ namespace Presentation.Web.Controllers.Web.Old
         private const string FeatureToggleKey = "FEATURE_TOGGLE";
         private const string SsoAuthenticationCompletedKey = "SSO_PREFERRED_START";
 
-        public OldHomeController(IAuthenticationContext userContext, IUserRepository userRepository)
+        public OldHomeController(IAuthenticationContext userContext, IUserRepository userRepository, IConfiguration configuration)
         {
             _userContext = userContext;
             _userRepository = userRepository;
-            _isProd = KitosEnvironmentConfiguration.FromConfiguration().Environment == KitosEnvironment.Production;
+            _isProd = KitosEnvironmentConfiguration.FromConfiguration(configuration).Environment == KitosEnvironment.Production;
         }
 
         [Route("")]
-        public ActionResult Index()
+        public IActionResult Index()
         {
             ViewBag.StylingScheme = _isProd ? "PROD" : "TEST";
             AppendSsoError();
@@ -82,3 +80,4 @@ namespace Presentation.Web.Controllers.Web.Old
         }
     }
 }
+

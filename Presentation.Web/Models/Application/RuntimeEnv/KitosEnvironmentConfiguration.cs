@@ -1,5 +1,5 @@
 ﻿using System.Configuration;
-using Presentation.Web.Properties;
+using Microsoft.Extensions.Configuration;
 
 namespace Presentation.Web.Models.Application.RuntimeEnv
 {
@@ -12,9 +12,9 @@ namespace Presentation.Web.Models.Application.RuntimeEnv
             Environment = environment;
         }
 
-        public static KitosEnvironmentConfiguration FromConfiguration()
+        public static KitosEnvironmentConfiguration FromConfiguration(IConfiguration configuration)
         {
-            var environmentConf = Settings.Default.Environment?.ToLowerInvariant() ?? "";
+            var environmentConf = configuration["AppSettings:Environment"]?.ToLowerInvariant() ?? "";
             var env = environmentConf switch
             {
                 "dev" => KitosEnvironment.Dev,

@@ -1,4 +1,4 @@
-﻿using Core.Abstractions.Types;
+using Core.Abstractions.Types;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models.API.V2.Types.Notifications;
 

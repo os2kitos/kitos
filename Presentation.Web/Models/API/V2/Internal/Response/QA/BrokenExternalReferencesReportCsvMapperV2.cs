@@ -1,7 +1,6 @@
-﻿using System.Linq;
-using System.Web.Http;
-using System.Web.Http.Results;
+using System.Linq;
 using Core.DomainModel.Qa.References;
+using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Models.Application.Csv;
 
 namespace Presentation.Web.Models.API.V2.Internal.Response.QA
@@ -11,7 +10,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.QA
         private const string UnknownValueString = "Ukendt";
         private static readonly string EmptyValueString = string.Empty;
 
-        public static IHttpActionResult CreateReportCsvResponse(BrokenExternalReferencesReport report)
+        public static IActionResult CreateReportCsvResponse(BrokenExternalReferencesReport report)
         {
             var csvResponseBuilder = new CsvResponseBuilder<IBrokenLink>();
 
@@ -29,7 +28,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.QA
                 .GetBrokenLinks()
                 .Aggregate(csvResponseBuilder, (builder, brokenLink) => builder.WithRow(brokenLink));
 
-            return new ResponseMessageResult(csvResponseBuilder.Build());
+            return csvResponseBuilder.Build();
         }
 
         private static string MapFileName(BrokenExternalReferencesReport report)
@@ -99,3 +98,4 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.QA
         }
     }
 }
+

@@ -1,20 +1,18 @@
-using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItContract;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItContractAgreementElementTypeMap : EntityTypeConfiguration<ItContractAgreementElementTypes>
+    public class ItContractAgreementElementTypeMap : IEntityTypeConfiguration<ItContractAgreementElementTypes>
     {
-        public ItContractAgreementElementTypeMap()
+        public void Configure(EntityTypeBuilder<ItContractAgreementElementTypes> builder)
         {
-            this.ToTable("ItContractAgreementElementTypes");
-            this.Property(t => t.ItContract_Id).HasColumnName("ItContract_Id");
-            this.Property(t => t.AgreementElementType_Id).HasColumnName("AgreementElementType_Id");
+            builder.ToTable("ItContractAgreementElementTypes");
+            builder.Property(t => t.ItContract_Id).HasColumnName("ItContract_Id");
+            builder.Property(t => t.AgreementElementType_Id).HasColumnName("AgreementElementType_Id");
 
-            HasKey(x => new
-            {
-                x.AgreementElementType_Id, x.ItContract_Id
-            });
+            builder.HasKey(x => new { x.AgreementElementType_Id, x.ItContract_Id });
         }
     }
 }

@@ -6,6 +6,7 @@
         Yearly = 1,
         EveryOtherYear = 2,
         Other = 3,
-        Undecided = 4
+        Undecided = 4,
+        EveryThirdYear = 5
     }
 }

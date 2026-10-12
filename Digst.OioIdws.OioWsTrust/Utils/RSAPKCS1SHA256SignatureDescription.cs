@@ -37,7 +37,7 @@ namespace Digst.OioIdws.OioWsTrust.Utils
         public override AsymmetricSignatureDeformatter CreateDeformatter(AsymmetricAlgorithm key)
         {
             var asymmetricSignatureDeformatter =
-                (AsymmetricSignatureDeformatter)CryptoConfig.CreateFromName(DeformatterAlgorithm);
+                (AsymmetricSignatureDeformatter)CryptoConfig.CreateFromName(DeformatterAlgorithm!)!;
             asymmetricSignatureDeformatter.SetKey(key);
             asymmetricSignatureDeformatter.SetHashAlgorithm("SHA256");
             return asymmetricSignatureDeformatter;
@@ -46,7 +46,7 @@ namespace Digst.OioIdws.OioWsTrust.Utils
         public override AsymmetricSignatureFormatter CreateFormatter(AsymmetricAlgorithm key)
         {
             var asymmetricSignatureFormatter =
-                (AsymmetricSignatureFormatter)CryptoConfig.CreateFromName(FormatterAlgorithm);
+                (AsymmetricSignatureFormatter)CryptoConfig.CreateFromName(FormatterAlgorithm!)!;
             asymmetricSignatureFormatter.SetKey(key);
             asymmetricSignatureFormatter.SetHashAlgorithm("SHA256");
             return asymmetricSignatureFormatter;

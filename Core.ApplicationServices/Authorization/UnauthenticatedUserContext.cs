@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 
@@ -53,6 +54,16 @@ namespace Core.ApplicationServices.Authorization
         }
 
         public bool IsSystemIntegrator()
+        {
+            return false;
+        }
+
+        public bool IsSupplierApiUserForOrganizationWithSuppliers(IEnumerable<int> supplierIds)
+        {
+            return false;
+        }
+
+        public bool IsSupplierUserFor(Guid organizationUuid)
         {
             return false;
         }

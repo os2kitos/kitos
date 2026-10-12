@@ -10,7 +10,7 @@ namespace Presentation.Web.Models.API.V2.Request.Interface
         public bool Deactivated { get; set; }
         public RegistrationScopeChoice Scope { get; set; }
         public Guid? ItInterfaceTypeUuid { get; set; }
-        public IEnumerable<ItInterfaceDataRequestDTO> Data { get; set; }
-        public string Note { get; set; }
+        public IEnumerable<ItInterfaceDataRequestDTO>? Data { get; set; }
+        public string? Note { get; set; }
     }
 }

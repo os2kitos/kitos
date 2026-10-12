@@ -1,18 +1,17 @@
-using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.Organization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class OrganizationTypeMap : EntityTypeConfiguration<OrganizationType>
+    public class OrganizationTypeMap : IEntityTypeConfiguration<OrganizationType>
     {
-        public OrganizationTypeMap()
+        public void Configure(EntityTypeBuilder<OrganizationType> builder)
         {
-            // Properties
-            Property(x => x.Name).IsRequired();
-            Property(t => t.Category).IsRequired();
+            builder.Property(x => x.Name).IsRequired();
+            builder.Property(t => t.Category).IsRequired();
 
-            // Table & Column Mappings
-            ToTable("OrganizationTypes");
+            builder.ToTable("OrganizationTypes");
         }
     }
 }

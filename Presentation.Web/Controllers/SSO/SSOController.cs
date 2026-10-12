@@ -1,17 +1,16 @@
-﻿using System;
-using System.Web.Http;
-using System.Web.Http.Results;
+using System;
 using Core.ApplicationServices.SSO;
 using Core.ApplicationServices.SSO.Model;
 using Core.ApplicationServices.SSO.State;
+using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Infrastructure.Attributes;
 using Serilog;
 
 namespace Presentation.Web.Controllers.SSO
 {
-    [RoutePrefix("SSO")]
+    [Route("SSO")]
     [InternalApi]
-    public class SSOController : ApiController
+    public class SSOController : ControllerBase
     {
         private readonly ISsoFlowApplicationService _ssoFlowApplicationService;
         private readonly ILogger _logger;
@@ -24,7 +23,7 @@ namespace Presentation.Web.Controllers.SSO
 
         [HttpGet]
         [Route("")]
-        public IHttpActionResult SSO()
+        public IActionResult SSO()
         {
             try
             {
@@ -45,28 +44,17 @@ namespace Presentation.Web.Controllers.SSO
             {
                 _logger.Error(e, "Unknown error in SSO flow: {errorCode}", e.Message);
             }
-            // Shut down gracefully
             return SsoError(SsoErrorCode.Unknown);
         }
 
-        private IHttpActionResult LoggedIn()
+        private IActionResult LoggedIn()
         {
-            //Redirect to front page
-            var uriBuilder = new UriBuilder(Request.RequestUri)
-            {
-                Path = "ui"
-            };
-            return Redirect(uriBuilder.Uri);
+            return Redirect("/ui");
         }
 
         private RedirectResult SsoError(SsoErrorCode error)
         {
-            var uriBuilder = new UriBuilder(Request.RequestUri)
-            {
-                Path = "ui",
-                Query = $"ssoErrorCode={error:G}"
-            };
-            return Redirect(uriBuilder.Uri);
+            return Redirect($"/ui?ssoErrorCode={error:G}");
         }
     }
 }

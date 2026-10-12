@@ -1,29 +1,5 @@
-﻿using Ninject.Extensions.Interception;
-using Serilog;
-
+// LogInterceptor - Ninject interception removed in ASP.NET Core migration
+// Logging is now handled by Serilog middleware in Program.cs
 namespace Presentation.Web.Infrastructure
 {
-    public class LogInterceptor : SimpleInterceptor
-    {
-        private readonly ILogger _logger;
-
-        public LogInterceptor()
-        {
-
-            _logger = Log.Logger;
-        }
-
-        protected override void BeforeInvoke(IInvocation invocation)
-        {
-
-        }
-
-        protected override void AfterInvoke(IInvocation invocation)
-        {
-
-            _logger.Information("Method: {Name} called with arguments {@Arguments}",
-                    invocation.Request.Target +"."+ invocation.Request.Method.Name,
-                    invocation.Request.Arguments);
-        }
-    }
 }

@@ -13,6 +13,6 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         ///       so if you want to retain "identity" of periods between updates make sure to specify the uuid.
         ///       Otherwise the data will be as the input dictates but the uuids will have changed.
         /// </summary>
-        public IEnumerable<JournalPeriodUpdateRequestDTO> JournalPeriods { get; set; }
+        public IEnumerable<JournalPeriodUpdateRequestDTO>? JournalPeriods { get; set; }
     }
 }

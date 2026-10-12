@@ -15,9 +15,9 @@ namespace Core.ApplicationServices
 
         void UpdateUser(User user, bool? sendMailOnUpdate, int? scopedToOrganizationId);
         void IssueAdvisMail(User user, bool reminder, int orgId);
-        PasswordResetRequest IssuePasswordReset(User user, string subject, string content);
-        PasswordResetRequest GetPasswordReset(string hash);
-        void ResetPassword(PasswordResetRequest passwordResetRequest, string newPassword);
+        PasswordResetRequest IssuePasswordReset(User user, string? subject, string? content);
+        PasswordResetRequest? GetPasswordReset(string hash);
+        void ResetPassword(PasswordResetRequest? passwordResetRequest, string newPassword);
         Result<IQueryable<User>, OperationError> GetUsersWithCrossOrganizationPermissions();
         Result<IQueryable<User>, OperationError> GetUsersWithRoleAssignedInAnyOrganization(OrganizationRole role);
         Result<IQueryable<User>, OperationError> GetUsersInOrganization(Guid organizationUuid, params IDomainQuery<User>[] queries);
@@ -34,7 +34,7 @@ namespace Core.ApplicationServices
         Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries);
         Result<UserAdministrationPermissions, OperationError> GetAdministrativePermissions(Guid organizationUuid);
         bool IsEmailInUse(string email);
-        Result<User, OperationError> GetUserByEmail(Guid organizationUuid, string email);
+        Result<User?, OperationError> GetUserByEmail(Guid organizationUuid, string email);
         Result<User, OperationError> GetUserByUuid(Guid userUuid);
         Result<User, OperationError> GetGlobalAdmin();
         Result<OrganizationUnit, OperationError> GetDefaultOrganizationUnit(Guid organizationUuid, Guid userUuid);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Presentation.Web.Models.API.V2.Response.Options
 {
@@ -16,8 +17,9 @@ namespace Presentation.Web.Models.API.V2.Response.Options
 
         }
 
-        public RoleOptionExtendedResponseDTO(Guid uuid, string name, bool writeAccess, bool isAvailable, string description)
-            : base(uuid, name, writeAccess, description)
+        [SetsRequiredMembers]
+        public RoleOptionExtendedResponseDTO(Guid uuid, string name, bool writeAccess, bool isAvailable, string description, bool isExternallyAvailable, string externallyAvailableDescription)
+            : base(uuid, name, writeAccess, description, isExternallyAvailable, externallyAvailableDescription)
         {
             IsAvailable = isAvailable;
         }

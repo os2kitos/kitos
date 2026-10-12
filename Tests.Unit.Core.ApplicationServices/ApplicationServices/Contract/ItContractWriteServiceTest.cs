@@ -19,6 +19,7 @@ using Core.ApplicationServices.References;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
+using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -28,6 +29,7 @@ using Core.DomainModel.References;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
+using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
 using Moq;
@@ -44,16 +46,14 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IEntityIdentityResolver> _identityResolverMock;
         private readonly Mock<IOptionResolver> _optionResolverMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
-        private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IDatabaseControl> _databaseControlMock;
-        private readonly Mock<IGenericRepository<ItContractAgreementElementTypes>> _agreementElementTypeRepository;
+        private readonly Mock<IDomainEvents> _domainEventsMock;
+        private readonly Mock<IPendingReadModelUpdateRepository> _pendingReadModelUpdateRepository = new();
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IReferenceService> _referenceServiceMock;
         private readonly Mock<IAuthorizationContext> _authContext;
         private readonly Mock<IAssignmentUpdateService> _assignmentUpdateServiceMock;
-        private readonly Mock<IItSystemUsageService> _usageServiceMock;
         private readonly Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>> _roleAssignmentService;
-        private readonly Mock<IDataProcessingRegistrationApplicationService> _dprServiceMock;
         private readonly Mock<IEntityTreeUuidCollector> _entityTreeUuidCollector;
 
         public ItContractWriteServiceTest()
@@ -64,14 +64,14 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _transactionManagerMock = new Mock<ITransactionManager>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _databaseControlMock = new Mock<IDatabaseControl>();
-            _agreementElementTypeRepository = new Mock<IGenericRepository<ItContractAgreementElementTypes>>();
+            var agreementElementTypeRepository = new Mock<IGenericRepository<ItContractAgreementElementTypes>>();
             _organizationServiceMock = new Mock<IOrganizationService>();
             _referenceServiceMock = new Mock<IReferenceService>();
             _authContext = new Mock<IAuthorizationContext>();
             _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
-            _usageServiceMock = new Mock<IItSystemUsageService>();
+            var usageServiceMock = new Mock<IItSystemUsageService>();
             _roleAssignmentService = new Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>>();
-            _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
+            var dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
             _entityTreeUuidCollector = new Mock<IEntityTreeUuidCollector>();
             _sut = new ItContractWriteService(_itContractServiceMock.Object,
                 _identityResolverMock.Object,
@@ -79,16 +79,17 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 _transactionManagerMock.Object,
                 _domainEventsMock.Object,
                 _databaseControlMock.Object,
-                _agreementElementTypeRepository.Object,
+                agreementElementTypeRepository.Object,
                 _authContext.Object,
                 _organizationServiceMock.Object,
                 _referenceServiceMock.Object,
                 _assignmentUpdateServiceMock.Object,
-                _usageServiceMock.Object,
+                usageServiceMock.Object,
                 _roleAssignmentService.Object,
-                _dprServiceMock.Object,
+                dprServiceMock.Object,
                 Mock.Of<IGenericRepository<EconomyStream>>(),
-                _entityTreeUuidCollector.Object);
+                _entityTreeUuidCollector.Object,
+                _pendingReadModelUpdateRepository.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -290,7 +291,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Arrange
             var parentUuid = A<Guid>();
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parentUuid);
-            var parent = new ItContract() { Id = A<int>(), Uuid = parentUuid, OrganizationId = createdContract.OrganizationId };
+            var parent = new ItContract { Id = A<int>(), Uuid = parentUuid, OrganizationId = createdContract.OrganizationId };
             ExpectGetReturns(parent.Uuid, parent);
 
             //Act
@@ -306,7 +307,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Can_Create_With_No_Parent()
         {
             //Arrange
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: null);
+            var (organizationUuid, parameters, _, transaction) = SetupCreateScenarioPrerequisites(parentUuid: null);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -322,7 +323,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         {
             //Arrange
             var parent = new ItContract() { Id = A<int>(), Uuid = A<Guid>() };
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parent.Uuid);
+            var (organizationUuid, parameters, _, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parent.Uuid);
             var operationError = A<OperationError>();
             ExpectGetReturns(parent.Uuid, operationError);
 
@@ -338,7 +339,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         {
             //Arrange
             var parent = new ItContract() { Id = A<int>(), Uuid = A<Guid>(), OrganizationId = A<int>() };
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parent.Uuid);
+            var (organizationUuid, parameters, _, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parent.Uuid);
             ExpectGetReturns(parent.Uuid, parent);
 
             //Act
@@ -363,12 +364,12 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
 
             var (contractId,
-                contractTypeUuid,
-                contractTemplateUuid,
+                _,
+                __,
                 enforceValid,
                 validFrom,
                 validTo,
-                criticalityTypeUuid,
+                ___,
                 agreementElementUuids,
                 agreementElementTypes,
                 parameters) = SetupGeneralSectionInput(withContractType, withContractTemplate, withAgreementElements, withValidFrom, withValidTo, withCriticalityType, createdContract, organizationUuid);
@@ -390,7 +391,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Cannot_Create_With_GeneralData_With_Duplicate_AgreementElements()
         {
             // Arrange
-            var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var (organizationUuid, itContractModificationParameters, _, transaction) = SetupCreateScenarioPrerequisites();
 
             var agreementElementUuids = Many<Guid>().ToList();
             var parameters = new ItContractGeneralDataModificationParameters
@@ -418,7 +419,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Cannot_Create_With_GeneralData_With_AgreementElement_Being_Unavailable()
         {
             // Arrange
-            var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var (organizationUuid, itContractModificationParameters, _, transaction) = SetupCreateScenarioPrerequisites();
 
             var agreementElementUuids = Many<Guid>().ToList();
             var parameters = new ItContractGeneralDataModificationParameters
@@ -446,7 +447,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Cannot_Create_With_GeneralData_With_AgreementElement_Failing_To_Fetch()
         {
             // Arrange
-            var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var (organizationUuid, itContractModificationParameters, _, transaction) = SetupCreateScenarioPrerequisites();
 
             var agreementElementUuids = Many<Guid>().ToList();
             var parameters = new ItContractGeneralDataModificationParameters
@@ -484,7 +485,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Cannot_Create_With_GeneralData_If_ValidationPeriod_Is_Invalid()
         {
             // Arrange
-            var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var (organizationUuid, itContractModificationParameters, _, transaction) = SetupCreateScenarioPrerequisites();
 
             var validFrom = A<DateTime>().Date;
             var validTo = validFrom.Subtract(TimeSpan.FromDays(1)).Date;
@@ -649,7 +650,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             {
                 ProcurementPlan = (Convert.ToByte(halfOfYear), A<int>()).FromNullable().AsChangedValue()
             };
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
+            var (organizationUuid, parameters, _, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -714,12 +715,20 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var supplier = new ItContractSupplierModificationParameters()
             {
                 OrganizationUuid = ((Guid?)A<Guid>()).AsChangedValue(),
+                OrganizationUnitUuid = ((Guid?)A<Guid>()).AsChangedValue(),
+                IsInternal = true.AsChangedValue(),
                 Signed = A<bool>().AsChangedValue(),
                 SignedAt = A<DateTime?>().AsChangedValue(),
-                SignedBy = A<string>().AsChangedValue()
+                SignedBy = A<string>().AsChangedValue(),
+                ContactPerson = A<string>().AsChangedValue(),
+                UseSignedByForContact = A<bool>().AsChangedValue(),
+                ContactPhoneNumber = A<string>().AsChangedValue(),
+                ContactEmail = A<string>().AsChangedValue()
             };
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(supplier: supplier);
             var organization = new Organization() { Uuid = supplier.OrganizationUuid.NewValue.GetValueOrDefault() };
+            var organizationUnit = new OrganizationUnit() { Uuid = supplier.OrganizationUnitUuid.NewValue.GetValueOrDefault() };
+            createdContract.Organization.OrgUnits.Add(organizationUnit);
             _organizationServiceMock.Setup(x => x.GetOrganization(organization.Uuid, null)).Returns(organization);
 
             //Act
@@ -732,6 +741,12 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.Equal(supplier.Signed.NewValue, contract.HasSupplierSigned);
             Assert.Equal(supplier.SignedAt.NewValue?.Date, contract.SupplierSignedDate);
             Assert.Equal(supplier.SignedBy.NewValue, contract.SupplierContractSigner);
+            Assert.Equal(supplier.IsInternal.NewValue, contract.HasInternalSupplier);
+            Assert.Equal(supplier.OrganizationUnitUuid.NewValue, contract.SupplierOrganizationUnit?.Uuid);
+            Assert.Equal(supplier.ContactPerson.NewValue, contract.SupplierContactPerson);
+            Assert.Equal(supplier.UseSignedByForContact.NewValue, contract.UseSupplierContractSignerAsContactPerson);
+            Assert.Equal(supplier.ContactPhoneNumber.NewValue, contract.SupplierContactPhoneNumber);
+            Assert.Equal(supplier.ContactEmail.NewValue, contract.SupplierContactEmail);
             AssertTransactionCommitted(transaction);
         }
 
@@ -746,7 +761,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 SignedAt = A<DateTime?>().AsChangedValue(),
                 SignedBy = A<string>().AsChangedValue()
             };
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(supplier: supplier);
+            var (organizationUuid, parameters, _, transaction) = SetupCreateScenarioPrerequisites(supplier: supplier);
             var operationError = A<OperationError>();
             _organizationServiceMock.Setup(x => x.GetOrganization(supplier.OrganizationUuid.NewValue.GetValueOrDefault(), null)).Returns(operationError);
 
@@ -774,6 +789,11 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             Assert.True(result.Ok);
+            _pendingReadModelUpdateRepository.Verify(x => x.Add(It.Is<PendingReadModelUpdate>(update =>
+                update.SourceId == createdContract.Id &&
+                update.Category == PendingReadModelUpdateSourceCategory.ItSystemUsage_Contract)), Times.Once);
+            _pendingReadModelUpdateRepository.VerifyNoOtherCalls();
+            _domainEventsMock.Verify(x => x.Raise(It.IsAny<EntityUpdatedEvent<ItContract>>()), Times.Never);
             AssertTransactionCommitted(transaction);
         }
 
@@ -792,6 +812,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             Assert.True(result.Failed);
+            _pendingReadModelUpdateRepository.VerifyNoOtherCalls();
+            _domainEventsMock.Verify(x => x.Raise(It.IsAny<EntityUpdatedEvent<ItContract>>()), Times.Never);
             AssertFailureWithKnownError(result, operationError, transaction);
         }
 
@@ -801,7 +823,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Arrange
             var usage = new ItSystemUsage() { Id = A<int>(), Uuid = A<Guid>() };
             var usageUuids = new List<Guid> { usage.Uuid };
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
+            var (_, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
             createdContract.AssociatedSystemUsages.Add(new ItContractItSystemUsage { ItContract = createdContract, ItContractId = createdContract.Id, ItSystemUsage = usage, ItSystemUsageId = usage.Id });
 
             ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, usageUuids, Maybe<OperationError>.None);
@@ -823,7 +845,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Arrange
             var usage = new ItSystemUsage() { Id = A<int>(), Uuid = A<Guid>() };
             var usageUuids = new List<Guid>();
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
+            var (_, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
             createdContract.AssociatedSystemUsages.Add(new ItContractItSystemUsage { ItContract = createdContract, ItContractId = createdContract.Id, ItSystemUsage = usage, ItSystemUsageId = usage.Id });
 
             ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, usageUuids, Maybe<OperationError>.None);
@@ -882,7 +904,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Arrange
             var dpr = new DataProcessingRegistration() { Id = A<int>(), Uuid = A<Guid>() };
             var dprUuids = new List<Guid> { dpr.Uuid };
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
+            var (_, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
             createdContract.DataProcessingRegistrations.Add(dpr);
 
             ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, Maybe<OperationError>.None);
@@ -904,7 +926,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Arrange
             var dpr = new DataProcessingRegistration() { Id = A<int>(), Uuid = A<Guid>() };
             var dprUuids = new List<Guid>();
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
+            var (_, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
             createdContract.DataProcessingRegistrations.Add(dpr);
 
             ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, Maybe<OperationError>.None);
@@ -1022,7 +1044,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Assert
             Assert.True(result.Ok);
             AssertTransactionCommitted(transaction);
-            AssertPaymentModel(paymentModel, result.Value, withValues);
+            AssertPaymentModel(paymentModel, result.Value);
         }
 
         [Fact]
@@ -1145,7 +1167,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Cannot_Create_With_AgreementPeriod_If_ContinuousDuration_And_Fixed_Interval_Is_Also_Provided(bool hasDurationYear, bool hasDurationMonth)
         {
             //Arrange
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var (organizationUuid, parameters, _, transaction) = SetupCreateScenarioPrerequisites();
             var agreementPeriodInput = new ItContractAgreementPeriodModificationParameters
             {
                 DurationYears = (!hasDurationYear ? (int?)null : Math.Abs(A<int>())).AsChangedValue(),
@@ -1167,7 +1189,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Cannot_Create_With_AgreementPeriod_If_DurationMonth_Is_Invalid(int durationMonth)
         {
             //Arrange
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var (organizationUuid, parameters, _, transaction) = SetupCreateScenarioPrerequisites();
             var agreementPeriodInput = new ItContractAgreementPeriodModificationParameters
             {
                 DurationMonths = ((int?)durationMonth).AsChangedValue()
@@ -1185,7 +1207,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Cannot_Create_With_AgreementPeriod_If_DurationYear_Is_Invalid()
         {
             //Arrange
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var (organizationUuid, parameters, _, transaction) = SetupCreateScenarioPrerequisites();
             var agreementPeriodInput = new ItContractAgreementPeriodModificationParameters
             {
                 DurationYears = ((int?)-1).AsChangedValue()
@@ -1340,27 +1362,41 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Configure(f => f.Register<Guid?>(() => Guid.NewGuid()));
             Configure(f => f.Register<bool>(() => false));
 
+            var supplier = new ItContractSupplierModificationParameters()
+            {
+                OrganizationUuid = ((Guid?)A<Guid>()).AsChangedValue(),
+                OrganizationUnitUuid = ((Guid?)A<Guid>()).AsChangedValue(),
+                IsInternal = true.AsChangedValue(),
+                Signed = A<bool>().AsChangedValue(),
+                SignedAt = A<DateTime?>().AsChangedValue(),
+                SignedBy = A<string>().AsChangedValue(),
+                ContactPerson = A<string>().AsChangedValue(),
+                UseSignedByForContact = A<bool>().AsChangedValue(),
+                ContactPhoneNumber = A<string>().AsChangedValue(),
+                ContactEmail = A<string>().AsChangedValue()
+            };
+
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(
                 parentUuid: A<Guid>(),
                 responsible: A<ItContractResponsibleDataModificationParameters>(),
-                supplier: A<ItContractSupplierModificationParameters>(),
+                supplier: supplier,
                 systemUsageUuids: Many<Guid>().ToList(),
                 dataProcessingRegistrationUuids: Many<Guid>().ToList(),
                 roleAssignments: Many<UserRolePair>().ToList(),
                 payments: A<ItContractPaymentDataModificationParameters>());
 
             //Parent setup
-            var parent = new ItContract() { Id = A<int>(), Uuid = parameters.ParentContractUuid.NewValue.Value, OrganizationId = createdContract.OrganizationId };
+            var parent = new ItContract() { Id = A<int>(), Uuid = parameters.ParentContractUuid.NewValue!.Value, OrganizationId = createdContract.OrganizationId };
             ExpectGetReturns(parent.Uuid, parent);
 
             //General setup
             var (contractId,
-                contractTypeUuid,
-                contractTemplateUuid,
+                _,
+                _,
                 enforceValid,
                 validFrom,
                 validTo,
-                criticalityType,
+                _,
                 agreementElementUuids,
                 agreementElementTypes,
                 generalData) = SetupGeneralSectionInput(true, true, true, true, true, true, createdContract, organizationUuid);
@@ -1368,7 +1404,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             parameters.General = generalData;
 
             //Procurement setup
-            var (procurementStrategyUuid, purchaseTypeUuid, procurement) = CreateProcurementParameters(true, true, true, true);
+            var (_, _, procurement) = CreateProcurementParameters(true, true, true, true);
             parameters.Procurement = procurement;
             ExpectUpdateIndependentOptionTypeAssignmentReturns<ProcurementStrategyType>(createdContract, procurement.ProcurementStrategyUuid.NewValue, Maybe<OperationError>.None);
             ExpectUpdateIndependentOptionTypeAssignmentReturns<PurchaseFormType>(createdContract, procurement.PurchaseTypeUuid.NewValue, Maybe<OperationError>.None);
@@ -1380,6 +1416,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Supplier
             var organization = new Organization() { Uuid = parameters.Supplier.Value.OrganizationUuid.NewValue.GetValueOrDefault() };
             _organizationServiceMock.Setup(x => x.GetOrganization(organization.Uuid, null)).Returns(organization);
+            var supplierOrganizationUnit = new OrganizationUnit() { Uuid = parameters.Supplier.Value.OrganizationUnitUuid.NewValue.GetValueOrDefault() };
+            createdContract.Organization.OrgUnits.Add(supplierOrganizationUnit);
 
             //System usage setup
             ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, parameters.SystemUsageUuids, Maybe<OperationError>.None);
@@ -1470,8 +1508,14 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.Equal(parameters.Supplier.Value.Signed.NewValue, contract.HasSupplierSigned);
             Assert.Equal(parameters.Supplier.Value.SignedAt.NewValue?.Date, contract.SupplierSignedDate);
             Assert.Equal(parameters.Supplier.Value.SignedBy.NewValue, contract.SupplierContractSigner);
+            Assert.Equal(parameters.Supplier.Value.IsInternal.NewValue, contract.HasInternalSupplier);
+            Assert.Equal(parameters.Supplier.Value.OrganizationUnitUuid.NewValue, contract.SupplierOrganizationUnit?.Uuid);
+            Assert.Equal(parameters.Supplier.Value.ContactPerson.NewValue, contract.SupplierContactPerson);
+            Assert.Equal(parameters.Supplier.Value.UseSignedByForContact.NewValue, contract.UseSupplierContractSignerAsContactPerson);
+            Assert.Equal(parameters.Supplier.Value.ContactPhoneNumber.NewValue, contract.SupplierContactPhoneNumber);
+            Assert.Equal(parameters.Supplier.Value.ContactEmail.NewValue, contract.SupplierContactEmail);
 
-            AssertPaymentModel(paymentModel, contract, true);
+            AssertPaymentModel(paymentModel, contract);
 
             //Agreement period
             Assert.Equal(agreementPeriodInput.DurationMonths.NewValue, contract.DurationMonths);
@@ -1675,7 +1719,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             }
         }
 
-        private static void AssertPaymentModel(ItContractPaymentModelModificationParameters expected, ItContract actual, bool hasValues)
+        private static void AssertPaymentModel(ItContractPaymentModelModificationParameters expected, ItContract actual)
         {
             Assert.Equal(expected.OperationsRemunerationStartedAt.NewValue.Match<DateTime?>(date => date.Date, () => null), actual.OperationRemunerationBegun?.Date);
         }
@@ -1713,7 +1757,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 ProcurementStrategyUuid = procurementStrategyUuid.AsChangedValue(),
                 PurchaseTypeUuid = purchaseTypeUuid.AsChangedValue(),
                 ProcurementPlan = (withPlan ? (CreateValidHalfOfYearByte(), A<int>()) : Maybe<(byte half, int year)>.None).AsChangedValue(),
-                ProcurementInitiated = procurementInitiated.AsChangedValue() ?? Maybe<YesNoUndecidedOption>.None.AsChangedValue()
+                ProcurementInitiated = procurementInitiated.AsChangedValue()
             };
             return (procurementStrategyUuid, purchaseTypeUuid, procurement);
         }
@@ -1782,16 +1826,16 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
         private (Guid organizationUuid, ItContractModificationParameters parameters, ItContract createdContract, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
             Guid? parentUuid = null,
-            ItContractProcurementModificationParameters procurement = null,
-            ItContractResponsibleDataModificationParameters responsible = null,
-            ItContractSupplierModificationParameters supplier = null,
-            IEnumerable<UpdatedExternalReferenceProperties> externalReferences = null,
-            IEnumerable<Guid> systemUsageUuids = null,
-            IEnumerable<UserRolePair> roleAssignments = null,
-            IEnumerable<Guid> dataProcessingRegistrationUuids = null,
-            ItContractPaymentModelModificationParameters paymentModel = null,
-            ItContractAgreementPeriodModificationParameters agreementPeriod = null,
-            ItContractPaymentDataModificationParameters payments = null
+            ItContractProcurementModificationParameters? procurement = null,
+            ItContractResponsibleDataModificationParameters? responsible = null,
+            ItContractSupplierModificationParameters? supplier = null,
+            IEnumerable<UpdatedExternalReferenceProperties>? externalReferences = null,
+            IEnumerable<Guid>? systemUsageUuids = null,
+            IEnumerable<UserRolePair>? roleAssignments = null,
+            IEnumerable<Guid>? dataProcessingRegistrationUuids = null,
+            ItContractPaymentModelModificationParameters? paymentModel = null,
+            ItContractAgreementPeriodModificationParameters? agreementPeriod = null,
+            ItContractPaymentDataModificationParameters? payments = null
             )
         {
             var organization = new Organization

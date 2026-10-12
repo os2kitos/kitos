@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Core.Abstractions.Types;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainServices;
-using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Infrastructure.Services.DataAccess;
 
@@ -43,31 +42,24 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 var updates = _pendingReadModelUpdateRepository
                     .GetMany(category, int.MaxValue)
                     .OrderBy(x => x.CreatedAt) //The oldest will be served first
-                    .Select(x => new
-                    {
-                        Id = x.Id,
-                        SourceId = x.SourceId
-                    })
                     .ToList();
 
-                var idsToDelete =
+                var objectsToDelete =
                     (
-                        //Select ids of all duplicates and nuke them
+                        //Select all duplicates and nuke them - entities are already tracked so no second round-trip needed
                         from update in updates
                         where !idsInQueue.Add(update.SourceId)
-                        select update.Id
+                        select update
                     )
                     .ToList();
 
-                if (idsToDelete.Any())
+                if (objectsToDelete.Any())
                 {
-                    //Using optimized collection deletion. DeleteByKey first fetches the object from db and then marks as deleted. That is very slow since it will cause a lot of round-trips to the database in stead of one for select and one for delete
-                    var objectsToDelete = _primitiveRepository.AsQueryable().ByIds(idsToDelete).ToList();
                     _primitiveRepository.RemoveRange(objectsToDelete);
 
                     _primitiveRepository.Save();
                     transaction.Commit();
-                    deleted += idsToDelete.Count;
+                    deleted += objectsToDelete.Count;
                 }
             }
 

@@ -13,7 +13,7 @@ namespace PubSub.Test.Unit.Infrastructure.MessageQueue
     {
         private class DummyDTO
         {
-            public string Field { get; set; }
+            public required string Field { get; set; }
         }
         [Fact]
         public async Task Can_Post_With_Client_From_Factory()

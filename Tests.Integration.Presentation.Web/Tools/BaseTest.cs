@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
@@ -28,7 +29,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public class BaseTest : WithAutoFixture
     {
-        private string _token;
+        private string? _token;
         private readonly Random _random = new Random();
 
         public readonly Guid DefaultOrgUuid =
@@ -37,20 +38,21 @@ namespace Tests.Integration.Presentation.Web.Tools
         public readonly Guid SecondOrgUuid =
             DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.SecondOrganizationId);
 
-        public async Task<ShallowOrganizationResponseDTO> CreateOrganizationAsync(string name = null, string cvr = null,
-            OrganizationType type = OrganizationType.Municipality)
+        public async Task<ShallowOrganizationResponseDTO> CreateOrganizationAsync(string? name = null, string? cvr = null,
+            OrganizationType type = OrganizationType.Municipality, bool isSupplier = false)
         {
             var defaultRequest = new OrganizationCreateRequestDTO
             {
                 Name = name ?? A<string>(),
                 Cvr = cvr ?? CreateCvr(),
-                Type = type
+                Type = type,
+                IsSupplier = isSupplier
             };
             using var response = OrganizationInternalV2Helper.CreateOrganization(defaultRequest);
             return await response;
         }
 
-        public async Task<DataProcessingRegistrationResponseDTO> CreateDPRAsync(Guid orgUuid, string name = null)
+        public async Task<DataProcessingRegistrationResponseDTO> CreateDPRAsync(Guid orgUuid, string? name = null)
         {
             var token = await GetGlobalToken();
             var request = new CreateDataProcessingRegistrationRequestDTO
@@ -61,7 +63,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await DataProcessingRegistrationV2Helper.PostAsync(token, request);
         }
 
-        public async Task<ItContractResponseDTO> CreateItContractAsync(Guid organizationUuid, string name = null)
+        public async Task<ItContractResponseDTO> CreateItContractAsync(Guid organizationUuid, string? name = null)
         {
             return await ItContractV2Helper.PostContractAsync(await GetGlobalToken(), new CreateNewContractRequestDTO
             {
@@ -70,7 +72,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             });
         }
 
-        public async Task<ItSystemResponseDTO> CreateItSystemAsync(Guid orgGuid, string name = null,
+        public async Task<ItSystemResponseDTO> CreateItSystemAsync(Guid orgGuid, string? name = null,
             RegistrationScopeChoice scope = RegistrationScopeChoice.Global, Guid? rightsHolderUuid = null)
         {
             var request = new CreateItSystemRequestDTO
@@ -102,7 +104,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
 
         public async Task<OrganizationUnitResponseDTO> CreateOrganizationUnitAsync(Guid organizationUuid,
-            string name = null, Guid? parentUnitUuid = null)
+            string? name = null, Guid? parentUnitUuid = null)
         {
             var rootUnit = await OrganizationUnitV2Helper.GetRootUnit(organizationUuid);
             var request = new CreateOrganizationUnitRequestDTO
@@ -113,12 +115,14 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await OrganizationUnitV2Helper.CreateUnitAsync(organizationUuid, request);
         }
 
-        public async Task<ItInterfaceResponseDTO> CreateItInterfaceAsync(Guid organizationUuid, string name = null,
-            RegistrationScopeChoice scope = RegistrationScopeChoice.Global, string interfaceId = null)
+        public async Task<ItInterfaceResponseDTO> CreateItInterfaceAsync(Guid organizationUuid, string? name = null,
+            RegistrationScopeChoice scope = RegistrationScopeChoice.Global, string? interfaceId = null)
         {
             var request = new CreateItInterfaceRequestDTO
             {
                 Name = name ?? A<string>(),
+                Description = A<string>(),
+                UrlReference = A<string>(),
                 OrganizationUuid = organizationUuid,
                 Scope = scope,
                 InterfaceId = interfaceId ?? A<string>()
@@ -126,7 +130,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await InterfaceV2Helper.CreateItInterfaceAsync(await GetGlobalToken(), request);
         }
 
-        public async Task<UserResponseDTO> CreateUserAsync(Guid organizationUuid, string email = null, bool apiAccess = false)
+        public async Task<UserResponseDTO> CreateUserAsync(Guid organizationUuid, string? email = null, bool apiAccess = false)
         {
             var request = new CreateUserRequestDTO
             {

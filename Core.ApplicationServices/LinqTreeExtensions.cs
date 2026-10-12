@@ -42,7 +42,7 @@ namespace Core.ApplicationServices
                 {
                     // typeof(T).GetProperties() doesn't work with ExpandoObject so instead we need to cast to IDictionary
                     var propertyValues = item as IDictionary<string, object>;
-                    line = string.Join(";", propertyValues.Values.Select(p => p.ToCsvValue()).ToArray());
+                    line = string.Join(";", propertyValues!.Values.Select(p => p.ToCsvValue()).ToArray());
                 }
                 else
                 {
@@ -59,14 +59,14 @@ namespace Core.ApplicationServices
 
             if (item is string)
             {
-                return string.Format("\"{0}\"", item.ToString().Replace("\"", "\\\""));
+                return $"\"{item.ToString()?.Replace("\"", "\\\"")}\"";
             }
-            double dummy;
-            if (double.TryParse(item.ToString(), out dummy))
+
+            if (double.TryParse(item.ToString(), out _))
             {
-                return string.Format("{0}", item);
+                return $"{item}";
             }
-            return string.Format("\"{0}\"", item);
+            return $"\"{item}\"";
         }
     }
 }

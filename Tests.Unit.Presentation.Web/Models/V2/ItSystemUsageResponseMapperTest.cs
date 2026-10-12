@@ -60,9 +60,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             Assert.Equal(itSystemUsage.Uuid, dto.Uuid);
             Assert.Equal(itSystemUsage.LastChanged, dto.LastModified);
+            Assert.Equal(itSystemUsage.Concluded, dto.CreatedAt);
             AssertUser(itSystemUsage.ObjectOwner, dto.CreatedBy);
             AssertUser(itSystemUsage.LastChangedByUser, dto.LastModifiedBy);
             AssertIdentity(itSystemUsage.ItSystem, dto.SystemContext);
+            Assert.NotNull(dto.OrganizationContext);
             AssertOrganization(itSystemUsage.Organization, dto.OrganizationContext);
         }
 
@@ -84,16 +86,20 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertUserCount(itSystemUsage, dto.General.NumberOfExpectedUsers);
             Assert.Equal(itSystemUsage.Version, dto.General.SystemVersion);
             AssertIdentity(itSystemUsage.MainContract.ItContract, dto.General.MainContract);
-            Assert.Equal(itSystemUsage.Concluded, dto.General.Validity.ValidFrom);
-            Assert.Equal(itSystemUsage.ExpirationDate, dto.General.Validity.ValidTo);
-            Assert.Equal(itSystemUsage.LifeCycleStatus, dto.General.Validity.LifeCycleStatus?.ToLifeCycleStatusType());
-            Assert.Equal(itSystemUsage.IsActiveAccordingToDateFields, dto.General.Validity.ValidAccordingToValidityPeriod);
-            Assert.Equal(itSystemUsage.IsActiveAccordingToLifeCycle, dto.General.Validity.ValidAccordingToLifeCycle);
-            Assert.Equal(itSystemUsage.IsActiveAccordingToMainContract, dto.General.Validity.ValidAccordingToMainContract);
-            Assert.Equal(itSystemUsage.CheckSystemValidity().Result, dto.General.Validity.Valid);
+            Assert.Equal(itSystemUsage.Concluded, dto.General.Validity?.ValidFrom);
+            Assert.Equal(itSystemUsage.ExpirationDate, dto.General.Validity?.ValidTo);
+            Assert.Equal(itSystemUsage.LifeCycleStatus, dto.General.Validity?.LifeCycleStatus?.ToLifeCycleStatusType());
+            Assert.Equal(itSystemUsage.IsActiveAccordingToDateFields, dto.General.Validity?.ValidAccordingToValidityPeriod);
+            Assert.Equal(itSystemUsage.IsActiveAccordingToLifeCycle, dto.General.Validity?.ValidAccordingToLifeCycle);
+            Assert.Equal(itSystemUsage.IsActiveAccordingToMainContract, dto.General.Validity?.ValidAccordingToMainContract);
+            Assert.Equal(itSystemUsage.CheckSystemValidity().Result, dto.General.Validity?.Valid);
             Assert.Equal(itSystemUsage.WebAccessibilityCompliance, dto.General.WebAccessibilityCompliance?.ToYesNoPartiallyOption());
             Assert.Equal(itSystemUsage.LastWebAccessibilityCheck, dto.General.LastWebAccessibilityCheck);
             Assert.Equal(itSystemUsage.WebAccessibilityNotes, dto.General.WebAccessibilityNotes);
+            Assert.Equal(itSystemUsage.IsSociallyCritical?.ToYesNoDontKnowChoice(), dto.General.IsSociallyCritical);
+            AssertYesNoDontKnow(dto.General.IsBusinessCritical, itSystemUsage.isBusinessCritical);
+            Assert.Equal(itSystemUsage.CriticalityFieldsLastChanged, dto.General.CriticalityFieldsLastChanged);
+            AssertHostedAt(dto.General.HostedAt, itSystemUsage.HostedAt);
         }
 
         [Fact]
@@ -145,7 +151,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             var expectedAdditions = itSystemUsage.TaskRefs.Select(tr => (tr.TaskKey, tr.Uuid)).ToList();
-            var actualAdditions = dto.LocalKLEDeviations.AddedKLE.Select(kle => (kle.Name, kle.Uuid)).ToList();
+            var actualAdditions = dto.LocalKLEDeviations!.AddedKLE.Select(kle => (kle.Name, kle.Uuid)).ToList();
             Assert.Equal(expectedAdditions, actualAdditions);
 
             var expectedRemovals = itSystemUsage.TaskRefsOptOut.Select(tr => (tr.TaskKey, tr.Uuid)).ToList();
@@ -262,45 +268,44 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var dto = _sut.MapSystemUsageDTO(itSystemUsage);
 
             //Assert
-            Assert.Equal(dto.GDPR.Purpose, itSystemUsage.GeneralPurpose);
-            AssertYesNoExtended(dto.GDPR.BusinessCritical, itSystemUsage.isBusinessCritical);
-            AssertYesNoExtended(dto.GDPR.DPIAConducted, itSystemUsage.DPIA);
+            Assert.Equal(dto.GDPR.ProcessingPurpose, itSystemUsage.ProcessingPurpose);
+            AssertYesNoDontKnow(dto.GDPR.DPIAConducted, itSystemUsage.DPIA);
             AssertSimpleLink(dto.GDPR.DPIADocumentation, itSystemUsage.DPIASupervisionDocumentationUrlName, itSystemUsage.DPIASupervisionDocumentationUrl);
-            AssertHostedAt(dto.GDPR.HostedAt, itSystemUsage.HostedAt);
             AssertSimpleLink(dto.GDPR.DirectoryDocumentation, itSystemUsage.LinkToDirectoryUrlName, itSystemUsage.LinkToDirectoryUrl);
-            Assert.Equal(dto.GDPR.DataSensitivityLevels.Select(MapDataSensitivity).OrderBy(x => x).ToList(), itSystemUsage.SensitiveDataLevels.Select(x => x.SensitivityDataLevel).OrderBy(x => x).ToList());
-            AssertYesNoExtended(dto.GDPR.TechnicalPrecautionsInPlace, itSystemUsage.precautions);
+            Assert.Equal(dto.GDPR.DataSensitivityLevels?.Select(MapDataSensitivity).OrderBy(x => x).ToList(), itSystemUsage.SensitiveDataLevels?.Select(x => x.SensitivityDataLevel).OrderBy(x => x).ToList());
+            AssertYesNoDontKnow(dto.GDPR.TechnicalPrecautionsInPlace, itSystemUsage.precautions);
             AssertAppliedPrecautions(dto.GDPR.TechnicalPrecautionsApplied, itSystemUsage);
             AssertSimpleLink(dto.GDPR.TechnicalPrecautionsDocumentation, itSystemUsage.TechnicalSupervisionDocumentationUrlName, itSystemUsage.TechnicalSupervisionDocumentationUrl);
-            AssertYesNoExtended(dto.GDPR.DPIAConducted, itSystemUsage.DPIA);
+            AssertYesNoDontKnow(dto.GDPR.DPIAConducted, itSystemUsage.DPIA);
             Assert.Equal(dto.GDPR.DPIADate, itSystemUsage.DPIADateFor);
-            AssertYesNoExtended(dto.GDPR.RetentionPeriodDefined, itSystemUsage.answeringDataDPIA);
+            AssertYesNoDontKnow(dto.GDPR.RetentionPeriodDefined, itSystemUsage.answeringDataDPIA);
             Assert.Equal(dto.GDPR.DataRetentionEvaluationFrequencyInMonths, itSystemUsage.numberDPIA);
             Assert.Equal(dto.GDPR.NextDataRetentionEvaluationDate, itSystemUsage.DPIAdeleteDate);
-            AssertYesNoExtended(dto.GDPR.UserSupervision, itSystemUsage.UserSupervision);
+            AssertYesNoDontKnow(dto.GDPR.UserSupervision, itSystemUsage.UserSupervision);
             Assert.Equal(dto.GDPR.UserSupervisionDate, itSystemUsage.UserSupervisionDate);
             AssertSimpleLink(dto.GDPR.UserSupervisionDocumentation, itSystemUsage.UserSupervisionDocumentationUrlName, itSystemUsage.UserSupervisionDocumentationUrl);
-            AssertYesNoExtended(dto.GDPR.RiskAssessmentConducted, itSystemUsage.riskAssessment);
+            AssertYesNoDontKnowIrrelevant(dto.GDPR.RiskAssessmentConducted, itSystemUsage.riskAssessment);
             Assert.Equal(dto.GDPR.RiskAssessmentConductedDate, itSystemUsage.riskAssesmentDate);
             AssertSimpleLink(dto.GDPR.RiskAssessmentDocumentation, itSystemUsage.RiskSupervisionDocumentationUrlName, itSystemUsage.RiskSupervisionDocumentationUrl);
             Assert.Equal(dto.GDPR.RiskAssessmentNotes, itSystemUsage.noteRisks);
             AssertRiskLevel(dto.GDPR.RiskAssessmentResult, itSystemUsage.preriskAssessment);
             Assert.Equal(dto.GDPR.PlannedRiskAssessmentDate, itSystemUsage.PlannedRiskAssessmentDate);
+            Assert.Equal(dto.General.SystemUsageCriticalityLevel?.Uuid, itSystemUsage.SystemUsageCriticalityLevel?.Uuid);
 
-            Assert.Equal(dto.GDPR.SpecificPersonalData.Count(), itSystemUsage.PersonalDataOptions.Count);
-            foreach (var dataOption in dto.GDPR.SpecificPersonalData)
+            Assert.Equal(dto.GDPR.SpecificPersonalData?.Count(), itSystemUsage.PersonalDataOptions.Count);
+            foreach (var dataOption in dto.GDPR.SpecificPersonalData ?? [])
             {
                 Assert.Contains(dataOption, itSystemUsage.PersonalDataOptions.Select(x => x.PersonalData.ToGDPRPersonalDataChoice()));
             }
 
-            Assert.Equal(dto.GDPR.SensitivePersonData.Count(), expectedSensitivePersonData.Count);
-            Assert.Equal(dto.GDPR.RegisteredDataCategories.Count(), expectedRegisterTypes.Count);
-            foreach (var comparison in expectedSensitivePersonData.OrderBy(x => x.Name).Zip(dto.GDPR.SensitivePersonData.OrderBy(x => x.Name), (expected, actual) => new { expected, actual }))
+            Assert.Equal(dto.GDPR.SensitivePersonData?.Count(), expectedSensitivePersonData.Count);
+            Assert.Equal(dto.GDPR.RegisteredDataCategories?.Count(), expectedRegisterTypes.Count);
+            foreach (var comparison in expectedSensitivePersonData.OrderBy(x => x.Name).Zip(dto.GDPR.SensitivePersonData!.OrderBy(x => x.Name), (expected, actual) => new { expected, actual }))
             {
                 AssertIdentity(comparison.expected, comparison.actual);
             }
 
-            foreach (var comparison in expectedRegisterTypes.OrderBy(x => x.Name).Zip(dto.GDPR.RegisteredDataCategories.OrderBy(x => x.Name), (expected, actual) => new { expected, actual }))
+            foreach (var comparison in expectedRegisterTypes.OrderBy(x => x.Name).Zip(dto.GDPR.RegisteredDataCategories!.OrderBy(x => x.Name), (expected, actual) => new { expected, actual }))
             {
                 AssertIdentity(comparison.expected, comparison.actual);
             }
@@ -400,7 +405,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected, actual);
         }
 
-        private static void AssertAppliedPrecautions(IEnumerable<TechnicalPrecautionChoice> actual, ItSystemUsage source)
+        private static void AssertAppliedPrecautions(IEnumerable<TechnicalPrecautionChoice>? actual, ItSystemUsage source)
         {
             var expectedChoices = new List<TechnicalPrecautionChoice>();
             if (source.precautionsOptionsAccessControl)
@@ -411,7 +416,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 expectedChoices.Add(TechnicalPrecautionChoice.Logging);
             if (source.precautionsOptionsPseudonomisering)
                 expectedChoices.Add(TechnicalPrecautionChoice.Pseudonymization);
-            Assert.Equal(expectedChoices.OrderBy(x => x).ToList(), actual.OrderBy(x => x).ToList());
+            Assert.Equal(expectedChoices.OrderBy(x => x).ToList(), actual?.OrderBy(x => x).ToList());
         }
 
         private static SensitiveDataLevel MapDataSensitivity(DataSensitivityLevelChoice actual)
@@ -439,16 +444,15 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected, actual);
         }
 
-        private static void AssertSimpleLink(SimpleLinkDTO actual, string expectedName, string expectedUrl)
+        private static void AssertSimpleLink(SimpleLinkDTO? actual, string expectedName, string expectedUrl)
         {
-            Assert.Equal(expectedName, actual.Name);
-            Assert.Equal(expectedUrl, actual.Url);
+            Assert.Equal(expectedName, actual?.Name);
+            Assert.Equal(expectedUrl, actual?.Url);
         }
 
         private (IReadOnlyList<SensitivePersonalDataType> sensitivePersonData, IReadOnlyList<RegisterType> registerTypeData) AssignGDPR(ItSystemUsage itSystemUsage, bool withCrossReferences)
         {
             itSystemUsage.GeneralPurpose = A<string>();
-            itSystemUsage.isBusinessCritical = A<DataOptions>();
             itSystemUsage.UpdateDPIAConducted(DataOptions.YES);
             itSystemUsage.UpdateDPIADate(A<DateTime>());
             itSystemUsage.UpdateDPIADocumentation(A<string>(), A<string>());
@@ -462,7 +466,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.UpdateRetentionPeriodDefined(DataOptions.YES);
             itSystemUsage.UpdateNextDataRetentionEvaluationDate(A<DateTime>());
             itSystemUsage.UpdateDataRetentionEvaluationFrequencyInMonths(A<int>());
-            itSystemUsage.UpdateRiskAssessment(DataOptions.YES);
+            itSystemUsage.UpdateRiskAssessment(YesNoDontKnowIrrelevant.Yes);
             itSystemUsage.UpdateRiskAssessmentDate(A<DateTime>()); 
             itSystemUsage.UpdateRiskAssessmentDocumentation(A<string>(), A<string>());
             itSystemUsage.UpdatePlannedRiskAssessmentDate(A<DateTime>());
@@ -508,7 +512,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.ArchivePeriods = Many<string>().Select(CreateArchivePeriod).ToList();
         }
 
-        private ArchivePeriod CreateArchivePeriod(string id = null)
+        private ArchivePeriod CreateArchivePeriod(string? id = null)
         {
             return new ArchivePeriod
             {
@@ -548,7 +552,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertOptionalIdentity(expected.RelationInterface, actual.RelationInterface);
         }
 
-        private static void AssertOptionalIdentity<T>(T optionalExpectedIdentity, IdentityNamePairResponseDTO actualIdentity) where T : IHasUuid, IHasName
+        private static void AssertOptionalIdentity<T>(T? optionalExpectedIdentity, IdentityNamePairResponseDTO? actualIdentity) where T : IHasUuid, IHasName
         {
             if (optionalExpectedIdentity == null)
                 Assert.Null(actualIdentity);
@@ -560,7 +564,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             itSystemUsage.UsageRelations = new[]
             {
-                CreateOutgoingSystemRelation(itSystemUsage,false,false,false),
+                CreateOutgoingSystemRelation(itSystemUsage),
                 CreateOutgoingSystemRelation(itSystemUsage,false,false,true),
                 CreateOutgoingSystemRelation(itSystemUsage,false,true,true),
                 CreateOutgoingSystemRelation(itSystemUsage,true,true,true)
@@ -641,7 +645,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }).ToList();
             itSystemUsage.Rights = rights;
         }
-        private static void AssertUserCount(ItSystemUsage itSystemUsage, ExpectedUsersIntervalDTO generalNumberOfExpectedUsers)
+        private static void AssertUserCount(ItSystemUsage itSystemUsage, ExpectedUsersIntervalDTO? generalNumberOfExpectedUsers)
         {
             if (itSystemUsage.UserCount is UserCount.UNDECIDED or null)
             {
@@ -652,16 +656,32 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 (int from, int? to) expected = itSystemUsage.UserCount switch
                 {
                     UserCount.BELOWTEN => (0, 9),
-                    UserCount.TENTOFIFTY => (10, 50),
-                    UserCount.FIFTYTOHUNDRED => (50, 100),
-                    UserCount.HUNDREDPLUS => (100, null),
+                    UserCount.TENTOFORTYNINE => (10, 49),
+                    UserCount.FIFTYTONINETYNINE => (50, 99),
+                    UserCount.HUNDREDTOFOURHUNDREDNINETYNINE => (100, 499),
+                    UserCount.FIVEHUNDREDPLUS => (500, null),
                     _ => throw new ArgumentOutOfRangeException()
                 };
-                Assert.Equal(expected, (generalNumberOfExpectedUsers.LowerBound, generalNumberOfExpectedUsers.UpperBound));
+                Assert.Equal(expected, (generalNumberOfExpectedUsers?.LowerBound, generalNumberOfExpectedUsers?.UpperBound));
             }
         }
 
-        private static void AssertYesNoExtended(YesNoDontKnowChoice? actual, DataOptions? expectedFromSource)
+        private static void AssertYesNoDontKnowIrrelevant(YesNoDontKnowIrrelevantChoice? actual, YesNoDontKnowIrrelevant? expectedFromSource)
+        {
+            YesNoDontKnowIrrelevantChoice? expected = expectedFromSource switch
+            {
+                YesNoDontKnowIrrelevant.No => YesNoDontKnowIrrelevantChoice.No,
+                YesNoDontKnowIrrelevant.Yes => YesNoDontKnowIrrelevantChoice.Yes,
+                YesNoDontKnowIrrelevant.DontKnow => YesNoDontKnowIrrelevantChoice.DontKnow,
+                YesNoDontKnowIrrelevant.Irrelevant => YesNoDontKnowIrrelevantChoice.Irrelevant,
+                YesNoDontKnowIrrelevant.Undecided => YesNoDontKnowIrrelevantChoice.Undecided,
+                null => null,
+                _ => throw new ArgumentOutOfRangeException(nameof(expectedFromSource), expectedFromSource, null)
+            };
+            Assert.Equal(expected, actual);
+        }
+
+        private static void AssertYesNoDontKnow(YesNoDontKnowChoice? actual, DataOptions? expectedFromSource)
         {
             YesNoDontKnowChoice? expected = expectedFromSource switch
             {
@@ -690,6 +710,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.WebAccessibilityCompliance = A<YesNoPartiallyOption>();
             itSystemUsage.LastWebAccessibilityCheck = A<DateTime>();
             itSystemUsage.WebAccessibilityNotes = A<string>();
+            itSystemUsage.UpdateIsBusinessCritical(A<DataOptions>());
 
         }
 
@@ -710,16 +731,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(organization.Cvr, dtoOrganizationContext.Cvr);
         }
 
-        private static void AssertIdentity(ItSystemUsage sourceIdentity, IdentityNamePairResponseDTO dto)
+        private static void AssertIdentity(ItSystemUsage sourceIdentity, IdentityNamePairResponseDTO? dto)
         {
-            Assert.Equal(sourceIdentity.ItSystem.Name, dto.Name);
-            Assert.Equal(sourceIdentity.Uuid, dto.Uuid);
+            Assert.Equal(sourceIdentity.ItSystem.Name, dto?.Name);
+            Assert.Equal(sourceIdentity.Uuid, dto?.Uuid);
         }
 
-        private static void AssertIdentity<T>(T sourceIdentity, IdentityNamePairResponseDTO dto) where T : IHasUuid, IHasName
+        private static void AssertIdentity<T>(T sourceIdentity, IdentityNamePairResponseDTO? dto) where T : IHasUuid, IHasName
         {
-            Assert.Equal(sourceIdentity.Name, dto.Name);
-            Assert.Equal(sourceIdentity.Uuid, dto.Uuid);
+            Assert.Equal(sourceIdentity.Name, dto?.Name);
+            Assert.Equal(sourceIdentity.Uuid, dto?.Uuid);
         }
 
         private Organization CreateOrganization()
@@ -736,9 +757,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             };
         }
 
-        private static void AssertUser(User user, IdentityNamePairResponseDTO dtoValue)
+        private static void AssertUser(User user, IdentityNamePairResponseDTO? dtoValue)
         {
-            Assert.Equal((user.GetFullName(), user.Uuid), (dtoValue.Name, dtoValue.Uuid));
+            Assert.Equal((user.GetFullName(), user.Uuid), (dtoValue?.Name, dtoValue?.Uuid));
         }
 
         private User CreateUser()

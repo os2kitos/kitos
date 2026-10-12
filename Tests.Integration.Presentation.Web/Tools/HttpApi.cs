@@ -113,6 +113,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             StatelessHttpClient.DefaultRequestHeaders.ConnectionClose = true;
         }
 
+#pragma warning disable SYSLIB0014
         public static void ConfigureServicePointManager()
         {
             ServicePointManager.SecurityProtocol = EnumRange
@@ -122,8 +123,9 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             ServicePointManager.Expect100Continue = false;
         }
+#pragma warning restore SYSLIB0014
 
-        public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token, IEnumerable<KeyValuePair<string, string>> headers = null)
+        public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token, IEnumerable<KeyValuePair<string, string>>? headers = null)
         {
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
             if (headers != null)
@@ -143,29 +145,29 @@ namespace Tests.Integration.Presentation.Web.Tools
             requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
             return StatelessHttpClient.SendAsync(requestMessage);
         }
-        public static Task<HttpResponseMessage> PutWithTokenAsync(Uri url, string token, object body = null)
+        public static Task<HttpResponseMessage> PutWithTokenAsync(Uri url, string token, object? body = null)
         {
             var requestMessage = CreatePutMessage(url, body);
             requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
             return StatelessHttpClient.SendAsync(requestMessage);
         }
 
-        public static Task<HttpResponseMessage> PatchWithTokenAsync(Uri url, string token, object body = null)
+        public static Task<HttpResponseMessage> PatchWithTokenAsync(Uri url, string token, object? body = null)
         {
             var requestMessage = CreatePatchMessage(url, body);
             requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
-            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/merge-patch+json");
+            requestMessage.Content?.Headers.ContentType = new MediaTypeHeaderValue("application/merge-patch+json");
             return StatelessHttpClient.SendAsync(requestMessage);
         }
 
-        public static Task<HttpResponseMessage> DeleteWithTokenAsync(Uri url, string token, object body = null)
+        public static Task<HttpResponseMessage> DeleteWithTokenAsync(Uri url, string token, object? body = null)
         {
             var requestMessage = CreateMessageWithContent(HttpMethod.Delete, url, body);
             requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
             return StatelessHttpClient.SendAsync(requestMessage);
         }
 
-        public static Task<HttpResponseMessage> PostWithCookieAsync(Uri url, Cookie cookie, object body, bool acceptUnAuthorized = false)
+        public static Task<HttpResponseMessage> PostWithCookieAsync(Uri url, Cookie cookie, object? body, bool acceptUnAuthorized = false)
         {
             return WithRetryPolicy(async () =>
             {
@@ -178,7 +180,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             }, acceptUnAuthorized == false);
         }
 
-        public static Task<HttpResponseMessage> PutWithCookieAsync(Uri url, Cookie cookie, object body = null, bool acceptUnAuthorized = false)
+        public static Task<HttpResponseMessage> PutWithCookieAsync(Uri url, Cookie cookie, object? body = null, bool acceptUnAuthorized = false)
         {
             return WithRetryPolicy(async () =>
             {
@@ -198,7 +200,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             }, acceptUnAuthorized == false);
         }
 
-        public static Task<HttpResponseMessage> DeleteWithCookieAsync(Uri url, Cookie cookie, object body = null, bool acceptUnAuthorized = false)
+        public static Task<HttpResponseMessage> DeleteWithCookieAsync(Uri url, Cookie cookie, object? body = null, bool acceptUnAuthorized = false)
         {
             return WithRetryPolicy(async () =>
             {
@@ -212,7 +214,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             }, acceptUnAuthorized == false);
         }
 
-        public static Task<HttpResponseMessage> PatchWithCookieAsync(Uri url, Cookie cookie, object body, bool acceptUnAuthorized = false)
+        public static Task<HttpResponseMessage> PatchWithCookieAsync(Uri url, Cookie cookie, object? body, bool acceptUnAuthorized = false)
         {
             return WithRetryPolicy(async () =>
             {
@@ -231,7 +233,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
 
         private static async Task<HttpResponseMessage> SendWithCSRFToken(HttpRequestMessage requestMessage,
-            Cookie authCookie = null)
+            Cookie? authCookie = null)
         {
             var csrfToken = await GetCSRFToken(authCookie);
             requestMessage.Headers.Add(Constants.CSRFValues.HeaderName, csrfToken.FormToken);
@@ -247,27 +249,23 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task<CSRFTokenDTO> GetCSRFToken(Cookie authCookie = null)
+        public static async Task<CSRFTokenDTO> GetCSRFToken(Cookie? authCookie = null)
         {
             var url = TestEnvironment.CreateUrl("api/authorize/antiforgery");
             var csrfRequest = new HttpRequestMessage(HttpMethod.Get, url);
-            HttpResponseMessage csrfResponse = null;
+            HttpResponseMessage? csrfResponse = null;
             try
             {
                 if (authCookie == null)
                 {
-                    using (var scope = StatefulScope.Create())
-                    {
-                        csrfResponse = await scope.Client.SendAsync(csrfRequest);
-                    }
+                    using var scope = StatefulScope.Create();
+                    csrfResponse = await scope.Client.SendAsync(csrfRequest);
                 }
                 else
                 {
-                    using (var scope = StatefulScope.Create())
-                    {
-                        scope.CookieContainer.Add(authCookie);
-                        csrfResponse = await scope.Client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url));
-                    }
+                    using var scope = StatefulScope.Create();
+                    scope.CookieContainer.Add(authCookie);
+                    csrfResponse = await scope.Client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url));
                 }
 
                 Assert.Equal(HttpStatusCode.OK, csrfResponse.StatusCode);
@@ -299,17 +297,17 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
             return requestMessage;
         }
-        private static HttpRequestMessage CreatePutMessage(Uri url, object body)
+        private static HttpRequestMessage CreatePutMessage(Uri url, object? body)
         {
             return CreateMessageWithContent(HttpMethod.Put, url, body);
         }
 
-        private static HttpRequestMessage CreatePatchMessage(Uri url, object body)
+        private static HttpRequestMessage CreatePatchMessage(Uri url, object? body)
         {
             return CreateMessageWithContent(new HttpMethod("PATCH"), url, body);
         }
 
-        private static HttpRequestMessage CreateMessageWithContent(HttpMethod method, Uri url, object body)
+        private static HttpRequestMessage CreateMessageWithContent(HttpMethod method, Uri url, object? body)
         {
             var requestMessage = new HttpRequestMessage(method, url)
             {
@@ -328,7 +326,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<T> ReadResponseBodyAsAsync<T>(this HttpResponseMessage response)
         {
             var responseAsJson = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<T>(responseAsJson);
+            return JsonConvert.DeserializeObject<T>(responseAsJson)!;
         }
 
         public static async Task<List<T>> ReadOdataListResponseBodyAsAsync<T>(this HttpResponseMessage response)
@@ -336,6 +334,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var responseAsJson = await response.Content.ReadAsStringAsync();
             var spec = new { value = new List<T>() };
             var result = JsonConvert.DeserializeAnonymousType(responseAsJson, spec);
+            Assert.NotNull(result);
             return result.value;
         }
 
@@ -426,7 +425,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             var cookie = new Cookie(cookieName, cookieValue)
             {
-                Domain = cookieResponse.RequestMessage.RequestUri.Host
+                Domain = cookieResponse.RequestMessage?.RequestUri?.Host
             };
             CookiesCache.TryAdd(userCredentials.Username, cookie);
             return cookie;
@@ -464,7 +463,10 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 using var crypto = new CryptoService();
                 var user = x.AsQueryable().ByUuid(userUuid);
+                Assert.NotNull(user);
                 user.Password = crypto.Encrypt(password + user.Salt);
+                if(role == OrganizationRole.GlobalAdmin)
+                    user.IsGlobalAdmin = true;
             });
 
             var cookie = await GetCookieAsync(new KitosCredentials(email, password));
@@ -487,9 +489,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 using var crypto = new CryptoService();
                 var user = x.AsQueryable().ByUuid(userUuid);
-                user.Password = crypto.Encrypt(password + user.Salt);
-                user.IsGlobalAdmin = role == OrganizationRole.GlobalAdmin;
-                user.IsSystemIntegrator = isSystemIntegrator;
+                user?.Password = crypto.Encrypt(password + user.Salt);
+                user?.IsGlobalAdmin = role == OrganizationRole.GlobalAdmin;
+                user?.IsSystemIntegrator = isSystemIntegrator;
             });
 
             var token = await GetTokenAsync(new KitosCredentials(email, password));
@@ -506,9 +508,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             return userResponse.Uuid;
         }
 
-        public static async Task<HttpResponseMessage> SendAssignRoleToUserAsync(Guid userUuid, OrganizationRole role, Guid organizationUuid, Cookie optionalLoginCookie = null)
+        public static async Task<HttpResponseMessage> SendAssignRoleToUserAsync(Guid userUuid, OrganizationRole role, Guid organizationUuid, Cookie? optionalLoginCookie = null)
         {
-            var userEmail = DatabaseAccess.MapFromEntitySet<User, string>(x => x.AsQueryable().ByUuid(userUuid).Email);
+            var userEmail = DatabaseAccess.MapFromEntitySet<User, string>(x => x.AsQueryable().ByUuid(userUuid)!.Email);
             var rolesToPatch = await GetRolesToPatch(userUuid, organizationUuid, userEmail, role.ToOrganizationRoleChoice());
             return await UsersV2Helper.PatchUserAsync(organizationUuid, userUuid, x => x.Roles,
                 rolesToPatch, optionalLoginCookie);
@@ -521,7 +523,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             if (user.IsPartOfCurrentOrganization)
             {
                 var existingOrgUser = await UsersV2Helper.GetUser(organizationUuid, userUuid);
-                return existingOrgUser.Roles.Append(roleToAdd).ToHashSet();
+                return existingOrgUser.Roles!.Append(roleToAdd).ToHashSet();
             }
             else
             {

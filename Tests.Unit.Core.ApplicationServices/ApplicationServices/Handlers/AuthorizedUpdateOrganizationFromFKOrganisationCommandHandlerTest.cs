@@ -24,17 +24,33 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
     public class AuthorizedUpdateOrganizationFromFKOrganisationCommandHandlerTest : WithAutoFixture
     {
         private readonly DateTime _now = DateTime.Now;
-        private AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler _sut;
-        private Mock<IStsOrganizationSystemService> _stsOrganizationUnitService;
-        private Mock<IGenericRepository<OrganizationUnit>> _organizationUnitRepositoryMock;
-        private Mock<IDomainEvents> _domainEventsMock;
-        private Mock<IDatabaseControl> _databaseControlMock;
-        private Mock<ITransactionManager> _transactionManagerMock;
-        private Mock<IGenericRepository<StsOrganizationChangeLog>> _stsChangeLogRepositoryMock;
+        private readonly AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler _sut;
+        private readonly Mock<IStsOrganizationSystemService> _stsOrganizationUnitService;
+        private readonly Mock<IGenericRepository<OrganizationUnit>> _organizationUnitRepositoryMock;
+        private readonly Mock<IDomainEvents> _domainEventsMock;
+        private readonly Mock<IDatabaseControl> _databaseControlMock;
+        private readonly Mock<ITransactionManager> _transactionManagerMock;
 
         public AuthorizedUpdateOrganizationFromFKOrganisationCommandHandlerTest()
         {
-            CreateSut(Maybe<ActiveUserIdContext>.None);
+            var activeUserId = Maybe<ActiveUserIdContext>.None;
+            _stsOrganizationUnitService = new Mock<IStsOrganizationSystemService>();
+            _organizationUnitRepositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
+            _domainEventsMock = new Mock<IDomainEvents>();
+            _databaseControlMock = new Mock<IDatabaseControl>();
+            _transactionManagerMock = new Mock<ITransactionManager>();
+            var stsChangeLogRepositoryMock = new Mock<IGenericRepository<StsOrganizationChangeLog>>();
+            _sut = new AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler(
+                _stsOrganizationUnitService.Object,
+                _organizationUnitRepositoryMock.Object,
+                Mock.Of<ILogger>(),
+                _domainEventsMock.Object,
+                _databaseControlMock.Object,
+                _transactionManagerMock.Object,
+                activeUserId,
+                Mock.Of<IOperationClock>(x => x.Now == _now),
+                stsChangeLogRepositoryMock.Object
+            );
         }
 
         [Theory]
@@ -360,27 +376,6 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             transaction.Verify(x => x.Commit(), Times.Never());
             transaction.Verify(x => x.Rollback(), expectRollback ? Times.Once() : Times.Never());
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityUpdatedEvent<Organization>>(org => org.Entity == organization)), Times.Never());
-        }
-
-        private void CreateSut(Maybe<ActiveUserIdContext> activeUserId)
-        {
-            _stsOrganizationUnitService = new Mock<IStsOrganizationSystemService>();
-            _organizationUnitRepositoryMock = new Mock<IGenericRepository<OrganizationUnit>>();
-            _domainEventsMock = new Mock<IDomainEvents>();
-            _databaseControlMock = new Mock<IDatabaseControl>();
-            _transactionManagerMock = new Mock<ITransactionManager>();
-            _stsChangeLogRepositoryMock = new Mock<IGenericRepository<StsOrganizationChangeLog>>();
-            _sut = new AuthorizedUpdateOrganizationFromFKOrganisationCommandHandler(
-                _stsOrganizationUnitService.Object,
-                _organizationUnitRepositoryMock.Object,
-                Mock.Of<ILogger>(),
-                _domainEventsMock.Object,
-                _databaseControlMock.Object,
-                _transactionManagerMock.Object,
-                activeUserId,
-                Mock.Of<IOperationClock>(x => x.Now == _now),
-                _stsChangeLogRepositoryMock.Object
-            );
         }
 
         private OrganizationUnit CreateOrganizationUnit(Organization organization, bool isExternal = false)

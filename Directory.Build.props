@@ -1,0 +1,16 @@
+<Project>
+  <!-- Shared code quality settings for all projects. Rules and severities live in .editorconfig.
+       See docs/CODE_QUALITY.md. -->
+  <PropertyGroup>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <!-- Quality gate: enabled by CI and scripts/quality-check.ps1 (-p:KitosQualityGate=true).
+       Any compiler/analyzer warning fails the build. Local dev and Docker builds are unaffected. -->
+  <PropertyGroup Condition="'$(KitosQualityGate)' == 'true'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <MSBuildTreatWarningsAsErrors>false</MSBuildTreatWarningsAsErrors>
+  </PropertyGroup>
+</Project>

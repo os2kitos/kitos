@@ -48,7 +48,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void MapNotificationResponseDTO_Maps_No_Properties(RelatedEntityType relatedEntityType)
         {
             //Arrange
-            var notification = new NotificationResultModel(A<int>(), A<Guid>(), A<bool>(), null, null, null, null, null, null, null, null, relatedEntityType, A<AdviceType>(), null, null);
+            var notification = new NotificationResultModel(A<int>(), A<Guid>(), A<bool>(), null!, null, null, null, null!, null!, null, null!, relatedEntityType, A<AdviceType>(), null!, null!);
 
             //Act
             var dto = _sut.MapNotificationResponseDTO(notification);
@@ -60,10 +60,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(dto.ToDate);
             Assert.Null(dto.Subject);
             Assert.Null(dto.Body);
-            Assert.Null(dto.CCs.EmailRecipients);
-            Assert.Null(dto.CCs.RoleRecipients);
-            Assert.Null(dto.Receivers.EmailRecipients);
-            Assert.Null(dto.Receivers.RoleRecipients);
+            Assert.Null(dto.CCs?.EmailRecipients);
+            Assert.Null(dto.CCs?.RoleRecipients);
+            Assert.Null(dto.Receivers?.EmailRecipients);
+            Assert.Null(dto.Receivers?.RoleRecipients);
             Assert.Null(dto.RepetitionFrequency);
         }
 
@@ -102,7 +102,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         private static void AssertNotificationResponse(NotificationResultModel notification, NotificationResponseDTO dto)
         {
             Assert.Equal(notification.Uuid, dto.Uuid);
-            Assert.Equal(notification.OwnerResource.Uuid, dto.OwnerResource.Uuid);
+            Assert.Equal(notification.OwnerResource.Uuid, dto.OwnerResource?.Uuid);
             Assert.Equal(notification.IsActive, dto.Active);
             Assert.Equal(notification.Name, dto.Name);
             Assert.Equal(notification.SentDate, dto.LastSent);
@@ -127,18 +127,21 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private static void AssertRecipients(NotificationResultModel notification, NotificationResponseDTO dto)
         {
+            Assert.NotNull(dto.CCs);
             AssertRecipientsByRoot(notification.Ccs, dto.CCs);
+            Assert.NotNull(dto.Receivers);
             AssertRecipientsByRoot(notification.Receivers, dto.Receivers);
         }
 
         private static void AssertRecipientsByRoot(RecipientResultModel relations, RecipientResponseDTO dto)
         {
-            foreach (var roleRecipient in dto.RoleRecipients)
+            
+            foreach (var roleRecipient in dto.RoleRecipients ?? [])
             {
                 Assert.Single(relations.RoleRecipients,
                     x => x.Role.Uuid == roleRecipient.Role.Uuid);
             }
-            foreach (var emailRecipient in dto.EmailRecipients)
+            foreach (var emailRecipient in dto.EmailRecipients ?? [])
             {
                 Assert.Single(relations.EmailRecipients,
                     x => x.Email == emailRecipient.Email);

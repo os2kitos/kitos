@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^dotnet build \\.\\\\Tools\\.Test\\.Database\\\\Tools\\.Test\\.Database\\.csproj -c Debug$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}

@@ -1,18 +1,22 @@
 using Core.DomainModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class ConfigMap : EntityMap<Config>
     {
-        public ConfigMap()
+        public override void Configure(EntityTypeBuilder<Config> builder)
         {
-            // Table & Column Mappings
-            ToTable("Config");
-            Property(t => t.Id).HasColumnName("Id");
+            base.Configure(builder);
+            builder.ToTable("Config");
+            builder.Property(t => t.Id).HasColumnName("Id");
 
-            // Relationships
-            HasRequired(t => t.Organization)
-                .WithOptional(t => t.Config);
+            builder.HasOne(t => t.Organization)
+                .WithOne(t => t.Config)
+                .HasForeignKey<Config>(c => c.Id)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -2,6 +2,7 @@
 {
     public enum DataProcessingRegistrationValidationError
     {
-        MainContractNotActive = 0
+        MainContractNotActive = 0,
+        EnforcedInvalidity = 1,
     }
 }

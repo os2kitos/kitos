@@ -1139,35 +1139,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
                 default: throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null);
             }
         }
-
-        private void ExpectUpdateRelatedEntityReturns(IEntityWithAdvices entity, RelatedEntityType relatedEntityType)
-        {
-            switch (relatedEntityType)
-            {
-                case RelatedEntityType.dataProcessingRegistration:
-                    var dpr = entity as DataProcessingRegistration;
-                    _dprRepository.Setup(x => x.Update(dpr));
-                    ExpectRaiseUpdateEvent<DataProcessingRegistration>(dpr);
-                    break;
-                case RelatedEntityType.itContract:
-                    var contract = entity as ItContract;
-                    _contractRepository.Setup(x => x.Update(contract));
-                    ExpectRaiseUpdateEvent<ItContract>(contract);
-                    break;
-                case RelatedEntityType.itSystemUsage:
-                    var usage = entity as ItSystemUsage;
-                    _usageRepository.Setup(x => x.Update(usage));
-                    ExpectRaiseUpdateEvent<ItSystemUsage>(usage);
-                    break;
-                default: throw new ArgumentOutOfRangeException(nameof(relatedEntityType), relatedEntityType, null);
-            }
-        }
-
-        private void ExpectRaiseUpdateEvent<T>(IEntity entity)
-        {
-            _domainEvents.Setup(x => x.Raise(It.Is<EntityUpdatedEvent<T>>(eventParameter => eventParameter == entity)));
-        }
-
+        
         private void ExpectAllowModifyReturns(IEntity entity, bool result)
         {
             _authorizationContext.Setup(x => x.AllowModify(entity)).Returns(result);

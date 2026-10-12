@@ -6,13 +6,13 @@ namespace Presentation.Web.Models.API.V2.Request.User
     {
         [Required]
         [EmailAddress]
-        public new string Email { get; set; }
+        public new required string Email { get; set; }
 
         [Required]
-        public new string FirstName { get; set; }
+        public new required string FirstName { get; set; }
 
         [Required]
-        public new string LastName { get; set; }
+        public new required string LastName { get; set; }
 
     }
 }

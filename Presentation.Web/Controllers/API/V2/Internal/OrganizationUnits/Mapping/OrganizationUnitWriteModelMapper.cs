@@ -1,4 +1,4 @@
-﻿using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using System;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Extensions;
@@ -8,6 +8,7 @@ using Presentation.Web.Models.API.V2.Request.OrganizationUnit;
 using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.Organization;
 using Core.Abstractions.Types;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping
 {
@@ -33,7 +34,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits.Mapping
             var parameters = new OrganizationUnitUpdateParameters
             {
                 Name = rule.MustUpdate(x => x.Name)
-                    ? request.Name.AsChangedValue()
+                    ? request.Name.AsChangedValue()!
                     : OptionalValueChange<string>.None,
                 Origin = rule.MustUpdate(x => x.Origin)
                     ? request.Origin.ToOrganizationUnitOrigin().AsChangedValue()

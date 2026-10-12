@@ -13,23 +13,19 @@ using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Infrastructure
 {
-    public class GrandChildClass
-    {
-        public string GC1 { get; set; }
-        public string GC2 { get; set; }
-    }
+    public class GrandChildClass{}
 
     public class ChildClass
     {
-        public string C1 { get; set; }
-        public string C2 { get; set; }
-        public GrandChildClass GrandChild { get; set; }
+        public required string C1 { get; set; }
+        public required string C2 { get; set; }
+        public required GrandChildClass GrandChild { get; set; }
     }
 
     public class RootClass
     {
-        public string R1 { get; set; }
-        public ChildClass Child { get; set; }
+        public required string R1 { get; set; }
+        public required ChildClass Child { get; set; }
     }
 
     public class CurrentAspNetRequestTest : WithAutoFixture, IDisposable
@@ -92,7 +88,7 @@ namespace Tests.Unit.Presentation.Web.Infrastructure
         {
             //Arrange
             var rootClass = A<RootClass>();
-            rootClass.Child = null;
+            rootClass.Child = null!;
             SetStreamContent(rootClass);
 
             //Act

@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
-using System.IO;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Mime;
 using System.Text;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
-
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Models.Application.Csv
 {
@@ -49,7 +44,7 @@ namespace Presentation.Web.Models.Application.Csv
             return this;
         }
 
-        public HttpResponseMessage Build()
+        public IActionResult Build()
         {
             if (_fileName.IsNone)
                 throw new InvalidOperationException("File name must be defined");
@@ -61,27 +56,16 @@ namespace Presentation.Web.Models.Application.Csv
             return BuildResponse(documentInput);
         }
 
-
-
-        private HttpResponseMessage BuildResponse(IEnumerable<object> documentInput)
+        private IActionResult BuildResponse(IEnumerable<object> documentInput)
         {
             var s = documentInput.ToCsv();
             var outputEncoding = Encoding.Unicode;
             var bytes = outputEncoding.GetBytes(s);
-            var stream = new MemoryStream();
-            stream.Write(bytes, 0, bytes.Length);
-            stream.Seek(0, SeekOrigin.Begin);
-            var result = new HttpResponseMessage(HttpStatusCode.OK)
+            var fileName = BuildFileName();
+            return new FileContentResult(bytes, $"text/csv; charset={outputEncoding.WebName}")
             {
-                Content = new StreamContent(stream),
+                FileDownloadName = fileName
             };
-            result.Content.Headers.ContentEncoding.Add(outputEncoding.WebName);
-            result.Content.Headers.ContentType = new MediaTypeHeaderValue("text/csv") { CharSet = outputEncoding.WebName };
-            result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue(DispositionTypeNames.Attachment)
-            {
-                FileNameStar = BuildFileName()
-            };
-            return result;
         }
 
         private string BuildFileName()
@@ -95,7 +79,7 @@ namespace Presentation.Web.Models.Application.Csv
         private ExpandoObject BuildHeaders()
         {
             var headerExpando = new ExpandoObject();
-            var header = (IDictionary<string, object>)headerExpando;
+            var header = (IDictionary<string, object>)headerExpando!;
 
             foreach (var column in _columns)
             {
@@ -110,7 +94,7 @@ namespace Presentation.Web.Models.Application.Csv
             foreach (var rowInput in _rowInputs)
             {
                 var rowExpando = new ExpandoObject();
-                var row = (IDictionary<string, object>)rowExpando;
+                var row = (IDictionary<string, object>)rowExpando!;
 
                 foreach (var column in _columns)
                 {

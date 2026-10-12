@@ -1,25 +1,32 @@
-﻿using Core.DomainModel;
+using Core.DomainModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class AttachedOptionMap : EntityMap<AttachedOption>
     {
-        public AttachedOptionMap()
+        public override void Configure(EntityTypeBuilder<AttachedOption> builder)
         {
-            HasOptional(t => t.ObjectOwner)
+            base.Configure(builder);
+
+            // Override base required relationships - AttachedOption allows null ObjectOwner/LastChangedByUser
+            builder.HasOne(t => t.ObjectOwner)
                 .WithMany()
                 .HasForeignKey(d => d.ObjectOwnerId)
-                .WillCascadeOnDelete(false);
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasOptional(t => t.LastChangedByUser)
+            builder.HasOne(t => t.LastChangedByUser)
                 .WithMany()
                 .HasForeignKey(d => d.LastChangedByUserId)
-                .WillCascadeOnDelete(false);
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            Property(x => x.OptionType).HasIndexAnnotation("UX_OptionType", 0);
-            Property(x => x.OptionId).HasIndexAnnotation("UX_OptionId", 1);
-            Property(x => x.ObjectId).HasIndexAnnotation("UX_ObjectId", 2);
-            Property(x => x.ObjectType).HasIndexAnnotation("UX_ObjectType", 3);
+            builder.HasIndex(x => x.OptionType).HasDatabaseName("UX_OptionType");
+            builder.HasIndex(x => x.OptionId).HasDatabaseName("UX_OptionId");
+            builder.HasIndex(x => x.ObjectId).HasDatabaseName("UX_ObjectId");
+            builder.HasIndex(x => x.ObjectType).HasDatabaseName("UX_ObjectType");
         }
     }
 }

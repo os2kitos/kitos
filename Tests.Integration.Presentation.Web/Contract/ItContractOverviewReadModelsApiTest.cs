@@ -21,15 +21,16 @@ using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Extensions;
+using Presentation.Web.Models.API.V2.Response.Contract;
 
 namespace Tests.Integration.Presentation.Web.Contract
 {
     [Collection(nameof(SequentialTestGroup))]
     public class ItContractOverviewReadModelsApiTest : BaseTest, IAsyncLifetime
     {
-        private ShallowOrganizationResponseDTO _organization;
-        private ShallowOrganizationResponseDTO _supplier;
-
+        private ShallowOrganizationResponseDTO? _organization;
+        private ShallowOrganizationResponseDTO? _supplier;
+        
         public async Task InitializeAsync()
         {
             _organization = await CreateOrganizationAsync();
@@ -47,15 +48,17 @@ namespace Tests.Integration.Presentation.Web.Contract
         public async Task Can_Query_And_Page_ReadModels()
         {
             ////Arrange
-            var organizationUuid = _organization.Uuid;
+            var organizationUuid = _organization!.Uuid;
             var suffix = A<Guid>().ToString("N");
             var name1 = $"1_{suffix}";
             var name2 = $"2_{suffix}";
             var name3 = $"3_{suffix}";
 
+            var before = DateTime.Now;
             await CreateItContractAsync(organizationUuid, name1);
             await CreateItContractAsync(organizationUuid, name2);
             await CreateItContractAsync(organizationUuid, name3);
+            await ReadModelTestTools.WaitForReadModelQueueDepletion(before);
 
             //Act
             var page1 = (await ItContractV2Helper.QueryReadModelByNameContent(organizationUuid, suffix, 2, 0)).ToList();
@@ -74,7 +77,8 @@ namespace Tests.Integration.Presentation.Web.Contract
         public async Task ReadModels_Contain_Correct_Content()
         {
             //Arrange
-            var organizationUuid = _organization.Uuid;
+            var organizationUuid = _organization!.Uuid;
+            var before = DateTime.Now;
             var name = CreateName();
             var itSystem1 = await CreateItSystemAsync(organizationUuid);
             var itSystem2 = await CreateItSystemAsync(organizationUuid);
@@ -86,6 +90,7 @@ namespace Tests.Integration.Presentation.Web.Contract
             var terminated = A<DateTime>();
             var concluded = A<DateTime>();
             var expirationDate = concluded.AddDays(2);
+            var note = A<string>();
             var procurementPlan = A<ProcurementPlanDTO>();
 
             var dpr1 = await CreateDPRAsync(_organization.Uuid);
@@ -128,13 +133,21 @@ namespace Tests.Integration.Presentation.Web.Contract
                 new List<UpdateExternalReferenceDataWriteRequestDTO> { referenceRequest });
 
             var externalPaymentRequest = A<PaymentRequestDTO>();
+            var internalPaymentRequest = A<PaymentRequestDTO>();
             externalPaymentRequest.OrganizationUnitUuid = organizationUnit.Uuid;
-            await ItContractV2Helper.SendPatchPayments(await GetGlobalToken(), itContract.Uuid, new ContractPaymentsDataWriteRequestDTO { External = externalPaymentRequest.WrapAsEnumerable() });
+            internalPaymentRequest.OrganizationUnitUuid = organizationUnit.Uuid;
+            var patchPaymentsResponse = await ItContractV2Helper.SendPatchPayments(await GetGlobalToken(), itContract.Uuid, new ContractPaymentsDataWriteRequestDTO { External = externalPaymentRequest.WrapAsEnumerable(), Internal = internalPaymentRequest.WrapAsEnumerable() });
+            Assert.Equal(HttpStatusCode.OK, patchPaymentsResponse.StatusCode);
+            var paymentsResponseContent = await patchPaymentsResponse.ReadResponseBodyAsAsync<ItContractResponseDTO>();
+            var externalPaymentOrganizationUnit = paymentsResponseContent.Payments.External.First().OrganizationUnit;
+            Assert.NotNull(externalPaymentOrganizationUnit);
+            var internalPaymentOrganizationUnit = paymentsResponseContent.Payments.Internal.First().OrganizationUnit;
+            Assert.NotNull(internalPaymentOrganizationUnit);
 
             await ItContractV2Helper.SendPatchContractSupplierAsync(await GetGlobalToken(), itContract.Uuid,
                 new ContractSupplierDataWriteRequestDTO()
                 {
-                    OrganizationUuid = _supplier.Uuid,
+                    OrganizationUuid = _supplier!.Uuid,
                 }).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             await ItContractV2Helper.SendPatchContractResponsibleAsync(await GetGlobalToken(), itContract.Uuid,
@@ -184,6 +197,7 @@ namespace Tests.Integration.Presentation.Web.Contract
                     CriticalityUuid = criticality.Uuid,
                     ContractTemplateUuid = contractTemplate.Uuid,
                     ContractTypeUuid = contractType.Uuid,
+                    Notes = note,
                     Validity = new ContractValidityWriteRequestDTO
                     {
                         ValidFrom = concluded,
@@ -217,8 +231,9 @@ namespace Tests.Integration.Presentation.Web.Contract
             var user2Id = DatabaseAccess.GetEntityId<User>(user2.Uuid);
             var roles = await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractRoles,
                 organizationUuid, 25, 0);
-            var role1 = roles.RandomItem();
-            var role2 = roles.RandomItem();
+            var rolesList = roles.ToList();
+            var role1 = rolesList.RandomItem();
+            var role2 = rolesList.RandomItem();
             await ItContractV2Helper.SendPatchAddRoleAssignment(itContract.Uuid,
                 new RoleAssignmentRequestDTO
                 { RoleUuid = role1.Uuid, UserUuid = user1.Uuid });
@@ -227,7 +242,7 @@ namespace Tests.Integration.Presentation.Web.Contract
                 { RoleUuid = role2.Uuid, UserUuid = user2.Uuid });
 
             //Act
-            await ReadModelTestTools.WaitForReadModelQueueDepletion();
+            await ReadModelTestTools.WaitForReadModelQueueDepletion(before);
 
             var queryResult = (await ItContractV2Helper.QueryReadModelByNameContent(organizationUuid, name, 1, 0)).ToList();
 
@@ -237,11 +252,13 @@ namespace Tests.Integration.Presentation.Web.Contract
             Assert.Equal(itContract.Uuid, readModel.SourceEntityUuid);
             Assert.Equal(contractSigner, readModel.ContractSigner); //Need to figure out why this fails
             Assert.Equal(procurementInitiated.ToYesNoUndecidedOption(), readModel.ProcurementInitiated);
-            Assert.Equal(irrevocableTo.Date, readModel.IrrevocableTo);
-            Assert.Equal(terminated.Date, readModel.TerminatedAt);
-            Assert.Equal(concluded.Date, readModel.Concluded);
-            Assert.Equal(expirationDate.Date, readModel.ExpirationDate);
+            Assert.Equal(irrevocableTo.Date, readModel.IrrevocableTo.GetValueOrDefault().Date);
+            Assert.Equal(terminated.Date, readModel.TerminatedAt.GetValueOrDefault().Date);
+            Assert.Equal(concluded.Date, readModel.Concluded.GetValueOrDefault().Date);
+            Assert.Equal(expirationDate.Date, readModel.ExpirationDate.GetValueOrDefault().Date);
+            Assert.Equal(note, readModel.Note);
             AssertReferencedEntity(_supplier.Name, readModel.SupplierName, _supplier.Uuid, DatabaseAccess.GetEntityUuid<Organization>(readModel.SupplierId ?? 0));
+            Assert.Equal(_supplier.Cvr, readModel.SupplierCvr);
             AssertReferencedEntity(parentContract.Name, readModel.ParentContractName, parentContract.Uuid, readModel.ParentContractUuid);
             AssertReferencedEntity(criticality.Name, readModel.CriticalityName, criticality.Uuid, readModel.CriticalityUuid);
             AssertReferencedEntity(organizationUnit.Name, readModel.ResponsibleOrgUnitName, organizationUnit.Uuid, DatabaseAccess.GetEntityUuid<OrganizationUnit>(readModel.ResponsibleOrgUnitId ?? 0));
@@ -266,19 +283,21 @@ namespace Tests.Integration.Presentation.Web.Contract
             Assert.Equal(externalPaymentRequest.Acquisition, readModel.AccumulatedAcquisitionCost);
             Assert.Equal(externalPaymentRequest.Operation, readModel.AccumulatedOperationCost);
             Assert.Equal(externalPaymentRequest.Other, readModel.AccumulatedOtherCost);
-            Assert.Equal(externalPaymentRequest.AuditDate?.Date, readModel.LatestAuditDate);
+            Assert.Equal(externalPaymentRequest.AuditDate?.Date, readModel.LatestAuditDate?.Date);
             Assert.Equal(externalPaymentRequest.AuditStatus == PaymentAuditStatus.Green ? 1 : 0, readModel.AuditStatusGreen);
             Assert.Equal(externalPaymentRequest.AuditStatus == PaymentAuditStatus.White ? 1 : 0, readModel.AuditStatusWhite);
             Assert.Equal(externalPaymentRequest.AuditStatus == PaymentAuditStatus.Red ? 1 : 0, readModel.AuditStatusRed);
             Assert.Equal(externalPaymentRequest.AuditStatus == PaymentAuditStatus.Yellow ? 1 : 0, readModel.AuditStatusYellow);
             Assert.Equal(2, readModel.NumberOfAssociatedSystemRelations);
             AssertCsv(readModel.ItSystemUsagesCsv, itSystem1.Name, itSystem2.Name);
+            AssertCsv(readModel.ExternalPaymentOrganizationUnitsCsv, organizationUnit.Name);
+            AssertCsv(readModel.InternalPaymentOrganizationUnitsCsv, organizationUnit.Name);
             Assert.Equal(2, readModel.RoleAssignments.Count);
             Assert.Contains(readModel.RoleAssignments, ra => DatabaseAccess.GetEntityUuid<ItContractRole>(ra.RoleId) == role1.Uuid && ra.UserId == user1Id);
             Assert.Contains(readModel.RoleAssignments, ra => DatabaseAccess.GetEntityUuid<ItContractRole>(ra.RoleId) == role2.Uuid && ra.UserId == user2Id);
         }
 
-        private static void AssertCsv(string csv, params string[] expectedNames)
+        private static void AssertCsv(string csv, params string?[] expectedNames)
         {
             var dpas = csv.Split(new[] { ", " }, StringSplitOptions.RemoveEmptyEntries).ToList();
             Assert.Equal(expectedNames.Length, dpas.Count);

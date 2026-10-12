@@ -1,0 +1,208 @@
+# OS2KITOS code style and code quality rules.
+#
+# Severity policy:
+#   error/warning -> enforced by the quality gate (CI + scripts/quality-check.ps1). The solution must build with 0 warnings.
+#   suggestion    -> shown in the IDE only. Rules with existing violations live here until cleaned up,
+#                    after which they can be promoted to "warning" (ratchet - never demote).
+# See docs/CODE_QUALITY.md for details.
+
+root = true
+
+[*]
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{json,yml,yaml,xml,csproj,props,targets,config,ps1,sh}]
+indent_size = 2
+
+[*.{ps1}]
+indent_size = 4
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+indent_size = 4
+tab_width = 4
+
+#### Formatting (Allman braces, matches existing KITOS code) ####
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+csharp_new_line_between_query_expression_clauses = true
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_indent_block_contents = true
+csharp_indent_braces = false
+csharp_space_after_cast = false
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_around_binary_operators = before_and_after
+csharp_preserve_single_line_blocks = true
+csharp_preserve_single_line_statements = true
+
+#### Language preferences (IDE guidance) ####
+csharp_style_namespace_declarations = block_scoped:suggestion
+csharp_prefer_braces = true:suggestion
+csharp_style_var_for_built_in_types = true:silent
+csharp_style_var_when_type_is_apparent = true:silent
+csharp_style_var_elsewhere = true:silent
+csharp_style_expression_bodied_methods = when_on_single_line:silent
+csharp_style_expression_bodied_properties = true:silent
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+csharp_style_prefer_switch_expression = true:suggestion
+csharp_style_throw_expression = true:suggestion
+csharp_prefer_simple_using_statement = true:silent
+dotnet_style_readonly_field = true:suggestion
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_style_qualification_for_event = false:suggestion
+dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
+dotnet_style_predefined_type_for_member_access = true:suggestion
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggestion
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_sort_system_directives_first = false
+
+#### Naming conventions (KITOS: I-prefixed interfaces, PascalCase types/members, private fields use _camelCase - not enforced, see .github/copilot-instructions.md) ####
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_style.prefix_i.required_prefix = I
+dotnet_naming_style.prefix_i.capitalization = pascal_case
+dotnet_naming_rule.interfaces_start_with_i.symbols = interfaces
+dotnet_naming_rule.interfaces_start_with_i.style = prefix_i
+dotnet_naming_rule.interfaces_start_with_i.severity = warning
+
+dotnet_naming_symbols.types.applicable_kinds = class, struct, enum, delegate
+dotnet_naming_style.pascal.capitalization = pascal_case
+dotnet_naming_rule.types_pascal.symbols = types
+dotnet_naming_rule.types_pascal.style = pascal
+dotnet_naming_rule.types_pascal.severity = warning
+
+
+#### Enforced rules (zero existing violations - keep it that way) ####
+# Correctness / reliability
+# Rethrow to preserve stack details
+dotnet_diagnostic.CA2200.severity = warning
+# Forward the CancellationToken
+dotnet_diagnostic.CA2016.severity = warning
+# Use ValueTasks correctly
+dotnet_diagnostic.CA2012.severity = warning
+# Do not call ToImmutableCollection on an ImmutableCollection
+dotnet_diagnostic.CA2009.severity = warning
+# Do not use ReferenceEquals with value types
+dotnet_diagnostic.CA2013.severity = warning
+# Don't call Enumerable.Cast/OfType with incompatible types
+dotnet_diagnostic.CA2021.severity = warning
+# Do not assign a property to itself
+dotnet_diagnostic.CA2245.severity = warning
+# Do not assign a symbol and its member in the same statement
+dotnet_diagnostic.CA2246.severity = warning
+# Remove empty finalizers
+dotnet_diagnostic.CA1821.severity = warning
+# Provide correct arguments to formatting methods
+dotnet_diagnostic.CA2241.severity = warning
+# Test for NaN correctly
+dotnet_diagnostic.CA2242.severity = warning
+# Mark attributes with AttributeUsageAttribute
+dotnet_diagnostic.CA1018.severity = warning
+# Do not assign property within its setter
+dotnet_diagnostic.CA2011.severity = warning
+# Do not raise exceptions in unexpected locations
+dotnet_diagnostic.CA1065.severity = warning
+# Security
+# Review SQL queries for security vulnerabilities
+dotnet_diagnostic.CA2100.severity = warning
+# Insecure DTD processing
+dotnet_diagnostic.CA3075.severity = warning
+# Do not use weak cryptographic algorithms
+dotnet_diagnostic.CA5350.severity = warning
+# Do not use broken cryptographic algorithms
+dotnet_diagnostic.CA5351.severity = warning
+# Do not disable certificate validation
+dotnet_diagnostic.CA5359.severity = warning
+# Do not use deprecated security protocols
+dotnet_diagnostic.CA5364.severity = warning
+# Avoid hardcoding SecurityProtocolType value
+dotnet_diagnostic.CA5386.severity = warning
+# Do not use deprecated SslProtocols values
+dotnet_diagnostic.CA5397.severity = warning
+# Async hygiene
+# ConfigureAwait - not required in ASP.NET Core
+dotnet_diagnostic.CA2007.severity = none
+# Code hygiene
+# Remove unreachable code
+dotnet_diagnostic.IDE0035.severity = warning
+# Invalid format string
+dotnet_diagnostic.IDE0043.severity = warning
+# Invalid global SuppressMessageAttribute
+dotnet_diagnostic.IDE0076.severity = warning
+# Avoid legacy format target in global SuppressMessageAttribute
+dotnet_diagnostic.IDE0077.severity = warning
+# Naming rules above (I-prefixed interfaces, PascalCase types)
+dotnet_diagnostic.IDE1006.severity = warning
+
+#### Suggestions (existing violations - ratchet candidates) ####
+# Remove unnecessary usings
+dotnet_diagnostic.IDE0005.severity = suggestion
+# Unused private members
+dotnet_diagnostic.IDE0051.severity = suggestion
+# Unread private members
+dotnet_diagnostic.IDE0052.severity = suggestion
+# Unnecessary value assignment
+dotnet_diagnostic.IDE0059.severity = suggestion
+# Unused parameter
+dotnet_diagnostic.IDE0060.severity = suggestion
+# Avoid zero-length array allocations
+dotnet_diagnostic.CA1825.severity = suggestion
+# Use indexer instead of LINQ First/Last/Count
+dotnet_diagnostic.CA1826.severity = suggestion
+# Use Length/Count instead of Count()
+dotnet_diagnostic.CA1829.severity = suggestion
+# Prefer TryGetValue
+dotnet_diagnostic.CA1854.severity = suggestion
+# Do not raise reserved exception types
+dotnet_diagnostic.CA2201.severity = suggestion
+# Instantiate argument exceptions correctly
+dotnet_diagnostic.CA2208.severity = suggestion
+# CancellationToken parameters must come last
+dotnet_diagnostic.CA1068.severity = suggestion
+
+#### Scoped exceptions ####
+# Developer tools and test helpers build dynamic SQL against throw-away/local databases by design.
+[{Tools.*,Tests.*}/**.cs]
+dotnet_diagnostic.CA2100.severity = suggestion
+dotnet_diagnostic.CA5386.severity = suggestion
+
+#### Baseline: pre-existing violations in production code ####
+# Do NOT add new entries here to get a PR green - fix the code instead.
+# Remove an entry when the file has been fixed.
+[Presentation.Web/Infrastructure/Configuration/HangfireServiceCollectionExtensions.cs]
+dotnet_diagnostic.CA2100.severity = suggestion
+
+[Presentation.Web/Infrastructure/Attributes/IgnoreCSRFProtectionAttribute.cs]
+dotnet_diagnostic.CA1018.severity = suggestion
+
+[PubSub.Application.Api/Attributes/ApiVersionAttribute.cs]
+dotnet_diagnostic.CA1018.severity = suggestion
+
+[Core.ApplicationServices/Model/Authentication/BearerTokenConfig.cs]
+dotnet_diagnostic.CA1065.severity = suggestion
+
+# MD5 is used only to derive a non-security cache key
+[Infrastructure.STS.Common/Model/Token/TokenFetcher.cs]
+dotnet_diagnostic.CA5351.severity = suggestion
+
+# Generated code / migrations are never analyzed for style
+[**/Migrations/**.cs]
+generated_code = true
+dotnet_analyzer_diagnostic.severity = none
+
+[**/{obj,bin}/**]
+generated_code = true

@@ -858,22 +858,22 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(x => x.AllowModify(system)).Returns(value);
         }
 
-        private void ExpectGetSystemReturns(int id, ItSystem system)
+        private void ExpectGetSystemReturns(int id, ItSystem? system)
         {
             _systemRepository.Setup(x => x.GetSystem(id)).Returns(system);
         }
 
-        private void ExpectGetSystemUsageReturns(int id, ItSystemUsage systemUsage)
+        private void ExpectGetSystemUsageReturns(int id, ItSystemUsage? systemUsage)
         {
             _systemUsageRepository.Setup(x => x.GetSystemUsage(id)).Returns(systemUsage);
         }
 
-        private void ExpectGetContractReturns(int id, ItContract contract)
+        private void ExpectGetContractReturns(int id, ItContract? contract)
         {
             _contractRepository.Setup(x => x.GetById(id)).Returns(contract);
         }
 
-        private void ExpectGetDataProcessingRegistrationReturns(int id, DataProcessingRegistration dpr)
+        private void ExpectGetDataProcessingRegistrationReturns(int id, DataProcessingRegistration? dpr)
         {
             _dataProcessingRegistrationRepositoryMock.Setup(x => x.GetById(id)).Returns(dpr);
         }

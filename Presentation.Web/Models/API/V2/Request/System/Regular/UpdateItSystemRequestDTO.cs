@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Presentation.Web.Infrastructure.Attributes;
+﻿using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.System.Shared;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.Web.Models.API.V2.Request.System.Regular
 {
@@ -25,18 +25,18 @@ namespace Presentation.Web.Models.API.V2.Request.System.Regular
         /// Name of IT-System
         /// </summary>
         [MaxLength(Core.DomainModel.ItSystem.ItSystem.MaxNameLength)]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Former name of IT-System (if any)
         /// </summary>
-        public string PreviousName { get; set; }
+        public string? PreviousName { get; set; }
 
         /// <summary>
         /// Description
         /// </summary>
-        public string Description { get; set; }
-        
+        public string? Description { get; set; }
+
         /// <summary>
         /// User defined external references.
         /// The external reference marked as "master reference" will be shown in overviews
@@ -46,7 +46,7 @@ namespace Presentation.Web.Models.API.V2.Request.System.Regular
         ///     - If the reference has no uuid, a new External Reference will be created
         ///     - Existing references will be replaced by the input data, so unless identified using uuid in the updates, the existing references will be removed.
         /// </summary>
-        public IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> ExternalReferences { get; set; }
+        public IEnumerable<UpdateExternalReferenceDataWriteRequestDTO>? ExternalReferences { get; set; }
 
         /// <summary>
         /// UUID for IT-System business type
@@ -57,7 +57,7 @@ namespace Presentation.Web.Models.API.V2.Request.System.Regular
         /// <summary>
         /// UUID's for KLE numbers categorizing this IT-System
         /// </summary>
-        public IEnumerable<Guid> KLEUuids { get; set; }
+        public IEnumerable<Guid>? KLEUuids { get; set; }
         /// <summary>
         /// Optional rightsholder organization reference uuid
         /// </summary>
@@ -67,6 +67,6 @@ namespace Presentation.Web.Models.API.V2.Request.System.Regular
         /// Scope (if not provided, it will default to "Global"
         /// </summary>
         public RegistrationScopeChoice? Scope { get; set; }
-        public RecommendedArchiveDutyRequestDTO RecommendedArchiveDuty { get; set; }
+        public RecommendedArchiveDutyRequestDTO? RecommendedArchiveDuty { get; set; }
     }
 }

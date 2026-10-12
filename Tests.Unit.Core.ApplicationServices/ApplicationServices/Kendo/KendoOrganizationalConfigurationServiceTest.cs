@@ -126,6 +126,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             };
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
             _authorizationContext.Setup(x => x.AllowDelete(kendoConfig)).Returns(true);
+            var transaction = ExpectTransaction();
 
             //Act
             var deleteResult = _sut.Delete(orgId, overviewType);
@@ -133,6 +134,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             //Assert
             Assert.True(deleteResult.Ok);
             Assert.Equal(kendoConfig, deleteResult.Value);
+            transaction.Verify(x => x.Commit());
         }
 
         [Fact]
@@ -251,6 +253,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             };
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
             _authorizationContext.Setup(x => x.AllowDelete(kendoConfig)).Returns(false);
+            var transaction = ExpectTransaction();
 
             //Act
             var deleteResult = _sut.Delete(orgId, overviewType);
@@ -259,6 +262,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             Assert.True(deleteResult.Failed);
             Assert.Equal(OperationFailure.Forbidden, deleteResult.Error.FailureType);
             _repository.Verify(x => x.Delete(It.IsAny<KendoOrganizationalConfiguration>()), Times.Never);
+            transaction.Verify(x => x.Rollback());
         }
 
         [Fact]
@@ -268,6 +272,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             var orgId = A<int>();
             var overviewType = A<OverviewType>();
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(Maybe<KendoOrganizationalConfiguration>.None);
+            var transaction = ExpectTransaction();
 
             //Act
             var deleteResult = _sut.Delete(orgId, overviewType);
@@ -275,6 +280,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             //Assert
             Assert.True(deleteResult.Failed);
             Assert.Equal(OperationFailure.NotFound, deleteResult.Error.FailureType);
+            transaction.Verify(x => x.Rollback());
         }
 
         private List<KendoColumnConfiguration> CreateColumnConfigurations()

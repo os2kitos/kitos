@@ -7,7 +7,7 @@ namespace Presentation.Web.Models.API.V2.Response.System
 {
     public class ItSystemPermissionsResponseDTO : ResourcePermissionsResponseDTO, IHasDeletionConflicts<SystemDeletionConflict>
     {
-        public IEnumerable<SystemDeletionConflict> DeletionConflicts { get; set; }
+        public required IEnumerable<SystemDeletionConflict> DeletionConflicts { get; set; }
         public bool ModifyVisibility { get; set; }
     }
 }

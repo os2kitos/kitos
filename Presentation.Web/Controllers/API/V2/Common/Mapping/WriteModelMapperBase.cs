@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -27,6 +27,8 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         }
 
         /// <param name="enforceFallbackIfNotProvided">If set to true, the fallback strategy will be applied even if the data property was not provided in the request</param>
+        /// <param name="deserializedValue">The value that was deserialized from the request</param>
+        /// <param name="expectedSectionKey">The key of the section to check for changes</param>
         protected TSection WithResetDataIfPropertyIsDefined<TSection>(TSection deserializedValue, string expectedSectionKey, bool enforceFallbackIfNotProvided = false) where TSection : new()
         {
             var response = deserializedValue;
@@ -39,6 +41,9 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         }
 
         /// <param name="enforceFallbackIfNotProvided">If set to true, the fallback strategy will be applied even if the data property was not provided in the request</param>
+        /// <param name="deserializedValue">The value that was deserialized from the request</param>
+        /// <param name="expectedSectionKey">The key of the section to check for changes</param>
+        /// <param name="fallbackFactory">A factory function to create the fallback value if needed</param>
         protected TSection WithResetDataIfPropertyIsDefined<TSection>(TSection deserializedValue, string expectedSectionKey, Func<TSection> fallbackFactory, bool enforceFallbackIfNotProvided = false)
         {
             var response = deserializedValue;
@@ -51,6 +56,8 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         }
 
         /// <param name="enforceFallbackIfNotProvided">If set to true, the fallback strategy will be applied even if the data property was not provided in the request</param>
+        /// <param name="deserializedValue">The value that was deserialized from the request</param>
+        /// <param name="propertySelection">An expression to select the property to check for changes</param>
         protected TSection WithResetDataIfPropertyIsDefined<TRoot, TSection>(TSection deserializedValue, Expression<Func<TRoot, TSection>> propertySelection, bool enforceFallbackIfNotProvided = false) where TSection : new()
         {
             var response = deserializedValue;
@@ -63,6 +70,9 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         }
 
         /// <param name="enforceFallbackIfNotProvided">If set to true, the fallback strategy will be applied even if the data property was not provided in the request</param>
+        /// <param name="deserializedValue">The value that was deserialized from the request</param>
+        /// <param name="propertySelection">An expression to select the property to check for changes</param>
+        /// <param name="fallbackFactory">A factory function to create the fallback value if needed</param>
         protected TSection WithResetDataIfPropertyIsDefined<TRoot, TSection>(TSection deserializedValue, Expression<Func<TRoot, TSection>> propertySelection, Func<TSection> fallbackFactory, bool enforceFallbackIfNotProvided = false)
         {
             var response = deserializedValue;
@@ -96,10 +106,11 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
 
             HashSet<string> UpdateProperties(IEnumerable<string> pathTokensToLeafLevel)
             {
-                var key = CreatePathKey(pathTokensToLeafLevel);
+                var pathTokensToLeafLevelList = pathTokensToLeafLevel.ToList();
+                var key = CreatePathKey(pathTokensToLeafLevelList);
                 if (!_currentRequestProperties.TryGetValue(key, out var objectProperties))
                 {
-                    objectProperties = _currentHttpRequest.GetDefinedJsonProperties(pathTokensToLeafLevel)
+                    objectProperties = _currentHttpRequest.GetDefinedJsonProperties(pathTokensToLeafLevelList)
                         .ToHashSet(StringComparer.OrdinalIgnoreCase);
                     _currentRequestProperties[key] = objectProperties;
                     if (objectProperties.Any())
@@ -158,9 +169,9 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
             return isPartOfScopedReset;
         }
 
-        protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapCreateReferences(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
+        protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapCreateReferences(IEnumerable<ExternalReferenceDataWriteRequestDTO>? references)
         {
-            return references.Select(MapCommonReference).ToList();
+            return references?.Select(MapCommonReference).ToList() ?? Enumerable.Empty<UpdatedExternalReferenceProperties>();
         }
 
         protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapUpdateReferences(IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> references)
@@ -180,7 +191,7 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
             return new UpdatedExternalReferenceProperties(reference.Title, reference.DocumentId, reference.Url, reference.MasterReference);
         }
 
-        protected OptionalValueChange<Maybe<T>> GetOptionalValueChange<T>(Func<bool> shouldUpdate, Maybe<T> dtoField)
+        protected OptionalValueChange<Maybe<T>> GetOptionalValueChange<T>(Func<bool> shouldUpdate, Maybe<T>? dtoField)
         {
             return shouldUpdate()
                 ? (dtoField ?? Maybe<T>.None).AsChangedValue()

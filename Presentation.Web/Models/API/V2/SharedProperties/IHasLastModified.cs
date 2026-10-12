@@ -13,6 +13,6 @@ namespace Presentation.Web.Models.API.V2.SharedProperties
         /// <summary>
         /// Responsible for last modification
         /// </summary>
-        public IdentityNamePairResponseDTO LastModifiedBy { get; set; }
+        public IdentityNamePairResponseDTO? LastModifiedBy { get; set; }
     }
 }

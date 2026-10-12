@@ -1,24 +1,23 @@
-﻿using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract.Read;
-using System.Data.Entity.ModelConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    internal class ItContractOverviewReadModelItSystemUsageMap : EntityTypeConfiguration<ItContractOverviewReadModelItSystemUsage>
+    internal class ItContractOverviewReadModelItSystemUsageMap : IEntityTypeConfiguration<ItContractOverviewReadModelItSystemUsage>
     {
-        public ItContractOverviewReadModelItSystemUsageMap()
+        public void Configure(EntityTypeBuilder<ItContractOverviewReadModelItSystemUsage> builder)
         {
-            HasKey(x => x.Id);
-            Property(x => x.ItSystemUsageName)
-                .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)
-                .HasIndexAnnotation("IX_ItContract_Read_System_Name");
+            builder.HasKey(x => x.Id);
 
-            Property(x => x.ItSystemUsageUuid)
-                .HasIndexAnnotation("IX_ItContract_Read_System_Usage_Uuid");
-            
-            Property(x => x.ItSystemUsageSystemUuid)
-                .HasMaxLength(50)
-                .HasIndexAnnotation("IX_ItContract_Read_System_Uuid");
+            builder.Property(x => x.ItSystemUsageName).HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength);
+            builder.HasIndex(x => x.ItSystemUsageName).HasDatabaseName("IX_ItContract_Read_System_Name");
+
+            builder.HasIndex(x => x.ItSystemUsageUuid).HasDatabaseName("IX_ItContract_Read_System_Usage_Uuid");
+
+            builder.Property(x => x.ItSystemUsageSystemUuid).HasMaxLength(50);
+            builder.HasIndex(x => x.ItSystemUsageSystemUuid).HasDatabaseName("IX_ItContract_Read_System_Uuid");
         }
     }
 }

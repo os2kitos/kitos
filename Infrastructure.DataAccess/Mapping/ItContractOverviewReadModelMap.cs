@@ -1,212 +1,136 @@
-﻿using System;
-using System.Data.Entity.ModelConfiguration;
+using System;
 using System.Linq.Expressions;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Users;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItContractOverviewReadModelMap : EntityTypeConfiguration<ItContractOverviewReadModel>
+    public class ItContractOverviewReadModelMap : IEntityTypeConfiguration<ItContractOverviewReadModel>
     {
-        public ItContractOverviewReadModelMap()
+        public void Configure(EntityTypeBuilder<ItContractOverviewReadModel> builder)
         {
-            HasRequired(t => t.Organization)
+            builder.HasOne(t => t.Organization)
                 .WithMany(t => t.ItContractOverviewReadModels)
                 .HasForeignKey(d => d.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasRequired(x => x.SourceEntity)
+            builder.HasOne(x => x.SourceEntity)
                 .WithMany(x => x.OverviewReadModels)
                 .HasForeignKey(x => x.SourceEntityId)
-                .WillCascadeOnDelete(true);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
-            Property(x => x.SourceEntityUuid).IsRequired();
+            builder.Property(x => x.SourceEntityUuid).IsRequired();
 
-            Property(x => x.Name)
-                .HasMaxLength(ItContractConstraints.MaxNameLength)
-                .HasIndexAnnotation("IX_Contract_Name");
+            builder.Property(x => x.Name).HasMaxLength(ItContractConstraints.MaxNameLength);
+            builder.HasIndex(x => x.Name).HasDatabaseName("IX_Contract_Name");
 
-            Property(x => x.IsActive)
-                .HasIndexAnnotation("IX_Contract_Active");
+            builder.HasIndex(x => x.IsActive).HasDatabaseName("IX_Contract_Active");
 
-            Property(x => x.ParentContractId)
-                .IsOptional()
-                .HasIndexAnnotation("IX_ParentContract_Id");
+            builder.HasIndex(x => x.ParentContractId).HasDatabaseName("IX_ParentContract_Id");
+            builder.Property(x => x.ParentContractName).HasMaxLength(ItContractConstraints.MaxNameLength);
+            builder.HasIndex(x => x.ParentContractName).HasDatabaseName("IX_ParentContract_Name");
+            builder.HasIndex(x => x.ParentContractUuid).HasDatabaseName("IX_ParentContract_Uuid");
 
-            Property(x => x.ParentContractName)
-                .IsOptional()
-                .HasMaxLength(ItContractConstraints.MaxNameLength)
-                .HasIndexAnnotation("IX_ParentContract_Name");
+            MapOptionTypeReference<CriticalityType>(builder, p => p.CriticalityId, p => p.CriticalityName, p => p.CriticalityUuid);
 
-            Property(x => x.ParentContractUuid)
-                .IsOptional()
-                .HasIndexAnnotation("IX_ParentContract_Uuid");
+            builder.HasIndex(x => x.ResponsibleOrgUnitId).HasDatabaseName("IX_ResponsibleOrgUnitId");
 
-            MapOptionTypeReference<CriticalityType>(p => p.CriticalityId, p => p.CriticalityName, p => p.CriticalityUuid);
+            builder.HasIndex(x => x.SupplierId).HasDatabaseName("IX_SupplierId");
+            builder.Property(x => x.SupplierName).HasMaxLength(Organization.MaxNameLength);
+            builder.HasIndex(x => x.SupplierName).HasDatabaseName("IX_SupplierName");
 
-            Property(x => x.ResponsibleOrgUnitId)
-                .IsOptional()
-                .HasIndexAnnotation("IX_ResponsibleOrgUnitId");
+            MapOptionTypeReference<ItContractType>(builder, p => p.ContractTypeId, p => p.ContractTypeName, p => p.ContractTypeUuid);
+            MapOptionTypeReference<ItContractTemplateType>(builder, p => p.ContractTemplateId, p => p.ContractTemplateName, p => p.ContractTemplateUuid);
+            MapOptionTypeReference<PurchaseFormType>(builder, p => p.PurchaseFormId, p => p.PurchaseFormName, p => p.PurchaseFormUuid);
+            MapOptionTypeReference<ProcurementStrategyType>(builder, p => p.ProcurementStrategyId, p => p.ProcurementStrategyName, p => p.ProcurementStrategyUuid);
 
-            Property(x => x.ResponsibleOrgUnitName)
-                .IsOptional();
+            builder.HasIndex(x => x.ProcurementPlanYear).HasDatabaseName("IX_ProcurementPlanYear");
+            builder.HasIndex(x => x.ProcurementPlanQuarter).HasDatabaseName("IX_ProcurementPlanQuarter");
+            builder.HasIndex(x => x.ProcurementInitiated).HasDatabaseName("IX_ProcurementInitiated");
 
-            Property(x => x.SupplierId)
-                .IsOptional()
-                .HasIndexAnnotation("IX_SupplierId");
-
-            Property(x => x.SupplierName)
-                .HasMaxLength(Organization.MaxNameLength)
-                .IsOptional()
-                .HasIndexAnnotation("IX_SupplierName");
-
-            Property(x => x.ContractSigner)
-                .IsOptional();
-
-            MapOptionTypeReference<ItContractType>(p => p.ContractTypeId, p => p.ContractTypeName, p => p.ContractTypeUuid);
-
-            MapOptionTypeReference<ItContractTemplateType>(p => p.ContractTemplateId, p => p.ContractTemplateName, p => p.ContractTemplateUuid);
-
-            MapOptionTypeReference<PurchaseFormType>(p => p.PurchaseFormId, p => p.PurchaseFormName, p => p.PurchaseFormUuid);
-
-            MapOptionTypeReference<ProcurementStrategyType>(p => p.ProcurementStrategyId, p => p.ProcurementStrategyName, p => p.ProcurementStrategyUuid);
-
-            Property(x => x.ProcurementPlanYear)
-                .IsOptional()
-                .HasIndexAnnotation("IX_ProcurementPlanYear");
-
-            Property(x => x.ProcurementPlanQuarter)
-                .IsOptional()
-                .HasIndexAnnotation("IX_ProcurementPlanQuarter");
-
-            Property(x => x.ProcurementInitiated)
-                .IsOptional()
-                .HasIndexAnnotation("IX_ProcurementInitiated");
-
-            HasMany(x => x.RoleAssignments)
-                .WithRequired(x => x.Parent)
+            builder.HasMany(x => x.RoleAssignments)
+                .WithOne(x => x.Parent)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(true);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
-            HasMany(x => x.DataProcessingAgreements)
-                .WithRequired(x => x.Parent)
+            builder.HasMany(x => x.DataProcessingAgreements)
+                .WithOne(x => x.Parent)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(true);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
-            HasMany(x => x.SystemRelations)
-                .WithRequired(x => x.Parent)
+            builder.HasMany(x => x.SystemRelations)
+                .WithOne(x => x.Parent)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(true);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
-            Property(x => x.DataProcessingAgreementsCsv)
-                .IsOptional();
-
-            HasMany(x => x.ItSystemUsages)
-                .WithRequired(x => x.Parent)
+            builder.HasMany(x => x.ItSystemUsages)
+                .WithOne(x => x.Parent)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(true);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
-            Property(x => x.ItSystemUsagesCsv)
-                .IsOptional();
+            builder.HasIndex(x => x.NumberOfAssociatedSystemRelations).HasDatabaseName("IX_NumberOfAssociatedSystemRelations");
 
-            Property(x => x.ItSystemUsagesSystemUuidCsv)
-                .IsOptional();
+            builder.HasIndex(x => x.AccumulatedAcquisitionCost).HasDatabaseName("IX_AccumulatedAcquisitionCost");
+            builder.HasIndex(x => x.AccumulatedOperationCost).HasDatabaseName("IX_AccumulatedOperationCost");
+            builder.HasIndex(x => x.AccumulatedOtherCost).HasDatabaseName("IX_AccumulatedOtherCost");
 
-            Property(x => x.NumberOfAssociatedSystemRelations)
-                .HasIndexAnnotation("IX_NumberOfAssociatedSystemRelations");
+            builder.Property(x => x.ExternalPaymentOrganizationUnitsCsv);
+            builder.Property(x => x.InternalPaymentOrganizationUnitsCsv);
+            builder.Property(x => x.ItSystemUsagesSystemUuidCsv);
 
-            Property(x => x.ActiveReferenceTitle)
-                .IsOptional();
+            builder.HasIndex(x => x.OperationRemunerationBegunDate).HasDatabaseName("IX_OperationRemunerationBegunDate");
 
-            Property(x => x.ActiveReferenceUrl)
-                .IsOptional();
+            MapOptionTypeReference<PaymentModelType>(builder, p => p.PaymentModelId, p => p.PaymentModelName, p => p.PaymentModelUuid);
+            MapOptionTypeReference<PaymentFreqencyType>(builder, p => p.PaymentFrequencyId, p => p.PaymentFrequencyName, p => p.PaymentFrequencyUuid);
 
-            Property(x => x.ActiveReferenceExternalReferenceId)
-                .IsOptional();
+            builder.HasIndex(x => x.LatestAuditDate).HasDatabaseName("IX_LatestAuditDate");
 
-            Property(x => x.AccumulatedAcquisitionCost)
-                .HasIndexAnnotation("IX_AccumulatedAcquisitionCost");
+            builder.Property(x => x.Duration).HasMaxLength(100);
+            builder.HasIndex(x => x.Duration).HasDatabaseName("IX_Duration");
 
-            Property(x => x.AccumulatedOperationCost)
-                .HasIndexAnnotation("IX_AccumulatedOperationCost");
+            MapOptionTypeReference<OptionExtendType>(builder, p => p.OptionExtendId, p => p.OptionExtendName, p => p.OptionExtendUuid);
+            MapOptionTypeReference<TerminationDeadlineType>(builder, p => p.TerminationDeadlineId, p => p.TerminationDeadlineName, p => p.TerminationDeadlineUuid);
 
-            Property(x => x.AccumulatedOtherCost)
-                .HasIndexAnnotation("IX_AccumulatedOtherCost");
+            builder.HasIndex(x => x.IrrevocableTo).HasDatabaseName("IX_IrrevocableTo");
+            builder.HasIndex(x => x.TerminatedAt).HasDatabaseName("IX_TerminatedAt");
 
-            Property(x => x.OperationRemunerationBegunDate)
-                .IsOptional()
-                .HasIndexAnnotation("IX_OperationRemunerationBegunDate");
+            builder.Property(x => x.LastEditedByUserName).HasMaxLength(UserConstraints.MaxNameLength);
+            builder.HasIndex(x => x.LastEditedByUserName).HasDatabaseName("IX_LastEditedByUserName");
 
-            MapOptionTypeReference<PaymentModelType>(p => p.PaymentModelId, p => p.PaymentModelName, p => p.PaymentModelUuid);
-
-            MapOptionTypeReference<PaymentFreqencyType>(p => p.PaymentFrequencyId, p => p.PaymentFrequencyName, p => p.PaymentFrequencyUuid);
-
-            Property(x => x.LatestAuditDate)
-                .IsOptional()
-                .HasIndexAnnotation("IX_LatestAuditDate");
-
-            Property(x => x.AuditStatusWhite);
-
-            Property(x => x.AuditStatusRed);
-
-            Property(x => x.AuditStatusYellow);
-
-            Property(x => x.AuditStatusGreen);
-
-            Property(x => x.Duration)
-                .IsOptional()
-                .HasMaxLength(100)
-                .HasIndexAnnotation("IX_Duration");
-
-            MapOptionTypeReference<OptionExtendType>(p => p.OptionExtendId, p => p.OptionExtendName, p => p.OptionExtendUuid);
-
-            MapOptionTypeReference<TerminationDeadlineType>(p => p.TerminationDeadlineId, p => p.TerminationDeadlineName, p => p.TerminationDeadlineUuid);
-
-            Property(x => x.IrrevocableTo)
-                .IsOptional()
-                .HasIndexAnnotation("IX_IrrevocableTo");
-
-            Property(x => x.TerminatedAt)
-                .IsOptional()
-                .HasIndexAnnotation("IX_TerminatedAt");
-
-            Property(x => x.LastEditedByUserName)
-                .HasMaxLength(UserConstraints.MaxNameLength)
-                .IsOptional()
-                .HasIndexAnnotation("IX_LastEditedByUserName");
-
-            Property(x => x.LastEditedByUserId)
-                .IsOptional()
-                .HasIndexAnnotation("IX_LastEditedByUserId");
-
-            Property(x => x.LastEditedAtDate)
-                .IsOptional()
-                .HasIndexAnnotation("IX_LastEditedAtDate");
-
-            Property(x => x.Concluded)
-                .IsOptional()
-                .HasIndexAnnotation("IX_Concluded");
-
-            Property(x => x.ExpirationDate)
-                .IsOptional()
-                .HasIndexAnnotation("IX_ExpirationDate");
+            builder.HasIndex(x => x.LastEditedByUserId).HasDatabaseName("IX_LastEditedByUserId");
+            builder.HasIndex(x => x.LastEditedAtDate).HasDatabaseName("IX_LastEditedAtDate");
+            builder.HasIndex(x => x.Concluded).HasDatabaseName("IX_Concluded");
+            builder.HasIndex(x => x.ExpirationDate).HasDatabaseName("IX_ExpirationDate");
         }
 
-        private void MapOptionTypeReference<T>(Expression<Func<ItContractOverviewReadModel, int?>> idExpression, Expression<Func<ItContractOverviewReadModel, string>> nameExpression, Expression<Func<ItContractOverviewReadModel, Guid?>> uuidExpression)
+        private static void MapOptionTypeReference<T>(
+            EntityTypeBuilder<ItContractOverviewReadModel> builder,
+            Expression<Func<ItContractOverviewReadModel, int?>> idExpression,
+            Expression<Func<ItContractOverviewReadModel, string>> nameExpression,
+            Expression<Func<ItContractOverviewReadModel, Guid?>> uuidExpression)
         {
-            Property(idExpression)
-                .IsOptional()
-                .HasIndexAnnotation($"IX_{typeof(T).Name}_Id");
-            Property(nameExpression)
-                .IsOptional()
-                .HasMaxLength(OptionEntity<T>.MaxNameLength)
-                .HasIndexAnnotation($"IX_{typeof(T).Name}_Name");
-            Property(uuidExpression)
-                .IsOptional()
-                .HasIndexAnnotation($"IX_{typeof(T).Name}_Uuid");
+            builder.HasIndex(GetMemberName(idExpression)).HasDatabaseName($"IX_{typeof(T).Name}_Id");
+            builder.Property(nameExpression).HasMaxLength(OptionEntity<T>.MaxNameLength);
+            builder.HasIndex(GetMemberName(nameExpression)).HasDatabaseName($"IX_{typeof(T).Name}_Name");
+            builder.HasIndex(GetMemberName(uuidExpression)).HasDatabaseName($"IX_{typeof(T).Name}_Uuid");
+        }
+
+        private static string GetMemberName<TEntity, TProperty>(Expression<Func<TEntity, TProperty>> expression)
+        {
+            if (expression.Body is MemberExpression memberExpression)
+                return memberExpression.Member.Name;
+            throw new ArgumentException("Expression is not a member expression");
         }
     }
 }

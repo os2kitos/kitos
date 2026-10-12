@@ -18,7 +18,7 @@ namespace Presentation.Web.Models.API.V2.Response.KLE
         /// Requested payload
         /// </summary>
         [Required]
-        public T Payload { get; set; }
+        public required T Payload { get; set; }
 
     }
 }

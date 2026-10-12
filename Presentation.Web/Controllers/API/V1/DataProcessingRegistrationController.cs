@@ -1,11 +1,7 @@
-﻿using System;
+using System;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web;
-using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.GDPR;
@@ -23,117 +19,85 @@ using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.GDPR;
 using Presentation.Web.Models.API.V1.References;
 using Presentation.Web.Models.API.V1.Shared;
-using Swashbuckle.Swagger.Annotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.API.V1
 {
     [InternalApi]
-    [RoutePrefix("api/v1/data-processing-registration")]
-    public class DataProcessingRegistrationController : BaseApiController
+    [Route("api/v1/data-processing-registration")]
+    public class DataProcessingRegistrationController(
+        IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
+        IDataProcessingRegistrationOptionsApplicationService dataProcessingRegistrationOptionsApplicationService,
+        IEntityIdentityResolver identityResolver)
+        : BaseApiController
     {
-        private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
-        private readonly IDataProcessingRegistrationOptionsApplicationService _dataProcessingRegistrationOptionsApplicationService;
-        private readonly IEntityIdentityResolver _identityResolver;
-
-        public DataProcessingRegistrationController(
-            IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
-            IDataProcessingRegistrationOptionsApplicationService dataProcessingRegistrationOptionsApplicationService,
-            IEntityIdentityResolver identityResolver)
-        {
-            _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
-            _dataProcessingRegistrationOptionsApplicationService = dataProcessingRegistrationOptionsApplicationService;
-            _identityResolver = identityResolver;
-        }
-
-        protected override IEntity GetEntity(int id) => _dataProcessingRegistrationApplicationService.Get(id).Match(dataProcessingRegistration => dataProcessingRegistration, _ => null);
+        protected override IEntity GetEntity(int id) => dataProcessingRegistrationApplicationService.Get(id).Match(dataProcessingRegistration => dataProcessingRegistration, _ => throw new NullReferenceException($"Data processing registration with id: {id} was not found"));
 
         protected override bool AllowCreateNewEntity(int organizationId) => AllowCreate<DataProcessingRegistration>(organizationId);
 
         [HttpGet]
-        [Route]
+        [Route("")]
         [InternalApi]
-        public override HttpResponseMessage GetAccessRights(bool? getEntitiesAccessRights, int organizationId) => base.GetAccessRights(getEntitiesAccessRights, organizationId);
+        public override IActionResult GetAccessRights(bool? getEntitiesAccessRights, int organizationId) => base.GetAccessRights(getEntitiesAccessRights, organizationId);
 
         [HttpGet]
-        [Route]
+        [Route("")]
         [InternalApi]
-        public override HttpResponseMessage GetAccessRightsForEntity(int id, bool? getEntityAccessRights) => base.GetAccessRightsForEntity(id, getEntityAccessRights);
+        public override IActionResult GetAccessRightsForEntity(int id, bool? getEntityAccessRights) => base.GetAccessRightsForEntity(id, getEntityAccessRights);
 
         [HttpPost]
-        [Route]
-        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<DataProcessingRegistrationDTO>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage Post([FromBody] CreateDataProcessingRegistrationDTO dto)
+        [Route("")]
+        public IActionResult Post([FromBody] CreateDataProcessingRegistrationDTO? dto)
         {
             if (dto == null)
                 return BadRequest("No input parameters provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .Create(dto.OrganizationId, dto.Name)
-                .Match(value => Created(ToDTO(value), new Uri(Request.RequestUri + "/" + value.Id)), FromOperationError);
+                .Match(value => Created(ToDTO(value), new Uri($"{Request.Scheme}://{Request.Host}{Request.Path}/" + value.Id)), FromOperationError);
         }
 
         [HttpGet]
         [Route("{id}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<DataProcessingRegistrationDTO>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage Get(int id)
+        public IActionResult Get(int id)
         {
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .Get(id)
                 .Match(value => Ok(ToDTO(value)), FromOperationError);
         }
 
         [HttpGet]
         [Route("defined-in/{organizationId}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<DataProcessingRegistrationDTO[]>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        public HttpResponseMessage GetOrganizationData(int organizationId, int skip, int take)
+        public IActionResult GetOrganizationData(int organizationId, int skip, int take)
         {
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .GetOrganizationData(organizationId, skip, take)
                 .Match(value => Ok(ToDTOs(value, organizationId)), FromOperationError);
         }
 
         [HttpDelete]
         [Route("{id}")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage Delete(int id)
+        public IActionResult Delete(int id)
         {
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .Delete(id)
                 .Match(value => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/name")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage ChangeName(int id, [FromBody] SingleValueDTO<string> value)
+        public IActionResult ChangeName(int id, [FromBody] SingleValueDTO<string> value)
         {
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateName(id, value.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/master-reference")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage SetMasterReference(int id, [FromBody] SingleValueDTO<int> value)
+        public IActionResult SetMasterReference(int id, [FromBody] SingleValueDTO<int> value)
         {
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .SetMasterReference(id, value.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
@@ -141,20 +105,15 @@ namespace Presentation.Web.Controllers.API.V1
         /// <summary>
         /// Use internally to query whether a new agreement can be created with the suggested parameters
         /// </summary>
-        /// <param name="organizationId"></param>
-        /// <param name="name"></param>
+        /// <param name="orgId"></param>
+        /// <param name="checkname"></param>
         /// <returns></returns>
         [HttpGet]
         [InternalApi]
-        [Route]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage CanCreate(int orgId, string checkname)
+        [Route("")]
+        public IActionResult CanCreate(int orgId, string checkname)
         {
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .ValidateSuggestedNewRegistrationName(orgId, checkname)
                 .Select(FromOperationError)
                 .GetValueOrFallback(Ok());
@@ -162,13 +121,10 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpGet]
         [Route("{id}/available-roles")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<BusinessRoleDTO>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
         [InternalApi]
-        public HttpResponseMessage GetAvailableRoles(int id)
+        public IActionResult GetAvailableRoles(int id)
         {
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .GetAvailableRoles(id)
                 .Select<IEnumerable<BusinessRoleDTO>>(result => ToDTOs(result.roles, result.registration.OrganizationId).ToList())
                 .Match(Ok, FromOperationError);
@@ -177,13 +133,10 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpGet]
         [Route("{id}/available-roles/{roleId}/applicable-users")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<UserWithEmailDTO>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
         [InternalApi]
-        public HttpResponseMessage GetApplicableUsers(int id, int roleId, [FromUri] string nameOrEmailContent = null, [FromUri] int pageSize = 25)
+        public IActionResult GetApplicableUsers(int id, int roleId, [FromQuery] string? nameOrEmailContent = null, [FromQuery] int pageSize = 25)
         {
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .GetUsersWhichCanBeAssignedToRole(id, roleId, nameOrEmailContent, pageSize)
                 .Select<IEnumerable<UserWithEmailDTO>>(users => ToDTOs(users).ToList())
                 .Match(Ok, FromOperationError);
@@ -191,18 +144,13 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpPatch]
         [Route("{id}/roles/assign")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage AssignNewRole(int id, [FromBody] AssignRoleDTO dto)
+        public IActionResult AssignNewRole(int id, [FromBody] AssignRoleDTO dto)
         {
             if (dto == null)
                 return BadRequest("No input parameters provided");
 
             return
-                _dataProcessingRegistrationApplicationService
+                dataProcessingRegistrationApplicationService
                     .AssignRole(id, dto.RoleId, dto.UserId)
                     .Match(_ => Ok(), FromOperationError);
 
@@ -210,149 +158,111 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpPatch]
         [Route("{id}/roles/remove/{roleId}/from/{userId}")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        public HttpResponseMessage RemoveRole(int id, int roleId, int userId)
+        public IActionResult RemoveRole(int id, int roleId, int userId)
         {
             return
-                _dataProcessingRegistrationApplicationService
+                dataProcessingRegistrationApplicationService
                     .RemoveRole(id, roleId, userId)
                     .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpGet]
         [Route("{id}/it-systems/available")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetAvailableSystems(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        public IActionResult GetAvailableSystems(int id, [FromQuery] string? nameQuery = null, [FromQuery] int pageSize = 25)
         {
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .GetSystemsWhichCanBeAssigned(id, nameQuery, pageSize)
                 .Match(systems => Ok(systems.Select(x => x.MapToNamedEntityWithEnabledStatusDTO()).ToList()), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/it-systems/assign")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage AssignSystem(int id, [FromBody] SingleValueDTO<int> systemId)
+        public IActionResult AssignSystem(int id, [FromBody] SingleValueDTO<int> systemId)
         {
             if (systemId == null)
                 return BadRequest("systemId must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .AssignSystem(id, systemId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/it-systems/remove")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveSystem(int id, [FromBody] SingleValueDTO<int> systemId)
+        public IActionResult RemoveSystem(int id, [FromBody] SingleValueDTO<int>? systemId)
         {
             if (systemId == null)
                 return BadRequest("systemId must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .RemoveSystem(id, systemId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpGet]
         [Route("{id}/data-processors/available")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetAvailableDataProcessors(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        public IActionResult GetAvailableDataProcessors(int id, [FromQuery] string? nameQuery = null, [FromQuery] int pageSize = 25)
         {
-            nameQuery = HttpUtility.UrlDecode(nameQuery);
-            return _dataProcessingRegistrationApplicationService
+            if (nameQuery == null)
+                return BadRequest("nameQuery must be provided");
+            nameQuery = Uri.UnescapeDataString(nameQuery);
+            return dataProcessingRegistrationApplicationService
                 .GetDataProcessorsWhichCanBeAssigned(id, nameQuery, pageSize)
                 .Match(organizations => Ok(organizations.Select(x => x.MapToShallowOrganizationDTO()).ToList()), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/data-processors/assign")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage AssignDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        public IActionResult AssignDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
         {
             if (organizationId == null)
                 return BadRequest("organizationId must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .AssignDataProcessor(id, organizationId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/data-processors/remove")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        public IActionResult RemoveDataProcessor(int id, [FromBody] SingleValueDTO<int>? organizationId)
         {
             if (organizationId == null)
                 return BadRequest("organizationId must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .RemoveDataProcessor(id, organizationId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpGet]
         [Route("{id}/sub-data-processors/available")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetAvailableSubDataProcessors(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        public IActionResult GetAvailableSubDataProcessors(int id, [FromQuery] string? nameQuery = null, [FromQuery] int pageSize = 25)
         {
-            nameQuery = HttpUtility.UrlDecode(nameQuery);
-            return _dataProcessingRegistrationApplicationService
+            if (nameQuery == null)
+                return BadRequest("nameQuery must be provided");
+
+            nameQuery = Uri.UnescapeDataString(nameQuery);
+            return dataProcessingRegistrationApplicationService
                 .GetSubDataProcessorsWhichCanBeAssigned(id, nameQuery, pageSize)
                 .Match(organizations => Ok(organizations.Select(x => x.MapToShallowOrganizationDTO()).ToList()), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/sub-data-processors/state")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage SetSubDataProcessorsState(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> value)
+        public IActionResult SetSubDataProcessorsState(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> value)
         {
             if (value == null)
                 return BadRequest("value must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .SetSubDataProcessorsState(id, value.Value)
                 .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/sub-data-processors/assign")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage AssignSubDataProcessor(int id, [FromBody] AssignSubDataProcessorRequestDTO request)
+        public IActionResult AssignSubDataProcessor(int id, [FromBody] AssignSubDataProcessorRequestDTO request)
         {
             if (request == null)
                 return BadRequest("Request body must be provided");
@@ -361,19 +271,14 @@ namespace Presentation.Web.Controllers.API.V1
                 return BadRequest(ModelState);
 
             var details = ParseSubDataProcessorDetails(request);
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .AssignSubDataProcessor(id, request.OrganizationId, details)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/sub-data-processors/update")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage UpdateSubDataProcessor(int id, [FromBody] UpdateSubDataProcessorRequestDTO request)
+        public IActionResult UpdateSubDataProcessor(int id, [FromBody] UpdateSubDataProcessorRequestDTO request)
         {
             if (request == null)
                 return BadRequest("Request body must be provided");
@@ -387,206 +292,153 @@ namespace Presentation.Web.Controllers.API.V1
             if (details.IsNone)
                 return BadRequest($"Missing section: {nameof(request.Details)}");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateSubDataProcessor(id, request.OrganizationId, details.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/sub-data-processors/remove")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
+        public IActionResult RemoveSubDataProcessor(int id, [FromBody] SingleValueDTO<int> organizationId)
         {
             if (organizationId == null)
                 return BadRequest("organizationId must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .RemoveSubDataProcessor(id, organizationId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/agreement-concluded")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchIsAgreementConcluded(int id, [FromBody] SingleValueDTO<YesNoIrrelevantOption> concluded)
+        public IActionResult PatchIsAgreementConcluded(int id, [FromBody] SingleValueDTO<YesNoIrrelevantOption> concluded)
         {
             if (concluded == null)
                 return BadRequest("concluded must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateIsAgreementConcluded(id, concluded.Value)
                 .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/agreement-concluded-remark")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchIsAgreementConcludedRemark(int id, [FromBody] SingleValueDTO<string> remark)
+        public IActionResult PatchIsAgreementConcludedRemark(int id, [FromBody] SingleValueDTO<string> remark)
         {
             if (remark == null)
                 return BadRequest($"{nameof(remark)} must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateAgreementConcludedRemark(id, remark.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/agreement-concluded-at")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchAgreementConcludedAt(int id, [FromBody] SingleValueDTO<DateTime?> concludedAt)
+        public IActionResult PatchAgreementConcludedAt(int id, [FromBody] SingleValueDTO<DateTime?> concludedAt)
         {
             if (concludedAt == null)
                 return BadRequest("concludedAt must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateAgreementConcludedAt(id, concludedAt.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/insecure-third-countries/state")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage SetTransferToInsecureCountriesState(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> value)
+        public IActionResult SetTransferToInsecureCountriesState(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> value)
         {
             if (value == null)
                 return BadRequest("value must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateTransferToInsecureThirdCountries(id, value.Value)
                 .Match(dataProcessingRegistration => Ok(ToDTO(dataProcessingRegistration)), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/insecure-third-countries/assign")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage AssignInsecureThirdCountry(int id, [FromBody] SingleValueDTO<int> countryId)
+        public IActionResult AssignInsecureThirdCountry(int id, [FromBody] SingleValueDTO<int> countryId)
         {
             if (countryId == null)
                 return BadRequest($"{nameof(countryId)} must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .AssignInsecureThirdCountry(id, countryId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/insecure-third-countries/remove")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveInsecureThirdCountry(int id, [FromBody] SingleValueDTO<int> countryId)
+        public IActionResult RemoveInsecureThirdCountry(int id, [FromBody] SingleValueDTO<int> countryId)
         {
             if (countryId == null)
                 return BadRequest($"{nameof(countryId)} must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .RemoveInsecureThirdCountry(id, countryId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/basis-for-transfer/assign")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage AssignbBasisForTransfer(int id, [FromBody] SingleValueDTO<int> basisForTransferId)
+        public IActionResult AssignbBasisForTransfer(int id, [FromBody] SingleValueDTO<int> basisForTransferId)
         {
             if (basisForTransferId == null)
                 return BadRequest($"{nameof(basisForTransferId)} must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .AssignBasisForTransfer(id, basisForTransferId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/basis-for-transfer/clear")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage ClearBasisForTransfer(int id)
+        public IActionResult ClearBasisForTransfer(int id)
         {
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .ClearBasisForTransfer(id)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/oversight-interval")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchOversightOption(int id, [FromBody] SingleValueDTO<YearMonthIntervalOption> oversightInterval)
+        public IActionResult PatchOversightOption(int id, [FromBody] SingleValueDTO<YearMonthIntervalOption> oversightInterval)
         {
             if (oversightInterval == null)
                 return BadRequest(nameof(oversightInterval) + " must provided");
 
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateOversightInterval(id, oversightInterval.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/oversight-interval-remark")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchOversightIntervalRemark(int id, [FromBody] SingleValueDTO<string> oversightIntervalRemark)
+        public IActionResult PatchOversightIntervalRemark(int id, [FromBody] SingleValueDTO<string> oversightIntervalRemark)
         {
             if (oversightIntervalRemark == null)
                 return BadRequest(nameof(oversightIntervalRemark) + " must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateOversightIntervalRemark(id, oversightIntervalRemark.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpGet]
         [Route("available-options-in/{organizationId}")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetDataProcessingRegistrationOptionsById(int organizationId)
+        public IActionResult GetDataProcessingRegistrationOptionsById(int organizationId)
         {
             return GetDataProcessingRegistrationOptions(organizationId);
         }
 
         [HttpGet]
         [Route("available-options-in/organization/{organizationUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetDataProcessingRegistrationOptionsByUuid(Guid organizationUuid)
+        public IActionResult GetDataProcessingRegistrationOptionsByUuid(Guid organizationUuid)
         {
-            var orgIdResult = _identityResolver.ResolveDbId<Organization>(organizationUuid);
+            var orgIdResult = identityResolver.ResolveDbId<Organization>(organizationUuid);
             if (orgIdResult.IsNone)
             {
                 return FromOperationError(new OperationError("Invalid organization uuid", OperationFailure.NotFound));
@@ -599,110 +451,81 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpPatch]
         [Route("{id}/data-responsible/assign")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage AssignDataResponsible(int id, [FromBody] SingleValueDTO<int> dataResponsibleId)
+        public IActionResult AssignDataResponsible(int id, [FromBody] SingleValueDTO<int> dataResponsibleId)
         {
             if (dataResponsibleId == null)
                 return BadRequest($"{nameof(dataResponsibleId)} must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .AssignDataResponsible(id, dataResponsibleId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/data-responsible/clear")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage ClearDataResponsible(int id)
+        public IActionResult ClearDataResponsible(int id)
         {
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .ClearDataResponsible(id)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/data-responsible-remark")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchDataResponsibleRemark(int id, [FromBody] SingleValueDTO<string> remark)
+        public IActionResult PatchDataResponsibleRemark(int id, [FromBody] SingleValueDTO<string> remark)
         {
             if (remark == null)
                 return BadRequest($"{nameof(remark)} must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateDataResponsibleRemark(id, remark.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/oversight-option/assign")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public HttpResponseMessage AssignOversightOption(int id, [FromBody] SingleValueDTO<int> oversightOptionId)
+        public IActionResult AssignOversightOption(int id, [FromBody] SingleValueDTO<int> oversightOptionId)
         {
             if (oversightOptionId == null)
                 return BadRequest($"{nameof(oversightOptionId)} must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .AssignOversightOption(id, oversightOptionId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/oversight-option/remove")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveOversightOption(int id, [FromBody] SingleValueDTO<int> oversightOptionId)
+        public IActionResult RemoveOversightOption(int id, [FromBody] SingleValueDTO<int> oversightOptionId)
         {
             if (oversightOptionId == null)
                 return BadRequest($"{nameof(oversightOptionId)} must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .RemoveOversightOption(id, oversightOptionId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/oversight-option-remark")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchOversightOptionRemark(int id, [FromBody] SingleValueDTO<string> remark)
+        public IActionResult PatchOversightOptionRemark(int id, [FromBody] SingleValueDTO<string>? remark)
         {
             if (remark == null)
                 return BadRequest($"{nameof(remark)} must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateOversightOptionRemark(id, remark.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/oversight-completed")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchOversightCompleted(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption> completed)
+        public IActionResult PatchOversightCompleted(int id, [FromBody] SingleValueDTO<YesNoUndecidedOption>? completed)
         {
             if (completed == null)
                 return BadRequest(nameof(completed) + " must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateIsOversightCompleted(id, completed.Value)
                 .Select(ToDTO)
                 .Match(Ok, FromOperationError);
@@ -710,16 +533,12 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpPatch]
         [Route("{id}/oversight-scheduled-inspection-date")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchOversightScheduledInspectionDate(int id, [FromBody] SingleValueDTO<DateTime?> scheduledInspectionDate)
+        public IActionResult PatchOversightScheduledInspectionDate(int id, [FromBody] SingleValueDTO<DateTime?>? scheduledInspectionDate)
         {
             if (scheduledInspectionDate == null)
                 return BadRequest(nameof(scheduledInspectionDate) + " must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateOversightScheduledInspectionDate(id, scheduledInspectionDate.Value)
                 .Select(ToDTO)
                 .Match(Ok, FromOperationError);
@@ -727,50 +546,25 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpPatch]
         [Route("{id}/oversight-date/assign")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage AssignOversightDate(int id, [FromBody] CreateDataProcessingRegistrationOversightDateDTO createOversightDateDTO)
+        public IActionResult AssignOversightDate(int id, [FromBody] CreateDataProcessingRegistrationOversightDateDTO? createOversightDateDTO)
         {
             if (createOversightDateDTO == null)
                 return BadRequest(nameof(createOversightDateDTO) + " must be provided");
 
-            return _dataProcessingRegistrationApplicationService
-                .AssignOversightDate(id, createOversightDateDTO.OversightDate, createOversightDateDTO.OversightRemark)
-                .Select(ToDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        [HttpPatch]
-        [Route("{id}/oversight-date/modify")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage ModifyOversightDate(int id, [FromBody] DataProcessingRegistrationOversightDateDTO oversightDateDTO)
-        {
-            if (oversightDateDTO == null)
-                return BadRequest(nameof(oversightDateDTO) + " must be provided");
-
-            return _dataProcessingRegistrationApplicationService
-                .ModifyOversightDate(id, oversightDateDTO.Id, oversightDateDTO.OversightDate, oversightDateDTO.OversightRemark)
+            return dataProcessingRegistrationApplicationService
+                .AssignOversightDate(id, createOversightDateDTO.OversightDate, createOversightDateDTO.OversightRemark, createOversightDateDTO.OversightReportLink?.Url, createOversightDateDTO.OversightReportLink?.Name, createOversightDateDTO.OversightOptionUuid)
                 .Select(ToDTO)
                 .Match(Ok, FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/oversight-date/remove")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveOversightDate(int id, [FromBody] SingleValueDTO<int> oversightDateId)
+        public IActionResult RemoveOversightDate(int id, [FromBody] SingleValueDTO<int> oversightDateId)
         {
             if (oversightDateId == null)
                 return BadRequest(nameof(oversightDateId) + " must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .RemoveOversightDate(id, oversightDateId.Value)
                 .Select(ToDTO)
                 .Match(Ok, FromOperationError);
@@ -778,52 +572,40 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpPatch]
         [Route("{id}/oversight-completed-remark")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchOversightCompletedRemark(int id, [FromBody] SingleValueDTO<string> oversightCompletedRemark)
+        public IActionResult PatchOversightCompletedRemark(int id, [FromBody] SingleValueDTO<string> oversightCompletedRemark)
         {
             if (oversightCompletedRemark == null)
                 return BadRequest(nameof(oversightCompletedRemark) + " must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateOversightCompletedRemark(id, oversightCompletedRemark.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/main-contract/update")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PatchMainContract(int id, [FromBody] SingleValueDTO<int> mainContractId)
+        public IActionResult PatchMainContract(int id, [FromBody] SingleValueDTO<int> mainContractId)
         {
             if (mainContractId == null)
                 return BadRequest(nameof(mainContractId) + " must be provided");
 
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .UpdateMainContract(id, mainContractId.Value)
                 .Match(_ => Ok(), FromOperationError);
         }
 
         [HttpPatch]
         [Route("{id}/main-contract/remove")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage RemoveMainContract(int id)
+        public IActionResult RemoveMainContract(int id)
         {
-            return _dataProcessingRegistrationApplicationService
+            return dataProcessingRegistrationApplicationService
                 .RemoveMainContract(id)
                 .Match(_ => Ok(), FromOperationError);
         }
 
-        private HttpResponseMessage GetDataProcessingRegistrationOptions(int organizationId)
+        private IActionResult GetDataProcessingRegistrationOptions(int organizationId)
         {
-            return _dataProcessingRegistrationOptionsApplicationService
+            return dataProcessingRegistrationOptionsApplicationService
                 .GetAssignableDataProcessingRegistrationOptions(organizationId)
                 .Select(result => new DataProcessingOptionsDTO
                 {
@@ -843,7 +625,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         private IEnumerable<BusinessRoleDTO> ToDTOs(IEnumerable<DataProcessingRegistrationRole> roles, int organizationId)
         {
-            var dataProcessingRegistrationOptions = _dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId).Value;
+            var dataProcessingRegistrationOptions = dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId).Value;
             var localDescriptionOverrides = GetLocalRoleDescriptionOverrides(dataProcessingRegistrationOptions);
 
             var enabledRoles = GetIdsOfAvailableRoles(dataProcessingRegistrationOptions);
@@ -853,8 +635,8 @@ namespace Presentation.Web.Controllers.API.V1
 
         private List<DataProcessingRegistrationDTO> ToDTOs(IQueryable<DataProcessingRegistration> value, int organizationId)
         {
-            var localDescriptionOverrides = GetLocalRoleDescriptionOverrides(_dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId));
-            var assignableDataProcessingRegistrationOptions = _dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId).Value;
+            var localDescriptionOverrides = GetLocalRoleDescriptionOverrides(dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId));
+            var assignableDataProcessingRegistrationOptions = dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId).Value;
             var enabledCountryOptions = GetIdsOfAvailableCountryOptions(assignableDataProcessingRegistrationOptions);
             var enabledBasisForTransferOptions = GetIdsOfAvailableBasisForTransferOptions(assignableDataProcessingRegistrationOptions);
             var enabledDataResponsibleOptions = GetIdsOfAvailableDataResponsibleOptions(assignableDataProcessingRegistrationOptions);
@@ -919,7 +701,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         private DataProcessingRegistrationDTO ToDTO(DataProcessingRegistration value)
         {
-            var assignableDataProcessingRegistrationOptions = _dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(value.OrganizationId).Value;
+            var assignableDataProcessingRegistrationOptions = dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(value.OrganizationId).Value;
             var enabledCountryOptions = GetIdsOfAvailableCountryOptions(assignableDataProcessingRegistrationOptions);
             var enabledBasisForTransferOptions = GetIdsOfAvailableBasisForTransferOptions(assignableDataProcessingRegistrationOptions);
             var enabledDataResponsibleOptions = GetIdsOfAvailableDataResponsibleOptions(assignableDataProcessingRegistrationOptions);
@@ -928,7 +710,7 @@ namespace Presentation.Web.Controllers.API.V1
             int organizationId = value.OrganizationId;
             return ToDTO(
                 value,
-                GetLocalRoleDescriptionOverrides(_dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId)),
+                GetLocalRoleDescriptionOverrides(dataProcessingRegistrationOptionsApplicationService.GetAssignableDataProcessingRegistrationOptions(organizationId)),
                 enabledCountryOptions,
                 enabledBasisForTransferOptions,
                 enabledDataResponsibleOptions,

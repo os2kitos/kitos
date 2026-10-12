@@ -1,55 +1,40 @@
 using Core.DomainModel.ItSystem;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class ItInterfaceMap : EntityMap<ItInterface>
     {
-        public ItInterfaceMap()
+        public override void Configure(EntityTypeBuilder<ItInterface> builder)
         {
-            // Properties
-            this.Property(x => x.Version).HasMaxLength(ItInterface.MaxVersionLength);
+            base.Configure(builder);
 
-            this.Property(x => x.OrganizationId);
-            this.Property(x => x.Name)
-                .HasMaxLength(ItInterface.MaxNameLength)
-                .IsRequired();
-            this.Property(x => x.ItInterfaceId)
-                .HasMaxLength(ItInterface.MaxNameLength)
-                .IsRequired();
+            builder.Property(x => x.Version).HasMaxLength(ItInterface.MaxVersionLength);
+            builder.Property(x => x.Name).HasMaxLength(ItInterface.MaxNameLength).IsRequired();
+            builder.Property(x => x.ItInterfaceId).HasMaxLength(ItInterface.MaxNameLength).IsRequired();
 
-            HasIndex(x => new { x.OrganizationId, x.Name, x.ItInterfaceId })
-                .IsUnique(true)
-                .HasName("UX_NameAndVersionUniqueToOrg");
+            builder.HasIndex(x => new { x.OrganizationId, x.Name, x.ItInterfaceId }).IsUnique().HasDatabaseName("UX_NameAndVersionUniqueToOrg");
+            builder.HasIndex(x => x.OrganizationId).HasDatabaseName("IX_OrganizationId");
+            builder.HasIndex(x => x.Name).HasDatabaseName("IX_Name");
+            builder.HasIndex(x => x.Version).HasDatabaseName("IX_Version");
 
-            HasIndex(x => x.OrganizationId)
-                .IsUnique(false)
-                .HasName("IX_OrganizationId");
+            builder.ToTable("ItInterface");
 
-            HasIndex(x => x.Name)
-                .IsUnique(false)
-                .HasName("IX_Name");
-
-            HasIndex(x => x.Version)
-                .IsUnique(false)
-                .HasName("IX_Version");
-
-            // Table & Column Mappings
-            this.ToTable("ItInterface");
-
-            this.HasOptional(t => t.Interface)
+            builder.HasOne(t => t.Interface)
                 .WithMany(d => d.References)
                 .HasForeignKey(t => t.InterfaceId);
 
-            this.HasRequired(t => t.Organization)
+            builder.HasOne(t => t.Organization)
                 .WithMany(d => d.ItInterfaces)
                 .HasForeignKey(t => t.OrganizationId)
-                .WillCascadeOnDelete(false);
-
-            TypeMapping.AddIndexOnAccessModifier<ItInterfaceMap, ItInterface>(this);
-
-            Property(t => t.Uuid)
                 .IsRequired()
-                .HasUniqueIndexAnnotation("UX_ItInterface_Uuid", 0);
+                .OnDelete(DeleteBehavior.Restrict);
+
+            TypeMapping.AddIndexOnAccessModifier(builder);
+
+            builder.Property(t => t.Uuid).IsRequired();
+            builder.HasIndex(t => t.Uuid).IsUnique().HasDatabaseName("UX_ItInterface_Uuid");
         }
     }
 }

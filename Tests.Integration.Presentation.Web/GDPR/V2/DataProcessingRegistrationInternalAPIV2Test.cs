@@ -98,6 +98,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         {
             Assert.Equal(expectedContent.Uuid, dto.Uuid);
             Assert.Equal(expectedContent.Name, dto.Name);
+            Assert.NotNull(dto.OrganizationContext);
             Assert.Equal(expectedOrganization.Uuid, dto.OrganizationContext.Uuid);
             Assert.Equal(expectedOrganization.Name, dto.OrganizationContext.Name);
             Assert.Equal(expectedOrganization.Cvr, dto.OrganizationContext.Cvr);

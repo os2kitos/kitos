@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Presentation.Web.Models.API.V2.Response.Options
 {
@@ -9,12 +10,24 @@ namespace Presentation.Web.Models.API.V2.Response.Options
         /// </summary>
         public bool WriteAccess { get; set; }
 
+        /// <summary>
+        /// Determines if this role is used by any existing entities
+        /// </summary>
+        public bool IsExternallyAvailable { get; set; }
+        /// <summary>
+        /// Description about this roles usage externally
+        /// </summary>
+        public required string ExternallyAvailableDescription { get; set; }
+
         public RoleOptionResponseDTO() { }
 
-        public RoleOptionResponseDTO(Guid uuid, string name, bool writeAccess, string description)
-            : base(uuid, name,description)
+        [SetsRequiredMembers]
+        public RoleOptionResponseDTO(Guid uuid, string name, bool writeAccess, string description, bool isExternallyAvailable, string externallyAvailableDescription)
+            : base(uuid, name, description)
         {
             WriteAccess = writeAccess;
+            IsExternallyAvailable = isExternallyAvailable;
+            ExternallyAvailableDescription = externallyAvailableDescription;
         }
     }
 }

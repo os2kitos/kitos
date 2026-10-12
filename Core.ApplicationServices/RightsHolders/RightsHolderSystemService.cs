@@ -160,7 +160,11 @@ namespace Core.ApplicationServices.RightsHolders
                     _logger.Information("User {userId} deactivated system with id {systemUuid} due to reason:{reason}", _userContext.UserId, systemUuid, reason);
                     SaveAndNotify(result.Value, transaction);
 
-                    var currentUserEmail = _userRepository.GetById(_userContext.UserId).Email;
+                    var user = _userRepository.GetById(_userContext.UserId);
+                    if (user == null)
+                        return new OperationError($"User with id {_userContext.UserId} not found", OperationFailure.NotFound);
+
+                    var currentUserEmail = user.Email;
                     var deactivatedItSystem = result.Value;
                     const string subject = "IT-System blev deaktiveret af rettighedshaver";
                     var content =

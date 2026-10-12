@@ -1,4 +1,5 @@
-﻿using System.Net;
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
 using Core.Abstractions.Types;
 
 namespace Presentation.Web.Extensions

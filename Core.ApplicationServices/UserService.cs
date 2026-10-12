@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Mail;
 using System.Security;
 using System.Text;
-using System.Web;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -23,7 +22,6 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Infrastructure.Services.DataAccess;
-using Core.DomainServices.Generic;
 using Core.DomainServices.Queries.User;
 
 
@@ -46,10 +44,10 @@ namespace Core.ApplicationServices
         private readonly ICryptoService _cryptoService;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDomainEvents _domainEvents;
-        private readonly SHA256Managed _crypt;
+        private readonly SHA256 _crypt;
         private readonly IOrganizationalUserContext _organizationalUserContext;
         private readonly ICommandBus _commandBus;
-        private static readonly RNGCryptoServiceProvider rngCsp = new();
+        private static readonly RandomNumberGenerator rngCsp = RandomNumberGenerator.Create();
         private const string PasswordResetApiRoute = "ui/reset-password/";
         private const string KitosManualsLink = "https://info.kitos.dk/s/YeFJqK6D2f2CQCR";
 
@@ -88,7 +86,7 @@ namespace Core.ApplicationServices
             _transactionManager = transactionManager;
             _organizationalUserContext = organizationalUserContext;
             _commandBus = commandBus;
-            _crypt = new SHA256Managed();
+            _crypt = SHA256.Create();
             if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
             {
                 throw new ArgumentException(nameof(defaultUserPassword) + " must be defined, when it must be used.");
@@ -116,12 +114,12 @@ namespace Core.ApplicationServices
 
             var savedUser = _userRepository.Get(u => u.Id == user.Id).FirstOrDefault();
 
-            _domainEvents.Raise(new EntityCreatedEvent<User>(savedUser));
+            _domainEvents.Raise(new EntityCreatedEvent<User>(savedUser!));
 
             if (sendMailOnCreation)
                 IssueAdvisMail(savedUser, false, orgId);
 
-            return savedUser;
+            return savedUser!;
         }
 
         public void UpdateUser(User user, bool? sendMailOnUpdate, int? scopedToOrganizationId)
@@ -137,7 +135,7 @@ namespace Core.ApplicationServices
             }
         }
 
-        public void IssueAdvisMail(User user, bool reminder, int orgId)
+        public void IssueAdvisMail(User? user, bool reminder, int orgId)
         {
             if (user == null || _userRepository.GetByKey(user.Id) == null)
                 throw new ArgumentNullException(nameof(user));
@@ -150,7 +148,7 @@ namespace Core.ApplicationServices
             var subject = (reminder ? "Påmindelse: " : string.Empty) + "Oprettelse som ny bruger i KITOS " + _mailSuffix;
             var content = "<h2>Kære " + user.Name + "</h2>" +
                           "<p>Du er blevet oprettet, som bruger i KITOS (Kommunernes IT Overblikssystem) under organisationen " +
-                          org.Name + ".</p>" +
+                          org!.Name + ".</p>" +
                           "<p>Du bedes klikke <a href='" + resetLink +
                           "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil.</p>" +
                           "<p>Linket udløber om " + _ttl.TotalDays + " dage. <a href='" + resetLink + "'>Klik her</a>, " +
@@ -165,7 +163,7 @@ namespace Core.ApplicationServices
             _userRepository.Save();
         }
 
-        public PasswordResetRequest IssuePasswordReset(User user, string subject, string content)
+        public PasswordResetRequest IssuePasswordReset(User user, string? subject, string? content)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
@@ -201,7 +199,7 @@ namespace Core.ApplicationServices
 
         private string GetResetLink(string hash)
         {
-            return _baseUrl + PasswordResetApiRoute + HttpUtility.UrlEncode(hash);
+            return _baseUrl + PasswordResetApiRoute + Uri.EscapeDataString(hash);
         }
 
         public bool IsEmailInUse(string email)
@@ -210,7 +208,7 @@ namespace Core.ApplicationServices
             return matchingEmails.Any();
         }
 
-        public Result<User, OperationError> GetUserByEmail(Guid organizationUuid, string email)
+        public Result<User?, OperationError> GetUserByEmail(Guid organizationUuid, string email)
         {
             return _organizationService.GetPermissions(organizationUuid)
                 .Match(permissions =>
@@ -221,7 +219,7 @@ namespace Core.ApplicationServices
                             OperationFailure.Forbidden);
                     return Maybe<OperationError>.None;
                 }, error => error)
-                .Match<Result<User, OperationError>>(error => error,
+                .Match<Result<User?, OperationError>>(error => error,
                     () =>
                     {
                         return _repository.AsQueryable().FirstOrDefault(u =>
@@ -261,7 +259,7 @@ namespace Core.ApplicationServices
 
             byte[] encrypted = _crypt.ComputeHash(randomNumber);
 
-            var hash = HttpServerUtility.UrlTokenEncode(encrypted);
+            var hash = UrlTokenEncode(encrypted);
 
             var request = new PasswordResetRequest { Hash = hash, Time = now, UserId = user.Id };
 
@@ -271,7 +269,7 @@ namespace Core.ApplicationServices
             return request;
         }
 
-        public PasswordResetRequest GetPasswordReset(string hash)
+        public PasswordResetRequest? GetPasswordReset(string hash)
         {
             var passwordReset = _passwordResetRequestRepository.Get(req => req.Hash == hash).FirstOrDefault();
 
@@ -289,7 +287,7 @@ namespace Core.ApplicationServices
             return passwordReset;
         }
 
-        public void ResetPassword(PasswordResetRequest passwordResetRequest, string newPassword)
+        public void ResetPassword(PasswordResetRequest? passwordResetRequest, string newPassword)
         {
             if (passwordResetRequest == null)
                 throw new ArgumentNullException(nameof(passwordResetRequest));
@@ -453,7 +451,7 @@ namespace Core.ApplicationServices
 
             using var transaction = _transactionManager.Begin();
             var operationErrorMaybe = hasOrganizationIdValue
-                ? DeleteUser(scopedToOrganizationId.Value, user)
+                ? DeleteUser(scopedToOrganizationId!.Value, user)
                 : DeleteUserFromKitos(user);
             if (!operationErrorMaybe.HasValue)
             {
@@ -522,6 +520,38 @@ namespace Core.ApplicationServices
             return userToDelete.IsGlobalAdmin
                 ? OrganizationalUserDeletionStrategy.Local //Global admins are not automatically removed from kitos when removed from the last organization
                 : OrganizationalUserDeletionStrategy.Global;
+        }
+
+        /// <summary>
+        /// Reimplements System.Web.HttpServerUtility.UrlTokenEncode so that password-reset tokens
+        /// stored in the database remain valid after the System.Web removal.
+        /// </summary>
+        private static string UrlTokenEncode(byte[] input)
+        {
+            if (input == null) throw new ArgumentNullException(nameof(input));
+            if (input.Length == 0) return string.Empty;
+
+            string base64 = Convert.ToBase64String(input);
+            int endPos = base64.Length;
+            int paddingCount = 0;
+            while (endPos > 0 && base64[endPos - 1] == '=')
+            {
+                endPos--;
+                paddingCount++;
+            }
+
+            char[] chars = new char[endPos + 1];
+            chars[endPos] = (char)('0' + paddingCount);
+            for (int i = 0; i < endPos; i++)
+            {
+                chars[i] = base64[i] switch
+                {
+                    '+' => '-',
+                    '/' => '_',
+                    var c => c
+                };
+            }
+            return new string(chars);
         }
     }
 }

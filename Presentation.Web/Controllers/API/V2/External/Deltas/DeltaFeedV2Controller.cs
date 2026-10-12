@@ -1,9 +1,7 @@
-﻿using System;
+using System;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
-using System.Net;
-using System.Web.Http;
 using Core.ApplicationServices.Tracking;
 using Core.DomainModel.Tracking;
 using Presentation.Web.Controllers.API.V2.External.Deltas.Mapping;
@@ -11,11 +9,13 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Response.Tracking;
 using Presentation.Web.Models.API.V2.Types.Shared;
-using Swashbuckle.Swagger.Annotations;
+using Microsoft.AspNetCore.Mvc;
+using Presentation.Web.Infrastructure.Attributes;
 
+using System.Net;
 namespace Presentation.Web.Controllers.API.V2.External.Deltas
 {
-    [RoutePrefix("api/v2/delta-feed")]
+    [Route("api/v2/delta-feed")]
     public class DeltaFeedV2Controller : ExternalBaseController
     {
         private readonly ITrackingService _trackingService;
@@ -30,15 +30,16 @@ namespace Presentation.Web.Controllers.API.V2.External.Deltas
         /// </summary>
         /// <param name="entityType">Filter results based on tracked entity type.</param>
         /// <param name="deletedSinceUTC">Results will be returned where 'deletedTimeStamp >= deletedSinceUTC'</param>
+        /// <param name="pagination">Optional pagination query</param>
         /// <returns></returns>
         [HttpGet]
         [Route("deleted-entities")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<TrackingEventResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult GetDeletedObjects(
+        [ApiResponse(typeof(IEnumerable<TrackingEventResponseDTO>), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        public IActionResult GetDeletedObjects(
             TrackedEntityTypeChoice? entityType = null,
             DateTime? deletedSinceUTC = null,
-            [FromUri] BoundedPaginationQuery pagination = null)
+            [FromQuery] BoundedPaginationQuery? pagination = null)
         {
             var dtos = _trackingService
                 .QueryLifeCycleEvents(TrackedLifeCycleEventType.Deleted, entityType?.ToDomainType(), deletedSinceUTC)

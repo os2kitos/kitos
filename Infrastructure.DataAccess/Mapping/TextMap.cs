@@ -1,16 +1,16 @@
 ﻿using Core.DomainModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class TextMap : EntityMap<Text>
     {
-        public TextMap()
+        public override void Configure(EntityTypeBuilder<Text> builder)
         {
-            // Properties
-            // Table & Column Mappings
-            ToTable("Text");
-            Property(t => t.Value).HasColumnName("Value");
-
+            base.Configure(builder);
+            builder.ToTable("Text");
+            builder.Property(t => t.Value).HasColumnName("Value");
         }
     }
 }

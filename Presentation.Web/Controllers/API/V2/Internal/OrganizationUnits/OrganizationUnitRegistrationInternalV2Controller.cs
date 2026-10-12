@@ -1,16 +1,16 @@
-﻿using Core.ApplicationServices.Model.Organizations;
+using Core.ApplicationServices.Model.Organizations;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
-using Swashbuckle.Swagger.Annotations;
 using System.Net;
 using System;
 using System.Linq;
-using System.Web.Http;
 using Presentation.Web.Models.API.V2.Internal.Common;
 using Presentation.Web.Models.API.V2.Internal.Request.OrganizationUnit;
 using Presentation.Web.Models.API.V2.Internal.Response.OrganizationUnit;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
+using Microsoft.AspNetCore.Mvc;
+using Presentation.Web.Infrastructure.Attributes;
 using Core.DomainModel.ItSystemUsage;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
@@ -26,10 +26,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         }
 
         [HttpGet]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationRegistrationUnitResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetRegistrations(Guid organizationUuid, Guid unitUuid)
+        [ApiResponse(typeof(OrganizationRegistrationUnitResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult GetRegistrations(Guid organizationUuid, Guid unitUuid)
         {
             return _organizationUnitService.GetRegistrations(organizationUuid, unitUuid)
                 .Select(ToRegistrationDto)
@@ -37,10 +37,11 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         }
 
         [HttpDelete]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult RemoveRegistrations(Guid organizationUuid, Guid unitUuid, [FromBody] ChangeOrganizationUnitRegistrationV2RequestDTO requestDto)
+        [Consumes("application/json")]
+        [ApiResponse(HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult RemoveRegistrations(Guid organizationUuid, Guid unitUuid, [FromBody] ChangeOrganizationUnitRegistrationV2RequestDTO requestDto)
         {
             var changeParameters = ToChangeParameters(requestDto);
             return _organizationUnitService.DeleteRegistrations(organizationUuid, unitUuid, changeParameters)
@@ -48,10 +49,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         }
 
         [HttpPut]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult TransferRegistrations(Guid organizationUuid, Guid unitUuid, [FromBody] TransferOrganizationUnitRegistrationV2RequestDTO requestDto)
+        [ApiResponse(HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult TransferRegistrations(Guid organizationUuid, Guid unitUuid, [FromBody] TransferOrganizationUnitRegistrationV2RequestDTO requestDto)
         {
             var changeParameters = ToChangeParameters(requestDto);
             return _organizationUnitService.TransferRegistrations(organizationUuid, unitUuid, requestDto.TargetUnitUuid, changeParameters)
@@ -83,12 +84,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
 
         private static NamedEntityWithUserFullNameV2DTO MapUnitRightToNamedEntityDtoWithUserFullNameDto(OrganizationUnitRight right)
         {
-            return new NamedEntityWithUserFullNameV2DTO
-            {
-                Id = right.Id,
-                Name = right.Role.Name,
-                UserFullName = right.User.GetFullName()
-            };
+            return new NamedEntityWithUserFullNameV2DTO(
+                right.Id, null, right.Role.Name, right.User.GetFullName());
         }
 
         private static NamedEntityV2DTO MapPaymentToNamedEntityDto(EconomyStream payment)
@@ -125,3 +122,4 @@ namespace Presentation.Web.Controllers.API.V2.Internal.OrganizationUnits
         }
     }
 }
+

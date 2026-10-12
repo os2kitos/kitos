@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Core.DomainModel.GDPR.Read;
+﻿using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Organization;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
@@ -15,14 +9,21 @@ using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Options;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Response.Shared;
+using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public static class DataProcessingRegistrationV2Helper
     {
-        public static async Task<IEnumerable<DataProcessingRegistrationResponseDTO>> GetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, bool? agreementConcluded = null, string nameContains = null, string nameEquals = null, DateTime? changedSinceGtEq = null)
+        public static async Task<IEnumerable<DataProcessingRegistrationResponseDTO>> GetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, bool? agreementConcluded = null, string? nameContains = null, string? nameEquals = null, DateTime? changedSinceGtEq = null)
         {
             using var response = await SendGetDPRsAsync(token, page, pageSize, organizationUuid, systemUuid, systemUsageUuid, dataProcessorUuid, subDataProcessorUuid, agreementConcluded, nameContains, nameEquals, changedSinceGtEq);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -30,7 +31,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<IEnumerable<DataProcessingRegistrationResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, bool? agreementConcluded = null, string nameContains = null, string nameEquals = null, DateTime? changedSinceGtEq = null)
+        public static async Task<HttpResponseMessage> SendGetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, bool? agreementConcluded = null, string? nameContains = null, string? nameEquals = null, DateTime? changedSinceGtEq = null)
         {
             var queryParameters = new List<KeyValuePair<string, string>>()
             {
@@ -204,12 +205,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), cookie, CreatePatchPayload(nameof(UpdateDataProcessingRegistrationRequestDTO.Name), name));
         }
 
-        public static async Task<DataProcessingRegistrationPermissionsResponseDTO> GetPermissionsAsync(string token, Guid uuid)
+        public static async Task<CombinedPermissionsResponseDTO> GetPermissionsAsync(string token, Guid uuid)
         {
             using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid:D}/permissions"), token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<DataProcessingRegistrationPermissionsResponseDTO>();
+            return await response.ReadResponseBodyAsAsync<CombinedPermissionsResponseDTO>();
         }
 
         public static async Task<ResourceCollectionPermissionsResponseDTO> GetCollectionPermissionsAsync(string token, Guid organizationUuid)
@@ -233,7 +234,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/data-processing-registrations/{uuid}/roles/remove"), cookie, dto);
         }
 
-        public static async Task<IEnumerable<ShallowOrganizationResponseDTO>> GetAvailableDataProcessors(Guid uuid, string nameQuery, Cookie optionalLogin = null)
+        public static async Task<IEnumerable<ShallowOrganizationResponseDTO>> GetAvailableDataProcessors(Guid uuid, string nameQuery, Cookie? optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/data-processing-registrations/{uuid}/data-processors/available?nameQuery={nameQuery}"), cookie);
@@ -242,7 +243,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<IEnumerable<ShallowOrganizationResponseDTO>>();
         }
 
-        public static async Task<IEnumerable<ShallowOrganizationResponseDTO>> GetAvailableSubDataProcessors(Guid uuid, string nameQuery, Cookie optionalLogin = null)
+        public static async Task<IEnumerable<ShallowOrganizationResponseDTO>> GetAvailableSubDataProcessors(Guid uuid, string nameQuery, Cookie? optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/data-processing-registrations/{uuid}/sub-data-processors/available?nameQuery={nameQuery}"), cookie);
@@ -251,7 +252,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<IEnumerable<ShallowOrganizationResponseDTO>>();
         }
 
-        public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetAvailableSystemsAsync(Guid uuid, string nameQuery, Cookie optionalLogin = null)
+        public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetAvailableSystemsAsync(Guid uuid, string nameQuery, Cookie? optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v2/internal/data-processing-registrations/{uuid}/system-usages/available?nameQuery={nameQuery}"), cookie);
@@ -272,12 +273,50 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
         }
+        
+        public static async Task<OversightDateDTO> PostOversightDate(Guid uuid, ModifyOversightDateDTO request, string token)
+        {
+            using var response = await SendPostOversightDate(uuid, request, token);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<OversightDateDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPostOversightDate(Guid uuid, ModifyOversightDateDTO request, string token)
+        {
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/oversight-dates"), request, token);
+        }
+
+        public static async Task<OversightDateDTO> PatchOversightDate(Guid uuid, Guid oversightDateUuid, ModifyOversightDateDTO request, string token)
+        {
+            using var response = await SendPatchOversightDate(uuid, oversightDateUuid, request, token);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<OversightDateDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchOversightDate(Guid uuid, Guid oversightDateUuid, ModifyOversightDateDTO request, string token)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/oversight-dates/{oversightDateUuid}"), token, request);
+        }
+
+        public static async Task DeleteOversightDate(Guid uuid, Guid oversightDateUuid, string token)
+        {
+            using var response = await SendDeleteOversightDate(uuid, oversightDateUuid, token);
+
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteOversightDate(Guid uuid, Guid oversightDateUuid, string token)
+        {
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/oversight-dates/{oversightDateUuid}"), token);
+        }
 
         //Read model endpoint
-        public static async Task<IEnumerable<DataProcessingRegistrationReadModel>> QueryReadModelByNameContent(Guid organizationUuid, string nameContent, int top, int skip, Cookie optionalLogin = null)
+        public static async Task<IEnumerable<DataProcessingRegistrationReadModel>> QueryReadModelByNameContent(Guid organizationUuid, string nameContent, int top, int skip, Cookie? optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/DataProcessingRegistrationReadModels?organizationUuid={organizationUuid}&$expand=RoleAssignments&$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderBy=Name"), cookie);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/DataProcessingRegistrationReadModels?organizationUuid={organizationUuid}&$expand=RoleAssignments&$filter=contains(Name,'{nameContent}')&$top={top}&$skip={skip}&$orderby=Name"), cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadOdataListResponseBodyAsAsync<DataProcessingRegistrationReadModel>();
         }

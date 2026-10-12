@@ -1,24 +1,27 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public abstract class EntityMap<T> : EntityTypeConfiguration<T>
+    public abstract class EntityMap<T> : IEntityTypeConfiguration<T>
         where T : Entity
     {
-        protected EntityMap()
+        public virtual void Configure(EntityTypeBuilder<T> builder)
         {
-            HasKey(t => t.Id);
+            builder.HasKey(t => t.Id);
 
-            HasRequired(t => t.ObjectOwner)
+            builder.HasOne(t => t.ObjectOwner)
                 .WithMany()
                 .HasForeignKey(d => d.ObjectOwnerId)
-                .WillCascadeOnDelete(false);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasRequired(t => t.LastChangedByUser)
+            builder.HasOne(t => t.LastChangedByUser)
                 .WithMany()
                 .HasForeignKey(d => d.LastChangedByUserId)
-                .WillCascadeOnDelete(false);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

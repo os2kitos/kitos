@@ -30,7 +30,8 @@ namespace Core.DomainModel.ItSystemUsage
         IEntityWithAdvices,
         IEntityWithUserNotification,
         IHasUuid,
-        IHasDirtyMarking
+        IHasDirtyMarking,
+        IEntityOwnedByOrganization
     {
         public const int LongProperyMaxLength = 200;
         public const int DefaultMaxLength = 100;
@@ -53,11 +54,32 @@ namespace Core.DomainModel.ItSystemUsage
             MarkAsDirty();
             AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>();
             PersonalDataOptions = new List<ItSystemUsagePersonalData>();
+            TechnicalSystemTypes = new List<TechnicalSystemType>();
         }
 
         public bool IsActiveAccordingToDateFields => CheckDatesValidity(DateTime.UtcNow).Any() == false;
         public bool IsActiveAccordingToLifeCycle => CheckLifeCycleValidity().IsNone;
         public bool IsActiveAccordingToMainContract => CheckContractValidity().IsNone;
+
+        /// <summary>
+        /// Gets the current state of the main contract.
+        /// </summary>
+        /// <value>
+        /// The main contract state: NoContract if no contract is assigned, Active if contract is valid, Inactive otherwise.
+        /// </value>
+        public MainContractState MainContractState
+        {
+            get
+            {
+                if (MainContract == null)
+                {
+                    return MainContractState.NoContract;
+                }
+                return IsActiveAccordingToMainContract
+                    ? MainContractState.Active
+                    : MainContractState.Inactive;
+            }
+        }
 
         /// <summary>
         ///     When the system began. (indgået)
@@ -238,18 +260,69 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ArchiveTestLocation ArchiveTestLocation { get; set; }
 
         public int? ItSystemCategoriesId { get; set; }
+        public int? SystemUsageCriticalityLevelId { get; set; }
+        public virtual SystemUsageCriticalityLevel SystemUsageCriticalityLevel { get; set; }
+
+        public virtual ICollection<TechnicalSystemType> TechnicalSystemTypes { get; set; }
+
+        public string CriticalityLevelDocumentationUrl { get; set; }
+        public string CriticalityLevelDocumentationName { get; set; }
 
         public virtual ItSystemCategories ItSystemCategories { get; set; }
 
         public UserCount? UserCount { get; set; }
+        public IsDataProcessingAgreementRequired? IsDataProcessingAgreementRequired { get; set; }
 
         public YesNoUndecidedOption? ContainsAITechnology { get; set; }
 
+        public DataOptions? isBusinessCritical { get; private set; }
+
+        public DataOptions? IsSociallyCritical { get; private set; }
+
+        public DateTime? CriticalityFieldsLastChanged { get; private set; }
+
+        public void UpdateIsBusinessCritical(DataOptions? value)
+        {
+            if (value == isBusinessCritical) return;
+            isBusinessCritical = value;
+            SetCriticalityFieldsLastChanged();
+        }
+
+        public void UpdateIsSociallyCritical(DataOptions? value)
+        {
+            if (value == IsSociallyCritical) return;
+            IsSociallyCritical = value;
+            SetCriticalityFieldsLastChanged();
+        }
+
+        private void SetCriticalityFieldsLastChanged()
+        {
+            CriticalityFieldsLastChanged = DateTime.UtcNow;
+        }
+
+        public void UpdateCriticalityLevelDocumentationUrl(string value) {
+            if (value == CriticalityLevelDocumentationUrl) return;
+            CriticalityLevelDocumentationUrl = value;
+            SetCriticalityFieldsLastChanged();
+        }
+
+        public void UpdateCriticalityLevelDocumentationName(string value)
+        {
+            if (value == CriticalityLevelDocumentationName) return;
+            CriticalityLevelDocumentationName = value;
+            SetCriticalityFieldsLastChanged();
+        }
+
+        public void ResetCriticalityLevelDocumentation()
+        {
+            CriticalityLevelDocumentationUrl = null;
+            CriticalityLevelDocumentationName = null;
+            SetCriticalityFieldsLastChanged();
+        }
 
         #region GDPR
         public string GeneralPurpose { get; set; }
-        public DataOptions? isBusinessCritical { get; set; }
-
+        public string ProcessingPurpose { get; set; }
 
         public string LinkToDirectoryUrl { get; set; }
         public string LinkToDirectoryUrlName { get; set; }
@@ -283,7 +356,7 @@ namespace Core.DomainModel.ItSystemUsage
         public string UserSupervisionDocumentationUrlName { get; private set; }
         public string UserSupervisionDocumentationUrl { get; private set; }
 
-        public DataOptions? riskAssessment { get; private set; }
+        public YesNoDontKnowIrrelevant? riskAssessment { get; private set; }
         public DateTime? riskAssesmentDate { get; private set; }
         public RiskLevel? preriskAssessment { get; private set; }
         public DateTime? PlannedRiskAssessmentDate { get; private set; }
@@ -544,22 +617,26 @@ namespace Core.DomainModel.ItSystemUsage
             UserCount = DomainModel.ItSystem.DataTypes.UserCount.UNDECIDED;
         }
 
-        public Maybe<OperationError> SetExpectedUsersInterval((int lower, int? upperBound) newIntervalValue)
+        public Maybe<OperationError> SetExpectedUsersInterval((int? lower, int? upperBound) newIntervalValue)
         {
             switch (newIntervalValue)
             {
+                case (null, 9):
                 case (0, 9):
                     UserCount = DomainModel.ItSystem.DataTypes.UserCount.BELOWTEN;
                     break;
-                case (10, 50):
-                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.TENTOFIFTY;
+                case (10, 49):
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.TENTOFORTYNINE;
                     break;
-                case (50, 100):
-                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.FIFTYTOHUNDRED;
+                case (50, 99):
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.FIFTYTONINETYNINE;
                     break;
-                case (100, null):
-                case (100, int.MaxValue):
-                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.HUNDREDPLUS;
+                case (100, 499):
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.HUNDREDTOFOURHUNDREDNINETYNINE;
+                    break;
+                case (500, null):
+                case (500, int.MaxValue):
+                    UserCount = DomainModel.ItSystem.DataTypes.UserCount.FIVEHUNDREDPLUS;
                     break;
                 default:
                     return new OperationError("Invalid user count. Please refer to input documentation", OperationFailure.BadInput);
@@ -850,6 +927,57 @@ namespace Core.DomainModel.ItSystemUsage
             if (ArchiveLocation == null || ArchiveLocation.Id != newValue.Id)
             {
                 ArchiveLocation = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetSystemUsageCriticalityLevel()
+        {
+            SystemUsageCriticalityLevel.Track();
+            SystemUsageCriticalityLevel = null;
+            SetCriticalityFieldsLastChanged();
+        }
+
+        public Maybe<OperationError> UpdateSystemUsageCriticalityLevel(SystemUsageCriticalityLevel newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (SystemUsageCriticalityLevel == null || SystemUsageCriticalityLevel.Id != newValue.Id)
+            {
+                SystemUsageCriticalityLevel = newValue;
+                SetCriticalityFieldsLastChanged();
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetTechnicalSystemTypes()
+        {
+            foreach (var technicalSystemType in TechnicalSystemTypes.ToList())
+            {
+                technicalSystemType.Track();
+            }
+            TechnicalSystemTypes.Clear();
+        }
+
+        public Maybe<OperationError> UpdateTechnicalSystemTypes(IEnumerable<TechnicalSystemType> newValues)
+        {
+            if (newValues == null)
+                throw new ArgumentNullException(nameof(newValues));
+
+            var newList = newValues.ToList();
+            var currentIds = TechnicalSystemTypes.Select(x => x.Id).ToHashSet();
+            var newIds = newList.Select(x => x.Id).ToHashSet();
+
+            if (currentIds.SetEquals(newIds))
+                return Maybe<OperationError>.None;
+
+            TechnicalSystemTypes.Clear();
+            foreach (var item in newList)
+            {
+                TechnicalSystemTypes.Add(item);
             }
 
             return Maybe<OperationError>.None;
@@ -1196,12 +1324,12 @@ namespace Core.DomainModel.ItSystemUsage
 
         private Maybe<ItSystemUsageValidationError> CheckLifeCycleValidity()
         {
-            return LifeCycleStatus == LifeCycleStatusType.NotInUse
+            return LifeCycleStatus is (LifeCycleStatusType.NotInUse or LifeCycleStatusType.Pilot)
                 ? ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle
                 : Maybe<ItSystemUsageValidationError>.None;
         }
 
-        private Maybe<ItSystemUsageValidationError> CheckContractValidity()
+            private Maybe<ItSystemUsageValidationError> CheckContractValidity()
         {
             return MainContract?.ItContract?.IsActive == false
                 ? ItSystemUsageValidationError.MainContractNotActive
@@ -1260,7 +1388,7 @@ namespace Core.DomainModel.ItSystemUsage
             });
         }
 
-        public void UpdateRiskAssessment(DataOptions? riskAssessment)
+        public void UpdateRiskAssessment(YesNoDontKnowIrrelevant? riskAssessment)
         {
             this.riskAssessment = riskAssessment;
             if (HasRiskAssessment()) return;
@@ -1278,7 +1406,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         private bool HasRiskAssessment()
         {
-            return riskAssessment == DataOptions.YES;
+            return riskAssessment == YesNoDontKnowIrrelevant.Yes;
         }
 
         public Maybe<OperationError> UpdateRiskAssessmentDate(DateTime? date)
@@ -1371,5 +1499,27 @@ namespace Core.DomainModel.ItSystemUsage
         {
             return UpdateWithPrecondition(HasDataRetention() || dataRetentionEvaluationFrequencyInMonths == 0, () => numberDPIA = dataRetentionEvaluationFrequencyInMonths);
         }
+
+        public void UpdateGeneralPurpose(string purpose)
+        {
+            GeneralPurpose = purpose;
+        }
+
+        public void UpdateProcessingPurpose(string purpose)
+        {
+            ProcessingPurpose = purpose;
+        }
+
+        public Maybe<OperationError> SetLicensingAndCodeModels(IEnumerable<LicensingAndCodeModel> newModels)
+        {
+            if (newModels.Any(x => x == LicensingAndCodeModel.Proprietary) && newModels.Any(y => y != LicensingAndCodeModel.Proprietary))
+                return new OperationError($"The Proprietary licensing and code model cannot be set on the same system as another model", OperationFailure.Conflict);
+
+            LicensingAndCodeModels = [.. newModels.Distinct()];
+
+            return Maybe<OperationError>.None;
+        }
+
+        public ICollection<LicensingAndCodeModel> LicensingAndCodeModels { get; set; } = new List<LicensingAndCodeModel>();
     }
 }

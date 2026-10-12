@@ -4,6 +4,7 @@
     {
         ItSystemUsage = 1,
         DataProcessingRegistration = 2,
-        ItContract = 3
+        ItContract = 3,
+        ItContractSupplier = 4
     }
 }

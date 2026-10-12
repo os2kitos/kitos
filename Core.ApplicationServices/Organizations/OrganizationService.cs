@@ -12,7 +12,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Repositories.Organization;
@@ -30,7 +29,6 @@ namespace Core.ApplicationServices.Organizations
         private readonly IOrgUnitService _orgUnitService;
         private readonly IOrganizationRightsService _organizationRightsService;
         private readonly IDomainEvents _domainEvents;
-        private readonly IEntityIdentityResolver _identityResolver;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IGenericRepository<ContactPerson> _contactPersonRepository;
         private readonly IGenericRepository<User> _userRepository;
@@ -54,7 +52,7 @@ namespace Core.ApplicationServices.Organizations
             IOrganizationRightsService organizationRightsService,
             IOrgUnitService orgUnitService,
             IDomainEvents domainEvents,
-            IEntityIdentityResolver identityResolver, IGenericRepository<DataResponsible> dataResponsibleRepository,
+            IGenericRepository<DataResponsible> dataResponsibleRepository,
             IGenericRepository<DataProtectionAdvisor> dataProtectionAdvisorRepository)
         {
             _orgRepository = orgRepository;
@@ -68,7 +66,6 @@ namespace Core.ApplicationServices.Organizations
             _repository = repository;
             _orgUnitService = orgUnitService;
             _domainEvents = domainEvents;
-            _identityResolver = identityResolver;
             _dataResponsibleRepository = dataResponsibleRepository;
             _dataProtectionAdvisorRepository = dataProtectionAdvisorRepository;
             _organizationRightsService = organizationRightsService;
@@ -76,7 +73,7 @@ namespace Core.ApplicationServices.Organizations
 
         //returns the default org unit for that user inside that organization
         //or null if none has been chosen
-        public OrganizationUnit GetDefaultUnit(Organization organization, User user)
+        public OrganizationUnit? GetDefaultUnit(Organization organization, User user)
         {
             return _orgRightRepository
                 .Get(r => r.OrganizationId == organization.Id && r.UserId == user.Id)
@@ -132,7 +129,7 @@ namespace Core.ApplicationServices.Organizations
             return organization;
         }
 
-        public bool CanChangeOrganizationType(Organization organization, OrganizationTypeKeys organizationType)
+        public bool CanChangeOrganizationType(Organization? organization, OrganizationTypeKeys organizationType)
         {
             if (organization == null)
             {
@@ -143,7 +140,7 @@ namespace Core.ApplicationServices.Organizations
                 _authorizationContext.HasPermission(new DefineOrganizationTypePermission(organizationType, organization.Id));
         }
 
-        public Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg)
+        public Result<Organization, OperationFailure> CreateNewOrganization(Organization? newOrg)
         {
             if (newOrg == null)
             {
@@ -345,10 +342,10 @@ namespace Core.ApplicationServices.Organizations
                 return organizationWhichCanBeDeleted.Error;
             }
 
-            if (organizationWhichCanBeDeleted.Value.IsDefaultOrganization == true)
-            {
-                return new OperationError("Cannot delete default organization", OperationFailure.BadInput);
-            }
+            var organization = organizationWhichCanBeDeleted.Value;
+            var canDeleteError = organization.CheckCanBeDeleted();
+            if (canDeleteError.HasValue)
+                return canDeleteError.Value;
 
             var conflicts = ComputeOrganizationRemovalConflicts(uuid);
             if (conflicts.Failed)
@@ -360,8 +357,9 @@ namespace Core.ApplicationServices.Organizations
 
             try
             {
-                var organization = organizationWhichCanBeDeleted.Value;
                 _domainEvents.Raise(new EntityBeingDeletedEvent<Organization>(organization));
+                organization.ClearUsedAsSupplierByOrganizations();
+                organization.ClearSuppliers();
                 _orgRepository.DeleteWithReferencePreload(organization);
                 _orgRepository.Save();
                 transaction.Commit();
@@ -371,6 +369,34 @@ namespace Core.ApplicationServices.Organizations
                 _logger.Error(error, "Failed while deleting organization with uuid: {uuid}", uuid);
                 transaction.Rollback();
                 return new OperationError("Exception during deletion", OperationFailure.UnknownError);
+            }
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> ChangeOrganizationDisabledStatus(Guid organizationUuid, bool isDisabled)
+        {
+            using var transaction = _transactionManager.Begin();
+            var organizationWhichCanBeDisabledOrActivated = GetOrganization(organizationUuid).Bind(WithDisabledStateChangeAccess);
+            if (organizationWhichCanBeDisabledOrActivated.Failed)
+            {
+                return organizationWhichCanBeDisabledOrActivated.Error;
+            }
+
+            var organization = organizationWhichCanBeDisabledOrActivated.Value;
+
+            try
+            {
+                _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
+                organization.UpdateDisabledStatus(isDisabled);
+                _orgRepository.Update(organization);
+                _orgRepository.Save();
+                transaction.Commit();
+            }
+            catch (Exception error)
+            {
+                _logger.Error(error, "Failed while disabling organization with uuid: {uuid}", organizationUuid);
+                transaction.Rollback();
+                return new OperationError("Exception during disabling", OperationFailure.UnknownError);
             }
             return Maybe<OperationError>.None;
         }
@@ -449,6 +475,11 @@ namespace Core.ApplicationServices.Organizations
             }
 
             return new OperationError(OperationFailure.Forbidden);
+        }
+
+        private Result<Organization, OperationError> WithDisabledStateChangeAccess(Organization organization)
+        {
+            return WithDeletionAccess(organization);
         }
 
         private bool HasRole(int orgId, OrganizationRole role)

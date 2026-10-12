@@ -36,8 +36,8 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         protected static void CheckBaseDTOValues(ItSystemResponseDTO system, ItInterfaceResponseDTO itInterface, BaseItInterfaceResponseDTO interfaceDTO)
         {
             Assert.Equal(itInterface.Name, interfaceDTO.Name);
-            Assert.Equal(system?.Name, interfaceDTO.ExposedBySystem?.Name);
-            Assert.Equal(system?.Uuid, interfaceDTO.ExposedBySystem?.Uuid);
+            Assert.Equal(system.Name, interfaceDTO.ExposedBySystem?.Name);
+            Assert.Equal(system.Uuid, interfaceDTO.ExposedBySystem?.Uuid);
             Assert.Equal(itInterface.Uuid, interfaceDTO.Uuid);
             Assert.Equal(itInterface.Description, interfaceDTO.Description);
             Assert.Equal(itInterface.Notes, interfaceDTO.Notes);
@@ -48,6 +48,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
 
         protected static void BaseItInterfaceResponseDTODBCheck(ItInterface itInterface, BaseItInterfaceResponseDTO itInterfaceDTO)
         {
+
             Assert.Equal(itInterface.Uuid, itInterfaceDTO.Uuid);
             Assert.Equal(itInterface.Name, itInterfaceDTO.Name);
             Assert.Equal(itInterface.Description, itInterfaceDTO.Description);
@@ -56,12 +57,12 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(itInterface.Version, itInterfaceDTO.Version);
             Assert.Equal(itInterface.Disabled, itInterfaceDTO.Deactivated);
 
-            Assert.Equal(itInterface.Created, itInterfaceDTO.Created);
-            Assert.Equal(itInterface.ObjectOwner.Uuid, itInterfaceDTO.CreatedBy.Uuid);
-            Assert.Equal(itInterface.ObjectOwner.GetFullName(), itInterfaceDTO.CreatedBy.Name);
+            DateTimeTestHelper.AssertEqual(itInterface.Created, itInterfaceDTO.Created.GetValueOrDefault());
+            Assert.Equal(itInterface.ObjectOwner.Uuid, itInterfaceDTO.CreatedBy!.Uuid);
+            Assert.Equal(itInterface.ObjectOwner.GetFullName(), itInterfaceDTO.CreatedBy!.Name);
 
-            Assert.Equal(itInterface.ExhibitedBy.ItSystem.Uuid, itInterfaceDTO.ExposedBySystem.Uuid);
-            Assert.Equal(itInterface.ExhibitedBy.ItSystem.Name, itInterfaceDTO.ExposedBySystem.Name);
+            Assert.Equal(itInterface.ExhibitedBy.ItSystem.Uuid, itInterfaceDTO.ExposedBySystem!.Uuid);
+            Assert.Equal(itInterface.ExhibitedBy.ItSystem.Name, itInterfaceDTO.ExposedBySystem!.Name);
         }
 
         protected static void CheckCreatedInterface(CreateItInterfaceRequestDTO expected, ItInterfaceResponseDTO actual)

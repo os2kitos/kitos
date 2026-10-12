@@ -73,18 +73,24 @@ namespace Core.ApplicationServices
         public Result<KendoOrganizationalConfiguration, OperationError> Delete(int organizationId,
             OverviewType overviewType)
         {
+            var transaction = _transactionManager.Begin();
             var currentConfig = _kendoOrganizationRepository.Get(organizationId, overviewType);
 
             if (currentConfig.HasValue)
             {
                 var configToBeDeleted = currentConfig.Value;
                 if (!_authorizationContext.AllowDelete(configToBeDeleted))
+                {
+                    transaction.Rollback();
                     return new OperationError(OperationFailure.Forbidden);
+                }
 
                 _kendoOrganizationRepository.Delete(configToBeDeleted);
+                transaction.Commit();
                 return configToBeDeleted;
             }
 
+            transaction.Rollback();
             return new OperationError(OperationFailure.NotFound);
         }
 

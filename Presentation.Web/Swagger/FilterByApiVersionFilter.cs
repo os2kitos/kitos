@@ -1,27 +1,27 @@
-﻿using System;
+using System;
 using System.Linq;
-using System.Web.Http.Description;
-using Swashbuckle.Swagger;
+using Microsoft.OpenApi;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Presentation.Web.Swagger
 {
     public class FilterByApiVersionFilter : IDocumentFilter
     {
-        private readonly Func<SwaggerDocument, int> _getApiVersion;
+        private readonly Func<OpenApiDocument, int> _getApiVersion;
         private readonly Func<string, int> _getPathApiVersion;
 
-        public FilterByApiVersionFilter(Func<SwaggerDocument, int> getApiVersion, Func<string, int> getPathApiVersion)
+        public FilterByApiVersionFilter(Func<OpenApiDocument, int> getApiVersion, Func<string, int> getPathApiVersion)
         {
             _getApiVersion = getApiVersion;
             _getPathApiVersion = getPathApiVersion;
         }
 
-        public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
+        public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
             var docVersion = _getApiVersion(swaggerDoc);
-            foreach (var path in swaggerDoc.paths.Where(path => docVersion != _getPathApiVersion(path.Key)).ToList())
+            foreach (var path in swaggerDoc.Paths.Where(path => docVersion != _getPathApiVersion(path.Key)).ToList())
             {
-                swaggerDoc.paths.Remove(path);
+                swaggerDoc.Paths.Remove(path.Key);
             }
         }
     }

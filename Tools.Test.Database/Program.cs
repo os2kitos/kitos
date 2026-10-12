@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.Linq;
 using Core.DomainModel.Organization;
 using Infrastructure.DataAccess;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Tools.Test.Database.Model.Cli;
 using Tools.Test.Database.Model.Environment;
 using Tools.Test.Database.Model.Parameters;
@@ -13,18 +15,29 @@ namespace Tools.Test.Database
     {
         static int Main(string[] args)
         {
+            // Test data creators use legacy/local DateTime values; enable compatibility for PostgreSQL seeding.
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
             var task = GetArgument(args, 0);
             var additionalArgs = args.Skip(1).ToArray();
+            var rawConnectionString = GetArgument(additionalArgs, 0);
+            var connectionString = NormalizeConnectionString(rawConnectionString);
 
-            var databaseTask = CreateTask(task, additionalArgs);
+            var databaseTask = CreateTask(task, additionalArgs, connectionString);
             var taskName = $"{task}(implemented in {databaseTask.GetType().Name})";
 
             try
             {
                 Console.WriteLine($"Executing {taskName}");
-                var connectionString = GetArgument(additionalArgs, 0);
+                Console.WriteLine("Database provider: PostgreSql");
                 FailOnConnectionToProd(connectionString);
-                using (var context = new KitosContext(connectionString))
+                var dbOptionsBuilder = new DbContextOptionsBuilder<KitosContext>()
+                    .UseLazyLoadingProxies();
+                var pgCsb = new NpgsqlConnectionStringBuilder(connectionString) { SearchPath = "dbo,public" };
+                dbOptionsBuilder.UseNpgsql(pgCsb.ConnectionString);
+
+                var dbOptions = dbOptionsBuilder.Options;
+                using (var context = new KitosContext(dbOptions))
                 {
                     var success = databaseTask.Execute(context);
                     if (success == false)
@@ -44,13 +57,12 @@ namespace Tools.Test.Database
             return 0;
         }
 
-        private static DatabaseTask CreateTask(string task, string[] additionalArgs)
+        private static DatabaseTask CreateTask(string task, string[] additionalArgs, string connectionString)
         {
             switch (task)
             {
                 case CliTargets.DropDatabase:
                     Console.WriteLine("Expecting the following arguments: <connectionString>");
-                    var connectionString = GetArgument(additionalArgs, 0);
                     return new DropDatabaseTask(connectionString);
 
                 case CliTargets.CreateOrganization:
@@ -162,6 +174,22 @@ namespace Tools.Test.Database
             {
                 throw new NotSupportedException("This operation is not allowed in prod.");
             }
+        }
+
+        private static string NormalizeConnectionString(string connectionString)
+        {
+            var builder = new NpgsqlConnectionStringBuilder(connectionString);
+            if (string.Equals(builder.Host, "localhost", StringComparison.OrdinalIgnoreCase))
+            {
+                builder.Host = "127.0.0.1";
+            }
+
+            if (string.IsNullOrWhiteSpace(builder.Database) == false)
+            {
+                builder.Database = builder.Database.ToLowerInvariant();
+            }
+
+            return builder.ConnectionString;
         }
 
         private static string GetArgument(string[] additionalArgs, int index, bool trimEnclosingQuotes = true)

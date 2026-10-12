@@ -9,6 +9,7 @@ using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Shared;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -27,6 +28,168 @@ namespace Tests.Unit.Core.Model
             };
         }
 
+        [Fact]
+        public void SetLicensingAndCodeModels_Returns_Conflict_If_Proprietary_And_Other_Are_Present()
+        {
+            var models = new[] { LicensingAndCodeModel.OpenSource, LicensingAndCodeModel.Proprietary };
+
+            var result = _sut.SetLicensingAndCodeModels(models);
+
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.Conflict, result.Value.FailureType);
+            Assert.Empty(_sut.LicensingAndCodeModels);
+        }
+
+        [Fact]
+        public void SetLicensingAndCodeModels_Does_Not_Add_Duplicates()
+        {
+            var values = new[] { LicensingAndCodeModel.OpenSource, LicensingAndCodeModel.Freeware, LicensingAndCodeModel.Freeware };
+            var uniqueValuesCount = values.ToHashSet().Count;
+            _sut.SetLicensingAndCodeModels(values);
+
+            var result = _sut.SetLicensingAndCodeModels(values);
+
+            Assert.True(result.IsNone);
+            Assert.Equal(uniqueValuesCount, _sut.LicensingAndCodeModels.Count);
+        }
+
+        [Fact]
+        public void ResetSystemUsageCriticalityLevel_SetsLastChanged_AndSetsValueToNull()
+        {
+            _sut.UpdateSystemUsageCriticalityLevel(new SystemUsageCriticalityLevel() { Uuid = A<Guid>(), Name = A<string>()});
+            var beforeChange = _sut.CriticalityFieldsLastChanged;
+            Assert.NotNull(_sut.SystemUsageCriticalityLevel);
+
+            _sut.ResetSystemUsageCriticalityLevel();
+
+            Assert.Null(_sut.SystemUsageCriticalityLevel);
+            AssertCriticalityFieldsLastChanged(beforeChange);
+        }
+
+        [Fact]
+        public void ResetCriticalityLevelDocumentation_SetsLastChanged_AndSetsValuesToNull()
+        {
+            _sut.UpdateCriticalityLevelDocumentationUrl(A<string>());
+            _sut.UpdateCriticalityLevelDocumentationName(A<string>());
+            var beforeChange = _sut.CriticalityFieldsLastChanged;
+            Assert.NotNull(_sut.CriticalityLevelDocumentationUrl);
+            Assert.NotNull(_sut.CriticalityLevelDocumentationName);
+
+            _sut.ResetCriticalityLevelDocumentation();
+
+            Assert.Null(_sut.CriticalityLevelDocumentationUrl);
+            Assert.Null(_sut.CriticalityLevelDocumentationName);
+            AssertCriticalityFieldsLastChanged(beforeChange);
+        }
+
+        [Fact]
+        public void UpdateIsBusinessCritical_UpdatesCriticalityFieldsLastChanged_WhenNewValue()
+        {
+            _sut.UpdateIsBusinessCritical(DataOptions.NO);
+            var beforeChange = _sut.CriticalityFieldsLastChanged;
+            var expected = DataOptions.YES;
+
+            _sut.UpdateIsBusinessCritical(expected);
+
+            Assert.Equal(expected, _sut.isBusinessCritical);
+            AssertCriticalityFieldsLastChanged(beforeChange);
+        }
+
+        [Fact]
+        public void UpdateCriticalityLevelDocumentationUrl_DoesNotUpdateCriticalityFieldsLastChanged_WhenNotNewValue()
+        {
+            var existingValue = A<string?>();
+            _sut.UpdateCriticalityLevelDocumentationUrl(existingValue);
+            
+            var beforeChange = _sut.CriticalityFieldsLastChanged;
+
+            _sut.UpdateCriticalityLevelDocumentationUrl(existingValue);
+
+            Assert.Equal(existingValue, _sut.CriticalityLevelDocumentationUrl);
+            AssertCriticalityFieldsLastChanged(beforeChange, false);
+        }
+
+        [Fact]
+        public void UpdateCriticalityLevelDocumentationName_UpdatesCriticalityFieldsLastChanged_WhenNewValue()
+        {
+            var existing = A<string?>();
+            _sut.UpdateCriticalityLevelDocumentationName(existing);
+            var expected = A<string?>();
+            var beforeChange = _sut.CriticalityFieldsLastChanged;
+
+            _sut.UpdateCriticalityLevelDocumentationName(expected);
+
+            Assert.Equal(expected, _sut.CriticalityLevelDocumentationName);
+            AssertCriticalityFieldsLastChanged(beforeChange);
+        }
+
+        [Fact]
+        public void UpdateCriticalityLevelDocumentationName_DoesNotUpdateCriticalityFieldsLastChanged_WhenNotNewValue()
+        {
+            var existingValue = A<string?>();
+            _sut.UpdateCriticalityLevelDocumentationName(existingValue);
+            var beforeChange = _sut.CriticalityFieldsLastChanged;
+
+            _sut.UpdateCriticalityLevelDocumentationName(existingValue);
+
+            Assert.Equal(existingValue, _sut.CriticalityLevelDocumentationName);
+            AssertCriticalityFieldsLastChanged(beforeChange, false);
+        }
+
+        [Fact]
+        public void UpdateCriticalityLevelDocumentationUrl_UpdatesCriticalityFieldsLastChanged_WhenNewValue()
+        {
+            var existing = A<string?>();
+            _sut.UpdateCriticalityLevelDocumentationUrl(existing);
+            var expected = A<string?>();
+            var beforeChange = _sut.CriticalityFieldsLastChanged;
+
+            _sut.UpdateCriticalityLevelDocumentationUrl(expected);
+
+            Assert.Equal(expected, _sut.CriticalityLevelDocumentationUrl);
+            AssertCriticalityFieldsLastChanged(beforeChange);
+        }
+
+        [Fact]
+        public void UpdateIsBusinessCritical_DoesNotUpdateCriticalityFieldsLastChanged_WhenNotNewValue()
+        {
+            var existingValue = DataOptions.YES;
+            _sut.UpdateIsBusinessCritical(existingValue);
+
+            var beforeChange = _sut.CriticalityFieldsLastChanged;
+
+            _sut.UpdateIsBusinessCritical(existingValue);
+
+            Assert.Equal(existingValue, _sut.isBusinessCritical);
+            AssertCriticalityFieldsLastChanged(beforeChange, false);
+        }
+
+        [Fact]
+        public void UpdateIsSociallyCritical_UpdatesCriticalityFieldsLastChanged_WhenNewValue()
+        {
+            _sut.UpdateIsSociallyCritical(DataOptions.NO);
+            var expected = DataOptions.YES;
+            var beforeChange = _sut.CriticalityFieldsLastChanged;
+
+            _sut.UpdateIsSociallyCritical(expected);
+
+            Assert.Equal(expected, _sut.IsSociallyCritical);
+            AssertCriticalityFieldsLastChanged(beforeChange);
+        }
+
+        [Fact]
+        public void UpdateIsSociallyCritical_DoesNotUpdateCriticalityFieldsLastChanged_WhenNotNewValue()
+        {
+            var existingValue = DataOptions.YES;
+            _sut.UpdateIsSociallyCritical(existingValue);
+
+            var beforeChange = _sut.CriticalityFieldsLastChanged;
+
+            _sut.UpdateIsSociallyCritical(existingValue);
+
+            Assert.Equal(existingValue, _sut.IsSociallyCritical);
+            AssertCriticalityFieldsLastChanged(beforeChange, false);
+        }
 
         [Theory]
         [InlineData(DataOptions.DONTKNOW)]
@@ -100,7 +263,7 @@ namespace Tests.Unit.Core.Model
             else
             {
                 Assert.True(result.HasValue);
-                Assert.Equal(result.Value.FailureType, OperationFailure.BadInput);
+                Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
             }
         }
 
@@ -184,18 +347,19 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
-        [InlineData(DataOptions.YES)]
-        [InlineData(DataOptions.DONTKNOW)]
-        [InlineData(DataOptions.NO)]
-        [InlineData(DataOptions.UNDECIDED)]
-        public void UpdateRiskAssessmentDate_Updates_If_RiskAssessment_Is_Yes(DataOptions riskAssessment)
+        [InlineData(YesNoDontKnowIrrelevant.Yes)]
+        [InlineData(YesNoDontKnowIrrelevant.DontKnow)]
+        [InlineData(YesNoDontKnowIrrelevant.No)]
+        [InlineData(YesNoDontKnowIrrelevant.Undecided)]
+        [InlineData(YesNoDontKnowIrrelevant.Irrelevant)]
+        public void UpdateRiskAssessmentDate_Updates_If_RiskAssessment_Is_Yes(YesNoDontKnowIrrelevant riskAssessment)
         {
             _sut.UpdateRiskAssessment(riskAssessment);
             var date = A<DateTime>();
 
             _sut.UpdateRiskAssessmentDate(date);
 
-            if (riskAssessment == DataOptions.YES)
+            if (riskAssessment == YesNoDontKnowIrrelevant.Yes)
             {
                 Assert.Equal(date, _sut.riskAssesmentDate);
             }
@@ -206,18 +370,19 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
-        [InlineData(DataOptions.YES)]
-        [InlineData(DataOptions.DONTKNOW)]
-        [InlineData(DataOptions.NO)]
-        [InlineData(DataOptions.UNDECIDED)]
-        public void UpdateRiskAssessmentNotes_Updates_If_RiskAssessment_Is_Yes(DataOptions riskAssessment)
+        [InlineData(YesNoDontKnowIrrelevant.Yes)]
+        [InlineData(YesNoDontKnowIrrelevant.DontKnow)]
+        [InlineData(YesNoDontKnowIrrelevant.No)]
+        [InlineData(YesNoDontKnowIrrelevant.Undecided)]
+        [InlineData(YesNoDontKnowIrrelevant.Irrelevant)]
+        public void UpdateRiskAssessmentNotes_Updates_If_RiskAssessment_Is_Yes(YesNoDontKnowIrrelevant riskAssessment)
         {
             _sut.UpdateRiskAssessment(riskAssessment);
             var notes = A<string>();
 
             _sut.UpdateRiskAssessmentNotes(notes);
 
-            if (riskAssessment == DataOptions.YES)
+            if (riskAssessment == YesNoDontKnowIrrelevant.Yes)
             {
                 Assert.Equal(notes, _sut.noteRisks);
             }
@@ -238,18 +403,19 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
-        [InlineData(DataOptions.YES)]
-        [InlineData(DataOptions.DONTKNOW)]
-        [InlineData(DataOptions.NO)]
-        [InlineData(DataOptions.UNDECIDED)]
-        public void UpdateRiskAssessmentLevel_Updates_If_RiskAssessment_Is_Yes(DataOptions riskAssessment)
+        [InlineData(YesNoDontKnowIrrelevant.Yes)]
+        [InlineData(YesNoDontKnowIrrelevant.DontKnow)]
+        [InlineData(YesNoDontKnowIrrelevant.No)]
+        [InlineData(YesNoDontKnowIrrelevant.Undecided)]
+        [InlineData(YesNoDontKnowIrrelevant.Irrelevant)]
+        public void UpdateRiskAssessmentLevel_Updates_If_RiskAssessment_Is_Yes(YesNoDontKnowIrrelevant riskAssessment)
         {
             _sut.UpdateRiskAssessment(riskAssessment);
             var level = A<RiskLevel>();
 
             _sut.UpdateRiskAssessmentLevel(level);
 
-            if (riskAssessment == DataOptions.YES)
+            if (riskAssessment == YesNoDontKnowIrrelevant.Yes)
             {
                 Assert.Equal(level, _sut.preriskAssessment);
             }
@@ -260,18 +426,19 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
-        [InlineData(DataOptions.YES)]
-        [InlineData(DataOptions.DONTKNOW)]
-        [InlineData(DataOptions.NO)]
-        [InlineData(DataOptions.UNDECIDED)]
-        public void UpdateRiskAssessmentNote_Updates_If_RiskAssessment_Is_Yes(DataOptions riskAssessment)
+        [InlineData(YesNoDontKnowIrrelevant.Yes)]
+        [InlineData(YesNoDontKnowIrrelevant.DontKnow)]
+        [InlineData(YesNoDontKnowIrrelevant.No)]
+        [InlineData(YesNoDontKnowIrrelevant.Undecided)]
+        [InlineData(YesNoDontKnowIrrelevant.Irrelevant)]
+        public void UpdateRiskAssessmentNote_Updates_If_RiskAssessment_Is_Yes(YesNoDontKnowIrrelevant riskAssessment)
         {
             _sut.UpdateRiskAssessment(riskAssessment);
             var note = A<string>();
 
             _sut.UpdateRiskAssessmentNotes(note);
 
-            if (riskAssessment == DataOptions.YES)
+            if (riskAssessment == YesNoDontKnowIrrelevant.Yes)
             {
                 Assert.Equal(note, _sut.noteRisks);
             }
@@ -282,11 +449,12 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
-        [InlineData(DataOptions.YES)]
-        [InlineData(DataOptions.DONTKNOW)]
-        [InlineData(DataOptions.NO)]
-        [InlineData(DataOptions.UNDECIDED)]
-        public void UpdateRiskAssessmentDocumentation_Updates_If_RiskAssessment_Is_Yes(DataOptions riskAssessment)
+        [InlineData(YesNoDontKnowIrrelevant.Yes)]
+        [InlineData(YesNoDontKnowIrrelevant.DontKnow)]
+        [InlineData(YesNoDontKnowIrrelevant.No)]
+        [InlineData(YesNoDontKnowIrrelevant.Undecided)]
+        [InlineData(YesNoDontKnowIrrelevant.Irrelevant)]
+        public void UpdateRiskAssessmentDocumentation_Updates_If_RiskAssessment_Is_Yes(YesNoDontKnowIrrelevant riskAssessment)
         {
             _sut.UpdateRiskAssessment(riskAssessment);
             var url = A<string>();
@@ -295,7 +463,7 @@ namespace Tests.Unit.Core.Model
 
             _sut.UpdateRiskAssessmentDocumentation(url, name);
 
-            if (riskAssessment == DataOptions.YES)
+            if (riskAssessment == YesNoDontKnowIrrelevant.Yes)
             {
                 Assert.Equal(url, _sut.RiskSupervisionDocumentationUrl);
                 Assert.Equal(name, _sut.RiskSupervisionDocumentationUrlName);
@@ -309,11 +477,12 @@ namespace Tests.Unit.Core.Model
 
 
         [Theory]
-        [InlineData(DataOptions.DONTKNOW)]
-        [InlineData(DataOptions.NO)]
-        [InlineData(DataOptions.YES)]
-        [InlineData(DataOptions.UNDECIDED)]
-        public void UpdateRiskAssessment_Only_Clears_Related_Fields_If_Not_Yes(DataOptions riskAssessment)
+        [InlineData(YesNoDontKnowIrrelevant.No)]
+        [InlineData(YesNoDontKnowIrrelevant.DontKnow)]
+        [InlineData(YesNoDontKnowIrrelevant.Irrelevant)]
+        [InlineData(YesNoDontKnowIrrelevant.Undecided)]
+        [InlineData(YesNoDontKnowIrrelevant.Yes)]
+        public void UpdateRiskAssessment_Only_Clears_Related_Fields_If_Not_Yes(YesNoDontKnowIrrelevant riskAssessment)
         {
             var level = A<RiskLevel>();
             var riskAssessmentDate = A<DateTime>();
@@ -321,7 +490,7 @@ namespace Tests.Unit.Core.Model
             var urlName = A<string>();
             var notes = A<string>();
 
-            _sut.UpdateRiskAssessment(DataOptions.YES);
+            _sut.UpdateRiskAssessment(YesNoDontKnowIrrelevant.Yes);
             _sut.UpdateRiskAssessmentLevel(level);
             _sut.UpdateRiskAssessmentDate(riskAssessmentDate);
             _sut.UpdateRiskAssessmentDocumentation(url, urlName);
@@ -330,7 +499,7 @@ namespace Tests.Unit.Core.Model
             _sut.UpdateRiskAssessment(riskAssessment);
 
             Assert.Equal(riskAssessment, _sut.riskAssessment);
-            if (riskAssessment == DataOptions.YES)
+            if (riskAssessment == YesNoDontKnowIrrelevant.Yes)
             {
                 Assert.Equal(level, _sut.preriskAssessment);
                 Assert.Equal(riskAssessmentDate, _sut.riskAssesmentDate);
@@ -350,9 +519,9 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
+        [InlineData(DataOptions.YES)]
         [InlineData(DataOptions.DONTKNOW)]
         [InlineData(DataOptions.NO)]
-        [InlineData(DataOptions.YES)]
         [InlineData(DataOptions.UNDECIDED)]
         public void UpdateTechnicalPrecautionsInPlace_Only_Clears_Related_Fields_If_Not_Yes(DataOptions precautionsInPlace)
         {
@@ -459,6 +628,7 @@ namespace Tests.Unit.Core.Model
         [Theory]
         [InlineData(DataOptions.DONTKNOW)]
         [InlineData(DataOptions.NO)]
+        [InlineData(DataOptions.YES)]
         [InlineData(DataOptions.UNDECIDED)]
         public void UpdateUserSupervision_Clears_Related_Fields_If_Not_Yes(DataOptions userSupervision)
         {
@@ -934,12 +1104,14 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
+        [InlineData(null, 9, UserCount.BELOWTEN)]
         [InlineData(0, 9, UserCount.BELOWTEN)]
-        [InlineData(10, 50, UserCount.TENTOFIFTY)]
-        [InlineData(50, 100, UserCount.FIFTYTOHUNDRED)]
-        [InlineData(100, null, UserCount.HUNDREDPLUS)]
-        [InlineData(100, int.MaxValue, UserCount.HUNDREDPLUS)]
-        public void Can_Change_UserCount(int lower, int? upper, UserCount expectedResult)
+        [InlineData(10, 49, UserCount.TENTOFORTYNINE)]
+        [InlineData(50, 99, UserCount.FIFTYTONINETYNINE)]
+        [InlineData(100, 499, UserCount.HUNDREDTOFOURHUNDREDNINETYNINE)]
+        [InlineData(500, null, UserCount.FIVEHUNDREDPLUS)]
+        [InlineData(500, int.MaxValue, UserCount.FIVEHUNDREDPLUS)]
+        public void Can_Change_UserCount(int? lower, int? upper, UserCount expectedResult)
         {
             //Arrange
             var newIntervalValue = (lower, upper);
@@ -954,7 +1126,7 @@ namespace Tests.Unit.Core.Model
 
         [Theory]
         [MemberData(nameof(ValidationInvalidData))]
-        public void Invalid_When_LifeCycleStatus_Or_MainContract_Invalid(LifeCycleStatusType lifeCycleStatus, ItContractItSystemUsage mainContract, List<ItSystemUsageValidationError> expectedErrors)
+        public void Invalid_When_LifeCycleStatus_Or_MainContract_Invalid(LifeCycleStatusType? lifeCycleStatus, ItContractItSystemUsage? mainContract, List<ItSystemUsageValidationError> expectedErrors)
         {
             var itSystemUsage = new ItSystemUsage
             {
@@ -986,7 +1158,7 @@ namespace Tests.Unit.Core.Model
 
         [Theory]
         [MemberData(nameof(ValidationValidData))]
-        public void Valid_When_All_Valid(LifeCycleStatusType lifeCycleStatus, DateTime concluded, DateTime expirationDate, ItContractItSystemUsage mainContract)
+        public void Valid_When_All_Valid(LifeCycleStatusType lifeCycleStatus, DateTime concluded, DateTime expirationDate, ItContractItSystemUsage? mainContract)
         {
             var itSystemUsage = new ItSystemUsage
             {
@@ -1004,6 +1176,101 @@ namespace Tests.Unit.Core.Model
         public void Valid_When_All_Null()
         {
             var itSystemUsage = new ItSystemUsage();
+
+            var validity = itSystemUsage.CheckSystemValidity();
+
+            Assert.True(validity.Result);
+        }
+
+        [Fact]
+        public void Invalid_When_StartDate_Not_Passed_And_EndDate_Is_Also_In_Future()
+        {
+            var itSystemUsage = new ItSystemUsage
+            {
+                Concluded = DateTime.UtcNow.AddDays(1),
+                ExpirationDate = DateTime.UtcNow.AddDays(30)
+            };
+
+            var validity = itSystemUsage.CheckSystemValidity();
+
+            Assert.False(validity.Result);
+            Assert.Equal(new List<ItSystemUsageValidationError> { ItSystemUsageValidationError.StartDateNotPassed }, validity.ValidationErrors);
+        }
+
+        [Fact]
+        public void Invalid_When_EndDate_Passed_And_LifeCycle_Is_Invalid()
+        {
+            var itSystemUsage = new ItSystemUsage
+            {
+                ExpirationDate = DateTime.UtcNow.AddDays(-1),
+                LifeCycleStatus = LifeCycleStatusType.NotInUse
+            };
+
+            var validity = itSystemUsage.CheckSystemValidity();
+
+            Assert.False(validity.Result);
+            Assert.Equal(
+                new List<ItSystemUsageValidationError>
+                {
+                    ItSystemUsageValidationError.EndDatePassed,
+                    ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle
+                },
+                validity.ValidationErrors);
+        }
+
+        [Fact]
+        public void Invalid_When_EndDate_Passed_And_MainContract_Is_Inactive()
+        {
+            var itSystemUsage = new ItSystemUsage
+            {
+                ExpirationDate = DateTime.UtcNow.AddDays(-1),
+                MainContract = new ItContractItSystemUsage { ItContract = new ItContract { Terminated = DateTime.UtcNow.AddDays(-1) } }
+            };
+
+            var validity = itSystemUsage.CheckSystemValidity();
+
+            Assert.False(validity.Result);
+            Assert.Equal(
+                new List<ItSystemUsageValidationError>
+                {
+                    ItSystemUsageValidationError.EndDatePassed,
+                    ItSystemUsageValidationError.MainContractNotActive
+                },
+                validity.ValidationErrors);
+        }
+
+        [Theory]
+        [InlineData(LifeCycleStatusType.NotInUse)]
+        [InlineData(LifeCycleStatusType.Pilot)]
+        public void Invalid_When_All_Validation_Sources_Have_Errors(LifeCycleStatusType status)
+        {
+            var itSystemUsage = new ItSystemUsage
+            {
+                ExpirationDate = DateTime.UtcNow.AddDays(-1),
+                LifeCycleStatus = status,
+                MainContract = new ItContractItSystemUsage { ItContract = new ItContract { Terminated = DateTime.UtcNow.AddDays(-1) } }
+            };
+
+            var validity = itSystemUsage.CheckSystemValidity();
+
+            Assert.False(validity.Result);
+            Assert.Equal(
+                new List<ItSystemUsageValidationError>
+                {
+                    ItSystemUsageValidationError.EndDatePassed,
+                    ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle,
+                    ItSystemUsageValidationError.MainContractNotActive
+                },
+                validity.ValidationErrors);
+        }
+
+        [Fact]
+        public void Valid_When_MainContract_Is_Set_But_ItContract_Is_Null()
+        {
+            var itSystemUsage = new ItSystemUsage
+            {
+                MainContract = new ItContractItSystemUsage { ItContract = null }
+            };
 
             var validity = itSystemUsage.CheckSystemValidity();
 
@@ -1087,50 +1354,48 @@ namespace Tests.Unit.Core.Model
 
         public static readonly object[][] ValidationInvalidData =
         {
-            new object[]
-            {
-                LifeCycleStatusType.NotInUse, null,
+            [
+                LifeCycleStatusType.NotInUse, null!,
                 new List<ItSystemUsageValidationError> { ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle }
-            },
-            new object[]
-            {
-                null, new ItContractItSystemUsage {ItContract = new ItContract {Terminated = DateTime.UtcNow.AddDays(-1)}},
+            ],
+            [
+                LifeCycleStatusType.Pilot, null!,
+                new List<ItSystemUsageValidationError> { ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle }
+            ],
+            [
+                (LifeCycleStatusType?)null!, new ItContractItSystemUsage {ItContract = new ItContract {Terminated = DateTime.UtcNow.AddDays(-1)}},
                 new List<ItSystemUsageValidationError> {ItSystemUsageValidationError.MainContractNotActive}
-            },
-            new object[]
-            {
+            ],
+            [
                 LifeCycleStatusType.NotInUse, new ItContractItSystemUsage {ItContract = new ItContract {Terminated = DateTime.UtcNow.AddDays(-1)}},
                 new List<ItSystemUsageValidationError> {ItSystemUsageValidationError.NotOperationalAccordingToLifeCycle, ItSystemUsageValidationError.MainContractNotActive}
-            },
+            ],
         };
 
         public static readonly object[][] DateValidationInvalidData =
         {
-            new object[]
-            {
-                DateTime.UtcNow.AddDays(-1), null,
+            [
+                DateTime.UtcNow.AddDays(-1), null!,
                 new List<ItSystemUsageValidationError> { ItSystemUsageValidationError.EndDatePassed }
-            },
-            new object[]
-            {
-                null, DateTime.UtcNow.AddDays(-1),
+            ],
+            [
+                null!, DateTime.UtcNow.AddDays(-1),
                 new List<ItSystemUsageValidationError> { ItSystemUsageValidationError.EndDatePassed }
-            },
-            new object[]
-            {
-                DateTime.UtcNow.AddDays(1), null,
+            ],
+            [
+                DateTime.UtcNow.AddDays(1), null!,
                 new List<ItSystemUsageValidationError> { ItSystemUsageValidationError.StartDateNotPassed, ItSystemUsageValidationError.EndDatePassed }
-            }
+            ]
         };
 
         public static readonly object[][] ValidationValidData =
         {
-            new object[] {LifeCycleStatusType.Undecided, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null},
-            new object[] {LifeCycleStatusType.Operational, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null},
-            new object[] {LifeCycleStatusType.PhasingIn, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null},
-            new object[] {LifeCycleStatusType.PhasingOut, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null},
-            new object[] {null, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null},
-            new object[] {null, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), new ItContractItSystemUsage{ ItContract = new ItContract{ Active = true} }},
+            new object[] {LifeCycleStatusType.Undecided, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null!},
+            new object[] {LifeCycleStatusType.Operational, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null!},
+            new object[] {LifeCycleStatusType.PhasingIn, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null!},
+            new object[] {LifeCycleStatusType.PhasingOut, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null!},
+            new object[] {null!, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), null!},
+            new object[] {null!, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), new ItContractItSystemUsage{ ItContract = new ItContract{ Active = true} }},
             new object[] { LifeCycleStatusType.PhasingOut, DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1), new ItContractItSystemUsage{ ItContract = new ItContract{ Active = true} }},
         };
 
@@ -1159,6 +1424,181 @@ namespace Tests.Unit.Core.Model
             }
 
             return usage;
+        }
+
+        [Fact]
+        public void MainContractState_Returns_NoContract_When_No_MainContract_Assigned()
+        {
+            //Arrange
+            var usage = new ItSystemUsage
+            {
+                MainContract = null
+            };
+
+            //Act
+            var state = usage.MainContractState;
+
+            //Assert
+            Assert.Equal(MainContractState.NoContract, state);
+        }
+
+        [Fact]
+        public void MainContractState_Returns_Active_When_MainContract_Is_Active()
+        {
+            //Arrange
+            var usage = new ItSystemUsage
+            {
+                MainContract = new ItContractItSystemUsage
+                {
+                    ItContract = new ItContract
+                    {
+                        Active = true
+                    }
+                }
+            };
+
+            //Act
+            var state = usage.MainContractState;
+
+            //Assert
+            Assert.Equal(MainContractState.Active, state);
+        }
+
+        [Fact]
+        public void MainContractState_Returns_Inactive_When_MainContract_Exists_But_Is_Not_Active()
+        {
+            //Arrange
+            var usage = new ItSystemUsage
+            {
+                MainContract = new ItContractItSystemUsage
+                {
+                    ItContract = new ItContract
+                    {
+                        Active = false,
+                        ExpirationDate = DateTime.UtcNow.AddDays(-1) // Expired contract
+                    }
+                }
+            };
+
+            //Act
+            var state = usage.MainContractState;
+
+            //Assert
+            Assert.Equal(MainContractState.Inactive, state);
+        }
+
+        [Fact]
+        public void MainContractState_Returns_Active_When_MainContract_Has_No_Validity_Constraints()
+        {
+            //Arrange
+            var usage = new ItSystemUsage
+            {
+                MainContract = new ItContractItSystemUsage
+                {
+                    ItContract = new ItContract
+                    {
+                        // No dates set, so contract is valid by default
+                        Concluded = null,
+                        ExpirationDate = null
+                    }
+                }
+            };
+
+            //Act
+            var state = usage.MainContractState;
+
+            //Assert
+            Assert.Equal(MainContractState.Active, state);
+        }
+
+        [Fact]
+        public void MainContractState_Returns_Inactive_When_MainContract_Is_Expired()
+        {
+            //Arrange
+            var usage = new ItSystemUsage
+            {
+                MainContract = new ItContractItSystemUsage
+                {
+                    ItContract = new ItContract
+                    {
+                        Active = false,
+                        ExpirationDate = DateTime.UtcNow.AddDays(-1)
+                    }
+                }
+            };
+
+            //Act
+            var state = usage.MainContractState;
+
+            //Assert
+            Assert.Equal(MainContractState.Inactive, state);
+        }
+
+        [Fact]
+        public void ResetTechnicalSystemTypes_ClearsCollection()
+        {
+            _sut.UpdateTechnicalSystemTypes(new List<TechnicalSystemType> { new TechnicalSystemType { Id = A<int>(), Uuid = Guid.NewGuid() } });
+            Assert.NotEmpty(_sut.TechnicalSystemTypes);
+
+            _sut.ResetTechnicalSystemTypes();
+
+            Assert.Empty(_sut.TechnicalSystemTypes);
+        }
+
+        [Fact]
+        public void UpdateTechnicalSystemTypes_SetsValues_WhenNew()
+        {
+            var newValues = new List<TechnicalSystemType> { new TechnicalSystemType { Id = A<int>(), Uuid = Guid.NewGuid() } };
+
+            var error = _sut.UpdateTechnicalSystemTypes(newValues);
+
+            Assert.True(error.IsNone);
+            Assert.Single(_sut.TechnicalSystemTypes);
+        }
+
+        [Fact]
+        public void UpdateTechnicalSystemTypes_SetsValues_WhenDifferentIds()
+        {
+            var initial = new List<TechnicalSystemType> { new TechnicalSystemType { Id = A<int>(), Uuid = Guid.NewGuid() } };
+            _sut.UpdateTechnicalSystemTypes(initial);
+
+            var newValues = new List<TechnicalSystemType> { new TechnicalSystemType { Id = A<int>(), Uuid = Guid.NewGuid() } };
+            var error = _sut.UpdateTechnicalSystemTypes(newValues);
+
+            Assert.True(error.IsNone);
+            Assert.Single(_sut.TechnicalSystemTypes);
+            Assert.Equal(newValues[0].Id, _sut.TechnicalSystemTypes.First().Id);
+        }
+
+        [Fact]
+        public void UpdateTechnicalSystemTypes_DoesNotChangeValues_WhenSameIds()
+        {
+            var existing = new TechnicalSystemType { Id = A<int>(), Uuid = Guid.NewGuid() };
+            _sut.UpdateTechnicalSystemTypes(new List<TechnicalSystemType> { existing });
+
+            var sameIdValues = new List<TechnicalSystemType> { new TechnicalSystemType { Id = existing.Id, Uuid = existing.Uuid } };
+            var error = _sut.UpdateTechnicalSystemTypes(sameIdValues);
+
+            Assert.True(error.IsNone);
+            Assert.Single(_sut.TechnicalSystemTypes);
+        }
+
+        [Fact]
+        public void UpdateTechnicalSystemTypes_Throws_WhenNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => _sut.UpdateTechnicalSystemTypes(null));
+        }
+
+        private void AssertCriticalityFieldsLastChanged(DateTime? beforeChange, bool expectChange = true)
+        {
+            if (expectChange)
+            {
+                Assert.True(_sut.CriticalityFieldsLastChanged > beforeChange);
+            }
+            else
+            {
+                Assert.Equal(_sut.CriticalityFieldsLastChanged, beforeChange);
+            }
         }
     }
 }

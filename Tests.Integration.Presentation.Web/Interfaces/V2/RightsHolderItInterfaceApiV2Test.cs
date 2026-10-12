@@ -43,11 +43,12 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber);
 
             //Assert
-            Assert.Equal(pageSize, result.Count());
-            var interface1DTO = result.First(x => x.Name.Equals(itInterface1.Name));
-            CheckBaseDTOValues(system, itInterface1, interface1DTO);
-            var interface2DTO = result.First(x => x.Name.Equals(itInterface2.Name));
-            CheckBaseDTOValues(system, itInterface2, interface2DTO);
+            var resultList = result.ToList();
+            Assert.Equal(pageSize, resultList.Count);
+            var interface1Dto = Assert.Single(resultList, x => x.Name?.Equals(itInterface1.Name) == true);
+            CheckBaseDTOValues(system, itInterface1, interface1Dto);
+            var interface2Dto = Assert.Single(resultList, x => x.Name?.Equals(itInterface2.Name) == true);
+            CheckBaseDTOValues(system, itInterface2, interface2Dto);
         }
 
         [Theory]
@@ -74,6 +75,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             DatabaseAccess.MutateDatabase(db =>
             {
                 var dbInterface = db.ItInterfaces.AsQueryable().ByUuid(itInterface2.Uuid);
+                Assert.NotNull(dbInterface);
                 dbInterface.Disabled = true;
                 db.SaveChanges();
             });
@@ -84,13 +86,14 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Assert
             if (shouldIncludeDeactivated)
             {
-                Assert.Equal(pageSize, result.Count());
-                var interface1DTO = result.First(x => x.Name.Equals(itInterface1.Name));
-                CheckBaseDTOValues(system, itInterface1, interface1DTO);
-                Assert.False(interface1DTO.Deactivated);
-                var interface2DTO = result.First(x => x.Name.Equals(itInterface2.Name));
-                CheckBaseDTOValues(system, itInterface2, interface2DTO);
-                Assert.True(interface2DTO.Deactivated);
+                var resultList = result.ToList();
+                Assert.Equal(pageSize, resultList.Count);
+                var interface1Dto = Assert.Single(resultList, x => x.Name?.Equals(itInterface1.Name) == true);
+                CheckBaseDTOValues(system, itInterface1, interface1Dto);
+                Assert.False(interface1Dto.Deactivated);
+                var interface2Dto = Assert.Single(resultList, x => x.Name?.Equals(itInterface2.Name) == true);
+                CheckBaseDTOValues(system, itInterface2, interface2Dto);
+                Assert.True(interface2Dto.Deactivated);
             }
             else
             {
@@ -149,7 +152,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
                 await InterfaceV2Helper.PatchExposedBySystemAsync(interfaceDto.Uuid, system.Uuid);
             }
 
-            var interface3LastModified = DatabaseAccess.MapFromEntitySet<ItInterface, DateTime>(x => x.AsQueryable().ByUuid(itInterface3.Uuid).LastChanged.Transform(dt => DateTime.SpecifyKind(dt, DateTimeKind.Utc)));
+            var interface3LastModified = DatabaseAccess.MapFromEntitySet<ItInterface, DateTime>(x => x.AsQueryable().ByUuid(itInterface3.Uuid)!.LastChanged.Transform(DateTimeTestHelper.Normalize));
 
             //Act
             var dtos = (await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, changedSinceGtEq: interface3LastModified, pageNumber: 0, pageSize: 10)).ToList();
@@ -181,8 +184,8 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber, org1.Uuid);
 
             //Assert
-            var interface1DTO = Assert.Single(result);
-            CheckBaseDTOValues(system1, itInterface1, interface1DTO);
+            var interface1Dto = Assert.Single(result);
+            CheckBaseDTOValues(system1, itInterface1, interface1Dto);
         }
 
         [Fact]
@@ -220,6 +223,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             {
                 var dbInterface = db.ItInterfaces.AsQueryable().ByUuid(itInterface.Uuid);
 
+                Assert.NotNull(dbInterface);
                 dbInterface.Description = A<string>();
                 dbInterface.ItInterfaceId = A<string>();
                 dbInterface.Name = A<string>();
@@ -238,6 +242,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             DatabaseAccess.MapFromEntitySet<ItInterface, bool>(x =>
             {
                 var dbInterface = x.AsQueryable().ByUuid(itInterface.Uuid);
+                Assert.NotNull(dbInterface);
                 BaseItInterfaceResponseDTODBCheck(dbInterface, itInterfaceDTO);
 
                 return true;
@@ -250,7 +255,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         public async Task Cannot_Get_Interface_As_RightsHolder_If_Not_Exists()
         {
             //Arrange
-            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var (token, _) = await CreateRightsHolderUserInNewOrganizationAsync();
             var uuid = A<Guid>();
 
             //Act
@@ -264,7 +269,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         public async Task Cannot_Get_Interface_As_RightsHolder_If_System_Has_No_RightsHolder()
         {
             //Arrange
-            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var (token, _) = await CreateRightsHolderUserInNewOrganizationAsync();
 
             var system = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
             var itInterface = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
@@ -283,7 +288,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         public async Task Cannot_Get_Interface_As_RightsHolder_If_System_Has_Different_RightsHolder()
         {
             //Arrange
-            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var (token, _) = await CreateRightsHolderUserInNewOrganizationAsync();
 
             var system = await CreateItSystemAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
             var itInterface = await CreateItInterfaceAsync(DefaultOrgUuid, scope: RegistrationScopeChoice.Local);
@@ -327,7 +332,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             else
                 Assert.NotEqual(Guid.Empty, createdInterface.Uuid);
 
-            Assert.Equal(input.ExposedBySystemUuid, createdInterface.ExposedBySystem.Uuid);
+            Assert.Equal(input.ExposedBySystemUuid, createdInterface.ExposedBySystem?.Uuid);
             Assert.Equal(input.Name, createdInterface.Name);
             Assert.Equal(input.InterfaceId, createdInterface.InterfaceId);
             Assert.Equal(input.Description, createdInterface.Description);
@@ -352,9 +357,9 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             {
                 RightsHolderUuid = withoutRightsHolder ? Guid.Empty : org.Uuid,
                 ExposedBySystemUuid = withoutExposingSystem ? Guid.Empty : exposingSystem.Uuid,
-                Name = withoutName ? null : A<string>(),
-                Description = wihtoutDescription ? null : A<string>(),
-                UrlReference = withoutUrlReference ? null : A<string>()
+                Name = withoutName ? string.Empty : A<string>(),
+                Description = wihtoutDescription ? string.Empty : A<string>(),
+                UrlReference = withoutUrlReference ? string.Empty : A<string>()
             };
 
             //Act
@@ -466,7 +471,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
 
             //Assert
             Assert.Equal(createdInterface.Uuid, updatedInterface.Uuid); // Make sure Uuid has not been changed
-            Assert.Equal(updateParameters.ExposedBySystemUuid, updatedInterface.ExposedBySystem.Uuid);
+            Assert.Equal(updateParameters.ExposedBySystemUuid, updatedInterface.ExposedBySystem?.Uuid);
             Assert.Equal(updateParameters.Name, updatedInterface.Name);
             Assert.Equal(updateParameters.InterfaceId, updatedInterface.InterfaceId);
             Assert.Equal(updateParameters.Description, updatedInterface.Description);
@@ -484,7 +489,10 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
 
             var updateRequest = new RightsHolderWritableItInterfacePropertiesDTO
             {
-                ExposedBySystemUuid = A<Guid>()
+                Name = "",
+                ExposedBySystemUuid = A<Guid>(),
+                Description = A<string>(),
+                UrlReference = A<string>()
             };
 
             //Act
@@ -520,12 +528,12 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org1);
             var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token1, creationDTO);
 
-            var updateParameters = new RightsHolderWritableItInterfacePropertiesDTO()
+            var updateParameters = new RightsHolderWritableItInterfacePropertiesDTO
             {
-                ExposedBySystemUuid = createdInterface.ExposedBySystem.Uuid,
+                ExposedBySystemUuid = createdInterface.ExposedBySystem!.Uuid,
                 Name = A<string>(),
                 InterfaceId = A<string>(),
-                Version = A<string>().Substring(0, 20),
+                Version = A<string>()[..20],
                 Description = A<string>(),
                 UrlReference = A<string>()
             };
@@ -558,9 +566,9 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var input = new RightsHolderWritableItInterfacePropertiesDTO()
             {
                 ExposedBySystemUuid = withoutExposingSystem ? Guid.Empty : newExposingSystem.Uuid,
-                Name = withoutName ? null : A<string>(),
-                Description = wihtoutDescription ? null : A<string>(),
-                UrlReference = withoutUrlReference ? null : A<string>()
+                Name = withoutName ? string.Empty : A<string>(),
+                Description = wihtoutDescription ? string.Empty : A<string>(),
+                UrlReference = withoutUrlReference ? string.Empty : A<string>()
             };
 
             //Act
@@ -640,7 +648,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Assert
             Assert.Equal(withName ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Name)] : createdInterface.Name, updatedInterface.Name);
             Assert.Equal(withInterfaceId ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.InterfaceId)] : createdInterface.InterfaceId, updatedInterface.InterfaceId);
-            Assert.Equal(withExposedBySystem ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.ExposedBySystemUuid)] : createdInterface.ExposedBySystem.Uuid, updatedInterface.ExposedBySystem.Uuid);
+            Assert.Equal(withExposedBySystem ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.ExposedBySystemUuid)] : createdInterface.ExposedBySystem?.Uuid, updatedInterface.ExposedBySystem?.Uuid);
             Assert.Equal(withVersion ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Version)] : createdInterface.Version, updatedInterface.Version);
             Assert.Equal(withDescription ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Description)] : createdInterface.Description, updatedInterface.Description);
             Assert.Equal(withUrlReference ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.UrlReference)] : createdInterface.UrlReference, updatedInterface.UrlReference);
@@ -692,7 +700,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org1);
             var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token1, creationDTO);
 
-            var (token2, org2) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var (token2, _) = await CreateRightsHolderUserInNewOrganizationAsync();
 
             var reason = A<DeactivationReasonRequestDTO>();
 
@@ -708,7 +716,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
 
-            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var (token, _) = await CreateRightsHolderUserInNewOrganizationAsync();
             var uuid = A<Guid>();
 
             var reason = A<DeactivationReasonRequestDTO>();
@@ -727,7 +735,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
             var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org);
             var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token, creationDTO);
-            DatabaseAccess.MutateEntitySet<ItInterface>(repository => repository.AsQueryable().ByUuid(createdInterface.Uuid).Deactivate());
+            DatabaseAccess.MutateEntitySet<ItInterface>(repository => repository.AsQueryable().ByUuid(createdInterface.Uuid)!.Deactivate());
 
             var reason = A<DeactivationReasonRequestDTO>();
 
@@ -742,7 +750,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         public async Task Cannot_Invoke_Endpoint_Blocked_From_rightsHolders()
         {
             //Arrange
-            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var (token, _) = await CreateRightsHolderUserInNewOrganizationAsync();
 
             //Act
             using var result = await InterfaceV2Helper.SendGetInterfacesAsync(token);
@@ -771,7 +779,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         private async Task<(string token, ShallowOrganizationResponseDTO createdOrganization)> CreateRightsHolderUserInNewOrganizationAsync()
         {
             var org = await CreateOrganizationAsync();
-            var (userId, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org.Uuid, true);
+            var (_, __, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org.Uuid, true);
             return (token, org);
         }
 

@@ -7,8 +7,8 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Organizations
     public class StsOrganizationChangeLogResponseDTO
     {
         public StsOrganizationChangeLogOriginOption Origin { get; set; }
-        public UserReferenceResponseDTO User { get; set; }
+        public UserReferenceResponseDTO? User { get; set; }
         public DateTime LogTime { get; set; }
-        public IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO> Consequences { get; set; }
+        public IEnumerable<ConnectionUpdateOrganizationUnitConsequenceDTO>? Consequences { get; set; }
     }
 }

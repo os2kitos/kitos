@@ -132,7 +132,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var newOrg = await CreateOrganizationAsync(OrganizationType.Municipality);
-            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, newOrg.Uuid, true, false);
+            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, newOrg.Uuid, true);
 
             //Act
             var organizationsWithFiltering = await OrganizationV2Helper.GetOrganizationsAsync(token, 0, 2, onlyWhereUserHasMembership: true);
@@ -183,7 +183,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 250, nameOrCvrContent: inputIsCvr ? newOrg.Cvr : newOrg.Name);
 
             //Assert
-            var org = Assert.Single(organizations.Where(x => x.Uuid == newOrg.Uuid));
+            var org = Assert.Single(organizations, x => x.Uuid == newOrg.Uuid);
             Assert.Equal(newOrg.Uuid, org.Uuid);
         }
 

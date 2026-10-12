@@ -1,13 +1,8 @@
 ﻿namespace Core.Abstractions.Types
 {
-    public class DetailedOperationError<TDetail> : OperationError
+    public class DetailedOperationError<TDetail>(OperationFailure failureType, TDetail detail, string? message = null)
+        : OperationError(message, failureType)
     {
-        public DetailedOperationError(OperationFailure failureType, TDetail detail, string message = null) 
-            : base(message, failureType)
-        {
-            Detail = detail;
-        }
-
-        public TDetail Detail { get; }
+        public TDetail Detail { get; } = detail;
     }
 }

@@ -105,7 +105,7 @@ namespace Tests.Unit.Core.BackgroundJobs
             return true;
         }
 
-        private void ExpectEndpointValidationResult(string url, EndpointValidationError error = null)
+        private void ExpectEndpointValidationResult(string url, EndpointValidationError? error = null)
         {
             _endpointValidationService.Setup(x => x.ValidateAsync(url)).ReturnsAsync(
                 new EndpointValidation(url, error));

@@ -6,9 +6,16 @@ namespace Core.BackgroundJobs.Services
 {
     public class BackgroundJobScheduler : IBackgroundJobScheduler
     {
+        private readonly IRecurringJobManager _recurringJobManager;
+
+        public BackgroundJobScheduler(IRecurringJobManager recurringJobManager)
+        {
+            _recurringJobManager = recurringJobManager;
+        }
+
         public void ScheduleLinkCheckForImmediateExecution()
         {
-            RecurringJob.TriggerJob(StandardJobIds.CheckExternalLinks);
+            _recurringJobManager.Trigger(StandardJobIds.CheckExternalLinks);
         }
     }
 }

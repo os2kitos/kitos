@@ -1,25 +1,26 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItSystemUsage.Read;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemUsageOverviewArchivePeriodReadModelMap : EntityTypeConfiguration<ItSystemUsageOverviewArchivePeriodReadModel>
+    public class ItSystemUsageOverviewArchivePeriodReadModelMap : IEntityTypeConfiguration<ItSystemUsageOverviewArchivePeriodReadModel>
     {
-        public ItSystemUsageOverviewArchivePeriodReadModelMap()
+        public void Configure(EntityTypeBuilder<ItSystemUsageOverviewArchivePeriodReadModel> builder)
         {
-            HasKey(x => x.Id);
-            HasRequired(x => x.Parent)
+            builder.HasKey(x => x.Id);
+
+            builder.HasOne(x => x.Parent)
                 .WithMany(x => x.ArchivePeriods)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(true);
-
-            Property(x => x.StartDate)
                 .IsRequired()
-                .HasIndexAnnotation("ItSystemUsageOverviewArchivePeriodReadModel_index_StartDate", 0);
+                .OnDelete(DeleteBehavior.Cascade);
 
-            Property(x => x.EndDate)
-                .IsRequired()
-                .HasIndexAnnotation("ItSystemUsageOverviewArchivePeriodReadModel_index_EndDate", 0);
+            builder.Property(x => x.StartDate).IsRequired();
+            builder.HasIndex(x => x.StartDate).HasDatabaseName("ItSystemUsageOverviewArchivePeriodReadModel_index_StartDate");
+
+            builder.Property(x => x.EndDate).IsRequired();
+            builder.HasIndex(x => x.EndDate).HasDatabaseName("ItSystemUsageOverviewArchivePeriodReadModel_index_EndDate");
         }
     }
 }

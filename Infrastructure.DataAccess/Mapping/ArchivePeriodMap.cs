@@ -1,22 +1,24 @@
 using Core.DomainModel.ItSystem;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class ArchivePeriodMap : EntityMap<ArchivePeriod>
     {
-        public ArchivePeriodMap()
+        public override void Configure(EntityTypeBuilder<ArchivePeriod> builder)
         {
-            // Properties
-            // Table & Column Mappings
-            this.ToTable("ArchivePeriod");
+            base.Configure(builder);
+            builder.ToTable("ArchivePeriod");
 
-            this.HasRequired(t => t.ItSystemUsage)
+            builder.HasOne(t => t.ItSystemUsage)
                 .WithMany(t => t.ArchivePeriods)
-                .HasForeignKey(d => d.ItSystemUsageId);
-
-            Property(x => x.Uuid)
+                .HasForeignKey(d => d.ItSystemUsageId)
                 .IsRequired()
-                .HasIndexAnnotation("UX_ArchivePeriod_Uuid");
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(x => x.Uuid).IsRequired();
+            builder.HasIndex(x => x.Uuid).IsUnique().HasDatabaseName("UX_ArchivePeriod_Uuid");
         }
     }
 }

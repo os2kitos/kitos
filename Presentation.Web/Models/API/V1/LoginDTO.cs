@@ -8,7 +8,7 @@
 
     public class OrganizationAndDefaultUnitDTO
     {
-        public OrganizationDTO Organization { get; set; }
-        public OrgUnitSimpleDTO DefaultOrgUnit { get; set; }
+        public required OrganizationDTO Organization { get; set; }
+        public OrgUnitSimpleDTO? DefaultOrgUnit { get; set; }
     }
 }

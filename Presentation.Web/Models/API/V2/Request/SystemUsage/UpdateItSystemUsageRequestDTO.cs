@@ -5,7 +5,7 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {
     public class UpdateItSystemUsageRequestDTO : BaseItSystemUsageWriteRequestDTO
     {
-        public GeneralDataUpdateRequestDTO General { get; set; }
+        public GeneralDataUpdateRequestDTO? General { get; set; }
         /// <summary>
         /// User defined external references.
         /// The external reference marked as "master reference" will be shown in overviews
@@ -15,10 +15,10 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         ///     - If the reference has no uuid, a new External Reference will be created
         ///     - Existing references will be replaced by the input data, so unless identified using uuid in the updates, the existing references will be removed.
         /// </summary>
-        public IEnumerable<UpdateExternalReferenceDataWriteRequestDTO> ExternalReferences { get; set; }
+        public IEnumerable<UpdateExternalReferenceDataWriteRequestDTO>? ExternalReferences { get; set; }
         /// <summary>
         /// Defines archiving related properties for this system usage
         /// </summary>
-        public ArchivingUpdateRequestDTO Archiving { get; set; }
+        public ArchivingUpdateRequestDTO? Archiving { get; set; }
     }
 }

@@ -4,5 +4,5 @@ namespace Core.ApplicationServices;
 
 public interface IEventBody
 {
-    Dictionary<string, object> ToKeyValuePairs();
+    Dictionary<string, object?> ToKeyValuePairs();
 }

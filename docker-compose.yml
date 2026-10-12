@@ -1,0 +1,117 @@
+# KITOS Local Development - Podman Compose
+#
+# Usage: podman compose up
+#
+# This compose file starts local infrastructure and API services.
+# Database schema/data preparation is still done manually per developer via:
+#   DeploymentScripts/PrepareLocalDatabase.ps1
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: kitos-postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      APP_USER: kitos
+      APP_PASSWORD: kitos
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./DeploymentScripts/docker/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh:ro
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: kitos-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      # Use the server's user so an early health check cannot create a root-owned cookie.
+      test: ["CMD", "gosu", "rabbitmq", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  kitos-api:
+    build:
+      context: .
+      dockerfile: Presentation.Web/Dockerfile
+    container_name: kitos-api
+    entrypoint: ["/bin/sh", "-c", "set -e; if ls /kitos-certs/*.crt >/dev/null 2>&1; then cp /kitos-certs/*.crt /usr/local/share/ca-certificates/ && update-ca-certificates; fi; exec dotnet Presentation.Web.dll"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Database__Provider: PostgreSql
+      Hangfire__Provider: PostgreSql
+      ConnectionStrings__KitosContext: "Host=postgres;Port=5432;Database=kitos;Username=kitos;Password=kitos"
+      ConnectionStrings__kitos_HangfireDB: "Host=postgres;Port=5432;Database=kitos_hangfiredb;Username=kitos;Password=kitos"
+      AppSettings__BaseUrl: "http://localhost:5000"
+      AppSettings__PubSubBaseUrl: "http://pubsub-api:8080"
+      AppSettings__SsoCertFilePath: /etc/ssl/certs/${SSO_CERT_FILE_NAME:-kitos-local-pfx}
+      AppSettings__SsoCertPassword: ${SSO_CERT_PASSWORD:-}
+      AppSettings__StsCertFilePath: /etc/ssl/certs/${STS_CERT_FILE_NAME:-ADG_EXTTEST_Adgangsstyring_2.pfx}
+      AppSettings__StsCertPassword: ${STS_CERT_PASSWORD:-}
+      AppSettings__StsOrganisationCertFilePath: /etc/ssl/certs/${STS_ORG_CERT_FILE_NAME:-ORG_EXTTEST_Organisation_2.pfx}
+      AppSettings__StsOrganisationCertPassword: ${STS_ORG_CERT_PASSWORD:-}
+      AppSettings__SsoCertificateThumbprint: ${SSO_CERT_THUMBPRINT:-}
+      AppSettings__StsCertificateThumbprint: ${STS_CERT_THUMBPRINT:-}
+      AppSettings__StsOrganisationCertificateThumbprint: ${STS_ORG_CERT_THUMBPRINT:-}
+      AppSettings__StsCertificateValidationMode: ${STS_CERT_VALIDATION_MODE:-ChainTrust}
+      AppSettings__StsCertificateRevocationMode: ${STS_CERT_REVOCATION_MODE:-Online}
+      Serilog__WriteTo__0__Args__path: "/var/log/kitos/kitos-.txt"
+      Smtp__DeliveryMethod: SpecifiedPickupDirectory
+      Smtp__PickupDirectoryLocation: "/tmp/maildrop/"
+    ports:
+      - "5000:8080"
+    volumes:
+      - ./certs:/kitos-certs:ro
+      - ./certs/${SSO_CERT_FILE_NAME:-kitos-local-pfx}:/etc/ssl/certs/${SSO_CERT_FILE_NAME:-kitos-local-pfx}:ro
+      - ./certs/${STS_CERT_FILE_NAME:-ADG_EXTTEST_Adgangsstyring_2.pfx}:/etc/ssl/certs/${STS_CERT_FILE_NAME:-ADG_EXTTEST_Adgangsstyring_2.pfx}:ro
+      - ./certs/${STS_ORG_CERT_FILE_NAME:-ORG_EXTTEST_Organisation_2.pfx}:/etc/ssl/certs/${STS_ORG_CERT_FILE_NAME:-ORG_EXTTEST_Organisation_2.pfx}:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  pubsub-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP: PubSub.Application.Api
+    container_name: kitos-pubsub-api
+    entrypoint: ["dotnet", "PubSub.Application.Api.dll"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Database__Provider: PostgreSql
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=kitos_pubsub;Username=kitos;Password=kitos"
+      JwtValidation__ApiUrl: "http://kitos-api:8080"
+      JwtValidation__ValidationEndpoint: "/api/v2/token/validate"
+      RabbitMQ__HostName: rabbitmq
+      RABBIT_MQ_USER: guest
+      RABBIT_MQ_PASSWORD: guest
+      PUBSUB_API_KEY: "local-no-secret"
+    ports:
+      - "5100:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      kitos-api:
+        condition: service_started
+
+volumes:
+  postgres_data:
+  rabbitmq_data:

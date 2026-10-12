@@ -55,8 +55,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             ExpectHttpRequestPropertyNames<OrganizationUpdateRequestDTO>();
             var dto = A<OrganizationUpdateRequestDTO>();
             var result = _sut.ToOrganizationUpdateParameters(dto);
-            AssertParamHasValidChange(result.Cvr, dto.Cvr);
-            AssertParamHasValidChange(result.Name, dto.Name);
+            AssertParamHasValidChange(result.Cvr, dto.Cvr!);
+            AssertParamHasValidChange(result.Name, dto.Name!);
             Assert.Equal(result.TypeId.NewValue, (int)dto.Type);
             var foreignCountryCodeUuid = dto.ForeignCountryCodeUuid;
             Assert.NotNull(foreignCountryCodeUuid);
@@ -99,7 +99,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             ExpectHttpRequestPropertyNames<OrganizationCreateRequestDTO>();
             var dto = A<OrganizationCreateRequestDTO>();
             var result = _sut.ToOrganizationCreateParameters(dto);
-            AssertParamHasValidChange(result.Cvr, dto.Cvr);
+            AssertParamHasValidChange(result.Cvr, dto.Cvr!);
             AssertParamHasValidChange(result.Name, dto.Name);
             Assert.Equal(result.TypeId.NewValue, (int)dto.Type);
             var foreignCountryCodeUuid = dto.ForeignCountryCodeUuid;
@@ -152,6 +152,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
                 Assert.NotNull(actual);
                 Assert.Equal(expectedNode.Enabled, actual.Enabled);
+                Assert.Equal(expectedNode.Recommended, actual.Recommended);
             }
         }
 
@@ -178,7 +179,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             for (var i = 0; i < numberOfElements; i++)
             {
                 key = string.IsNullOrEmpty(key) ? GenerateKey() : key;
-                nodes.Add(new CustomizedUINodeRequestDTO { Key = key, Enabled = isEnabled });
+                nodes.Add(new CustomizedUINodeRequestDTO { Key = key, Enabled = isEnabled, Recommended = isEnabled });
             }
 
             return nodes;

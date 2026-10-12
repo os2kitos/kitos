@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.DomainModel.Organization;
+using Core.DomainModel.SupplierAssociatedFields;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Organization;
 using Moq;
@@ -68,7 +70,7 @@ namespace Tests.Unit.Core.DomainServices.Repositories
             _genericRepository.Setup(x => x.AsQueryable()).Returns(response.AsQueryable());
         }
 
-        private Organization CreateOrganization(string cvr = null)
+        private Organization CreateOrganization(string? cvr = null)
         {
             return new Organization
             {

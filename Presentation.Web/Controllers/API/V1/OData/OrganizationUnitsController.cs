@@ -1,11 +1,13 @@
-﻿using System;
-using System.Web.Http;
-using Microsoft.AspNet.OData;
-using Microsoft.AspNet.OData.Routing;
+using System.Linq;
+using System;
 using Core.DomainServices;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API.V1.OData
@@ -19,16 +21,16 @@ namespace Presentation.Web.Controllers.API.V1.OData
         }
 
         [EnableQuery]
-        [ODataRoute("OrganizationUnits")]
-        public IHttpActionResult GetOrganizationUnits()
+        [Route("odata/OrganizationUnits")]
+        public IActionResult GetOrganizationUnits()
         {
             return base.Get();
         }
 
         //GET /Organizations(1)/OrganizationUnits
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/OrganizationUnits")]
-        public IHttpActionResult GetOrganizationUnits(int orgKey)
+        [Route("odata/Organizations({orgKey})/OrganizationUnits")]
+        public IActionResult GetOrganizationUnits(int orgKey)
         {
             if (GetOrganizationReadAccessLevel(orgKey) < OrganizationDataReadAccessLevel.All)
             {
@@ -39,16 +41,20 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 .AsQueryable()
                 .ByOrganizationId(orgKey);
 
-            return Ok(result);
+            return Ok(result.ToList());
         }
 
         [NonAction]
-        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
+        public override IActionResult Delete(int key) => throw new NotSupportedException();
 
         [NonAction]
-        public override IHttpActionResult Post(int organizationId, OrganizationUnit entity) => throw new NotSupportedException();
+        public override IActionResult Post(int organizationId, OrganizationUnit entity) => throw new NotSupportedException();
 
         [NonAction]
-        public override IHttpActionResult Patch(int key, Delta<OrganizationUnit> delta) => throw new NotSupportedException();
+        public override IActionResult Patch(int key, Delta<OrganizationUnit> delta) => throw new NotSupportedException();
     }
 }
+
+
+
+

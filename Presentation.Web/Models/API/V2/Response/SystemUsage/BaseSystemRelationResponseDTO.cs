@@ -15,18 +15,18 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// <summary>
         /// The relation uses the interface
         /// </summary>
-        public IdentityNamePairResponseDTO RelationInterface { get; set; }
+        public IdentityNamePairResponseDTO? RelationInterface { get; set; }
         /// <summary>
         /// The contract association of the system relation
         /// </summary>
-        public IdentityNamePairResponseDTO AssociatedContract { get; set; }
+        public IdentityNamePairResponseDTO? AssociatedContract { get; set; }
         /// <summary>
         /// Frequency of the relation
         /// </summary>
-        public IdentityNamePairResponseDTO RelationFrequency { get; set; }
+        public IdentityNamePairResponseDTO? RelationFrequency { get; set; }
 
-        public string Description { get; set; }
-        public string UrlReference { get; set; }
+        public string? Description { get; set; }
+        public string? UrlReference { get; set; }
         
     }
 }

@@ -8,6 +8,6 @@ namespace Presentation.Web.Models.API.V2.Internal.Request.Notifications
         /// Email of the recipient
         /// </summary>
         [Required]
-        public string Email { get; set; }
+        public required string Email { get; set; }
     }
 }

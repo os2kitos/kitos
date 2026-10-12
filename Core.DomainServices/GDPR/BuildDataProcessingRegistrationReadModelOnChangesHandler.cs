@@ -33,7 +33,8 @@ namespace Core.DomainServices.GDPR
         IDomainEventHandler<EntityUpdatedEvent<DataProcessingOversightOption>>,
         IDomainEventHandler<EntityUpdatedEvent<LocalDataProcessingOversightOption>>,
         IDomainEventHandler<EntityUpdatedEvent<ItContract>>,
-        IDomainEventHandler<EntityBeingDeletedEvent<ItContract>>
+        IDomainEventHandler<EntityBeingDeletedEvent<ItContract>>,
+        IDomainEventHandler<ItSystemUsageValidityUpdated>
     {
         private readonly IDataProcessingRegistrationReadModelRepository _readModelRepository;
         private readonly IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel> _mapper;
@@ -163,6 +164,11 @@ namespace Core.DomainServices.GDPR
         public void Handle(EntityBeingDeletedEvent<User> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_User));
+        }
+
+        public void Handle(ItSystemUsageValidityUpdated domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItSystemUsage));
         }
     }
 }

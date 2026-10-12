@@ -6,10 +6,11 @@ namespace Presentation.Web.Models.API.V2.Internal.Request.Organizations
 {
     public class OrganizationBaseRequestDTO
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public OrganizationType Type { get; set; }
         [MaxLength(10)]
-        public string Cvr {  get; set; }
+        public string? Cvr {  get; set; }
         public Guid? ForeignCountryCodeUuid { get; set; }
+        public bool IsSupplier { get; set; }
     }
 }

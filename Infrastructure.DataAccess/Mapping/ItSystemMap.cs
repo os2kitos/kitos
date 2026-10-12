@@ -1,78 +1,69 @@
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using System;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class ItSystemMap : EntityMap<ItSystem>
     {
-        public ItSystemMap()
+        public override void Configure(EntityTypeBuilder<ItSystem> builder)
         {
-            // Properties
+            base.Configure(builder);
 
-            this.Property(x => x.Name)
-                .HasMaxLength(ItSystem.MaxNameLength)
-                .IsRequired();
+            builder.Property(x => x.Name).HasMaxLength(ItSystem.MaxNameLength).IsRequired();
 
-            HasIndex(x => new { x.OrganizationId, x.Name })
-                .IsUnique(true)
-                .HasName("UX_NameUniqueToOrg");
+            builder.HasIndex(x => new { x.OrganizationId, x.Name }).IsUnique().HasDatabaseName("UX_NameUniqueToOrg");
+            builder.HasIndex(x => x.OrganizationId).HasDatabaseName("IX_OrganizationId");
+            builder.HasIndex(x => x.Name).HasDatabaseName("IX_Name");
 
-            HasIndex(x => x.OrganizationId)
-                .IsUnique(false)
-                .HasName("IX_OrganizationId");
+            builder.ToTable("ItSystem");
 
-            HasIndex(x => x.Name)
-                .IsUnique(false)
-                .HasName("IX_Name");
-
-            // Table & Column Mappings
-            this.ToTable("ItSystem");
-
-            // Relationships
-            this.HasOptional(t => t.Parent)
+            builder.HasOne(t => t.Parent)
                 .WithMany(d => d.Children)
                 .HasForeignKey(t => t.ParentId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            this.HasRequired(t => t.Organization)
+            builder.HasOne(t => t.Organization)
                 .WithMany(d => d.ItSystems)
                 .HasForeignKey(t => t.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            this.HasOptional(t => t.BelongsTo)
+            builder.HasOne(t => t.BelongsTo)
                 .WithMany(d => d.BelongingSystems)
                 .HasForeignKey(t => t.BelongsToId);
 
-            this.HasOptional(t => t.BusinessType)
+            builder.HasOne(t => t.BusinessType)
                 .WithMany(t => t.References)
                 .HasForeignKey(t => t.BusinessTypeId);
 
-            this.HasMany(t => t.ItInterfaceExhibits)
-                .WithRequired(t => t.ItSystem)
-                .HasForeignKey(d => d.ItSystemId);
-
-            HasOptional(t => t.Reference);
-            HasMany(t => t.ExternalReferences)
-                .WithOptional(d => d.ItSystem)
-                .HasForeignKey(d => d.ItSystem_Id)
-                //No cascading delete in order to avoid causing cycles or multiple cascade paths
-                .WillCascadeOnDelete(false);
-
-            Property(x => x.Uuid)
+            builder.HasMany(t => t.ItInterfaceExhibits)
+                .WithOne(t => t.ItSystem)
+                .HasForeignKey(d => d.ItSystemId)
                 .IsRequired()
-                .HasUniqueIndexAnnotation("UX_System_Uuuid", 0);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            Property(x => x.LegalName)
-                .IsOptional()
-                .HasMaxLength(ItSystem.MaxNameLength)
-                .HasIndexAnnotation("ItSystem_IX_LegalName");
+            builder.HasMany(t => t.ExternalReferences)
+                .WithOne(d => d.ItSystem)
+                .HasForeignKey(d => d.ItSystem_Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            Property(x => x.LegalDataProcessorName)
-                .IsOptional()
-                .HasMaxLength(Organization.MaxNameLength)
-                .HasIndexAnnotation("ItSystem_IX_LegalDataProcessorName");
+            builder.Property(x => x.Uuid).IsRequired();
+            builder.HasIndex(x => x.Uuid).IsUnique().HasDatabaseName("UX_System_Uuuid");
 
-            TypeMapping.AddIndexOnAccessModifier<ItSystemMap, ItSystem>(this);
+            builder.Property(x => x.LegalName).HasMaxLength(ItSystem.MaxNameLength);
+            builder.HasIndex(x => x.LegalName).HasDatabaseName("ItSystem_IX_LegalName");
+
+            builder.Property(x => x.LegalDataProcessorName).HasMaxLength(Organization.MaxNameLength);
+            builder.HasIndex(x => x.LegalDataProcessorName).HasDatabaseName("ItSystem_IX_LegalDataProcessorName");
+
+            TypeMapping.AddIndexOnAccessModifier(builder);
         }
     }
 }

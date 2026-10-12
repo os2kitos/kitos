@@ -15,11 +15,11 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Roles
         /// KITOS user which the role has been assigned to
         /// </summary>
         [Required]
-        public UserReferenceResponseDTO User { get; set; }
+        public required UserReferenceResponseDTO User { get; set; }
         /// <summary>
         /// Specific role option assigned to the user.
         /// </summary>
         [Required]
-        public IdentityNamePairResponseDTO Role { get; set; }
+        public required IdentityNamePairResponseDTO Role { get; set; }
     }
 }

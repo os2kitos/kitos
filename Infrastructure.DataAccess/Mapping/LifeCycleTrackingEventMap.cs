@@ -1,53 +1,44 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.Tracking;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class LifeCycleTrackingEventMap : EntityTypeConfiguration<LifeCycleTrackingEvent>
+    public class LifeCycleTrackingEventMap : IEntityTypeConfiguration<LifeCycleTrackingEvent>
     {
-        public LifeCycleTrackingEventMap()
+        public void Configure(EntityTypeBuilder<LifeCycleTrackingEvent> builder)
         {
-            HasKey(x => x.Id);
-            HasOptional(x => x.OptionalOrganizationReference)
+            builder.HasKey(x => x.Id);
+
+            builder.HasOne(x => x.OptionalOrganizationReference)
                 .WithMany(x => x.LifeCycleTrackingEvents)
                 .HasForeignKey(x => x.OptionalOrganizationReferenceId);
 
-            HasOptional(x => x.OptionalRightsHolderOrganization)
+            builder.HasOne(x => x.OptionalRightsHolderOrganization)
                 .WithMany(x => x.LifeCycleTrackingEventsWhereOrganizationIsRightsHolder)
                 .HasForeignKey(x => x.OptionalRightsHolderOrganizationId);
 
-            //FK indexes for fast joins (are not created automatically once manual indexes are added where the ids are part of the columns)
-            HasIndex(x => x.OptionalOrganizationReferenceId)
-                .IsUnique(false);
+            builder.HasIndex(x => x.OptionalOrganizationReferenceId);
+            builder.HasIndex(x => x.OptionalRightsHolderOrganizationId);
 
-            HasIndex(x => x.OptionalRightsHolderOrganizationId)
-                .IsUnique(false);
+            builder.HasIndex(x => new { x.EventType, x.OccurredAtUtc, x.EntityType })
+                .HasDatabaseName("IX_EventType_OccurredAt_EntityType_EventType");
 
-            //Indexes to match expected query patterns
-            HasIndex(x => new { x.EventType, x.OccurredAtUtc, x.EntityType })
-                .HasName("IX_EventType_OccurredAt_EntityType_EventType")
-                .IsUnique(false);
+            builder.HasIndex(x => new { x.OptionalOrganizationReferenceId, x.EventType, x.OccurredAtUtc, x.EntityType })
+                .HasDatabaseName("IX_Org_EventType_OccurredAt_EntityType");
 
-            HasIndex(x => new { x.OptionalOrganizationReferenceId, x.EventType, x.OccurredAtUtc, x.EntityType })
-                .HasName("IX_Org_EventType_OccurredAt_EntityType")
-                .IsUnique(false);
+            builder.HasIndex(x => new { x.OptionalRightsHolderOrganizationId, x.OptionalOrganizationReferenceId, x.EventType, x.OccurredAtUtc, x.EntityType })
+                .HasDatabaseName("IX_RightsHolder_Org_EventType_OccurredAt_EntityType");
 
-            HasIndex(x => new { x.OptionalRightsHolderOrganizationId, x.OptionalOrganizationReferenceId, x.EventType, x.OccurredAtUtc, x.EntityType })
-                .HasName("IX_RightsHolder_Org_EventType_OccurredAt_EntityType")
-                .IsUnique(false);
+            builder.HasIndex(x => new { x.OptionalRightsHolderOrganizationId, x.EventType, x.OccurredAtUtc, x.EntityType })
+                .HasDatabaseName("IX_RightsHolder_EventType_OccurredAt_EntityType");
 
-            HasIndex(x => new { x.OptionalRightsHolderOrganizationId, x.EventType, x.OccurredAtUtc, x.EntityType })
-                .HasName("IX_RightsHolder_EventType_OccurredAt_EntityType")
-                .IsUnique(false);
+            builder.HasIndex(x => new { x.OptionalOrganizationReferenceId, x.OptionalAccessModifier, x.EventType, x.OccurredAtUtc, x.EntityType })
+                .HasDatabaseName("IX_Org_AccessModifier_EventType_OccurredAt_EntityType");
 
-            HasIndex(x => new { x.OptionalOrganizationReferenceId, x.OptionalAccessModifier, x.EventType, x.OccurredAtUtc, x.EntityType })
-                .HasName("IX_Org_AccessModifier_EventType_OccurredAt_EntityType")
-                .IsUnique(false);
+            builder.HasIndex(x => x.EntityUuid);
 
-            HasIndex(x => x.EntityUuid)
-                .IsUnique(false);
-
-            HasOptional(x => x.User)
+            builder.HasOne(x => x.User)
                 .WithMany(x => x.LifeCycleTrackingEvents)
                 .HasForeignKey(x => x.UserId);
         }

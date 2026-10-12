@@ -1,16 +1,15 @@
-﻿using System;
+using System.Linq;
+using System;
 using System.Net;
-using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
-using Microsoft.AspNet.OData;
-using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
-using Swashbuckle.OData;
-using Swashbuckle.Swagger.Annotations;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
@@ -31,9 +30,8 @@ namespace Presentation.Web.Controllers.API.V1.OData
         }
 
         [EnableQuery]
-        [SwaggerResponse(HttpStatusCode.OK, type:typeof(ODataListResponse<DataProcessingRegistrationReadModel>))]
-        [ODataRoute("Organizations({organizationId})/DataProcessingRegistrationReadModels")]
-        public IHttpActionResult Get([FromODataUri]int organizationId)
+        [Route("odata/Organizations({organizationId})/DataProcessingRegistrationReadModels")]
+        public IActionResult GetByOrganizationId([FromRoute]int organizationId)
         {
             return GetOverviewReadModels(organizationId);
         }
@@ -41,12 +39,12 @@ namespace Presentation.Web.Controllers.API.V1.OData
         /// <summary>
         /// V2 style OData endpoint suited for consumption by clients using UUID's for entity identity
         /// </summary>
-        /// <param name="organizationUuid"></param>
+        /// <param name="organizationUuid">UUID of the organization</param>
+        /// <param name="responsibleOrganizationUnitUuid">UUID of the responsible organization unit</param>
         /// <returns></returns>
         [EnableQuery(MaxNodeCount = 300)]
-        [SwaggerResponse(HttpStatusCode.OK, type: typeof(ODataListResponse<DataProcessingRegistrationReadModel>))]
-        [ODataRoute("DataProcessingRegistrationReadModels")]
-        public IHttpActionResult GetByUuid(Guid organizationUuid, Guid? responsibleOrganizationUnitUuid = null)
+        [Route("odata/DataProcessingRegistrationReadModels")]
+        public IActionResult Get(Guid organizationUuid, Guid? responsibleOrganizationUnitUuid = null)
         {
             var orgDbId = _identityResolver.ResolveDbId<Organization>(organizationUuid);
             if (orgDbId.IsNone)
@@ -57,11 +55,15 @@ namespace Presentation.Web.Controllers.API.V1.OData
             return GetOverviewReadModels(orgDbId.Value);
         }
 
-        private IHttpActionResult GetOverviewReadModels(int organizationId)
+        private IActionResult GetOverviewReadModels(int organizationId)
         {
             return _dataProcessingRegistrationReadModelService
                 .GetByOrganizationId(organizationId)
-                .Match(onSuccess: Ok, onFailure: FromOperationError);
+                .Match(onSuccess: q => Ok(q.ToList()), onFailure: FromOperationError);
         }
     }
 }
+
+
+
+

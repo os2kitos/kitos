@@ -1,6 +1,7 @@
 param (
     [Parameter(Mandatory = $true)]
-    [string]$targetEnvironment
+    [string]$targetEnvironment,
+    [string]$databaseProvider = "PostgreSql"
 )
 
 $ErrorActionPreference = "Stop"
@@ -10,7 +11,9 @@ $ErrorActionPreference = "Stop"
 
 Load-Pubsub-Parameters -envName $targetEnvironment
 
+$connectionString = $Env:PUBSUB_MIGRATION_CONNECTION_STRING
+
 #-------------------------------------------------------------
 Write-Host "Running migrations"
 #-------------------------------------------------------------
-Run-Pubsub-DB-Migrations -connectionString "$Env:PUBSUB_MIGRATION_CONNECTION_STRING"
+Run-Pubsub-DB-Migrations -connectionString $connectionString -provider $databaseProvider

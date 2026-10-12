@@ -110,26 +110,26 @@ namespace Digst.OioIdws.OioWsTrust.SignatureCase
                 namespaceManager.AddNamespace("s", S11Namespace);
                 namespaceManager.AddNamespace("wst", Wst13Namespace);
                 var envelopeElement = xDocument.XPathSelectElement("/s:Envelope", namespaceManager);
-                var xmlnsAttribute = envelopeElement.Attribute(XName.Get("xmlns"));
-                xmlnsAttribute.Remove();
+                var xmlnsAttribute = envelopeElement?.Attribute(XName.Get("xmlns"));
+                xmlnsAttribute?.Remove();
 
                 // faultcode must contain a qualified name. However, NemLog-in has forgotten to specify the wst namespace in order to make the SOAP fault SOAP 1.1 compliant.
-                var xmlnsWstAttribute = envelopeElement.Attribute(XNamespace.Xmlns + Wst13Prefix);
+                var xmlnsWstAttribute = envelopeElement?.Attribute(XNamespace.Xmlns + Wst13Prefix);
                 if (xmlnsWstAttribute == null)
-                    envelopeElement.Add(new XAttribute(XNamespace.Xmlns + Wst13Prefix, Wst13Namespace));
+                    envelopeElement?.Add(new XAttribute(XNamespace.Xmlns + Wst13Prefix, Wst13Namespace));
 
                 // faultcode and faultstring must be in the empty namespace.
                 var faultElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/s:Fault", namespaceManager);
                 var faultcodeElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/s:Fault/wst:faultcode",
                     namespaceManager);
-                faultcodeElement.Remove();
+                faultcodeElement?.Remove();
                 var faultstringElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/s:Fault/wst:faultstring",
                     namespaceManager);
-                faultstringElement.Remove();
-                var newFaultCodeElement = new XElement("faultcode") { Value = faultcodeElement.Value };
-                var newFaultStringElement = new XElement("faultstring") { Value = faultstringElement.Value };
-                faultElement.Add(newFaultCodeElement);
-                faultElement.Add(newFaultStringElement);
+                faultstringElement?.Remove();
+                var newFaultCodeElement = new XElement("faultcode") { Value = faultcodeElement!.Value };
+                var newFaultStringElement = new XElement("faultstring") { Value = faultstringElement!.Value };
+                faultElement?.Add(newFaultCodeElement);
+                faultElement?.Add(newFaultStringElement);
             }
             // Normal RSTR
             else
@@ -149,7 +149,7 @@ namespace Digst.OioIdws.OioWsTrust.SignatureCase
                 // Expiry time is currently not on the format specified by the spec. The spec says yyyy-MM-ddTHH:mm:ssZ but yyyy-MM-ddTHH:mm:ss.fffZ is currently retrieved.
                 // Verify life time of SOAP message
                 var messageExpireTimeElement = xDocument.XPathSelectElement("/s:Envelope/s:Header/wsse:Security/wsu:Timestamp/wsu:Expires", namespaceManager);
-                var messageExpireZuluTime = GetPatchedDateTime(messageExpireTimeElement.Value);
+                var messageExpireZuluTime = GetPatchedDateTime(messageExpireTimeElement!.Value);
                 var currentZuluTime = DateTime.UtcNow;
                 if (currentZuluTime >= messageExpireZuluTime)
                     throw new InvalidOperationException("SOAP message has expired. Current Zulu time was: " + currentZuluTime + ", message Zulu expiry time was: " + messageExpireZuluTime);
@@ -157,18 +157,18 @@ namespace Digst.OioIdws.OioWsTrust.SignatureCase
                 // Verify life time of RSTS
                 var rstsExpireTimeElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/wst:RequestSecurityTokenResponseCollection/wst:RequestSecurityTokenResponse/wst:Lifetime/wsu:Expires", namespaceManager);
 
-                var rstsExpireZuluTime = GetPatchedDateTime(rstsExpireTimeElement.Value);
+                var rstsExpireZuluTime = GetPatchedDateTime(rstsExpireTimeElement!.Value);
 
                 if (currentZuluTime >= rstsExpireZuluTime)
                     throw new InvalidOperationException("RSTS has expired. Current Zulu time was: " + currentZuluTime + ", RSTS Zulu expiry time was: " + rstsExpireZuluTime);
 
                 // Verify replay attack
                 var signatureValueElement = xDocument.XPathSelectElement("/s:Envelope/s:Header/wsse:Security/d:Signature/d:SignatureValue", namespaceManager);
-                if (ReplyAttackCache.DoesKeyExist(signatureValueElement.Value))
+                if (ReplyAttackCache.DoesKeyExist(signatureValueElement!.Value))
                 {
                     var messageIdElement = xDocument.XPathSelectElement("/s:Envelope/s:Header/wsa:MessageID",
                         namespaceManager);
-                    throw new InvalidOperationException("Replay attack detected. Response message id: " + messageIdElement.Value);
+                    throw new InvalidOperationException("Replay attack detected. Response message id: " + messageIdElement!.Value);
                 }
                 else
                 {
@@ -216,7 +216,7 @@ namespace Digst.OioIdws.OioWsTrust.SignatureCase
             if (faultElement != null)
             {
                 var innerEnvelopeElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/s:Envelope", namespaceManager);
-                xDocument = XDocument.Parse(innerEnvelopeElement.ToString());
+                xDocument = XDocument.Parse(innerEnvelopeElement!.ToString());
                 response = ConvertXmlToMessage(response, xDocument);
             }
         }
@@ -229,15 +229,15 @@ namespace Digst.OioIdws.OioWsTrust.SignatureCase
 
             // First remove all namespaces and then readd them in order to control prefixes. 
             // This is really not necessary ... it was done to make it easier to compare with official examples that uses the prefixes specified below.
-            envelopeElement.DescendantsAndSelf().Attributes().Where(n => n.IsNamespaceDeclaration).Remove();
-            envelopeElement.Add(new XAttribute(XNamespace.Xmlns + S11Prefix, S11Namespace));
-            envelopeElement.Add(new XAttribute(XNamespace.Xmlns + WsaPrefix, WsaNamespace));
-            envelopeElement.Add(new XAttribute(XNamespace.Xmlns + WspPrefix, WspNamespace));
-            envelopeElement.Add(new XAttribute(XNamespace.Xmlns + WssePrefix, Wsse10Namespace));
-            envelopeElement.Add(new XAttribute(XNamespace.Xmlns + Wst13Prefix, Wst13Namespace));
+            envelopeElement!.DescendantsAndSelf().Attributes().Where(n => n.IsNamespaceDeclaration).Remove();
+            envelopeElement!.Add(new XAttribute(XNamespace.Xmlns + S11Prefix, S11Namespace));
+            envelopeElement!.Add(new XAttribute(XNamespace.Xmlns + WsaPrefix, WsaNamespace));
+            envelopeElement!.Add(new XAttribute(XNamespace.Xmlns + WspPrefix, WspNamespace));
+            envelopeElement!.Add(new XAttribute(XNamespace.Xmlns + WssePrefix, Wsse10Namespace));
+            envelopeElement!.Add(new XAttribute(XNamespace.Xmlns + Wst13Prefix, Wst13Namespace));
 
             // This namespace is required. If not added then Id attributes is not correctly prefixed with "wsu" and RST becomes invalid according to standard.
-            envelopeElement.Add(new XAttribute(XNamespace.Xmlns + WsuPrefix, WsuNamespace));
+            envelopeElement!.Add(new XAttribute(XNamespace.Xmlns + WsuPrefix, WsuNamespace));
         }
 
         private static Message ConvertXmlToMessage(Message request, XNode xNode)
@@ -285,7 +285,7 @@ namespace Digst.OioIdws.OioWsTrust.SignatureCase
             var actionElement = xDocument.XPathSelectElement("/s:Envelope/s:Header/a:Action", namespaceManager);
             var messageIdElement = new XElement(XName.Get("MessageID", WsaNamespace));
             messageIdElement.Value = "uuid:" + Guid.NewGuid().ToString("D");
-            actionElement.AddAfterSelf(messageIdElement);
+            actionElement!.AddAfterSelf(messageIdElement);
 
             // a:To is normally set to the URI of the service endpoint by the framework which is not what we need here and therefore we neeed to set it manually.
             // In order to work ... ManualAddressing must be set to true on HttpsTransportBindingElement or else the a:To is overwritten in the HttpsTransportChannel.
@@ -311,7 +311,7 @@ namespace Digst.OioIdws.OioWsTrust.SignatureCase
             securityElement.Add(timestampElement);
             securityElement.Add(binarySecurityTokenElement);
             var headerElement = xDocument.XPathSelectElement("/s:Envelope/s:Header", namespaceManager);
-            headerElement.Add(securityElement);
+            headerElement!.Add(securityElement);
         }
 
         private static void ManipulateBody(XDocument xDocument)
@@ -326,19 +326,19 @@ namespace Digst.OioIdws.OioWsTrust.SignatureCase
 
             // Add Context attribute to wst:RequestSecurityToken with a unique ID as value
             var requestSecurityTokenElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/trust:RequestSecurityToken", namespaceManager);
-            requestSecurityTokenElement.Add(new XAttribute("Context", new UniqueId()));
+            requestSecurityTokenElement!.Add(new XAttribute("Context", new UniqueId()));
 
             // Replace namespace http://schemas.xmlsoap.org/ws/2004/09/policy with http://schemas.xmlsoap.org/ws/2002/12/policy
             var appliesToElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/trust:RequestSecurityToken/wsp12:AppliesTo", namespaceManager);
             var endpointReferenceElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/trust:RequestSecurityToken/wsp12:AppliesTo/wsa:EndpointReference", namespaceManager);
-            appliesToElement.Remove();
+            appliesToElement!.Remove();
             var newAppliesToElement = new XElement(XName.Get("AppliesTo", WspNamespace));
             newAppliesToElement.Add(endpointReferenceElement);
             requestSecurityTokenElement.Add(newAppliesToElement);
 
             // Remove last '/' in endpoint address. Due to new URI(...) automatically adds an ending '/'.
             var addressReferenceElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/trust:RequestSecurityToken/wsp:AppliesTo/wsa:EndpointReference/wsa:Address", namespaceManager);
-            RemoveEndingForwardSlash(addressReferenceElement);
+            RemoveEndingForwardSlash(addressReferenceElement!);
 
             // Change lifetime expires format if present from "yyyy-MM-ddTHH:mm:ss.fffZ" to "yyyy-MM-ddTHH:mm:ssZ"
             var lifetimeElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/trust:RequestSecurityToken/trust:Lifetime/wsu:Expires", namespaceManager);
@@ -363,20 +363,20 @@ namespace Digst.OioIdws.OioWsTrust.SignatureCase
             var requestSecurityTokenResponseElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/trust:RequestSecurityTokenResponseCollection/trust:RequestSecurityTokenResponse", namespaceManager);
             var appliesToElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/trust:RequestSecurityTokenResponseCollection/trust:RequestSecurityTokenResponse/wsp:AppliesTo", namespaceManager);
             var endpointReferenceElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/trust:RequestSecurityTokenResponseCollection/trust:RequestSecurityTokenResponse/wsp:AppliesTo/wsa:EndpointReference", namespaceManager);
-            appliesToElement.Remove();
+            appliesToElement!.Remove();
             var newAppliesToElement = new XElement(XName.Get("AppliesTo", Wsp12Namespace));
             newAppliesToElement.Add(endpointReferenceElement);
-            requestSecurityTokenResponseElement.Add(newAppliesToElement);
+            requestSecurityTokenResponseElement!.Add(newAppliesToElement);
 
             // Replace RequestedAttachedReference and RequestedUnattachedReference with true saml2 SecurityTokenReference elements
             // This is needed because WCF otherwise does not know that the token is an encrypted SAML2 assertion and would therefore not be able to create a correct SecurityTokenReference according to the LIB-BAS profile when making the call from WSC to WSP.
             var referenceElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/trust:RequestSecurityTokenResponseCollection/trust:RequestSecurityTokenResponse/trust:RequestedAttachedReference/wsse:SecurityTokenReference/wsse:Reference", namespaceManager);
-            var assertionReferenceId = referenceElement.Attribute(XName.Get("URI")).Value.Substring(1); // Substring is used to convert e.g. '#encryptedassertion' to 'encryptedassertion'
+            var assertionReferenceId = referenceElement!.Attribute(XName.Get("URI"))!.Value.Substring(1); // Substring is used to convert e.g. '#encryptedassertion' to 'encryptedassertion'
 
             var requestedAttachedReferenceElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/trust:RequestSecurityTokenResponseCollection/trust:RequestSecurityTokenResponse/trust:RequestedAttachedReference", namespaceManager);
-            requestedAttachedReferenceElement.Remove();
+            requestedAttachedReferenceElement!.Remove();
             var requestedUnattachedReferenceElement = xDocument.XPathSelectElement("/s:Envelope/s:Body/trust:RequestSecurityTokenResponseCollection/trust:RequestSecurityTokenResponse/trust:RequestedUnattachedReference", namespaceManager);
-            requestedUnattachedReferenceElement.Remove();
+            requestedUnattachedReferenceElement!.Remove();
             // Recreate RequestedAttachedReference
             var newKeyIdentifierElement = new XElement(XName.Get("KeyIdentifier", Wsse10Namespace));
             newKeyIdentifierElement.Add(new XAttribute("ValueType", SamlValueType));
@@ -421,12 +421,12 @@ namespace Digst.OioIdws.OioWsTrust.SignatureCase
             var binarySecurityTokenElement = xDocument.XPathSelectElement("/s:Envelope/s:Header/wsse:Security/wsse:BinarySecurityToken", namespaceManager);
             var bodyElement = xDocument.XPathSelectElement("/s:Envelope/s:Body", namespaceManager);
             var idXName = XName.Get("Id", WsuNamespace);
-            actionElement.Add(new XAttribute(idXName, ActionIdValue));
-            msgElement.Add(new XAttribute(idXName, MessageIdIdValue));
-            toElement.Add(new XAttribute(idXName, ToIdValue));
-            timeStampElement.Add(new XAttribute(idXName, TimeStampIdValue));
-            binarySecurityTokenElement.Add(new XAttribute(idXName, BinarySecurityTokenIdValue));
-            bodyElement.Add(new XAttribute(idXName, BodyIdValue));
+            actionElement!.Add(new XAttribute(idXName, ActionIdValue));
+            msgElement!.Add(new XAttribute(idXName, MessageIdIdValue));
+            toElement!.Add(new XAttribute(idXName, ToIdValue));
+            timeStampElement!.Add(new XAttribute(idXName, TimeStampIdValue));
+            binarySecurityTokenElement!.Add(new XAttribute(idXName, BinarySecurityTokenIdValue));
+            bodyElement!.Add(new XAttribute(idXName, BodyIdValue));
 
             var idOfElementsThatMustBeSigned = new List<string> { ActionIdValue, MessageIdIdValue, ToIdValue, TimeStampIdValue, BinarySecurityTokenIdValue, BodyIdValue };
 
@@ -447,16 +447,6 @@ namespace Digst.OioIdws.OioWsTrust.SignatureCase
                 }
             }
             return xDocument;
-        }
-
-        private static void RemoveMustUnderstandAttribute(XElement element)
-        {
-            var mustUnderstandAttribute =
-                element.Attribute(XName.Get("mustUnderstand", S11Namespace));
-            if (mustUnderstandAttribute != null)
-            {
-                mustUnderstandAttribute.Remove();
-            }
         }
     }
 }

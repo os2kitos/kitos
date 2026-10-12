@@ -1,32 +1,36 @@
-﻿using Core.DomainModel.GDPR;
-using System.Data.Entity.ModelConfiguration;
+using Core.DomainModel.GDPR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class SubDataProcessorMap : EntityTypeConfiguration<SubDataProcessor>
+    public class SubDataProcessorMap : IEntityTypeConfiguration<SubDataProcessor>
     {
-        public SubDataProcessorMap()
+        public void Configure(EntityTypeBuilder<SubDataProcessor> builder)
         {
-            HasKey(x => new { x.OrganizationId, x.DataProcessingRegistrationId });
-            HasRequired(x => x.DataProcessingRegistration)
+            builder.HasKey(x => new { x.OrganizationId, x.DataProcessingRegistrationId });
+
+            builder.HasOne(x => x.DataProcessingRegistration)
                 .WithMany(x => x.AssignedSubDataProcessors)
                 .HasForeignKey(x => x.DataProcessingRegistrationId)
-                .WillCascadeOnDelete(true);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
-            HasRequired(x => x.Organization)
+            builder.HasOne(x => x.Organization)
                 .WithMany(x => x.SubDataProcessorRegistrations)
                 .HasForeignKey(x => x.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasOptional(x => x.SubDataProcessorBasisForTransfer)
+            builder.HasOne(x => x.SubDataProcessorBasisForTransfer)
                 .WithMany(x => x.SubDataProcessors)
                 .HasForeignKey(x => x.SubDataProcessorBasisForTransferId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasOptional(x => x.InsecureCountry)
+            builder.HasOne(x => x.InsecureCountry)
                 .WithMany(x => x.SubDataProcessors)
                 .HasForeignKey(x => x.InsecureCountryId)
-                .WillCascadeOnDelete(false);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

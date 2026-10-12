@@ -4,7 +4,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Organizations.Conflic
 {
     public class SystemWithUsageOutsideOrganizationConflictResponseDTO
     {
-        public string SystemName { get; set; }
-        public IEnumerable<string> OrganizationNames { get; set; }
+        public required string SystemName { get; set; }
+        public required IEnumerable<string> OrganizationNames { get; set; }
     }
 }

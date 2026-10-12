@@ -4,6 +4,8 @@ using System.Globalization;
 using Serilog;
 using Serilog.Events;
 
+#pragma warning disable CS8765  // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
+#pragma warning disable CS8610  // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
 namespace Presentation.Web.Infrastructure.Tracelistener
 {
     public class SerilogTraceListener : System.Diagnostics.TraceListener
@@ -114,3 +116,5 @@ namespace Presentation.Web.Infrastructure.Tracelistener
         }
     }
 }
+#pragma warning restore CS8765 // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
+#pragma warning restore CS8610 // Nullability of reference types in type of parameter doesn't match overridden member.

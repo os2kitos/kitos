@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.Shared;
+﻿using System;
+using Core.DomainModel.Shared;
 
 namespace Core.DomainModel.Events
 {
@@ -14,6 +15,7 @@ namespace Core.DomainModel.Events
 
         protected EntityLifeCycleEvent(LifeCycleEventType changeType, TEntity entity)
         {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
             ChangeType = changeType;
             Entity = entity;
         }

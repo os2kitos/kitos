@@ -7,6 +7,6 @@ namespace Presentation.Web.Models.API.V2.Request.Token
     {
         public bool Active { get; set; }
         public DateTime Expiration { get; set; }
-        public IEnumerable<ClaimResponseDTO> Claims { get; set; }
+        public required IEnumerable<ClaimResponseDTO> Claims { get; set; }
     }
 }

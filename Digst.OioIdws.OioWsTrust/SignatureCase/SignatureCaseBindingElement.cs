@@ -25,6 +25,7 @@ namespace Digst.OioIdws.OioWsTrust.SignatureCase
             _stsCertificate = stsCertificate;
         }
 
+#pragma warning disable CS8603 // Possible null reference return.
         public override T GetProperty<T>(BindingContext context)
         {
             // GetProperty<T>(BindingContext context) of SignatureCaseBindingElement must match GetProperty<T>() of SignatureCaseChannelFactory. 
@@ -37,6 +38,7 @@ namespace Digst.OioIdws.OioWsTrust.SignatureCase
 
             return context.GetInnerProperty<T>();
         }
+#pragma warning restore CS8603 // Possible null reference return.
 
         public override bool CanBuildChannelFactory<TChannel>(BindingContext context)
         {

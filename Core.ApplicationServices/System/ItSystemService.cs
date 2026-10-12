@@ -142,7 +142,7 @@ namespace Core.ApplicationServices.System
             return Maybe<IDomainQuery<ItSystem>>.None;
         }
 
-        public IQueryable<ItSystem> GetAvailableSystems(int organizationId, string optionalNameSearch = null)
+        public IQueryable<ItSystem> GetAvailableSystems(int organizationId, string? optionalNameSearch = null)
         {
             var itSystems = _itSystemRepository.GetSystems(
                 new OrganizationDataQueryParameters(
@@ -172,7 +172,7 @@ namespace Core.ApplicationServices.System
         public Result<IEnumerable<ItSystem>, OperationError> GetCompleteHierarchy(int systemId)
         {
             return GetSystem(systemId)
-                .Select(system => system.FlattenCompleteHierarchy());
+                .Select(system => system.FlattenCompleteHierarchy().Where(x => _authorizationContext.AllowReads(x)));
         }
 
         public SystemDeleteResult Delete(int id, bool breakBindings = false)
@@ -318,13 +318,16 @@ namespace Core.ApplicationServices.System
                     .Match
                     (
                         onValue: namingError => namingError,
-                        onNone: () => system
-                            .UpdateName(newName)
-                            .Match
-                            (
-                                onValue: namingError => namingError,
-                                onNone: () => Result<ItSystem, OperationError>.Success(system)
-                            )
+                        onNone: () => system.UpdateName(newName)
+                    )
+                    .Match
+                    (
+                        onValue: namingError => namingError,
+                        onNone: () =>
+                            {
+                                _domainEvents.Raise(new NamedEntityChangedNameEvent<ItSystem>(system));
+                                return Result<ItSystem, OperationError>.Success(system);
+                            }
                     );
             });
         }
@@ -587,7 +590,7 @@ namespace Core.ApplicationServices.System
                 .ToList()
                 .AsReadOnly();
         }
-        private Result<ItSystem, OperationError> Mutate(int systemId, Predicate<ItSystem> performUpdateTo, Action<ItSystem> updateWith = null, Func<ItSystem, Result<ItSystem, OperationError>> updateWithResult = null)
+        private Result<ItSystem, OperationError> Mutate(int systemId, Predicate<ItSystem> performUpdateTo, Action<ItSystem>? updateWith = null, Func<ItSystem, Result<ItSystem, OperationError>>? updateWithResult = null)
         {
             if (updateWith == null && updateWithResult == null)
                 throw new ArgumentException("No mutations provided");

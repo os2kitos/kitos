@@ -12,18 +12,14 @@ using Core.DomainServices.Model.Options;
 
 namespace Core.ApplicationServices.OptionTypes
 {
-    public class OptionsApplicationService<TReference, TOption> : IOptionsApplicationService<TReference, TOption>
+    public class OptionsApplicationService<TReference, TOption> : BaseOptionsApplicationService<TReference, TOption>, IOptionsApplicationService<TReference, TOption>
         where TOption : OptionEntity<TReference>
     {
         private readonly IOptionsService<TReference, TOption> _optionsTypeService;
-        private readonly IOrganizationRepository _organizationRepository;
-        private readonly IAuthorizationContext _authorizationContext;
 
-        public OptionsApplicationService(IOptionsService<TReference, TOption> optionsTypeService, IAuthorizationContext authorizationContext, IOrganizationRepository organizationRepository)
+        public OptionsApplicationService(IOptionsService<TReference, TOption> optionsTypeService, IAuthorizationContext authorizationContext, IOrganizationRepository organizationRepository): base(organizationRepository, authorizationContext)
         {
             _optionsTypeService = optionsTypeService;
-            _authorizationContext = authorizationContext;
-            _organizationRepository = organizationRepository;
         }
 
         public Result<(OptionDescriptor<TOption> option, bool available), OperationError> GetOptionType(Guid organizationUuid, Guid optionTypeUuid)
@@ -49,26 +45,6 @@ namespace Core.ApplicationServices.OptionTypes
             return ResolveOrgId(organizationUuid)
                     .Select(_optionsTypeService.GetAvailableOptionsDetails)
                     .Select(SortOptionsByPriority);
-        }
-
-        private static IEnumerable<OptionDescriptor<TOption>> SortOptionsByPriority(IEnumerable<OptionDescriptor<TOption>> options)
-        {
-            return options.OrderByDescending(x => x.Option.Priority);
-        }
-
-        private Result<int, OperationError> ResolveOrgId(Guid organizationUuid)
-        {
-            var organizationId = _organizationRepository.GetByUuid(organizationUuid).Select(org => org.Id);
-            if (organizationId.IsNone)
-            {
-                return new OperationError(OperationFailure.NotFound);
-            }
-            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId.Value) < OrganizationDataReadAccessLevel.All)
-            {
-                return new OperationError(OperationFailure.Forbidden);
-            }
-
-            return organizationId.Value;
         }
     }
 }

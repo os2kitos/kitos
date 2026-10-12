@@ -39,6 +39,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
             updatesExecuted += HandleDataResponsibleUpdates(token, alreadyScheduledIds);
             updatesExecuted += HandleOversightOptionUpdates(token, alreadyScheduledIds);
             updatesExecuted += HandleContractUpdates(token, alreadyScheduledIds);
+            updatesExecuted += HandleSystemUsageUpdates(token, alreadyScheduledIds);
             return updatesExecuted;
         }
 
@@ -93,6 +94,17 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 token,
                 alreadyScheduledIds,
                 PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItSystem,
+                update => _dataProcessingRegistrationRepository.GetBySystemId(update.SourceId).Select(x => x.Id)
+            );
+        }
+
+        private int HandleSystemUsageUpdates(CancellationToken token, HashSet<int> alreadyScheduledIds)
+        {
+            return ScheduleRootEntityChanges
+            (
+                token,
+                alreadyScheduledIds,
+                PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItSystemUsage,
                 update => _dataProcessingRegistrationRepository.GetBySystemId(update.SourceId).Select(x => x.Id)
             );
         }

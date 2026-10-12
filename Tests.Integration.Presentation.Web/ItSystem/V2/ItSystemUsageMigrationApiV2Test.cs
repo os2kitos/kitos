@@ -35,7 +35,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var (itSystem, organization) = await CreatePrerequisites(accessModifier: AccessModifier.Public);
 
             //Act
-            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 10, itSystem.Name, cookie);
+            var systems = await ItSystemUsageMigrationV2Helper.GetUnusedSystemsAsync(organization.Uuid, 10, itSystem.Name!, cookie);
 
             //Assert
             var system = Assert.Single(systems);
@@ -250,9 +250,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var toSystemUsage = await TakeSystemIntoUsageAsync(toSystem.Uuid, organization.Uuid);
 
             var interfaceDto = await CreateItInterfaceAsync(organization.Uuid);
-            var exhibit =
-                await InterfaceV2Helper.PatchExposedBySystemAsync(interfaceDto.Uuid,
-                    fromSystem.Uuid);
+            await InterfaceV2Helper.PatchExposedBySystemAsync(interfaceDto.Uuid, fromSystem.Uuid);
 
             var relationDTO = await ItSystemUsageV2Helper.PostRelationAsync(await GetGlobalToken(), toSystemUsage.Uuid,
                 new SystemRelationWriteRequestDTO
@@ -269,10 +267,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Empty(result.AffectedContracts);
 
             var affectedRelation = Assert.Single(result.AffectedRelations);
-            Assert.Equal(relationDTO.ToSystemUsage.Name, affectedRelation.ToSystem.Name);
-            Assert.Equal(toSystem.Name, affectedRelation.FromSystem.Name); //Why??
+            Assert.Equal(relationDTO.ToSystemUsage!.Name, affectedRelation.ToSystem!.Name);
+            Assert.Equal(toSystem.Name, affectedRelation.FromSystem!.Name);
             Assert.Equal(relationDTO.Description, affectedRelation.Description);
-            Assert.Equal(relationDTO.RelationInterface.Name, affectedRelation.Interface.Name);
+            Assert.Equal(relationDTO.RelationInterface!.Name, affectedRelation.Interface!.Name);
             Assert.Null(affectedRelation.Contract);
             Assert.Null(affectedRelation.FrequencyType);
 
@@ -371,6 +369,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var fromSystemUsage = await TakeSystemIntoUsageAsync(fromSystem.Uuid, organization.Uuid);
             var toSystem = await CreateItSystemAsync(organization.Uuid, CreateName());
             var toSystemUsage = await TakeSystemIntoUsageAsync(toSystem.Uuid, organization.Uuid);
+            var migrateToItSystem = await CreateItSystemAsync(organization.Uuid, CreateName());
 
             var contract = await CreateItContractAsync(organization.Uuid);
             await ItContractV2Helper.SendPatchSystemUsagesAsync(await GetGlobalToken(), contract.Uuid,
@@ -394,7 +393,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 });
 
             //Act
-            await ItSystemUsageMigrationV2Helper.ExecuteMigration(fromSystemUsage.Uuid, toSystem.Uuid);
+            await ItSystemUsageMigrationV2Helper.ExecuteMigration(fromSystemUsage.Uuid, migrateToItSystem.Uuid);
 
             //Assert
             await AssertSystemUsageAssociationExistsInContract(contract, fromSystemUsage);
@@ -427,6 +426,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var fromSystemUsage = await TakeSystemIntoUsageAsync(fromSystem.Uuid, organization.Uuid);
             var toSystem = await CreateItSystemAsync(organization.Uuid, CreateName());
             var toSystemUsage = await TakeSystemIntoUsageAsync(toSystem.Uuid, organization.Uuid);
+            var migrateToItSystem = await CreateItSystemAsync(organization.Uuid, CreateName());
 
             var interfaceDto = await CreateItInterfaceAsync(organization.Uuid);
             await InterfaceV2Helper.PatchExposedBySystemAsync(interfaceDto.Uuid, toSystem.Uuid);
@@ -439,7 +439,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 });
 
             //Act
-            await ItSystemUsageMigrationV2Helper.ExecuteMigration(fromSystemUsage.Uuid, toSystem.Uuid);
+            await ItSystemUsageMigrationV2Helper.ExecuteMigration(fromSystemUsage.Uuid, migrateToItSystem.Uuid);
 
             //Assert
             await AssertRelationExists(relation, fromSystemUsage, true);
@@ -540,7 +540,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
             var contractFromServer = await ItContractV2Helper.GetItContractAsync(token.Token, contract.Uuid);
 
-            Assert.Equal(1, contractFromServer.SystemUsages.Count(x => x.Uuid == usage.Uuid));
+            Assert.Equal(1, contractFromServer.SystemUsages.Count(x => x!.Uuid == usage.Uuid));
         }
 
         private static async Task AssertRelationExists(OutgoingSystemRelationResponseDTO expectedRelation, ItSystemUsageResponseDTO usage, bool hasInterface = false, bool hasFrequency = false, bool hasContract = false)
@@ -578,13 +578,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             }
         }
 
-        private static void AssertEqualNamedEntities(IdentityNamePairResponseDTO expected, IdentityNamePairResponseDTO actual)
+        private static void AssertEqualNamedEntities(IdentityNamePairResponseDTO? expected, IdentityNamePairResponseDTO? actual)
         {
-            Assert.Equal(expected.Uuid, actual.Uuid);
-            Assert.Equal(expected.Name, actual.Name);
+            Assert.Equal(expected?.Uuid, actual?.Uuid);
+            Assert.Equal(expected?.Name, actual?.Name);
         }
 
-        private async Task<(ItSystemResponseDTO system, ShallowOrganizationResponseDTO organization, Cookie cookie)> CreatePrerequisitesWithUser(OrganizationRole role, string systemName = null, AccessModifier accessModifier = AccessModifier.Local)
+        private async Task<(ItSystemResponseDTO system, ShallowOrganizationResponseDTO organization, Cookie cookie)> CreatePrerequisitesWithUser(OrganizationRole role, string? systemName = null, AccessModifier accessModifier = AccessModifier.Local)
         {
             var (system, organization) = await CreatePrerequisites(systemName, accessModifier);
             var user = await HttpApi.CreateUserAndLogin(CreateEmail(), role, organization.Uuid);
@@ -592,7 +592,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             return (system, organization, user.loginCookie);
         }
 
-        private async Task<(ItSystemResponseDTO system, ShallowOrganizationResponseDTO organization)> CreatePrerequisites(string systemName = null, AccessModifier accessModifier = AccessModifier.Local)
+        private async Task<(ItSystemResponseDTO system, ShallowOrganizationResponseDTO organization)> CreatePrerequisites(string? systemName = null, AccessModifier accessModifier = AccessModifier.Local)
         {
             var organization = await CreateOrganizationAsync();
             var system = await CreateItSystemAsync(organization.Uuid, systemName, accessModifier.ToChoice());

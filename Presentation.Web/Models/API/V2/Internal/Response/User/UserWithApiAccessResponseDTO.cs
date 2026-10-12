@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Presentation.Web.Models.API.V2.Internal.Response.User
 {
@@ -9,6 +10,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.User
         {
         }
 
+        [SetsRequiredMembers]
         public UserWithApiAccessResponseDTO(Guid uuid, string name, string email, bool apiAccess)
             : base(uuid, name, email)
         {

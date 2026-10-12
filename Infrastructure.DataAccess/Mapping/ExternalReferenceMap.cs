@@ -1,19 +1,22 @@
-﻿using Core.DomainModel;
+using Core.DomainModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-   public class ExternalReferenceMap : EntityMap<ExternalReference>
+    public class ExternalReferenceMap : EntityMap<ExternalReference>
     {
-        public ExternalReferenceMap() {
-            ToTable("ExternalReferences");
+        public override void Configure(EntityTypeBuilder<ExternalReference> builder)
+        {
+            base.Configure(builder);
+            builder.ToTable("ExternalReferences");
 
-            Property(t => t.Itcontract_Id).HasColumnName("ItContract_Id").IsOptional();
-            Property(t => t.ItSystemUsage_Id).HasColumnName("ItSystemUsage_Id").IsOptional();
-            Property(t => t.ItSystem_Id).HasColumnName("ItSystem_Id").IsOptional();
+            builder.Property(t => t.Itcontract_Id).HasColumnName("ItContract_Id");
+            builder.Property(t => t.ItSystemUsage_Id).HasColumnName("ItSystemUsage_Id");
+            builder.Property(t => t.ItSystem_Id).HasColumnName("ItSystem_Id");
 
-            Property(x => x.Uuid)
-                .IsRequired()
-                .HasUniqueIndexAnnotation("UX_ExternalReference_Uuid", 0);
+            builder.Property(x => x.Uuid).IsRequired();
+            builder.HasIndex(x => x.Uuid).IsUnique().HasDatabaseName("UX_ExternalReference_Uuid");
         }
     }
 }

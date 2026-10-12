@@ -1,37 +1,44 @@
-﻿using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Formatting;
-using System.Web.Http.Filters;
-using Presentation.Web.Infrastructure.Config;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace Presentation.Web.Infrastructure.Attributes
 {
     public class V2StyleJsonResponseSerializationAttribute : ActionFilterAttribute
     {
-        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
+        private static readonly JsonSerializerSettings V2Settings = new JsonSerializerSettings
         {
-            base.OnActionExecuted(actionExecutedContext);
-            if (DisableV2StyleEnumSerialization(actionExecutedContext))
-            {
-                return;
-            }
-            if (actionExecutedContext.Response.Content is ObjectContent { Formatter: JsonMediaTypeFormatter, Value: { } value })
-            {
-                //Take a copy of the existing (global) media type formatter and extend that with the StringEnumConverter
-                var updatedMediaTypeFormatter = V2JsonSerializationConfig.JsonMediaTypeFormatter;
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            TypeNameHandling = TypeNameHandling.Auto,
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
+            Converters = { new StringEnumConverter() }
+        };
 
-                //Update the response content
-                actionExecutedContext.Response.Content = new ObjectContent(value.GetType(), value, updatedMediaTypeFormatter, "application/json");
+        public override void OnActionExecuted(ActionExecutedContext context)
+        {
+            base.OnActionExecuted(context);
+
+            if (DisableV2StyleEnumSerialization(context))
+                return;
+
+            if (context.Result is ObjectResult objectResult)
+            {
+                context.Result = new JsonResult(objectResult.Value, V2Settings)
+                {
+                    StatusCode = objectResult.StatusCode
+                };
             }
         }
 
-        public bool DisableV2StyleEnumSerialization(HttpActionExecutedContext context)
+        private static bool DisableV2StyleEnumSerialization(ActionExecutedContext context)
         {
-            return context
-                       .Request
-                       .Headers
-                       .TryGetValues(KitosConstants.Headers.SerializeEnumAsInteger, out var values) &&
-                   values.Any(v => bool.TryParse(v, out var enabled) && enabled);
+            return context.HttpContext.Request.Headers
+                .TryGetValue(KitosConstants.Headers.SerializeEnumAsInteger, out var values) &&
+                values.Any(v => bool.TryParse(v, out var enabled) && enabled);
         }
     }
 }

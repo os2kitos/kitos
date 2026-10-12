@@ -30,9 +30,9 @@ namespace Digst.OioIdws.OioWsTrust.Utils
 
             // Apply private key, canonicalization method and signature method
             var signedXml = new SignedXmlWithIdResolvement(doc);
-            signedXml.SignedInfo.CanonicalizationMethod = SignedXml.XmlDsigExcC14NTransformUrl;
+            signedXml.SignedInfo!.CanonicalizationMethod = SignedXml.XmlDsigExcC14NTransformUrl;
             signedXml.SignedInfo.SignatureMethod = RsaPkcs1Sha256SignatureDescription.XmlDsigMoreRsaSha256Url;
-            signedXml.SigningKey = cert.PrivateKey;
+            signedXml.SigningKey = cert.GetRSAPrivateKey();
 
             // Make a reference for each element that must be signed.
             foreach (var id in ids)
@@ -61,7 +61,7 @@ namespace Digst.OioIdws.OioWsTrust.Utils
             nsManager.AddNamespace(SignatureCaseMessageTransformer.WssePrefix, SignatureCaseMessageTransformer.Wsse10Namespace);
             var securityNode = doc.SelectSingleNode("/" + SignatureCaseMessageTransformer.S11Prefix + ":Envelope/" + SignatureCaseMessageTransformer.S11Prefix + ":Header/" + SignatureCaseMessageTransformer.WssePrefix + ":Security", nsManager);
             var binarySecurityTokenNode = doc.SelectSingleNode("/" + SignatureCaseMessageTransformer.S11Prefix + ":Envelope/" + SignatureCaseMessageTransformer.S11Prefix + ":Header/" + SignatureCaseMessageTransformer.WssePrefix + ":Security/" + SignatureCaseMessageTransformer.WssePrefix + ":BinarySecurityToken", nsManager);
-            securityNode.InsertAfter(doc.ImportNode(signedXml.GetXml(), true), binarySecurityTokenNode);
+            securityNode!.InsertAfter(doc.ImportNode(signedXml.GetXml(), true), binarySecurityTokenNode);
 
             var signedDocument = ToXDocument(doc);
 
@@ -80,7 +80,7 @@ namespace Digst.OioIdws.OioWsTrust.Utils
             if (nodeList.Count == 0)
                 throw new InvalidOperationException("Document does not contain a signature to verify.");
 
-            signedXml.LoadXml((XmlElement)nodeList[0]);
+            signedXml.LoadXml((XmlElement)nodeList[0]!);
 
             return signedXml.CheckSignature(cert, true);
         }

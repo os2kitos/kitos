@@ -8,7 +8,7 @@ namespace Tests.Unit.Presentation.Web.Helpers
     public class DataProcessingRegistrationReadModelTestData
     {
         private static readonly Fixture Fixture = new();
-        public static DataProcessingRegistrationReadModel CreateReadModel(bool isActive, ItContract mainContract)
+        public static DataProcessingRegistrationReadModel CreateReadModel(bool isActive, ItContract? mainContract)
         {
             return new DataProcessingRegistrationReadModel
             {

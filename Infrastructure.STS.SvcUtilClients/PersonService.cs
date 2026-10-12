@@ -11097,22 +11097,7 @@ namespace Kombit.InfrastructureSamples.PersonService
         {
         }
         
-        public PersonPortTypeClient(string endpointConfigurationName) : 
-                base(endpointConfigurationName)
-        {
-        }
-        
-        public PersonPortTypeClient(string endpointConfigurationName, string remoteAddress) : 
-                base(endpointConfigurationName, remoteAddress)
-        {
-        }
-        
-        public PersonPortTypeClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
-                base(endpointConfigurationName, remoteAddress)
-        {
-        }
-        
-        public PersonPortTypeClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public PersonPortTypeClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
                 base(binding, remoteAddress)
         {
         }

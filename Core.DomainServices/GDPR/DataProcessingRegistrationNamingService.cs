@@ -22,7 +22,7 @@ namespace Core.DomainServices.GDPR
             return ValidateNewName(organizationId, name, Maybe<int>.None);
         }
 
-        public Maybe<OperationError> ChangeName(DataProcessingRegistration dataProcessingRegistration, string newName)
+        public Maybe<OperationError> ChangeName(DataProcessingRegistration dataProcessingRegistration, string? newName)
         {
             if (dataProcessingRegistration == null) throw new ArgumentNullException(nameof(dataProcessingRegistration));
 
@@ -38,7 +38,7 @@ namespace Core.DomainServices.GDPR
             return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> ValidateNewName(int organizationId, string name, Maybe<int> exceptId)
+        private Maybe<OperationError> ValidateNewName(int organizationId, string? name, Maybe<int> exceptId)
         {
             if (!DataProcessingRegistration.IsNameValid(name))
                 return new OperationError("Name is invalid", OperationFailure.BadInput);

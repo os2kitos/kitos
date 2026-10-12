@@ -1,4 +1,5 @@
 ﻿using System;
+// ReSharper disable InconsistentNaming
 
 namespace Core.DomainModel.BackgroundJobs
 {
@@ -13,7 +14,8 @@ namespace Core.DomainModel.BackgroundJobs
         DataProcessingRegistration_DataResponsible = 5,
         DataProcessingRegistration_OversightOption = 6,
         DataProcessingRegistration_ItContract = 7,
-        
+        DataProcessingRegistration_ItSystemUsage = 100,
+
         //IT-System usage
         ItSystemUsage = 8,
         ItSystemUsage_ItSystem = 9,
@@ -42,7 +44,10 @@ namespace Core.DomainModel.BackgroundJobs
         ItContract_ItSystemUsage = 61,
         ItContract_ItSystem = 62,
         ItContract_OptionExtendType = 63,
-        ItContract_TerminationDeadlineType = 64
+        ItContract_TerminationDeadlineType = 64,
+        ItContract_SupplierOverview = 65,
+        ItContract_SupplierOverview_CriticalityType = 66,
+        ItContract_SupplierOverview_Organization = 67
     }
 
     public class PendingReadModelUpdate : IHasId

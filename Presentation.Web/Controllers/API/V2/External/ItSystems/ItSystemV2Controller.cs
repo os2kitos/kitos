@@ -1,9 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Web.Http;
-using System.Web.Http.Results;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
@@ -20,12 +18,12 @@ using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Response.System;
 using Presentation.Web.Models.API.V2.SharedProperties;
-using Swashbuckle.Swagger.Annotations;
 using Core.ApplicationServices.System.Write;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Models.API.V2.Response.Generic.Hierarchy;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems
@@ -33,7 +31,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
     /// <summary>
     /// API for the system product master data (not local organization usage registrations) stored in KITOS.
     /// </summary>
-    [RoutePrefix("api/v2")]
+    [Route("api/v2")]
     public class ItSystemV2Controller : ExternalBaseController
     {
         private readonly IItSystemService _itSystemService;
@@ -73,26 +71,27 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
         /// <param name="usedInOrganizationUuid">Filter by UUID of an organization which has taken the it-system into use through an it-system-usage resource</param>
         /// <param name="nameContains">Include only systems with a name that contains the content in the parameter</param>
+        /// <param name="paginationQuery">Pagination query parameters</param>
         /// <param name="orderByProperty">Ordering property</param>
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItSystems(
+        [ApiResponse(typeof(IEnumerable<ItSystemResponseDTO>), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult GetItSystems(
             [NonEmptyGuid] Guid? rightsHolderUuid = null,
             [NonEmptyGuid] Guid? businessTypeUuid = null,
-            string kleNumber = null,
+            string? kleNumber = null,
             [NonEmptyGuid] Guid? kleUuid = null,
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             [NonEmptyGuid] Guid? usedInOrganizationUuid = null,
-            string nameContains = null,
+            string? nameContains = null,
             CommonOrderByProperty? orderByProperty = null,
-            [FromUri] BoundedPaginationQuery paginationQuery = null)
+            [FromQuery] BoundedPaginationQuery? paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -111,13 +110,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpPost]
         [Route("it-systems")]
-        [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PostItSystem([FromBody] CreateItSystemRequestDTO request)
+        [ApiResponse(typeof(ItSystemResponseDTO), HttpStatusCode.Created)]
+        [ApiResponse(HttpStatusCode.Conflict)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult PostItSystem([FromBody] CreateItSystemRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -136,13 +134,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpPatch]
         [Route("it-systems/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PatchItSystem([NonEmptyGuid] Guid uuid, [FromBody] UpdateItSystemRequestDTO request)
+        [ApiResponse(typeof(ItSystemResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        [ApiResponse(HttpStatusCode.Conflict)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult PatchItSystem([NonEmptyGuid] Guid uuid, [FromBody] UpdateItSystemRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -165,12 +163,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpDelete]
         [Route("it-systems/{uuid}")]
-        [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult DeleteItSystem([NonEmptyGuid] Guid uuid)
+        [ApiResponse(HttpStatusCode.NotFound)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult DeleteItSystem([NonEmptyGuid] Guid uuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -187,12 +184,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns>Specific data related to the IT-System</returns>
         [HttpGet]
         [Route("it-systems/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystem([NonEmptyGuid] Guid uuid)
+        [ApiResponse(typeof(ItSystemResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult GetItSystem([NonEmptyGuid] Guid uuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -210,11 +207,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems/{uuid}/hierarchy")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegistrationHierarchyNodeWithActivationStatusResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetHierarchy([NonEmptyGuid] Guid uuid)
+        [ApiResponse(typeof(IEnumerable<RegistrationHierarchyNodeWithActivationStatusResponseDTO>), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult GetHierarchy([NonEmptyGuid] Guid uuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -230,18 +227,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <param name="rightsHolderUuid">Optional filtering if a user is rights holder in multiple organizations and wishes to scope the request to a single one</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
+        /// <param name="paginationQuery"></param>
         /// <returns></returns>
         [HttpGet]
         [AllowRightsHoldersAccess]
         [Route("rightsholder/it-systems")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RightsHolderItSystemResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItSystemsByRightsHoldersAccess(
+        [ApiResponse(typeof(IEnumerable<RightsHolderItSystemResponseDTO>), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult GetItSystemsByRightsHoldersAccess(
             [NonEmptyGuid] Guid? rightsHolderUuid = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
-            [FromUri] BoundedPaginationQuery paginationQuery = null)
+            [FromQuery] BoundedPaginationQuery? paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -273,12 +271,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         [HttpGet]
         [AllowRightsHoldersAccess]
         [Route("rightsholder/it-systems/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RightsHolderItSystemResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystemByRightsHoldersAccess([NonEmptyGuid] Guid uuid)
+        [ApiResponse(typeof(RightsHolderItSystemResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult GetItSystemByRightsHoldersAccess([NonEmptyGuid] Guid uuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -297,13 +295,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         [HttpPost]
         [AllowRightsHoldersAccess]
         [Route("rightsholder/it-systems")]
-        [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(RightsHolderItSystemResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public IHttpActionResult PostItSystemAsRightsHolder([FromBody] RightsHolderFullItSystemRequestDTO request)
+        [ApiResponse(typeof(RightsHolderItSystemResponseDTO), HttpStatusCode.Created)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.Conflict)]
+        public IActionResult PostItSystemAsRightsHolder([FromBody] RightsHolderFullItSystemRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -323,16 +320,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 		/// NOTE: Only active systems can be modified.
         /// </summary>
         /// <param name="uuid">Specific IT-System UUID</param>
+        /// <param name="request">IT-System data to update</param>
         /// <returns>The updated IT-System</returns>
         [HttpPut]
         [AllowRightsHoldersAccess]
         [Route("rightsholder/it-systems/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RightsHolderItSystemResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderFullItSystemRequestDTO request)
+        [ApiResponse(typeof(RightsHolderItSystemResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult PutItSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderFullItSystemRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -350,16 +348,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// NOTE: Only active systems can be modified.
         /// </summary>
         /// <param name="uuid">Specific IT-System UUID</param>
+        /// <param name="request">IT-System data to update</param>
         /// <returns>The updated IT-System</returns>
         [HttpPatch]
         [AllowRightsHoldersAccess]
         [Route("rightsholder/it-systems/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RightsHolderItSystemResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PatchItSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderUpdateSystemPropertiesRequestDTO request)
+        [ApiResponse(typeof(RightsHolderItSystemResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult PatchItSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderUpdateSystemPropertiesRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -380,13 +379,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns>No content</returns>
         [HttpDelete]
         [AllowRightsHoldersAccess]
+        [Consumes("application/json")]
         [Route("rightsholder/it-systems/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.NoContent)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeactivateSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
+        [ApiResponse(HttpStatusCode.NoContent)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult DeactivateSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -394,7 +394,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             return _rightsHolderSystemService
                 .DeactivateAsRightsHolder(uuid, request.DeactivationReason)
                 .Select(_systemResponseMapper.ToRightsHolderResponseDTO)
-                .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);
+                .Match(_ => StatusCode((int)HttpStatusCode.NoContent), FromOperationError);
         }
 
         /// <summary>
@@ -404,11 +404,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems/{systemUuid}/permissions")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemPermissionsResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystemPermissions([NonEmptyGuid] Guid systemUuid)
+        [ApiResponse(typeof(ItSystemPermissionsResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult GetItSystemPermissions([NonEmptyGuid] Guid systemUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -427,11 +427,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems/permissions")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourceCollectionPermissionsResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystemCollectionPermissions([Required][NonEmptyGuid] Guid organizationUuid)
+        [ApiResponse(typeof(ResourceCollectionPermissionsResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult GetItSystemCollectionPermissions([Required][NonEmptyGuid] Guid organizationUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -446,16 +446,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// Creates an external reference for the system
         /// </summary>
         /// <param name="systemUuid"></param>
+        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("it-systems/{systemUuid}/external-references")]
-        [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ExternalReferenceDataResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PostExternalReference([NonEmptyGuid] Guid systemUuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
+        [ApiResponse(typeof(ExternalReferenceDataResponseDTO), HttpStatusCode.Created)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult PostExternalReference([NonEmptyGuid] Guid systemUuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -465,23 +465,24 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             return _writeService
                 .AddExternalReference(systemUuid, properties)
                 .Select(_referenceResponseMapper.MapExternalReference)
-                .Match(reference => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{systemUuid}/external-references/{reference.Uuid}", reference), FromOperationError);
+                .Match(reference => Created($"{new Uri($"{Request.Scheme}://{Request.Host}{Request.Path}").AbsoluteUri.TrimEnd('/')}/{systemUuid}/external-references/{reference.Uuid}", reference), FromOperationError);
         }
 
         /// <summary>
         /// Updates a system external reference
         /// </summary>
-        /// <param name="systemUuid"></param>
-        /// <param name="externalReferenceUuid"></param>
+        /// <param name="systemUuid">UUID of the system</param>
+        /// <param name="externalReferenceUuid">UUID of the external reference</param>
+        /// <param name="dto">External reference data</param>
         /// <returns></returns>
         [HttpPut]
         [Route("it-systems/{systemUuid}/external-references/{externalReferenceUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ExternalReferenceDataResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutExternalReference([NonEmptyGuid] Guid systemUuid, [NonEmptyGuid] Guid externalReferenceUuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
+        [ApiResponse(typeof(ExternalReferenceDataResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult PutExternalReference([NonEmptyGuid] Guid systemUuid, [NonEmptyGuid] Guid externalReferenceUuid, [FromBody] ExternalReferenceDataWriteRequestDTO dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -502,13 +503,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <returns></returns>
         [HttpDelete]
         [Route("it-systems/{systemUuid}/external-references/{externalReferenceUuid}")]
-        [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.NoContent)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult DeleteExternalReference([NonEmptyGuid] Guid systemUuid, [NonEmptyGuid] Guid externalReferenceUuid)
+        [ApiResponse(HttpStatusCode.NoContent)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult DeleteExternalReference([NonEmptyGuid] Guid systemUuid, [NonEmptyGuid] Guid externalReferenceUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -518,9 +518,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
                 .Match(_ => NoContent(), FromOperationError);
         }
 
-        private CreatedNegotiatedContentResult<T> MapSystemCreatedResponse<T>(T dto) where T : IHasUuidExternal
+        private IActionResult MapSystemCreatedResponse<T>(T dto) where T : IHasUuidExternal
         {
-            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
+            return Created($"{new Uri($"{Request.Scheme}://{Request.Host}{Request.Path}").AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }
     }
 }
+
+

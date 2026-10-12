@@ -14,7 +14,7 @@ namespace Tests.Integration.Presentation.Web.Users.V2
         {
             var organization = await CreateOrganizationAsync();
             var user = await CreateUserAsync(organization.Uuid);
-            var request = new RequestPasswordResetRequestDTO { Email = user.Email };
+            var request = new RequestPasswordResetRequestDTO { Email = user.Email! };
             
             var result = await PasswordResetV2Helper.PostPasswordReset(request);
 

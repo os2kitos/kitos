@@ -11,7 +11,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.DPR
 {
     public class DataProcessingRegistrationInternalV2Helper
     {
-        public static async Task<IEnumerable<DataProcessingRegistrationResponseDTO>> GetDPRsAsync(Cookie cookie, Guid organizationUuid, int page = 0, int pageSize = 10, string nameContains = null, DateTime? changedSinceGtEq = null)
+        public static async Task<IEnumerable<DataProcessingRegistrationResponseDTO>> GetDPRsAsync(Cookie cookie, Guid organizationUuid, int page = 0, int pageSize = 10, string? nameContains = null, DateTime? changedSinceGtEq = null)
         {
             using var response = await SendGetDPRsAsync(cookie, organizationUuid, page, pageSize, nameContains, changedSinceGtEq);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -19,7 +19,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.DPR
             return await response.ReadResponseBodyAsAsync<IEnumerable<DataProcessingRegistrationResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetDPRsAsync(Cookie cookie, Guid organizationUuid, int page = 0, int pageSize = 10, string nameContains = null, DateTime? changedSinceGtEq = null)
+        public static async Task<HttpResponseMessage> SendGetDPRsAsync(Cookie cookie, Guid organizationUuid, int page = 0, int pageSize = 10, string? nameContains = null, DateTime? changedSinceGtEq = null)
         {
             var queryParameters = new List<KeyValuePair<string, string>>
             {

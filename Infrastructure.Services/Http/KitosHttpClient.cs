@@ -28,7 +28,7 @@ public class KitosHttpClient : IKitosHttpClient
             Content = payload
         };
 
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        request.Headers.Authorization = new AuthenticationHeaderValue(AuthenticationSchemes.Bearer, token);
         try
         {
             return await _httpClient.SendAsync(request);
@@ -36,7 +36,7 @@ public class KitosHttpClient : IKitosHttpClient
         catch (Exception e)
         {
             _logger.Warning($"Failed to send to {request.RequestUri}, payload: {serializedObject}, exception: {e}");
-            throw e;
+            throw;
         }
 
     }

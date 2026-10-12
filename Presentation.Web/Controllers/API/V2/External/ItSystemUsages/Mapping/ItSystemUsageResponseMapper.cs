@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
@@ -44,8 +44,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 SystemContext = systemUsage.ItSystem.MapIdentityNamePairDTO(),
                 OrganizationContext = systemUsage.Organization.MapShallowOrganizationResponseDTO(),
                 CreatedBy = systemUsage.ObjectOwner?.MapIdentityNamePairDTO(),
+                CreatedAt = systemUsage.Concluded,
                 LastModified = systemUsage.LastChanged,
-                LastModifiedBy = systemUsage.LastChangedByUser?.MapIdentityNamePairDTO(),
+                LastModifiedBy = systemUsage.LastChangedByUser.MapIdentityNamePairDTO(),
                 General = MapGeneral(systemUsage),
                 Roles = MapRoles(systemUsage),
                 LocalKLEDeviations = MapKle(systemUsage),
@@ -65,18 +66,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
             return new GDPRRegistrationsResponseDTO
             {
-                Purpose = systemUsage.GeneralPurpose,
-                BusinessCritical = MapYesNoExtended(systemUsage.isBusinessCritical),
-                DPIAConducted = MapYesNoExtended(systemUsage.DPIA),
+                ProcessingPurpose = systemUsage.ProcessingPurpose,
+                DPIAConducted = MapYesNoDontKnow(systemUsage.DPIA),
                 DPIADate = systemUsage.DPIADateFor,
                 DPIADocumentation = MapSimpleLink(systemUsage.DPIASupervisionDocumentationUrlName, systemUsage.DPIASupervisionDocumentationUrl),
-                HostedAt = MapHosting(systemUsage),
                 DirectoryDocumentation = MapSimpleLink(systemUsage.LinkToDirectoryUrlName, systemUsage.LinkToDirectoryUrl),
                 DataSensitivityLevels = systemUsage
                     .SensitiveDataLevels
                     .Select(MapDataSensitivity)
                     .Where(level => level.HasValue)
-                    .Select(level => level.Value)
+                    .Select(level => level!.Value)
                     .ToList(),
                 SpecificPersonalData = systemUsage.PersonalDataOptions.Select(x => x.PersonalData.ToGDPRPersonalDataChoice()).ToList(),
                 SensitivePersonData = attachedOptions
@@ -89,22 +88,28 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                     .Where(option => registerTypesMap.Value.ContainsKey(option.OptionId))
                     .Select(option => registerTypesMap.Value[option.OptionId].MapIdentityNamePairDTO())
                     .ToList(),
-                TechnicalPrecautionsInPlace = MapYesNoExtended(systemUsage.precautions),
+                TechnicalPrecautionsInPlace = MapYesNoDontKnow(systemUsage.precautions),
                 TechnicalPrecautionsApplied = MapPrecautions(systemUsage).ToList(),
                 TechnicalPrecautionsDocumentation = MapSimpleLink(systemUsage.TechnicalSupervisionDocumentationUrlName, systemUsage.TechnicalSupervisionDocumentationUrl),
-                RetentionPeriodDefined = MapYesNoExtended(systemUsage.answeringDataDPIA),
+                RetentionPeriodDefined = MapYesNoDontKnow(systemUsage.answeringDataDPIA),
                 DataRetentionEvaluationFrequencyInMonths = systemUsage.numberDPIA,
                 NextDataRetentionEvaluationDate = systemUsage.DPIAdeleteDate,
-                RiskAssessmentConducted = MapYesNoExtended(systemUsage.riskAssessment),
+                RiskAssessmentConducted = systemUsage.riskAssessment?.ToChoice(),
                 RiskAssessmentConductedDate = systemUsage.riskAssesmentDate,
                 RiskAssessmentDocumentation = MapSimpleLink(systemUsage.RiskSupervisionDocumentationUrlName, systemUsage.RiskSupervisionDocumentationUrl),
                 RiskAssessmentNotes = systemUsage.noteRisks,
                 RiskAssessmentResult = MapRiskAssessment(systemUsage),
                 PlannedRiskAssessmentDate = systemUsage.PlannedRiskAssessmentDate,
-                UserSupervision = MapYesNoExtended(systemUsage.UserSupervision),
+                UserSupervision = MapYesNoDontKnow(systemUsage.UserSupervision),
                 UserSupervisionDate = systemUsage.UserSupervisionDate,
-                UserSupervisionDocumentation = MapSimpleLink(systemUsage.UserSupervisionDocumentationUrlName, systemUsage.UserSupervisionDocumentationUrl)
+                UserSupervisionDocumentation = MapSimpleLink(systemUsage.UserSupervisionDocumentationUrlName, systemUsage.UserSupervisionDocumentationUrl),
+                IsDataProcessingAgreementRequired = MapIsDataProcessingAgreementRequired(systemUsage.IsDataProcessingAgreementRequired)
             };
+        }
+
+        private IsDataProcessingAgreementRequiredChoice? MapIsDataProcessingAgreementRequired(IsDataProcessingAgreementRequired? source) {
+            if (source is null) return null;
+            return source.Value.ToChoice();
         }
 
         private ArchivingRegistrationsResponseDTO MapArchiving(ItSystemUsage systemUsage)
@@ -120,7 +125,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 TestLocation = systemUsage.ArchiveTestLocation?.MapIdentityNamePairDTO(),
                 Type = systemUsage.ArchiveType?.MapIdentityNamePairDTO(),
                 Supplier = systemUsage.ArchiveSupplier?.MapShallowOrganizationResponseDTO(),
-                JournalPeriods = systemUsage.ArchivePeriods.Select(period => MapJournalPeriodResponseDto(period)).ToList()
+                JournalPeriods = systemUsage.ArchivePeriods.Select(MapJournalPeriodResponseDto).ToList()
             };
         }
 
@@ -181,6 +186,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                     ValidAccordingToValidityPeriod = systemUsage.IsActiveAccordingToDateFields,
                     ValidAccordingToLifeCycle = systemUsage.IsActiveAccordingToLifeCycle,
                     ValidAccordingToMainContract = systemUsage.IsActiveAccordingToMainContract,
+                    MainContractState = systemUsage.MainContractState.ToMainContractStateChoice(),
                     LifeCycleStatus = MapLifeCycleStatus(systemUsage),
                     ValidFrom = systemUsage.Concluded,
                     ValidTo = systemUsage.ExpirationDate
@@ -188,7 +194,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 ContainsAITechnology = systemUsage.ContainsAITechnology?.ToYesNoUndecidedChoice(),
                 WebAccessibilityCompliance = systemUsage.WebAccessibilityCompliance?.ToYesNoPartiallyChoice(),
                 LastWebAccessibilityCheck = systemUsage.LastWebAccessibilityCheck,
-                WebAccessibilityNotes = systemUsage.WebAccessibilityNotes
+                WebAccessibilityNotes = systemUsage.WebAccessibilityNotes,
+                IsSociallyCritical = MapYesNoDontKnow(systemUsage.IsSociallyCritical),
+                IsBusinessCritical = MapYesNoDontKnow(systemUsage.isBusinessCritical),
+                CriticalityFieldsLastChanged = systemUsage.CriticalityFieldsLastChanged,
+                SystemUsageCriticalityLevel = systemUsage.SystemUsageCriticalityLevel?.MapIdentityNamePairDTO(),
+                CriticalityLevelDocumentation = MapSimpleLink(systemUsage.CriticalityLevelDocumentationName, systemUsage.CriticalityLevelDocumentationUrl),
+                Purpose = systemUsage.GeneralPurpose,
+                TechnicalSystemTypes = (systemUsage.TechnicalSystemTypes ?? Array.Empty<TechnicalSystemType>()).Select(x => x.MapIdentityNamePairDTO()).ToList(),
+                HostedAt = MapHosting(systemUsage),
+                LicensingAndCodeModels = (systemUsage.LicensingAndCodeModels ?? []).Select(x => x.ToChoice()).ToList()
             };
         }
 
@@ -212,7 +227,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return systemUsage.HostedAt?.ToHostingChoice();
         }
 
-        private static SimpleLinkDTO MapSimpleLink(string name, string url)
+        private static SimpleLinkDTO MapSimpleLink(string? name, string? url)
         {
             return new()
             {
@@ -221,7 +236,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private static YesNoDontKnowChoice? MapYesNoExtended(DataOptions? input)
+        private static YesNoDontKnowChoice? MapYesNoDontKnow(DataOptions? input)
         {
             return input?.ToYesNoDontKnowChoice();
         }
@@ -255,6 +270,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return MapSharedRelationProperties(systemRelation, dto);
         }
 
+        public IEnumerable<OutgoingSystemRelationResponseDTO> MapOutgoingSystemRelationDTOs(IEnumerable<SystemRelation> systemRelations)
+        {
+            return systemRelations.Select(MapOutgoingSystemRelationDTO);
+        }
+
         public IncomingSystemRelationResponseDTO MapIncomingSystemRelationDTO(SystemRelation systemRelation)
         {
             var dto = new IncomingSystemRelationResponseDTO
@@ -284,15 +304,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private static ExpectedUsersIntervalDTO MapExpectedUsers(ItSystemUsage systemUsage)
+        private static ExpectedUsersIntervalDTO? MapExpectedUsers(ItSystemUsage systemUsage)
         {
             return systemUsage.UserCount switch
             {
                 null or UserCount.UNDECIDED => null,
                 UserCount.BELOWTEN => new ExpectedUsersIntervalDTO { LowerBound = 0, UpperBound = 9 },
-                UserCount.TENTOFIFTY => new ExpectedUsersIntervalDTO { LowerBound = 10, UpperBound = 50 },
-                UserCount.FIFTYTOHUNDRED => new ExpectedUsersIntervalDTO { LowerBound = 50, UpperBound = 100 },
-                UserCount.HUNDREDPLUS => new ExpectedUsersIntervalDTO { LowerBound = 100 },
+                UserCount.TENTOFORTYNINE => new ExpectedUsersIntervalDTO { LowerBound = 10, UpperBound = 49 },
+                UserCount.FIFTYTONINETYNINE => new ExpectedUsersIntervalDTO { LowerBound = 50, UpperBound = 99 },
+                UserCount.HUNDREDTOFOURHUNDREDNINETYNINE => new ExpectedUsersIntervalDTO { LowerBound = 100, UpperBound = 499 },
+                UserCount.FIVEHUNDREDPLUS => new ExpectedUsersIntervalDTO { LowerBound = 500},
                 _ => throw new ArgumentOutOfRangeException(nameof(systemUsage.UserCount))
             };
         }

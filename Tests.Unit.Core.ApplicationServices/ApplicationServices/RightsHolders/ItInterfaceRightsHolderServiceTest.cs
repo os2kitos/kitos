@@ -33,13 +33,9 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
         private readonly Mock<IItInterfaceService> _interfaceServiceMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
-        private readonly Mock<ILogger> _logger;
         private readonly Mock<IGlobalAdminNotificationService> _globalAdminNotificationServiceMock;
         private readonly Mock<IUserRepository> _userRepositoryMock;
-        private readonly Mock<IOperationClock> _operationClockMock;
         private readonly Mock<IItInterfaceWriteService> _writeServiceMock;
-        private readonly Mock<IDomainEvents> _domainEventsMock;
-        private readonly Mock<IDatabaseControl> _databaseControlMock;
 
         public ItInterfaceRightsHolderServiceTest()
         {
@@ -47,26 +43,26 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();
             _interfaceServiceMock = new Mock<IItInterfaceService>();
             _transactionManagerMock = new Mock<ITransactionManager>();
-            _logger = new Mock<ILogger>();
+            var logger = new Mock<ILogger>();
             _globalAdminNotificationServiceMock = new Mock<IGlobalAdminNotificationService>();
             _userRepositoryMock = new Mock<IUserRepository>();
-            _operationClockMock = new Mock<IOperationClock>();
+            var operationClockMock = new Mock<IOperationClock>();
 
             _writeServiceMock = new Mock<IItInterfaceWriteService>();
-            _domainEventsMock = new Mock<IDomainEvents>();
-            _databaseControlMock = new Mock<IDatabaseControl>();
+            var domainEventsMock = new Mock<IDomainEvents>();
+            var databaseControlMock = new Mock<IDatabaseControl>();
             _sut = new ItInterfaceRightsHolderService(
                 _userContextMock.Object,
                 _organizationRepositoryMock.Object,
                 _interfaceServiceMock.Object,
                 _transactionManagerMock.Object,
-                _logger.Object,
+                logger.Object,
                 _globalAdminNotificationServiceMock.Object,
                 _userRepositoryMock.Object,
-                _operationClockMock.Object,
+                operationClockMock.Object,
                 _writeServiceMock.Object,
-                _domainEventsMock.Object,
-                _databaseControlMock.Object);
+                domainEventsMock.Object,
+                databaseControlMock.Object);
         }
 
         [Fact]
@@ -74,10 +70,9 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             ExpectUserHasRightsHolderAccessReturns(false);
-            var refinements = new List<IDomainQuery<ItInterface>>();
 
             //Act
-            var result = _sut.GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(refinements);
+            var result = _sut.GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(new List<IDomainQuery<ItInterface>>());
 
             //Assert
             Assert.True(result.Failed);
@@ -92,10 +87,9 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var expectedResponse = Mock.Of<IQueryable<ItInterface>>();
             _userContextMock.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(Many<int>());
             _interfaceServiceMock.Setup(x => x.GetAvailableInterfaces(It.IsAny<IDomainQuery<ItInterface>>())).Returns(expectedResponse);
-            var refinements = new List<IDomainQuery<ItInterface>>();
 
             //Act
-            var result = _sut.GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(refinements);
+            var result = _sut.GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(new List<IDomainQuery<ItInterface>>());
 
             //Assert
             Assert.True(result.Ok);
@@ -542,7 +536,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
 
         private void ExpectHasSpecificAccessReturns(ItInterface itInterface, bool value)
         {
-            _userContextMock.Setup(x => x.HasRole(itInterface.ExhibitedBy.ItSystem.BelongsToId.Value, OrganizationRole.RightsHolderAccess))
+            _userContextMock.Setup(x => x.HasRole(itInterface.ExhibitedBy.ItSystem.BelongsToId!.Value, OrganizationRole.RightsHolderAccess))
                 .Returns(value);
         }
 

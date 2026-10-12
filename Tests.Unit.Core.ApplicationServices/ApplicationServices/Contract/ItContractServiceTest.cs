@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Core.Abstractions.Types;
+﻿using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Contracts;
@@ -22,6 +19,9 @@ using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -92,7 +92,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         {
             //Arrange
             var contractId = A<int>();
-            ExpectGetContractReturns(contractId, default);
+            ExpectGetContractReturns(contractId, null);
 
             //Act
             var result = _sut.Delete(contractId);
@@ -120,6 +120,26 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         }
 
         [Fact]
+        public void Delete_CanDelete_WithAssociatedAgreementElementTypes()
+        {
+            var contractId = A<int>();
+            var itContract = new ItContract() {  Id = contractId };
+            var agreementElementType = new ItContractAgreementElementTypes()
+            {
+                AgreementElementType = new AgreementElementType(),
+                AgreementElementType_Id = 1,
+                ItContract = itContract,
+                ItContract_Id = itContract.Id
+            };
+            var transaction = new Mock<IDatabaseTransaction>();
+            SetupDeleteSuccess(itContract, contractId, transaction.Object);
+            
+            var result = _sut.Delete(contractId);
+
+            Assert.True(result.Ok);
+        }
+
+        [Fact]
         public void Delete_Deletes_EconomyStreams_And_Raises_Domain_Event_And_Returns_Ok()
         {
             //Arrange
@@ -134,10 +154,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 InternEconomyStreams = new List<EconomyStream> { internEconomyStream1, internEconomyStream2 }
             };
             var transaction = new Mock<IDatabaseTransaction>();
-            ExpectGetContractReturns(contractId, itContract);
-            ExpectAllowDeleteReturns(itContract, true);
-            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
-            _referenceService.Setup(x => x.DeleteByContractId(contractId)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new List<ExternalReference>()));
+            SetupDeleteSuccess(itContract, contractId, transaction.Object);
 
             //Act
             var result = _sut.Delete(contractId);
@@ -347,10 +364,10 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             Assert.Equal(2, contracts.Count());
-            var result1 = Assert.Single(contracts.Where(x => x.OrganizationId == org1));
+            var result1 = Assert.Single(contracts, x => x.OrganizationId == org1);
             Assert.Same(contract1, result1);
 
-            var result2 = Assert.Single(contracts.Where(x => x.OrganizationId == org2));
+            var result2 = Assert.Single(contracts, x => x.OrganizationId == org2);
             Assert.Same(contract2, result2);
         }
 
@@ -862,7 +879,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _authorizationContext.Setup(x => x.AllowModify(itContract)).Returns(value);
         }
 
-        private void ExpectGetContractReturns(int contractId, ItContract itContract)
+        private void ExpectGetContractReturns(int contractId, ItContract? itContract)
         {
             _contractRepository.Setup(x => x.GetById(contractId)).Returns(itContract);
         }
@@ -973,6 +990,14 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private void ExpectAllowCreateReturns(int organizationId, bool value)
         {
             _authorizationContext.Setup(x => x.AllowCreate<ItContract>(organizationId)).Returns(value);
+        }
+
+        private void SetupDeleteSuccess(ItContract itContract, int contractId, IDatabaseTransaction transaction)
+        {
+            ExpectGetContractReturns(contractId, itContract);
+            ExpectAllowDeleteReturns(itContract, true);
+            _referenceService.Setup(x => x.DeleteByContractId(contractId)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new List<ExternalReference>()));
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction);
         }
     }
 }

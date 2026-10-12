@@ -36,10 +36,8 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
         {
             var organizationDto = await CreateOrganizationAsync(type: OrganizationType.OtherPublicAuthority);
             var (_, _, loginCookie) = await HttpApi.CreateUserAndLogin($"email{A<Guid>():N}@test.dk", OrganizationRole.LocalAdmin, organizationDto.Uuid);
-            var content = new MultipartFormDataContent
-            {
-                new ByteArrayContent(Resources.valid_it_contract_example)
-            };
+            var content = new MultipartFormDataContent();
+            content.Add(new ByteArrayContent(Resources.valid_it_contract_example), "file", "import.xlsx");
             return (organizationDto, loginCookie, content);
         }
 
@@ -60,10 +58,8 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             //Arrange
             var organizationDto = await CreateOrganizationAsync(type: OrganizationType.OtherPublicAuthority);
             var (_, _, loginCookie) = await HttpApi.CreateUserAndLogin($"email{A<Guid>():N}@test.dk", OrganizationRole.LocalAdmin, organizationDto.Uuid);
-            var content = new MultipartFormDataContent
-            {
-                new ByteArrayContent(Resources.invalid_contract_example)
-            };
+            var content = new MultipartFormDataContent();
+            content.Add(new ByteArrayContent(Resources.invalid_contract_example), "file", "import.xlsx");
 
             //Act
             using var response = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"{ExcelApiPrefix}/{ByUuidApiPrefix}?organizationUuid={organizationDto.Uuid}"), loginCookie, content);

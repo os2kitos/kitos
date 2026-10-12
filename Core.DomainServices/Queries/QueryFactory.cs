@@ -17,7 +17,7 @@ namespace Core.DomainServices.Queries
                 typeof(QueryByOrganizationId<>)
                     .MakeGenericType(typeof(T))
                     .GetConstructor(new[] { typeof(int) });
-            return (IDomainQuery<T>)constructor?.Invoke(new object[] { organizationId });
+            return (IDomainQuery<T>)constructor!.Invoke(new object[] { organizationId });
         }
 
         public static IDomainQuery<T> ByOrganizationIds<T>(IEnumerable<int> organizationIds)
@@ -26,7 +26,7 @@ namespace Core.DomainServices.Queries
                 typeof(QueryByOrganizationIds<>)
                     .MakeGenericType(typeof(T))
                     .GetConstructor(new[] { typeof(IEnumerable<int>) });
-            return (IDomainQuery<T>)constructor?.Invoke(new object[] { organizationIds });
+            return (IDomainQuery<T>)constructor!.Invoke(new object[] { organizationIds });
         }
 
         public static IDomainQuery<T> ByOrganizationId<T>(int organizationId, OrganizationDataReadAccessLevel accessLevel)
@@ -63,7 +63,7 @@ namespace Core.DomainServices.Queries
                 typeof(QueryByAccessModifier<>)
                     .MakeGenericType(typeof(T))
                     .GetConstructor(new[] { typeof(AccessModifier) });
-            return (IDomainQuery<T>)constructor?.Invoke(new object[] { AccessModifier.Public });
+            return (IDomainQuery<T>)constructor!.Invoke(new object[] { AccessModifier.Public });
         }
 
         public static IDomainQuery<T> ByPublicAccessOrOrganizationId<T>(int organizationId)
@@ -72,7 +72,7 @@ namespace Core.DomainServices.Queries
                 typeof(QueryByPublicAccessOrOrganizationId<>)
                     .MakeGenericType(typeof(T))
                     .GetConstructor(new[] { typeof(int) });
-            return (IDomainQuery<T>)constructor?.Invoke(new object[] { organizationId });
+            return (IDomainQuery<T>)constructor!.Invoke(new object[] { organizationId });
         }
 
         public static IDomainQuery<T> ByPublicAccessOrOrganizationIds<T>(IEnumerable<int> organizationIds) where T : class
@@ -81,7 +81,7 @@ namespace Core.DomainServices.Queries
                 typeof(QueryByPublicAccessOrOrganizationIds<>)
                     .MakeGenericType(typeof(T))
                     .GetConstructor(new[] { typeof(IEnumerable<int>) });
-            return (IDomainQuery<T>)constructor?.Invoke(new object[] { organizationIds });
+            return (IDomainQuery<T>)constructor!.Invoke(new object[] { organizationIds });
         }
     }
 }

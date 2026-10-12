@@ -1,29 +1,31 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.UIConfiguration;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class UIModuleCustomizationMap : EntityTypeConfiguration<UIModuleCustomization>
+    public class UIModuleCustomizationMap : IEntityTypeConfiguration<UIModuleCustomization>
     {
-        public UIModuleCustomizationMap()
+        public void Configure(EntityTypeBuilder<UIModuleCustomization> builder)
         {
-            HasKey(x => x.Id);
-            
-            Property(x => x.Module)
+            builder.HasKey(x => x.Id);
+
+            builder.Property(x => x.Module)
                 .HasMaxLength(UIModuleCustomizationConstraints.MaxModuleLength)
                 .IsRequired();
 
-            Property(x => x.OrganizationId)
+            builder.Property(x => x.OrganizationId)
                 .IsRequired();
 
-            HasIndex(x => new { x.OrganizationId, x.Module })
-                .IsUnique(true)
-                .HasName("UX_OrganizationId_UIModuleCustomization_Module");
+            builder.HasIndex(x => new { x.OrganizationId, x.Module })
+                .IsUnique()
+                .HasDatabaseName("UX_OrganizationId_UIModuleCustomization_Module");
 
-            HasRequired(t => t.Organization)
+            builder.HasOne(t => t.Organization)
                 .WithMany(t => t.UIModuleCustomizations)
                 .HasForeignKey(d => d.OrganizationId)
-                .WillCascadeOnDelete(true);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

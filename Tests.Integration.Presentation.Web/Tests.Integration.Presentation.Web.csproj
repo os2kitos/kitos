@@ -1,333 +1,49 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\xunit.runner.visualstudio.2.4.5\build\net462\xunit.runner.visualstudio.props" Condition="Exists('..\packages\xunit.runner.visualstudio.2.4.5\build\net462\xunit.runner.visualstudio.props')" />
-  <Import Project="..\packages\xunit.runner.console.2.4.2\build\xunit.runner.console.props" Condition="Exists('..\packages\xunit.runner.console.2.4.2\build\xunit.runner.console.props')" />
-  <Import Project="..\packages\xunit.core.2.4.2\build\xunit.core.props" Condition="Exists('..\packages\xunit.core.2.4.2\build\xunit.core.props')" />
-  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{46D4551A-7301-456B-A9BA-1E0621C09112}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tests.Integration.Presentation.Web</RootNamespace>
-    <AssemblyName>Tests.Integration.Presentation.Web</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFramework>net10.0</TargetFramework>
+    <PlatformTarget Condition="'$(ContainerBuild)' != 'true'">x64</PlatformTarget>
     <LangVersion>latest</LangVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>true</Deterministic>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoFixture, Version=4.17.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoFixture.4.17.0\lib\net452\AutoFixture.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Core, Version=5.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Castle.Core.5.1.0\lib\net462\Castle.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="CsvHelper, Version=28.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
-      <HintPath>..\packages\CsvHelper.28.0.1\lib\net47\CsvHelper.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-    </Reference>
-    <Reference Include="ExpectedObjects, Version=3.5.4.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExpectedObjects.3.5.4\lib\net40\ExpectedObjects.dll</HintPath>
-    </Reference>
-    <Reference Include="Fare, Version=2.2.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
-      <HintPath>..\packages\Fare.2.2.1\lib\net35\Fare.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.4, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.9.0.4\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.HashCode.1.1.1\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Bcl.Memory, Version=9.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.Memory.9.0.0\lib\net462\Microsoft.Bcl.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Bcl.TimeProvider, Version=8.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.TimeProvider.8.0.1\lib\net462\Microsoft.Bcl.TimeProvider.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=2.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.2.1.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.IdentityModel.Abstractions, Version=8.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Abstractions.8.9.0\lib\net472\Microsoft.IdentityModel.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.IdentityModel.JsonWebTokens, Version=8.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.JsonWebTokens.8.9.0\lib\net472\Microsoft.IdentityModel.JsonWebTokens.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.IdentityModel.Logging, Version=8.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Logging.8.9.0\lib\net472\Microsoft.IdentityModel.Logging.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.IdentityModel.Tokens, Version=8.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.IdentityModel.Tokens.8.9.0\lib\net472\Microsoft.IdentityModel.Tokens.dll</HintPath>
-    </Reference>
-    <Reference Include="Moq, Version=4.18.0.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <HintPath>..\packages\Moq.4.18.2\lib\net462\Moq.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Polly, Version=7.0.0.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Polly.7.2.3\lib\net472\Polly.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Diagnostics.DiagnosticSource, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.8.0.0\lib\net462\System.Diagnostics.DiagnosticSource.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IdentityModel.Tokens.Jwt, Version=8.9.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.IdentityModel.Tokens.Jwt.8.9.0\lib\net472\System.IdentityModel.Tokens.Jwt.dll</HintPath>
-    </Reference>
-    <Reference Include="System.IO.Pipelines, Version=9.0.0.4, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.IO.Pipelines.9.0.4\lib\net462\System.IO.Pipelines.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Encodings.Web, Version=9.0.0.4, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encodings.Web.9.0.4\lib\net462\System.Text.Encodings.Web.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Json, Version=9.0.0.4, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Json.9.0.4\lib\net462\System.Text.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-    <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.abstractions.2.0.3\lib\net35\xunit.abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="xunit.assert, Version=2.4.2.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.assert.2.4.2\lib\netstandard1.1\xunit.assert.dll</HintPath>
-    </Reference>
-    <Reference Include="xunit.core, Version=2.4.2.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.extensibility.core.2.4.2\lib\net452\xunit.core.dll</HintPath>
-    </Reference>
-    <Reference Include="xunit.execution.desktop, Version=2.4.2.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.extensibility.execution.2.4.2\lib\net452\xunit.execution.desktop.dll</HintPath>
-    </Reference>
-    <Reference Include="xunit.runner.reporters.net452, Version=2.4.2.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.runner.reporters.2.4.2\lib\net452\xunit.runner.reporters.net452.dll</HintPath>
-    </Reference>
-    <Reference Include="xunit.runner.utility.net452, Version=2.4.2.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
-      <HintPath>..\packages\xunit.runner.utility.2.4.2\lib\net452\xunit.runner.utility.net452.dll</HintPath>
-    </Reference>
+    <PackageReference Include="AutoFixture" Version="4.18.1" />
+    <PackageReference Include="AutoFixture.AutoMoq" Version="4.18.1" />
+    <PackageReference Include="ExpectedObjects" Version="3.5.4" />
+    <PackageReference Include="kitos.dk.nita.saml20" Version="1.1.10" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
+    <PackageReference Include="CsvHelper" Version="33.1.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.17.0" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.17.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.17.0" />
+    <PackageReference Include="Polly" Version="8.6.6" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Microsoft.Bcl.TimeProvider" Version="10.0.9" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Authorization\TokenV2Tests.cs" />
-    <Compile Include="Contract\ItContractOverviewReadModelsApiTest.cs" />
-    <Compile Include="Contract\V2\ItContractsInternalApiV2Test.cs" />
-    <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
-    <Compile Include="GDPR\V2\DataProcessingRegistrationInternalAPIV2Test.cs" />
-    <Compile Include="GlobalAdminArea\ItSystemGlobalBusinessTypesInternalV2ApiTest.cs" />
-    <Compile Include="GlobalAdminArea\ItSystemGlobalRoleOptionTypesInternalV2ApiTest.cs" />
-    <Compile Include="Headers\V2EnumSerializationTest.cs" />
-    <Compile Include="HelpTexts\HelpTextsInternalApiV2Test.cs" />
-    <Compile Include="Interfaces\V2\BaseItInterfaceApiV2Test.cs" />
-    <Compile Include="Interfaces\V2\RightsHolderItInterfaceApiV2Test.cs" />
-    <Compile Include="Internal\GdprReport\GdprReportApiV2Test.cs" />
-    <Compile Include="Internal\Messages\PublicMessagesApiV2Test.cs" />
-    <Compile Include="ItSystem\V2\BaseItSystemsApiV2Test.cs" />
-    <Compile Include="SystemUsage\V2\BaseItSystemUsageApiV2Test.cs" />
-    <Compile Include="ItSystem\V2\LegalPropertiesV2ApiTest.cs" />
-    <Compile Include="ItSystem\V2\ItSystemLocalOptionTypesInternalV2ApiTest.cs" />
-    <Compile Include="ItSystem\V2\ItSystemsInternalApiV2Test.cs" />
-    <Compile Include="ItSystem\V2\ItSystemsApiV2RightsHoldersTest.cs" />
-    <Compile Include="LocalAdminArea\ExcelImportTest.cs" />
-    <Compile Include="ItSystem\V2\ItSystemUsageMigrationApiV2Test.cs" />
-    <Compile Include="Notifications\AlertsApiV2Test.cs" />
-    <Compile Include="Notifications\NotificationApiV2Test.cs" />
-    <Compile Include="Organizations\V2\LocalOrganizationUnitRoleOptionTypesInternalV2ApiTest.cs" />
-    <Compile Include="Organizations\V2\OrganizationApiV2TestBase.cs" />
-    <Compile Include="Organizations\V2\OrganizationGridApiV2Test.cs" />
-    <Compile Include="Organizations\V2\OrganizationInternalApiV2Test.cs" />
-    <Compile Include="Organizations\V2\OrganizationUnitRegistrationApiV2Test.cs" />
-    <Compile Include="References\ExternalReferenceInternalApiV2Test.cs" />
-    <Compile Include="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Tools\BaseTest.cs" />
-    <Compile Include="Tools\Extensions\StringExtensions.cs" />
-    <Compile Include="Tools\External\LegalItSystemPropertiesV2Helper.cs" />
-    <Compile Include="Tools\HelpTextsInternalV2Helper.cs" />
-    <Compile Include="Tools\Internal\DPR\DataProcessingRegistrationInternalV2Helper.cs" />
-    <Compile Include="Tools\Internal\GdprReportV2Helper.cs" />
-    <Compile Include="Tools\Internal\GlobalOptionTypeV2Helper.cs" />
-    <Compile Include="Tools\Internal\ItSystemUsage\ItSystemUsageMigrationV2Helper.cs" />
-    <Compile Include="Tools\Internal\LocalOptionTypeV2Helper.cs" />
-    <Compile Include="Tools\Internal\Notifications\AlertsV2Helper.cs" />
-    <Compile Include="Tools\Internal\Notifications\NotificationV2Helper.cs" />
-    <Compile Include="Tools\Internal\Organizations\OrganizationInternalV2Helper.cs" />
-    <Compile Include="Tools\Internal\Organizations\OrganizationUnitRegistrationV2Helper.cs" />
-    <Compile Include="Tools\Internal\References\ExternalReferencesInternalV2Helper.cs" />
-    <Compile Include="Tools\Internal\References\ExternalReferencesV2Helper.cs" />
-    <Compile Include="Tools\Internal\Users\PasswordResetV2Helper.cs" />
-    <Compile Include="Tools\Internal\Users\UsersV2Helper.cs" />
-    <Compile Include="Tools\OrganizationGridConfigV2Helper.cs" />
-    <Compile Include="Organizations\StsOrganizationSynchronizationApiTest.cs" />
-    <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
-    <Compile Include="GDPR\V2\DataProcessingRegistrationApiV2Test.cs" />
-    <Compile Include="Tools\External\DeltaFeedV2Helper.cs" />
-    <Compile Include="Tools\External\ApiV2HelperPatchPayloadExtensions.cs" />
-    <Compile Include="Tools\External\DataProcessingRegistrationV2Helper.cs" />
-    <Compile Include="KLE\V2\KleOptionV2ApiTest.cs" />
-    <Compile Include="Contract\V2\ItContractsApiV2Test.cs" />
-    <Compile Include="Options\V2\OptionV2ApiTests.cs" />
-    <Compile Include="Interfaces\V2\ItInterfaceApiV2Test.cs" />
-    <Compile Include="GDPR\DataProcessingRegistrationReadModelsTest.cs" />
-    <Compile Include="ItSystem\V2\ItSystemsApiV2Test.cs" />
-    <Compile Include="KLE\KLEDataBridgeTest.cs" />
-    <Compile Include="KLE\TaskRefIntegrityInput.cs" />
-    <Compile Include="Organizations\V2\OrganizationApiV2Test.cs" />
-    <Compile Include="Organizations\V2\OrganizationUnitsApiV2Test.cs" />
-    <Compile Include="Organizations\V2\OrganizationUserApiV2Test.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Qa\BrokenExternalReferencesReportTest.cs" />
-    <Compile Include="Security\AccessibilityTests.cs" />
-    <Compile Include="Security\AuthorizationTests.cs" />
-    <Compile Include="Security\CSRFProtectionTest.cs" />
-    <Compile Include="Swagger\SwaggerDocumentationTest.cs" />
-    <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelsTest.cs" />
-    <Compile Include="TestEnvironmentValidation\TestEnvironmentTest.cs" />
-    <Compile Include="Tools\BrokenExternalReferencesReportHelper.cs" />
-    <Compile Include="Tools\DatabaseAccess.cs" />
-    <Compile Include="Tools\DisposableExtensions.cs" />
-    <Compile Include="Tools\External\ItContractV2Helper.cs" />
-    <Compile Include="Tools\External\ItSystemUsageV2Helper.cs" />
-    <Compile Include="Tools\External\KleOptionV2Helper.cs" />
-    <Compile Include="Tools\External\OptionV2ApiHelper.cs" />
-    <Compile Include="Tools\External\InterfaceV2Helper.cs" />
-    <Compile Include="Tools\External\OrganizationUnitV2Helper.cs" />
-    <Compile Include="Tools\External\OrganizationUserV2Helper.cs" />
-    <Compile Include="Tools\HttpApi.cs" />
-    <Compile Include="Tools\HttpCommandAssertionHelper.cs" />
-    <Compile Include="Tools\Model\ApiUserDTO.cs" />
-    <Compile Include="Tools\Model\CreateUserDTO.cs" />
-    <Compile Include="Tools\Model\CSRFTokenDTO.cs" />
-    <Compile Include="Tools\Model\KitosCredentials.cs" />
-    <Compile Include="Tools\Model\KitosTestEnvironment.cs" />
-    <Compile Include="Tools\Model\OrgRightDTO.cs" />
-    <Compile Include="Tools\ObjectCreateHelper.cs" />
-    <Compile Include="Tools\ReadModelTestTools.cs" />
-    <Compile Include="Tools\TestEnvironment.cs" />
-    <Compile Include="Tools\External\ItSystemV2Helper.cs" />
-    <Compile Include="Tools\External\OrganizationV2Helper.cs" />
-    <Compile Include="Tools\XUnit\SequentialTestGroup.cs" />
-    <Compile Include="Users\V2\PasswordResetInternalApiV2Test.cs" />
-    <Compile Include="Users\V2\UserInternalApiV2Test.cs" />
+    <ProjectReference Include="..\Tests.Toolkit\Tests.Toolkit.csproj" />
+    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj" />
+    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj" />
+    <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj" />
+    <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj" />
+    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj" />
+    <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj" />
+    <ProjectReference Include="..\Presentation.Web\Presentation.Web.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-    <None Include="Resources\invalid_contract_example.xlsx" />
-    <None Include="Resources\valid_it_contract_example.xlsx" />
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
-      <Project>{bd8c90e7-52c7-4ad0-935d-98a2aa89e449}</Project>
-      <Name>Core.Abstractions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
-      <Project>{F0986888-8F35-4559-8FBA-428BC9EC9ADD}</Project>
-      <Name>Core.ApplicationServices</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
-      <Name>Core.DomainModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
-      <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
-      <Name>Core.DomainServices</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
-      <Project>{6CD15363-5401-43C5-9479-02FDDFA881DC}</Project>
-      <Name>Infrastructure.DataAccess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
-      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
-      <Name>Infrastructure.Services</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Tests.Toolkit\Tests.Toolkit.csproj">
-      <Project>{43199485-65c5-4bff-88b2-b594d5b58146}</Project>
-      <Name>Tests.Toolkit</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Presentation.Web\Presentation.Web.csproj">
-      <Project>{E75385A3-EA7C-4DFF-B989-BEE64BC506ED}</Project>
-      <Name>Presentation.Web</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\packages\xunit.analyzers.1.0.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
-    <Analyzer Include="..\packages\xunit.analyzers.1.0.0\analyzers\dotnet\cs\xunit.analyzers.fixes.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
-    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
-    <Error Condition="!Exists('..\packages\xunit.core.2.4.2\build\xunit.core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.core.2.4.2\build\xunit.core.props'))" />
-    <Error Condition="!Exists('..\packages\xunit.core.2.4.2\build\xunit.core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.core.2.4.2\build\xunit.core.targets'))" />
-    <Error Condition="!Exists('..\packages\xunit.runner.console.2.4.2\build\xunit.runner.console.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.runner.console.2.4.2\build\xunit.runner.console.props'))" />
-    <Error Condition="!Exists('..\packages\xunit.runner.visualstudio.2.4.5\build\net462\xunit.runner.visualstudio.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\xunit.runner.visualstudio.2.4.5\build\net462\xunit.runner.visualstudio.props'))" />
-  </Target>
-  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
-  <Import Project="..\packages\xunit.core.2.4.2\build\xunit.core.targets" Condition="Exists('..\packages\xunit.core.2.4.2\build\xunit.core.targets')" />
+
 </Project>
+

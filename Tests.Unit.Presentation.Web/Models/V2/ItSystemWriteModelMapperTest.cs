@@ -130,7 +130,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
            bool noTaskRefUuids)
         {
             //Arrange
-            var emptyInput = new RightsHolderFullItSystemRequestDTO();
+            var emptyInput = new RightsHolderFullItSystemRequestDTO{Name = string.Empty, Description = string.Empty};
             var definedProperties = GetAllInputPropertyNames<RightsHolderUpdateSystemPropertiesRequestDTO>();
             if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
@@ -167,7 +167,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
        bool noTaskRefUuids)
         {
             //Arrange
-            var emptyInput = new RightsHolderFullItSystemRequestDTO();
+            var emptyInput = new RightsHolderFullItSystemRequestDTO{Name = string.Empty, Description = string.Empty};
             var definedProperties = GetAllInputPropertyNames<RightsHolderUpdateSystemPropertiesRequestDTO>();
             if (noName) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(RightsHolderUpdateSystemPropertiesRequestDTO.Description));
@@ -290,7 +290,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noDeactivated)
         {
             //Arrange
-            var emptyInput = new CreateItSystemRequestDTO();
+            var emptyInput = new CreateItSystemRequestDTO{Name = string.Empty};
             var definedProperties = GetAllInputPropertyNames<UpdateItSystemRequestDTO>();
             if (noName) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Name));
             if (noDescription) definedProperties.Remove(nameof(UpdateItSystemRequestDTO.Description));
@@ -328,6 +328,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.Deactivated, AssertPropertyContainsDataChange(output.Deactivated));
             Assert.Equal(input.Scope?.FromChoice(), AssertPropertyContainsDataChange(output.Scope));
             Assert.Equal(input.RightsHolderUuid, AssertPropertyContainsDataChange(output.RightsHolderUuid));
+            Assert.NotNull(input.RecommendedArchiveDuty);
             Assert.Equal(input.RecommendedArchiveDuty.Comment,
                 AssertPropertyContainsDataChange(AssertPropertyContainsDataChange(output.ArchivingRecommendation).comment));
             Assert.Equal(input.RecommendedArchiveDuty?.Id?.FromChoice(),

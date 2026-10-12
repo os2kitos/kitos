@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Presentation.Web.Models.API.V2.Internal.Response;
@@ -25,6 +25,6 @@ public class LocalOptionTypeResponseMapper : ILocalOptionTypeResponseMapper
 
     public LocalRoleOptionResponseDTO ToLocalRoleOptionDTO<TReference, TOption>(TOption option) where TOption : OptionEntity<TReference>, IRoleEntity
     {
-        return new(option.Uuid, option.Name, option.Description, option.IsLocallyAvailable, option.IsObligatory, option.HasWriteAccess);
+        return new(option.Uuid, option.Name, option.Description, option.IsLocallyAvailable, option.IsObligatory, option.HasWriteAccess, option.RoleIsExternallyUsed, option.RoleExternallyUsedDescription);
     }
 }

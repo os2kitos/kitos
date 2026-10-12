@@ -6,6 +6,6 @@ namespace Presentation.Web.Models.API.V1.GDPR
     {
         [Required]
         public int OrganizationId { get; set; }
-        public SubDataProcessorDetailsDTO Details { get; set; }
+        public required SubDataProcessorDetailsDTO Details { get; set; }
     }
 }

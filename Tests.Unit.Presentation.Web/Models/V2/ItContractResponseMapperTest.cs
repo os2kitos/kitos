@@ -80,7 +80,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Empty(general.AgreementElements);
             Assert.Null(general.Criticality);
             var validity = general.Validity;
-            Assert.Equal(contract.IsActive, validity.Valid);
+            Assert.Equal(contract.IsActive, validity!.Valid);
             Assert.False(validity.EnforcedValid);
             Assert.Null(validity.ValidFrom);
             Assert.Null(validity.ValidTo);
@@ -97,6 +97,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(supplier.SignedBy);
             Assert.Null(supplier.SignedAt);
             Assert.Null(supplier.Organization);
+            Assert.Null(supplier.OrganizationUnit);
+            Assert.Null(supplier.IsInternal);
+            Assert.Null(supplier.ContactPerson);
+            Assert.True(supplier.UseSignedByForContact);
+            Assert.Null(supplier.ContactPhoneNumber);
+            Assert.Null(supplier.ContactEmail);
 
             var responsible = dto.Responsible;
             Assert.False(responsible.Signed);
@@ -159,7 +165,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertOptionalIdentity(contract.Criticality, dto.General.Criticality);
             AssertAgreementElements(contract.AssociatedAgreementElementTypes, dto.General.AgreementElements);
 
-            Assert.Equal(contract.Concluded, dto.General.Validity.ValidFrom);
+            Assert.Equal(contract.Concluded, dto.General.Validity!.ValidFrom);
             Assert.Equal(contract.ExpirationDate, dto.General.Validity.ValidTo);
             Assert.Equal(contract.Active, dto.General.Validity.EnforcedValid);
             Assert.Equal(contract.IsActive, dto.General.Validity.Valid);
@@ -183,9 +189,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertOptionalIdentity(contract.PurchaseForm, dto.Procurement.PurchaseType);
             if (withOptionalCrossReferences)
             {
-                Assert.Equal(Convert.ToByte(contract.ProcurementPlanQuarter.Value), dto.Procurement.ProcurementPlan.QuarterOfYear);
-                Assert.Equal(contract.ProcurementPlanYear.Value, dto.Procurement.ProcurementPlan.Year);
-                Assert.Equal(contract.ProcurementInitiated.Value.ToYesNoUndecidedChoice(), dto.Procurement.ProcurementInitiated);
+                Assert.Equal(Convert.ToByte(contract.ProcurementPlanQuarter!.Value), dto.Procurement.ProcurementPlan!.QuarterOfYear);
+                Assert.Equal(contract.ProcurementPlanYear!.Value, dto.Procurement.ProcurementPlan.Year);
+                Assert.Equal(contract.ProcurementInitiated!.Value.ToYesNoUndecidedChoice(), dto.Procurement.ProcurementInitiated);
             }
             else
             {
@@ -211,13 +217,20 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(contract.SupplierContractSigner, dto.Supplier.SignedBy);
             Assert.Equal(contract.HasSupplierSigned, dto.Supplier.Signed);
             Assert.Equal(contract.SupplierSignedDate, dto.Supplier.SignedAt);
+            Assert.Equal(contract.HasInternalSupplier, dto.Supplier.IsInternal);
+            Assert.Equal(contract.SupplierContactPerson, dto.Supplier.ContactPerson);
+            Assert.Equal(contract.UseSupplierContractSignerAsContactPerson, dto.Supplier.UseSignedByForContact);
+            Assert.Equal(contract.SupplierContactPhoneNumber, dto.Supplier.ContactPhoneNumber);
+            Assert.Equal(contract.SupplierContactEmail, dto.Supplier.ContactEmail);
             if (withOptionalCrossReferences)
             {
                 AssertOrganization(contract.Supplier, dto.Supplier.Organization);
+                AssertIdentity(contract.SupplierOrganizationUnit, dto.Supplier.OrganizationUnit);
             }
             else
             {
                 Assert.Null(dto.Supplier.Organization);
+                Assert.Null(dto.Supplier.OrganizationUnit);
             }
         }
 
@@ -273,7 +286,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             if (withSystemUsages)
             {
-                AssertSystemUsages(contract, dto.SystemUsages.ToList());
+                AssertSystemUsages(contract, dto.SystemUsages.ToList()!);
             }
             else
             {
@@ -291,8 +304,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssignBasicProperties(contract);
             if (withDpr)
             {
-                var dpr1 = CreateDPR();
-                var dpr2 = CreateDPR();
+                var dpr1 = CreateDpr();
+                var dpr2 = CreateDpr();
                 AssignDPRs(contract, new[] { dpr1, dpr2 });
             }
             else
@@ -461,7 +474,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         
         #region Creaters
 
-        private DataProcessingRegistration CreateDPR()
+        private DataProcessingRegistration CreateDpr()
         {
             return new()
             {
@@ -636,8 +649,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             contract.SupplierContractSigner = A<string>();
             contract.HasSupplierSigned = A<bool>();
             contract.SupplierSignedDate = A<DateTime>();
+            contract.SetInternalSupplier(true);
+            contract.SupplierContactPerson = A<string>();
+            contract.UseSupplierContractSignerAsContactPerson = A<bool>();
+            contract.SupplierContactPhoneNumber = A<string>();
+            contract.SupplierContactEmail = A<string>();
             contract.Supplier = withOptionalCrossReferences
                 ? CreateOrganization()
+                : null;
+            contract.SupplierOrganizationUnit = withOptionalCrossReferences
+                ? CreateOrganizationUnit()
                 : null;
         }
 
@@ -747,6 +768,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 YearSegmentOption.EndOfCalendarYear => YearSegmentChoice.EndOfCalendarYear,
                 YearSegmentOption.EndOfQuarter => YearSegmentChoice.EndOfQuarter,
                 YearSegmentOption.EndOfMonth => YearSegmentChoice.EndOfMonth,
+                YearSegmentOption.BillingPeriod => YearSegmentChoice.BillingPeriod,
                 null => null,
                 _ => throw new ArgumentOutOfRangeException(nameof(expectedFromSource), expectedFromSource, null)
             };

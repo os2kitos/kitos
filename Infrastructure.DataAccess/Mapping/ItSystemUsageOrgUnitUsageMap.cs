@@ -1,16 +1,14 @@
-using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItSystemUsage;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemUsageOrgUnitUsageMap : EntityTypeConfiguration<ItSystemUsageOrgUnitUsage>
+    public class ItSystemUsageOrgUnitUsageMap : IEntityTypeConfiguration<ItSystemUsageOrgUnitUsage>
     {
-        public ItSystemUsageOrgUnitUsageMap()
+        public void Configure(EntityTypeBuilder<ItSystemUsageOrgUnitUsage> builder)
         {
-            HasKey(x => new
-            {
-                x.ItSystemUsageId, x.OrganizationUnitId
-            });
+            builder.HasKey(x => new { x.ItSystemUsageId, x.OrganizationUnitId });
         }
     }
 }

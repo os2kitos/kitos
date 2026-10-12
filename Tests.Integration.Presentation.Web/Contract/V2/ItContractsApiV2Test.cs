@@ -36,7 +36,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_GET_Specific_Contract()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var newContract = await CreateItContractAsync(organization.Uuid);
 
             //Act
@@ -50,7 +50,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Cannot_Get_Contract_If_Unknown()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, __) = await CreatePrerequisitesAsync();
 
             //Act
             using var response = await ItContractV2Helper.SendGetItContractAsync(token, A<Guid>());
@@ -63,7 +63,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Cannot_Get_Contract_If_NotAllowedTo()
         {
             //Arrange
-            var (token, user, organization1) = await CreatePrerequisitesAsync();
+            var (token, _, __) = await CreatePrerequisitesAsync();
             var organization2 = await CreateOrganizationAsync();
             var newContract = await CreateItContractAsync(organization2.Uuid);
 
@@ -78,7 +78,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Cannot_Get_Contract_If_Empty_Uuid_In_Request()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, __) = await CreatePrerequisitesAsync();
 
             //Act
             using var response = await ItContractV2Helper.SendGetItContractAsync(token, Guid.Empty);
@@ -91,7 +91,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_GET_All_Contracts()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var contract1 = await CreateItContractAsync(organization.Uuid);
             var contract2 = await CreateItContractAsync(organization.Uuid);
 
@@ -108,7 +108,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_GET_All_Contracts_With_Paging()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var contract1 = await CreateItContractAsync(organization.Uuid);
             var contract2 = await CreateItContractAsync(organization.Uuid);
             var contract3 = await CreateItContractAsync(organization.Uuid);
@@ -130,7 +130,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_GET_All_Contracts_With_LastModifiedFiltering()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var contract1 = await CreateItContractAsync(organization.Uuid);
             var contract2 = await CreateItContractAsync(organization.Uuid);
             var contract3 = await CreateItContractAsync(organization.Uuid);
@@ -155,10 +155,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_GET_All_Contracts_With_User_OrganizationFiltering_Implicit()
         {
             //Arrange
-            var (token, user, organization1) = await CreatePrerequisitesAsync();
+            var (token, _, organization1) = await CreatePrerequisitesAsync();
             var contract1 = await CreateItContractAsync(organization1.Uuid);
             var organization2 = await CreateOrganizationAsync();
-            var contract2 = await CreateItContractAsync(organization2.Uuid);
+            await CreateItContractAsync(organization2.Uuid);
 
             //Act
             var contracts = (await ItContractV2Helper.GetItContractsAsync(token)).ToList();
@@ -175,7 +175,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var (token, user, organization1) = await CreatePrerequisitesAsync();
             var contract1 = await CreateItContractAsync(organization1.Uuid);
             var organization2 = await CreateOrganizationAsync();
-            var contract2 = await CreateItContractAsync(organization2.Uuid);
+            await CreateItContractAsync(organization2.Uuid);
             await HttpApi.SendAssignRoleToUserAsync(user.Uuid, OrganizationRole.LocalAdmin, organization2.Uuid).DisposeAsync();
 
             //Act
@@ -190,11 +190,11 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_GET_All_Contracts_With_SystemFiltering()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var newSystem = await CreateItSystemAsync(organization.Uuid);
             var newSystemUsage = await TakeSystemIntoUsageAsync(newSystem.Uuid, organization.Uuid);
             var contract1 = await CreateItContractAsync(organization.Uuid);
-            var contract2 = await CreateItContractAsync(organization.Uuid);
+            await CreateItContractAsync(organization.Uuid);
             await ItContractV2Helper.SendPatchSystemUsagesAsync(await GetGlobalToken(), contract1.Uuid,
                 newSystemUsage.Uuid.WrapAsEnumerable());
 
@@ -210,11 +210,11 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_GET_All_Contracts_With_SystemUsageFiltering()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var newSystem = await CreateItSystemAsync(organization.Uuid);
             var newSystemUsage = await TakeSystemIntoUsageAsync(newSystem.Uuid, organization.Uuid);
             var contract1 = await CreateItContractAsync(organization.Uuid);
-            var contract2 = await CreateItContractAsync(organization.Uuid);
+            await CreateItContractAsync(organization.Uuid);
             await ItContractV2Helper.SendPatchSystemUsagesAsync(await GetGlobalToken(), contract1.Uuid,
                 newSystemUsage.Uuid.WrapAsEnumerable());
 
@@ -230,10 +230,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_GET_All_Contracts_With_DPRFiltering()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var dpr = await CreateDPRAsync(organization.Uuid);
             var contract1 = await CreateItContractAsync(organization.Uuid);
-            var contract2 = await CreateItContractAsync(organization.Uuid);
+            await CreateItContractAsync(organization.Uuid);
             using var dprAssignmentResponse =
                 await ItContractV2Helper.SendPatchDataProcessingRegistrationsAsync(await GetGlobalToken(),
                     contract1.Uuid, dpr.Uuid.WrapAsEnumerable());
@@ -251,10 +251,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_GET_All_Contracts_With_ResponsibleOrgUnitFiltering()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var orgUnit = await CreateOrganizationUnitAsync(organization.Uuid);
             var contract1 = await CreateItContractAsync(organization.Uuid);
-            var contract2 = await CreateItContractAsync(organization.Uuid);
+            await CreateItContractAsync(organization.Uuid);
             using var responsibleOrgUnitAssignmentResponse = await ItContractV2Helper.SendPatchContractResponsibleAsync(
                 await GetGlobalToken(), contract1.Uuid, new ContractResponsibleDataWriteRequestDTO
                 {
@@ -274,10 +274,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_GET_All_Contracts_With_SupplierFiltering()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var supplier = await CreateOrganizationAsync();
             var contract1 = await CreateItContractAsync(organization.Uuid);
-            var contract2 = await CreateItContractAsync(organization.Uuid);
+            await CreateItContractAsync(organization.Uuid);
             using var supplierAssignmentResponse = await ItContractV2Helper.SendPatchContractSupplierAsync(
                 await GetGlobalToken(), contract1.Uuid,
                 new ContractSupplierDataWriteRequestDTO { OrganizationUuid = supplier.Uuid });
@@ -296,10 +296,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var content = $"CONTENT_{A<Guid>()}";
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var contract1 = await CreateItContractAsync(organization.Uuid, $"{content}ONE");
             var contract2 = await CreateItContractAsync(organization.Uuid, $"TWO{content}");
-            var contract3 = await CreateItContractAsync(organization.Uuid);
+            await CreateItContractAsync(organization.Uuid);
 
             //Act
             var contracts = (await ItContractV2Helper.GetItContractsAsync(token, nameContent: content)).ToList();
@@ -410,7 +410,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task POST_With_Name_Alone()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var requestDto = new CreateNewContractRequestDTO
             {
                 OrganizationUuid = organization.Uuid,
@@ -422,6 +422,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             Assert.Equal(requestDto.Name, contractDTO.Name);
+            Assert.NotNull(contractDTO.OrganizationContext);
             Assert.Equal(organization.Name, contractDTO.OrganizationContext.Name);
             Assert.Equal(organization.Cvr, contractDTO.OrganizationContext.Cvr);
             Assert.Equal(organization.Uuid, contractDTO.OrganizationContext.Uuid);
@@ -432,7 +433,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
 
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var requestDto = new CreateNewContractRequestDTO
             {
                 OrganizationUuid = organization.Uuid,
@@ -451,7 +452,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_POST_With_Parent()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var parent = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
 
             var requestDto = new CreateNewContractRequestDTO()
@@ -472,7 +473,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Cannot_POST_With_Parent_If_Not_Allowed_To_Read_Parent()
         {
             //Arrange
-            var (token, user, organization1) = await CreatePrerequisitesAsync();
+            var (token, _, organization1) = await CreatePrerequisitesAsync();
             var organization2 = await CreateOrganizationAsync();
             var parent = await CreateItContractAsync(organization2.Uuid);
 
@@ -517,7 +518,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Cannot_POST_With_Unknown_Parent()
         {
             //Arrange
-            var (token, user, organization1) = await CreatePrerequisitesAsync();
+            var (token, _, organization1) = await CreatePrerequisitesAsync();
 
             var requestDto = new CreateNewContractRequestDTO()
             {
@@ -537,7 +538,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_PATCH_With_Parent()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
 
             var parent = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
 
@@ -589,10 +590,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_POST_With_Procurement()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
 
             var (procurementRequest, procurementStrategy, purchaseType) = await CreateProcurementRequestAsync(organization.Uuid);
-            var requestDto = new CreateNewContractRequestDTO()
+            var requestDto = new CreateNewContractRequestDTO
             {
                 OrganizationUuid = organization.Uuid,
                 Name = CreateName(),
@@ -610,7 +611,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_POST_With_Procurement_If_ProcurementPlan_Is_Null()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
 
             var (procurementRequest, procurementStrategy, purchaseType) = await CreateProcurementRequestAsync(organization.Uuid);
             procurementRequest.ProcurementPlan = null;
@@ -632,9 +633,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Cannot_POST_With_Procurement_If_Unknown_Strategy()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
 
-            var (procurementRequest, procurementStrategy, purchaseType) = await CreateProcurementRequestAsync(organization.Uuid);
+            var (procurementRequest, _, __) = await CreateProcurementRequestAsync(organization.Uuid);
             procurementRequest.ProcurementStrategyUuid = A<Guid>();
             var requestDto = new CreateNewContractRequestDTO()
             {
@@ -654,9 +655,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Cannot_POST_With_Procurement_If_Unknown_PurchaseType()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
 
-            var (procurementRequest, procurementStrategy, purchaseType) = await CreateProcurementRequestAsync(organization.Uuid);
+            var (procurementRequest, _, __) = await CreateProcurementRequestAsync(organization.Uuid);
             procurementRequest.PurchaseTypeUuid = A<Guid>();
             var requestDto = new CreateNewContractRequestDTO()
             {
@@ -676,7 +677,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_PATCH_With_Procurement()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
 
             var newContract = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
 
@@ -723,7 +724,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_POST_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withCriticalityType)
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var (contractType, contractTemplateType, agreementElements, criticalityType, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, withContractType, withContractTemplate, withAgreementElements, withCriticalityType);
             var request = new CreateNewContractRequestDTO
             {
@@ -744,7 +745,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_PATCH_With_GeneralData()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
             var request = new CreateNewContractRequestDTO()
             {
                 OrganizationUuid = organization.Uuid,
@@ -790,7 +791,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_POST_With_Responsible(bool withOrgUnit, bool withSignedAt, bool withSignedBy)
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
 
             var contractResponsibleDataWriteRequestDto = await CreateContractResponsibleDataRequestDTO(token, organization, withOrgUnit, withSignedAt, withSignedBy);
 
@@ -813,7 +814,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task Can_PATCH_With_Responsible()
         {
             //Arrange
-            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (token, _, organization) = await CreatePrerequisitesAsync();
 
             var request = new CreateNewContractRequestDTO
             {
@@ -1645,6 +1646,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
 
             //Assert
+            Assert.NotNull(contractDTO.OrganizationContext);
             Assert.Equal(organization.Name, contractDTO.OrganizationContext.Name);
             Assert.Equal(organization.Cvr, contractDTO.OrganizationContext.Cvr);
             Assert.Equal(organization.Uuid, contractDTO.OrganizationContext.Uuid);
@@ -1794,7 +1796,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var contractDTO3 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
 
             Assert.Equal(requestDto3.Name, contractDTO3.Name);
-            AssertCrossReference((ItContractResponseDTO)null, contractDTO3.ParentContract);
+            AssertCrossReference<ItContractResponseDTO, IdentityNamePairResponseDTO>(null, contractDTO3.ParentContract);
             AssertProcurement(requestDto3.Procurement, null, null, contractDTO3.Procurement);
             AssertGeneralDataSection(requestDto3.General, null, null, null, null, contractDTO3);
 
@@ -1959,6 +1961,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Assert
             Assert.Equal(expectValid, result.General.Validity.Valid);
             Assert.Equal(enforceValid, result.General.Validity.EnforcedValid);
+            Assert.NotNull(result.General.Validity.ValidationErrors);
             if (expectDateError)
             {
                 var dateError = Assert.Single(result.General.Validity.ValidationErrors);
@@ -2045,6 +2048,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var response = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO { Name = A<string>(), OrganizationUuid = organization.Uuid, ParentContractUuid = invalidContract.Uuid, General = new ContractGeneralDataWriteRequestDTO { Validity = new ContractValidityWriteRequestDTO { RequireValidParent = true } } });
 
             Assert.False(response.General.Validity.Valid);
+            Assert.NotNull(response.General.Validity.ValidationErrors);
             var error = Assert.Single(response.General.Validity.ValidationErrors);
             Assert.Equal(ItContractValidationErrorChoice.InvalidParentContract, error);
         }
@@ -2121,15 +2125,15 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return new List<Guid> { system1Usage.Uuid, system2Usage.Uuid };
         }
 
-        private static void AssertTermination(ContractTerminationDataWriteRequestDTO expected, IdentityNamePairResponseDTO noticePeriodMonthsType, ContractTerminationDataResponseDTO actual)
+        private static void AssertTermination(ContractTerminationDataWriteRequestDTO? expected, IdentityNamePairResponseDTO? noticePeriodMonthsType, ContractTerminationDataResponseDTO actual)
         {
-            Assert.Equal(expected?.TerminatedAt, actual.TerminatedAt);
+            DateTimeTestHelper.AssertEqual(expected?.TerminatedAt, actual.TerminatedAt);
             Assert.Equal(expected?.Terms?.NoticePeriodExtendsCurrent, actual.Terms.NoticePeriodExtendsCurrent);
             Assert.Equal(expected?.Terms?.NoticeByEndOf, actual.Terms.NoticeByEndOf);
             AssertCrossReference(noticePeriodMonthsType, actual.Terms.NoticePeriodMonths);
         }
 
-        private async Task<(ContractTerminationDataWriteRequestDTO terminationRequest, IdentityNamePairResponseDTO noticePeriodMonthsType)> CreateTerminationRequest(Guid organizationUuid, bool withNoticePeriodMonth)
+        private async Task<(ContractTerminationDataWriteRequestDTO terminationRequest, IdentityNamePairResponseDTO? noticePeriodMonthsType)> CreateTerminationRequest(Guid organizationUuid, bool withNoticePeriodMonth)
         {
             var noticePeriodMonths = withNoticePeriodMonth
                 ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractNoticePeriodMonthTypes,
@@ -2150,9 +2154,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return (terminationRequest, noticePeriodMonths);
         }
 
-        private static void AssertPaymentModel(ContractPaymentModelDataWriteRequestDTO expected, IdentityNamePairResponseDTO paymentFrequencyType, IdentityNamePairResponseDTO paymentModelType, IdentityNamePairResponseDTO priceRegulationType, ContractPaymentModelDataResponseDTO actual)
+        private static void AssertPaymentModel(ContractPaymentModelDataWriteRequestDTO? expected, IdentityNamePairResponseDTO? paymentFrequencyType, IdentityNamePairResponseDTO? paymentModelType, IdentityNamePairResponseDTO? priceRegulationType, ContractPaymentModelDataResponseDTO actual)
         {
-            Assert.Equal(expected?.OperationsRemunerationStartedAt, actual.OperationsRemunerationStartedAt);
+            DateTimeTestHelper.AssertEqual(expected?.OperationsRemunerationStartedAt, actual.OperationsRemunerationStartedAt);
             AssertCrossReference(paymentFrequencyType, actual.PaymentFrequency);
             AssertCrossReference(paymentModelType, actual.PaymentModel);
             AssertCrossReference(priceRegulationType, actual.PriceRegulation);
@@ -2160,9 +2164,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private async Task<(
             ContractPaymentModelDataWriteRequestDTO paymentModelRequest,
-            IdentityNamePairResponseDTO paymentFrequencyType,
-            IdentityNamePairResponseDTO paymentModelType,
-            IdentityNamePairResponseDTO priceRegulationType)>
+            IdentityNamePairResponseDTO? paymentFrequencyType,
+            IdentityNamePairResponseDTO? paymentModelType,
+            IdentityNamePairResponseDTO? priceRegulationType)>
             CreatePaymentModelRequestAsync(Guid organizationUuid, bool withPaymentFrequencyType, bool withPaymentModelType, bool withPriceRegulationType, bool withMilestones)
         {
             var paymentFrequencyType = withPaymentFrequencyType
@@ -2191,10 +2195,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return (paymentModelRequest, paymentFrequencyType, paymentModelType, priceRegulationType);
         }
 
-        private static void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
+        private static void AssertMultiAssignment(IEnumerable<Guid>? expected, IEnumerable<IdentityNamePairResponseDTO?> actual)
         {
             var expectedUuids = (expected ?? Array.Empty<Guid>()).OrderBy(x => x).ToList();
-            var actualUuids = actual.Select(x => x.Uuid).OrderBy(x => x).ToList();
+            var actualUuids = actual.Select(x => x!.Uuid).OrderBy(x => x).ToList();
             Assert.Equal(expectedUuids.Count, actualUuids.Count);
             Assert.Equal(expectedUuids, actualUuids);
         }
@@ -2209,12 +2213,17 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 Signed = A<bool>(),
                 SignedAt = withSignedAt ? A<DateTime>() : null,
                 SignedBy = withSignedBy ? A<string>() : null,
-                OrganizationUuid = supplierOrganization?.Uuid
+                OrganizationUuid = supplierOrganization?.Uuid,
+                IsInternal = A<bool>(),
+                ContactPerson = A<string>(),
+                UseSignedByForContact = A<bool>(),
+                ContactPhoneNumber = A<string>(),
+                ContactEmail = A<string>()
             };
             return contractResponsibleDataWriteRequestDto;
         }
 
-        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, IdentityNamePairResponseDTO criticalityType, ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(ShallowOrganizationResponseDTO organization, bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withCriticalityType)
+        private async Task<(IdentityNamePairResponseDTO? contractType, IdentityNamePairResponseDTO? contractTemplateType, List<IdentityNamePairResponseDTO>? agreementElements, IdentityNamePairResponseDTO? criticalityType, ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(ShallowOrganizationResponseDTO organization, bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withCriticalityType)
         {
             var contractType = withContractType
                 ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractContractTypes,
@@ -2253,11 +2262,11 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         private static void AssertGeneralDataSection(
-            ContractGeneralDataWriteRequestDTO request,
-            IdentityNamePairResponseDTO expectedContractType,
-            IdentityNamePairResponseDTO expectedContractTemplateType,
-            List<IdentityNamePairResponseDTO> expectedAgreementElements,
-            IdentityNamePairResponseDTO criticalityType,
+            ContractGeneralDataWriteRequestDTO? request,
+            IdentityNamePairResponseDTO? expectedContractType,
+            IdentityNamePairResponseDTO? expectedContractTemplateType,
+            List<IdentityNamePairResponseDTO>? expectedAgreementElements,
+            IdentityNamePairResponseDTO? criticalityType,
             ItContractResponseDTO freshDTO)
         {
             Assert.Equal(request?.Notes, freshDTO.General.Notes);
@@ -2289,7 +2298,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return $"{nameof(ItContractsApiV2Test)}æøå{A<string>()}";
         }
 
-        private static void AssertCrossReference<TExpected, TActual>(TExpected expected, TActual actual) where TExpected : IHasNameExternal, IHasUuidExternal where TActual : IHasNameExternal, IHasUuidExternal
+        private static void AssertCrossReference<TExpected, TActual>(TExpected? expected, TActual? actual) where TExpected : IHasNameExternal, IHasUuidExternal where TActual : IHasNameExternal?, IHasUuidExternal?
         {
             Assert.Equal(expected?.Uuid, actual?.Uuid);
             Assert.Equal(expected?.Name, actual?.Name);
@@ -2305,6 +2314,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             Assert.Equal(expectedContent.Uuid, dto.Uuid);
             Assert.Equal(expectedContent.Name, dto.Name);
+            Assert.NotNull(dto.OrganizationContext);
             Assert.Equal(expectedOrganization.Uuid, dto.OrganizationContext.Uuid);
             Assert.Equal(expectedOrganization.Name, dto.OrganizationContext.Name);
             Assert.Equal(expectedOrganization.Cvr, dto.OrganizationContext.Cvr);
@@ -2320,7 +2330,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         private async Task<(User user, string token)> CreateApiUserAsync(Guid organizationUuid)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organizationUuid, true, false);
-            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userAndGetToken.userUuid));
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userAndGetToken.userUuid)!);
             return (user, userAndGetToken.token);
         }
         private IEnumerable<ExternalReferenceDataWriteRequestDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
@@ -2377,9 +2387,15 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         private static void AssertSupplier(ContractSupplierDataWriteRequestDTO contractResponsibleDataWriteRequestDto, ItContractResponseDTO freshDTO)
         {
             Assert.Equal(contractResponsibleDataWriteRequestDto.OrganizationUuid, freshDTO.Supplier.Organization?.Uuid);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.OrganizationUnitUuid, freshDTO.Supplier.OrganizationUnit?.Uuid);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.IsInternal, freshDTO.Supplier.IsInternal);
             Assert.Equal(contractResponsibleDataWriteRequestDto.Signed, freshDTO.Supplier.Signed);
             Assert.Equal(contractResponsibleDataWriteRequestDto.SignedAt?.Date, freshDTO.Supplier.SignedAt);
             Assert.Equal(contractResponsibleDataWriteRequestDto.SignedBy, freshDTO.Supplier.SignedBy);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.ContactPerson, freshDTO.Supplier.ContactPerson);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.UseSignedByForContact, freshDTO.Supplier.UseSignedByForContact);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.ContactPhoneNumber, freshDTO.Supplier.ContactPhoneNumber);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.ContactEmail, freshDTO.Supplier.ContactEmail);
         }
 
         private async Task<ContractResponsibleDataWriteRequestDTO> CreateContractResponsibleDataRequestDTO(string token, ShallowOrganizationResponseDTO organization, bool withOrgUnit, bool withSignedAt, bool withSignedBy)
@@ -2397,7 +2413,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return contractResponsibleDataWriteRequestDto;
         }
 
-        private static void AssertProcurement(ContractProcurementDataWriteRequestDTO expected, IdentityNamePairResponseDTO procurementStrategy, IdentityNamePairResponseDTO purchaseType, ContractProcurementDataResponseDTO actual)
+        private static void AssertProcurement(ContractProcurementDataWriteRequestDTO? expected, IdentityNamePairResponseDTO? procurementStrategy, IdentityNamePairResponseDTO? purchaseType, ContractProcurementDataResponseDTO actual)
         {
             AssertCrossReference(procurementStrategy, actual.ProcurementStrategy);
             AssertCrossReference(purchaseType, actual.PurchaseType);
@@ -2407,13 +2423,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             }
             else
             {
+                Assert.NotNull(actual.ProcurementPlan);
                 Assert.Equal(expected.ProcurementPlan.QuarterOfYear, actual.ProcurementPlan.QuarterOfYear);
                 Assert.Equal(expected.ProcurementPlan.Year, actual.ProcurementPlan.Year);
                 Assert.Equal(expected.ProcurementInitiated, actual.ProcurementInitiated);
             }
         }
 
-        private async Task<(ContractProcurementDataWriteRequestDTO request, IdentityNamePairResponseDTO procurementStrategy, IdentityNamePairResponseDTO purchaseType)> CreateProcurementRequestAsync(Guid organizationUuid)
+        private async Task<(ContractProcurementDataWriteRequestDTO request, IdentityNamePairResponseDTO? procurementStrategy, IdentityNamePairResponseDTO? purchaseType)> CreateProcurementRequestAsync(Guid organizationUuid)
         {
             var procurementStrategy = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractProcurementStrategyTypes, organizationUuid, 10, 0)).RandomItem();
             var purchaseType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractPurchaseTypes, organizationUuid, 10, 0)).RandomItem();
@@ -2446,7 +2463,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertPaymentStream(input.External, freshDto.External);
         }
 
-        private static void AssertPaymentStream(IEnumerable<PaymentRequestDTO> inputExternal, IEnumerable<PaymentResponseDTO> outputPayments)
+        private static void AssertPaymentStream(IEnumerable<PaymentRequestDTO>? inputExternal, IEnumerable<PaymentResponseDTO>? outputPayments)
         {
             var expectedPayments = (inputExternal?.ToList() ?? new List<PaymentRequestDTO>()).OrderBy(x => x.AccountingEntry).ToList();
             var actualPayments = (outputPayments?.ToList() ?? new List<PaymentResponseDTO>()).OrderBy(x => x.AccountingEntry).ToList();
@@ -2468,8 +2485,8 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private async Task<ContractPaymentsDataWriteRequestDTO> CreatePaymentsInput(string token, ShallowOrganizationResponseDTO organization, bool withExternal, bool withInternal)
         {
-            List<PaymentRequestDTO> internalPayments = null;
-            List<PaymentRequestDTO> externalPayments = null;
+            List<PaymentRequestDTO>? internalPayments = null;
+            List<PaymentRequestDTO>? externalPayments = null;
             var organizationUnits = (await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid, 0, 10)).ToList();
 
             if (withInternal)
@@ -2505,7 +2522,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(input.IsContinuous, freshDTO.IsContinuous);
             Assert.Equal(input.ExtensionOptionsUsed, freshDTO.ExtensionOptionsUsed);
             Assert.Equal(input.ExtensionOptionsUuid, freshDTO.ExtensionOptions?.Uuid);
-            Assert.Equal(input.IrrevocableUntil, freshDTO.IrrevocableUntil);
+            DateTimeTestHelper.AssertEqual(input.IrrevocableUntil, freshDTO.IrrevocableUntil);
         }
 
         private async Task<ContractAgreementPeriodDataWriteRequestDTO> CreateAgreementPeriodInput(bool hasExtensionOption, bool isContinuous, bool hasIrrevocableDate,

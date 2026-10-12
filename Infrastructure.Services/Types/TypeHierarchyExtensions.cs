@@ -7,14 +7,15 @@ namespace Infrastructure.Services.Types
         public static bool IsImplementationOfGenericType(this Type src, Type targetGenericType)
         {
             //Search through the type tree
-            while (src != null)
+            Type? current = src;
+            while (current != null)
             {
-                if (src.IsGenericType && src.GetGenericTypeDefinition() == targetGenericType)
+                if (current.IsGenericType && current.GetGenericTypeDefinition() == targetGenericType)
                 {
                     return true;
                 }
 
-                src = src.BaseType;
+                current = current.BaseType;
             }
 
             return false;

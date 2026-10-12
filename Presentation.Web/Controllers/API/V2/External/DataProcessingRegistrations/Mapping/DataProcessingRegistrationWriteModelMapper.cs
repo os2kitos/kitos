@@ -1,7 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
@@ -16,17 +12,18 @@ using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.SharedProperties;
+using Presentation.Web.Models.API.V2.Types.DataProcessing;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping
 {
-    public class DataProcessingRegistrationWriteModelMapper : WriteModelMapperBase, IDataProcessingRegistrationWriteModelMapper
+    public class DataProcessingRegistrationWriteModelMapper(ICurrentHttpRequest currentHttpRequest)
+        : WriteModelMapperBase(currentHttpRequest), IDataProcessingRegistrationWriteModelMapper
     {
-        public DataProcessingRegistrationWriteModelMapper(ICurrentHttpRequest currentHttpRequest)
-            : base(currentHttpRequest)
-        {
-        }
-
-        public DataProcessingRegistrationModificationParameters FromPOST(CreateDataProcessingRegistrationRequestDTO dto)
+        public DataProcessingRegistrationCreationParameters FromPOST(CreateDataProcessingRegistrationRequestDTO dto)
         {
             return MapCreate(dto, false);
         }
@@ -41,10 +38,25 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             return MapUpdate(dto, false);
         }
 
-        private DataProcessingRegistrationModificationParameters MapCreate(
+        public UpdatedDataProcessingRegistrationOversightDateParameters FromOversightPOST(CreateOversightDateDTO dto)
+        {
+            return MapOversightDate(dto, true);
+        }
+
+        public UpdatedDataProcessingRegistrationOversightDateParameters FromOversightPATCH(ModifyOversightDateDTO dto)
+        {
+            return MapOversightDate(dto, false);
+        }
+
+        private DataProcessingRegistrationCreationParameters MapCreate(
             CreateDataProcessingRegistrationRequestDTO dto, bool enforceFallbackIfNotProvided)
         {
-            var parameters = Map<CreateDataProcessingRegistrationRequestDTO, ExternalReferenceDataWriteRequestDTO>(dto, enforceFallbackIfNotProvided);
+            var parameters = Map<DataProcessingRegistrationCreationParameters, CreateDataProcessingRegistrationRequestDTO, ExternalReferenceDataWriteRequestDTO>(
+                dto,
+                enforceFallbackIfNotProvided,
+                ClientRequestsChangeTo<IHasNameExternal>(x => x.Name) || enforceFallbackIfNotProvided
+                    ? dto.Name.AsChangedValue()
+                    : OptionalValueChange<string>.None);
             parameters.ExternalReferences = MapCreateReferences(dto);
 
             return parameters;
@@ -53,28 +65,37 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         private DataProcessingRegistrationModificationParameters MapUpdate(
             UpdateDataProcessingRegistrationRequestDTO dto, bool enforceFallbackIfNotProvided)
         {
-            var parameters = Map<UpdateDataProcessingRegistrationRequestDTO, UpdateExternalReferenceDataWriteRequestDTO>(dto, enforceFallbackIfNotProvided);
+            var parameters = Map<DataProcessingRegistrationModificationParameters, UpdateDataProcessingRegistrationRequestDTO, UpdateExternalReferenceDataWriteRequestDTO>(
+                dto,
+                enforceFallbackIfNotProvided,
+                ClientRequestsChangeTo<UpdateDataProcessingRegistrationRequestDTO>(x => x.Name!) || enforceFallbackIfNotProvided
+                    ? dto.Name.AsChangedValue()!
+                    : OptionalValueChange<string>.None);
             parameters.ExternalReferences = MapUpdateReferences(dto);
 
             return parameters;
         }
 
-        private DataProcessingRegistrationModificationParameters Map<TDto, TExternalReferenceDto>(TDto dto, bool enforceFallbackIfNotProvided)
-            where TDto : DataProcessingRegistrationWriteRequestDTO, IHasNameExternal, IHasExternalReference<TExternalReferenceDto>
+        private TParameters Map<TParameters, TDto, TExternalReferenceDto>(
+            TDto dto,
+            bool enforceFallbackIfNotProvided,
+            OptionalValueChange<string> name)
+            where TParameters : BaseDataProcessingRegistrationParameters, new()
+            where TDto : DataProcessingRegistrationWriteRequestDTO, IHasExternalReference<TExternalReferenceDto>
             where TExternalReferenceDto : ExternalReferenceDataWriteRequestDTO
         {
             TSection WithResetDataIfSectionIsNotDefined<TSection>(TSection deserializedValue, Expression<Func<TDto, TSection>> propertySelection) where TSection : new() => WithResetDataIfPropertyIsDefined(deserializedValue, propertySelection, enforceFallbackIfNotProvided);
             TSection WithResetDataIfSectionIsNotDefinedWithFallback<TSection>(TSection deserializedValue, Expression<Func<TDto, TSection>> propertySelection, Func<TSection> fallbackFactory) => WithResetDataIfPropertyIsDefined(deserializedValue, propertySelection, fallbackFactory, enforceFallbackIfNotProvided);
 
             dto.General = WithResetDataIfSectionIsNotDefined(dto.General, x => x.General);
-            dto.SystemUsageUuids = WithResetDataIfSectionIsNotDefinedWithFallback(dto.SystemUsageUuids, x => x.SystemUsageUuids, () => new List<Guid>());
+            dto.SystemUsageUuids = WithResetDataIfSectionIsNotDefinedWithFallback(dto.SystemUsageUuids, x => x.SystemUsageUuids, () => []);
             dto.Oversight = WithResetDataIfSectionIsNotDefined(dto.Oversight, x => x.Oversight);
             dto.Roles = WithResetDataIfSectionIsNotDefinedWithFallback(dto.Roles, x => x.Roles, Array.Empty<RoleAssignmentRequestDTO>);
             dto.ExternalReferences = WithResetDataIfSectionIsNotDefinedWithFallback(dto.ExternalReferences, x => x.ExternalReferences, Array.Empty<TExternalReferenceDto>);
 
-            return new DataProcessingRegistrationModificationParameters
+            return new TParameters
             {
-                Name = (ClientRequestsChangeTo<IHasNameExternal>(x => x.Name) || enforceFallbackIfNotProvided) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
+                Name = name,
                 General = dto.General.FromNullable().Select(generalData => MapGeneral(generalData, enforceFallbackIfNotProvided)),
                 SystemUsageUuids = dto.SystemUsageUuids.FromNullable(),
                 Oversight = dto.Oversight.FromNullable().Select(oversight => MapOversight(oversight, enforceFallbackIfNotProvided)),
@@ -97,55 +118,59 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             var rule = CreateChangeRule<DataProcessingRegistrationWriteRequestDTO>(enforceFallbackIfNotProvided);
             return new UpdatedDataProcessingRegistrationGeneralDataParameters
             {
-                DataResponsibleUuid = rule.MustUpdate(x => x.General.DataResponsibleUuid)
+                DataResponsibleUuid = rule.MustUpdate(x => x.General!.DataResponsibleUuid)
                     ? dto.DataResponsibleUuid.AsChangedValue()
                     : OptionalValueChange<Guid?>.None,
 
-                DataResponsibleRemark = rule.MustUpdate(x => x.General.DataResponsibleRemark)
-                    ? dto.DataResponsibleRemark.AsChangedValue()
+                DataResponsibleRemark = rule.MustUpdate(x => x.General!.DataResponsibleRemark)
+                    ? dto.DataResponsibleRemark!.AsChangedValue()
                     : OptionalValueChange<string>.None,
 
-                IsAgreementConcluded = rule.MustUpdate(x => x.General.IsAgreementConcluded)
+                IsAgreementConcluded = rule.MustUpdate(x => x.General!.IsAgreementConcluded)
                     ? (dto.IsAgreementConcluded?.ToYesNoIrrelevantOption()).AsChangedValue()
                     : OptionalValueChange<YesNoIrrelevantOption?>.None,
 
-                IsAgreementConcludedRemark = rule.MustUpdate(x => x.General.IsAgreementConcludedRemark)
-                    ? dto.IsAgreementConcludedRemark.AsChangedValue()
+                IsAgreementConcludedRemark = rule.MustUpdate(x => x.General!.IsAgreementConcludedRemark)
+                    ? dto.IsAgreementConcludedRemark!.AsChangedValue()
                     : OptionalValueChange<string>.None,
 
-                AgreementConcludedAt = rule.MustUpdate(x => x.General.AgreementConcludedAt)
+                AgreementConcludedAt = rule.MustUpdate(x => x.General!.AgreementConcludedAt)
                     ? dto.AgreementConcludedAt.AsChangedValue()
                     : OptionalValueChange<DateTime?>.None,
 
-                BasisForTransferUuid = rule.MustUpdate(x => x.General.BasisForTransferUuid)
+                BasisForTransferUuid = rule.MustUpdate(x => x.General!.BasisForTransferUuid)
                     ? dto.BasisForTransferUuid.AsChangedValue()
                     : OptionalValueChange<Guid?>.None,
 
-                TransferToInsecureThirdCountries = rule.MustUpdate(x => x.General.TransferToInsecureThirdCountries)
+                TransferToInsecureThirdCountries = rule.MustUpdate(x => x.General!.TransferToInsecureThirdCountries)
                     ? (dto.TransferToInsecureThirdCountries?.ToYesNoUndecidedOption()).AsChangedValue()
                     : OptionalValueChange<YesNoUndecidedOption?>.None,
 
                 InsecureCountriesSubjectToDataTransferUuids =
-                    rule.MustUpdate(x => x.General.InsecureCountriesSubjectToDataTransferUuids)
+                    rule.MustUpdate(x => x.General!.InsecureCountriesSubjectToDataTransferUuids)
                         ? dto.InsecureCountriesSubjectToDataTransferUuids.FromNullable().AsChangedValue()
                         : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
 
-                DataProcessorUuids = rule.MustUpdate(x => x.General.DataProcessorUuids)
+                DataProcessorUuids = rule.MustUpdate(x => x.General!.DataProcessorUuids)
                     ? dto.DataProcessorUuids.FromNullable().AsChangedValue()
                     : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
 
-                HasSubDataProcessors = rule.MustUpdate(x => x.General.HasSubDataProcessors)
+                HasSubDataProcessors = rule.MustUpdate(x => x.General!.HasSubDataProcessors)
                     ? (dto.HasSubDataProcessors?.ToYesNoUndecidedOption()).AsChangedValue()
                     : OptionalValueChange<YesNoUndecidedOption?>.None,
 
-                SubDataProcessors = rule.MustUpdate(x => x.General.SubDataProcessors)
-                    ? dto.SubDataProcessors.FromNullable().Select<IEnumerable<SubDataProcessorParameter>>(sdps => sdps.Select(ToSubDataProcessorParameter).ToList()).AsChangedValue()
+                SubDataProcessors = rule.MustUpdate(x => x.General!.SubDataProcessors)
+                    ? dto.SubDataProcessors.FromNullable().Select<IEnumerable<SubDataProcessorParameter>>(sdps => [.. sdps.Select(ToSubDataProcessorParameter)]).AsChangedValue()
                     : OptionalValueChange<Maybe<IEnumerable<SubDataProcessorParameter>>>.None,
 
-                MainContractUuid = rule.MustUpdate(x => x.General.MainContractUuid)
+                EnforceInvalidity = rule.MustUpdate(x => x.General!.EnforceInvalidity)
+                    ? dto.EnforceInvalidity.AsChangedValue()
+                    : OptionalValueChange<bool?>.None,
+
+                MainContractUuid = rule.MustUpdate(x => x.General!.MainContractUuid)
                     ? dto.MainContractUuid.AsChangedValue()
                     : OptionalValueChange<Guid?>.None,
-                ResponsibleUnitUuid = rule.MustUpdate(x => x.General.ResponsibleOrganizationUnitUuid) ? dto.ResponsibleOrganizationUnitUuid.AsChangedValue() : OptionalValueChange<Guid?>.None
+                ResponsibleUnitUuid = rule.MustUpdate(x => x.General!.ResponsibleOrganizationUnitUuid) ? dto.ResponsibleOrganizationUnitUuid.AsChangedValue() : OptionalValueChange<Guid?>.None
             };
         }
 
@@ -164,44 +189,71 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             return new UpdatedDataProcessingRegistrationOversightDataParameters
             {
-                OversightOptionUuids = rule.MustUpdate(x => x.Oversight.OversightOptionUuids)
+                OversightOptionUuids = rule.MustUpdate(x => x.Oversight!.OversightOptionUuids)
                     ? dto.OversightOptionUuids.FromNullable().AsChangedValue()
                     : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
 
-                OversightOptionsRemark = rule.MustUpdate(x => x.Oversight.OversightOptionsRemark)
-                    ? dto.OversightOptionsRemark.AsChangedValue()
+                OversightOptionsRemark = rule.MustUpdate(x => x.Oversight!.OversightOptionsRemark)
+                    ? dto.OversightOptionsRemark!.AsChangedValue()
                     : OptionalValueChange<string>.None,
 
-                OversightInterval = rule.MustUpdate(x => x.Oversight.OversightInterval)
+                OversightInterval = rule.MustUpdate(x => x.Oversight!.OversightInterval)
                     ? (dto.OversightInterval?.ToIntervalOption()).AsChangedValue()
                     : OptionalValueChange<YearMonthIntervalOption?>.None,
 
-                OversightIntervalRemark = rule.MustUpdate(x => x.Oversight.OversightIntervalRemark)
-                    ? dto.OversightIntervalRemark.AsChangedValue()
+                OversightIntervalRemark = rule.MustUpdate(x => x.Oversight!.OversightIntervalRemark)
+                    ? dto.OversightIntervalRemark!.AsChangedValue()
                     : OptionalValueChange<string>.None,
 
-                IsOversightCompleted = rule.MustUpdate(x => x.Oversight.IsOversightCompleted)
+                IsOversightCompleted = rule.MustUpdate(x => x.Oversight!.IsOversightCompleted)
                     ? (dto.IsOversightCompleted?.ToYesNoUndecidedOption()).AsChangedValue()
                     : OptionalValueChange<YesNoUndecidedOption?>.None,
 
-                OversightCompletedRemark = rule.MustUpdate(x => x.Oversight.OversightCompletedRemark)
-                    ? dto.OversightCompletedRemark.AsChangedValue()
+                OversightCompletedRemark = rule.MustUpdate(x => x.Oversight!.OversightCompletedRemark)
+                    ? dto.OversightCompletedRemark!.AsChangedValue()
                     : OptionalValueChange<string>.None,
 
-                OversightScheduledInspectionDate = rule.MustUpdate(x => x.Oversight.OversightScheduledInspectionDate)
+                OversightScheduledInspectionDate = rule.MustUpdate(x => x.Oversight!.OversightScheduledInspectionDate)
                     ? dto.OversightScheduledInspectionDate.AsChangedValue()
                     : OptionalValueChange<DateTime?>.None,
 
-                OversightDates = rule.MustUpdate(x => x.Oversight.OversightDates)
+                OversightDates = rule.MustUpdate(x => x.Oversight!.OversightDates)
                     ? dto.OversightDates
                         .FromNullable()
                         .Select(x => x
-                            .Select(y => new UpdatedDataProcessingRegistrationOversightDate()
+                            .Select(y => new UpdatedDataProcessingRegistrationOversightDate
                             {
                                 CompletedAt = y.CompletedAt,
-                                Remark = y.Remark
+                                Remark = y.Remark,
+                                OversightReportLink = y.OversightReportLink?.Url,
+                                OversightReportLinkName = y.OversightReportLink?.Name,
+                                OversightOptionUuid = y.OversightOptionUuid,
                             })).AsChangedValue()
                     : OptionalValueChange<Maybe<IEnumerable<UpdatedDataProcessingRegistrationOversightDate>>>.None
+            };
+        }
+
+        private UpdatedDataProcessingRegistrationOversightDateParameters MapOversightDate<TDto>(TDto dto, bool enforceFallback)
+            where TDto : class, IOversightDateDTO
+        {
+            var rule = CreateChangeRule<TDto>(enforceFallback);
+            return new UpdatedDataProcessingRegistrationOversightDateParameters
+            {
+                CompletedAt = rule.MustUpdate(x => x.CompletedAt)
+                    ? OptionalValueChange<DateTime?>.With(dto.CompletedAt)
+                    : OptionalValueChange<DateTime?>.None,
+                Remark = rule.MustUpdate(x => x.Remark)
+                    ? dto.Remark?.AsChangedValue() ?? OptionalValueChange<string>.With(string.Empty)
+                    : OptionalValueChange<string>.None,
+                OversightReportLink = rule.MustUpdate(x => x.OversightReportLink!.Url)
+                    ? dto.OversightReportLink?.Url?.AsChangedValue() ?? OptionalValueChange<string>.With(string.Empty)
+                    : OptionalValueChange<string>.None,
+                OversightReportLinkName = rule.MustUpdate(x => x.OversightReportLink!.Name)
+                    ? dto.OversightReportLink?.Name?.AsChangedValue() ?? OptionalValueChange<string>.With(string.Empty)
+                    : OptionalValueChange<string>.None,
+                OversightOptionUuid = rule.MustUpdate(x => x.OversightOptionUuid)
+                    ? dto.OversightOptionUuid.AsChangedValue()
+                    : OptionalValueChange<Guid?>.None
             };
         }
 

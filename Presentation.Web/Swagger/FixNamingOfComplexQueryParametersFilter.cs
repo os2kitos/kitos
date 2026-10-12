@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+using Microsoft.OpenApi;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System;
 using System.Linq;
-using System.Web.Http.Description;
-using Swashbuckle.Swagger;
 
 namespace Presentation.Web.Swagger
 {
@@ -14,31 +13,21 @@ namespace Presentation.Web.Swagger
     {
         private const string Separator = ".";
 
-        public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            var parameters = operation.parameters?.ToList() ?? new List<Parameter>();
-            if (parameters.Any() && MatchGET(apiDescription))
+            if (operation.Parameters == null) return;
+            if (!MatchGET(context)) return;
+
+            foreach (var parameter in operation.Parameters)
             {
-                foreach (var parameter in parameters.Where(IsNestedInComplexType).ToList())
+                if (parameter is OpenApiParameter mutableParam && mutableParam.Name?.Contains(Separator) == true)
                 {
-                    parameter.name = GetParameterNameWithoutPrefix(parameter);
+                    mutableParam.Name = mutableParam.Name.Split(new[] { Separator }, StringSplitOptions.RemoveEmptyEntries).Last();
                 }
             }
         }
 
-        private static string GetParameterNameWithoutPrefix(Parameter parameter)
-        {
-            return parameter.name.Split(new[] { Separator }, StringSplitOptions.RemoveEmptyEntries).Last();
-        }
-
-        private static bool IsNestedInComplexType(Parameter x)
-        {
-            return x.name.Contains(Separator);
-        }
-
-        private static bool MatchGET(ApiDescription apiDescription)
-        {
-            return apiDescription.HttpMethod.Method.Equals("get", StringComparison.OrdinalIgnoreCase);
-        }
+        private static bool MatchGET(OperationFilterContext context) =>
+            string.Equals(context.ApiDescription.HttpMethod, "GET", StringComparison.OrdinalIgnoreCase);
     }
 }

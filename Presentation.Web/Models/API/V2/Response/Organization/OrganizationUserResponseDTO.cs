@@ -11,20 +11,20 @@ namespace Presentation.Web.Models.API.V2.Response.Organization
         /// User's first name
         /// </summary>
         [Required]
-        public string FirstName { get; set; }
+        public required string FirstName { get; set; }
         /// <summary>
         /// User's last name(s)
         /// </summary>
-        public string LastName { get; set; }
+        public string? LastName { get; set; }
         /// <summary>
         /// User's email
         /// </summary>
         [Required]
-        public string Email { get; set; }
+        public required string Email { get; set; }
         /// <summary>
         /// User's phone number
         /// </summary>
-        public string PhoneNumber { get; set; }
+        public required string PhoneNumber { get; set; }
         /// <summary>
         /// Determines if the user credentials can be used to request a KITOS API token
         /// </summary>
@@ -34,6 +34,6 @@ namespace Presentation.Web.Models.API.V2.Response.Organization
         /// Roles assigned to the user within the context of the organization
         /// </summary>
         [Required]
-        public IEnumerable<OrganizationUserRole> Roles { get; set; }
+        public required IEnumerable<OrganizationUserRole> Roles { get; set; }
     }
 }

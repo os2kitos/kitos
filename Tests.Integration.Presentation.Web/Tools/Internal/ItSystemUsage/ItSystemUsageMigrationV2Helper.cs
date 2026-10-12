@@ -14,7 +14,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystemUsage
     {
         private const string BasePath = "api/v2/internal/it-system-usages";
 
-        public static async Task<IEnumerable<IdentityNamePairWithDeactivatedStatusDTO>> GetUnusedSystemsAsync(Guid organizationUuid, int numberOfItSystems, string nameContent = null, Cookie userCookie = null)
+        public static async Task<IEnumerable<IdentityNamePairWithDeactivatedStatusDTO>> GetUnusedSystemsAsync(Guid organizationUuid, int numberOfItSystems, string? nameContent = null, Cookie? userCookie = null)
         {
             var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var path = BasePath + "/migration/unused-it-systems";
@@ -35,7 +35,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystemUsage
             return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairWithDeactivatedStatusDTO>>();
         }
 
-        public static async Task<ItSystemUsageMigrationV2ResponseDTO> GetMigration(Guid itSystemUsageUuid, Guid toSystemUuid, Cookie userCookie = null)
+        public static async Task<ItSystemUsageMigrationV2ResponseDTO> GetMigration(Guid itSystemUsageUuid, Guid toSystemUuid, Cookie? userCookie = null)
         {
             var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var path = BasePath + $"/{itSystemUsageUuid}/migration?toSystemUuid={toSystemUuid}";
@@ -46,7 +46,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystemUsage
             return await response.ReadResponseBodyAsAsync<ItSystemUsageMigrationV2ResponseDTO>();
         }
 
-        public static async Task ExecuteMigration(Guid itSystemUsageUuid, Guid toSystemUuid, Cookie userCookie = null)
+        public static async Task ExecuteMigration(Guid itSystemUsageUuid, Guid toSystemUuid, Cookie? userCookie = null)
         {
             var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var path = BasePath + $"/{itSystemUsageUuid}/migration?toSystemUuid={toSystemUuid}";
@@ -55,7 +55,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.ItSystemUsage
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
-        public static async Task<ItSystemUsageMigrationPermissionsResponseDTO> GetPermissions(Cookie userCookie = null)
+        public static async Task<ItSystemUsageMigrationPermissionsResponseDTO> GetPermissions(Cookie? userCookie = null)
         {
             var cookie = userCookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var path = BasePath + "/migration/permissions";

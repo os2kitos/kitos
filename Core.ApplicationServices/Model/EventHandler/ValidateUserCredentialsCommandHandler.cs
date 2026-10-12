@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Web.Security;
+using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Authentication.Commands;
 using Core.DomainModel;
@@ -10,7 +9,7 @@ using Serilog;
 
 namespace Core.ApplicationServices.Model.EventHandler
 {
-    public class ValidateUserCredentialsCommandHandler : ICommandHandler<ValidateUserCredentialsCommand,Result<User,OperationError>>
+    public class ValidateUserCredentialsCommandHandler : ICommandHandler<ValidateUserCredentialsCommand, Result<User, OperationError>>
     {
         private readonly IUserRepository _userRepository;
         private readonly ICryptoService _cryptoService;
@@ -25,32 +24,34 @@ namespace Core.ApplicationServices.Model.EventHandler
 
         public Result<User, OperationError> Execute(ValidateUserCredentialsCommand command)
         {
-            if (!Membership.ValidateUser(command.Email, command.Password))
-            {
-                _logger.Information("AUTH FAILED: Attempt to login with bad credentials for {hashEmail}", _cryptoService.Encrypt(command.Email ?? ""));
-                {
-                    return new OperationError(OperationFailure.BadInput);
-                }
-            }
-
             var user = _userRepository.GetByEmail(command.Email);
             if (user == null)
             {
-                _logger.Error("AUTH FAILED: User found during membership validation but could not be found by email: {hashEmail}", _cryptoService.Encrypt(command.Email));
-                {
-                    return new OperationError(OperationFailure.BadInput);
-                }
-            }
-
-            if (user.GetAuthenticationSchemes().Contains(command.AuthenticationScheme))
-            {
-                return user;
-            }
-
-            _logger.Information("'AUTH FAILED: Non-global admin' User with id {userId} and no organization rights or wrong scheme {scheme} denied access", user.Id, command.AuthenticationScheme);
-            {
+                _logger.Information("AUTH FAILED: Login attempt for unknown user email {hashEmail}", _cryptoService.Encrypt(command.Email ?? ""));
                 return new OperationError(OperationFailure.BadInput);
             }
+
+            if (user.Deleted)
+            {
+                _logger.Warning("AUTH FAILED: Attempt to login as deleted user with id:{id}", user.Id);
+                return new OperationError(OperationFailure.BadInput);
+            }
+
+            // Validate password using the same logic as CustomMembershipProvider
+            var expectedHash = _cryptoService.Encrypt((command.Password ?? "") + user.Salt);
+            if (user.Password != expectedHash)
+            {
+                _logger.Information("AUTH FAILED: Attempt to login with bad credentials for {hashEmail}", _cryptoService.Encrypt(command.Email ?? ""));
+                return new OperationError(OperationFailure.BadInput);
+            }
+
+            if (!user.GetAuthenticationSchemes().Contains(command.AuthenticationScheme))
+            {
+                _logger.Information("AUTH FAILED: User with id {userId} attempted login with disallowed scheme {scheme}", user.Id, command.AuthenticationScheme);
+                return new OperationError(OperationFailure.BadInput);
+            }
+
+            return user;
         }
     }
 }

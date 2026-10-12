@@ -1,5 +1,4 @@
-﻿using System;
-using Core.Abstractions.Extensions;
+﻿using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
@@ -9,6 +8,9 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
+using System;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItSystemUsage;
 
 
 namespace Core.ApplicationServices.Authorization
@@ -21,6 +23,7 @@ namespace Core.ApplicationServices.Authorization
         private readonly IGlobalReadAccessPolicy _globalReadAccessPolicy;
         private readonly IModuleCreationPolicy _typeCreationPolicy;
         private readonly IUserRepository _userRepository;
+        private readonly IAuthorizationModelFactory _authorizationModelFactory;
 
         public OrganizationAuthorizationContext(
             IOrganizationalUserContext activeUserContext,
@@ -28,7 +31,8 @@ namespace Core.ApplicationServices.Authorization
             IModuleModificationPolicy moduleLevelAccessPolicy,
             IGlobalReadAccessPolicy globalReadAccessPolicy,
             IModuleCreationPolicy typeCreationPolicy,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            IAuthorizationModelFactory authorizationModelFactory)
         {
             _activeUserContext = activeUserContext;
             _typeResolver = typeResolver;
@@ -36,6 +40,15 @@ namespace Core.ApplicationServices.Authorization
             _globalReadAccessPolicy = globalReadAccessPolicy;
             _typeCreationPolicy = typeCreationPolicy;
             _userRepository = userRepository;
+            _authorizationModelFactory = authorizationModelFactory;
+        }
+
+        public IAuthorizationModel GetAuthorizationModel(IEntityOwnedByOrganization entity)
+        {
+            if (!EntityHasSupplierAssociatedFields(entity)) return _authorizationModelFactory.CreateCrudAuthorizationModel(this);
+            return (entity.Organization?.HasSuppliers() ?? false)
+                ? _authorizationModelFactory.CreateFieldAuthorizationModel(this)
+                : _authorizationModelFactory.CreateCrudAuthorizationModel(this);
         }
 
         public CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccess()
@@ -277,7 +290,7 @@ namespace Core.ApplicationServices.Authorization
             return result;
         }
 
-        private bool AllowAdministerOrganizationRight(OrganizationRight right)
+        public bool AllowAdministerOrganizationRight(OrganizationRight right)
         {
             return HasPermission(new AdministerOrganizationRightPermission(right));
         }
@@ -378,6 +391,10 @@ namespace Core.ApplicationServices.Authorization
         {
             return _activeUserContext.HasRole(organizationId, OrganizationRole.ContractModuleAdmin);
         }
+        private bool EntityHasSupplierAssociatedFields(IEntity entity)
+        {
+            return entity is DataProcessingRegistration or ItSystemUsage;
+        }
 
         #region PERMISSIONS
         bool IPermissionVisitor.Visit(BatchImportPermission permission)
@@ -418,6 +435,10 @@ namespace Core.ApplicationServices.Authorization
 
             var isGlobalAdmin = IsGlobalAdmin();
             var hasFullLocalAccess = isGlobalAdmin || IsLocalAdmin(right.OrganizationId);
+            var isContractModuleAdmin =
+                _activeUserContext.HasRole(right.OrganizationId, OrganizationRole.ContractModuleAdmin);
+            var isSystemModuleAdmin =
+                _activeUserContext.HasRole(right.OrganizationId, OrganizationRole.SystemModuleAdmin);
 
             return right.Role switch
             {
@@ -426,6 +447,8 @@ namespace Core.ApplicationServices.Authorization
                 OrganizationRole.LocalAdmin => hasFullLocalAccess,
                 OrganizationRole.User => hasFullLocalAccess || IsOrganizationModuleAdmin(right.OrganizationId),
                 OrganizationRole.OrganizationModuleAdmin => hasFullLocalAccess || IsOrganizationModuleAdmin(right.OrganizationId),
+                OrganizationRole.ContractModuleAdmin => hasFullLocalAccess || isContractModuleAdmin,
+                OrganizationRole.SystemModuleAdmin => hasFullLocalAccess || isSystemModuleAdmin,
                 _ => hasFullLocalAccess
             };
         }

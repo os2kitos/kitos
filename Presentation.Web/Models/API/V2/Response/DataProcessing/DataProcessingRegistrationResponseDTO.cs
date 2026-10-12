@@ -1,50 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.SharedProperties;
+using Presentation.Web.Models.API.V2.Types.DataProcessing;
 
 namespace Presentation.Web.Models.API.V2.Response.DataProcessing
 {
     public class DataProcessingRegistrationResponseDTO : IHasNameExternal, IHasUuidExternal, IHasEntityCreator, IHasLastModified, IHasOrganizationContext
     {
-        [Required]
-        public string Name { get; set; }
-        [Required]
-        public Guid Uuid { get; set; }
-        [Required]
-        public IdentityNamePairResponseDTO CreatedBy { get; set; }
+        public required string Name { get; set; }
+        public required Guid Uuid { get; set; }
+        public IdentityNamePairResponseDTO? CreatedBy { get; set; }
         /// <summary>
         /// UTC timestamp of latest modification
         /// </summary>
-        [Required]
-        public DateTime LastModified { get; set; }
-        [Required]
-        public IdentityNamePairResponseDTO LastModifiedBy { get; set; }
-        [Required]
-        public ShallowOrganizationResponseDTO OrganizationContext { get; set; }
-        [Required]
-        public DataProcessingRegistrationGeneralDataResponseDTO General { get; set; }
+        public required DateTime LastModified { get; set; }
+        public IdentityNamePairResponseDTO? LastModifiedBy { get; set; }
+        public ShallowOrganizationResponseDTO? OrganizationContext { get; set; }
+        public required DataProcessingRegistrationGeneralDataResponseDTO General { get; set; }
         /// <summary>
         /// Associated it-system-usage entities
-        [Required]
-        public IEnumerable<IdentityNamePairResponseDTO> SystemUsages { get; set; }
-        [Required]
-        public DataProcessingRegistrationOversightResponseDTO Oversight { get; set; }
+        /// </summary>
+        public required IEnumerable<ShallowItSystemUsageResponseDTO> SystemUsages { get; set; }
+        public required DataProcessingRegistrationOversightResponseDTO Oversight { get; set; }
         /// <summary>
         /// Data processing role assignments
         /// </summary>
-        [Required]
-        public IEnumerable<RoleAssignmentResponseDTO> Roles { get; set; }
+        public required IEnumerable<RoleAssignmentResponseDTO> Roles { get; set; }
         /// <summary>
         /// External reference definitions
         /// </summary>
-        [Required]
-        public IEnumerable<ExternalReferenceDataResponseDTO> ExternalReferences { get; set; }
-
-
+        public required IEnumerable<ExternalReferenceDataResponseDTO> ExternalReferences { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace Core.DomainModel.KendoConfig
         public OverviewType OverviewType { get; set; }
         public string Version { get; set; }
         public int OrganizationId { get; set; }
-        public Organization.Organization Organization { get; set; }
+        public virtual Organization.Organization Organization { get; set; }
         public virtual ICollection<KendoColumnConfiguration> VisibleColumns { get; set; }
 
         public void AddColumns(IEnumerable<KendoColumnConfiguration> newColumns)

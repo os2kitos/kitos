@@ -11097,22 +11097,7 @@ namespace Kombit.InfrastructureSamples.BrugerService
         {
         }
         
-        public BrugerPortTypeClient(string endpointConfigurationName) : 
-                base(endpointConfigurationName)
-        {
-        }
-        
-        public BrugerPortTypeClient(string endpointConfigurationName, string remoteAddress) : 
-                base(endpointConfigurationName, remoteAddress)
-        {
-        }
-        
-        public BrugerPortTypeClient(string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
-                base(endpointConfigurationName, remoteAddress)
-        {
-        }
-        
-        public BrugerPortTypeClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public BrugerPortTypeClient(System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) :
                 base(binding, remoteAddress)
         {
         }

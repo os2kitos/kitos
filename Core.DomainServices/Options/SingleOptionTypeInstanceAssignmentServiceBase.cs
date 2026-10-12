@@ -16,7 +16,7 @@ namespace Core.DomainServices.Options
             _optionsService = optionsService;
         }
 
-        public Result<TOption, OperationError> Assign(TOwner owner, int optionId)
+        public Result<TOption, OperationError> Assign(TOwner? owner, int optionId)
         {
             if (owner == null) throw new ArgumentNullException(nameof(owner));
             return

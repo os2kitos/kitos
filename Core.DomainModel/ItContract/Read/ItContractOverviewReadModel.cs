@@ -33,6 +33,8 @@ namespace Core.DomainModel.ItContract.Read
         public string ResponsibleOrgUnitName { get; set; } // For sorting
         public int? SupplierId { get; set; }
         public string SupplierName { get; set; }
+        public string SupplierCvr { get; set; }
+        public bool IsSupplierDisabled { get; set; }
         public string ContractSigner { get; set; }
         public int? ContractTypeId { get; set; }     // For filtering
         public Guid? ContractTypeUuid { get; set; }     // For filtering
@@ -54,6 +56,8 @@ namespace Core.DomainModel.ItContract.Read
         public string DataProcessingAgreementsCsv { get; set; } //Used for sorting AND excel output (not filtering since we cannot set a ceiling on length and hence no index)
         public virtual ICollection<ItContractOverviewReadModelItSystemUsage> ItSystemUsages { get; set; } //used for generating links and filtering IN collection (we can add index since the name can be constrained)
         public string ItSystemUsagesCsv { get; set; } //Used for sorting AND excel output 
+        public string ExternalPaymentOrganizationUnitsCsv { get; set; }
+        public string InternalPaymentOrganizationUnitsCsv { get; set; }
         public string ItSystemUsagesSystemUuidCsv { get; set; } //Used for sorting AND excel output 
         public int NumberOfAssociatedSystemRelations { get; set; } //for display, order and filtering
         public virtual ICollection<ItContractOverviewReadModelSystemRelation> SystemRelations { get; set; } //for lookup used during update scheduling (to check if an outside change affects this overview item)
@@ -82,6 +86,7 @@ namespace Core.DomainModel.ItContract.Read
         public int? TerminationDeadlineId { get; set; }     // For filtering
         public Guid? TerminationDeadlineUuid { get; set; }     // For filtering
         public string TerminationDeadlineName { get; set; } // For sorting
+        public YearSegmentOption? ByEnding { get; set; }
         public DateTime? IrrevocableTo { get; set; }
         public DateTime? TerminatedAt { get; set; }
         public int? LastEditedByUserId { get; set; }
@@ -89,6 +94,6 @@ namespace Core.DomainModel.ItContract.Read
         public DateTime? LastEditedAtDate { get; set; }
         public DateTime? Concluded { get; set; }
         public DateTime? ExpirationDate { get; set; }
-
+        public string Note { get; set; }
     }
 }

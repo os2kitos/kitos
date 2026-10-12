@@ -11,7 +11,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         private const string ControllerRoutePrefix = "api/v2/it-systems";
 
         public static async Task<HttpResponseMessage> PatchSystem(Guid systemUuid,
-            LegalPropertiesUpdateRequestDTO request, string token = null)
+            LegalPropertiesUpdateRequestDTO request, string? token = null)
         {
             var requestToken = token ?? (await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin)).Token;
             var url = GetUrl(systemUuid);

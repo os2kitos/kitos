@@ -6,6 +6,8 @@ namespace Presentation.Web.Models.API.V1.GDPR
     {
         public int Id { get; set; }
         public DateTime OversightDate { get; set; }
-        public string OversightRemark { get; set; }
+        public string? OversightRemark { get; set; }
+        public string? OversightReportLink { get; set; }
+        public string? OversightReportLinkName { get; set; }
     }
 }

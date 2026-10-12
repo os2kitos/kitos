@@ -9,9 +9,9 @@ namespace Core.ApplicationServices.Model.Contracts.Write
         public int Acquisition { get; set; }
         public int Operation { get; set; }
         public int Other { get; set; }
-        public string AccountingEntry { get; set; }
+        public required string AccountingEntry { get; set; }
         public TrafficLight AuditStatus { get; set; }
         public DateTime? AuditDate { get; set; }
-        public string Note { get; set; }
+        public required string Note { get; set; }
     }
 }

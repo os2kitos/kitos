@@ -2,7 +2,7 @@
 {
     public class ExternalReferenceProperties
     {
-        public ExternalReferenceProperties(string title, string documentId, string url, bool masterReference)
+        public ExternalReferenceProperties(string title, string? documentId, string? url, bool masterReference)
         {
             Title = title;
             DocumentId = documentId;
@@ -11,8 +11,8 @@
         }
 
         public string Title { get; }
-        public string DocumentId { get; }
-        public string Url { get; }
+        public string? DocumentId { get; }
+        public string? Url { get; }
         public bool MasterReference { get; }
     }
 }

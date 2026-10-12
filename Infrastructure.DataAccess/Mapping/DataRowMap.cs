@@ -1,27 +1,28 @@
-﻿using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class DataRowMap : EntityMap<DataRow>
     {
-        public DataRowMap()
+        public override void Configure(EntityTypeBuilder<DataRow> builder)
         {
-            // Properties
-            // Table & Column Mappings
-            this.ToTable("DataRow");
+            base.Configure(builder);
+            builder.ToTable("DataRow");
 
-            this.HasOptional(t => t.DataType)
+            builder.HasOne(t => t.DataType)
                 .WithMany(d => d.References)
                 .HasForeignKey(t => t.DataTypeId);
 
-            this.HasRequired(t => t.ItInterface)
+            builder.HasOne(t => t.ItInterface)
                 .WithMany(d => d.DataRows)
                 .HasForeignKey(t => t.ItInterfaceId)
-                .WillCascadeOnDelete(false);
-
-            Property(x => x.Uuid)
                 .IsRequired()
-                .HasUniqueIndexAnnotation("UX_uuid", 0);
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Property(x => x.Uuid).IsRequired();
+            builder.HasIndex(x => x.Uuid).IsUnique().HasDatabaseName("UX_uuid");
         }
     }
 }

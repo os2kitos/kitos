@@ -18,8 +18,8 @@ namespace Core.Abstractions.Types
             FailureType = failureType;
         }
 
-        public OperationError(string message, OperationFailure failureType)
-            : this(message.FromNullable(), failureType)
+        public OperationError(string? message, OperationFailure failureType)
+            : this(message == null ? Maybe<string>.None : message.FromNullable(), failureType)
         {
 
         }
@@ -35,7 +35,7 @@ namespace Core.Abstractions.Types
             return Equals(Message, other.Message) && FailureType == other.FailureType;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;

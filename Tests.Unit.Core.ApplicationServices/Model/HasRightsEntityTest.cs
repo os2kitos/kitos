@@ -24,11 +24,11 @@ namespace Tests.Unit.Core.Model
     internal class RightStub : IRight<ModelStub, RightStub, RoleStub>
     {
         public int UserId { get; set; }
-        public User User { get; set; }
+        public required User User { get; set; }
         public int RoleId { get; set; }
-        public RoleStub Role { get; set; }
+        public required RoleStub Role { get; set; }
         public int ObjectId { get; set; }
-        public ModelStub Object { get; set; }
+        public required ModelStub Object { get; set; }
     }
 
     internal class RoleStub : IRoleEntity, IHasId, IHasUuid
@@ -37,11 +37,11 @@ namespace Tests.Unit.Core.Model
         public bool HasWriteAccess { get; set; }
         public int Id { get; set; }
         public Guid Uuid { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
         public DateTime LastChanged { get; set; }
-        public User LastChangedByUser { get; set; }
+        public User? LastChangedByUser { get; set; }
         public int? LastChangedByUserId { get; set; }
-        public User ObjectOwner { get; set; }
+        public User? ObjectOwner { get; set; }
         public int? ObjectOwnerId { get; set; }
         public bool HasUserWriteAccess(User user)
         {

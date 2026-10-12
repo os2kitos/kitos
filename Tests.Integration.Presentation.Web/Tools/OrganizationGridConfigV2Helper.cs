@@ -30,7 +30,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
 
         public static async Task<HttpResponseMessage> SendGetConfigurationRequestAsync(Guid orgUuid,
-            Cookie cookie = null)
+            Cookie? cookie = null)
         {
 
             var url = TestEnvironment.CreateUrl(GetPathForGridConfigOperations(orgUuid, "get"));
@@ -39,7 +39,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
 
         public static async Task<HttpResponseMessage> SendSaveConfigurationRequestAsync(Guid orgUuid, IEnumerable<ColumnConfigurationRequestDTO> columns,
-            Cookie cookie = null)
+            Cookie? cookie = null)
         {
             var url = TestEnvironment.CreateUrl(GetPathForGridConfigOperations(orgUuid, "save"));
             var body = new OrganizationGridConfigurationRequestDTO { VisibleColumns = columns};
@@ -49,7 +49,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<OrganizationGridConfigurationResponseDTO> SaveConfigurationRequestAsync(Guid orgUuid,
             IEnumerable<ColumnConfigurationRequestDTO> columns,
-            Cookie cookie = null)
+            Cookie? cookie = null)
         {
             var response = await SendSaveConfigurationRequestAsync(orgUuid, columns, cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -58,21 +58,21 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
 
         public static async Task<HttpResponseMessage> SendDeleteConfigurationRequestAsync(Guid orgUuid,
-            Cookie cookie = null)
+            Cookie? cookie = null)
         {
             var url = TestEnvironment.CreateUrl(GetPathForGridConfigOperations(orgUuid, "delete"));
             var httpCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
             return await HttpApi.DeleteWithCookieAsync(url, httpCookie);
         }
 
-        public static async Task<OrganizationGridConfigurationResponseDTO> GetResponseBodyAsync(Guid orgUuid, Cookie cookie = null)
+        public static async Task<OrganizationGridConfigurationResponseDTO> GetResponseBodyAsync(Guid orgUuid, Cookie? cookie = null)
         {
             using var response = await SendGetConfigurationRequestAsync(orgUuid, cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<OrganizationGridConfigurationResponseDTO>();
         }
 
-        public static async Task<OrganizationGridPermissionsResponseDTO> GetOrganizationPermissionsAsync(Guid orgUuid, Cookie cookie = null)
+        public static async Task<OrganizationGridPermissionsResponseDTO> GetOrganizationPermissionsAsync(Guid orgUuid, Cookie? cookie = null)
         {
             var url = TestEnvironment.CreateUrl(GetPermissionsPath(orgUuid));
             var httpCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);

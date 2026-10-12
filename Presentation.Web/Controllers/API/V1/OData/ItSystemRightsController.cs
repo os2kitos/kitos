@@ -1,17 +1,15 @@
-﻿using System.Linq;
-using System.Web.Http;
-using Microsoft.AspNet.OData;
-using Microsoft.AspNet.OData.Routing;
+using System.Linq;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
-using Swashbuckle.OData;
-using Swashbuckle.Swagger.Annotations;
 using System.Net;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystemUsage;
 
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API.V1.OData
@@ -45,14 +43,13 @@ namespace Presentation.Web.Controllers.API.V1.OData
         }
 
         [EnableQuery]
-        [ODataRoute("Users({userId})/ItSystemRights")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IQueryable<ItSystemRight>>))]
+        [Route("odata/Users({userId})/ItSystemRights")]
         [RequireTopOnOdataThroughKitosToken]
-        public IHttpActionResult GetByUser(int userId)
+        public IActionResult GetByUser(int userId)
         {
             var result = GetAllQuery().Where(x => x.UserId == userId);
 
-            return Ok(result);
+            return Ok(result.ToList());
         }
 
         protected override void RaiseCreatedDomainEvent(ItSystemRight entity)
@@ -81,3 +78,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         }
     }
 }
+
+
+
+

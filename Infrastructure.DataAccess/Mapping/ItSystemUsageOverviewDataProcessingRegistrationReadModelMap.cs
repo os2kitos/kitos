@@ -1,32 +1,29 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemUsageOverviewDataProcessingRegistrationReadModelMap : EntityTypeConfiguration<ItSystemUsageOverviewDataProcessingRegistrationReadModel>
+    public class ItSystemUsageOverviewDataProcessingRegistrationReadModelMap : IEntityTypeConfiguration<ItSystemUsageOverviewDataProcessingRegistrationReadModel>
     {
-        public ItSystemUsageOverviewDataProcessingRegistrationReadModelMap()
+        public void Configure(EntityTypeBuilder<ItSystemUsageOverviewDataProcessingRegistrationReadModel> builder)
         {
-            HasKey(x => x.Id);
-            HasRequired(x => x.Parent)
+            builder.HasKey(x => x.Id);
+
+            builder.HasOne(x => x.Parent)
                 .WithMany(x => x.DataProcessingRegistrations)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(true);
-
-            Property(x => x.DataProcessingRegistrationId)
                 .IsRequired()
-                .HasIndexAnnotation("ItSystemUsageOverviewArchivePeriodReadModel_index_DataProcessingRegistrationId", 0);
+                .OnDelete(DeleteBehavior.Cascade);
 
-            Property(x => x.DataProcessingRegistrationUuid).IsRequired();
+            builder.Property(x => x.DataProcessingRegistrationId).IsRequired();
+            builder.HasIndex(x => x.DataProcessingRegistrationId).HasDatabaseName("ItSystemUsageOverviewArchivePeriodReadModel_index_DataProcessingRegistrationId");
 
-            Property(x => x.DataProcessingRegistrationName)
-                .IsRequired()
-                .HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewArchivePeriodReadModel_index_DataProcessingRegistrationName", 0);
+            builder.Property(x => x.DataProcessingRegistrationUuid).IsRequired();
 
-            Property(x => x.IsAgreementConcluded)
-                .IsOptional();
+            builder.Property(x => x.DataProcessingRegistrationName).IsRequired().HasMaxLength(DataProcessingRegistrationConstraints.MaxNameLength);
+            builder.HasIndex(x => x.DataProcessingRegistrationName).HasDatabaseName("ItSystemUsageOverviewArchivePeriodReadModel_index_DataProcessingRegistrationName");
         }
     }
 }

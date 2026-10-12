@@ -1,34 +1,41 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Core.ApplicationServices.Authentication;
-using Microsoft.Owin;
-using Ninject;
+using Microsoft.AspNetCore.Http;
 using Presentation.Web.Extensions;
 using Presentation.Web.Helpers;
 using Serilog;
 
 namespace Presentation.Web.Infrastructure.Middleware
 {
-    public class DenyModificationsThroughApiMiddleware : OwinMiddleware
+    public class DenyModificationsThroughApiMiddleware : IMiddleware
     {
-        public DenyModificationsThroughApiMiddleware(OwinMiddleware next) : base(next)
+        private readonly ILogger _logger;
+        private readonly IAuthenticationContext _authenticationContext;
+
+        public DenyModificationsThroughApiMiddleware(ILogger logger, IAuthenticationContext authenticationContext)
         {
+            _logger = logger;
+            _authenticationContext = authenticationContext;
         }
 
-        public override async Task Invoke(IOwinContext context)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var kernel = context.GetNinjectKernel();
-            var logger = kernel.Get<ILogger>();
-            var authenticationContext = kernel.Get<IAuthenticationContext>();
-            if (IsKitosTokenAuthenticated(authenticationContext) && IsIllegalMutationAttempt(context))
+            if (IsKitosTokenAuthenticated(_authenticationContext) && IsIllegalMutationAttempt(context))
             {
-                logger.Warning("User with id: {userID} attempted to mutate resource: {url} by method {method}",
-                    authenticationContext.UserId, context.Request.Uri.ToString(), context.Request.Method);
+                var sanitizedMethod = context.Request.Method
+                    .Replace("\r", string.Empty)
+                    .Replace("\n", string.Empty);
+                var sanitizedPath = context.Request.Path.ToString()
+                    .Replace("\r", string.Empty)
+                    .Replace("\n", string.Empty);
+                _logger.Warning("User with id: {userID} attempted to mutate resource: {url} by method {method}",
+                    _authenticationContext.UserId, sanitizedPath, sanitizedMethod);
                 context.Response.StatusCode = 403;
-                context.Response.Write("Write operations are not allowed on this API");
+                await context.Response.WriteAsync("Write operations are not allowed on this API");
             }
             else
             {
-                await Next.Invoke(context);
+                await next(context);
             }
         }
 
@@ -37,14 +44,14 @@ namespace Presentation.Web.Infrastructure.Middleware
             return authenticationContext.Method == AuthenticationMethod.KitosToken;
         }
 
-        private static bool IsIllegalMutationAttempt(IOwinContext context)
+        private static bool IsIllegalMutationAttempt(HttpContext context)
         {
-            return (context.Request.Method.IsMutation() && IsNotExternalApiUsage(context));
+            return context.Request.Method.IsMutation() && IsNotExternalApiUsage(context);
         }
 
-        private static bool IsNotExternalApiUsage(IOwinContext context)
+        private static bool IsNotExternalApiUsage(HttpContext context)
         {
-            return !context.Request.Uri.AbsoluteUri.IsExternalApiPath();
+            return !context.Request.Path.ToString().IsExternalApiPath();
         }
     }
 }

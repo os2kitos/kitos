@@ -7,7 +7,7 @@ namespace Core.ApplicationServices.Model.HelpTexts
 {
     public class HelpTextUpdateParameters
     {
-        public OptionalValueChange<Maybe<string>> Title { get; set; }
-        public OptionalValueChange<Maybe<string>> Description { get; set; }
+        public required OptionalValueChange<Maybe<string>> Title { get; set; }
+        public required OptionalValueChange<Maybe<string>> Description { get; set; }
     }
 }

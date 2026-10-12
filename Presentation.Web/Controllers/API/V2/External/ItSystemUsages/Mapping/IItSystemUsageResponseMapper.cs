@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.ItSystem;
+using System.Collections.Generic;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 
@@ -9,6 +10,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         ItSystemUsageResponseDTO MapSystemUsageDTO(ItSystemUsage systemUsage);
         GeneralSystemRelationResponseDTO MapGeneralSystemRelationDTO(SystemRelation systemRelation);
         OutgoingSystemRelationResponseDTO MapOutgoingSystemRelationDTO(SystemRelation systemRelation);
+        IEnumerable<OutgoingSystemRelationResponseDTO> MapOutgoingSystemRelationDTOs(IEnumerable<SystemRelation> systemRelations);
+
         IncomingSystemRelationResponseDTO MapIncomingSystemRelationDTO(SystemRelation systemRelation);
         public JournalPeriodResponseDTO MapJournalPeriodResponseDto(ArchivePeriod period);
     }

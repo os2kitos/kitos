@@ -25,6 +25,7 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     $Env:ResetPasswordTtl = $parameters["ResetPasswordTtl"]
     $Env:MailSuffix = $parameters["MailSuffix"]
     $Env:KitosEnvName = $parameters["KitosEnvName"]
+    $Env:KitosDbProvider = if ([string]::IsNullOrWhiteSpace($parameters["KitosDbProvider"])) { "PostgreSql" } else { $parameters["KitosDbProvider"] }
     $Env:KitosDbConnectionStringForIIsApp = $parameters["KitosDbConnectionStringForIIsApp"]
     $Env:HangfireDbConnectionStringForIIsApp = $parameters["HangfireDbConnectionStringForIIsApp"]
     $Env:KitosDbConnectionStringForTeamCity = $parameters["KitosDbConnectionStringForTeamCity"]
@@ -47,11 +48,40 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     $Env:StsOrganisationSystemPort = $parameters["StsOrganisationSystemPort"]
     $Env:StsOrganisationCertificateThumbprint = $parameters["StsOrganisationCertificateThumbprint"]
     $Env:PubSubBaseUrl = $parameters["PubSubBaseUrl"]
-    
+    $Env:SmtpDeliveryMethod = $parameters["SmtpDeliveryMethod"]
+
     if($loadTcHangfireConnectionString -eq $true) {
         $Env:HangfireDbConnectionStringForTeamCity = $parameters["HangfireDbConnectionStringForTeamCity"]
     }
-    
+
+    # When the DB provider is PostgreSQL, override connection strings with values from
+    # the PostgreSQL-compatible environment SSM path (same environment name, e.g. /kitos/integration/).
+    if ($Env:KitosDbProvider -and (
+        $Env:KitosDbProvider.Equals("Postgres", [System.StringComparison]::OrdinalIgnoreCase) -or
+        $Env:KitosDbProvider.Equals("PostgreSql", [System.StringComparison]::OrdinalIgnoreCase) -or
+        $Env:KitosDbProvider.Equals("Npgsql", [System.StringComparison]::OrdinalIgnoreCase)
+    )) {
+        $pgEnvName = $envName
+        Write-Host "KitosDbProvider is PostgreSQL - loading DB connection strings from SSM path: /kitos/$pgEnvName/"
+        $pgParameters = Get-SSM-Parameters -environmentName "$pgEnvName"
+
+        if ($pgParameters.Count -eq 0) {
+            throw "No parameters found for Postgres environment $pgEnvName"
+        }
+
+        $Env:KitosHostName = $pgParameters["HostName"]
+        $Env:MsDeployUrl    = $pgParameters["MsDeployUrl"]
+        $Env:KitosDbConnectionStringForIIsApp    = $pgParameters["KitosDbConnectionStringForIIsApp"]
+        $Env:HangfireDbConnectionStringForIIsApp = $pgParameters["HangfireDbConnectionStringForIIsApp"]
+        $Env:KitosDbConnectionStringForTeamCity  = $pgParameters["KitosDbConnectionStringForTeamCity"]
+        $Env:KitosDbProvider = "PostgreSql"
+
+        if ($loadTcHangfireConnectionString -eq $true) {
+            $Env:HangfireDbConnectionStringForTeamCity = $pgParameters["HangfireDbConnectionStringForTeamCity"]
+        }
+    }
+
+
     if($loadTestUsers -eq $true) {
         $Env:TestUserGlobalAdmin = $parameters["TestUserGlobalAdmin"]
         $Env:TestUserGlobalAdminPw = $parameters["TestUserGlobalAdminPw"]
@@ -78,6 +108,23 @@ Function Load-Environment-Secrets-From-Aws([String] $envName, [bool] $loadTcHang
     Write-Host "Finished loading environment configuration from SSM"
 }
 
+# Emits ##teamcity[setParameter] messages for every env: variable currently set in this process,
+# making them available to all subsequent TeamCity build steps as environment variables.
+Function Publish-TeamCityParameters() {
+    if (-not $Env:TEAMCITY_VERSION) { return }  # no-op outside TeamCity
+
+    # These TeamCity parameters are marked readOnly and must not be re-published.
+    $variablesNotToPublish = @("AwsAccessKeyId", "AwsSecretAccessKey")
+
+    Get-ChildItem Env: | ForEach-Object {
+        if ($variablesNotToPublish -contains $_.Name) { return }
+        if ([string]::IsNullOrEmpty($_.Value)) { return }
+
+        $escaped = $_.Value -replace '\|', '||' -replace "'", "|'" -replace '\[', '|[' -replace '\]', '|]' -replace "`n", '|n' -replace "`r", '|r'
+        Write-Host "##teamcity[setParameter name='env.$($_.Name)' value='$escaped']"
+    }
+}
+
 Function Setup-Environment([String] $environmentName) {
     Write-Host "Configuring Deployment Environment $environmentName"
     
@@ -88,9 +135,9 @@ Function Setup-Environment([String] $environmentName) {
     	throw "Error: Remember to set the AwsSecretAccessKey input before starting the build"
     }
 
-    $Env:MigrationsFolder = Resolve-Path "$PSScriptRoot\..\DataAccessApp"
+    $forcePickupDirectorySmtp = $false
 
-    switch( $environmentName ) 
+    switch( $environmentName )
     {
         "integration" 
         {
@@ -99,6 +146,7 @@ Function Setup-Environment([String] $environmentName) {
             $loadTestUsers = $true
             $Env:UseDefaultUserPassword = "true"
             $Env:Robots = ".*Robots\.Test\.Txt"
+            $forcePickupDirectorySmtp = $true
             break;
         }
         "dev" 
@@ -108,6 +156,7 @@ Function Setup-Environment([String] $environmentName) {
             $loadTestUsers = $true
             $Env:UseDefaultUserPassword = "true"
             $Env:Robots = ".*Robots\.Test\.Txt"
+            $forcePickupDirectorySmtp = $true
             break;
         }
          "staging"
@@ -131,6 +180,17 @@ Function Setup-Environment([String] $environmentName) {
     
     Configure-Aws -accessKeyId "$Env:AwsAccessKeyId" -secretAccessKey "$Env:AwsSecretAccessKey"
     Load-Environment-Secrets-From-Aws -envName "$environmentName" -loadTcHangfireConnectionString $loadTcHangfireConnectionString -loadTestUsers $loadTestUsers
-    
+
+    # Apply after SSM load so these cannot be overwritten by SSM parameters
+    if ($forcePickupDirectorySmtp) {
+        $Env:SmtpDeliveryMethod = "SpecifiedPickupDirectory"
+    } else {
+        $Env:SmtpDeliveryMethod = "Network"
+    }
+
+    # Emit TeamCity service messages after all overrides are applied so subsequent
+    # build steps receive the final values (not the pre-override SSM values).
+    Publish-TeamCityParameters
+
     Write-Host "Finished configuring $environmentName"
 }

@@ -23,6 +23,7 @@ namespace Core.Abstractions.Exceptions
             Error = error;
         }
 
+        [Obsolete("Obsolete")]
         protected OperationErrorException(SerializationInfo info, StreamingContext context, TError error) : base(info, context)
         {
             Error = error;

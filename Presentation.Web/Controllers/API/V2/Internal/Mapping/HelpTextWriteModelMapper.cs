@@ -1,4 +1,4 @@
-﻿using Core.Abstractions.Extensions;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Model.HelpTexts;
 using Presentation.Web.Controllers.API.V2.Common.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
@@ -12,9 +12,9 @@ public class HelpTextWriteModelMapper : WriteModelMapperBase, IHelpTextWriteMode
     {
         return new()
         {
-            Key = dto.Key,
-            Description = dto.Description,
-            Title = dto.Title
+            Key = dto.Key ?? string.Empty,
+            Description = dto.Description ?? string.Empty,
+            Title = dto.Title ?? string.Empty
         };
     }
 

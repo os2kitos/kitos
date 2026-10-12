@@ -16,14 +16,14 @@ namespace Digst.OioIdws.OioWsTrust.Utils
         /// <summary>
         /// Id attributes are prefixed with <see cref="SignatureCaseMessageTransformer.WsuPrefix"/> and can not be resolved by the standard implementation. This implementation handles this.
         /// </summary>
-        public override XmlElement GetIdElement(XmlDocument document, string idValue)
+        public override XmlElement? GetIdElement(XmlDocument? document, string idValue)
         {
             // Check to see if it's a standard ID reference
             var idElem = base.GetIdElement(document, idValue);
 
             if (idElem == null)
             {
-                var nsManager = new XmlNamespaceManager(document.NameTable);
+                var nsManager = new XmlNamespaceManager(document!.NameTable);
                 nsManager.AddNamespace(SignatureCaseMessageTransformer.WsuPrefix, SignatureCaseMessageTransformer.WsuNamespace);
 
                 idElem = document.SelectSingleNode("//*[@" + SignatureCaseMessageTransformer.WsuPrefix + ":Id=\"" + idValue + "\"]", nsManager) as XmlElement;

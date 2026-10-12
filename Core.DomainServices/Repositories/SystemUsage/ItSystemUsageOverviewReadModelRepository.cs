@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -54,6 +55,14 @@ namespace Core.DomainServices.Repositories.SystemUsage
         public Maybe<ItSystemUsageOverviewReadModel> GetBySourceId(int sourceId)
         {
             return _repository.AsQueryable().FirstOrDefault(x => x.SourceEntityId == sourceId);
+        }
+
+        public IReadOnlyDictionary<int, ItSystemUsageOverviewReadModel> GetBySourceIds(IEnumerable<int> sourceIds)
+        {
+            var ids = sourceIds.ToList();
+            return _repository.AsQueryable()
+                .Where(x => ids.Contains(x.SourceEntityId))
+                .ToDictionary(x => x.SourceEntityId);
         }
 
         public void Update(ItSystemUsageOverviewReadModel readModel)

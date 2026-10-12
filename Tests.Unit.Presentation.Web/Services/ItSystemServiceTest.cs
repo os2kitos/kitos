@@ -41,12 +41,10 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IDatabaseTransaction> _dbTransaction;
         private readonly Mock<IReferenceService> _referenceService;
-        private readonly Mock<ILogger> _logger;
         private readonly Mock<IOrganizationalUserContext> _userContext;
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
         private readonly Mock<IOptionsService<ItSystem, BusinessType>> _businessTypeServiceMock;
         private readonly Mock<ITaskRefRepository> _taskRefRepositoryMock;
-        private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IItInterfaceService> _interfaceServiceMock;
         private readonly Mock<IItSystemUsageService> _systemUsageServiceMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
@@ -59,12 +57,12 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager = new Mock<ITransactionManager>();
             _dbTransaction = new Mock<IDatabaseTransaction>();
             _referenceService = new Mock<IReferenceService>();
-            _logger = new Mock<ILogger>();
+            var logger = new Mock<ILogger>();
             _userContext = new Mock<IOrganizationalUserContext>();
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();
             _businessTypeServiceMock = new Mock<IOptionsService<ItSystem, BusinessType>>();
             _taskRefRepositoryMock = new Mock<ITaskRefRepository>();
-            _domainEventsMock = new Mock<IDomainEvents>();
+            var domainEventsMock = new Mock<IDomainEvents>();
             _interfaceServiceMock = new Mock<IItInterfaceService>();
             _systemUsageServiceMock = new Mock<IItSystemUsageService>();
             _organizationServiceMock = new Mock<IOrganizationService>();
@@ -77,9 +75,9 @@ namespace Tests.Unit.Presentation.Web.Services
                 _taskRefRepositoryMock.Object,
                 _businessTypeServiceMock.Object,
                 _organizationRepositoryMock.Object,
-                _logger.Object,
+                logger.Object,
                 _userContext.Object,
-                _domainEventsMock.Object,
+                domainEventsMock.Object,
                 Mock.Of<IOperationClock>(),
                 _interfaceServiceMock.Object,
                 _systemUsageServiceMock.Object,
@@ -1239,8 +1237,11 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var (root, createdItSystems) = CreateHierarchy();
+            foreach (var system in createdItSystems)
+            {
+                ExpectAllowReadsReturns(system, true);
+            }
 
-            ExpectAllowReadsReturns(root, true);
             ExpectGetSystemReturns(root.Id, root);
 
             //Act
@@ -1306,7 +1307,11 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var (root, createdItSystems) = CreateHierarchy();
 
-            ExpectAllowReadsReturns(root, true);
+            foreach (var system in createdItSystems)
+            {
+                ExpectAllowReadsReturns(system, true);
+            }
+
             ExpectGetSystemReturns(root.Id, root);
             ExpectResolveIdReturns<ItSystem>(root.Uuid, root.Id);
 
@@ -1348,6 +1353,77 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Get_Hierarchy_Filters_Out_Systems_User_Cannot_Read()
+        {
+            //Arrange
+            var (root, createdItSystems) = CreateHierarchy();
+            var child = createdItSystems[1];
+            var grandchild = createdItSystems[2];
+
+            ExpectAllowReadsReturns(root, true);
+            ExpectAllowReadsReturns(child, false);
+            ExpectAllowReadsReturns(grandchild, true);
+            ExpectGetSystemReturns(root.Id, root);
+
+            //Act
+            var result = _sut.GetCompleteHierarchy(root.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            var hierarchy = result.Value.ToList();
+            Assert.Equal(2, hierarchy.Count);
+            Assert.Contains(root, hierarchy);
+            Assert.DoesNotContain(child, hierarchy);
+            Assert.Contains(grandchild, hierarchy);
+        }
+
+        [Fact]
+        public void Get_Hierarchy_Returns_Forbidden_When_No_Systems_Are_Readable()
+        {
+            //Arrange
+            var (root, createdItSystems) = CreateHierarchy();
+            foreach (var system in createdItSystems)
+            {
+                ExpectAllowReadsReturns(system, false);
+            }
+
+            ExpectGetSystemReturns(root.Id, root);
+
+            //Act
+            var result = _sut.GetCompleteHierarchy(root.Id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Get_Hierarchy_By_Uuid_Filters_Out_Systems_User_Cannot_Read()
+        {
+            //Arrange
+            var (root, createdItSystems) = CreateHierarchy();
+            var child = createdItSystems[1];
+            var grandchild = createdItSystems[2];
+
+            ExpectAllowReadsReturns(root, true);
+            ExpectAllowReadsReturns(child, false);
+            ExpectAllowReadsReturns(grandchild, true);
+            ExpectGetSystemReturns(root.Id, root);
+            ExpectResolveIdReturns<ItSystem>(root.Uuid, root.Id);
+
+            //Act
+            var result = _sut.GetCompleteHierarchyByUuid(root.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var hierarchy = result.Value.ToList();
+            Assert.Equal(2, hierarchy.Count);
+            Assert.Contains(root, hierarchy);
+            Assert.DoesNotContain(child, hierarchy);
+            Assert.Contains(grandchild, hierarchy);
         }
 
         [Fact]
@@ -1683,7 +1759,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private void ExpectGetSystemByUuidReturns(Guid? uuid, Maybe<ItSystem> value)
         {
-            _systemRepository.Setup(x => x.GetSystem(uuid.Value)).Returns(value);
+            _systemRepository.Setup(x => x.GetSystem(uuid!.Value)).Returns(value);
         }
 
         private void ExpectAllowCreateReturns(int organizationId, bool value)
@@ -1691,7 +1767,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(x => x.AllowCreate<ItSystem>(organizationId)).Returns(value);
         }
 
-        private void ExpectGetSystemsReturns(OrganizationDataQueryParameters organizationDataQueryParameters, IEnumerable<ItSystem> itSystems)
+        private void ExpectGetSystemsReturns(OrganizationDataQueryParameters? organizationDataQueryParameters, IEnumerable<ItSystem> itSystems)
         {
             _systemRepository.Setup(x => x.GetSystems(organizationDataQueryParameters))
                 .Returns(new EnumerableQuery<ItSystem>(itSystems));
@@ -1702,7 +1778,7 @@ namespace Tests.Unit.Presentation.Web.Services
             return new() { Id = A<int>(), Uuid = A<Guid>(), Name = A<string>() };
         }
 
-        private ItSystem CreateSystem(int? organizationId = null, AccessModifier accessModifier = AccessModifier.Local, int? belongsToId = null, string name = null)
+        private ItSystem CreateSystem(int? organizationId = null, AccessModifier accessModifier = AccessModifier.Local, int? belongsToId = null, string? name = null)
         {
             ItSystem itSystem = new()
             {
@@ -1757,7 +1833,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 .Returns(value);
         }
 
-        private void ExpectGetSystemReturns(int id, ItSystem system)
+        private void ExpectGetSystemReturns(int id, ItSystem? system)
         {
             _systemRepository.Setup(x => x.GetSystem(id)).Returns(system);
         }

@@ -6,8 +6,8 @@ namespace Core.ApplicationServices.Model.UiCustomization
 {
     public class UIRootConfigUpdateParameters
     {
-        public OptionalValueChange<Maybe<bool>> ShowItContractModule { get; set; }
-        public OptionalValueChange<Maybe<bool>> ShowDataProcessing { get; set; }
-        public OptionalValueChange<Maybe<bool>> ShowItSystemModule { get; set; }
+        public required OptionalValueChange<Maybe<bool>> ShowItContractModule { get; set; }
+        public required OptionalValueChange<Maybe<bool>> ShowDataProcessing { get; set; }
+        public required OptionalValueChange<Maybe<bool>> ShowItSystemModule { get; set; }
     }
 }

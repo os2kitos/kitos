@@ -1,22 +1,22 @@
-﻿using Core.ApplicationServices;
+using Core.ApplicationServices;
 using Core.DomainModel;
 using Presentation.Web.Infrastructure.Attributes;
-using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Net;
-using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Users.Write;
 using Presentation.Web.Models.API.V2.Internal.Request;
 using Presentation.Web.Models.API.V2.Internal.Response;
 using Core.Abstractions.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Core.ApplicationServices.ScheduledJobs;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Users
 {
     [AllowAnonymous]
     [AllowRightsHoldersAccess]
-    [RoutePrefix("api/v2/internal/users/password-reset")]
+    [Route("api/v2/internal/users/password-reset")]
     public class PasswordResetInternalV2Controller : InternalApiV2Controller
     {
         private readonly IUserService _userService;
@@ -32,8 +32,8 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
 
         [Route("create")]
         [HttpPost]
-        [SwaggerResponse(HttpStatusCode.NoContent)]
-        public IHttpActionResult RequestPasswordReset([FromBody] RequestPasswordResetRequestDTO request)
+        [ApiResponse(HttpStatusCode.NoContent)]
+        public IActionResult RequestPasswordReset([FromBody] RequestPasswordResetRequestDTO request)
         {
             _hangfire.Schedule(() => _userWriteService.RequestPasswordReset(request.Email));
             return NoContent();
@@ -41,9 +41,9 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
 
         [Route("{requestId}")]
         [HttpGet]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(PasswordResetResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetPasswordReset([FromUri] string requestId)
+        [ApiResponse(typeof(PasswordResetResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult GetPasswordReset([FromRoute] string requestId)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
                 var response = MapPasswordResetToResponseDTO(requestResult.Value);
                 return Ok(response);
             }
-            catch (Exception e)
+            catch
             {
                 return UnknownError();
             }
@@ -60,10 +60,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
 
         [Route("{requestId}")]
         [HttpPost]
-        [SwaggerResponse(HttpStatusCode.NoContent)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        public IHttpActionResult PostPasswordReset([FromUri] string requestId, [FromBody] ResetPasswordRequestDTO request)
+        [ApiResponse(HttpStatusCode.NoContent)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        public IActionResult PostPasswordReset([FromRoute] string requestId, [FromBody] ResetPasswordRequestDTO request)
         {
             try
             {
@@ -71,13 +71,13 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
                 _userService.ResetPassword(resetRequest, request.Password);
                 return NoContent();
             }
-            catch (Exception e)
+            catch
             {
                 return UnknownError();
             }
         }
 
-        private IHttpActionResult UnknownError()
+        private IActionResult UnknownError()
         {
             return FromOperationFailure(OperationFailure.UnknownError);
         }
@@ -91,3 +91,4 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Users
         }
     }
 }
+

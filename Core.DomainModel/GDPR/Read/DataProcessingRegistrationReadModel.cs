@@ -33,10 +33,13 @@ namespace Core.DomainModel.GDPR.Read
 
         public string SystemNamesAsCsv { get; set; }
         public string SystemUuidsAsCsv { get; set; }
-        
+        public string SystemValiditiesAsCsv { get; set; }
+
         public string DataProcessorNamesAsCsv { get; set; }
+        public string DataProcessorCvrsAsCsv { get; set; }
         
         public string SubDataProcessorNamesAsCsv { get; set; }
+        public string SubDataProcessorCvrsAsCsv { get; set; }
 
         public virtual DataProcessingRegistration SourceEntity { get; set; }
 
@@ -50,6 +53,8 @@ namespace Core.DomainModel.GDPR.Read
 
         public DateTime? LatestOversightDate { get; set; }
         public string LatestOversightRemark { get; set; }
+        public string LatestOversightReportLink { get; set; }
+        public string LatestOversightReportLinkName { get; set; }
 
         public string BasisForTransfer{ get; set; }
 

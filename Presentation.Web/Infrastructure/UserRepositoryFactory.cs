@@ -1,20 +1,21 @@
-﻿using Core.DomainServices;
-using Ninject;
+using Core.DomainServices;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Presentation.Web.Infrastructure
 {
     public class UserRepositoryFactory : IUserRepositoryFactory
     {
-        private readonly IKernel _kernel;
+        private readonly IServiceProvider _serviceProvider;
 
-        public UserRepositoryFactory(IKernel kernel)
+        public UserRepositoryFactory(IServiceProvider serviceProvider)
         {
-            _kernel = kernel;
+            _serviceProvider = serviceProvider;
         }
 
         public IUserRepository GetUserRepository()
         {
-            return _kernel.Get<IUserRepository>();
+            return _serviceProvider.GetRequiredService<IUserRepository>();
         }
     }
 }

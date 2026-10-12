@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainServices.Queries;
@@ -8,6 +8,8 @@ using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries.ItSystem;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Presentation.Web.Controllers.API.V2.Common.Helpers
 {
@@ -20,16 +22,16 @@ namespace Presentation.Web.Controllers.API.V2.Common.Helpers
             this IItSystemService service,
             Guid? rightsHolderUuid = null,
             Guid? businessTypeUuid = null,
-            string kleNumber = null,
+            string? kleNumber = null,
             Guid? kleUuid = null,
             int? numberOfUsers = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             Guid? usedInOrganizationUuid = null,
-            string nameEquals = null,
-            string nameContains = null,
+            string? nameEquals = null,
+            string? nameContains = null,
             CommonOrderByProperty? orderByProperty = null,
-            BoundedPaginationQuery paginationQuery = null,
+            BoundedPaginationQuery? paginationQuery = null,
             Guid? excludeUuid = null,
             Guid? excludeChildrenOfUuid = null)
         {
@@ -69,6 +71,21 @@ namespace Presentation.Web.Controllers.API.V2.Common.Helpers
                 refinements.Add(new QueryExceptChildrenOfUuid(excludeChildrenOfUuid.Value));
 
             return service.GetAvailableSystems(refinements.ToArray())
+                .Include(system => system.Organization)
+                .Include(system => system.LastChangedByUser)
+                .Include(system => system.ObjectOwner)
+                .Include(system => system.BelongsTo)
+                .Include(system => system.BusinessType)
+                .Include(system => system.Parent)
+                .Include(system => system.ExternalReferences)
+                .Include(system => system.TaskRefs)
+                .Include(system => system.Usages)
+                    .ThenInclude(usage => usage.Organization)
+                .Include(system => system.Usages)
+                    .ThenInclude(usage => usage.MainContract)
+                        .ThenInclude(mainContract => mainContract.ItContract)
+                            .ThenInclude(contract => contract.Supplier)
+                .AsSplitQuery()
                 .OrderApiResultsByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
                 .Page(paginationQuery)
                 .ToList();

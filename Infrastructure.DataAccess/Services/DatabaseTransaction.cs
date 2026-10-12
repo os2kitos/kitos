@@ -1,14 +1,14 @@
-﻿using System;
-using System.Data.Entity;
+using System;
+using Microsoft.EntityFrameworkCore.Storage;
 using Infrastructure.Services.DataAccess;
 
 namespace Infrastructure.DataAccess.Services
 {
     public class DatabaseTransaction : IDatabaseTransaction
     {
-        private readonly DbContextTransaction _transaction;
+        private readonly IDbContextTransaction _transaction;
 
-        public DatabaseTransaction(DbContextTransaction transaction)
+        public DatabaseTransaction(IDbContextTransaction transaction)
         {
             _transaction = transaction ?? throw new ArgumentNullException(nameof(transaction));
         }

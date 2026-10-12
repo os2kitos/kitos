@@ -216,8 +216,7 @@ namespace Core.ApplicationServices.System.Write
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ArchivingRecommendation, UpdateUpdateRecommendedArchiveDuty))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.RightsHolderUuid, (itSystem, newValue) => _systemService.UpdateRightsHolder(itSystem.Id, newValue)))
                 .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Scope, (itSystem, newValue) => _systemService.UpdateAccessModifier(itSystem.Id, newValue)))
-                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Deactivated, HandleDeactivatedState));
-        }
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Deactivated, HandleDeactivatedState));        }
 
         private static Result<ItSystem, OperationError> ApplyLegalPropertyUpdates(ItSystem itSystem, LegalUpdateParameters parameters)
         {
@@ -254,7 +253,7 @@ namespace Core.ApplicationServices.System.Write
 
         private Result<ItSystem, OperationError> UpdateTaskRefs(ItSystem system, IEnumerable<Guid> taskRefUuidsChanges)
         {
-            var taskRefUuids = taskRefUuidsChanges.ToList();
+            var taskRefUuids = taskRefUuidsChanges?.ToList() ?? new List<Guid>();
 
             var taskRefIds = new HashSet<int>();
             foreach (var uuid in taskRefUuids)

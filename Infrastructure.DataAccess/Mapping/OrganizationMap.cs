@@ -1,61 +1,62 @@
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.Infrastructure.Annotations;
+﻿using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class OrganizationMap : EntityMap<Organization>
     {
-        public OrganizationMap()
+        public override void Configure(EntityTypeBuilder<Organization> builder)
         {
-            // Properties
-            Property(x => x.Name)
-                .HasMaxLength(Organization.MaxNameLength)
-                // http://stackoverflow.com/questions/1827063/mysql-error-key-specification-without-a-key-length
-                .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(new IndexAttribute()));
-            Property(t => t.Cvr)
-                .HasMaxLength(10)
-                .IsOptional()
-                .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(new IndexAttribute()));
+            base.Configure(builder);
 
-            // Table & Column Mappings
-            ToTable("Organization");
+            builder.Property(x => x.Name).HasMaxLength(Organization.MaxNameLength);
+            builder.HasIndex(x => x.Name);
 
-            // Relationships
-            HasOptional(t => t.Config)
-                .WithRequired(t => t.Organization)
-                .WillCascadeOnDelete(true);
+            builder.Property(t => t.Cvr).HasMaxLength(10);
+            builder.HasIndex(t => t.Cvr);
 
-            HasRequired(t => t.Type)
+            builder.ToTable("Organization");
+
+            builder.HasOne(t => t.Config)
+                .WithOne(t => t.Organization)
+                .HasForeignKey<Config>(c => c.Id)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(t => t.Type)
                 .WithMany(t => t.Organizations)
                 .HasForeignKey(t => t.TypeId)
-                .WillCascadeOnDelete(false);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            HasOptional(o => o.ContactPerson)
-                .WithOptionalDependent(c => c.Organization)
-                .WillCascadeOnDelete(true);
+            builder.HasOne(o => o.ContactPerson)
+                .WithOne(c => c.Organization)
+                .HasForeignKey<Organization>("ContactPerson_Id")
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            HasOptional(o => o.ForeignCountryCode)
+            builder.HasOne(o => o.ForeignCountryCode)
                 .WithMany(c => c.References)
                 .HasForeignKey(o => o.ForeignCountryCodeId);
 
-            HasMany(x => x.DataResponsibles)
-                .WithOptional(dr => dr.Organization)
-                .WillCascadeOnDelete(true);
+            builder.HasMany(x => x.DataResponsibles)
+                .WithOne(dr => dr.Organization)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            HasMany(x => x.DataProtectionAdvisors)
-                .WithOptional(dr => dr.Organization)
-                .WillCascadeOnDelete(true);
+            builder.HasMany(x => x.DataProtectionAdvisors)
+                .WithOne(dr => dr.Organization)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            TypeMapping.AddIndexOnAccessModifier<OrganizationMap, Organization>(this);
+            TypeMapping.AddIndexOnAccessModifier(builder);
 
-            Property(x => x.Uuid)
-                .IsRequired()
-                .HasUniqueIndexAnnotation("UX_Organization_UUID", 0);
+            builder.Ignore(o => o.OrganizationOptions);
 
-            Property(x => x.IsDefaultOrganization)
-                .IsOptional()
-                .HasIndexAnnotation("IX_DEFAULT_ORG", 0);
+            builder.Property(x => x.Uuid).IsRequired();
+            builder.HasIndex(x => x.Uuid).IsUnique().HasDatabaseName("UX_Organization_UUID");
+
+            builder.HasIndex(x => x.IsDefaultOrganization).HasDatabaseName("IX_DEFAULT_ORG");
         }
     }
 }

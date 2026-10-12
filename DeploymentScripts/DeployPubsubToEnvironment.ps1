@@ -6,7 +6,9 @@ param (
     [string]$ASPNETCORE_ENVIRONMENT,
 
     [Parameter(Mandatory = $true)]
-    [string]$IMAGE_TAG 
+    [string]$IMAGE_TAG,
+
+    [string]$DATABASE_PROVIDER = "PostgreSql"
 )
 
 .$PSScriptRoot\SetupPubsubEnviroment.ps1
@@ -50,6 +52,7 @@ PUBSUB_API_KEY=$Env:PUBSUB_API_KEY
 IDP_HOST_MAPPING=$Env:IDP_HOST_MAPPING
 CERT_PASSWORD=$Env:CERT_PASSWORD
 PUBSUB_CONNECTION_STRING=$Env:PUBSUB_CONNECTION_STRING
+DATABASE_PROVIDER=$DATABASE_PROVIDER
 IMAGE_TAG=$IMAGE_TAG
 "@
 

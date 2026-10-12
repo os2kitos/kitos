@@ -1,30 +1,33 @@
-﻿using Core.ApplicationServices.Authorization;
+﻿using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
+using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Shared;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
+using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Generic;
 using Core.DomainServices.GDPR;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Reference;
+using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Core.Abstractions.Extensions;
-using Core.Abstractions.Types;
-using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
-using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Organization;
-using Core.DomainServices;
-using Core.DomainServices.Queries;
-using Core.DomainServices.Role;
-using Core.ApplicationServices.Model.GDPR;
-using Core.ApplicationServices.Organizations;
 
 namespace Core.ApplicationServices.GDPR
 {
+    //13/10/2025 DEPRECATED: this service only serves test purposes through leftover setup with v1 controllers.
+    //Do not use in application code as it ignores v2 API authorization rules.
     public class DataProcessingRegistrationApplicationService : IDataProcessingRegistrationApplicationService
     {
         private readonly IAuthorizationContext _authorizationContext;
@@ -38,12 +41,14 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingRegistrationInsecureCountriesAssignmentService _countryAssignmentService;
         private readonly IDataProcessingRegistrationBasisForTransferAssignmentService _basisForTransferAssignmentService;
         private readonly IDataProcessingRegistrationOversightOptionsAssignmentService _oversightOptionAssignmentService;
-        private readonly IDataProcessingRegistrationOversightDateAssignmentService _oversightDateAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IOrganizationalUserContext _userContext;
         private readonly IGenericRepository<DataProcessingRegistrationOversightDate> _dataProcessingRegistrationOversightDateRepository;
         private readonly IGenericRepository<SubDataProcessor> _sdpRepository;
         private readonly IOrganizationService _organizationService;
+        private readonly IGenericRepository<DataProcessingRegistrationOversightDate> _oversightDateRepository;
+        private readonly IFieldAuthorizationModel _fieldAuthorizationModel;
+        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
         public DataProcessingRegistrationApplicationService(
             IAuthorizationContext authorizationContext,
@@ -57,12 +62,14 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingRegistrationInsecureCountriesAssignmentService countryAssignmentService,
             IDataProcessingRegistrationBasisForTransferAssignmentService basisForTransferAssignmentService,
             IDataProcessingRegistrationOversightOptionsAssignmentService oversightOptionAssignmentService,
-            IDataProcessingRegistrationOversightDateAssignmentService oversightDateAssignmentService,
             ITransactionManager transactionManager,
             IOrganizationalUserContext userContext,
             IGenericRepository<DataProcessingRegistrationOversightDate> dataProcessingRegistrationOversightDateRepository,
             IGenericRepository<SubDataProcessor> sdpRepository, 
-            IOrganizationService organizationService)
+            IOrganizationService organizationService,
+            IGenericRepository<DataProcessingRegistrationOversightDate> oversightDateRepository, 
+            IFieldAuthorizationModel fieldAuthorizationModel,
+            IEntityIdentityResolver entityIdentityResolver)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;
@@ -75,12 +82,14 @@ namespace Core.ApplicationServices.GDPR
             _countryAssignmentService = countryAssignmentService;
             _basisForTransferAssignmentService = basisForTransferAssignmentService;
             _oversightOptionAssignmentService = oversightOptionAssignmentService;
-            _oversightDateAssignmentService = oversightDateAssignmentService;
             _transactionManager = transactionManager;
             _userContext = userContext;
             _dataProcessingRegistrationOversightDateRepository = dataProcessingRegistrationOversightDateRepository;
             _sdpRepository = sdpRepository;
             _organizationService = organizationService;
+            _oversightDateRepository = oversightDateRepository;
+            _fieldAuthorizationModel = fieldAuthorizationModel;
+            _entityIdentityResolver = entityIdentityResolver;
         }
 
         public Result<DataProcessingRegistration, OperationError> Create(int organizationId, string name)
@@ -197,7 +206,7 @@ namespace Core.ApplicationServices.GDPR
                 registration => (registration, _roleAssignmentsService.GetApplicableRoles(registration).ToList()));
         }
 
-        public Result<IEnumerable<User>, OperationError> GetUsersWhichCanBeAssignedToRole(int id, int roleId, string nameEmailQuery, int pageSize)
+        public Result<IEnumerable<User>, OperationError> GetUsersWhichCanBeAssignedToRole(int id, int roleId, string? nameEmailQuery, int pageSize)
         {
             if (pageSize < 1)
                 throw new ArgumentException($"{nameof(pageSize)} must be above 0");
@@ -226,7 +235,7 @@ namespace Core.ApplicationServices.GDPR
             return Modify(id, registration => _roleAssignmentsService.RemoveRole(registration, roleId, userId));
         }
 
-        public Result<IEnumerable<ItSystemUsage>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
+        public Result<IEnumerable<ItSystemUsage>, OperationError> GetSystemsWhichCanBeAssigned(int id, string? nameQuery, int pageSize)
         {
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
@@ -257,7 +266,7 @@ namespace Core.ApplicationServices.GDPR
             return Modify(id, registration => _systemAssignmentService.RemoveSystem(registration, systemId));
         }
 
-        public Result<IEnumerable<Organization>, OperationError> GetDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
+        public Result<IEnumerable<Organization>, OperationError> GetDataProcessorsWhichCanBeAssigned(int id, string? nameQuery, int pageSize)
         {
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
@@ -288,7 +297,7 @@ namespace Core.ApplicationServices.GDPR
             return Modify(id, registration => _dataProcessingRegistrationDataProcessorAssignmentService.RemoveDataProcessor(registration, organizationId));
         }
 
-        public Result<IEnumerable<Organization>, OperationError> GetSubDataProcessorsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
+        public Result<IEnumerable<Organization>, OperationError> GetSubDataProcessorsWhichCanBeAssigned(int id, string? nameQuery, int pageSize)
         {
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
 
@@ -414,7 +423,6 @@ namespace Core.ApplicationServices.GDPR
         public Result<DataProcessingBasisForTransferOption, OperationError> ClearBasisForTransfer(int id)
         {
             return Modify(id, registration => _basisForTransferAssignmentService.Clear(registration));
-
         }
 
         public Result<DataProcessingRegistration, OperationError> UpdateOversightInterval(int id, YearMonthIntervalOption oversightInterval)
@@ -536,19 +544,27 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
-        public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(int id, DateTime oversightDate, string oversightRemark)
+        public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(int id, DateTime oversightDate, string? oversightRemark, string? oversightReportLink, string? oversightReportLinkName, Guid? oversightOptionUuid)
         {
-            return Modify(id, registration => _oversightDateAssignmentService.Assign(registration, oversightDate, oversightRemark));
+            return Modify(id, registration => ResolveOversightOptionId(oversightOptionUuid)
+                .Bind(oversightOptionId => registration.AssignOversightDate(oversightDate, oversightRemark, oversightReportLink, oversightReportLinkName, oversightOptionId)));
         }
 
-        public Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int id, int oversightDateId, DateTime oversightDate, string oversightRemark)
+        private Result<int?, OperationError> ResolveOversightOptionId(Guid? oversightOptionUuid)
         {
-            return Modify(id, registration => _oversightDateAssignmentService.Modify(registration, oversightDateId, oversightDate, oversightRemark));
-        }
+            if (!oversightOptionUuid.HasValue)
+                return (int?)null;
 
+            var oversightOptionId = _entityIdentityResolver.ResolveDbId<DataProcessingOversightOption>(oversightOptionUuid.Value);
+            if (oversightOptionId.IsNone)
+                return new OperationError($"Failed to resolve Id for Uuid {oversightOptionUuid.Value}", OperationFailure.BadInput);
+
+            return oversightOptionId.Value;
+        }
+        
         public Result<DataProcessingRegistrationOversightDate, OperationError> RemoveOversightDate(int id, int oversightDateId)
         {
-            return Modify(id, registration => _oversightDateAssignmentService.Remove(registration, oversightDateId));
+            return Modify(id, registration => Remove(registration, oversightDateId));
         }
 
         public Result<DataProcessingRegistration, OperationError> UpdateOversightCompletedRemark(int id, string remark)
@@ -604,7 +620,7 @@ namespace Core.ApplicationServices.GDPR
                 );
         }
 
-        public Result<DataProcessingRegistrationPermissions, OperationError> GetPermissions(Guid uuid)
+        public Result<CombinedPermissionsResult, OperationError> GetPermissions(Guid uuid)
         {
             return GetByUuid(uuid).Transform(GetPermissions);
         }
@@ -616,18 +632,34 @@ namespace Core.ApplicationServices.GDPR
                 .Select(organization => ResourceCollectionPermissionsResult.FromOrganizationId<DataProcessingRegistration>(organization.Id, _authorizationContext));
         }
 
-        private Result<DataProcessingRegistrationPermissions, OperationError> GetPermissions(Result<DataProcessingRegistration, OperationError> systemResult)
+        private Result<CombinedPermissionsResult, OperationError> GetPermissions(Result<DataProcessingRegistration, OperationError> dprResult)
         {
-            return systemResult
+            return dprResult
                 .Transform
                 (
-                    system =>
+                    dpr =>
                     {
                         return ResourcePermissionsResult
-                            .FromResolutionResult(system, _authorizationContext)
-                            .Select(permissions =>
-                                new DataProcessingRegistrationPermissions(permissions));
+                            .FromResolutionResult(dpr, _authorizationContext)
+                            .Bind(permissions =>
+                            {
+                                return ModuleFieldsPermissionsResult
+                                    .CreateFromDPRResult(_fieldAuthorizationModel, dpr)
+                                    .Select(fieldPermissions =>
+                                        new CombinedPermissionsResult(permissions, fieldPermissions)
+                                    );
+                            });
                     });
+        }
+
+        private Result<DataProcessingRegistrationOversightDate, OperationError> Remove(DataProcessingRegistration registration, int oversightId)
+        {
+            var removedRegistration = registration.RemoveOversightDate(oversightId);
+            if (removedRegistration.Ok)
+            {
+                _oversightDateRepository.Delete(removedRegistration.Value);
+            }
+            return removedRegistration;
         }
     }
 }

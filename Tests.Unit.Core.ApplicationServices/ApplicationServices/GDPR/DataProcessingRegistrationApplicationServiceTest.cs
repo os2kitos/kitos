@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Core.Abstractions.Helpers;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
-using Core.ApplicationServices.Model.GDPR;
 using Core.ApplicationServices.Model.GDPR.Write.SubDataProcessor;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
@@ -16,14 +13,18 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Generic;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
-
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Core.ApplicationServices.Model.Shared;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -44,11 +45,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService> _insecureThirdCountryAssignmentMock;
         private readonly Mock<IDataProcessingRegistrationBasisForTransferAssignmentService> _basisForTransferAssignmentServiceMock;
         private readonly Mock<IDataProcessingRegistrationOversightOptionsAssignmentService> _oversightOptionAssignmentServiceMock;
-        private readonly Mock<IDataProcessingRegistrationOversightDateAssignmentService> _oversightDateAssignmentServiceMock;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IGenericRepository<DataProcessingRegistrationOversightDate>> _dprOversightDaterepositoryMock;
         private readonly Mock<IGenericRepository<SubDataProcessor>> _sdpRepositoryMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
+        private readonly Mock<IGenericRepository<DataProcessingRegistrationOversightDate>> _oversightDateRepositoryMock;
+        private readonly Mock<IFieldAuthorizationModel> _fieldAuthorizationModelMock;
+        private readonly Mock<IEntityIdentityResolver> _entityIdentityResolverMock;
 
         public DataProcessingRegistrationApplicationServiceTest()
         {
@@ -64,11 +67,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _insecureThirdCountryAssignmentMock = new Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService>();
             _basisForTransferAssignmentServiceMock = new Mock<IDataProcessingRegistrationBasisForTransferAssignmentService>();
             _oversightOptionAssignmentServiceMock = new Mock<IDataProcessingRegistrationOversightOptionsAssignmentService>();
-            _oversightDateAssignmentServiceMock = new Mock<IDataProcessingRegistrationOversightDateAssignmentService>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _dprOversightDaterepositoryMock = new Mock<IGenericRepository<DataProcessingRegistrationOversightDate>>();
             _sdpRepositoryMock = new Mock<IGenericRepository<SubDataProcessor>>();
             _organizationServiceMock = new Mock<IOrganizationService>();
+            _oversightDateRepositoryMock = new Mock<IGenericRepository<DataProcessingRegistrationOversightDate>>();
+            _fieldAuthorizationModelMock = new Mock<IFieldAuthorizationModel>();
+            _entityIdentityResolverMock = new Mock<IEntityIdentityResolver>();
             _sut = new DataProcessingRegistrationApplicationService(
                 _authorizationContextMock.Object,
                 _repositoryMock.Object,
@@ -81,12 +86,14 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _insecureThirdCountryAssignmentMock.Object,
                 _basisForTransferAssignmentServiceMock.Object,
                 _oversightOptionAssignmentServiceMock.Object,
-                _oversightDateAssignmentServiceMock.Object,
                 _transactionManagerMock.Object,
                 _userContextMock.Object,
                 _dprOversightDaterepositoryMock.Object,
                 _sdpRepositoryMock.Object,
-                _organizationServiceMock.Object);
+                _organizationServiceMock.Object,
+                _oversightDateRepositoryMock.Object,
+                _fieldAuthorizationModelMock.Object,
+                _entityIdentityResolverMock.Object);
         }
 
         [Fact]
@@ -1622,17 +1629,21 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             //Arrange
             var id = A<int>();
-            var registration = new DataProcessingRegistration();
+            var registration = new DataProcessingRegistration{ IsOversightCompleted = YesNoUndecidedOption.Yes};
             var oversightDate = A<DateTime>();
             var oversightRemark = A<string>();
+            var oversightReportLink = A<string>();
+            var oversightReportLinkName = A<string>();
+            var oversightOptionUuid = A<Guid>();
+            var oversightOptionId = A<int>();
+            _entityIdentityResolverMock.Setup(x => x.ResolveDbId<DataProcessingOversightOption>(oversightOptionUuid)).Returns(oversightOptionId);
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
 
             var transaction = ExpectTransaction();
-            _oversightDateAssignmentServiceMock.Setup(x => x.Assign(registration, oversightDate, oversightRemark)).Returns(Result<DataProcessingRegistrationOversightDate, OperationError>.Success(new DataProcessingRegistrationOversightDate()));
 
             //Act
-            var result = _sut.AssignOversightDate(id, oversightDate, oversightRemark);
+            var result = _sut.AssignOversightDate(id, oversightDate, oversightRemark, oversightReportLink, oversightReportLinkName, oversightOptionUuid);
 
             //Assert
             Assert.True(result.Ok);
@@ -1643,49 +1654,19 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         [Fact]
         public void Cannot_AssignOversightDate_If_Dpr_Is_Not_Found()
         {
-            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignOversightDate(id, A<DateTime>(), A<string>()));
+            var oversightReportLink = A<string>();
+            var oversightReportLinkName = A<string>();
+            var oversightOptionUuid = A<Guid>();
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.AssignOversightDate(id, A<DateTime>(), A<string>(), oversightReportLink, oversightReportLinkName, oversightOptionUuid));
         }
 
         [Fact]
         public void Cannot_AssignOversightDate_If_Write_Access_Is_Denied()
         {
-            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignOversightDate(id, A<DateTime>(), A<string>()));
-        }
-
-        [Fact]
-        public void Can_ModifyOversightDate()
-        {
-            //Arrange
-            var id = A<int>();
-            var registration = new DataProcessingRegistration();
-            var oversightDateId = A<int>();
-            var oversightDate = A<DateTime>();
-            var oversightRemark = A<string>();
-            ExpectRepositoryGetToReturn(id, registration);
-            ExpectAllowModifyReturns(registration, true);
-
-            var transaction = ExpectTransaction();
-            _oversightDateAssignmentServiceMock.Setup(x => x.Modify(registration, oversightDateId, oversightDate, oversightRemark)).Returns(Result<DataProcessingRegistrationOversightDate, OperationError>.Success(new DataProcessingRegistrationOversightDate()));
-
-            //Act
-            var result = _sut.ModifyOversightDate(id, oversightDateId, oversightDate, oversightRemark);
-
-            //Assert
-            Assert.True(result.Ok);
-
-            transaction.Verify(x => x.Commit());
-        }
-
-        [Fact]
-        public void Cannot_ModifyOversightDate_If_Dpr_Is_Not_Found()
-        {
-            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.ModifyOversightDate(id, A<int>(), A<DateTime>(), A<string>()));
-        }
-
-        [Fact]
-        public void Cannot_ModifyOversightDate_If_Write_Access_Is_Denied()
-        {
-            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.ModifyOversightDate(id, A<int>(), A<DateTime>(), A<string>()));
+            var oversightReportLink = A<string>();
+            var oversightReportLinkName = A<string>();
+            var oversightOptionUuid = A<Guid>();
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.AssignOversightDate(id, A<DateTime>(), A<string>(), oversightReportLink, oversightReportLinkName, oversightOptionUuid));
         }
 
         [Fact]
@@ -1693,13 +1674,12 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             //Arrange
             var id = A<int>();
-            var registration = new DataProcessingRegistration();
             var oversightDateId = A<int>();
+            var registration = new DataProcessingRegistration{ OversightDates = { new DataProcessingRegistrationOversightDate{ Id = oversightDateId }}};
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
 
             var transaction = ExpectTransaction();
-            _oversightDateAssignmentServiceMock.Setup(x => x.Remove(registration, oversightDateId)).Returns(Result<DataProcessingRegistrationOversightDate, OperationError>.Success(new DataProcessingRegistrationOversightDate()));
 
             //Act
             var result = _sut.RemoveOversightDate(id, oversightDateId);
@@ -1835,10 +1815,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.Equal(2, dprs.Count());
-            var result1 = Assert.Single(dprs.Where(x => x.OrganizationId == org1));
+            var result1 = Assert.Single(dprs, x => x.OrganizationId == org1);
             Assert.Same(registration1, result1);
 
-            var result2 = Assert.Single(dprs.Where(x => x.OrganizationId == org2));
+            var result2 = Assert.Single(dprs, x => x.OrganizationId == org2);
             Assert.Same(registration2, result2);
         }
 
@@ -1925,11 +1905,45 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             //Arrange
             var uuid = A<Guid>();
-            var registration = new DataProcessingRegistration { Id = A<int>(), Uuid = uuid };
+            var orgUuid = A<Guid>();
+            var registration = new DataProcessingRegistration 
+            { 
+                Id = A<int>(), 
+                Uuid = uuid,  
+                Organization = new Organization { Id = A<int>(), Uuid = orgUuid } 
+            };
+
+            var oversightDateCollectionEnabled = A<bool>();
+            var oversightDateDateEnabled = A<bool>();
+            var oversightDateRemarkEnabled = A<bool>();
+            var oversightDateLinkNameEnabled = A<bool>();
+            var oversightDateLinkEnabled = A<bool>();
+
+            var oversightDateCollectionKey = ObjectHelper
+                .GetPropertyPath<DataProcessingRegistration>(
+                    x => x.IsOversightCompleted);
+            var oversightDateDateKey = ObjectHelper
+                .GetPropertyPath<DataProcessingRegistrationOversightDate>(
+                    x => x.OversightDate);
+            var oversightDateRemarkKey = ObjectHelper
+                .GetPropertyPath<DataProcessingRegistrationOversightDate>(
+                    x => x.OversightRemark);
+            var oversightDateLinkKey = ObjectHelper
+                .GetPropertyPath<DataProcessingRegistrationOversightDate>(
+                    x => x.OversightReportLink);
+            var oversightDateLinkNameKey =
+                ObjectHelper.GetPropertyPath<DataProcessingRegistrationOversightDate>(x =>
+                    x.OversightReportLinkName);
+
             _repositoryMock.Setup(x => x.AsQueryable()).Returns(CreateListOfDPRFromDpr(registration).AsQueryable());
             ExpectAllowReadReturns(registration, read);
             ExpectAllowModifyReturns(registration, modify);
             ExpectAllowDeleteReturns(registration, delete);
+            ExpectGetFieldPermissionsReturns(registration, oversightDateCollectionKey, oversightDateCollectionEnabled);
+            ExpectGetFieldPermissionsReturns(registration, oversightDateDateKey, oversightDateDateEnabled);
+            ExpectGetFieldPermissionsReturns(registration, oversightDateRemarkKey, oversightDateRemarkEnabled);
+            ExpectGetFieldPermissionsReturns(registration, oversightDateLinkNameKey, oversightDateLinkNameEnabled);
+            ExpectGetFieldPermissionsReturns(registration, oversightDateLinkKey, oversightDateLinkEnabled);
 
             //Act
             var result = _sut.GetPermissions(uuid);
@@ -1937,9 +1951,30 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             var permissions = result.Value;
-            Assert.Equivalent(new DataProcessingRegistrationPermissions(new ResourcePermissionsResult(read, modify, delete)), permissions);
+            if (!permissions.BasePermissions.Read)
+            {
+                Assert.Empty(permissions.FieldPermissions.Fields);
+                return;
+            }
+
+            Assert.Equivalent(new CombinedPermissionsResult(new ResourcePermissionsResult(read, modify, delete), new ModuleFieldsPermissionsResult
+            {
+                Fields = new List<FieldPermissionsResult>
+                {
+                    new() { Enabled = oversightDateCollectionEnabled, Key = oversightDateCollectionKey },
+                    new() { Enabled = oversightDateDateEnabled, Key = oversightDateDateKey },
+                    new() { Enabled = oversightDateRemarkEnabled, Key = oversightDateRemarkKey },
+                    new() { Enabled = oversightDateLinkNameEnabled, Key = oversightDateLinkNameKey },
+                    new() { Enabled = oversightDateLinkEnabled, Key = oversightDateLinkKey }
+                }
+            }), permissions);
         }
-        
+
+        private void ExpectGetFieldPermissionsReturns(DataProcessingRegistration registration, string key, bool result)
+        {
+            _fieldAuthorizationModelMock.Setup(x => x.GetFieldPermissions(registration, key, It.IsAny<Guid>())).Returns(new FieldPermissionsResult{ Enabled = result, Key = key});
+        }
+
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -1996,10 +2031,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         /// Helper test to make it easy to cover the "Modify succeeds" case
         /// </summary>
         /// <param name="command"></param>
-        /// <param name="assertAdditionalConditions">Additional assertions besides Result=OK AND transaction committed</param>
         private void Test_Command_Which_ModifiesState_With_Success<TSuccess>(
-            Func<DataProcessingRegistration, Result<TSuccess, OperationError>> command,
-            Action<DataProcessingRegistration, TSuccess> assertAdditionalConditions = null)
+            Func<DataProcessingRegistration, Result<TSuccess, OperationError>> command)
         {
             //Arrange
             var id = A<int>();

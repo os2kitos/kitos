@@ -1,7 +1,5 @@
 ﻿using Digst.OioIdws.Soap.MessageInspectors;
-using Digst.OioIdws.Soap.StrCustomization;
 using System;
-using System.IdentityModel.Tokens;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
 using System.ServiceModel.Dispatcher;
@@ -28,15 +26,6 @@ namespace Digst.OioIdws.Soap.Behaviors
             // Setting signature requirements for WSP repsonse to WSC
             // This is done in order to validate the response. This is required by [OIO IDWS SOAP 1.1].
             requirements.OutgoingSignatureParts.AddParts(SoapServiceBehavior.MessagePartSpecificationWsp());
-
-            var clientCredentials = bindingParameters.Find<ClientCredentials>();
-            clientCredentials.UseIdentityConfiguration = true; // Use WIF instead of WCF
-
-            var securityTokenHandlerCollectionManager = clientCredentials.SecurityTokenHandlerCollectionManager[
-                SecurityTokenHandlerCollectionManager.Usage.Default];
-            // This is done in order to have correct STR's (Security Token Reference)
-            securityTokenHandlerCollectionManager.AddOrReplace(
-                    new StrReferenceSaml2SecurityTokenHandler());
         }
 
         public static MessagePartSpecification MessagePartSpecificationWsc()

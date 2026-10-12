@@ -18,12 +18,14 @@ namespace Tools.SSOWithKombitSts
             var certificateFilename = args[0];
             var entityId = args[1];
             var callbackUrl = args[2] ?? entityId;
-            var samlMetadataTemplate = new XmlDocument {PreserveWhitespace = true};
+            var samlMetadataTemplate = new XmlDocument { PreserveWhitespace = true };
             samlMetadataTemplate.Load("SamlMetadataTemplate.xml");
             try
             {
-                var patchedCertificateSamlXml = PatchCertificatesInSamlMetadataXml(samlMetadataTemplate, certificateFilename);
-                var patchedEntityIdSamlXml = PatchEntityIdInSamlMetadataXml(patchedCertificateSamlXml, entityId, callbackUrl);
+                var patchedCertificateSamlXml =
+                    PatchCertificatesInSamlMetadataXml(samlMetadataTemplate, certificateFilename);
+                var patchedEntityIdSamlXml =
+                    PatchEntityIdInSamlMetadataXml(patchedCertificateSamlXml, entityId, callbackUrl);
                 var meta = new dk.nita.saml20.Saml20MetadataDocument(patchedEntityIdSamlXml);
                 var metaAsXmlString = meta.ToXml();
                 const string samlMetadataXmlFilename = "kitosids-saml-metadata.xml";
@@ -49,41 +51,63 @@ namespace Tools.SSOWithKombitSts
             Console.WriteLine();
             Console.WriteLine("SSOWithKombitSts [file.cer] [entityID] {callbackUrl}");
             Console.WriteLine();
-            Console.WriteLine("file.cer\tFilename for public part of exported FOCES certificate (Base64 X509 .cer format)");
-            Console.WriteLine("entityID\tEntityID identifying system in KOMBIT STS Administration module (eg https://kitos-internal.strongminds.dk)");
-            Console.WriteLine("callbackUrl\tServer for STS Organisation to callback, if different from entityID (eg https://kitostest.miracle.dk)");
+            Console.WriteLine(
+                "file.cer\tFilename for public part of exported FOCES certificate (Base64 X509 .cer format)");
+            Console.WriteLine(
+                "entityID\tEntityID identifying system in KOMBIT STS Administration module (eg https://kitos-internal.strongminds.dk)");
+            Console.WriteLine(
+                "callbackUrl\tServer for STS Organisation to callback, if different from entityID (eg https://kitostest.miracle.dk)");
             Console.WriteLine();
         }
 
-        private static XmlDocument PatchCertificatesInSamlMetadataXml(XmlDocument samlMetadataTemplate, string certificateFilename)
+        private static XmlDocument PatchCertificatesInSamlMetadataXml(XmlDocument samlMetadataTemplate,
+            string certificateFilename)
         {
             var namespaceManager = GetXmlNamespaceManager(samlMetadataTemplate);
             var certificateNodes = samlMetadataTemplate.SelectNodes("//ds:X509Certificate", namespaceManager);
             var extractCertificateFromFile = ExtractCertificateFromFile(certificateFilename);
+            if (certificateNodes == null)
+                return samlMetadataTemplate;
+
             for (var i = 0; i < certificateNodes.Count; i++)
             {
-                certificateNodes.Item(i).InnerText = extractCertificateFromFile;
+                certificateNodes.Item(i)?.InnerText = extractCertificateFromFile;
             }
+
             return samlMetadataTemplate;
         }
 
         private static XmlNamespaceManager GetXmlNamespaceManager(XmlDocument samlMetadataTemplate)
         {
-          var namespaceManager = new XmlNamespaceManager(samlMetadataTemplate.NameTable);
-          namespaceManager.AddNamespace("md", "urn:oasis:names:tc:SAML:2.0:metadata");
-          namespaceManager.AddNamespace("ds", "http://www.w3.org/2000/09/xmldsig#");
-          return namespaceManager;
+            var namespaceManager = new XmlNamespaceManager(samlMetadataTemplate.NameTable);
+            namespaceManager.AddNamespace("md", "urn:oasis:names:tc:SAML:2.0:metadata");
+            namespaceManager.AddNamespace("ds", "http://www.w3.org/2000/09/xmldsig#");
+            return namespaceManager;
         }
 
         private static XmlDocument PatchEntityIdInSamlMetadataXml(XmlDocument patchedCertificateSamlXml,
             string entityId, string callbackUrl)
         {
-          var xmlNamespaceManager = GetXmlNamespaceManager(patchedCertificateSamlXml);
-          var entityIdAttr = patchedCertificateSamlXml.SelectSingleNode("//md:EntityDescriptor/@entityID", xmlNamespaceManager);
-          entityIdAttr.Value = entityId;
-          var acsLocation = patchedCertificateSamlXml.SelectSingleNode("//md:AssertionConsumerService/@Location", xmlNamespaceManager);
-          acsLocation.Value = callbackUrl.TrimEnd('/') + "/Login.ashx";
-          return patchedCertificateSamlXml;
+            var xmlNamespaceManager = GetXmlNamespaceManager(patchedCertificateSamlXml);
+            var entityIdAttr =
+                patchedCertificateSamlXml.SelectSingleNode("//md:EntityDescriptor/@entityID", xmlNamespaceManager);
+            if (entityIdAttr == null)
+            {
+                throw new NullReferenceException("Entity Descriptor is missing!");
+            }
+
+            entityIdAttr.Value = entityId;
+            var acsLocation =
+                patchedCertificateSamlXml.SelectSingleNode("//md:AssertionConsumerService/@Location",
+                    xmlNamespaceManager);
+            if (acsLocation == null)
+            {
+                throw new NullReferenceException("Assertion Consumer Service is missing!");
+            }
+
+            acsLocation.Value = callbackUrl.TrimEnd('/') + "/Login.ashx";
+
+            return patchedCertificateSamlXml;
         }
 
         private static string ExtractCertificateFromFile(string certificateFilename)
@@ -97,6 +121,7 @@ namespace Tools.SSOWithKombitSts
                     if (line.StartsWith("---")) continue;
                     result.Append(line);
                 }
+
                 return result.ToString();
             }
             catch (FileNotFoundException)

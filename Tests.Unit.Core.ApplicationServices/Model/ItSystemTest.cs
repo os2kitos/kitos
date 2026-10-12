@@ -1,6 +1,7 @@
 ﻿using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
+using System.Linq;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -25,7 +26,17 @@ namespace Tests.Unit.Core.Model
         [InlineData(ArchiveDutyRecommendationTypes.B, null)]
         [InlineData(ArchiveDutyRecommendationTypes.K, "")]
         [InlineData(ArchiveDutyRecommendationTypes.K, null)]
-        public void Can_UpdateRecommendedArchiveDuty(ArchiveDutyRecommendationTypes? recommendation, string comment)
+        [InlineData(ArchiveDutyRecommendationTypes.KB, null)]
+        [InlineData(ArchiveDutyRecommendationTypes.KB, "")]
+        [InlineData(ArchiveDutyRecommendationTypes.KD, null)]
+        [InlineData(ArchiveDutyRecommendationTypes.KD, "")]
+        [InlineData(ArchiveDutyRecommendationTypes.BK, null)]
+        [InlineData(ArchiveDutyRecommendationTypes.BK, "")]
+        [InlineData(ArchiveDutyRecommendationTypes.DK, null)]
+        [InlineData(ArchiveDutyRecommendationTypes.DK, "")]
+        [InlineData(ArchiveDutyRecommendationTypes.DD, null)]
+        [InlineData(ArchiveDutyRecommendationTypes.DD, "")]
+        public void Can_UpdateRecommendedArchiveDuty(ArchiveDutyRecommendationTypes? recommendation, string? comment)
         {
             //Act
             var error = _sut.UpdateRecommendedArchiveDuty(recommendation, comment);

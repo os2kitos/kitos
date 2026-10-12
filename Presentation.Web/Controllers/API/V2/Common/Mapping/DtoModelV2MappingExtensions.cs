@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel;
@@ -45,6 +45,11 @@ namespace Presentation.Web.Controllers.API.V2.Common.Mapping
         public static ShallowOrganizationResponseDTO MapShallowOrganizationResponseDTO(this Organization organization)
         {
             return new(organization.Uuid, organization.Name, organization.GetActiveCvr());
+        }
+
+        public static ShallowOrganizationResponseWithDisabledStateDTO MapShallowOrganizationResponseWithDisabledStateDTO(this Organization organization)
+        {
+            return new(organization.Uuid, organization.Name, organization.GetActiveCvr(), organization.Disabled);
         }
 
         public static UserRolePair ToUserRolePair(this RoleAssignmentRequestDTO src)

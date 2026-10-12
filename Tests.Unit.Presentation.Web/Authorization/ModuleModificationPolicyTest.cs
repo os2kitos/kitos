@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
+using Core.DomainModel.Archive;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -77,6 +78,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ItSystem), false, true, null, true)]
         [InlineData(typeof(ItInterface), false, true, null, true)]
         [InlineData(typeof(ItSystemUsage), false, true, null, true)]
+        [InlineData(typeof(ItSystemUsageArchive), false, true, null, true)]
         [InlineData(typeof(ItContract), false, true, null, true)]
         [InlineData(typeof(Organization), false, true, null, true)]
         [InlineData(typeof(User), false, true, null, true)]
@@ -86,6 +88,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ItSystem), true, false, null, false)]
         [InlineData(typeof(ItInterface), true, false, null, true)]
         [InlineData(typeof(ItSystemUsage), true, false, null, true)]
+        [InlineData(typeof(ItSystemUsageArchive), true, false, null, true)]
         [InlineData(typeof(ItContract), true, false, null, true)]
         [InlineData(typeof(User), true, false, null, true)]
         [InlineData(typeof(Organization), true, false, null, false)]
@@ -95,6 +98,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ItSystem), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(ItInterface), false, false, OrganizationRole.SystemModuleAdmin, true)]
         [InlineData(typeof(ItSystemUsage), false, false, OrganizationRole.SystemModuleAdmin, true)]
+        [InlineData(typeof(ItSystemUsageArchive), false, false, OrganizationRole.SystemModuleAdmin, true)]
         [InlineData(typeof(ItContract), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(Organization), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(User), false, false, OrganizationRole.SystemModuleAdmin, false)]
@@ -104,6 +108,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ItSystem), false, false, OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(typeof(ItInterface), false, false, OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(typeof(ItSystemUsage), false, false, OrganizationRole.ContractModuleAdmin, false)]
+        [InlineData(typeof(ItSystemUsageArchive), false, false, OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(typeof(ItContract), false, false, OrganizationRole.ContractModuleAdmin, true)]
         [InlineData(typeof(Organization), false, false, OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(typeof(User), false, false, OrganizationRole.ContractModuleAdmin, false)]
@@ -113,6 +118,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ItSystem), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(typeof(ItInterface), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(typeof(ItSystemUsage), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
+        [InlineData(typeof(ItSystemUsageArchive), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(typeof(ItContract), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(typeof(Organization), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(typeof(User), false, false, OrganizationRole.OrganizationModuleAdmin, true)]

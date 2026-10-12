@@ -1,6 +1,7 @@
-﻿using Core.DomainModel;
+using Core.DomainModel;
 using Core.Abstractions.Types;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.API.V2.External.Generic
 {
@@ -14,6 +15,11 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             (
                 (RecommendedArchiveDutyChoice.B, ArchiveDutyRecommendationTypes.B),
                 (RecommendedArchiveDutyChoice.K, ArchiveDutyRecommendationTypes.K),
+                (RecommendedArchiveDutyChoice.BK, ArchiveDutyRecommendationTypes.BK),
+                (RecommendedArchiveDutyChoice.KB, ArchiveDutyRecommendationTypes.KB),
+                (RecommendedArchiveDutyChoice.KD, ArchiveDutyRecommendationTypes.KD),
+                (RecommendedArchiveDutyChoice.DK, ArchiveDutyRecommendationTypes.DK),
+                (RecommendedArchiveDutyChoice.DD, ArchiveDutyRecommendationTypes.DD),
                 (RecommendedArchiveDutyChoice.NoRecommendation, ArchiveDutyRecommendationTypes.NoRecommendation),
                 (RecommendedArchiveDutyChoice.Undecided, ArchiveDutyRecommendationTypes.Undecided),
                 (RecommendedArchiveDutyChoice.PreserveDataCanDiscardDocuments, ArchiveDutyRecommendationTypes.PreserveDataCanDiscardDocuments)

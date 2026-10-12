@@ -1,25 +1,21 @@
-﻿using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Web.Helpers;
-using System.Web.Http.Controllers;
-using System.Web.Mvc;
+using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authentication;
-
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using Presentation.Web.Extensions;
 using Presentation.Web.Helpers;
 using Serilog;
-using ActionFilterAttribute = System.Web.Http.Filters.ActionFilterAttribute;
 
 namespace Presentation.Web.Infrastructure.Attributes
 {
     public class RequireValidatedCSRFAttributed : ActionFilterAttribute
     {
-        public override void OnActionExecuting(HttpActionContext actionContext)
+        public override void OnActionExecuting(ActionExecutingContext actionContext)
         {
-
             var error = Maybe<string>.None;
 
             if (RequiresAntiforgeryCheck(actionContext))
@@ -29,7 +25,7 @@ namespace Presentation.Web.Infrastructure.Attributes
 
             if (error.HasValue)
             {
-                FailWith(actionContext, error.Value);
+                actionContext.Result = new BadRequestObjectResult(error.Value);
             }
             else
             {
@@ -37,90 +33,58 @@ namespace Presentation.Web.Infrastructure.Attributes
             }
         }
 
-        private static Maybe<string> ValidateCSRF(HttpActionContext actionContext)
+        private static Maybe<string> ValidateCSRF(ActionExecutingContext actionContext)
         {
-            var request = actionContext.Request;
-            var logger = GetService<ILogger>(actionContext);
-            var headers = request.Headers;
+            var request = actionContext.HttpContext.Request;
+            var logger = actionContext.HttpContext.RequestServices.GetRequiredService<ILogger>();
 
-            if (!headers.TryGetValues(Constants.CSRFValues.HeaderName, out var xsrfToken))
-            {
+            if (!request.Headers.TryGetValue(Constants.CSRFValues.HeaderName, out var xsrfToken))
                 return Maybe<string>.Some(Constants.CSRFValues.MissingXsrfHeaderError);
-            }
 
-            var tokenHeaderValue = xsrfToken.First();
-            var cookieHeaderValue = GetCookie(request);
+            var tokenHeaderValue = xsrfToken.FirstOrDefault();
+            var cookieHeaderValue = request.Cookies[Constants.CSRFValues.CookieName];
 
-            if (cookieHeaderValue?.Value == null)
-            {
+            if (cookieHeaderValue == null)
                 return Maybe<string>.Some(Constants.CSRFValues.MissingXsrfCookieError);
-            }
 
-            try
+            if (tokenHeaderValue != cookieHeaderValue)
             {
-                AntiForgery.Validate(cookieHeaderValue.Value, tokenHeaderValue);
-            }
-            catch (HttpAntiForgeryException e)
-            {
-                logger.Error(e.Message);
+                logger.Error("XSRF token mismatch");
                 return Maybe<string>.Some(Constants.CSRFValues.XsrfValidationFailedError);
             }
 
             return Maybe<string>.None;
         }
 
-        private static bool RequiresAntiforgeryCheck(HttpActionContext actionContext)
+        private static bool RequiresAntiforgeryCheck(ActionExecutingContext actionContext)
         {
-            return IgnoreCSRFCheck(actionContext) == false;
+            return !IgnoreCSRFCheck(actionContext);
         }
 
-        private static CookieState GetCookie(HttpRequestMessage request)
-        {
-            return request
-                .Headers
-                .GetCookies()
-                .SelectMany(x => x.Cookies)
-                .FirstOrDefault(c => c.Name == Constants.CSRFValues.CookieName);
-        }
-
-        private static bool IgnoreCSRFCheck(HttpActionContext actionContext)
+        private static bool IgnoreCSRFCheck(ActionExecutingContext actionContext)
         {
             return IsExternalApiRequest(actionContext) ||
                    IsReadOnlyRequest(actionContext) ||
                    CSRFCheckIsIgnoredOnTargetMethod(actionContext);
         }
 
-        private static bool CSRFCheckIsIgnoredOnTargetMethod(HttpActionContext actionContext)
+        private static bool CSRFCheckIsIgnoredOnTargetMethod(ActionExecutingContext actionContext)
         {
-
-            return
-                actionContext.ActionDescriptor.GetCustomAttributes<IgnoreCSRFProtectionAttribute>().Any() ||
-                actionContext.ControllerContext.ControllerDescriptor.GetCustomAttributes<IgnoreCSRFProtectionAttribute>().Any();
+            return actionContext.ActionDescriptor.EndpointMetadata
+                .OfType<IgnoreCSRFProtectionAttribute>()
+                .Any();
         }
 
-        private static bool IsExternalApiRequest(HttpActionContext actionContext)
+        private static bool IsExternalApiRequest(ActionExecutingContext actionContext)
         {
-            var authenticationContext = GetService<IAuthenticationContext>(actionContext);
+            var authenticationContext = actionContext.HttpContext.RequestServices
+                .GetRequiredService<IAuthenticationContext>();
             return authenticationContext.Method == AuthenticationMethod.KitosToken;
         }
 
-        private static bool IsReadOnlyRequest(HttpActionContext actionContext)
+        private static bool IsReadOnlyRequest(ActionExecutingContext actionContext)
         {
-            return !actionContext.Request.Method.Method.IsMutation();
-        }
-
-        private static void FailWith(HttpActionContext context, string errorMessage)
-        {
-            context.Response = new HttpResponseMessage()
-            {
-                StatusCode = HttpStatusCode.BadRequest,
-                Content = new StringContent(errorMessage)
-            };
-        }
-
-        private static T GetService<T>(HttpActionContext actionContext)
-        {
-            return (T)actionContext.ControllerContext.Configuration.DependencyResolver.GetService(typeof(T));
+            return !actionContext.HttpContext.Request.Method.IsMutation();
         }
     }
 }

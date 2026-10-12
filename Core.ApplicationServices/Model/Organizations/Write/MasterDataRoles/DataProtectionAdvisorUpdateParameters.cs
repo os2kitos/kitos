@@ -5,7 +5,7 @@ namespace Core.ApplicationServices.Model.Organizations.Write.MasterDataRoles;
 
 public class DataProtectionAdvisorUpdateParameters: OrganizationMasterDataRoleUpdateParameters
 {
-    public OptionalValueChange<Maybe<string>> Cvr { get; set; }
-    public OptionalValueChange<Maybe<string>> Phone { get; set; }
-    public OptionalValueChange<Maybe<string>> Address { get; set; }
+    public required OptionalValueChange<Maybe<string>> Cvr { get; set; }
+    public required OptionalValueChange<Maybe<string>> Phone { get; set; }
+    public required OptionalValueChange<Maybe<string>> Address { get; set; }
 }

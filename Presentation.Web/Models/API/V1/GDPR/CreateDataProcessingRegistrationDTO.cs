@@ -3,6 +3,6 @@
     public class CreateDataProcessingRegistrationDTO
     {
         public int OrganizationId { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
     }
 }

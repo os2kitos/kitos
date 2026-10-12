@@ -24,7 +24,7 @@ namespace Core.DomainServices.Repositories.System
             _systemRepository = systemRepository;
         }
 
-        public IQueryable<ItSystem> GetSystems(OrganizationDataQueryParameters parameters = null)
+        public IQueryable<ItSystem> GetSystems(OrganizationDataQueryParameters? parameters = null)
         {
             var itSystems = _systemRepository.AsQueryable();
 
@@ -48,7 +48,7 @@ namespace Core.DomainServices.Repositories.System
             return _systemRepository.AsQueryable().ByIds(idsOfSystemsInUse);
         }
 
-        public ItSystem GetSystem(int systemId)
+        public ItSystem? GetSystem(int systemId)
         {
             return _systemRepository.AsQueryable().ById(systemId);
         }

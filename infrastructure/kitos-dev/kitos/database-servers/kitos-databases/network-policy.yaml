@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/name: kitos-databases
+    app.kubernetes.io/component: database
+    app.kubernetes.io/part-of: kitos
+    app.kubernetes.io/managed-by: easy-hosting
+    network-policy.kubernetes.io/type: ingress
+    network-policy.kubernetes.io/purpose: allow-namespace
+  name: kitos-databases-allow-from-namespace-deny-egress
+  namespace: kitos
+spec:
+  egress: []
+  ingress:
+  - from:
+    - podSelector: {}
+    ports:
+    - port: 5432
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app: kitos-databases
+  policyTypes:
+  - Ingress
+  - Egress

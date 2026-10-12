@@ -9,7 +9,7 @@ namespace Presentation.Web.Models.API.V2.Request.System.Regular
         /// Constraints:
         /// - Only valid if 'Id' is NOT null or 'Undecided'
         /// </summary>
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
 
         /// <summary>
         /// Archive duty recommendation identifier

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using Presentation.Web.Models.API.V2.SharedProperties;
 
 namespace Presentation.Web.Models.API.V2.Response.Generic.Identity
@@ -10,6 +11,7 @@ namespace Presentation.Web.Models.API.V2.Response.Generic.Identity
         {
 
         }
+        [SetsRequiredMembers]
         public IdentityNamePairWithDeactivatedStatusDTO(Guid uuid, string name, bool deactivated)
         {
             Uuid = uuid;

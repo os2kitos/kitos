@@ -31,7 +31,6 @@ Setup-Environment -environmentName $targetEnvironment
 
 .$PSScriptRoot\PrepareCleanDeveloperDatabase.ps1 `
                 -testToolsExePath "$Env:TestToolsPath" `
-                -migrationsFolderPath "$Env:MigrationsFolder" `
                 -kitosDbConnectionString "$Env:KitosDbConnectionStringForTeamCity" `
                 -hangfireDbConnectionString "$Env:HangfireDbConnectionStringForTeamCity" `
                 -globalAdminUserName "$Env:TestUserGlobalAdmin" `
@@ -45,5 +44,7 @@ Setup-Environment -environmentName $targetEnvironment
                 -apiGlobalAdminUserName "$Env:TestUserApiGlobalAdmin" `
                 -apiGlobalAdminPw "$Env:TestUserApiGlobalAdminPw" `
                 -systemIntegratorEmail "$Env:TestUserSystemIntegrator" `
-                -systemIntegratorPw "$Env:TestUserSystemIntegratorPw"
+                -systemIntegratorPw "$Env:TestUserSystemIntegratorPw" `
+                -buildConfiguration "Release" `
+                -stopWebHostDuringReset
                 

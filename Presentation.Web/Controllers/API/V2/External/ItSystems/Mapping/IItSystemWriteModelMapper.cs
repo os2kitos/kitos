@@ -1,4 +1,4 @@
-﻿using Core.ApplicationServices.Model.Shared.Write;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.System;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
 using Presentation.Web.Models.API.V2.Request.System.Regular;

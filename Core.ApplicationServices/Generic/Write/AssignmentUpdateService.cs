@@ -59,7 +59,7 @@ namespace Core.ApplicationServices.Generic.Write
             Func<TDestination, IEnumerable<TAssignmentState>> getExistingState,
             Func<TDestination, TAssignmentInput, Maybe<OperationError>> assign,
             Func<TDestination, TAssignmentState, Maybe<OperationError>> unAssign,
-            Func<TDestination, TAssignmentState, Maybe<OperationError>> update = null)
+            Func<TDestination, TAssignmentState, Maybe<OperationError>>? update = null)
             where TAssignmentState : class, IHasId, IHasUuid
         {
             var newUuids = assignedItemUuids.Match(uuids => uuids.ToList(), () => new List<Guid>());
@@ -101,7 +101,7 @@ namespace Core.ApplicationServices.Generic.Write
             //Optionally perform updates
             if (update != null)
             {
-                foreach (var assignmentState in itemsToUpdate.Values)
+                foreach (var assignmentState in itemsToUpdate!.Values)
                 {
                     //Perform the update to existing items
                     var updateError = update(destination, assignmentState);

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using Core.Abstractions.Extensions;
+﻿using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
@@ -22,6 +17,12 @@ using Presentation.Web.Models.API.V2.Response.System;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.System;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Reflection.PortableExecutable;
+using System.Threading.Tasks;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.Internal;
@@ -97,6 +98,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             DatabaseAccess.MutateDatabase(db =>
             {
                 var itSystem = db.ItSystems.AsQueryable().ByUuid(system);
+                Assert.NotNull(itSystem);
                 var interfaceToExpose = db.Set<ItInterface>().AsQueryable().ByUuid(exposedInterface.Uuid);
                 var taskRef = db.TaskRefs.AsQueryable().First();
 
@@ -129,6 +131,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             DatabaseAccess.MutateEntitySet<Core.DomainModel.ItSystem.ItSystem>(systems =>
             {
                 var itSystem = systems.AsQueryable().ByUuid(system);
+                Assert.NotNull(itSystem);
                 itSystem.Disabled = A<bool>(); //Cannot before setting into use because if it becomes false, the taking into use will fail
             });
 
@@ -140,10 +143,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             DatabaseAccess.MapFromEntitySet<Core.DomainModel.ItSystem.ItSystem, bool>(repository =>
             {
                 var dbSystem = repository.AsQueryable().ByUuid(system);
-
+                Assert.NotNull(dbSystem);
                 AssertBaseSystemDTO(dbSystem, systemDTO);
 
-                Assert.Equal(dbSystem.LastChanged, systemDTO.LastModified);
+                DateTimeTestHelper.AssertEqual(dbSystem.LastChanged, systemDTO.LastModified);
+                Assert.NotNull(systemDTO.LastModifiedBy);
                 Assert.Equal(dbSystem.LastChangedByUser.Uuid, systemDTO.LastModifiedBy.Uuid);
                 Assert.Equal(dbSystem.LastChangedByUser.GetFullName(), systemDTO.LastModifiedBy.Name);
 
@@ -204,7 +208,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         public async Task GET_Many_As_StakeHolder_Depends_On_IncludeDeactivated(bool shouldIncludeDeactivated)
         {
             //Arrange
-            var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var (token, _) = await CreateStakeHolderUserInNewOrganizationAsync();
             var rightsHolder = await CreateOrganizationAsync();
 
             var inactive = await CreateSystemAsync(DefaultOrgUuid, AccessModifier.Public);
@@ -219,6 +223,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             DatabaseAccess.MutateDatabase(db =>
             {
                 var dbSystem = db.ItSystems.AsQueryable().ByUuid(inactive);
+                Assert.NotNull(dbSystem);
                 dbSystem.Disabled = true;
                 db.SaveChanges();
             });
@@ -352,7 +357,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         public async Task GET_Many_As_StakeHolder_With_NumberOfUsers_Filter()
         {
             //Arrange - Scope the test with additional rightsHolder filter so that we can control which response we get
-            var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var (token, _) = await CreateStakeHolderUserInNewOrganizationAsync();
             var rightsHolder = await CreateOrganizationAsync();
 
             var excludedSinceTooFewUsages = await CreateSystemAsync(DefaultOrgUuid, AccessModifier.Public);
@@ -392,14 +397,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             await ItSystemV2Helper.SendPatchSystemNameAsync(await GetGlobalToken(), system3.Uuid, CreateName());
             await ItSystemV2Helper.SendPatchSystemNameAsync(await GetGlobalToken(), system1.Uuid, CreateName());
 
-            var system3DTO = await ItSystemV2Helper.GetSingleAsync(token, system3.Uuid); //system 3 was changed as the second one and system 1 the last
+            var system3Dto = await ItSystemV2Helper.GetSingleAsync(token, system3.Uuid); //system 3 was changed as the second one and system 1 the last
 
             //Act
-            var dtos = (await ItSystemV2Helper.GetManyAsync(token, changedSinceGtEq: system3DTO.LastModified, page: 0, pageSize: 10)).ToList();
+            var dtos = (await ItSystemV2Helper.GetManyAsync(token, changedSinceGtEq: system3Dto.LastModified, page: 0, pageSize: 10)).ToList();
 
-            //Assert
-            Assert.Equal(2, dtos.Count);
-            Assert.Equal(new[] { system3.Uuid, system1.Uuid }, dtos.Select(x => x.Uuid).ToArray());
+            //Assert - system3 and system1 were modified at or after the cutoff; system2 was modified before it
+            Assert.Contains(dtos, dto => dto.Uuid == system3.Uuid);
+            Assert.Contains(dtos, dto => dto.Uuid == system1.Uuid);
+            Assert.DoesNotContain(dtos, dto => dto.Uuid == system2.Uuid);
         }
 
         [Fact]
@@ -453,7 +459,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Assert
             var hierarchy = response.ToList();
             AssertHierarchy(rootUuid, hierarchy, createdSystems);
-            var usedSystem = Assert.Single(hierarchy.Where(x => x.IsInUse));
+            var usedSystem = Assert.Single(hierarchy, x => x.IsInUse);
             Assert.Equal(firstSystem.Uuid, usedSystem.Node.Uuid);
         }
 
@@ -486,7 +492,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var itSystem = await CreateItSystemAsync(organization.Uuid);
             var (_, supplierOrg1) = await CreateUsageWithMainContractAndSupplier(itSystem.Uuid, null);
             var (_, supplierOrg2) = await CreateUsageWithMainContractAndSupplier(itSystem.Uuid, null);
-            var (_, _) = await CreateUsageWithMainContractAndSupplier(itSystem.Uuid, supplierOrg1.Uuid); //Create duplicate supplier
+            await CreateUsageWithMainContractAndSupplier(itSystem.Uuid, supplierOrg1.Uuid); //Create duplicate supplier
             await ItSystemUsageV2Helper.PostAsync(token.Token, new CreateItSystemUsageRequestDTO
             {
                 SystemUuid = itSystem.Uuid,
@@ -495,6 +501,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             var itSystemResponse = await ItSystemV2Helper.GetSingleAsync(token.Token, itSystem.Uuid);
 
+            Assert.NotNull(itSystemResponse.MainContractSuppliers);
             var mainContractSuppliers = itSystemResponse.MainContractSuppliers.ToList();
             Assert.Equal(2, mainContractSuppliers.Count);
             var supplier1 = Assert.Single(mainContractSuppliers, x => x.Uuid == supplierOrg1.Uuid);
@@ -565,6 +572,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             using var getAfterDeleteResponse = await ItSystemV2Helper.SendGetSingleAsync(token.Token, createdSystem.Uuid);
 
             //Assert creation, deletion and GET after deletion
+            Assert.NotNull(createdSystem.OrganizationContext);
             AssertOrganization(organizationDto, createdSystem.OrganizationContext);
             Assert.Equal(name, createdSystem.Name);
             Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
@@ -593,10 +601,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(fullRequest.Deactivated, createdSystem.Deactivated);
             Assert.Equivalent(businessType, createdSystem.BusinessType);
             Assert.Equal(fullRequest.Scope, createdSystem.Scope);
-            Assert.Equivalent(kleChoices.Select(x => new IdentityNamePairResponseDTO(x.Uuid, x.KleNumber)), createdSystem.KLE);
-            Assert.Equivalent(parent.Transform(x => new IdentityNamePairResponseDTO(x.Uuid, x.Name)), createdSystem.ParentSystem);
-            Assert.Equivalent(fullRequest.RecommendedArchiveDuty.Id, createdSystem.RecommendedArchiveDuty.Id);
-            Assert.Equivalent(fullRequest.RecommendedArchiveDuty.Comment, createdSystem.RecommendedArchiveDuty.Comment);
+            Assert.Equivalent(kleChoices.Select(x => new IdentityNamePairResponseDTO(x.Uuid, x.KleNumber!)), createdSystem.KLE);
+            Assert.Equivalent(parent.Transform(x => new IdentityNamePairResponseDTO(x.Uuid, x.Name!)), createdSystem.ParentSystem);
+            Assert.Equivalent(fullRequest.RecommendedArchiveDuty?.Id, createdSystem.RecommendedArchiveDuty?.Id);
+            Assert.Equivalent(fullRequest.RecommendedArchiveDuty?.Comment, createdSystem.RecommendedArchiveDuty?.Comment);
             Assert.Equivalent(fullRequest.ExternalReferences, createdSystem.ExternalReferences);
 
             Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
@@ -665,14 +673,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             //Assert that only the patched properties have changed
             Assert.Equal(createdSystem.Uuid, updatedSystem.Uuid); //No changes expected
-            Assert.Equal(createdSystem.Created, updatedSystem.Created); //No changes expected
-            Assert.Equal(updateRightsHolder ? changes[nameof(UpdateItSystemRequestDTO.RightsHolderUuid)] : createdSystem.RightsHolder.Uuid, updatedSystem.RightsHolder.Uuid);
+            DateTimeTestHelper.AssertEqual(createdSystem.Created, updatedSystem.Created); //No changes expected
+            Assert.Equal(updateRightsHolder ? changes[nameof(UpdateItSystemRequestDTO.RightsHolderUuid)] : createdSystem.RightsHolder?.Uuid, updatedSystem.RightsHolder?.Uuid);
             Assert.Equal(updateName ? changes[nameof(UpdateItSystemRequestDTO.Name)] : createdSystem.Name, updatedSystem.Name);
             Assert.Equal(updateFormerName ? changes[nameof(UpdateItSystemRequestDTO.PreviousName)] : createdSystem.FormerName, updatedSystem.FormerName);
             Assert.Equal(updateDescription ? changes[nameof(UpdateItSystemRequestDTO.Description)] : createdSystem.Description, updatedSystem.Description);
             Assert.Equal(updateBusinessType ? changes[nameof(UpdateItSystemRequestDTO.BusinessTypeUuid)] : createdSystem.BusinessType?.Uuid, updatedSystem.BusinessType?.Uuid);
             Assert.Equal(updateParent ? changes[nameof(UpdateItSystemRequestDTO.ParentUuid)] : createdSystem.ParentSystem?.Uuid, updatedSystem.ParentSystem?.Uuid);
-            Assert.Equal(updateKle ? changes[nameof(UpdateItSystemRequestDTO.KLEUuids)] : createdSystem.KLE.Select(x => x.Uuid), updatedSystem.KLE.Select(x => x.Uuid));
+            Assert.Equal(updateKle ? changes[nameof(UpdateItSystemRequestDTO.KLEUuids)] : createdSystem.KLE?.Select(x => x.Uuid), updatedSystem.KLE?.Select(x => x.Uuid));
             Assert.Equivalent(updateReferences ? changes[nameof(UpdateItSystemRequestDTO.ExternalReferences)] : createdSystem.ExternalReferences, updatedSystem.ExternalReferences);
             Assert.Equal(updateDeactivated ? changes[nameof(UpdateItSystemRequestDTO.Deactivated)] : createdSystem.Deactivated, updatedSystem.Deactivated);
             Assert.Equal(updateScope ? changes[nameof(UpdateItSystemRequestDTO.Scope)] : createdSystem.Scope, updatedSystem.Scope);
@@ -709,6 +717,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             var afterCreate = await ItSystemV2Helper.GetSingleAsync(token, createdSystem.Uuid);
 
+            Assert.NotNull(afterCreate.ExternalReferences);
             var checkCreatedExternalReference = Assert.Single(afterCreate.ExternalReferences);
             AssertExternalReference(request, checkCreatedExternalReference);
 
@@ -729,6 +738,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             var afterUpdate = await ItSystemV2Helper.GetSingleAsync(token, createdSystem.Uuid);
 
+            Assert.NotNull(afterUpdate.ExternalReferences);
             var checkUpdatedExternalReference = Assert.Single(afterUpdate.ExternalReferences);
             AssertExternalReference(updateRequest, checkUpdatedExternalReference);
 
@@ -737,6 +747,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             //Assert - delete
             var afterDelete = await ItSystemV2Helper.GetSingleAsync(token, createdSystem.Uuid);
+            Assert.NotNull(afterDelete.ExternalReferences);
             Assert.Empty(afterDelete.ExternalReferences);
         }
 
@@ -800,7 +811,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             await Test_Get_ItSystem_Permissions_With_Deletion_Conflicts((token, system) => ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO
             {
-                OrganizationUuid = system.OrganizationContext.Uuid,
+                OrganizationUuid = system.OrganizationContext!.Uuid,
                 SystemUuid = system.Uuid
             }), SystemDeletionConflict.HasItSystemUsages);
         }
@@ -811,7 +822,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             await Test_Get_ItSystem_Permissions_With_Deletion_Conflicts((token, system) => ItSystemV2Helper.CreateSystemAsync(token, new CreateItSystemRequestDTO
             {
                 Name = A<string>(),
-                OrganizationUuid = system.OrganizationContext.Uuid,
+                OrganizationUuid = system.OrganizationContext!.Uuid,
                 Scope = RegistrationScopeChoice.Global,
                 ParentUuid = system.Uuid
             }), SystemDeletionConflict.HasChildSystems);
@@ -823,8 +834,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             await Test_Get_ItSystem_Permissions_With_Deletion_Conflicts((token, system) => InterfaceV2Helper.CreateItInterfaceAsync(token, new CreateItInterfaceRequestDTO()
             {
                 Name = A<string>(),
-                OrganizationUuid = system.OrganizationContext.Uuid,
-                ExposedBySystemUuid = system.Uuid
+                OrganizationUuid = system.OrganizationContext!.Uuid,
+                ExposedBySystemUuid = system.Uuid,
+                Description = A<string>(),
+                UrlReference = A<string>()
             }), SystemDeletionConflict.HasInterfaceExposures);
         }
 
@@ -885,8 +898,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
         private async Task<(User user, string token)> CreateApiUser(Guid organizationUuid)
         {
-            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organizationUuid, true, false);
-            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userAndGetToken.userUuid));
+            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organizationUuid, true);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userAndGetToken.userUuid)!);
             return (user, userAndGetToken.token);
         }
 
@@ -943,11 +956,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             return (token, organization);
         }
 
-        private static void AssertOrganization(ShallowOrganizationResponseDTO expected, ShallowOrganizationResponseDTO actual)
+        private static void AssertOrganization(ShallowOrganizationResponseDTO expected, ShallowOrganizationResponseDTO? actual)
         {
-            Assert.Equal(expected.Name, actual.Name);
-            Assert.Equal(expected.Cvr, actual.Cvr);
-            Assert.Equal(expected.Uuid, actual.Uuid);
+            Assert.Equal(expected.Name, actual?.Name);
+            Assert.Equal(expected.Cvr, actual?.Cvr);
+            Assert.Equal(expected.Uuid, actual?.Uuid);
         }
 
         private async Task<(

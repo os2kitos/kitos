@@ -1,10 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
-using System.Web.Http;
-using System.Web.Http.Results;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Interface.Write;
@@ -23,11 +21,11 @@ using Presentation.Web.Models.API.V2.Response.Interface;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Response.Shared;
 using Presentation.Web.Models.API.V2.Types.Shared;
-using Swashbuckle.Swagger.Annotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 {
-    [RoutePrefix("api/v2")]
+    [Route("api/v2")]
     public class ItInterfaceV2Controller : ExternalBaseController
     {
         private readonly IItInterfaceRightsHolderService _rightsHolderService;
@@ -60,13 +58,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <returns>Location header is set to uri for newly created IT-Interface</returns>
         [HttpPost]
         [Route("it-interfaces")]
-        [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItInterfaceResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public IHttpActionResult Post([FromBody] CreateItInterfaceRequestDTO request)
+        [ApiResponse(typeof(ItInterfaceResponseDTO), HttpStatusCode.Created)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.Conflict)]
+        public IActionResult Post([FromBody] CreateItInterfaceRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -87,12 +84,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <returns></returns>
         [HttpPatch]
         [Route("it-interfaces/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Patch([NonEmptyGuid] Guid uuid, [FromBody] UpdateItInterfaceRequestDTO request)
+        [ApiResponse(typeof(ItInterfaceResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult Patch([NonEmptyGuid] Guid uuid, [FromBody] UpdateItInterfaceRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -114,13 +111,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <returns></returns>
         [HttpDelete]
         [Route("it-interfaces/{uuid}")]
-        [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.NoContent)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Delete([NonEmptyGuid] Guid uuid)
+        [ApiResponse(HttpStatusCode.NoContent)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult Delete([NonEmptyGuid] Guid uuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -134,15 +130,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// Creates a new IT-Interface data description
         /// </summary>
         /// <param name="request">A collection of specific IT-Interface data description values</param>
+        /// <param name="uuid">UUID of the IT-Interface in KITOS</param>
         /// <returns>Location header is set to uri for newly created IT-Interface data description</returns>
         [HttpPost]
         [Route("it-interfaces/{uuid}/data")]
-        [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItInterfaceDataResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PostDataDescription([NonEmptyGuid] Guid uuid, [FromBody] ItInterfaceDataRequestDTO request)
+        [ApiResponse(typeof(ItInterfaceDataResponseDTO), HttpStatusCode.Created)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult PostDataDescription([NonEmptyGuid] Guid uuid, [FromBody] ItInterfaceDataRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -159,15 +155,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// Replace an existing IT-Interface data description
         /// </summary>
         /// <param name="request">A collection of specific IT-Interface data description values</param>
+        /// <param name="uuid">UUID of the IT-Interface in KITOS</param>
+        /// <param name="dataDescriptionUuid">UUID of the data description in KITOS</param>
         /// <returns>Updated data description</returns>
         [HttpPut]
         [Route("it-interfaces/{uuid}/data/{dataDescriptionUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceDataResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataDescription([NonEmptyGuid] Guid uuid, [NonEmptyGuid] Guid dataDescriptionUuid, [FromBody] ItInterfaceDataRequestDTO request)
+        [ApiResponse(typeof(ItInterfaceDataResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult PutDataDescription([NonEmptyGuid] Guid uuid, [NonEmptyGuid] Guid dataDescriptionUuid, [FromBody] ItInterfaceDataRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -183,16 +181,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <summary>
         /// Delete an existing IT-Interface data description
         /// </summary>
+        /// <param name="uuid">UUID of the IT-Interface in KITOS</param>
+        /// <param name="dataDescriptionUuid">UUID of the data description in KITOS</param>
         /// <returns>Updated data description</returns>
         [HttpDelete]
         [Route("it-interfaces/{uuid}/data/{dataDescriptionUuid}")]
-        [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.NoContent)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult DeleteDataDescription([NonEmptyGuid] Guid uuid, [NonEmptyGuid] Guid dataDescriptionUuid)
+        [ApiResponse(HttpStatusCode.NoContent)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult DeleteDataDescription([NonEmptyGuid] Guid uuid, [NonEmptyGuid] Guid dataDescriptionUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -210,13 +209,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         [HttpPost]
         [AllowRightsHoldersAccess]
         [Route("rightsholder/it-interfaces")]
-        [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(RightsHolderItInterfaceResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        public IHttpActionResult PostItInterfaceAsRightsHolder([FromBody] RightsHolderCreateItInterfaceRequestDTO request)
+        [ApiResponse(typeof(RightsHolderItInterfaceResponseDTO), HttpStatusCode.Created)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.Conflict)]
+        public IActionResult PostItInterfaceAsRightsHolder([FromBody] RightsHolderCreateItInterfaceRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -235,19 +233,20 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <param name="rightsHolderUuid">Uuid of the organization you want interfaces from. If not provided all available interfaces (based on access rights) will be returned</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
+        /// <param name="pagination">Pagination parameters</param>
         /// <returns></returns>
         [HttpGet]
         [AllowRightsHoldersAccess]
         [Route("rightsholder/it-interfaces")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RightsHolderItInterfaceResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItInterfacesAsRightsHolder(
+        [ApiResponse(typeof(IEnumerable<RightsHolderItInterfaceResponseDTO>), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult GetItInterfacesAsRightsHolder(
             [NonEmptyGuid] Guid? rightsHolderUuid = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
-            [FromUri] BoundedPaginationQuery pagination = null)
+            [FromQuery] BoundedPaginationQuery? pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -280,12 +279,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         [HttpGet]
         [AllowRightsHoldersAccess]
         [Route("rightsholder/it-interfaces/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RightsHolderItInterfaceResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid)
+        [ApiResponse(typeof(RightsHolderItInterfaceResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult GetItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid)
         {
             return _rightsHolderService
                 .GetInterfaceAsRightsHolder(uuid)
@@ -297,16 +296,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// Sets IT-Interface values
         /// </summary>
         /// <param name="uuid">Specific IT-Interface UUID</param>
+        /// <param name="request">Updated IT-Interface properties</param>
         /// <returns>The updated IT-Interface</returns>
         [HttpPut]
         [AllowRightsHoldersAccess]
         [Route("rightsholder/it-interfaces/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RightsHolderItInterfaceResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO request)
+        [ApiResponse(typeof(RightsHolderItInterfaceResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult PutItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -329,12 +329,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         [HttpPatch]
         [AllowRightsHoldersAccess]
         [Route("rightsholder/it-interfaces/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RightsHolderItInterfaceResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PatchItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderPartialUpdateItInterfaceRequestDTO request)
+        [ApiResponse(typeof(RightsHolderItInterfaceResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult PatchItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderPartialUpdateItInterfaceRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -351,17 +351,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// Deactivates an IT-Interface
         /// </summary>
         /// <param name="uuid">Specific IT-Interface UUID</param>
-        /// <param name="deactivationReasonDTO">Reason for deactivation</param>
+        /// <param name="request">Reason for deactivation</param>
         /// <returns>No content</returns>
         [HttpDelete]
         [AllowRightsHoldersAccess]
+        [Consumes("application/json")]
         [Route("rightsholder/it-interfaces/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.NoContent)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeactivateItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
+        [ApiResponse(HttpStatusCode.NoContent)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult DeactivateItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -369,7 +370,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             return _rightsHolderService
                 .Deactivate(uuid, request.DeactivationReason)
                 .Select(ToRightsHolderItInterfaceResponseDTO)
-                .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);
+                .Match(_ => StatusCode((int)HttpStatusCode.NoContent), FromOperationError);
         }
 
         /// <summary>
@@ -384,25 +385,29 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <param name="interfaceId">Include only interfaces with an InterfaceId equal to the parameter</param>
         /// <param name="organizationUuid">Query it-interfaces created in a specific organization</param>
         /// <param name="orderByProperty">Ordering property</param>
+        /// <param name="availableInOrganizationUuid">Filter by UUID of an organization which has access to the IT-Interface</param>
+        /// <param name="nameOrItInterfaceIdContains">Filter by contents of the name or IT-Interface ID</param>
+        /// <param name="pagination">Pagination parameters</param>
         /// <returns></returns>
         [HttpGet]
         [Route("it-interfaces")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItInterfaceResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItInterfaces(
+        [ApiResponse(typeof(IEnumerable<ItInterfaceResponseDTO>), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        public IActionResult GetItInterfaces(
             [NonEmptyGuid] Guid? exposedBySystemUuid = null,
             bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
-            string nameEquals = null,
+            string? nameEquals = null,
             [NonEmptyGuid] Guid? usedInOrganizationUuid = null,
-            string nameContains = null,
-            string interfaceId = null,
+            string? nameContains = null,
+            string? interfaceId = null,
             [NonEmptyGuid] Guid? organizationUuid = null,
             CommonOrderByProperty? orderByProperty = null,
             [NonEmptyGuid] Guid? availableInOrganizationUuid = null,
-            [FromUri] BoundedPaginationQuery pagination = null)
+            string? nameOrItInterfaceIdContains = null,
+            [FromQuery] BoundedPaginationQuery? pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -436,6 +441,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             if (availableInOrganizationUuid.HasValue)
                 refinements.Add(new QueryByPublicAccessOrOrganizationUuid<ItInterface>(availableInOrganizationUuid.Value));
 
+            if (nameOrItInterfaceIdContains != null)
+                refinements.Add(new QueryByNameOrItInterfaceId(nameOrItInterfaceIdContains));
+
             return _itInterfaceService
                 .GetAvailableInterfaces(refinements.ToArray())
                 .OrderApiResultsByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
@@ -452,12 +460,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <returns>Specific data related to the IT-Interface</returns>
         [HttpGet]
         [Route("it-interfaces/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItInterface([NonEmptyGuid] Guid uuid)
+        [ApiResponse(typeof(ItInterfaceResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult GetItInterface([NonEmptyGuid] Guid uuid)
         {
             return _itInterfaceService
                 .GetInterface(uuid)
@@ -472,11 +480,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <returns></returns>
         [HttpGet]
         [Route("it-interfaces/{interfaceUuid}/permissions")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfacePermissionsResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItInterfacePermissions([NonEmptyGuid] Guid interfaceUuid)
+        [ApiResponse(typeof(ItInterfacePermissionsResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult GetItInterfacePermissions([NonEmptyGuid] Guid interfaceUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -495,11 +503,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <returns></returns>
         [HttpGet]
         [Route("it-interfaces/permissions")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ResourceCollectionPermissionsResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItInterfaceCollectionPermissions([Required][NonEmptyGuid] Guid organizationUuid)
+        [ApiResponse(typeof(ResourceCollectionPermissionsResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult GetItInterfaceCollectionPermissions([Required][NonEmptyGuid] Guid organizationUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -520,9 +528,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             return _responseMapper.ToItInterfaceResponseDTO(itInterface);
         }
 
-        private CreatedNegotiatedContentResult<T> ToCreatedResponse<T>(T dto) where T : IHasUuidExternal
+        private IActionResult ToCreatedResponse<T>(T dto) where T : IHasUuidExternal
         {
-            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
+            return Created($"{new Uri($"{Request.Scheme}://{Request.Host}{Request.Path}").AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }
     }
 }
+
+

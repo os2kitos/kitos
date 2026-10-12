@@ -1,15 +1,26 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.Qa.References;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class BrokenLinkInInterfaceMap : EntityTypeConfiguration<BrokenLinkInInterface>
+    public class BrokenLinkInInterfaceMap : IEntityTypeConfiguration<BrokenLinkInInterface>
     {
-        public BrokenLinkInInterfaceMap()
+        public void Configure(EntityTypeBuilder<BrokenLinkInInterface> builder)
         {
-            HasRequired(x => x.BrokenReferenceOrigin)
+            builder.ToTable("BrokenLinkInInterfaces");
+
+            builder.HasOne(x => x.BrokenReferenceOrigin)
                 .WithMany(x => x.BrokenLinkReports)
-                .WillCascadeOnDelete(false);
+                .HasForeignKey("BrokenReferenceOrigin_Id")
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(x => x.ParentReport)
+                .WithMany(x => x.BrokenInterfaceLinks)
+                .HasForeignKey("ParentReport_Id")
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

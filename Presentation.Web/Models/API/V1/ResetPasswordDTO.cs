@@ -2,7 +2,7 @@
 {
     public class ResetPasswordDTO
     {
-        public string RequestId;
-        public string NewPassword;
+        public required string RequestId;
+        public required string NewPassword;
     }
 }

@@ -5,6 +5,6 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {
     public class ArchivingCreationRequestDTO : BaseArchivingWriteRequestDTO, IHasJournalPeriods<JournalPeriodDTO>
     {
-        public IEnumerable<JournalPeriodDTO> JournalPeriods { get; set; }
+        public IEnumerable<JournalPeriodDTO>? JournalPeriods { get; set; }
     }
 }

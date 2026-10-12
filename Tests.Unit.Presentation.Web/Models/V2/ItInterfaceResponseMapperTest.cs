@@ -72,9 +72,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(itInterface.Disabled, responseDto.Deactivated);
             AssertIdentityReference(itInterface.Interface, responseDto.ItInterfaceType);
             AssertIdentityReference(itInterface.ExhibitedBy?.ItSystem, responseDto.ExposedBySystem);
+            Assert.NotNull(responseDto.OrganizationContext);
             AssertOrganization(itInterface.Organization, responseDto.OrganizationContext);
             if(!minimumData)
+            {
+                Assert.NotNull(responseDto.RightsHolder);
                 AssertOrganization(itInterface.GetRightsHolderOrganization(), responseDto.RightsHolder);
+            }
             AssertData(itInterface, responseDto);
 
         }
@@ -138,13 +142,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             foreach (var dataRow in expected.DataRows)
             {
-                var matchingRow = Assert.Single(actualData.Where(x => x.Uuid == dataRow.Uuid));
+                var matchingRow = Assert.Single(actualData, x => x.Uuid == dataRow.Uuid);
                 AssertIdentityReference(dataRow.DataType, matchingRow.DataType);
                 Assert.Equal(dataRow.Data, matchingRow.Description);
             }
         }
 
-        private static void AssertUser(User expected, IdentityNamePairResponseDTO actual)
+        private static void AssertUser(User? expected, IdentityNamePairResponseDTO? actual)
         {
             Assert.Equivalent(expected?.Transform(u => new IdentityNamePairResponseDTO(u.Uuid, u.GetFullName())), actual);
         }
@@ -155,9 +159,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected.GetActiveCvr(), actual.Cvr);
         }
 
-        private static void AssertIdentityReference<T>(T expected, IdentityNamePairResponseDTO actual) where T : IHasName, IHasUuid
+        private static void AssertIdentityReference<T>(T? expected, IdentityNamePairResponseDTO? actual) where T : IHasName, IHasUuid
         {
-            Assert.Equivalent(expected?.Transform(u => new IdentityNamePairResponseDTO(u.Uuid, u.Name)), actual);
+            Assert.Equivalent(expected?.Transform(u => new IdentityNamePairResponseDTO(u!.Uuid, u.Name)), actual);
         }
     }
 }

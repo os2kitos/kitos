@@ -70,8 +70,9 @@ namespace Tests.Integration.Presentation.Web.GlobalAdminArea
             var globalOption = new ItSystemRole()
             {
                 Uuid = A<Guid>(),
-                Id = A<int>(),
                 Name = A<string>(),
+                ObjectOwnerId = TestEnvironment.DefaultUserId,
+                LastChangedByUserId = TestEnvironment.DefaultUserId,
                 IsObligatory = true,
                 IsLocallyAvailable = true,
                 HasWriteAccess = A<bool>()

@@ -133,9 +133,9 @@ namespace Core.ApplicationServices.GlobalOptions
             return Patch(updatedOption);
         }
 
-        private IQueryable<TOptionType> GetOptionsWithPriorityInInterval(int from, int to)
+        private List<TOptionType> GetOptionsWithPriorityInInterval(int from, int to)
         {
-            return _globalOptionsRepository.AsQueryable().Where(p => from <= p.Priority && p.Priority <= to);
+            return _globalOptionsRepository.AsQueryable().Where(p => from <= p.Priority && p.Priority <= to).ToList();
         }
 
         private static bool ShouldNotUpdatePriority(GlobalRegularOptionUpdateParameters updateParameters, int existingPriority)

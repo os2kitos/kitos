@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.LocalOptions
 {
-    public class LocalOrganizationUnitRole: LocalOptionEntity<OrganizationUnitRole>
+    public class LocalOrganizationUnitRole: LocalRoleOptionEntity<OrganizationUnitRole>
     {
     }
 }

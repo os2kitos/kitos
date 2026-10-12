@@ -35,7 +35,7 @@ namespace Core.BackgroundJobs.Factories
         public IAsyncBackgroundJob CreateRebuildJob(ReadModelRebuildScope scope)
         {
             string id;
-            Func<IEnumerable<int>> getIds = null;
+            Func<IEnumerable<int>>? getIds = null;
             PendingReadModelUpdateSourceCategory updateSourceCategory;
             switch (scope)
             {
@@ -53,6 +53,11 @@ namespace Core.BackgroundJobs.Factories
                     id = StandardJobIds.RebuildItContractReadModels;
                     getIds = () => _contractRepository.AsQueryable().Select(x => x.Id).AsEnumerable();
                     updateSourceCategory = PendingReadModelUpdateSourceCategory.ItContract;
+                    break;
+                case ReadModelRebuildScope.ItContractSupplier:
+                    id = StandardJobIds.RebuildItContractSupplierReadModels;
+                    getIds = () => _contractRepository.AsQueryable().Select(x => x.Id).AsEnumerable();
+                    updateSourceCategory = PendingReadModelUpdateSourceCategory.ItContract_SupplierOverview;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(scope), scope, null);

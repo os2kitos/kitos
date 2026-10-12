@@ -74,12 +74,12 @@ namespace Tests.Integration.Presentation.Web.Qa
 
         public class LinkReportCsvFormat
         {
-            public string Oprindelse { get; set; }
-            public string Navn { get; set; }
-            public string Referencenavn { get; set; }
-            public string Fejlkategori { get; set; }
-            public string Fejlkode { get; set; }
-            public string Url { get; set; }
+            public string? Oprindelse { get; set; }
+            public string? Navn { get; set; }
+            public string? Referencenavn { get; set; }
+            public string? Fejlkategori { get; set; }
+            public string? Fejlkode { get; set; }
+            public string? Url { get; set; }
         }
 
         [Fact]
@@ -112,8 +112,10 @@ namespace Tests.Integration.Presentation.Web.Qa
             Assert.True(dto.Available);
             var report = await GetBrokenLinksReportAsync();
 
+            Assert.NotNull(system.Name);
             var brokenSystemLink = Assert.Single(report[system.Name]);
             AssertBrokenLinkRow(brokenSystemLink, "IT System", system.Name, systemReferenceName, "Se fejlkode", "404", SystemReferenceUrl);
+            Assert.NotNull(interfaceDto.Name);
             var brokenInterfaceLink = Assert.Single(report[interfaceDto.Name]);
             AssertBrokenLinkRow(brokenInterfaceLink, "Snitflade", interfaceDto.Name, string.Empty, "Se fejlkode", "404", InterfaceUrl);
         }
@@ -178,7 +180,7 @@ namespace Tests.Integration.Presentation.Web.Qa
 
             foreach (var parentGroup in csvReader.GetRecords<LinkReportCsvFormat>().GroupBy(record => record.Navn))
             {
-                result[parentGroup.Key] = new List<LinkReportCsvFormat>(parentGroup);
+                result[parentGroup.Key!] = new List<LinkReportCsvFormat>(parentGroup);
             }
 
             return result;
@@ -200,7 +202,7 @@ namespace Tests.Integration.Presentation.Web.Qa
         private static async Task<BrokenExternalReferencesReportStatusResponseDTO> WaitForReportGenerationCompletedAsync()
         {
             var beginning = DateTime.Now;
-            var waitedFor = DateTime.Now.Subtract(beginning);
+            TimeSpan waitedFor;
             BrokenExternalReferencesReportStatusResponseDTO dto;
             do
             {

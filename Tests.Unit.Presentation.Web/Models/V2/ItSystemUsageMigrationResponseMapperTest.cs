@@ -95,16 +95,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expectedDto.CanExecute, actualDto.CanExecute);
         }
 
-        private static void AssertIdentityNamePair<TEntity>(TEntity entity, IdentityNamePairResponseDTO dto) where TEntity : class, IHasUuid, IHasName
+        private static void AssertIdentityNamePair<TEntity>(TEntity entity, IdentityNamePairResponseDTO? dto) where TEntity : class, IHasUuid, IHasName
         {
-            Assert.Equal(entity.Uuid, dto.Uuid);
-            Assert.Equal(entity.Name, dto.Name);
+            Assert.Equal(entity.Uuid, dto?.Uuid);
+            Assert.Equal(entity.Name, dto?.Name);
         }
 
-        private static void AssertIdentityNamePairWithDeactivatedStatus<TEntity>(TEntity entity, IdentityNamePairWithDeactivatedStatusDTO dto) where TEntity : class, IHasUuid, IHasName, IEntityWithEnabledStatus
+        private static void AssertIdentityNamePairWithDeactivatedStatus<TEntity>(TEntity entity, IdentityNamePairWithDeactivatedStatusDTO? dto) where TEntity : class, IHasUuid, IHasName, IEntityWithEnabledStatus
         {
             AssertIdentityNamePair(entity, dto);
-            Assert.Equal(entity.Disabled, dto.Deactivated);
+            Assert.Equal(entity.Disabled, dto?.Deactivated);
         }
 
         private static void AssertIdentityNamePairWithDeactivatedStatus(ItSystemUsage entity, IdentityNamePairWithDeactivatedStatusDTO dto)

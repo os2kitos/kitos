@@ -4,7 +4,7 @@ namespace Digst.OioIdws.Common.Logging
 {
     public static class LoggerFactory
     {
-        private static ILogger _customLogger;
+        private static ILogger? _customLogger;
 
         internal static ILogger CreateLogger()
         {
@@ -23,7 +23,7 @@ namespace Digst.OioIdws.Common.Logging
                     var t = Type.GetType(config.Logger);
                     if (t != null)
                     {
-                        return (ILogger)Activator.CreateInstance(t);
+                        return (ILogger)Activator.CreateInstance(t)!;
                     }
 
                     throw new Exception($"The type {config.Logger} is not available for the logging. Please check the type name and assembly");

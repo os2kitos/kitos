@@ -1,7 +1,4 @@
 using System;
-using System.Security.Cryptography.X509Certificates;
-using System.ServiceModel;
-using Digst.OioIdws.Soap.Bindings;
 using Kombit.InfrastructureSamples.BrugerService;
 
 namespace Core.DomainServices.SSO
@@ -17,21 +14,6 @@ namespace Core.DomainServices.SSO
                 LaesInput = laesInputType,
             };
             return laesRequest;
-        }
-
-        public static BrugerPortTypeClient CreateBrugerPortTypeClient(SoapBinding binding, string urlServicePlatformService, X509Certificate2 certificate)
-        {
-            var client = new BrugerPortTypeClient(binding, new EndpointAddress(urlServicePlatformService))
-            {
-                ClientCredentials =
-                {
-                    ClientCertificate =
-                    {
-                        Certificate = certificate
-                    }
-                }
-            };
-            return client;
         }
 
         public static bool IsStsBrugerObsolete(this RegistreringType5 registreringType1)

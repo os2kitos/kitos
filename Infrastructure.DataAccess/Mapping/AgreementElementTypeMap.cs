@@ -1,15 +1,20 @@
-﻿using Core.DomainModel.ItContract;
+using Core.DomainModel.ItContract;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class AgreementElementTypeMap : OptionEntityMap<AgreementElementType, ItContract>
     {
-        public AgreementElementTypeMap(){
+        public override void Configure(EntityTypeBuilder<AgreementElementType> builder)
+        {
+            base.Configure(builder);
 
-            this.HasMany(t => t.References)
-                .WithRequired(t => t.AgreementElementType)
+            builder.HasMany(t => t.References)
+                .WithOne(t => t.AgreementElementType)
                 .HasForeignKey(d => d.AgreementElementType_Id)
-                .WillCascadeOnDelete(false);
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

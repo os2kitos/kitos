@@ -1,6 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -9,12 +6,14 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.Shared.Write;
+using Core.ApplicationServices.Model.SystemUsage;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.DomainModel;
+using Core.DomainModel.Archive;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
@@ -29,107 +28,66 @@ using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Core.ApplicationServices.SystemUsage.Write
 {
-    public class ItSystemUsageWriteService : IItSystemUsageWriteService
+    public class ItSystemUsageWriteService(
+        IItSystemUsageService systemUsageService,
+        ITransactionManager transactionManager,
+        IItSystemService systemService,
+        IOrganizationService organizationService,
+        IAuthorizationContext authorizationContext,
+        IOptionsService<ItSystemUsage, ItSystemCategories> systemCategoriesOptionsService,
+        IItContractService contractService,
+        IKLEApplicationService kleApplicationService,
+        IReferenceService referenceService,
+        IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> roleAssignmentService,
+        IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem> sensitivePersonDataAssignmentService,
+        IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage> registerTypeAssignmentService,
+        IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
+        IDatabaseControl databaseControl,
+        IDomainEvents domainEvents,
+        ILogger logger,
+        IOptionsService<ItSystemUsage, ArchiveType> archiveTypeOptionsService,
+        IOptionsService<ItSystemUsage, ArchiveLocation> archiveLocationOptionsService,
+        IOptionsService<ItSystemUsage, ArchiveTestLocation> archiveTestLocationOptionsService,
+        IItsystemUsageRelationsService systemUsageRelationsService,
+        IEntityIdentityResolver identityResolver,
+        IGenericRepository<ItSystemUsagePersonalData> personalDataOptionsRepository,
+        IOptionsService<ItSystemUsage, SystemUsageCriticalityLevel> systemUsageCriticalityLevelOptionsService,
+        IOptionsService<ItSystemUsage, TechnicalSystemType> technicalSystemTypeOptionsService,
+        IItSystemUsageArchiveService itSystemArchiveService)
+        : IItSystemUsageWriteService
     {
-        private readonly IItSystemUsageService _systemUsageService;
-        private readonly ITransactionManager _transactionManager;
-        private readonly IItSystemService _systemService;
-        private readonly IOrganizationService _organizationService;
-        private readonly IAuthorizationContext _authorizationContext;
-        private readonly IOptionsService<ItSystemUsage, ItSystemCategories> _systemCategoriesOptionsService;
-        private readonly IOptionsService<ItSystemUsage, ArchiveType> _archiveTypeOptionsService;
-        private readonly IOptionsService<ItSystemUsage, ArchiveLocation> _archiveLocationOptionsService;
-        private readonly IOptionsService<ItSystemUsage, ArchiveTestLocation> _archiveTestLocationOptionsService;
-        private readonly IItsystemUsageRelationsService _systemUsageRelationsService;
-        private readonly IEntityIdentityResolver _identityResolver;
-        private readonly IItContractService _contractService;
-        private readonly IKLEApplicationService _kleApplicationService;
-        private readonly IReferenceService _referenceService;
-        private readonly IDatabaseControl _databaseControl;
-        private readonly IDomainEvents _domainEvents;
-        private readonly ILogger _logger;
-        private readonly IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> _roleAssignmentService;
-        private readonly IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem> _sensitivePersonDataAssignmentService;
-        private readonly IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage> _registerTypeAssignmentService;
-        private readonly IGenericRepository<ItSystemUsageSensitiveDataLevel> _sensitiveDataLevelRepository;
-        private readonly IGenericRepository<ItSystemUsagePersonalData> _personalDataOptionsRepository;
-
-        public ItSystemUsageWriteService(
-            IItSystemUsageService systemUsageService,
-            ITransactionManager transactionManager,
-            IItSystemService systemService,
-            IOrganizationService organizationService,
-            IAuthorizationContext authorizationContext,
-            IOptionsService<ItSystemUsage, ItSystemCategories> systemCategoriesOptionsService,
-            IItContractService contractService,
-            IKLEApplicationService kleApplicationService,
-            IReferenceService referenceService,
-            IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> roleAssignmentService,
-            IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem> sensitivePersonDataAssignmentService,
-            IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage> registerTypeAssignmentService,
-            IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
-            IDatabaseControl databaseControl,
-            IDomainEvents domainEvents,
-            ILogger logger,
-            IOptionsService<ItSystemUsage, ArchiveType> archiveTypeOptionsService,
-            IOptionsService<ItSystemUsage, ArchiveLocation> archiveLocationOptionsService,
-            IOptionsService<ItSystemUsage, ArchiveTestLocation> archiveTestLocationOptionsService,
-            IItsystemUsageRelationsService systemUsageRelationsService,
-            IEntityIdentityResolver identityResolver,
-            IGenericRepository<ItSystemUsagePersonalData> personalDataOptionsRepository)
-        {
-            _systemUsageService = systemUsageService;
-            _transactionManager = transactionManager;
-            _systemService = systemService;
-            _organizationService = organizationService;
-            _authorizationContext = authorizationContext;
-            _systemCategoriesOptionsService = systemCategoriesOptionsService;
-            _contractService = contractService;
-            _kleApplicationService = kleApplicationService;
-            _referenceService = referenceService;
-            _databaseControl = databaseControl;
-            _domainEvents = domainEvents;
-            _logger = logger;
-            _roleAssignmentService = roleAssignmentService;
-            _sensitivePersonDataAssignmentService = sensitivePersonDataAssignmentService;
-            _registerTypeAssignmentService = registerTypeAssignmentService;
-            _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
-            _archiveTypeOptionsService = archiveTypeOptionsService;
-            _archiveLocationOptionsService = archiveLocationOptionsService;
-            _archiveTestLocationOptionsService = archiveTestLocationOptionsService;
-            _systemUsageRelationsService = systemUsageRelationsService;
-            _identityResolver = identityResolver;
-            _personalDataOptionsRepository = personalDataOptionsRepository;
-        }
-
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
         {
-            using var transaction = _transactionManager.Begin();
-            var systemResult = _systemService.GetSystem(parameters.SystemUuid);
+            using var transaction = transactionManager.Begin();
+            var systemResult = systemService.GetSystem(parameters.SystemUuid);
             if (systemResult.Failed)
             {
-                _logger.Error("Failed to retrieve itSystem with id {uuid}. Error {error}", parameters.SystemUuid, systemResult.Error.ToString());
+                logger.Error("Failed to retrieve itSystem with id {uuid}. Error {error}", parameters.SystemUuid, systemResult.Error.ToString());
                 return new OperationError("Unable to resolve IT-System:" + systemResult.Error.Message.GetValueOrEmptyString(), systemResult.Error.FailureType);
             }
 
-            var organizationResult = _organizationService.GetOrganization(parameters.OrganizationUuid);
+            var organizationResult = organizationService.GetOrganization(parameters.OrganizationUuid);
             if (organizationResult.Failed)
             {
-                _logger.Error("Failed to retrieve organization with id {uuid}. Error {error}", parameters.OrganizationUuid, organizationResult.Error.ToString());
+                logger.Error("Failed to retrieve organization with id {uuid}. Error {error}", parameters.OrganizationUuid, organizationResult.Error.ToString());
                 return new OperationError("Unable to resolve IT-System:" + organizationResult.Error.Message.GetValueOrEmptyString(), organizationResult.Error.FailureType);
             }
 
-            var creationResult = _systemUsageService
+            var creationResult = systemUsageService
                 .CreateNew(systemResult.Value.Id, organizationResult.Value.Id)
-                .Bind(createdSystemUsage => Update(() => createdSystemUsage, parameters.AdditionalValues));
+                .Bind(createdSystemUsage => Update(() => createdSystemUsage, parameters.AdditionalValues, true));
 
             if (creationResult.Ok)
             {
-                _databaseControl.SaveChanges();
+                databaseControl.SaveChanges();
                 transaction.Commit();
+                domainEvents.Raise(new SystemTakenIntoUsageEvent(creationResult.Value, parameters.SystemUuid, parameters.OrganizationUuid));
             }
 
             return creationResult;
@@ -138,13 +96,13 @@ namespace Core.ApplicationServices.SystemUsage.Write
         public Result<ExternalReference, OperationError> AddExternalReference(Guid usageUuid, ExternalReferenceProperties externalReferenceProperties)
         {
             return GetUsageAndAuthorizeWriteAccess(usageUuid)
-                .Bind(usage => _referenceService.AddReference(usage.Id, ReferenceRootType.SystemUsage, externalReferenceProperties));
+                .Bind(usage => referenceService.AddReference(usage.Id, ReferenceRootType.SystemUsage, externalReferenceProperties));
         }
 
         public Result<ExternalReference, OperationError> UpdateExternalReference(Guid usageUuid, Guid externalReferenceUuid, ExternalReferenceProperties externalReferenceProperties)
         {
             return GetUsageAndAuthorizeWriteAccess(usageUuid)
-                .Bind(usage => _referenceService.UpdateReference(usage.Id, ReferenceRootType.SystemUsage, externalReferenceUuid, externalReferenceProperties));
+                .Bind(usage => referenceService.UpdateReference(usage.Id, ReferenceRootType.SystemUsage, externalReferenceUuid, externalReferenceProperties));
         }
 
         public Result<ExternalReference, OperationError> DeleteExternalReference(Guid usageUuid, Guid externalReferenceUuid)
@@ -152,12 +110,12 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return GetUsageAndAuthorizeWriteAccess(usageUuid)
                 .Bind(_ =>
                     {
-                        var getIdResult = _identityResolver.ResolveDbId<ExternalReference>(externalReferenceUuid);
+                        var getIdResult = identityResolver.ResolveDbId<ExternalReference>(externalReferenceUuid);
                         if (getIdResult.IsNone)
                             return new OperationError($"ExternalReference with uuid: {externalReferenceUuid} was not found", OperationFailure.NotFound);
                         var externalReferenceId = getIdResult.Value;
 
-                        return _referenceService.DeleteByReferenceId(externalReferenceId)
+                        return referenceService.DeleteByReferenceId(externalReferenceId)
                             .Match(Result<ExternalReference, OperationError>.Success,
                                 operationFailure =>
                                     new OperationError($"Failed to remove the ExternalReference with uuid: {externalReferenceUuid}", operationFailure));
@@ -166,7 +124,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<ItSystemUsage, OperationError> Update(Guid systemUsageUuid, SystemUsageUpdateParameters parameters)
         {
-            return Update(() => _systemUsageService.GetReadableItSystemUsageByUuid(systemUsageUuid), parameters);
+            return Update(() => systemUsageService.GetItSystemUsageByUuid(systemUsageUuid), parameters);
         }
 
         public Result<ItSystemUsage, OperationError> AddRole(Guid systemUsageUuid, UserRolePair assignment)
@@ -176,8 +134,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<ItSystemUsage, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair assignment)
         {
-            return _systemUsageService
-                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+            return systemUsageService
+                .GetItSystemUsageByUuidAndAuthorizeRead(systemUsageUuid)
                 .Select(RoleMappingHelper.ExtractAssignedRoles)
                 .Bind<SystemUsageUpdateParameters>(existingRoles =>
                 {
@@ -193,24 +151,24 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private Result<ItSystemUsage, OperationError> AddRoles(Guid systemUsageUuid,
             IEnumerable<UserRolePair> assignments)
         {
-            return _systemUsageService
-                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+            return systemUsageService
+                .GetItSystemUsageByUuidAndAuthorizeRead(systemUsageUuid)
                 .Bind(usage => GetRoleAssignmentUpdates(usage, assignments))
                 .Bind(update => Update(systemUsageUuid, update));
         }
 
-        private Result<ItSystemUsage, OperationError> Update(Func<Result<ItSystemUsage, OperationError>> getItSystemUsage, SystemUsageUpdateParameters parameters)
+        private Result<ItSystemUsage, OperationError> Update(Func<Result<ItSystemUsage, OperationError>> getItSystemUsage, SystemUsageUpdateParameters parameters, bool isCreate = false)
         {
-            using var transaction = _transactionManager.Begin();
+            using var transaction = transactionManager.Begin();
 
             var result = getItSystemUsage()
-                    .Bind(WithWriteAccess)
+                    .Bind(usage => WithAuthorizationModelWriteAccess(usage, parameters, isCreate))
                     .Bind(systemUsage => PerformUpdates(systemUsage, parameters));
 
             if (result.Ok)
             {
-                _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(result.Value));
-                _databaseControl.SaveChanges();
+                domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(result.Value));
+                databaseControl.SaveChanges();
                 transaction.Commit();
             }
             else
@@ -236,14 +194,13 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private Result<ItSystemUsage, OperationError> PerformGDPRUpdates(ItSystemUsage itSystemUsage, UpdatedSystemUsageGDPRProperties parameters)
         {
             //General GDPR registrations
-            return itSystemUsage.WithOptionalUpdate(parameters.Purpose, (usage, newPurpose) => usage.GeneralPurpose = newPurpose)
-                .Bind(usage => usage.WithOptionalUpdate(parameters.BusinessCritical, (systemUsage, businessCritical) => systemUsage.isBusinessCritical = businessCritical))
-                .Bind(usage => usage.WithOptionalUpdate(parameters.HostedAt, (systemUsage, hostedAt) => systemUsage.HostedAt = hostedAt))
+            return itSystemUsage.WithOptionalUpdate(parameters.ProcessingPurpose, (systemUsage, processingPurpose) => systemUsage.UpdateProcessingPurpose(processingPurpose))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.DirectoryDocumentation, (systemUsage, newLink) =>
                    {
                        systemUsage.LinkToDirectoryUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
                        systemUsage.LinkToDirectoryUrl = newLink.Select(x => x.Url).GetValueOrDefault();
                    }))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.IsDataProcessingAgreementRequired, (systemUsage, isDataProcessingAgreementRequired) => systemUsage.IsDataProcessingAgreementRequired = isDataProcessingAgreementRequired))
 
                 //Registered data sensitivity
                 .Bind(usage => usage.WithOptionalUpdate(parameters.DataSensitivityLevels, (systemUsage, levels) => UpdateSensitivityLevels(levels, systemUsage)))
@@ -297,11 +254,11 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             foreach (var removedSensitiveDataLevel in levelsRemoved)
             {
-                _sensitiveDataLevelRepository.Delete(removedSensitiveDataLevel);
+                sensitiveDataLevelRepository.Delete(removedSensitiveDataLevel);
             }
 
             var removedPersonalDataOptions = result.Value;
-            _personalDataOptionsRepository.RemoveRange(removedPersonalDataOptions);
+            personalDataOptionsRepository.RemoveRange(removedPersonalDataOptions);
 
             if (!systemUsage.SensitiveDataLevelExists(SensitiveDataLevel.SENSITIVEDATA))
             {
@@ -318,7 +275,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Maybe<OperationError> UpdateRegisteredDataCategories(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> registerTypeUuids)
         {
-            return _registerTypeAssignmentService
+            return registerTypeAssignmentService
                 .UpdateAssignedOptions(systemUsage, registerTypeUuids.GetValueOrFallback(new List<Guid>()))
                 .MatchFailure();
         }
@@ -335,20 +292,20 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 switch (delta)
                 {
                     case EnumerableExtensions.EnumerableDelta.Added:
-                        var additionError = _systemUsageService.AddPersonalDataOption(systemUsage.Id, item);
+                        var additionError = systemUsageService.AddPersonalDataOption(systemUsage.Id, item);
                         if (additionError.HasValue)
                         {
                             var error = additionError.Value;
-                            _logger.Error("Failed removing personData {personDataType} from system usage ({uuid}) Error:{errorCode}: {errorMessage}", item, systemUsage.Uuid, error.FailureType, error.Message.GetValueOrFallback(string.Empty));
+                            logger.Error("Failed removing personData {personDataType} from system usage ({uuid}) Error:{errorCode}: {errorMessage}", item, systemUsage.Uuid, error.FailureType, error.Message.GetValueOrFallback(string.Empty));
                             return additionError;
                         }
                         break;
                     case EnumerableExtensions.EnumerableDelta.Removed:
-                        var deletionError = _systemUsageService.RemovePersonalDataOption(systemUsage.Id, item);
+                        var deletionError = systemUsageService.RemovePersonalDataOption(systemUsage.Id, item);
                         if (deletionError.HasValue)
                         {
                             var error = deletionError.Value;
-                            _logger.Error("Failed adding personData {personDataType} to system usage ({uuid}) Error:{errorCode}: {errorMessage}", item, systemUsage.Uuid, error.FailureType, error.Message.GetValueOrFallback(string.Empty));
+                            logger.Error("Failed adding personData {personDataType} to system usage ({uuid}) Error:{errorCode}: {errorMessage}", item, systemUsage.Uuid, error.FailureType, error.Message.GetValueOrFallback(string.Empty));
                             return deletionError.Value;
                         }
                         break;
@@ -362,7 +319,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Maybe<OperationError> UpdateSensitivePersonDataIds(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> sensitiveDataTypeUuids)
         {
-            return _sensitivePersonDataAssignmentService
+            return sensitivePersonDataAssignmentService
                 .UpdateAssignedOptions(systemUsage, sensitiveDataTypeUuids.GetValueOrFallback(new List<Guid>()))
                 .MatchFailure();
         }
@@ -370,7 +327,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private Result<ItSystemUsage, OperationError> PerformReferencesUpdate(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
         {
             //Clear existing state
-            var updateResult = _referenceService.UpdateExternalReferences(
+            var updateResult = referenceService.UpdateExternalReferences(
                 ReferenceRootType.SystemUsage,
                 systemUsage.Id,
                 externalReferences);
@@ -420,7 +377,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 foreach (var specificJournalPeriodUpdate in specificJournalPeriodUpdates)
                 {
                     var period = specificJournalPeriodUpdate.Value;
-                    var updateResult = _systemUsageService.UpdateArchivePeriod(systemUsage.Id, specificJournalPeriodUpdate.Key, period.StartDate, period.EndDate, period.ArchiveId, period.Approved);
+                    var updateResult = systemUsageService.UpdateArchivePeriod(systemUsage.Id, specificJournalPeriodUpdate.Key, period.StartDate, period.EndDate, period.ArchiveId, period.Approved);
                     if (updateResult.Failed)
                         return new OperationError($"Failed to update ArchiveJournalPeriod {period.Uuid} as part of the update. Update error: {updateResult.Error.Message.GetValueOrEmptyString()}", updateResult.Error.FailureType);
                 }
@@ -433,7 +390,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     .ToList();
                 foreach (var uuid in uuidsOfJournalPeriodsToRemove)
                 {
-                    var removeResult = _systemUsageService.RemoveArchivePeriod(systemUsage.Id, uuid);
+                    var removeResult = systemUsageService.RemoveArchivePeriod(systemUsage.Id, uuid);
                     if (removeResult.Failed)
                         return new OperationError($"Failed to remove ArchiveJournalPeriod {uuid} as part of the update. Remove error: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
                 }
@@ -441,7 +398,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             else
             {
                 //If no specific updates, just remove all
-                var removeResult = _systemUsageService.RemoveAllArchivePeriods(systemUsage.Id);
+                var removeResult = systemUsageService.RemoveAllArchivePeriods(systemUsage.Id);
                 if (removeResult.Failed)
                     return new OperationError($"Failed to remove all ArchiveJournalPeriods as part of the update. Remove error: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
             }
@@ -449,7 +406,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             //Add periods which were not part of the specific update set.
             foreach (var newPeriod in journalPeriodsToAddAfterReset)
             {
-                var addResult = _systemUsageService.AddArchivePeriod(systemUsage.Id, newPeriod.StartDate,
+                var addResult = systemUsageService.AddArchivePeriod(systemUsage.Id, newPeriod.StartDate,
                     newPeriod.EndDate, newPeriod.ArchiveId, newPeriod.Approved);
 
                 if (addResult.Failed)
@@ -469,7 +426,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 return Maybe<OperationError>.None;
             }
 
-            var orgByUuid = _organizationService.GetOrganization(archiveSupplierOrganization.Value);
+            var orgByUuid = organizationService.GetOrganization(archiveSupplierOrganization.Value);
 
             if (orgByUuid.Failed)
                 return new OperationError($"Failed to get organization for ArchiveSupplierOrganization. Original error message: {orgByUuid.Error.Message.GetValueOrEmptyString()}", orgByUuid.Error.FailureType);
@@ -489,7 +446,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 return Maybe<OperationError>.None;
             }
 
-            var optionByUuid = _archiveTestLocationOptionsService.GetOptionByUuid(systemUsage.OrganizationId, archiveTestLocation.Value);
+            var optionByUuid = archiveTestLocationOptionsService.GetOptionByUuid(systemUsage.OrganizationId, archiveTestLocation.Value);
 
             if (optionByUuid.IsNone)
                 return new OperationError("Invalid ArchiveTestLocation Uuid", OperationFailure.BadInput);
@@ -512,7 +469,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 return Maybe<OperationError>.None;
             }
 
-            var optionByUuid = _archiveLocationOptionsService.GetOptionByUuid(systemUsage.OrganizationId, archiveLocation.Value);
+            var optionByUuid = archiveLocationOptionsService.GetOptionByUuid(systemUsage.OrganizationId, archiveLocation.Value);
 
             if (optionByUuid.IsNone)
                 return new OperationError("Invalid ArchiveLocation Uuid", OperationFailure.BadInput);
@@ -527,6 +484,62 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return systemUsage.UpdateArchiveLocation(optionByUuid.Value.option);
         }
 
+        private Maybe<OperationError> UpdateSystemUsageCriticalityLevel(ItSystemUsage systemUsage, Maybe<Guid> systemUsageCriticalityLevelUuid)
+        {
+            if (systemUsageCriticalityLevelUuid.IsNone)
+            {
+                systemUsage.ResetSystemUsageCriticalityLevel();
+                return Maybe<OperationError>.None;
+            }
+
+            var optionByUuid = systemUsageCriticalityLevelOptionsService.GetOptionByUuid(systemUsage.OrganizationId, systemUsageCriticalityLevelUuid.Value);
+
+            if (optionByUuid.IsNone)
+                return new OperationError("Invalid SystemUsageCriticalityLevel Uuid", OperationFailure.BadInput);
+
+            if (systemUsage.SystemUsageCriticalityLevelId != null && systemUsage.SystemUsageCriticalityLevelId == optionByUuid.Value.option.Id)
+                return Maybe<OperationError>.None;
+
+            if (!optionByUuid.Value.available)
+                return new OperationError($"SystemUsageCriticalityLevel with uuid {systemUsageCriticalityLevelUuid.Value} is not available in this organization.", OperationFailure.BadInput);
+
+            return systemUsage.UpdateSystemUsageCriticalityLevel(optionByUuid.Value.option);
+        }
+
+        private Maybe<OperationError> UpdateTechnicalSystemTypes(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> technicalSystemTypeUuids)
+        {
+            if (technicalSystemTypeUuids.IsNone)
+            {
+                systemUsage.ResetTechnicalSystemTypes();
+                return Maybe<OperationError>.None;
+            }
+
+            var uuids = technicalSystemTypeUuids.Value.ToList();
+            if (uuids.Count != uuids.Distinct().Count())
+                return new OperationError("It's not allowed to have duplicate uuids in TechnicalSystemTypeUuids.", OperationFailure.BadInput);
+            if (uuids.Count == 0)
+            {
+                systemUsage.ResetTechnicalSystemTypes();
+                return Maybe<OperationError>.None;
+            }
+
+            var resolvedTypes = new List<TechnicalSystemType>();
+            foreach (var uuid in uuids)
+            {
+                var optionByUuid = technicalSystemTypeOptionsService.GetOptionByUuid(systemUsage.OrganizationId, uuid);
+
+                if (optionByUuid.IsNone)
+                    return new OperationError($"Invalid TechnicalSystemType Uuid: {uuid}", OperationFailure.BadInput);
+
+                if (!optionByUuid.Value.available)
+                    return new OperationError($"TechnicalSystemType with uuid {uuid} is not available in this organization.", OperationFailure.BadInput);
+
+                resolvedTypes.Add(optionByUuid.Value.option);
+            }
+
+            return systemUsage.UpdateTechnicalSystemTypes(resolvedTypes);
+        }
+
         private Maybe<OperationError> UpdateArchiveType(ItSystemUsage systemUsage, Maybe<Guid> archiveType)
         {
             if (archiveType.IsNone)
@@ -535,7 +548,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 return Maybe<OperationError>.None;
             }
 
-            var optionByUuid = _archiveTypeOptionsService.GetOptionByUuid(systemUsage.OrganizationId, archiveType.Value);
+            var optionByUuid = archiveTypeOptionsService.GetOptionByUuid(systemUsage.OrganizationId, archiveType.Value);
 
             if (optionByUuid.IsNone)
                 return new OperationError("Invalid ArchiveType Uuid", OperationFailure.BadInput);
@@ -560,7 +573,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 var additions = new List<TaskRef>();
                 foreach (var uuid in addedTaskRefs)
                 {
-                    var result = _kleApplicationService.GetKle(uuid);
+                    var result = kleApplicationService.GetKle(uuid);
                     if (result.Failed)
                     {
                         return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
@@ -571,7 +584,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 var removals = new List<TaskRef>();
                 foreach (var uuid in removedTaskRefs)
                 {
-                    var result = _kleApplicationService.GetKle(uuid);
+                    var result = kleApplicationService.GetKle(uuid);
                     if (result.Failed)
                     {
                         return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
@@ -594,7 +607,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 var nextResponsibleOrg = Maybe<OrganizationUnit>.None;
                 if (nextResponsibleOrgUuid.HasValue)
                 {
-                    var organizationUnitResult = _organizationService.GetOrganizationUnit(nextResponsibleOrgUuid.Value);
+                    var organizationUnitResult = organizationService.GetOrganizationUnit(nextResponsibleOrgUuid.Value);
                     if (organizationUnitResult.Failed)
                         return new OperationError($"Failed to fetch responsible org unit: {organizationUnitResult.Error.Message.GetValueOrEmptyString()}", organizationUnitResult.Error.FailureType);
                     nextResponsibleOrg = organizationUnitResult.Value;
@@ -608,7 +621,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     {
                         foreach (var usingOrgUnitUuid in usingOrgUnitUuids)
                         {
-                            var result = _organizationService.GetOrganizationUnit(usingOrgUnitUuid);
+                            var result = organizationService.GetOrganizationUnit(usingOrgUnitUuid);
                             if (result.Failed)
                                 return new OperationError($"Failed to using org unit with id {usingOrgUnitUuid}: {result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
                             nextUsingOrganizationUnits.Add(result.Value);
@@ -632,22 +645,55 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.Notes, (systemUsage, notes) => systemUsage.Note = notes))
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.SystemVersion, (systemUsage, version) => systemUsage.UpdateSystemVersion(version)))
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.NumberOfExpectedUsersInterval, UpdateExpectedUsersInterval))
-                .Bind(usage => usage.WithOptionalUpdate(generalProperties.LifeCycleStatus, (systemUsage, lifeCycleStatus) => systemUsage.LifeCycleStatus = lifeCycleStatus))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.LifeCycleStatus, (systemUsage, lifeCycleStatus) => UpdateLifecycleStatus(systemUsage, lifeCycleStatus)))
                 .Bind(usage => UpdateValidityPeriod(usage, generalProperties))
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.MainContractUuid, UpdateMainContract))
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.ContainsAITechnology, (systemUsage, containsAITechnology) => systemUsage.UpdateContainsAITechnology(containsAITechnology)))
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.WebAccessibilityCompliance, (systemUsage, webAccessibilityCompliance) => systemUsage.UpdateWebAccessibilityCompliance(webAccessibilityCompliance)))
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.LastWebAccessibilityCheck, (systemUsage, lastWebAccessibilityCheck) => systemUsage.UpdateLastWebAccessibilityCheck(lastWebAccessibilityCheck)))
-                .Bind(usage => usage.WithOptionalUpdate(generalProperties.WebAccessibilityNotes, (systemUsage, webAccessibilityNotes) => systemUsage.UpdateWebAccessibilityNotes(webAccessibilityNotes)));
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.WebAccessibilityNotes, (systemUsage, webAccessibilityNotes) => systemUsage.UpdateWebAccessibilityNotes(webAccessibilityNotes)))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.IsSociallyCritical, (systemUsage, isSociallyCritical) => systemUsage.UpdateIsSociallyCritical(isSociallyCritical)))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.BusinessCritical, (systemUsage, businessCritical) => systemUsage.UpdateIsBusinessCritical(businessCritical)))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.SystemUsageCriticalityLevelUuid, UpdateSystemUsageCriticalityLevel))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.CriticalityLevelDocumentation, (systemUsage, newLink) => UpdateCriticalityLevelDocumentation(systemUsage, newLink)))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.Purpose, (systemUsage, newPurpose) => systemUsage.UpdateGeneralPurpose(newPurpose)))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.TechnicalSystemTypeUuids, UpdateTechnicalSystemTypes))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.HostedAt, (systemUsage, hostedAt) => systemUsage.HostedAt = hostedAt))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.LicensingAndCodeModels, (systemUsage, newModels) => systemUsage.SetLicensingAndCodeModels(newModels)));
         }
 
-        private static Result<ItSystemUsage, OperationError> UpdateValidityPeriod(ItSystemUsage usage, UpdatedSystemUsageGeneralProperties generalProperties)
+        private void RaiseValidityUpdatedEvent(ItSystemUsage usage) {
+            domainEvents.Raise(new ItSystemUsageValidityUpdated(usage));
+        }
+
+        private ItSystemUsage UpdateLifecycleStatus(ItSystemUsage usage, LifeCycleStatusType? lifeCycleStatus) {
+            usage.LifeCycleStatus = lifeCycleStatus;
+            RaiseValidityUpdatedEvent(usage);
+            return usage;
+        }
+
+        private static ItSystemUsage UpdateCriticalityLevelDocumentation(ItSystemUsage usage, Maybe<NamedLink> newLink)
+        {
+            if (newLink.IsNone)
+            {
+                usage.ResetCriticalityLevelDocumentation();
+                return usage;
+            }
+
+            var value = newLink.Value;
+            usage.UpdateCriticalityLevelDocumentationUrl(value?.Url);
+            usage.UpdateCriticalityLevelDocumentationName(value?.Name);
+            return usage;
+        }
+
+        private Result<ItSystemUsage, OperationError> UpdateValidityPeriod(ItSystemUsage usage, UpdatedSystemUsageGeneralProperties generalProperties)
         {
             if (generalProperties.ValidFrom.IsUnchanged && generalProperties.ValidTo.IsUnchanged)
                 return usage; //Not changes provided
 
             var newValidFrom = generalProperties.ValidFrom.MapDateTimeOptionalChangeWithFallback(usage.Concluded);
             var newValidTo = generalProperties.ValidTo.MapDateTimeOptionalChangeWithFallback(usage.ExpirationDate);
+            RaiseValidityUpdatedEvent(usage);
 
             return usage.UpdateSystemValidityPeriod(newValidFrom, newValidTo).Match<Result<ItSystemUsage, OperationError>>(error => error, () => usage);
         }
@@ -660,10 +706,11 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 return systemUsage;
             }
 
-            var contractResult = _contractService.GetContract(contractId.Value);
+            var contractResult = contractService.GetContract(contractId.Value);
             if (contractResult.Failed)
                 return new OperationError($"Failure getting the contract:{contractResult.Error.Message.GetValueOrEmptyString()}", contractResult.Error.FailureType);
 
+            RaiseValidityUpdatedEvent(systemUsage);
             return systemUsage.SetMainContract(contractResult.Value).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
         }
 
@@ -686,7 +733,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 return Maybe<OperationError>.None;
             }
 
-            var optionByUuid = _systemCategoriesOptionsService.GetOptionByUuid(systemUsage.OrganizationId, dataClassificationOptionId.Value);
+            var optionByUuid = systemCategoriesOptionsService.GetOptionByUuid(systemUsage.OrganizationId, dataClassificationOptionId.Value);
 
             if (optionByUuid.IsNone)
                 return new OperationError("Invalid DataClassification Uuid", OperationFailure.BadInput);
@@ -700,6 +747,21 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             return systemUsage.UpdateSystemCategories(optionByUuid.Value.option);
         }
+        private Result<ItSystemUsage, OperationError> WithAuthorizationModelWriteAccess(ItSystemUsage systemUsage, SystemUsageUpdateParameters parameters, bool isCreate = false)
+        {
+            if (isCreate) return WithWriteAccess(systemUsage);
+            var authModel = authorizationContext.GetAuthorizationModel(systemUsage);
+            var authResult = authModel.AuthorizeUpdate(systemUsage, parameters);
+            if (authResult.Failed) return authResult.Error;
+
+            var isAuthorized = authResult.Value;
+            return isAuthorized ? systemUsage : new OperationError(OperationFailure.Forbidden);
+        }
+
+        private Result<ItSystemUsage, OperationError> WithWriteAccess(ItSystemUsage systemUsage)
+        {
+            return authorizationContext.AllowModify(systemUsage) ? systemUsage : new OperationError(OperationFailure.Forbidden);
+        }
 
         private Result<ItSystemUsage, OperationError> PerformRoleAssignmentUpdates(ItSystemUsage itSystemUsage, UpdatedSystemUsageRoles usageRoles)
         {
@@ -712,45 +774,41 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Select(x => x.Select(pair => (pair.RoleUuid, pair.UserUuid)))
                 .GetValueOrFallback(new List<(Guid RoleUuid, Guid UserUuid)>());
 
-            return _roleAssignmentService
+            return roleAssignmentService
                 .BatchUpdateRoles(systemUsage, roleAssignments)
                 .Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
         }
 
         private Result<ItSystemUsage, OperationError> GetUsageAndAuthorizeWriteAccess(Guid uuid)
         {
-            return _systemUsageService.GetReadableItSystemUsageByUuid(uuid)
+            return systemUsageService.GetItSystemUsageByUuidAndAuthorizeRead(uuid)
                 .Bind(WithWriteAccess);
-        }
-
-        private Result<ItSystemUsage, OperationError> WithWriteAccess(ItSystemUsage systemUsage)
-        {
-            return _authorizationContext.AllowModify(systemUsage) ? systemUsage : new OperationError(OperationFailure.Forbidden);
         }
 
         public Maybe<OperationError> Delete(Guid itSystemUsageUuid)
         {
-            return _systemUsageService.GetReadableItSystemUsageByUuid(itSystemUsageUuid)
+            return systemUsageService.GetItSystemUsageByUuidAndAuthorizeRead(itSystemUsageUuid)
                 .Match(DeleteUsage, error => error);
         }
 
         public Maybe<OperationError> DeleteByItSystemAndOrganizationUuids(Guid itSystemUuid, Guid organizationUuid)
         {
-            return _systemService.GetSystem(itSystemUuid)
-                .Bind(system => _organizationService.GetOrganization(organizationUuid).Select(organization => (system, organization)))
+            return systemService.GetSystem(itSystemUuid)
+                .Bind(system => organizationService.GetOrganization(organizationUuid).Select(organization => (system, organization)))
                 .Match(result =>
                 {
-                    var usage = _systemUsageService.GetByOrganizationAndSystemId(result.organization.Id, result.system.Id);
+                    var usage = systemUsageService.GetByOrganizationAndSystemId(result.organization.Id, result.system.Id);
+                    if (usage == null) return new OperationError($"It System Usage for system with Id: {result.system.Id} and organization with Id: {result.organization.Id} was not found", OperationFailure.NotFound);
                     return DeleteUsage(usage);
                 }, error => error);
         }
 
         public Result<SystemRelation, OperationError> CreateSystemRelation(Guid fromSystemUsageUuid, SystemRelationParameters parameters)
         {
-            return _systemUsageService.GetReadableItSystemUsageByUuid(fromSystemUsageUuid)
+            return systemUsageService.GetItSystemUsageByUuidAndAuthorizeRead(fromSystemUsageUuid)
                 .Bind(usage => ResolveRelationParameterIdentities(parameters).Select(ids => (usage, ids)))
                 .Bind(usageAndIds =>
-                    _systemUsageRelationsService.AddRelation
+                    systemUsageRelationsService.AddRelation
                         (
                             usageAndIds.usage.Id,
                             usageAndIds.ids.systemUsageId,
@@ -761,6 +819,24 @@ namespace Core.ApplicationServices.SystemUsage.Write
                             usageAndIds.ids.contractId.Match<int?>(id => id, () => null)
                         )
                 );
+        }
+        
+        public Result<IEnumerable<SystemRelation>, OperationError> CreateSystemRelations(Guid fromSystemUsageUuid, IEnumerable<SystemRelationParameters> parametersCollection)
+        {
+            using var transaction = transactionManager.Begin();
+            var results = new List<SystemRelation>();
+            foreach (var parameters in parametersCollection)
+            {
+                var createResult = CreateSystemRelation(fromSystemUsageUuid, parameters);
+                if (createResult.Failed)
+                {
+                    transaction.Rollback();
+                    return createResult.Error;
+                }
+                results.Add(createResult.Value);
+            }
+            transaction.Commit();
+            return results;
         }
 
         private Result<(Maybe<int> contractId, Maybe<int> interfaceId, Maybe<int> frequencyId, int systemUsageId), OperationError> ResolveRelationParameterIdentities(SystemRelationParameters parameters)
@@ -773,11 +849,11 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<SystemRelation, OperationError> UpdateSystemRelation(Guid fromSystemUsageUuid, Guid relationUuid, SystemRelationParameters parameters)
         {
-            return _systemUsageService.GetReadableItSystemUsageByUuid(fromSystemUsageUuid)
+            return systemUsageService.GetItSystemUsageByUuidAndAuthorizeRead(fromSystemUsageUuid)
                 .Bind(usage => ResolveRelationParameterIdentities(parameters).Select(ids => (usage, ids)))
                 .Bind(usageAndIds => ResolveRequiredId<SystemRelation>(relationUuid).Select(relationId => (usageAndIds.usage, relationId, usageAndIds.ids)))
                 .Bind(usageAndIds =>
-                    _systemUsageRelationsService.ModifyRelation(
+                    systemUsageRelationsService.ModifyRelation(
                         usageAndIds.usage.Id,
                         usageAndIds.relationId,
                         usageAndIds.ids.systemUsageId,
@@ -792,47 +868,77 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Maybe<OperationError> DeleteSystemRelation(Guid itSystemUsageUuid, Guid itSystemUsageRelationUuid)
         {
-            return _systemUsageService
-                .GetReadableItSystemUsageByUuid(itSystemUsageUuid)
+            return systemUsageService
+                .GetItSystemUsageByUuidAndAuthorizeRead(itSystemUsageUuid)
                 .Bind<(int usageId, int relationId)>(usage =>
                 {
-                    var usageRelation = _identityResolver.ResolveDbId<SystemRelation>(itSystemUsageRelationUuid);
+                    var usageRelation = identityResolver.ResolveDbId<SystemRelation>(itSystemUsageRelationUuid);
                     if (usageRelation.IsNone)
                         return new OperationError(
                             $"Relation with id:{itSystemUsageRelationUuid} does not exist", OperationFailure.BadInput);
                     return (usage.Id, usageRelation.Value);
                 })
-                .Bind(usageAndRelation => _systemUsageRelationsService.RemoveRelation(usageAndRelation.usageId, usageAndRelation.relationId))
+                .Bind(usageAndRelation => systemUsageRelationsService.RemoveRelation(usageAndRelation.usageId, usageAndRelation.relationId))
                 .MatchFailure();
         }
 
         public Result<ArchivePeriod, OperationError> CreateJournalPeriod(Guid systemUsageUuid, SystemUsageJournalPeriodProperties parameters)
         {
-            return _systemUsageService
-                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+            return systemUsageService
+                .GetItSystemUsageByUuidAndAuthorizeRead(systemUsageUuid)
                 .Bind(WithWriteAccess)
-                .Bind(usage => _systemUsageService.AddArchivePeriod(usage.Id, parameters.StartDate, parameters.EndDate, parameters.ArchiveId, parameters.Approved));
+                .Bind(usage => systemUsageService.AddArchivePeriod(usage.Id, parameters.StartDate, parameters.EndDate, parameters.ArchiveId, parameters.Approved));
         }
 
         public Result<ArchivePeriod, OperationError> UpdateJournalPeriod(Guid systemUsageUuid, Guid periodUuid, SystemUsageJournalPeriodProperties parameters)
         {
-            return _systemUsageService
-                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+            return systemUsageService
+                .GetItSystemUsageByUuidAndAuthorizeRead(systemUsageUuid)
                 .Bind(WithWriteAccess)
-                .Bind(usage => _systemUsageService.UpdateArchivePeriod(usage.Id, periodUuid, parameters.StartDate, parameters.EndDate, parameters.ArchiveId, parameters.Approved));
+                .Bind(usage => systemUsageService.UpdateArchivePeriod(usage.Id, periodUuid, parameters.StartDate, parameters.EndDate, parameters.ArchiveId, parameters.Approved));
         }
 
         public Result<ArchivePeriod, OperationError> DeleteJournalPeriod(Guid systemUsageUuid, Guid periodUuid)
         {
-            return _systemUsageService
-                .GetReadableItSystemUsageByUuid(systemUsageUuid)
+            return systemUsageService
+                .GetItSystemUsageByUuidAndAuthorizeRead(systemUsageUuid)
                 .Bind(WithWriteAccess)
-                .Bind(usage => _systemUsageService.RemoveArchivePeriod(usage.Id, periodUuid));
+                .Bind(usage => systemUsageService.RemoveArchivePeriod(usage.Id, periodUuid));
+        }
+
+        public Result<ItSystemUsageArchive, OperationError> Archive(Guid systemUsageUuid, ArchiveItSystemUsageParameters parameters)
+        {
+            using var transaction = transactionManager.Begin();
+
+            var result = CreateArchiveAndDeleteUsage(systemUsageUuid, parameters);
+
+            if (result.Ok)
+            {
+                transaction.Commit();
+            }
+            else
+            {
+                transaction.Rollback();
+            }
+
+            return result;
+        }
+
+        private Result<ItSystemUsageArchive, OperationError> CreateArchiveAndDeleteUsage(Guid systemUsageUuid, ArchiveItSystemUsageParameters parameters)
+        {
+            return itSystemArchiveService.Create(systemUsageUuid, parameters)
+                .Bind(archive => DeleteUsageAndReturnArchive(systemUsageUuid, archive));
+        }
+
+        private Result<ItSystemUsageArchive, OperationError> DeleteUsageAndReturnArchive(Guid systemUsageUuid, ItSystemUsageArchive archive)
+        {
+            return Delete(systemUsageUuid)
+                .Match<Result<ItSystemUsageArchive, OperationError>>(error => error, () => archive);
         }
 
         private Maybe<OperationError> DeleteUsage(ItSystemUsage usage)
         {
-            return _systemUsageService.Delete(usage.Id)
+            return systemUsageService.Delete(usage.Id)
                 .Match(_ => Maybe<OperationError>.None, error => new OperationError($"Failed to delete it system usage with Uuid: {usage.Uuid}, Error message: {error.Message.GetValueOrEmptyString()}", error.FailureType));
         }
 
@@ -846,7 +952,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             if (optionalId.HasValue)
             {
-                var id = _identityResolver.ResolveDbId<T>(optionalId.Value);
+                var id = identityResolver.ResolveDbId<T>(optionalId.Value);
 
                 return id.Match<Result<Maybe<int>, OperationError>>
                 (

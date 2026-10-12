@@ -11,14 +11,13 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 
 namespace Core.ApplicationServices.KitosEvents;
-public class PublishSystemChangesEventHandler : IDomainEventHandler<EntityUpdatedEventWithSnapshot<ItSystem, ItSystemSnapshot>>, IDomainEventHandler<EntityUpdatedEventWithSnapshot<DataProcessingRegistration, DprSnapshot>>
+
+public class PublishSystemChangesEventHandler(IKitosEventPublisherService eventPublisher)
+    : IDomainEventHandler<EntityUpdatedEventWithSnapshot<ItSystem, ItSystemSnapshot>>,
+        IDomainEventHandler<EntityUpdatedEventWithSnapshot<DataProcessingRegistration, DprSnapshot>>
 {
-    private readonly IKitosEventPublisherService _eventPublisher;
     private const string QueueTopic = KitosQueueTopics.SystemChangedEventTopic;
-    public PublishSystemChangesEventHandler(IKitosEventPublisherService eventPublisher)
-    {
-        _eventPublisher = eventPublisher;
-    }
+
     public void Handle(EntityUpdatedEventWithSnapshot<ItSystem, ItSystemSnapshot> domainEvent)
     {
         var changeEvent = CalculateChangeEventFromSystemModel(domainEvent);
@@ -27,7 +26,7 @@ public class PublishSystemChangesEventHandler : IDomainEventHandler<EntityUpdate
             return;
         }
         var newEvent = new KitosEvent(changeEvent.Value, QueueTopic);
-        _eventPublisher.PublishEvent(newEvent);
+        eventPublisher.PublishEvent(newEvent);
     }
     public void Handle(EntityUpdatedEventWithSnapshot<DataProcessingRegistration, DprSnapshot> domainEvent)
     {
@@ -39,7 +38,7 @@ public class PublishSystemChangesEventHandler : IDomainEventHandler<EntityUpdate
         foreach (var changeEvent in changeEvents.Value)
         {
             var newEvent = new KitosEvent(changeEvent, QueueTopic);
-            _eventPublisher.PublishEvent(newEvent);
+            eventPublisher.PublishEvent(newEvent);
         }
     }
 
@@ -60,7 +59,8 @@ public class PublishSystemChangesEventHandler : IDomainEventHandler<EntityUpdate
             return Maybe<IEnumerable<SystemChangeEventBodyModel>>.None;
         }
 
-        return dprAfter.SystemUsages?.Select(usage => GetEventFromUsage(usage, dprAfter)).FromNullable();
+        return dprAfter.SystemUsages?.Select(usage => GetEventFromUsage(usage, dprAfter)).FromNullable()
+               ?? Maybe<IEnumerable<SystemChangeEventBodyModel>>.None;
     }
 
     private static SystemChangeEventBodyModel GetEventFromUsage(ItSystemUsage usage, DataProcessingRegistration dpr)
@@ -69,8 +69,8 @@ public class PublishSystemChangesEventHandler : IDomainEventHandler<EntityUpdate
         return new SystemChangeEventBodyModel
         {
             SystemUuid = usage.ItSystem.Uuid,
-            DataProcessorUuid = dataProcessor.Select(x => x.Uuid).AsChangedValue(),
-            DataProcessorName = dataProcessor.Select(x => x.Name).GetValueOrDefault().AsChangedValue()
+            DataProcessorUuid = dataProcessor.Select(x => x.Uuid).AsChangedValue()!,
+            DataProcessorName = dataProcessor.Select(x => x.Name).GetValueOrDefault().AsChangedValue()!
         };
     }
 

@@ -1,26 +1,23 @@
-﻿using Core.ApplicationServices.KLE;
+using Core.ApplicationServices.KLE;
 using Core.DomainModel.KLE;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
-using System.Net.Http.Headers;
-using System.Net.Http;
-using System.Net;
 using System.Text;
 using System;
 using System.Linq;
-using System.Web.Http;
-using System.Web.Http.Results;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Extensions;
 using Presentation.Web.Controllers.API.V2.Internal.KLE.Mapping;
 using Presentation.Web.Helpers;
-using Swashbuckle.Swagger.Annotations;
+using Microsoft.AspNetCore.Mvc;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Response.KLE;
 
+using System.Net;
 namespace Presentation.Web.Controllers.API.V2.Internal.KLE
 {
-    [RoutePrefix("api/v2/internal/kle")]
+    [Route("api/v2/internal/kle")]
     public class KLEInternalV2Controller : InternalApiV2Controller
     {
         private const string KLETypeColumnName = Constants.KLE.Type.Column;
@@ -38,10 +35,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.KLE
 
         [HttpGet]
         [Route("status")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(KLEStatusResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        public IHttpActionResult GetKLEStatus()
+        [ApiResponse(typeof(KLEStatusResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        public IActionResult GetKLEStatus()
         {
             var result = _kleApplicationService.GetKLEStatus();
 
@@ -57,10 +54,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.KLE
 
         [HttpGet]
         [Route("changes")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        public IHttpActionResult GetKLEChanges()
+        [ApiResponse(HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        public IActionResult GetKLEChanges()
         {
             var result = _kleApplicationService.GetKLEChangeSummary();
             if (!result.Ok) return FromOperationFailure(result.Error);
@@ -74,10 +71,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal.KLE
 
         [HttpPut]
         [Route("update")]
-        [SwaggerResponse(HttpStatusCode.OK)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        public IHttpActionResult PutKLEChanges()
+        [ApiResponse(HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        public IActionResult PutKLEChanges()
         {
             var result = _kleApplicationService.UpdateKLE();
 
@@ -118,25 +115,15 @@ namespace Presentation.Web.Controllers.API.V2.Internal.KLE
             }
         }
 
-        private static IHttpActionResult CreateCsvFormattedHttpResponse(IEnumerable<dynamic> list)
+        private static FileStreamResult CreateCsvFormattedHttpResponse(IEnumerable<dynamic> list)
         {
             var s = list.ToCsv();
             var bytes = Encoding.UTF8.GetBytes(s);
-            var stream = new MemoryStream();
-            stream.Write(bytes, 0, bytes.Length);
-            stream.Seek(0, SeekOrigin.Begin);
-            var result = new HttpResponseMessage(HttpStatusCode.OK)
+            var stream = new MemoryStream(bytes);
+            return new FileStreamResult(stream, Constants.KLE.MediaTypeHeaderValue)
             {
-                Content = new StreamContent(stream),
+                FileDownloadName = Constants.KLE.FileNameStar
             };
-            result.Content.Headers.ContentType = new MediaTypeHeaderValue(Constants.KLE.MediaTypeHeaderValue);
-            result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue(Constants.KLE.DispositionType)
-            {
-                FileNameStar = Constants.KLE.FileNameStar,
-                DispositionType = Constants.KLE.DispositionType
-
-            };
-            return new ResponseMessageResult(result);
         }
 
         private string ChangeTypeToString(KLEChangeType changeType)
@@ -154,3 +141,4 @@ namespace Presentation.Web.Controllers.API.V2.Internal.KLE
         #endregion
     }
 }
+

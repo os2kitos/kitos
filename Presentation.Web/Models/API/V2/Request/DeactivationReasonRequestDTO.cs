@@ -8,6 +8,6 @@ namespace Presentation.Web.Models.API.V2.Request
         /// Reason for deactivation
         /// </summary>
         [Required(AllowEmptyStrings = false)]
-        public string DeactivationReason { get; set; }
+        public required string DeactivationReason { get; set; }
     }
 }

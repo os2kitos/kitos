@@ -1,19 +1,18 @@
-﻿using Core.ApplicationServices.SystemUsage.GDPR;
+using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Internal.Response;
-using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
 
+using System.Net;
 namespace Presentation.Web.Controllers.API.V2.Internal
 {
 
-    [RoutePrefix("api/v2/internal/gdpr-report")]
+    [Route("api/v2/internal/gdpr-report")]
     public class GdprExportReportInternalV2Controller : InternalApiV2Controller
     {
         private readonly IGDPRExportService _gdprExportService;
@@ -25,12 +24,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal
 
         [HttpGet]
         [Route("{organizationUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<GdprReportResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult GetGdprReport([FromUri][NonEmptyGuid] Guid organizationUuid)
+        [ApiResponse(typeof(IEnumerable<GdprReportResponseDTO>), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        public IActionResult GetGdprReport([FromRoute][NonEmptyGuid] Guid organizationUuid)
         {
             return _gdprExportService.GetGDPRDataByUuid(organizationUuid)
                     .Select(MapGdprDataToDTO)
@@ -52,11 +51,10 @@ namespace Presentation.Web.Controllers.API.V2.Internal
                 PersonalData = gdprReport.PersonalData,
                 SensitiveData = gdprReport.SensitiveData,
                 LegalData = gdprReport.LegalData,
-                BusinessCritical = gdprReport.BusinessCritical?.ToYesNoDontKnowChoice(),
                 DataProcessingAgreementConcluded = gdprReport.DataProcessingAgreementConcluded,
                 LinkToDirectory = gdprReport.LinkToDirectory,
                 SensitiveDataTypes = gdprReport.SensitiveDataTypes,
-                RiskAssessment = gdprReport.RiskAssessment?.ToYesNoDontKnowChoice(),
+                RiskAssessment = gdprReport.RiskAssessment?.ToChoice(),
                 RiskAssessmentDate = gdprReport.RiskAssessmentDate,
                 PlannedRiskAssessmentDate = gdprReport.PlannedRiskAssessmentDate,
                 PreRiskAssessment = gdprReport.PreRiskAssessment?.ToRiskLevelChoice(),
@@ -66,7 +64,6 @@ namespace Presentation.Web.Controllers.API.V2.Internal
                 PersonalDataSocialOtherPrivateMatters = gdprReport.PersonalDataSocialOtherPrivateMatters,
                 DPIA = gdprReport.DPIA?.ToYesNoDontKnowChoice(),
                 DPIADate = gdprReport.DPIADate,
-                HostedAt = gdprReport.HostedAt?.ToHostingChoice(),
                 TechnicalSupervisionDocumentationUrl = gdprReport.TechnicalSupervisionDocumentationUrl,
                 TechnicalSupervisionDocumentationUrlName = gdprReport.TechnicalSupervisionDocumentationUrlName,
                 UserSupervision = gdprReport.UserSupervision?.ToYesNoDontKnowChoice(),
@@ -78,3 +75,4 @@ namespace Presentation.Web.Controllers.API.V2.Internal
         }
     }
 }
+

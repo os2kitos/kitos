@@ -1,8 +1,8 @@
-﻿namespace Presentation.Web.Ninject
+namespace Presentation.Web.Ninject
 {
     public enum KernelMode
     {
         Web,
-        HangFireJob
+        Test
     }
 }

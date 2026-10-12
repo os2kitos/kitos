@@ -57,7 +57,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         [InlineData(" ")]
         [InlineData("123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789011234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890")] //201
         [InlineData(null)]
-        public void ChangeName_Returns_BadInput(string name)
+        public void ChangeName_Returns_BadInput(string? name)
         {
             //Arrange
             var registration = new DataProcessingRegistration() { Name = A<string>() };

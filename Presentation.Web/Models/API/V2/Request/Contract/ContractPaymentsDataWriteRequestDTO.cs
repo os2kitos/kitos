@@ -7,10 +7,10 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// <summary>
         /// External payments
         /// </summary>
-        public IEnumerable<PaymentRequestDTO> External { get; set; }
+        public IEnumerable<PaymentRequestDTO>? External { get; set; }
         /// <summary>
         /// Internal payments
         /// </summary>
-        public IEnumerable<PaymentRequestDTO> Internal { get; set; }
+        public IEnumerable<PaymentRequestDTO>? Internal { get; set; }
     }
 }

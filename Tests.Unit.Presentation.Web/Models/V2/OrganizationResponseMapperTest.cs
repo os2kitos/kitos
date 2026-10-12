@@ -63,6 +63,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
                 Assert.NotNull(actual);
                 Assert.Equal(expectedNode.Enabled, actual.Enabled);
+                Assert.Equal(expectedNode.Recommended, actual.Recommended);
             }
         }
 
@@ -197,7 +198,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             for (var i = 0; i < numberOfElements; i++)
             {
                 key = string.IsNullOrEmpty(key) ? GenerateKey() : key;
-                nodes.Add(new CustomizedUINode { Key = key, Enabled = isEnabled });
+                nodes.Add(new CustomizedUINode { Key = key, Enabled = isEnabled, Recommended = isEnabled });
             }
 
             return nodes;

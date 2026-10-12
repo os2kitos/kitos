@@ -16,9 +16,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int page = 0,
             int pageSize = 100,
             Guid? parentIdQuery = null,
-            string parentKeyQuery = null,
-            string kleNumberPrefix = null,
-            string kleDescriptionContent = null)
+            string? parentKeyQuery = null,
+            string? kleNumberPrefix = null,
+            string? kleDescriptionContent = null)
         {
             using var response = await SendGetKleNumbersAsync(token, page, pageSize, parentIdQuery, parentKeyQuery, kleNumberPrefix, kleDescriptionContent);
 
@@ -30,9 +30,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int page = 0,
             int pageSize = 100,
             Guid? parentIdQuery = null,
-            string parentKeyQuery = null,
-            string kleNumberPrefix = null,
-            string kleDescriptionContent = null)
+            string? parentKeyQuery = null,
+            string? kleNumberPrefix = null,
+            string? kleDescriptionContent = null)
         {
             var queryParameters = new List<KeyValuePair<string, string>>
             {

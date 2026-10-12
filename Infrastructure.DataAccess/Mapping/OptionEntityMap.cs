@@ -1,19 +1,21 @@
-﻿using Core.DomainModel;
+using Core.DomainModel;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public abstract class OptionEntityMap<T, TReference> : EntityMap<T>
         where T : OptionEntity<TReference>
     {
-        protected OptionEntityMap()
+        public override void Configure(EntityTypeBuilder<T> builder)
         {
-            this.Property(t => t.Name)
+            base.Configure(builder);
+
+            builder.Property(t => t.Name)
                 .HasMaxLength(OptionEntity<TReference>.MaxNameLength)
                 .IsRequired();
 
-            Property(x => x.Uuid)
-                .IsRequired()
-                .HasUniqueIndexAnnotation("UX_Option_Uuid", 0);
+            builder.HasIndex(x => x.Uuid).IsUnique().HasDatabaseName("UX_Option_Uuid");
         }
     }
 }

@@ -7,6 +7,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.GDPR;
+using Microsoft.Extensions.Logging.Abstractions;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Models.API.V1;
@@ -25,7 +26,7 @@ namespace Presentation.Web
                 cfg.AllowNullDestinationValues = true;
                 cfg.AddProfile<MappingProfile>();
                 cfg.AddProfile<DropdownProfile>();
-            });
+            }, NullLoggerFactory.Instance);
 
             //Precompile automapper mappings to take performance hit during application boot in stead of during first request.
             mappingconfig.CompileMappings();

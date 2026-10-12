@@ -20,7 +20,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     ///     Contains info about an it contract
     /// </summary>
-    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContractModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification, IHasUuid, IHasDirtyMarking
+    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContractModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification, IHasUuid, IHasDirtyMarking, IEntityOwnedByOrganization
     {
         public ItContract()
         {
@@ -39,6 +39,7 @@ namespace Core.DomainModel.ItContract
         }
 
         public Guid Uuid { get; set; }
+
 
         public ItContractValidationResult Validate(DateTime todayReference)
         {
@@ -91,6 +92,8 @@ namespace Core.DomainModel.ItContract
         {
             return Validate(DateTime.Now);
         }
+
+        public bool? HasInternalSupplier { get; private set; }
 
         /// <summary>
         ///     Whether the contract is active or not
@@ -235,6 +238,13 @@ namespace Core.DomainModel.ItContract
         ///     The organization.
         /// </value>
         public virtual Organization.Organization Supplier { get; set; }
+
+        public int? SupplierOrganizationUnitId { get; set; }
+        public virtual OrganizationUnit SupplierOrganizationUnit { get; set; }
+        public string SupplierContactPerson { get; set; }
+        public bool UseSupplierContractSignerAsContactPerson { get; set; } = true;
+        public string SupplierContactPhoneNumber { get; set; }
+        public string SupplierContactEmail { get; set; }
 
         /// <summary>
         ///     Gets or sets the chosen procurement strategy option identifier. (Genanskaffelsesstrategi)
@@ -382,7 +392,7 @@ namespace Core.DomainModel.ItContract
         #region Deadlines (aftalefrister)
 
         /// <summary>
-        ///     When the contract began. (indgået)
+        ///     When the contract began. (indgÃ¥et)
         /// </summary>
         /// <value>
         ///     The concluded date.
@@ -406,7 +416,7 @@ namespace Core.DomainModel.ItContract
         public int? DurationMonths { get; set; }
 
         /// <summary>
-        ///     Gets or sets the ongoing status. (løbende)
+        ///     Gets or sets the ongoing status. (lÃ¸bende)
         /// </summary>
         /// <value>
         ///     Is the duration ongoing.
@@ -422,7 +432,7 @@ namespace Core.DomainModel.ItContract
         public DateTime? IrrevocableTo { get; set; }
 
         /// <summary>
-        ///     When the contract expires. (udløbet)
+        ///     When the contract expires. (udlÃ¸bet)
         /// </summary>
         /// <value>
         ///     The expiration date.
@@ -459,7 +469,7 @@ namespace Core.DomainModel.ItContract
         ///
         /// </summary>
         /// <value>
-        ///     (løbende)
+        ///     (lÃ¸bende)
         /// </value>
         public YearSegmentOption? Running { get; set; }
 
@@ -763,15 +773,46 @@ namespace Core.DomainModel.ItContract
             Supplier = null;
         }
 
-        public Maybe<OperationError> SetSupplierOrganization(Organization.Organization organization)
+        public Maybe<OperationError> SetSupplierOrganizationUnit(Guid organizationUnitUuid)
         {
-            if (organization == null)
-                throw new ArgumentNullException(nameof(organization));
+            if (organizationUnitUuid != SupplierOrganizationUnit?.Uuid)
+            {
+                var organizationUnit = Organization.GetOrganizationUnit(organizationUnitUuid);
+                if (organizationUnit.IsNone)
+                {
+                    return new OperationError("UUID of supplier organization unit does not match an organization unit on this contract's organization", OperationFailure.BadInput);
+                }
 
-            if (Supplier == null || organization.Uuid != Supplier.Uuid)
-                Supplier = organization;
+                SupplierOrganizationUnit = organizationUnit.Value;
+            }
 
             return Maybe<OperationError>.None;
+        }
+
+        public void ResetSupplierOrganizationUnit()
+        {
+            SupplierOrganizationUnit?.Track();
+            SupplierOrganizationUnit = null;
+        }
+
+        public Maybe<OperationError> SetSupplierOrganization(Organization.Organization newSupplier)
+        {
+            if (newSupplier == null)
+                return new OperationError("Organization cannot be null when updating the supplier", OperationFailure.BadState);
+
+            SetInternalSupplier(newSupplier.Uuid == Organization.Uuid);
+            Supplier = newSupplier;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void SetInternalSupplier(bool isInternal)
+        {
+            HasInternalSupplier = isInternal;
+            if (!isInternal)
+            {
+                ResetSupplierOrganizationUnit();
+            }
         }
 
         public Maybe<OperationError> UpdateExtendMultiplier(int extendMultiplier)

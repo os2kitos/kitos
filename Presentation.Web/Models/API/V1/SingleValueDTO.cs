@@ -2,6 +2,6 @@
 {
     public class SingleValueDTO<TValue>
     {
-        public TValue Value { get; set; }
+        public required TValue Value { get; set; }
     }
 }

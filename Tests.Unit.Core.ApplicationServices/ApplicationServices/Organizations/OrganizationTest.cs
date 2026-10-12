@@ -7,6 +7,7 @@ using Core.DomainModel.Constants;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.SupplierAssociatedFields;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -14,8 +15,8 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 {
     public class OrganizationTest : WithAutoFixture
     {
-        private Organization _sut;
-        private OrganizationUnit _root;
+        private Organization _sut = null!;
+        private OrganizationUnit _root = null!;
 
         protected override void OnFixtureCreated(Fixture fixture)
         {
@@ -23,6 +24,205 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _sut = new Organization();
             _sut.OrgUnits.Add(CreateOrganizationUnit());
             _root = _sut.GetRoot();
+        }
+
+        [Fact]
+        public void ClearUsedAsSupplierByOrganizations_Clears_Collection() {
+            _sut.UsedAsSupplierByOrganizations = new List<OrganizationSupplier>() { new() };
+            Assert.Single(_sut.UsedAsSupplierByOrganizations);
+
+            _sut.ClearUsedAsSupplierByOrganizations();
+
+            Assert.Empty(_sut.UsedAsSupplierByOrganizations);
+        }
+
+        [Fact]
+        public void ClearSuppliers_Clears_Collection()
+        {
+            _sut.Suppliers = new List<OrganizationSupplier>() { new() };
+            Assert.Single(_sut.Suppliers);
+
+            _sut.ClearSuppliers();
+
+            Assert.Empty(_sut.Suppliers);
+        }
+
+        [Fact]
+        public void GivenNullSuppliers_HasSuppliers_Returns_False()
+        {
+            _sut.Suppliers = null;
+            var result = _sut.HasSuppliers();
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void GivenEmptySuppliersCollection_HasSuppliers_Returns_False()
+        {
+            _sut.Suppliers = new List<OrganizationSupplier>();
+            var result = _sut.HasSuppliers();
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void GivenSuppliers_HasSuppliers_Returns_True()
+        {
+            _sut.Suppliers = new List<OrganizationSupplier>(){new()};
+            var result = _sut.HasSuppliers();
+
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void UpdateFieldConfigurations_GivenNullInput_ReturnsBadInput()
+        {
+            var result = _sut.UpdateFieldConfigurations(null);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void UpdateFieldConfigurations_GivenEmptyFieldKey_ReturnsBadInput()
+        {
+            var result = _sut.UpdateFieldConfigurations(new[]
+            {
+                new KeyValuePair<string, FieldControlState>("", FieldControlState.Organization)
+            });
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void UpdateFieldConfigurations_GivenDuplicateFieldKey_ReturnsBadInput()
+        {
+            var result = _sut.UpdateFieldConfigurations(new[]
+            {
+                new KeyValuePair<string, FieldControlState>("contractOwner", FieldControlState.Organization),
+                new KeyValuePair<string, FieldControlState>("contractOwner", FieldControlState.Supplier)
+            });
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void UpdateFieldConfigurations_AddsNewConfigurations()
+        {
+            var result = _sut.UpdateFieldConfigurations(new[]
+            {
+                new KeyValuePair<string, FieldControlState>("fieldA", FieldControlState.Organization),
+                new KeyValuePair<string, FieldControlState>("fieldB", FieldControlState.Supplier)
+            });
+
+            Assert.True(result.Ok);
+            Assert.Equal(2, _sut.SupplierAssociatedFieldConfigurations.Count);
+            Assert.Equal(FieldControlState.Organization, _sut.GetFieldConfiguration("fieldA").GetValueOrDefault()?.ControlState);
+            Assert.Equal(FieldControlState.Supplier, _sut.GetFieldConfiguration("fieldB").GetValueOrDefault()?.ControlState);
+        }
+
+        [Fact]
+        public void UpdateFieldConfigurations_UpdatesExistingConfiguration()
+        {
+            _sut.SupplierAssociatedFieldConfigurations = new List<SupplierAssociatedFieldConfiguration>
+            {
+                new() { FieldKey = "fieldA", ControlState = FieldControlState.Organization }
+            };
+
+            var result = _sut.UpdateFieldConfigurations(new[]
+            {
+                new KeyValuePair<string, FieldControlState>("fieldA", FieldControlState.Shared)
+            });
+
+            Assert.True(result.Ok);
+            Assert.Single(_sut.SupplierAssociatedFieldConfigurations);
+            Assert.Equal(FieldControlState.Shared, _sut.GetFieldConfiguration("fieldA").GetValueOrDefault()?.ControlState);
+        }
+
+        [Fact]
+        public void GetFieldConfiguration_GivenUnknownFieldKey_ReturnsNone()
+        {
+            _sut.SupplierAssociatedFieldConfigurations = new List<SupplierAssociatedFieldConfiguration>
+            {
+                new() { FieldKey = "fieldA", ControlState = FieldControlState.Organization }
+            };
+
+            var result = _sut.GetFieldConfiguration("fieldB");
+
+            Assert.True(result.IsNone);
+        }
+
+        [Fact]
+        public void GetFieldConfiguration_GivenKnownFieldKey_ReturnsConfiguration()
+        {
+            _sut.SupplierAssociatedFieldConfigurations = new List<SupplierAssociatedFieldConfiguration>
+            {
+                new() { FieldKey = "fieldA", ControlState = FieldControlState.Shared }
+            };
+
+            var result = _sut.GetFieldConfiguration("fieldA");
+
+            Assert.True(result.HasValue);
+            Assert.Equal(FieldControlState.Shared, result.GetValueOrDefault()?.ControlState);
+        }
+
+        [Fact]
+        public void GivenCompanyTypeIdAndIsSupplierState_UpdateTypeToNonCompany_TogglesOffSupplierState()
+        {
+            const int companyTypeId = (int)OrganizationTypeKeys.Virksomhed;
+            _sut.UpdateOrganizationTypeId(companyTypeId);            
+            _sut.UpdateIsSupplier(true);
+            var nonCompanyOrgType = new OrganizationType() { Id = (int)OrganizationTypeKeys.Kommune };
+
+            _sut.UpdateOrganizationType(nonCompanyOrgType);
+
+            Assert.Equal(nonCompanyOrgType, _sut.Type);
+            Assert.False(_sut.IsSupplier);
+        }
+
+        [Fact]
+        public void GivenCompanyAndIsSupplierState_UpdateTypeIdToNonCompany_TogglesOffSupplierState()
+        {
+            const int companyTypeId = (int)OrganizationTypeKeys.Virksomhed;
+            _sut.UpdateOrganizationTypeId(companyTypeId);
+            _sut.UpdateIsSupplier(true);
+            const int nonCompanyId = (int)OrganizationTypeKeys.Kommune;
+
+            _sut.UpdateOrganizationTypeId(nonCompanyId);
+
+            Assert.Equal(nonCompanyId, _sut.TypeId);
+            Assert.False(_sut.IsSupplier);
+        }
+
+        [Fact]
+        public void GivenNonCompanyTypeId_UpdateTypeIdToCompanyAndUpdateSupplierToTrue_SetsSupplierToTrue()
+        {
+            const int nonCompanyTypeId = (int)OrganizationTypeKeys.Interessefællesskab;
+            _sut.UpdateOrganizationTypeId(nonCompanyTypeId);
+
+            var companyOrgTypeId = (int)OrganizationTypeKeys.Virksomhed;
+            _sut.UpdateOrganizationTypeId(companyOrgTypeId);
+            var result = _sut.UpdateIsSupplier(true);
+
+            Assert.Equal(_sut.TypeId, companyOrgTypeId);
+            Assert.True(_sut.IsSupplier);
+            Assert.True(result.IsNone);
+        }
+
+        [Fact]
+        public void GivenMunicipalityTypeId_UpdateSupplierToTrue_ReturnsOperationError()
+        {
+            const int nonCompanyTypeId = (int)OrganizationTypeKeys.Kommune;
+            _sut.UpdateOrganizationTypeId(nonCompanyTypeId);
+            
+            var result = _sut.UpdateIsSupplier(true);
+
+            Assert.Equal(nonCompanyTypeId, _sut.TypeId);
+            Assert.False(result.IsNone);
+            Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
+            Assert.False(_sut.IsSupplier);
         }
 
         [Fact]

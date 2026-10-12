@@ -11,14 +11,14 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
 {
     public class OrganizationUnitRegistrationV2Helper
     {
-        public static async Task<OrganizationRegistrationUnitResponseDTO> GetRegistrationsAsync(Guid organizationUuid, Guid unitUuid, Cookie optionalLogin = null)
+        public static async Task<OrganizationRegistrationUnitResponseDTO> GetRegistrationsAsync(Guid organizationUuid, Guid unitUuid, Cookie? optionalLogin = null)
         {
             using var response = await SendGetRegistrationsAsync(organizationUuid, unitUuid, optionalLogin);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<OrganizationRegistrationUnitResponseDTO>();
         }
-        public static async Task<HttpResponseMessage> SendGetRegistrationsAsync(Guid organizationUuid, Guid unitUuid, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendGetRegistrationsAsync(Guid organizationUuid, Guid unitUuid, Cookie? optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var orgUnitUrl = TestEnvironment.CreateUrl($"api/v2/internal/organizations/{organizationUuid}/organization-units/{unitUuid}/registrations");
@@ -26,7 +26,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
             return await HttpApi.GetWithCookieAsync(orgUnitUrl, cookie);
         }
 
-        public static async Task DeleteSelectedRegistrationsAsync(Guid organizationUuid, Guid unitUuid, ChangeOrganizationUnitRegistrationV2RequestDTO body, Cookie optionalLogin = null)
+        public static async Task DeleteSelectedRegistrationsAsync(Guid organizationUuid, Guid unitUuid, ChangeOrganizationUnitRegistrationV2RequestDTO body, Cookie? optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var orgUnitUrl = TestEnvironment.CreateUrl($"api/v2/internal/organizations/{organizationUuid}/organization-units/{unitUuid}/registrations");
@@ -35,7 +35,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        public static async Task TransferRegistrationsAsync(Guid organizationUuid, Guid unitUuid, TransferOrganizationUnitRegistrationV2RequestDTO body, Cookie optionalLogin = null)
+        public static async Task TransferRegistrationsAsync(Guid organizationUuid, Guid unitUuid, TransferOrganizationUnitRegistrationV2RequestDTO body, Cookie? optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var orgUnitUrl = TestEnvironment.CreateUrl($"api/v2/internal/organizations/{organizationUuid}/organization-units/{unitUuid}/registrations");

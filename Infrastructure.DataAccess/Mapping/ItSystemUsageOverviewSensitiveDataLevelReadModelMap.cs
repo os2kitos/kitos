@@ -1,21 +1,23 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItSystemUsage.Read;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemUsageOverviewSensitiveDataLevelReadModelMap : EntityTypeConfiguration<ItSystemUsageOverviewSensitiveDataLevelReadModel>
+    public class ItSystemUsageOverviewSensitiveDataLevelReadModelMap : IEntityTypeConfiguration<ItSystemUsageOverviewSensitiveDataLevelReadModel>
     {
-        public ItSystemUsageOverviewSensitiveDataLevelReadModelMap()
+        public void Configure(EntityTypeBuilder<ItSystemUsageOverviewSensitiveDataLevelReadModel> builder)
         {
-            HasKey(x => x.Id);
-            HasRequired(x => x.Parent)
+            builder.HasKey(x => x.Id);
+
+            builder.HasOne(x => x.Parent)
                 .WithMany(x => x.SensitiveDataLevels)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(true);
-
-            Property(x => x.SensitivityDataLevel)
                 .IsRequired()
-                .HasIndexAnnotation("ItSystemUsageOverviewSensitiveDataLevelReadModel_Index_SensitiveDataLevel", 0);
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Property(x => x.SensitivityDataLevel).IsRequired();
+            builder.HasIndex(x => x.SensitivityDataLevel).HasDatabaseName("ItSystemUsageOverviewSensitiveDataLevelReadModel_Index_SensitiveDataLevel");
         }
     }
 }

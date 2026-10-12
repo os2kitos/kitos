@@ -1,8 +1,12 @@
-﻿namespace Presentation.Web.Models.API.V1.Shared
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Presentation.Web.Models.API.V1.Shared
 {
     public class OptionWithDescriptionAndExpirationDTO : NamedEntityWithExpirationStatusDTO
     {
         public string Description { get; set; }
+
+        [SetsRequiredMembers]
         public OptionWithDescriptionAndExpirationDTO(int id, string name, bool expired, string description)
             : base(id, name, expired)
         {

@@ -6,7 +6,7 @@ namespace Core.ApplicationServices.Model.Shared.Write
     {
         public Guid? Uuid { get; set; }
 
-        public UpdatedExternalReferenceProperties(string title, string documentId, string url, bool masterReference) : base(title, documentId, url, masterReference)
+        public UpdatedExternalReferenceProperties(string title, string? documentId, string? url, bool masterReference) : base(title, documentId, url, masterReference)
         {
         }
     }

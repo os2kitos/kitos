@@ -31,7 +31,7 @@ namespace Tests.Unit.Core.Model.Strategies
 
         private int GetNewOrgUnitId() => _nextOrgUnitId++;
 
-        private void PrepareConnectedOrganization(OrganizationUnit predefinedRoot = null, bool enforceCompleteSync = false)
+        private void PrepareConnectedOrganization(OrganizationUnit? predefinedRoot = null, bool enforceCompleteSync = false)
         {
             _organization.StsOrganizationConnection = new StsOrganizationConnection
             {
@@ -62,7 +62,7 @@ namespace Tests.Unit.Core.Model.Strategies
             }
         }
 
-        private OrganizationUnit CreateOrganizationUnit(OrganizationUnitOrigin origin, string prefix = null, IEnumerable<OrganizationUnit> children = null)
+        private OrganizationUnit CreateOrganizationUnit(OrganizationUnitOrigin origin, string? prefix = null, IEnumerable<OrganizationUnit>? children = null)
         {
             prefix ??= "<no_prefix>";
             var unit = new OrganizationUnit
@@ -454,7 +454,7 @@ namespace Tests.Unit.Core.Model.Strategies
             //Assert
             Assert.True(consequences.Ok);
             Assert.DoesNotContain(root.FlattenHierarchy(), child => expectedRemovedUnits.Contains(child));
-            var actualConverted = Assert.Single(root.FlattenHierarchy().Where(x => x == nodeExpectedToBeConverted));
+            var actualConverted = Assert.Single(root.FlattenHierarchy(), x => x == nodeExpectedToBeConverted);
             Assert.Equal(OrganizationUnitOrigin.Kitos, actualConverted.Origin);
             Assert.Null(actualConverted.ExternalOriginUuid);
         }
@@ -471,7 +471,7 @@ namespace Tests.Unit.Core.Model.Strategies
             //Assert
             Assert.True(consequences.Ok);
 
-            var expectedConversion = Assert.Single(root.FlattenHierarchy().Where(x => x == removedNodeInUse));
+            var expectedConversion = Assert.Single(root.FlattenHierarchy(), x => x == removedNodeInUse);
             Assert.Equal(OrganizationUnitOrigin.Kitos, expectedConversion.Origin);
             Assert.Null(expectedConversion.ExternalOriginUuid);
         }
@@ -531,9 +531,9 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Equal(2, addedUnits.Count);
             Assert.Contains(addedUnits, unit => expectedNewUnits.Any(x => x.ExternalOriginUuid.GetValueOrDefault() == unit.unitToAdd.Uuid));
 
-            var addedRoot = Assert.Single(addedUnits.Where(x => x.unitToAdd.Uuid == expectedSubTree.ExternalOriginUuid.GetValueOrDefault()));
+            var addedRoot = Assert.Single(addedUnits, x => x.unitToAdd.Uuid == expectedSubTree.ExternalOriginUuid.GetValueOrDefault());
             Assert.Equal(randomParentOfNewSubTree.ExternalOriginUuid.GetValueOrDefault(), addedRoot.parent.Uuid);
-            var addedChild = Assert.Single(addedUnits.Where(x => x.unitToAdd.Uuid == expectedChild.ExternalOriginUuid.GetValueOrDefault()));
+            var addedChild = Assert.Single(addedUnits, x => x.unitToAdd.Uuid == expectedChild.ExternalOriginUuid.GetValueOrDefault());
             Assert.Equal(addedRoot.unitToAdd, addedChild.parent);
         }
 
@@ -688,9 +688,9 @@ namespace Tests.Unit.Core.Model.Strategies
             Assert.Empty(consequences.OrganizationUnitsBeingMoved);
         }
 
-        private static ExternalOrganizationUnit ConvertToExternalTree(OrganizationUnit root, Func<OrganizationUnit, IEnumerable<OrganizationUnit>, IEnumerable<OrganizationUnit>> customChildren = null)
+        private static ExternalOrganizationUnit ConvertToExternalTree(OrganizationUnit root, Func<OrganizationUnit, IEnumerable<OrganizationUnit>, IEnumerable<OrganizationUnit>>? customChildren = null)
         {
-            customChildren ??= ((unit, existingChildren) => existingChildren);
+            customChildren ??= ((_, existingChildren) => existingChildren);
 
             return new ExternalOrganizationUnit(
                 root.ExternalOriginUuid.GetValueOrDefault(),

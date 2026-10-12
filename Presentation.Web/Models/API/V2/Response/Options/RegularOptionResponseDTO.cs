@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Models.API.V2.Response.Options
@@ -10,6 +11,7 @@ namespace Presentation.Web.Models.API.V2.Response.Options
         {
         }
 
+        [SetsRequiredMembers]
         public RegularOptionResponseDTO(Guid uuid, string name, string description) : base(uuid, name)
         {
             Description = description;
@@ -19,6 +21,6 @@ namespace Presentation.Web.Models.API.V2.Response.Options
         /// Extended description of the choice
         /// </summary>
         [Required]
-        public string Description { get; set; }
+        public required string Description { get; set; }
     }
 }

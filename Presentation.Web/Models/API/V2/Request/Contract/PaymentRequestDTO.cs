@@ -25,7 +25,7 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// Part of payment which is not classified as either operations or acquisition
         /// </summary>
         public int Other { get; set; }
-        public string AccountingEntry { get; set; }
+        public string? AccountingEntry { get; set; }
         /// <summary>
         /// The result of the specific payment audit
         /// </summary>
@@ -34,6 +34,6 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// Defines the date at which the payment was audited
         /// </summary>
         public DateTime? AuditDate { get; set; }
-        public string Note { get; set; }
+        public string? Note { get; set; }
     }
 }

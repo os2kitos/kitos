@@ -21,7 +21,7 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// <summary>
         /// Optional agreement extension option
         /// </summary>
-        public IdentityNamePairResponseDTO ExtensionOptions { get; set; }
+        public IdentityNamePairResponseDTO? ExtensionOptions { get; set; }
         /// <summary>
         /// Determines how many of the agreement available extension options that have been used
         /// </summary>

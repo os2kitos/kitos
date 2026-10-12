@@ -22,6 +22,6 @@ namespace Presentation.Web.Models.API.V2.Request.Generic.Roles
         ///     - every User must be a member of the organization
         /// </summary>
         [Required]
-        public IEnumerable<Guid> UserUuids { get; set; }
+        public required IEnumerable<Guid> UserUuids { get; set; }
     }
 }

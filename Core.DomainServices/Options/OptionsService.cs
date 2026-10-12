@@ -116,7 +116,7 @@ namespace Core.DomainServices.Options
                 .FromNullable()
                 .Match
                 (
-                    foundOption => GetOption(organizationId, foundOption.Id),
+                    foundOption => GetOption(organizationId, foundOption!.Id),
                     () => Maybe<(TOption option, bool available)>.None
                 );
         }

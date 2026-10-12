@@ -1,6 +1,7 @@
-﻿using Core.Abstractions.Types;
+using Core.Abstractions.Types;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping
 {
@@ -14,6 +15,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 (OversightIntervalChoice.BiYearly, YearMonthIntervalOption.Half_yearly),
                 (OversightIntervalChoice.Yearly, YearMonthIntervalOption.Yearly),
                 (OversightIntervalChoice.EveryOtherYear, YearMonthIntervalOption.Every_second_year),
+                (OversightIntervalChoice.EveryThirdYear, YearMonthIntervalOption.Every_third_year),
                 (OversightIntervalChoice.Other, YearMonthIntervalOption.Other),
                 (OversightIntervalChoice.Undecided, YearMonthIntervalOption.Undecided)
             );

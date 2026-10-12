@@ -9,7 +9,7 @@ namespace Presentation.Web.Infrastructure.Attributes
         private const string DefaultErrorMessage = "The {0} field must not be an empty GUID";
         public NonEmptyGuidAttribute() : base(DefaultErrorMessage) { }
 
-        public override bool IsValid(object value)
+        public override bool IsValid(object? value)
         {
             //If nullable and it is null, bypass the value check
             if (value is null)

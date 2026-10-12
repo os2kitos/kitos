@@ -154,9 +154,6 @@ namespace Tests.Unit.Core.ApplicationServices
                 Uuid = uuid ?? Guid.NewGuid()
             };
 
-            var option = new Mock<OptionEntity<RelationFrequencyType>>();
-
-            localRelationFrequencyType.Option = option.Object;
             localRelationFrequencyType.OptionId = relationFrequencyType.Id;
             return (localRelationFrequencyType, relationFrequencyType);
         }

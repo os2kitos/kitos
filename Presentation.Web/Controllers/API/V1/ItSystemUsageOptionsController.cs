@@ -1,8 +1,6 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -15,12 +13,12 @@ using Core.DomainServices.Model.Options;
 using Core.DomainServices.Options;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
-using Swashbuckle.Swagger.Annotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.API.V1
 {
     [InternalApi]
-    [RoutePrefix("api/v1/itsystem-usage/options")]
+    [Route("api/v1/itsystem-usage/options")]
     public class ItSystemUsageOptionsController : BaseApiController
     {
         private readonly IOptionsService<ItSystem, BusinessType> _businessTypeService;
@@ -42,16 +40,14 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpGet]
         [Route("overview")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageOptionsDTO))]
-        public HttpResponseMessage Get(int organizationId)
+        public IActionResult Get(int organizationId)
         {
             return GetOptions(organizationId);
         }
 
         [HttpGet]
         [Route("overview/organizationUuid")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageOptionsDTO))]
-        public HttpResponseMessage GetByUuid(Guid organizationUuid)
+        public IActionResult GetByUuid(Guid organizationUuid)
         {
             var orgDbId = _identityResolver.ResolveDbId<Organization>(organizationUuid);
             if (orgDbId.IsNone)
@@ -62,7 +58,7 @@ namespace Presentation.Web.Controllers.API.V1
             return GetOptions(orgDbId.Value);
         }
 
-        private HttpResponseMessage GetOptions(int organizationId)
+        private IActionResult GetOptions(int organizationId)
         {
             if (GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
             {

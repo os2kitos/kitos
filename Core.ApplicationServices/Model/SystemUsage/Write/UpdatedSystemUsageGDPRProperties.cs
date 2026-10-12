@@ -11,9 +11,7 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
 {
     public class UpdatedSystemUsageGDPRProperties
     {
-        public OptionalValueChange<string> Purpose { get; set; } = OptionalValueChange<string>.None;
-        public OptionalValueChange<DataOptions?> BusinessCritical { get; set; } = OptionalValueChange<DataOptions?>.None;
-        public OptionalValueChange<HostedAt?> HostedAt { get; set; } = OptionalValueChange<HostedAt?>.None;
+        public OptionalValueChange<string> ProcessingPurpose { get; set; } = OptionalValueChange<string>.None;
         public OptionalValueChange<Maybe<NamedLink>> DirectoryDocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
         public OptionalValueChange<Maybe<IEnumerable<SensitiveDataLevel>>> DataSensitivityLevels { get; set; } = OptionalValueChange<Maybe<IEnumerable<SensitiveDataLevel>>>.None;
         public OptionalValueChange<Maybe<IEnumerable<Guid>>> SensitivePersonDataUuids { get; set; } = OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
@@ -25,7 +23,7 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         public OptionalValueChange<DataOptions?> UserSupervision { get; set; } = OptionalValueChange<DataOptions?>.None;
         public OptionalValueChange<DateTime?> UserSupervisionDate { get; set; } = OptionalValueChange<DateTime?>.None;
         public OptionalValueChange<Maybe<NamedLink>> UserSupervisionDocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
-        public OptionalValueChange<DataOptions?> RiskAssessmentConducted { get; set; } = OptionalValueChange<DataOptions?>.None;
+        public OptionalValueChange<YesNoDontKnowIrrelevant?> RiskAssessmentConducted { get; set; } = OptionalValueChange<YesNoDontKnowIrrelevant?>.None;
         public OptionalValueChange<DateTime?> RiskAssessmentConductedDate { get; set; } = OptionalValueChange<DateTime?>.None;
         public OptionalValueChange<RiskLevel?> RiskAssessmentResult { get; set; } = OptionalValueChange<RiskLevel?>.None;
         public OptionalValueChange<Maybe<NamedLink>> RiskAssessmentDocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
@@ -37,5 +35,6 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         public OptionalValueChange<DataOptions?> RetentionPeriodDefined { get; set; } = OptionalValueChange<DataOptions?>.None;
         public OptionalValueChange<DateTime?> NextDataRetentionEvaluationDate { get; set; } = OptionalValueChange<DateTime?>.None;
         public OptionalValueChange<int?> DataRetentionEvaluationFrequencyInMonths { get; set; } = OptionalValueChange<int?>.None;
+        public OptionalValueChange<IsDataProcessingAgreementRequired?> IsDataProcessingAgreementRequired { get; set; } = OptionalValueChange<IsDataProcessingAgreementRequired?>.None;
     }
 }

@@ -9,18 +9,18 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// A collection of IT-System usage role option assignments
         /// Constraint: Duplicates are not allowed
         /// </summary>
-        public IEnumerable<RoleAssignmentRequestDTO> Roles { get; set; }
+        public IEnumerable<RoleAssignmentRequestDTO>? Roles { get; set; }
         /// <summary>
         /// Contains organizational references for the system usage
         /// </summary>
-        public OrganizationUsageWriteRequestDTO OrganizationUsage { get; set; }
+        public OrganizationUsageWriteRequestDTO? OrganizationUsage { get; set; }
         /// <summary>
         /// Added/removed KLE when compared to inherited KLE from the IT-System
         /// </summary>
-        public LocalKLEDeviationsRequestDTO LocalKleDeviations { get; set; }
+        public LocalKLEDeviationsRequestDTO? LocalKleDeviations { get; set; }
         /// <summary>
         /// GDPR-specific registrations
         /// </summary>
-        public GDPRWriteRequestDTO GDPR { get; set; }
+        public GDPRWriteRequestDTO? GDPR { get; set; }
     }
 }

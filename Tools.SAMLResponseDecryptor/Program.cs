@@ -17,13 +17,19 @@ namespace Tools.SAMLResponseDecryptor
                 return;
             }
             Console.WriteLine("Enter the password for the certificate (from 1pwd):");
-            var certificatePassword = Console.ReadLine();
+            var certificatePassword = Console.ReadLine() ?? string.Empty;
+
             Console.WriteLine("Enter the SAML response symmetric key (<e:CipherValue>):");
-            var key = Console.ReadLine();
+            var key = ReadValueOrFile();
             var decryptedSymmetricKey = SAMLDecryptor.DecryptSymmetricKey(key, certificatePath, certificatePassword);
 
-            Console.WriteLine("Enter the SAML response assertion (<xenc:CipherValue>):");
-            var data = Console.ReadLine();
+            Console.WriteLine("Enter the SAML response assertion (<xenc:CipherValue>), or a file path prefixed with 'file:':");
+            Console.WriteLine("  (Tip: save the value to a .txt file and enter: file:C:\\Temp\\assertion.txt)");
+            var data = ReadValueOrFile();
+
+            Console.WriteLine($"[DEBUG] Symmetric key  : {decryptedSymmetricKey.Length} bytes ({decryptedSymmetricKey.Length * 8} bits)");
+            Console.WriteLine($"[DEBUG] Assertion data : {Convert.FromBase64String(data).Length} bytes");
+
             var decryptedAssertion = SAMLDecryptor.DecryptAssertion(data, decryptedSymmetricKey);
             Console.WriteLine("---");
             Console.WriteLine($"Decrypted assertion: {decryptedAssertion}");
@@ -49,6 +55,27 @@ namespace Tools.SAMLResponseDecryptor
                 Console.WriteLine($"Privilege={decodedPrivilege}");
             }
             Console.ReadLine();
+        }
+
+        private static string ReadValueOrFile()
+        {
+            var input = Console.ReadLine()?.Trim() ?? string.Empty;
+
+            if (input.StartsWith("file:", StringComparison.OrdinalIgnoreCase))
+            {
+                var filePath = input["file:".Length..].Trim();
+                if (!File.Exists(filePath))
+                    throw new FileNotFoundException($"File not found: {filePath}");
+                return File.ReadAllText(filePath).Trim();
+            }
+
+            if (File.Exists(input))
+            {
+                Console.WriteLine($"[INFO] Reading value from file: {input}");
+                return File.ReadAllText(input).Trim();
+            }
+
+            return input;
         }
     }
 }

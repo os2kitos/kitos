@@ -9,6 +9,7 @@ using Core.DomainModel.Organization;
 using Newtonsoft.Json;
 using Presentation.Web.Models.API.V2.Internal.Request.Organizations;
 using Presentation.Web.Models.API.V2.Internal.Response.Organizations;
+using Presentation.Web.Models.API.V2.Internal.Response.Organizations.Conflicts;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
@@ -134,6 +135,65 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             await AssertUICustomizationResponse(dto, response);
         }
 
+        [Theory]
+        [InlineData(false, false)]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        [InlineData(true, true)]
+        public async Task Can_Update_UI_Customization_Flags(bool enabled, bool recommended)
+        {
+            const string moduleName = "ItSystemUsages";
+            var (cookie, organization) = await CreateUiCustomizationPrerequisitesAsync();
+            var node = new CustomizedUINodeRequestDTO
+            {
+                Key = "Existing.Key", Enabled = false, Recommended = false
+            };
+            var dto = new UIModuleCustomizationRequestDTO { Nodes = new[] { node } };
+            using var initialResponse = await OrganizationInternalV2Helper.PutUIModuleCustomization(organization.Uuid, moduleName, dto, cookie);
+            await AssertUICustomizationResponse(dto, initialResponse);
+
+            node.Enabled = enabled;
+            node.Recommended = recommended;
+            using var updateResponse = await OrganizationInternalV2Helper.PutUIModuleCustomization(organization.Uuid, moduleName, dto, cookie);
+            await AssertUICustomizationResponse(dto, updateResponse);
+
+            using var getResponse = await OrganizationInternalV2Helper.GetUIModuleCustomization(organization.Uuid, moduleName);
+            await AssertUICustomizationResponse(dto, getResponse);
+        }
+
+        [Fact]
+        public async Task Can_Add_Remove_And_Update_UI_Customization_Nodes()
+        {
+            const string moduleName = "ItSystemUsages";
+            var (cookie, organization) = await CreateUiCustomizationPrerequisitesAsync();
+            var dto = new UIModuleCustomizationRequestDTO
+            {
+                Nodes = new[]
+                {
+                    new CustomizedUINodeRequestDTO { Key = "Existing.Key", Enabled = false, Recommended = false },
+                    new CustomizedUINodeRequestDTO { Key = "Removed.Key", Enabled = true, Recommended = true }
+                }
+            };
+            using var initialResponse = await OrganizationInternalV2Helper.PutUIModuleCustomization(organization.Uuid, moduleName, dto, cookie);
+            await AssertUICustomizationResponse(dto, initialResponse);
+
+            dto.Nodes = new[]
+            {
+                new CustomizedUINodeRequestDTO { Key = "Existing.Key", Enabled = true, Recommended = true },
+                new CustomizedUINodeRequestDTO { Key = "Added.Key", Enabled = true, Recommended = false }
+            };
+            using var updateResponse = await OrganizationInternalV2Helper.PutUIModuleCustomization(organization.Uuid, moduleName, dto, cookie);
+            await AssertUICustomizationResponse(dto, updateResponse);
+            using var getResponse = await OrganizationInternalV2Helper.GetUIModuleCustomization(organization.Uuid, moduleName);
+            await AssertUICustomizationResponse(dto, getResponse);
+
+            dto.Nodes = Array.Empty<CustomizedUINodeRequestDTO>();
+            using var clearResponse = await OrganizationInternalV2Helper.PutUIModuleCustomization(organization.Uuid, moduleName, dto, cookie);
+            await AssertUICustomizationResponse(dto, clearResponse);
+            using var getEmptyResponse = await OrganizationInternalV2Helper.GetUIModuleCustomization(organization.Uuid, moduleName);
+            await AssertUICustomizationResponse(dto, getEmptyResponse);
+        }
+
         [Fact]
         public async Task Can_Get_Master_Data()
         {
@@ -145,6 +205,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataResponseDTO>(content);
+            Assert.NotNull(responseDto);
             Assert.Equal(organization.Uuid, responseDto.Uuid);
             Assert.Equal(organization.Cvr, responseDto.Cvr);
             Assert.Equal(organization.Name, responseDto.Name);
@@ -169,6 +230,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataResponseDTO>(content);
+            Assert.NotNull(responseDto);
             Assert.Equal(patchDto.Cvr, responseDto.Cvr);
             Assert.Equal(organizationToPatch.Uuid, responseDto.Uuid);
         }
@@ -186,6 +248,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataResponseDTO>(content);
+            Assert.NotNull(responseDto);
             Assert.Equal(patchDto.Cvr, responseDto.Cvr);
             Assert.Equal(organizationToPatch.Uuid, responseDto.Uuid);
         }
@@ -210,6 +273,8 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.OK, upsertResponse.StatusCode);
             var upsertContent = await upsertResponse.Content.ReadAsStringAsync();
             var upsertResponseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(upsertContent);
+            Assert.NotNull(upsertResponseDto);
+            Assert.NotNull(upsertResponseDto.ContactPerson);
             Assert.Equal(contactPersonDto.Name, upsertResponseDto.ContactPerson.Name);
             Assert.Equal(organization.Uuid, upsertResponseDto.OrganizationUuid);
 
@@ -218,6 +283,8 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
+            Assert.NotNull(responseDto);
+            Assert.NotNull(responseDto.ContactPerson);
             Assert.Equal(contactPersonDto.Name, responseDto.ContactPerson.Name);
             Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
         }
@@ -232,6 +299,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
+            Assert.NotNull(responseDto);
             Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
             var cpDto = responseDto.ContactPerson;
             var drDto = responseDto.DataResponsible;
@@ -274,6 +342,10 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
+            Assert.NotNull(responseDto);
+            Assert.NotNull(responseDto.ContactPerson);
+            Assert.NotNull(responseDto.DataResponsible);
+            Assert.NotNull(responseDto.DataProtectionAdvisor);
             Assert.Equal(contactPersonDto.Name, responseDto.ContactPerson.Name);
             Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
             Assert.Equal(dataResponsibleDto.Name, responseDto.DataResponsible.Name);
@@ -321,16 +393,20 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
+            Assert.NotNull(responseDto);
             Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
             switch (roleType)
             {
                 case RoleType.ContactPerson:
+                    Assert.NotNull(responseDto.ContactPerson);
                     Assert.Equal(contactPersonDto.LastName, responseDto.ContactPerson.LastName);
                     break;
                 case RoleType.DataResponsible:
+                    Assert.NotNull(responseDto.DataResponsible);
                     Assert.Equal(dataResponsibleDto.Email, responseDto.DataResponsible.Email);
                     break;
                 case RoleType.DataProtectionAdvisor:
+                    Assert.NotNull(responseDto.DataProtectionAdvisor);
                     Assert.Equal(dataProtectionAdvisorDto.Cvr, responseDto.DataProtectionAdvisor.Cvr);
                     break;
                 default:
@@ -350,6 +426,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(content);
+            Assert.NotNull(responseDto);
             Assert.Equal(organization.Uuid, responseDto.OrganizationUuid);
             await GetMasterDataRolesAndAssertNotNull(organization.Uuid);
         }
@@ -367,6 +444,21 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(requestDto.Cvr, updatedOrganization.Cvr);
             Assert.Equal(requestDto.Name, updatedOrganization.Name);
             Assert.Equal(requestDto.Type, updatedOrganization.OrganizationType);
+        }
+
+        [Fact]
+        public async Task Can_Update_Supplier_Organization()
+        {
+            var organization = await CreateTestOrganization();
+            var requestDto = UpdateRequestDtoWithoutCountryCode();
+            requestDto.Type = OrganizationType.Company;
+            requestDto.IsSupplier = true;
+
+            using var response = await OrganizationInternalV2Helper.PatchOrganization(organization.Uuid, requestDto);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var updatedOrganization = await OrganizationV2Helper.GetOrganizationAsync(await GetGlobalToken(), organization.Uuid);
+            Assert.True(updatedOrganization.IsSupplier);
         }
 
         [Fact]
@@ -405,6 +497,9 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         public async Task Can_Only_Delete_Organization_As_Global_Admin(OrganizationRole role)
         {
             var orgToDelete = await CreateTestOrganization();
+
+            using var statusResponse = await OrganizationInternalV2Helper.ChangeOrganizationDisabledState(orgToDelete.Uuid, true);
+            Assert.True(statusResponse.IsSuccessStatusCode);
 
             using var response = await OrganizationInternalV2Helper.DeleteOrganization(orgToDelete.Uuid, true, role);
 
@@ -456,6 +551,26 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
+        [Fact]
+        public async Task Can_Disable_And_Enable_Organization()
+        {
+            var org = await CreateTestOrganization();
+
+            using var response = await OrganizationInternalV2Helper.ChangeOrganizationDisabledState(org.Uuid, true);
+
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+            var updatedOrg = await OrganizationV2Helper.GetOrganizationAsync(await GetGlobalToken(), org.Uuid);
+            Assert.True(updatedOrg.Disabled);
+
+            using var response2 = await OrganizationInternalV2Helper.ChangeOrganizationDisabledState(org.Uuid, false);
+
+            Assert.Equal(HttpStatusCode.NoContent, response2.StatusCode);
+
+            var updatedOrg2 = await OrganizationV2Helper.GetOrganizationAsync(await GetGlobalToken(), org.Uuid);
+            Assert.False(updatedOrg2.Disabled);
+        }
+
         private async Task CreateConflictsForOrg(Guid organizationUuid)
         {
             var otherOrganization = await CreateTestOrganization();
@@ -479,6 +594,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             var getResponse = await OrganizationInternalV2Helper.GetOrganizationMasterDataRoles(orgUuid);
             var getContent = await getResponse.Content.ReadAsStringAsync();
             var getResponseDto = JsonConvert.DeserializeObject<OrganizationMasterDataRolesResponseDTO>(getContent);
+            Assert.NotNull(getResponseDto);
             Assert.NotNull(getResponseDto.ContactPerson);
             Assert.NotNull(getResponseDto.DataResponsible);
             Assert.NotNull(getResponseDto.DataProtectionAdvisor);
@@ -539,15 +655,17 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var content = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<UIModuleCustomizationResponseDTO>(content);
+            Assert.NotNull(responseDto);
             var expectedNodes = expected.Nodes.ToList();
             var actualNodes = responseDto.Nodes.ToList();
             Assert.Equal(expectedNodes.Count, actualNodes.Count);
             foreach (var expectedNode in expectedNodes)
             {
-                var actual = actualNodes.FirstOrDefault(nodeDto => nodeDto.Key == expectedNode.Key);
+                var actual = Assert.Single(actualNodes, nodeDto => nodeDto.Key == expectedNode.Key);
 
                 Assert.NotNull(actual);
                 Assert.Equal(expectedNode.Enabled, actual.Enabled);
+                Assert.Equal(expectedNode.Recommended, actual.Recommended);
             }
         }
 
@@ -562,6 +680,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             var requestDto = A<OrganizationCreateRequestDTO>();
             requestDto.ForeignCountryCodeUuid = null;
+            requestDto.IsSupplier = false;
             return requestDto;
         }
 
@@ -574,6 +693,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                 {
                     Key = GenerateKey(),
                     Enabled = A<bool>(),
+                    Recommended = A<bool>(),
                 });
             }
             return nodes;

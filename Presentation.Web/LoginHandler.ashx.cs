@@ -1,17 +1,9 @@
-﻿using System.Web;
-
 namespace Presentation.Web
 {
-    /// <summary>
-    /// LoginHandler redirects to the Login.ashx page with the forceAuthn parameter set to true.
-    /// </summary>
-    public class LoginHandler : IHttpHandler
+    // The LoginHandler.ashx redirect (to Login.ashx?forceAuthn=true) is handled by
+    // a minimal-API route registered in Program.cs. This class stub keeps the .ashx
+    // file valid so that the SAML library can still resolve the endpoint path.
+    public class LoginHandler
     {
-        public void ProcessRequest(HttpContext context)
-        {
-            context.Response.Redirect("Login.ashx?forceAuthn=true");
-        }
-
-        public bool IsReusable => false;
     }
 }

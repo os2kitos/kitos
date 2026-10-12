@@ -1,0 +1,49 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/name: kitos-broker
+    app.kubernetes.io/component: service
+    app.kubernetes.io/part-of: kitos
+    app.kubernetes.io/managed-by: easy-hosting
+    network-policy.kubernetes.io/type: egress
+    network-policy.kubernetes.io/purpose: allow-egress
+  name: kitos-broker-allow-all-egress
+  namespace: kitos
+spec:
+  egress:
+  - {}
+  podSelector:
+    matchLabels:
+      app: kitos-broker
+  policyTypes:
+  - Egress
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/name: kitos-broker
+    app.kubernetes.io/component: service
+    app.kubernetes.io/part-of: kitos
+    app.kubernetes.io/managed-by: easy-hosting
+    network-policy.kubernetes.io/type: ingress
+    network-policy.kubernetes.io/purpose: allow-namespace
+  name: kitos-broker-allow-from-namespace
+  namespace: kitos
+spec:
+  egress:
+  - to:
+    - podSelector: {}
+  ingress:
+  - from:
+    - podSelector: {}
+    ports:
+    - port: 5672
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app: kitos-broker
+  policyTypes:
+  - Ingress
+  - Egress

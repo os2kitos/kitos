@@ -1,15 +1,14 @@
-﻿using System;
+using System;
 using System.Net;
-using System.Web.Http;
 using Core.ApplicationServices.System.Write;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.System.Regular;
-using Swashbuckle.Swagger.Annotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems;
 
-[RoutePrefix("api/v2/it-systems/{systemUuid}/dbs")]
+[Route("api/v2/it-systems/{systemUuid}/dbs")]
 public class ItSystemDBSV2Controller : ExternalBaseController
 {
     private readonly IItSystemWriteService _writeService;
@@ -22,16 +21,18 @@ public class ItSystemDBSV2Controller : ExternalBaseController
     }
 
     [HttpPatch]
-    [Route]
-    [SwaggerResponse(HttpStatusCode.NoContent)]
-    [SwaggerResponse(HttpStatusCode.BadRequest)]
-    [SwaggerResponse(HttpStatusCode.Forbidden)]
-    [SwaggerResponse(HttpStatusCode.NotFound)]
-    [SwaggerResponse(HttpStatusCode.Unauthorized)]
-    public IHttpActionResult PatchDbsProperties([NonEmptyGuid][FromUri] Guid systemUuid, [FromBody] LegalPropertiesUpdateRequestDTO request)
+    [Route("")]
+    [ApiResponse(HttpStatusCode.NoContent)]
+    [ApiResponse(HttpStatusCode.BadRequest)]
+    [ApiResponse(HttpStatusCode.Forbidden)]
+    [ApiResponse(HttpStatusCode.NotFound)]
+    [ApiResponse(HttpStatusCode.Unauthorized)]
+        public IActionResult PatchDbsProperties([NonEmptyGuid][FromRoute] Guid systemUuid, [FromBody] LegalPropertiesUpdateRequestDTO request)
     {
         var parameters = _writeModelMapper.FromPATCH(request);
         return _writeService.LegalPropertiesUpdate(systemUuid, parameters)
             .Match(NoContent, FromOperationError);
     }
 }
+
+

@@ -10,7 +10,7 @@ namespace Kombit.InfrastructureSamples.Token
             MemoryCache.Default.Add(cacheKey, savedItem, absoluteExpiration);
         }
 
-        public static T GetFromCache<T>(string cacheKey) where T : class
+        public static T? GetFromCache<T>(string cacheKey) where T : class
         {
             return MemoryCache.Default[cacheKey] as T;
         }

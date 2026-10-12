@@ -1,29 +1,29 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage.Read;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemUsageOverviewItContractReadModelMap : EntityTypeConfiguration<ItSystemUsageOverviewItContractReadModel>
+    public class ItSystemUsageOverviewItContractReadModelMap : IEntityTypeConfiguration<ItSystemUsageOverviewItContractReadModel>
     {
-        public ItSystemUsageOverviewItContractReadModelMap()
+        public void Configure(EntityTypeBuilder<ItSystemUsageOverviewItContractReadModel> builder)
         {
-            HasKey(x => x.Id);
-            HasRequired(x => x.Parent)
+            builder.HasKey(x => x.Id);
+
+            builder.HasOne(x => x.Parent)
                 .WithMany(x => x.AssociatedContracts)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(true);
-
-            Property(x => x.ItContractId)
                 .IsRequired()
-                .HasIndexAnnotation("ItContractId", 0);
+                .OnDelete(DeleteBehavior.Cascade);
 
-            Property(x => x.ItContractUuid).IsRequired();
+            builder.Property(x => x.ItContractId).IsRequired();
+            builder.HasIndex(x => x.ItContractId).HasDatabaseName("ItContractId");
 
-            Property(x => x.ItContractName)
-                .IsRequired()
-                .HasMaxLength(ItContractConstraints.MaxNameLength)
-                .HasIndexAnnotation("ItContractNameName", 0);
+            builder.Property(x => x.ItContractUuid).IsRequired();
+
+            builder.Property(x => x.ItContractName).IsRequired().HasMaxLength(ItContractConstraints.MaxNameLength);
+            builder.HasIndex(x => x.ItContractName).HasDatabaseName("ItContractNameName");
         }
     }
 }

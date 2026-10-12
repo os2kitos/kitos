@@ -9,7 +9,7 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// <summary>
         /// User-assigned contract id
         /// </summary>
-        public string ContractId { get; set; }
+        public string? ContractId { get; set; }
         /// <summary>
         /// Optionally assigned contract type
         /// Constraints:
@@ -29,13 +29,13 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// Constraints:
         ///     - If changed from current state, the option types must be available in the organization
         /// </summary>
-        public IEnumerable<Guid> AgreementElementUuids { get; set; }
+        public IEnumerable<Guid>? AgreementElementUuids { get; set; }
 
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         /// <summary>
         /// Validity of the it-contract
         /// </summary>
-        public ContractValidityWriteRequestDTO Validity { get; set; }
+        public ContractValidityWriteRequestDTO? Validity { get; set; }
 
         /// <summary>
         /// Optionally assigned criticality

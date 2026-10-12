@@ -5,6 +5,8 @@ using Serilog.Core;
 using Serilog.Events;
 using Serilog.Parsing;
 
+#pragma warning disable CS8614 // Nullability of reference types in type of parameter doesn't match implicitly implemented member.
+#pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
 namespace Presentation.Web.Infrastructure.Tracelistener
 {
     internal class SilentLogger : ILogger
@@ -19,7 +21,7 @@ namespace Presentation.Web.Infrastructure.Tracelistener
             return this;
         }
 
-        public ILogger ForContext(string propertyName, object value, bool destructureObjects = false)
+        public ILogger ForContext(string propertyName, object? value, bool destructureObjects = false)
         {
             return this;
         }
@@ -61,6 +63,7 @@ namespace Presentation.Web.Infrastructure.Tracelistener
         }
 
         public void Write(LogEventLevel level, Exception exception, string messageTemplate)
+
         {
         }
 
@@ -369,3 +372,5 @@ namespace Presentation.Web.Infrastructure.Tracelistener
         }
     }
 }
+#pragma warning restore CS8614 // Nullability of reference types in type of parameter doesn't match implicitly implemented member.
+#pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).

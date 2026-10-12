@@ -1,20 +1,29 @@
-﻿using Core.DomainModel.Organization;
+using Core.DomainModel.Organization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class OrganizationRightMap : EntityMap<OrganizationRight>
     {
-        public OrganizationRightMap()
+        public override void Configure(EntityTypeBuilder<OrganizationRight> builder)
         {
-            this.HasRequired(right => right.Organization)
+            base.Configure(builder);
+            base.Configure(builder);
+
+            builder.HasOne(right => right.Organization)
                 .WithMany(obj => obj.Rights)
-                .HasForeignKey(right => right.OrganizationId);
+                .HasForeignKey(right => right.OrganizationId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
 
-            this.HasRequired(t => t.User)
+            builder.HasOne(t => t.User)
                 .WithMany(d => d.OrganizationRights)
-                .HasForeignKey(t => t.UserId);
+                .HasForeignKey(t => t.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
-            this.HasOptional(t => t.DefaultOrgUnit)
+            builder.HasOne(t => t.DefaultOrgUnit)
                 .WithMany(d => d.DefaultUsers)
                 .HasForeignKey(t => t.DefaultOrgUnitId);
         }

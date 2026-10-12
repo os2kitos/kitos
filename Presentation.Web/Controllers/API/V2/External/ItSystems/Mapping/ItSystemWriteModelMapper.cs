@@ -1,5 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Shared;
@@ -14,6 +12,8 @@ using Presentation.Web.Models.API.V2.Request.System.Regular;
 using Presentation.Web.Models.API.V2.Request.System.RightsHolder;
 using Presentation.Web.Models.API.V2.Request.System.Shared;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using System;
+using System.Collections.Generic;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 {
@@ -91,12 +91,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
         private (OptionalValueChange<ArchiveDutyRecommendationTypes?> recommendation, OptionalValueChange<string> comment) MapArchivingRecommendation<TDto>(TDto source, bool enforceResetOnMissingProperty) where TDto : IItSystemWriteRequestCommonPropertiesDTO, IItSystemWriteRequestPropertiesDTO
         {
             var rule = CreateChangeRule<TDto>(enforceResetOnMissingProperty);
-            var recommendedArchiveDutyChoice = rule.MustUpdate(x => x.RecommendedArchiveDuty.Id)
+            var recommendedArchiveDutyChoice = rule.MustUpdate(x => x.RecommendedArchiveDuty!.Id)
                 ? (source.RecommendedArchiveDuty?.Id?.FromChoice()).AsChangedValue()
                 : OptionalValueChange<ArchiveDutyRecommendationTypes?>.None;
 
-            var comment = rule.MustUpdate(x => x.RecommendedArchiveDuty.Comment)
-                ? (source.RecommendedArchiveDuty?.Comment).AsChangedValue()
+            var comment = rule.MustUpdate(x => x.RecommendedArchiveDuty!.Comment)
+                ? (source.RecommendedArchiveDuty?.Comment).AsChangedValue()!
                 : OptionalValueChange<string>.None;
 
             return (recommendedArchiveDutyChoice, comment);
@@ -115,13 +115,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
         {
             var rule = CreateChangeRule<IItSystemWriteRequestCommonPropertiesDTO>(enforceResetOnMissingProperty);
 
-            destination.Name = rule.MustUpdate(x => x.Name) ? source.Name.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.Name = rule.MustUpdate(x => x.Name) ? source.Name.AsChangedValue()! : OptionalValueChange<string>.None;
             destination.ParentSystemUuid = rule.MustUpdate(x => x.ParentUuid) ? source.ParentUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
-            destination.FormerName = rule.MustUpdate(x => x.PreviousName) ? source.PreviousName.AsChangedValue() : OptionalValueChange<string>.None;
-            destination.Description = rule.MustUpdate(x => x.Description) ? source.Description.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.FormerName = rule.MustUpdate(x => x.PreviousName) ? source.PreviousName.AsChangedValue()! : OptionalValueChange<string>.None;
+            destination.Description = rule.MustUpdate(x => x.Description) ? source.Description.AsChangedValue()! : OptionalValueChange<string>.None;
             destination.BusinessTypeUuid = rule.MustUpdate(x => x.BusinessTypeUuid) ? source.BusinessTypeUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
-            destination.TaskRefUuids = rule.MustUpdate(x => x.KLEUuids) ? (source.KLEUuids ?? new List<Guid>()).AsChangedValue() : OptionalValueChange<IEnumerable<Guid>>.None;
-
+            destination.TaskRefUuids = rule.MustUpdate(x => x.KLEUuids) ? (source.KLEUuids).AsChangedValue()! : OptionalValueChange<IEnumerable<Guid>>.None;
             MapExternalReferences(source, destination, enforceResetOnMissingProperty);
         }
 
@@ -131,7 +130,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
             {
                 case IHasExternalReferencesCreation createReferences:
                     destination.ExternalReferences =
-                        (createReferences.ExternalReferences ?? Array.Empty<ExternalReferenceDataWriteRequestDTO>())
+                        createReferences.ExternalReferences
                         .Transform(MapReferences).FromNullable();
                     break;
                 case IHasExternalReferencesUpdate updateReferences:
@@ -148,7 +147,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
             }
         }
 
-        private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataWriteRequestDTO> references)
+        private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataWriteRequestDTO>? references)
         {
             return BaseMapCreateReferences(references);
         }

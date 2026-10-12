@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Core.Abstractions.Extensions;
+﻿using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Shared;
+using Core.DomainServices.Extensions;
 using Core.DomainServices.Mapping;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 
 namespace Core.DomainServices.GDPR
@@ -75,6 +77,8 @@ namespace Core.DomainServices.GDPR
             PatchIsOversightCompleted(source, destination);
             PatchOversightOptions(source, destination);
             PatchLatestOversightRemark(source, destination);
+            PatchLatestOversightReportLink(source, destination);
+            PatchLatestOversightReportLinkName(source, destination);
         }
 
         private void PatchOversightOptions(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -102,8 +106,13 @@ namespace Core.DomainServices.GDPR
 
         private static void PatchDataProcessors(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.DataProcessorNamesAsCsv = string.Join(", ", source.DataProcessors.Select(x => x.Name));
-            destination.SubDataProcessorNamesAsCsv = string.Join(", ", source.AssignedSubDataProcessors.Select(x => x.Organization).Select(x => x.Name));
+            var dataProcessors = source.DataProcessors;
+            destination.DataProcessorNamesAsCsv = dataProcessors.Select(x => x.Name).ToStringWithDelimiter();
+            destination.DataProcessorCvrsAsCsv = dataProcessors.Select(x => x.Cvr).ToStringWithDelimiter();
+
+            var subDataProcessorOrganizations = source.AssignedSubDataProcessors.Select(x => x.Organization).Where(x => x != null);
+            destination.SubDataProcessorNamesAsCsv = subDataProcessorOrganizations.Select(x => x!.Name).ToStringWithDelimiter();
+            destination.SubDataProcessorCvrsAsCsv = subDataProcessorOrganizations.Select(x => x!.Cvr).ToStringWithDelimiter();
         }
 
         private static void PatchIsAgreementConcluded(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -114,13 +123,14 @@ namespace Core.DomainServices.GDPR
 
         private static void PatchSystems(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.SystemNamesAsCsv = string.Join(", ", source.SystemUsages.Select(usage => usage.MapItSystemName()));
-            destination.SystemUuidsAsCsv = string.Join(", ", source.SystemUsages.Select(x => x.ItSystem.Uuid));
+            destination.SystemNamesAsCsv = source.SystemUsages.Select(usage => usage.MapItSystemName()).ToStringWithDelimiter();
+            destination.SystemUuidsAsCsv = source.SystemUsages.Where(x => x.ItSystem != null).Select(x => x.ItSystem!.Uuid.ToString()).ToStringWithDelimiter();
+            destination.SystemValiditiesAsCsv = source.SystemUsages.MapDataProcessingRegistrationSystemUsages();
         }
 
         private static void PatchContracts(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
-            destination.ContractNamesAsCsv = string.Join(", ", source.AssociatedContracts.Select(x => (x.Name)));
+            destination.ContractNamesAsCsv = source.AssociatedContracts.Select(x => (x.Name)).ToStringWithDelimiter();
         }
 
         private static void PatchActiveState(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
@@ -197,7 +207,7 @@ namespace Core.DomainServices.GDPR
             });
         }
 
-        private static string GetNameOfOption<TOption>(
+        private static string? GetNameOfOption<TOption>(
             DataProcessingRegistration parent,
             TOption optionEntity,
             IOptionsService<DataProcessingRegistration, TOption> service)
@@ -232,6 +242,20 @@ namespace Core.DomainServices.GDPR
         {
             var latestOversight = source.GetLatestOversight();
             destination.LatestOversightRemark = latestOversight.Select(x => x.OversightRemark).GetValueOrDefault();
+        }
+
+        private static void PatchLatestOversightReportLink(DataProcessingRegistration source,
+            DataProcessingRegistrationReadModel destination)
+        {
+            var latestOversight = source.GetLatestOversight();
+            destination.LatestOversightReportLink = latestOversight.Select(x => x.OversightReportLink).GetValueOrDefault();
+        }
+
+        private static void PatchLatestOversightReportLinkName(DataProcessingRegistration source,
+            DataProcessingRegistrationReadModel destination)
+        {
+            var latestOversight = source.GetLatestOversight();
+            destination.LatestOversightReportLinkName = latestOversight.Select(x => x.OversightReportLinkName).GetValueOrDefault();
         }
 
         private static void PatchLastUpdateBy(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)

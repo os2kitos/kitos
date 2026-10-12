@@ -10,7 +10,7 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// Constraints:
         ///     - If changed from current state, the option type must be available in the organization
         /// </summary>
-        public IdentityNamePairResponseDTO NoticePeriodMonths { get; set; }
+        public IdentityNamePairResponseDTO? NoticePeriodMonths { get; set; }
         /// <summary>
         /// Elaborates the selection in NoticePeriod 
         /// </summary>

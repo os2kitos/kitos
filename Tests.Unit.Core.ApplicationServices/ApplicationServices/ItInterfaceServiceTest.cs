@@ -70,7 +70,7 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             //Arrange
             var interfaceId = A<int>();
-            ExpectGetInterfaceReturns(interfaceId, default(ItInterface));
+            ExpectGetInterfaceReturns(interfaceId, null);
 
             //Act
             var result = _sut.UpdateExposingSystem(interfaceId, A<int>());
@@ -105,7 +105,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             ExpectGetInterfaceReturns(interfaceId, itInterface);
             ExpectAllowModifyReturns(itInterface, true);
-            ExpectGetSystemReturns(newSystemId, default(ItSystem));
+            ExpectGetSystemReturns(newSystemId, null);
 
             //Act
             var result = _sut.UpdateExposingSystem(interfaceId, newSystemId);
@@ -465,9 +465,9 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.Equal(2, result.Count());
-            var rightsHolderItInterfaceResult = Assert.Single(result.Where(x => x.Uuid == rightsHolderItInterfaceUuid));
+            var rightsHolderItInterfaceResult = Assert.Single(result, x => x.Uuid == rightsHolderItInterfaceUuid);
             Assert.Equal(rightsHolderItInterfaceUuid, rightsHolderItInterfaceResult.Uuid);
-            var organizationItInterfaceResult = Assert.Single(result.Where(x => x.Uuid == organizationItInterfaceUuid));
+            var organizationItInterfaceResult = Assert.Single(result, x => x.Uuid == organizationItInterfaceUuid);
             Assert.Equal(organizationItInterfaceUuid, organizationItInterfaceResult.Uuid);
         }
 
@@ -624,10 +624,10 @@ namespace Tests.Unit.Core.ApplicationServices
         [InlineData(null, "Valid ItInterfaceId")]
         [InlineData("", "Valid ItInterfaceId")]
         [InlineData("Valid Name", null)]
-        public void CreateNewItInterface_Returns_BadInput_If_Name_Or_ItInterfaceId_Is_Not_Valid(string name, string itInterfaceId)
+        public void CreateNewItInterface_Returns_BadInput_If_Name_Or_ItInterfaceId_Is_Not_Valid(string? name, string? itInterfaceId)
         {
             //Arrange
-            var org = new Organization()
+            var org = new Organization
             {
                 Id = A<int>(),
                 Uuid = A<Guid>()
@@ -1751,7 +1751,7 @@ namespace Tests.Unit.Core.ApplicationServices
             return transaction;
         }
 
-        private void ExpectGetInterfaceReturns(int interfaceId, ItInterface value)
+        private void ExpectGetInterfaceReturns(int interfaceId, ItInterface? value)
         {
             _repository.Setup(x => x.GetInterface(interfaceId)).Returns(value);
         }
@@ -1771,7 +1771,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext.Setup(x => x.AllowReads(entity)).Returns(value);
         }
 
-        private void ExpectGetSystemReturns(int newSystemId, ItSystem value)
+        private void ExpectGetSystemReturns(int newSystemId, ItSystem? value)
         {
             _systemRepository.Setup(x => x.GetSystem(newSystemId)).Returns(value);
         }

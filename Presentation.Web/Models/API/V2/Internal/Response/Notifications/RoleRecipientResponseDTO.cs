@@ -7,6 +7,6 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
         /// <summary>
         /// Role to which the notification should be sent
         /// </summary>
-        public IdentityNamePairResponseDTO Role { get; set; }
+        public required IdentityNamePairResponseDTO Role { get; set; }
     }
 }

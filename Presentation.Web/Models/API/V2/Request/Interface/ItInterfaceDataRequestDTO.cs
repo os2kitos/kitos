@@ -8,7 +8,7 @@ namespace Presentation.Web.Models.API.V2.Request.Interface
         /// <summary>
         /// Optional description of the data
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
         /// <summary>
         /// Optional reference to the it-interface-data-type option type
         /// Constraint:

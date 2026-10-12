@@ -11,7 +11,9 @@ namespace Infrastructure.Services.BackgroundJobs
         Task LaunchUpdateStaleDataProcessingRegistrationReadModels(CancellationToken token = default);
         Task LaunchScheduleItSystemUsageOverviewReadModelUpdates(CancellationToken token = default);
         Task LaunchScheduleItContractOverviewReadModelUpdates(CancellationToken token = default);
+        Task LaunchScheduleItContractSupplierOverviewReadModelUpdates(CancellationToken token = default);
         Task LaunchUpdateItSystemUsageOverviewReadModels(CancellationToken token = default);
+        Task LaunchUpdateItContractSupplierOverviewReadModels(CancellationToken token = default);
         Task LaunchFullReadModelRebuild(ReadModelRebuildScope scope, CancellationToken token);
         Task LaunchPurgeDuplicatedReadModelUpdates(CancellationToken token);
         Task LaunchUpdateStaleSystemUsageRmAsync(CancellationToken token = default);

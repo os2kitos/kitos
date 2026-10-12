@@ -1,21 +1,25 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.UIConfiguration;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class CustomizedUINodeMap : EntityTypeConfiguration<CustomizedUINode>
+    public class CustomizedUINodeMap : IEntityTypeConfiguration<CustomizedUINode>
     {
-        public CustomizedUINodeMap()
+        public void Configure(EntityTypeBuilder<CustomizedUINode> builder)
         {
-            Property(x => x.Key)
+            builder.ToTable("CustomizedUiNodes");
+
+            builder.Property(x => x.Key)
                 .IsRequired();
-            Property(x => x.Enabled)
+            builder.Property(x => x.Enabled)
                 .IsRequired();
             
-            HasRequired(t => t.UiModuleCustomization)
+            builder.HasOne(t => t.UiModuleCustomization)
                 .WithMany(t => t.Nodes)
                 .HasForeignKey(d => d.ModuleId)
-                .WillCascadeOnDelete(true);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

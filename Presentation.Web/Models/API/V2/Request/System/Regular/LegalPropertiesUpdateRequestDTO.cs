@@ -7,8 +7,8 @@ namespace Presentation.Web.Models.API.V2.Request.System.Regular;
 public class LegalPropertiesUpdateRequestDTO
 {
     [MaxLength(ItSystem.MaxNameLength)]
-    public string SystemName { get; set; }
+    public string? SystemName { get; set; }
 
     [MaxLength(Organization.MaxNameLength)]
-    public string DataProcessorName { get; set; }
+    public string? DataProcessorName { get; set; }
 }

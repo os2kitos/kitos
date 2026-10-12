@@ -1,4 +1,4 @@
-﻿using Core.DomainModel;
+using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
@@ -24,7 +24,7 @@ namespace Presentation.Web.Controllers.API.V1.Mapping
 
         public static ShallowOrganizationDTO MapToShallowOrganizationDTO(this Organization source)
         {
-            return new ShallowOrganizationDTO(source.Id, source.Name) { CvrNumber = source.GetActiveCvr() };
+            return new ShallowOrganizationDTO(source.Id, source.Name, source.GetActiveCvr());
         }
     }
 }

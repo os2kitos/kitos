@@ -1,4 +1,5 @@
-﻿using System.Web.Http.Filters;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Presentation.Web.Infrastructure.Attributes
 {
@@ -6,3 +7,4 @@ namespace Presentation.Web.Infrastructure.Attributes
     {
     }
 }
+

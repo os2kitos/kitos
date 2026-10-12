@@ -1,31 +1,33 @@
 ﻿using Core.DomainModel.Organization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class StsOrganizationChangeLogMap : EntityMap<StsOrganizationChangeLog>
     {
-        public StsOrganizationChangeLogMap()
+        public override void Configure(EntityTypeBuilder<StsOrganizationChangeLog> builder)
         {
-            HasRequired(x => x.StsOrganizationConnection)
+            base.Configure(builder);
+            base.Configure(builder);
+
+            builder.HasOne(x => x.StsOrganizationConnection)
                 .WithMany(c => c.StsOrganizationChangeLogs)
                 .HasForeignKey(x => x.StsOrganizationConnectionId)
-                .WillCascadeOnDelete(true);
-
-            Property(x => x.ResponsibleType)
                 .IsRequired()
-                .HasIndexAnnotation("IX_ChangeLogResponsibleType");
+                .OnDelete(DeleteBehavior.Cascade);
 
-            Property(x => x.LogTime)
-                .IsRequired()
-                .HasIndexAnnotation("IX_LogTime");
+            builder.Property(x => x.ResponsibleType).IsRequired();
+            builder.HasIndex(x => x.ResponsibleType).HasDatabaseName("IX_ChangeLogResponsibleType");
 
-            HasOptional(x => x.ResponsibleUser)
+            builder.Property(x => x.LogTime).IsRequired();
+            builder.HasIndex(x => x.LogTime).HasDatabaseName("IX_LogTime");
+
+            builder.HasOne(x => x.ResponsibleUser)
                 .WithMany(x => x.StsOrganizationChangeLogs)
                 .HasForeignKey(x => x.ResponsibleUserId);
 
-            Property(x => x.ResponsibleUserId)
-                .IsOptional()
-                .HasIndexAnnotation("IX_ChangeLogName");
+            builder.HasIndex(x => x.ResponsibleUserId).HasDatabaseName("IX_ChangeLogName");
         }
     }
 }

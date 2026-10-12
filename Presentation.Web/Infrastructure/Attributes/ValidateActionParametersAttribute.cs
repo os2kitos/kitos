@@ -1,45 +1,39 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Web.Http.Controllers;
-using System.Web.Http.Filters;
-using System.Web.Http.ModelBinding;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Presentation.Web.Infrastructure.Attributes
 {
     /// <summary>
-    /// Enables model state validation to include data annotations added to action parameters. Default in this asp net version is to only care about model state on complex type properties.
+    /// Enables model state validation to include data annotations added to action parameters.
     /// </summary>
     public class ValidateActionParametersAttribute : ActionFilterAttribute
     {
-        public override void OnActionExecuting(HttpActionContext actionContext)
+        public override void OnActionExecuting(ActionExecutingContext actionContext)
         {
             var descriptor = actionContext.ActionDescriptor;
 
             if (descriptor != null)
             {
-                var parameters = descriptor.GetParameters();
-
-                foreach (var parameter in parameters)
+                foreach (var parameter in descriptor.Parameters)
                 {
-                    var argument = actionContext.ActionArguments[parameter.ParameterName];
+                    if (!actionContext.ActionArguments.TryGetValue(parameter.Name, out var argument))
+                        continue;
 
-                    Validate(parameter, argument, actionContext.ModelState);
+                    var validationAttributes = parameter.ParameterType.GetCustomAttributes(typeof(ValidationAttribute), true);
+                    foreach (ValidationAttribute validationAttribute in validationAttributes)
+                    {
+                        var isValid = validationAttribute.IsValid(argument);
+                        if (!isValid)
+                        {
+                            actionContext.ModelState.AddModelError(parameter.Name, validationAttribute.FormatErrorMessage(parameter.Name));
+                        }
+                    }
                 }
             }
 
             base.OnActionExecuting(actionContext);
         }
-        private static void Validate(HttpParameterDescriptor parameter, object argument, ModelStateDictionary modelState)
-        {
-            var validationAttributes = parameter.GetCustomAttributes<ValidationAttribute>();
-
-            foreach (var validationAttribute in validationAttributes)
-            {
-                var isValid = validationAttribute.IsValid(argument);
-                if (!isValid)
-                {
-                    modelState.AddModelError(parameter.ParameterName, validationAttribute.FormatErrorMessage(parameter.ParameterName));
-                }
-            }
-        }
     }
 }
+

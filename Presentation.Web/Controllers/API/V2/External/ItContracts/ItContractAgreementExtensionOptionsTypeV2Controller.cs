@@ -1,17 +1,16 @@
-﻿using Core.ApplicationServices.OptionTypes;
+using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItContract;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Response.Options;
-using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 {
-    [RoutePrefix("api/v2/it-contract-agreement-extension-option-types")]
+    [Route("api/v2/it-contract-agreement-extension-option-types")]
     public class ItContractAgreementExtensionOptionTypeV2Controller : BaseRegularOptionTypeV2Controller<ItContract, OptionExtendType>
     {
         public ItContractAgreementExtensionOptionTypeV2Controller(IOptionsApplicationService<ItContract, OptionExtendType> optionService)
@@ -23,14 +22,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// Returns It-Contract agreement extension option type options 
         /// </summary>
         /// <param name="organizationUuid">organization context for the agreement extension option types availability</param>
+        /// <param name="pagination">Optional pagination query</param>
         /// <returns>A list of available It-Contract agreement extension option types</returns>
         [HttpGet]
-        [Route]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RegularOptionResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get([NonEmptyGuid] Guid organizationUuid, [FromUri] UnboundedPaginationQuery pagination = null)
+        [Route("")]
+        [ApiResponse(typeof(IEnumerable<RegularOptionResponseDTO>), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult Get([NonEmptyGuid] Guid organizationUuid, [FromQuery] UnboundedPaginationQuery? pagination = null)
         {
             return GetAll(organizationUuid, pagination);
         }
@@ -43,14 +43,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// <returns>A uuid and name pair with boolean to mark if the agreement extension option type is available in the organization</returns>
         [HttpGet]
         [Route("{agreementExtensionOptionTypeUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RegularOptionExtendedResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get([NonEmptyGuid] Guid agreementExtensionOptionTypeUuid, [NonEmptyGuid] Guid organizationUuid)
+        [ApiResponse(typeof(RegularOptionExtendedResponseDTO), HttpStatusCode.OK)]
+        [ApiResponse(HttpStatusCode.BadRequest)]
+        [ApiResponse(HttpStatusCode.Unauthorized)]
+        [ApiResponse(HttpStatusCode.Forbidden)]
+        [ApiResponse(HttpStatusCode.NotFound)]
+        public IActionResult Get([NonEmptyGuid] Guid agreementExtensionOptionTypeUuid, [NonEmptyGuid] Guid organizationUuid)
         {
             return GetSingle(agreementExtensionOptionTypeUuid, organizationUuid);
         }
     }
 }
+

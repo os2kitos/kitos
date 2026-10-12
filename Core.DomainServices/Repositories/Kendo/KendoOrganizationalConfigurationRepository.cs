@@ -31,6 +31,7 @@ namespace Core.DomainServices.Repositories.Kendo
 
         public void Delete(KendoOrganizationalConfiguration configToDelete)
         {
+            DeleteColumns(configToDelete);
             _repository.Delete(configToDelete);
             _repository.Save();
         }
@@ -43,7 +44,10 @@ namespace Core.DomainServices.Repositories.Kendo
 
         public void DeleteColumns(KendoOrganizationalConfiguration configWithColumnsToBeDeleted)
         {
-            _columnRepository.RemoveRange(configWithColumnsToBeDeleted.VisibleColumns);
+            var columns = _columnRepository.AsQueryable()
+                .Where(x => x.KendoOrganizationalConfigurationId == configWithColumnsToBeDeleted.Id)
+                .ToList();
+            _columnRepository.RemoveRange(columns);
             configWithColumnsToBeDeleted.VisibleColumns.Clear();
             _columnRepository.Save();
         }

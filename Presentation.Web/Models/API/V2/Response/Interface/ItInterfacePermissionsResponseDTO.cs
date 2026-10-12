@@ -7,6 +7,6 @@ namespace Presentation.Web.Models.API.V2.Response.Interface
 {
     public class ItInterfacePermissionsResponseDTO : ResourcePermissionsResponseDTO, IHasDeletionConflicts<ItInterfaceDeletionConflict>
     {
-        public IEnumerable<ItInterfaceDeletionConflict> DeletionConflicts { get; set; }
+        public required IEnumerable<ItInterfaceDeletionConflict> DeletionConflicts { get; set; }
     }
 }

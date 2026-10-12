@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
@@ -15,17 +14,17 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// <summary>
         /// Defines the archiving type associated with the it-system
         /// </summary>
-        public IdentityNamePairResponseDTO Type { get; set; }
+        public IdentityNamePairResponseDTO? Type { get; set; }
         /// <summary>
         /// Identifies the physical location for archive receiving the data
         /// </summary>
-        public IdentityNamePairResponseDTO Location { get; set; }
+        public IdentityNamePairResponseDTO? Location { get; set; }
         /// <summary>
         /// Identifies the physical location for the archiving test
         /// </summary>
-        public IdentityNamePairResponseDTO TestLocation { get; set; }
+        public IdentityNamePairResponseDTO? TestLocation { get; set; }
 
-        public ShallowOrganizationResponseDTO Supplier { get; set; }
+        public ShallowOrganizationResponseDTO? Supplier { get; set; }
         /// <summary>
         /// Determines if any archiving has occurred from this system
         /// </summary>
@@ -33,15 +32,14 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// <summary>
         /// Archiving notes
         /// </summary>
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
         /// <summary>
         /// Determines the frequency of the archiving activity
         /// </summary>
         public int? FrequencyInMonths { get; set; }
 
         public bool? DocumentBearing { get; set; }
-        [Required]
-        public IEnumerable<JournalPeriodResponseDTO> JournalPeriods { get; set; }
+        public required IEnumerable<JournalPeriodResponseDTO> JournalPeriods { get; set; }
 
     }
 }

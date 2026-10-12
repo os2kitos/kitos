@@ -1,57 +1,71 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.ApplicationServices.Authentication;
-using Microsoft.Owin;
-using Ninject;
+using Microsoft.AspNetCore.Http;
 using Serilog;
 
 namespace Presentation.Web.Infrastructure.Middleware
 {
-    public class ApiRequestsLoggingMiddleware : OwinMiddleware
+    public class ApiRequestsLoggingMiddleware : IMiddleware
     {
         private const int INVALID_ID = -1;
-        public ApiRequestsLoggingMiddleware(OwinMiddleware next) : base(next)
+        private readonly ILogger _logger;
+        private readonly IAuthenticationContext _authenticationContext;
+
+        public ApiRequestsLoggingMiddleware(ILogger logger, IAuthenticationContext authenticationContext)
         {
+            _logger = logger;
+            _authenticationContext = authenticationContext;
         }
 
-        public override async Task Invoke(IOwinContext context)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var kernel = context.GetNinjectKernel();
-            var logger = kernel.Get<ILogger>();
-            var authenticationContext = kernel.Get<IAuthenticationContext>();
-            if (authenticationContext.Method == AuthenticationMethod.KitosToken)
+            if (_authenticationContext.Method == AuthenticationMethod.KitosToken)
             {
                 var requestStart = DateTime.UtcNow;
                 var route = context.Request.Path;
                 var method = context.Request.Method;
                 var queryParameters = GetQueryParameters(context.Request.Query);
-                var userId = authenticationContext.UserId.GetValueOrDefault(INVALID_ID);
-                logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} RequestStartUTC: {requestStart}", route, method, queryParameters, userId, requestStart);
+                var sanitizedRoute = SanitizeForLogging(route);
+                var sanitizedQueryParameters = SanitizeForLogging(queryParameters);
+                var userId = _authenticationContext.UserId.GetValueOrDefault(INVALID_ID);
+                _logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} RequestStartUTC: {requestStart}", sanitizedRoute, method, sanitizedQueryParameters, userId, requestStart);
                 try
                 {
-                    await Next.Invoke(context);
+                    await next(context);
                 }
                 finally
                 {
                     var requestEnd = DateTime.UtcNow;
-                    logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} RequestEndUTC: {requestEnd}", route, method, queryParameters, userId, requestEnd);
+                    _logger.Information("Route: {route} Method: {method} QueryParameters: {queryParameters} UserID: {userID} RequestEndUTC: {requestEnd}", sanitizedRoute, method, sanitizedQueryParameters, userId, requestEnd);
                 }
             }
             else
             {
-                await Next.Invoke(context);
+                await next(context);
             }
         }
 
-        private static string GetQueryParameters(IReadableStringCollection query)
+        private static string GetQueryParameters(IQueryCollection query)
         {
             if (query.Any())
             {
-                var parameters = query.Select(i => i.Key).Aggregate((i, j) => i + ", " + j);
-                return parameters;
+                return query.Select(i => i.Key).Aggregate((i, j) => i + ", " + j);
             }
             return string.Empty;
+        }
+
+        private static string SanitizeForLogging(string input)
+        {
+            if (input == null)
+            {
+                return string.Empty;
+            }
+
+            // Remove newline characters to prevent log forging via user-controlled input.
+            return input.Replace("\r", string.Empty)
+                        .Replace("\n", string.Empty);
         }
     }
 }

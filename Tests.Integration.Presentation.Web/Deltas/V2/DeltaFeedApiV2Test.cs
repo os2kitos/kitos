@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
@@ -88,22 +89,30 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
 
             await DeleteDprAsync(token, dpr3);
             await DeleteDprAsync(token, dpr1);
+
+            // Derive the marker from the server's own clock (via the API response) to avoid
+            // clock-skew between the test client and the remote server. A small delay ensures
+            // the server's Windows system timer has advanced past the first batch's tick so
+            // the second batch events get strictly later OccurredAtUtc values.
+            await Task.Delay(TimeSpan.FromMilliseconds(50));
+            var firstBatchEvents = (await DeltaFeedV2Helper.GetDeletedEntitiesAsync(token)).ToList();
+            var deletedSinceMarker = firstBatchEvents.Max(x => x.OccurredAtUtc).AddMilliseconds(1);
+
             await DeleteDprAsync(token, dpr2);
             await DeleteDprAsync(token, dpr4);
-            var all = (await DeltaFeedV2Helper.GetDeletedEntitiesAsync(token)).ToList();
-            var thirdItemDeletedAt = all.Skip(2).First().OccurredAtUtc;
 
             //Act
-            var deletedItemsFiltered = (await DeltaFeedV2Helper.GetDeletedEntitiesAsync(token, deletedSinceUTC: thirdItemDeletedAt)).ToList();
+            var deletedItemsFiltered = (await DeltaFeedV2Helper.GetDeletedEntitiesAsync(token, deletedSinceUTC: deletedSinceMarker)).ToList();
 
             //Assert that that the last two are iuncluded (filtering includes changes AT the data provided
             Assert.Equal(new[] { dpr2.Uuid, dpr4.Uuid }, deletedItemsFiltered.Select(x => x.EntityUuid));
 
-            //Act - add one tick - now we expect only one result
-            deletedItemsFiltered = (await DeltaFeedV2Helper.GetDeletedEntitiesAsync(token, deletedSinceUTC: thirdItemDeletedAt.AddTicks(1))).ToList();
+            //Act - move marker to the latest server-side event + 1 ms and assert no new deletions are returned
+            var noNewEventsMarker = deletedItemsFiltered.Max(x => x.OccurredAtUtc).AddMilliseconds(1);
+            deletedItemsFiltered = (await DeltaFeedV2Helper.GetDeletedEntitiesAsync(token, deletedSinceUTC: noNewEventsMarker)).ToList();
 
-            //Assert that that the last two are iuncluded (filtering includes changes AT the data provided
-            Assert.Equal(new[] { dpr4.Uuid }, deletedItemsFiltered.Select(x => x.EntityUuid));
+            //Assert no additional events after current marker
+            Assert.Empty(deletedItemsFiltered);
         }
 
         [Theory]
@@ -156,7 +165,7 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
         private async Task<(User user, string token)> CreateApiUser(ShallowOrganizationResponseDTO organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Uuid, true, false);
-            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userAndGetToken.userUuid));
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ByUuid(userAndGetToken.userUuid)!);
             return (user, userAndGetToken.token);
         }
     }

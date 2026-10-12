@@ -9,7 +9,7 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// <summary>
         /// Optional reference responsible organization unit
         /// </summary>
-        public IdentityNamePairResponseDTO OrganizationUnit { get; set; }
+        public IdentityNamePairResponseDTO? OrganizationUnit { get; set; }
         /// <summary>
         /// Determines if the contract has been signed
         /// </summary>
@@ -18,7 +18,7 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// <summary>
         /// Who, in the organization, signed the contract
         /// </summary>
-        public string SignedBy { get; set; }
+        public string? SignedBy { get; set; }
         /// <summary>
         /// Which date was the contract signed
         /// </summary>

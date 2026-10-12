@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
+using PubSub.Core.Abstractions.Helpers;
 using PubSub.Core.ApplicationServices.CallbackAuthenticator;
 using PubSub.Core.ApplicationServices.Config;
 using RabbitMQ.Client;
@@ -57,10 +59,13 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<PubSubContext>(options =>
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
-            options.UseSqlServer(connectionString);
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+            dataSourceBuilder.ConnectionStringBuilder.GssEncryptionMode = GssEncryptionMode.Disable;
+            options.UseNpgsql(dataSourceBuilder.Build());
         });
         return services;
     }
+
 
     public static IServiceCollection AddAuthenticationServices(this IServiceCollection services,
         ConfigurationManager configuration)

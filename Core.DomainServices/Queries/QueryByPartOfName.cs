@@ -9,15 +9,17 @@ namespace Core.DomainServices.Queries
     {
 
         private readonly string _nameContent;
+        private readonly string _nameContentLower;
 
         public QueryByPartOfName(string nameContent)
         {
             _nameContent = string.IsNullOrWhiteSpace(nameContent) ? throw new ArgumentException(nameof(nameContent) + " must be string containing more than whitespaces") : nameContent;
+            _nameContentLower = _nameContent.ToLower();
         }
 
         public IQueryable<T> Apply(IQueryable<T> source)
         {
-            return source.Where(x => x.Name.Contains(_nameContent));
+            return source.Where(x => x.Name.ToLower().Contains(_nameContentLower));
         }
     }
 }

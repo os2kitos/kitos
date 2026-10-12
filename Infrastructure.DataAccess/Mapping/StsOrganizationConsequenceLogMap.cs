@@ -1,29 +1,31 @@
 ﻿using Core.DomainModel.Organization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class StsOrganizationConsequenceLogMap : EntityMap<StsOrganizationConsequenceLog>
     {
-        public StsOrganizationConsequenceLogMap()
+        public override void Configure(EntityTypeBuilder<StsOrganizationConsequenceLog> builder)
         {
-            HasRequired(x => x.ChangeLog)
+            base.Configure(builder);
+            base.Configure(builder);
+
+            builder.HasOne(x => x.ChangeLog)
                 .WithMany(x => x.Entries)
                 .HasForeignKey(x => x.ChangeLogId)
-                .WillCascadeOnDelete(true);
-
-            Property(x => x.ExternalUnitUuid)
                 .IsRequired()
-                .HasIndexAnnotation("IX_StsOrganizationConsequenceUuid");
+                .OnDelete(DeleteBehavior.Cascade);
 
-            Property(x => x.Type)
-                .IsRequired()
-                .HasIndexAnnotation("IX_StsOrganizationConsequenceType");
+            builder.Property(x => x.ExternalUnitUuid).IsRequired();
+            builder.HasIndex(x => x.ExternalUnitUuid).HasDatabaseName("IX_StsOrganizationConsequenceUuid");
 
-            Property(x => x.Name)
-                .IsRequired();
+            builder.Property(x => x.Type).IsRequired();
+            builder.HasIndex(x => x.Type).HasDatabaseName("IX_StsOrganizationConsequenceType");
 
-            Property(x => x.Description)
-                .IsRequired();
+            builder.Property(x => x.Name).IsRequired();
+
+            builder.Property(x => x.Description).IsRequired();
         }
     }
 }

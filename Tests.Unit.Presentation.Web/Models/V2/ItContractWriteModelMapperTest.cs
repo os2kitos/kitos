@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
@@ -45,7 +45,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         [Theory]
         [InlineData("")]
-        [InlineData(null)]
         [InlineData("test")]
         public void Can_Map_Name_From_Post(string name)
         {
@@ -63,7 +62,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         [InlineData("")]
         [InlineData(null)]
         [InlineData("test")]
-        public void Can_Map_Name_From_Put(string name)
+        public void Can_Map_Name_From_Put(string? name)
         {
             //Arrange
             var requestDto = new UpdateContractRequestDTO { Name = name };
@@ -79,7 +78,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         [InlineData("")]
         [InlineData(null)]
         [InlineData("test")]
-        public void Can_Map_Name_From_Patch(string name)
+        public void Can_Map_Name_From_Patch(string? name)
         {
             //Arrange
             var requestDto = new UpdateContractRequestDTO { Name = name };
@@ -113,7 +112,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedSupplierDataPropertiesInput()
         {
-            return CreateGetUndefinedSectionsInput(4);
+            return CreateGetUndefinedSectionsInput(10);
         }
 
         public static IEnumerable<object[]> GetUndefinedPaymentModelPropertiesInput()
@@ -227,7 +226,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noRequireValidParent)
         {
             //Arrange
-            var input = new CreateNewContractRequestDTO();
+            var input = new CreateNewContractRequestDTO { Name = A<string>() };
             ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo, noCriticalityTypeUuid, noRequireValidParent);
 
             //Act
@@ -319,7 +318,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noProcurementInitiated)
         {
             //Arrange
-            var input = new CreateNewContractRequestDTO();
+            var input = new CreateNewContractRequestDTO { Name = A<string>() };
             ConfigureProcurementInputContext(noProcurementStrategyUuid, noPurchaseTypeUuid, noProcurementPlan, noProcurementInitiated);
 
             //Act
@@ -382,7 +381,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noSignedBy)
         {
             //Arrange
-            var input = new CreateNewContractRequestDTO();
+            var input = new CreateNewContractRequestDTO { Name = A<string>() };
             ConfigureResponsibleDataInputContext(noOrganizationUnitUuid, noSigned, noSignedAt, noSignedBy);
 
             //Act
@@ -442,67 +441,103 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         [Theory]
         [MemberData(nameof(GetUndefinedSupplierDataPropertiesInput))]
         public void FromPOST_Ignores_Undefined_Properties_In_SupplierSection(
+            bool noOrganizationUuid,
             bool noOrganizationUnitUuid,
+            bool noIsInternal,
             bool noSigned,
             bool noSignedAt,
-            bool noSignedBy)
+            bool noSignedBy,
+            bool noContactPerson,
+            bool noUseSignedByForContact,
+            bool noContactPhoneNumber,
+            bool noContactEmail)
         {
             //Arrange
-            var input = new CreateNewContractRequestDTO();
-            ConfigureSupplierDataInputContext(noOrganizationUnitUuid, noSigned, noSignedAt, noSignedBy);
+            var input = new CreateNewContractRequestDTO { Name = A<string>() };
+            ConfigureSupplierDataInputContext(noOrganizationUuid, noOrganizationUnitUuid, noIsInternal, noSigned, noSignedAt, noSignedBy, noContactPerson, noUseSignedByForContact, noContactPhoneNumber, noContactEmail);
 
             //Act
             var output = _sut.FromPOST(input).Supplier.Value;
 
             //Assert
-            Assert.Equal(noOrganizationUnitUuid, output.OrganizationUuid.IsUnchanged);
+            Assert.Equal(noOrganizationUuid, output.OrganizationUuid.IsUnchanged);
+            Assert.Equal(noOrganizationUnitUuid, output.OrganizationUnitUuid.IsUnchanged);
+            Assert.Equal(noIsInternal, output.IsInternal.IsUnchanged);
             Assert.Equal(noSigned, output.Signed.IsUnchanged);
             Assert.Equal(noSignedAt, output.SignedAt.IsUnchanged);
             Assert.Equal(noSignedBy, output.SignedBy.IsUnchanged);
+            Assert.Equal(noContactPerson, output.ContactPerson.IsUnchanged);
+            Assert.Equal(noUseSignedByForContact, output.UseSignedByForContact.IsUnchanged);
+            Assert.Equal(noContactPhoneNumber, output.ContactPhoneNumber.IsUnchanged);
+            Assert.Equal(noContactEmail, output.ContactEmail.IsUnchanged);
         }
 
         [Theory]
         [MemberData(nameof(GetUndefinedSupplierDataPropertiesInput))]
         public void FromPATCH_Ignores_Undefined_Properties_In_SupplierSection(
+            bool noOrganizationUuid,
             bool noOrganizationUnitUuid,
+            bool noIsInternal,
             bool noSigned,
             bool noSignedAt,
-            bool noSignedBy)
+            bool noSignedBy,
+            bool noContactPerson,
+            bool noUseSignedByForContact,
+            bool noContactPhoneNumber,
+            bool noContactEmail)
         {
             //Arrange
             var input = new UpdateContractRequestDTO();
-            ConfigureSupplierDataInputContext(noOrganizationUnitUuid, noSigned, noSignedAt, noSignedBy);
+            ConfigureSupplierDataInputContext(noOrganizationUuid, noOrganizationUnitUuid, noIsInternal, noSigned, noSignedAt, noSignedBy, noContactPerson, noUseSignedByForContact, noContactPhoneNumber, noContactEmail);
 
             //Act
             var output = _sut.FromPATCH(input).Supplier.Value;
 
             //Assert
-            Assert.Equal(noOrganizationUnitUuid, output.OrganizationUuid.IsUnchanged);
+            Assert.Equal(noOrganizationUuid, output.OrganizationUuid.IsUnchanged);
+            Assert.Equal(noOrganizationUnitUuid, output.OrganizationUnitUuid.IsUnchanged);
+            Assert.Equal(noIsInternal, output.IsInternal.IsUnchanged);
             Assert.Equal(noSigned, output.Signed.IsUnchanged);
             Assert.Equal(noSignedAt, output.SignedAt.IsUnchanged);
             Assert.Equal(noSignedBy, output.SignedBy.IsUnchanged);
+            Assert.Equal(noContactPerson, output.ContactPerson.IsUnchanged);
+            Assert.Equal(noUseSignedByForContact, output.UseSignedByForContact.IsUnchanged);
+            Assert.Equal(noContactPhoneNumber, output.ContactPhoneNumber.IsUnchanged);
+            Assert.Equal(noContactEmail, output.ContactEmail.IsUnchanged);
         }
 
         [Theory]
         [MemberData(nameof(GetUndefinedSupplierDataPropertiesInput))]
         public void FromPUT_Enforces_Undefined_Properties_In_SupplierSection(
+            bool noOrganizationUuid,
             bool noOrganizationUnitUuid,
+            bool noIsInternal,
             bool noSigned,
             bool noSignedAt,
-            bool noSignedBy)
+            bool noSignedBy,
+            bool noContactPerson,
+            bool noUseSignedByForContact,
+            bool noContactPhoneNumber,
+            bool noContactEmail)
         {
             //Arrange
             var input = new UpdateContractRequestDTO();
-            ConfigureSupplierDataInputContext(noOrganizationUnitUuid, noSigned, noSignedAt, noSignedBy);
+            ConfigureSupplierDataInputContext(noOrganizationUuid, noOrganizationUnitUuid, noIsInternal, noSigned, noSignedAt, noSignedBy, noContactPerson, noUseSignedByForContact, noContactPhoneNumber, noContactEmail);
 
             //Act
             var output = _sut.FromPUT(input).Supplier.Value;
 
             //Assert
             Assert.True(output.OrganizationUuid.HasChange);
+            Assert.True(output.OrganizationUnitUuid.HasChange);
+            Assert.True(output.IsInternal.HasChange);
             Assert.True(output.Signed.HasChange);
             Assert.True(output.SignedAt.HasChange);
             Assert.True(output.SignedBy.HasChange);
+            Assert.True(output.ContactPerson.HasChange);
+            Assert.True(output.UseSignedByForContact.HasChange);
+            Assert.True(output.ContactPhoneNumber.HasChange);
+            Assert.True(output.ContactEmail.HasChange);
         }
 
         [Theory]
@@ -514,7 +549,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noPriceRegulationUuid)
         {
             //Arrange
-            var input = new CreateNewContractRequestDTO();
+            var input = new CreateNewContractRequestDTO { Name = A<string>() };
             ConfigurePaymentModelInputContext(noOperationsRemunerationStartedAt, noPaymentFrequencyUuid, noPaymentModelUuid, noPriceRegulationUuid);
 
             //Act
@@ -582,7 +617,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noIsContinuous)
         {
             //Arrange
-            var input = new CreateNewContractRequestDTO();
+            var input = new CreateNewContractRequestDTO { Name = A<string>() };
             ConfigureAgreementPeriodInputContext(noDurationMonths, noDurationYears, noExtensionOptionsUsed, noExtensionOptionsUuid, noIrrevocableUntil, noIsContinuous);
 
             //Act
@@ -658,7 +693,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noNoticeByEndOf)
         {
             //Arrange
-            var input = new CreateNewContractRequestDTO();
+            var input = new CreateNewContractRequestDTO { Name = A<string>() };
             ConfigureTerminationDataInputContext(noTerminatedAt, noNoticePeriodMonthsUuid, noNoticePeriodExtendsCurrent, noNoticeByEndOf);
 
             //Act
@@ -720,8 +755,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void FromPost_Maps_General()
         {
             //Arrange
-            var input = new CreateNewContractRequestDTO()
-            {
+            var input = new CreateNewContractRequestDTO { Name = A<string>(),
                 General = A<ContractGeneralDataWriteRequestDTO>()
             };
 
@@ -771,7 +805,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var parentUuid = hasParentUuid ? A<Guid?>() : null;
-            var requestDto = new CreateNewContractRequestDTO { ParentContractUuid = parentUuid };
+            var requestDto = new CreateNewContractRequestDTO { Name = A<string>(), ParentContractUuid = parentUuid };
 
             //Act
             var modificationParameters = _sut.FromPOST(requestDto);
@@ -819,7 +853,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<ContractResponsibleDataWriteRequestDTO>();
 
             //Act
-            var output = _sut.FromPOST(new CreateNewContractRequestDTO() { Responsible = input });
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO { Name = A<string>(), Responsible = input });
 
             //Assert
             AssertResponsible(input, output.Responsible.Value);
@@ -858,7 +892,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<ContractSupplierDataWriteRequestDTO>();
 
             //Act
-            var output = _sut.FromPOST(new CreateNewContractRequestDTO() { Supplier = input });
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO { Name = A<string>(), Supplier = input });
 
             //Assert
             AssertSupplier(input, output.Supplier.Value);
@@ -920,9 +954,15 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         private static void AssertSupplier(ContractSupplierDataWriteRequestDTO input, ItContractSupplierModificationParameters output)
         {
             Assert.Equal(input.OrganizationUuid, AssertPropertyContainsDataChange(output.OrganizationUuid));
+            Assert.Equal(input.OrganizationUnitUuid, AssertPropertyContainsDataChange(output.OrganizationUnitUuid));
+            Assert.Equal(input.IsInternal, AssertPropertyContainsDataChange(output.IsInternal));
             Assert.Equal(input.Signed, AssertPropertyContainsDataChange(output.Signed));
             Assert.Equal(input.SignedAt, AssertPropertyContainsDataChange(output.SignedAt));
             Assert.Equal(input.SignedBy, AssertPropertyContainsDataChange(output.SignedBy));
+            Assert.Equal(input.ContactPerson, AssertPropertyContainsDataChange(output.ContactPerson));
+            Assert.Equal(input.UseSignedByForContact, AssertPropertyContainsDataChange(output.UseSignedByForContact));
+            Assert.Equal(input.ContactPhoneNumber, AssertPropertyContainsDataChange(output.ContactPhoneNumber));
+            Assert.Equal(input.ContactEmail, AssertPropertyContainsDataChange(output.ContactEmail));
         }
 
         private static void AssertResponsible(ContractResponsibleDataWriteRequestDTO input,
@@ -941,7 +981,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var procurement = CreateProcurementRequest(hasValues);
-            var requestDto = new CreateNewContractRequestDTO { Procurement = procurement };
+            var requestDto = new CreateNewContractRequestDTO { Name = A<string>(), Procurement = procurement };
 
             //Act
             var modificationParameters = _sut.FromPOST(requestDto);
@@ -1021,7 +1061,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var references = Many<ExternalReferenceDataWriteRequestDTO>().OrderBy(x => x.Url).ToList();
 
             //Act
-            var mappedReferences = _sut.FromPOST(new CreateNewContractRequestDTO { ExternalReferences = references }).ExternalReferences.Value.OrderBy(x => x.Url).ToList();
+            var mappedReferences = _sut.FromPOST(new CreateNewContractRequestDTO { Name = A<string>(), ExternalReferences = references }).ExternalReferences.Value.OrderBy(x => x.Url).ToList();
 
             //Assert
             AssertExternalReferences(mappedReferences, references);
@@ -1034,7 +1074,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var systemUsageUuids = hasValues ? new[] { A<Guid>(), A<Guid>() } : new Guid[0];
-            var requestDto = new CreateNewContractRequestDTO { SystemUsageUuids = systemUsageUuids };
+            var requestDto = new CreateNewContractRequestDTO { Name = A<string>(), SystemUsageUuids = systemUsageUuids };
 
             //Act
             var modificationParameters = _sut.FromPOST(requestDto);
@@ -1114,7 +1154,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var roles = Many<RoleAssignmentRequestDTO>().OrderBy(x => x.RoleUuid).ToList();
 
             //Act
-            var result = _sut.FromPOST(new CreateNewContractRequestDTO { Roles = roles });
+            var result = _sut.FromPOST(new CreateNewContractRequestDTO { Name = A<string>(), Roles = roles });
 
             //Assert
             AssertRoles(roles, AssertPropertyContainsDataChange(result.Roles).ToList());
@@ -1127,7 +1167,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var dataProcessingRegistrationUuids = hasValues ? new[] { A<Guid>(), A<Guid>() } : new Guid[0];
-            var requestDto = new CreateNewContractRequestDTO { DataProcessingRegistrationUuids = dataProcessingRegistrationUuids };
+            var requestDto = new CreateNewContractRequestDTO { Name = A<string>(), DataProcessingRegistrationUuids = dataProcessingRegistrationUuids };
 
             //Act
             var modificationParameters = _sut.FromPOST(requestDto);
@@ -1201,7 +1241,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             };
 
             //Act
-            var output = _sut.FromPOST(new CreateNewContractRequestDTO() { PaymentModel = input });
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO { Name = A<string>(), PaymentModel = input });
 
             //Assert
             AssertPaymentModel(input, output.PaymentModel.Value);
@@ -1282,7 +1322,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<ContractAgreementPeriodDataWriteRequestDTO>();
 
             //Act
-            var output = _sut.FromPOST(new CreateNewContractRequestDTO { AgreementPeriod = input });
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO { Name = A<string>(), AgreementPeriod = input });
 
             //Assert
             AssertAgreementPeriod(input, AssertPropertyContainsDataChange(output.AgreementPeriod));
@@ -1295,7 +1335,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<ContractPaymentsDataWriteRequestDTO>();
 
             //Act
-            var output = _sut.FromPOST(new CreateNewContractRequestDTO { Payments = input }).Payments.Value;
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO { Name = A<string>(), Payments = input }).Payments.Value;
 
             //Assert
             AssertPayments(input, output);
@@ -1360,7 +1400,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<ContractTerminationDataWriteRequestDTO>();
 
             //Act
-            var output = _sut.FromPOST(new CreateNewContractRequestDTO() { Termination = input });
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO { Name = A<string>(), Termination = input });
 
             //Assert
             AssertTermination(input, AssertPropertyContainsDataChange(output.Termination));
@@ -1369,6 +1409,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         private static void AssertTermination(ContractTerminationDataWriteRequestDTO input, ItContractTerminationParameters output)
         {
             Assert.Equal(input.TerminatedAt, AssertPropertyContainsDataChange(output.TerminatedAt));
+            Assert.NotNull(input.Terms);
             Assert.Equal(input.Terms.NoticePeriodMonthsUuid, AssertPropertyContainsDataChange(output.NoticePeriodMonthsUuid));
             Assert.Equal(input.Terms.NoticePeriodExtendsCurrent?.ToYearSegmentOption(), AssertPropertyContainsDataChange(output.NoticePeriodExtendsCurrent));
             Assert.Equal(input.Terms.NoticeByEndOf?.ToYearSegmentOption(), AssertPropertyContainsDataChange(output.NoticeByEndOf));
@@ -1432,6 +1473,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.ContractTemplateUuid, AssertPropertyContainsDataChange(output.ContractTemplateUuid));
             Assert.Equal(input.AgreementElementUuids, AssertPropertyContainsDataChange(output.AgreementElementUuids));
             Assert.Equal(input.Notes, AssertPropertyContainsDataChange(output.Notes));
+            Assert.NotNull(input.Validity);
             Assert.Equal(input.Validity.ValidFrom, AssertPropertyContainsDataChange(output.ValidFrom));
             Assert.Equal(input.Validity.ValidTo, AssertPropertyContainsDataChange(output.ValidTo));
             Assert.Equal(input.Validity.EnforcedValid, AssertPropertyContainsDataChange(output.EnforceValid));
@@ -1447,6 +1489,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (hasValues)
             {
                 var (half, year) = AssertPropertyContainsDataChange(actual.ProcurementPlan);
+                Assert.NotNull(expected.ProcurementPlan);
                 Assert.Equal(expected.ProcurementPlan.QuarterOfYear, half);
                 Assert.Equal(expected.ProcurementPlan.Year, year);
                 Assert.Equal(expected.ProcurementInitiated, AssertPropertyContainsDataChange(actual.ProcurementInitiated).ToYesNoUndecidedChoice());
@@ -1486,9 +1529,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertPaymentCollection(input.External, AssertPropertyContainsDataChange(output.ExternalPayments));
         }
 
-        private static void AssertPaymentCollection(IEnumerable<PaymentRequestDTO> expectedPayments, IEnumerable<ItContractPayment> outputPayments)
+        private static void AssertPaymentCollection(IEnumerable<PaymentRequestDTO>? expectedPayments, IEnumerable<ItContractPayment> outputPayments)
         {
-            var expected = expectedPayments.ToList();
+            var expected = expectedPayments?.ToList() ?? new List<PaymentRequestDTO>();
             var actual = outputPayments.ToList();
             Assert.Equal(expected.Count, actual.Count);
             for (var i = 0; i < expected.Count; i++)
@@ -1578,16 +1621,28 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private void ConfigureSupplierDataInputContext(
             bool noOrganizationUuid,
+            bool noOrganizationUnitUuid,
+            bool noIsInternal,
             bool noSigned,
             bool noSignedAt,
-            bool noSignedBy)
+            bool noSignedBy,
+            bool noContactPerson,
+            bool noUseSignedByForContact,
+            bool noContactPhoneNumber,
+            bool noContactEmail)
         {
             var sectionProperties = GetAllInputPropertyNames<ContractSupplierDataWriteRequestDTO>();
 
             if (noOrganizationUuid) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.OrganizationUuid));
+            if (noOrganizationUnitUuid) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.OrganizationUnitUuid));
+            if (noIsInternal) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.IsInternal));
             if (noSigned) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.Signed));
             if (noSignedAt) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.SignedAt));
             if (noSignedBy) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.SignedBy));
+            if (noContactPerson) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.ContactPerson));
+            if (noUseSignedByForContact) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.UseSignedByForContact));
+            if (noContactPhoneNumber) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.ContactPhoneNumber));
+            if (noContactEmail) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.ContactEmail));
 
             _currentHttpRequestMock
                 .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Supplier).WrapAsEnumerable().AsParameterMatch()))

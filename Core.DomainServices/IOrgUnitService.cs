@@ -9,7 +9,7 @@ namespace Core.DomainServices
 {
     public interface IOrgUnitService
     {
-        ICollection<OrganizationUnit> GetSubTree(int orgUnitId);
+        ICollection<OrganizationUnit?> GetSubTree(int orgUnitId);
 
         bool DescendsFrom(int descendantUnitId, int ancestorUnitId);
         IQueryable<OrganizationUnit> GetOrganizationUnits(Organization organization);

@@ -25,16 +25,18 @@ namespace Core.Abstractions.Types
             }
         }
 
-        public static implicit operator Maybe<T>(T source)
+        public static implicit operator Maybe<T>(T? source)
         {
             return source == null ? None : Some(source);
         }
 
+        #pragma warning disable CS8601
         private Maybe(bool hasValue, T value = default(T))
         {
             HasValue = hasValue;
             _value = value;
         }
+        #pragma warning restore CS8601
 
         public static Maybe<T> Some(T value)
         {
@@ -64,7 +66,7 @@ namespace Core.Abstractions.Types
             return Match(val => val, () => fallback);
         }
 
-        public T GetValueOrDefault()
+        public T? GetValueOrDefault()
         {
             return Match(val => val, () => default(T));
         }
@@ -74,7 +76,7 @@ namespace Core.Abstractions.Types
             return HasValue ? onValue(Value) : onNone();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (!(obj is Maybe<T> other))
                 return false;
@@ -89,7 +91,7 @@ namespace Core.Abstractions.Types
 
         public override int GetHashCode()
         {
-            return HasValue ? Value.GetHashCode() : 0;
+            return HasValue && Value != null ? Value.GetHashCode() : 0;
         }
     }
 }

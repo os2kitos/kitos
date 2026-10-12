@@ -8,7 +8,7 @@ namespace Presentation.Web.Models.API.V2.Response.Organization
         /// <summary>
         /// Optional Link to parent unit in the organizational hierarchy
         /// </summary>
-        public IdentityNamePairResponseDTO ParentOrganizationUnit { get; set; }
+        public IdentityNamePairResponseDTO? ParentOrganizationUnit { get; set; }
         /// <summary>
         /// Optional EAN number for the organization unit.
         /// </summary>
@@ -16,7 +16,7 @@ namespace Presentation.Web.Models.API.V2.Response.Organization
         /// <summary>
         /// Optional Organization Unit Id
         /// </summary>
-        public string UnitId { get; set; }
+        public string? UnitId { get; set; }
 
         public OrganizationUnitOriginChoice Origin { get; set; }
     }

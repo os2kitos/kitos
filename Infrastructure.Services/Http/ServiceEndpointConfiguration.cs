@@ -1,18 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Net;
-
-namespace Infrastructure.Services.Http
+﻿namespace Infrastructure.Services.Http
 {
     public static class ServiceEndpointConfiguration
     {
         public static void ConfigureValidationOfOutgoingConnections()
         {
-            //Allow all versions of ssl for outgoing connections
-            ServicePointManager.SecurityProtocol = Enum
-                .GetValues(typeof(SecurityProtocolType))
-                .Cast<SecurityProtocolType>()
-                .Aggregate(SecurityProtocolType.SystemDefault, (acc, next) => acc | next);
+            // No-op on .NET Core: ServicePointManager is not supported.
+            // SSL/TLS protocol configuration is handled per-client via HttpClientHandler
+            // (see EndpointValidationService static constructor).
         }
     }
 }

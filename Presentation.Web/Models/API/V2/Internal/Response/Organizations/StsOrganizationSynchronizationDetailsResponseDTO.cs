@@ -4,7 +4,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Organizations
 {
     public class StsOrganizationSynchronizationDetailsResponseDTO
     {
-        public StsOrganizationAccessStatusResponseDTO AccessStatus { get; set; }
+        public required StsOrganizationAccessStatusResponseDTO AccessStatus { get; set; }
         public bool Connected { get; set; }
         public bool SubscribesToUpdates { get; set; }
         public DateTime? DateOfLatestCheckBySubscription { get; set; }

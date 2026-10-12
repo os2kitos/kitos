@@ -14,13 +14,12 @@ namespace Core.ApplicationServices.Contract
     public interface IItContractService
     {
         Result<ItContract, OperationError> Create(int organizationId, string name);
-        Result<IQueryable<ItContract>,OperationError> GetAllByOrganization(int orgId, string optionalNameSearch = null);
         Result<ItContract, OperationFailure> Delete(int id);
 
         Result<DataProcessingRegistration, OperationError> AssignDataProcessingRegistration(int id, int dataProcessingRegistrationId);
 
         Result<DataProcessingRegistration, OperationError> RemoveDataProcessingRegistration(int id, int dataProcessingRegistrationId);
-        Result<IEnumerable<DataProcessingRegistration>, OperationError> GetDataProcessingRegistrationsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
+        Result<IEnumerable<DataProcessingRegistration>, OperationError> GetDataProcessingRegistrationsWhichCanBeAssigned(int id, string? nameQuery, int pageSize);
         Result<ItContract, OperationError> GetContract(Guid uuid);
         Result<ItContract, OperationError> GetContract(int id);
         Result<bool,OperationError> CanCreateNewContractWithName(string name, int organizationId);

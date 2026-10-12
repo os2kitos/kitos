@@ -1,5 +1,6 @@
-﻿using Presentation.Web.Models.API.V2.Request.User;
+using Presentation.Web.Models.API.V2.Request.User;
 using System;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Users.Mapping
 {

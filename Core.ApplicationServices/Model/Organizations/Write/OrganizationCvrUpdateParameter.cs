@@ -5,6 +5,6 @@ namespace Core.ApplicationServices.Model.Organizations.Write
 {
     public class OrganizationCvrUpdateParameter
     {
-        public OptionalValueChange<Maybe<string>> Cvr { get; set; }
+        public required OptionalValueChange<Maybe<string>> Cvr { get; set; }
     }
 }

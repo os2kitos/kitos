@@ -8,7 +8,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Request.Organizations
         [Required]
         public new string Name
         {
-            get => base.Name;
+            get => base.Name ?? string.Empty;
             set => base.Name = value;
         }
 

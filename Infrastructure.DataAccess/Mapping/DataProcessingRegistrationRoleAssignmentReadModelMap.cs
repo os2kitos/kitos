@@ -1,31 +1,31 @@
-﻿using System.Data.Entity.ModelConfiguration;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Users;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class DataProcessingRegistrationRoleAssignmentReadModelMap : EntityTypeConfiguration<DataProcessingRegistrationRoleAssignmentReadModel>
+    public class DataProcessingRegistrationRoleAssignmentReadModelMap : IEntityTypeConfiguration<DataProcessingRegistrationRoleAssignmentReadModel>
     {
-        public DataProcessingRegistrationRoleAssignmentReadModelMap()
+        public void Configure(EntityTypeBuilder<DataProcessingRegistrationRoleAssignmentReadModel> builder)
         {
-            HasKey(x => x.Id);
-            HasRequired(x => x.Parent)
+            builder.HasKey(x => x.Id);
+
+            builder.HasOne(x => x.Parent)
                 .WithMany(x => x.RoleAssignments)
                 .HasForeignKey(x => x.ParentId)
-                .WillCascadeOnDelete(true);
-            Property(x=>x.UserFullName)
                 .IsRequired()
-                .HasMaxLength(UserConstraints.MaxNameLength)
-                .HasIndexAnnotation("IX_UserFullName", 0);
-            Property(x => x.Email)
-                .IsOptional();
-            Property(x => x.UserId)
-                .IsRequired()
-                .HasIndexAnnotation("IX_UserId", 0);
+                .OnDelete(DeleteBehavior.Cascade);
 
-            Property(x => x.RoleId)
-                .IsRequired()
-                .HasIndexAnnotation("IX_RoleId", 0);
+            builder.Property(x => x.UserFullName).IsRequired().HasMaxLength(UserConstraints.MaxNameLength);
+            builder.HasIndex(x => x.UserFullName).HasDatabaseName("IX_UserFullName");
+
+            builder.Property(x => x.UserId).IsRequired();
+            builder.HasIndex(x => x.UserId).HasDatabaseName("IX_UserId");
+
+            builder.Property(x => x.RoleId).IsRequired();
+            builder.HasIndex(x => x.RoleId).HasDatabaseName("IX_RoleId");
         }
     }
 }

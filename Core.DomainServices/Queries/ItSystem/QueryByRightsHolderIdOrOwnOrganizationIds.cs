@@ -9,10 +9,10 @@ namespace Core.DomainServices.Queries.ItSystem
         private readonly IEnumerable<int> _ownOrganizationIds;
         private readonly IEnumerable<int> _rightsHoldersOrganizationIds;
 
-        public QueryByRightsHolderIdOrOwnOrganizationIds(IEnumerable<int> organizationIds = default, IEnumerable<int> ownOrganizationIds = default)
+        public QueryByRightsHolderIdOrOwnOrganizationIds(IEnumerable<int>? organizationIds = null, IEnumerable<int>? ownOrganizationIds = null)
         {
-            _ownOrganizationIds = ownOrganizationIds?.ToList() ?? new List<int>();
-            _rightsHoldersOrganizationIds = organizationIds?.ToList() ?? new List<int>();
+            _ownOrganizationIds = ownOrganizationIds?.ToList() ?? [];
+            _rightsHoldersOrganizationIds = organizationIds?.ToList() ?? [];
 
             if (!_ownOrganizationIds.Any() && !_rightsHoldersOrganizationIds.Any())
                 throw new ArgumentException("No constraints provided - query will reject all input");

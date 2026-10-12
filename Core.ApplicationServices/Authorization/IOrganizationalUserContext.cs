@@ -17,5 +17,6 @@ namespace Core.ApplicationServices.Authorization
         bool HasRoleIn(int organizationId);
         bool HasRoleInSameOrganizationAs(IEntity entity);
         bool IsSystemIntegrator();
+        bool IsSupplierApiUserForOrganizationWithSuppliers(IEnumerable<int> supplierIds);
     }
 }

@@ -2,7 +2,7 @@
 {
     public class ApiReturnDTO<T>
     {
-        public string Msg { get; set; }
-        public T Response { get; set; }
+        public string? Msg { get; set; }
+        public required T Response { get; set; }
     }
 }

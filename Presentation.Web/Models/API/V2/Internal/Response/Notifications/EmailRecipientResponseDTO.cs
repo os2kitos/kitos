@@ -5,6 +5,6 @@
         /// <summary>
         /// Email of the recipient
         /// </summary>
-        public string Email { get; set; }
+        public required string Email { get; set; }
     }
 }

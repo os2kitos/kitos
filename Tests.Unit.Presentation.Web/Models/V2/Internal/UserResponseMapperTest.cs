@@ -75,6 +75,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2.Internal
             Assert.Equal(user.HasApiAccess, response.HasApiAccess);
             Assert.Equal(user.HasStakeHolderAccess, response.HasStakeHolderAccess);
             Assert.Equal(user.OrganizationRights.Select(x => x.Role.ToOrganizationRoleChoice()), response.Roles);
+            Assert.NotNull(response.DefaultOrganizationUnit);
             Assert.Equal(unit.Uuid, response.DefaultOrganizationUnit.Uuid);
             Assert.Equal(unit.Name, response.DefaultOrganizationUnit.Name);
         }

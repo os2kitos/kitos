@@ -1,32 +1,33 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Core.ApplicationServices.Authentication;
-using Microsoft.Owin;
-using Ninject;
+using Microsoft.AspNetCore.Http;
 using Serilog;
 
 namespace Presentation.Web.Infrastructure.Middleware
 {
-    public class DenyUsersWithoutApiAccessMiddleware : OwinMiddleware
+    public class DenyUsersWithoutApiAccessMiddleware : IMiddleware
     {
-        public DenyUsersWithoutApiAccessMiddleware(OwinMiddleware next) : base(next)
+        private readonly ILogger _logger;
+        private readonly IAuthenticationContext _authenticationContext;
+
+        public DenyUsersWithoutApiAccessMiddleware(ILogger logger, IAuthenticationContext authenticationContext)
         {
+            _logger = logger;
+            _authenticationContext = authenticationContext;
         }
 
-        public override async Task Invoke(IOwinContext context)
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var kernel = context.GetNinjectKernel();
-            var logger = kernel.Get<ILogger>();
-            var authenticationContext = kernel.Get<IAuthenticationContext>();
-            if (authenticationContext.Method == AuthenticationMethod.KitosToken && !authenticationContext.HasApiAccess)
+            if (_authenticationContext.Method == AuthenticationMethod.KitosToken && !_authenticationContext.HasApiAccess)
             {
-                logger.Warning("User with id: {userID} made an API call without having API access",
-                    authenticationContext.UserId);
+                _logger.Warning("User with id: {userID} made an API call without having API access",
+                    _authenticationContext.UserId);
                 context.Response.StatusCode = 403;
-                context.Response.Write("Du har ikke tilladelse til at kalde API endpoints");
+                await context.Response.WriteAsync("Du har ikke tilladelse til at kalde API endpoints");
             }
             else
             {
-                await Next.Invoke(context);
+                await next(context);
             }
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Models.API.V2.Internal.Response.User
@@ -15,6 +16,7 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.User
         {
         }
 
+        [SetsRequiredMembers]
         public UserReferenceResponseDTO(Guid uuid, string name, string email)
             : base(uuid, name)
         {
@@ -22,6 +24,6 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.User
         }
 
         [Required]
-        public string Email { get; set; }
+        public required string Email { get; set; }
     }
 }

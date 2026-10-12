@@ -35,20 +35,17 @@ namespace Core.DomainServices.Repositories.KLE
             IGenericRepository<ItSystemUsage> systemUsageRepository,
             IOperationClock clock,
             ILogger logger,
-            IDomainEvents domainEvents) : this(new KLEParentHelper(), new KLEConverterHelper(clock))
+            IDomainEvents domainEvents)
         {
+
+            _kleParentHelper = new KLEParentHelper();
+            _kleConverterHelper = new KLEConverterHelper(clock);
             _kleDataBridge = kleDataBridge;
             _transactionManager = transactionManager;
             _existingTaskRefRepository = existingTaskRefRepository;
             _systemUsageRepository = systemUsageRepository;
             _logger = logger;
             _domainEvents = domainEvents;
-        }
-
-        private KLEStandardRepository(IKLEParentHelper kleParentHelper, IKLEConverterHelper kleConverterHelper)
-        {
-            _kleParentHelper = kleParentHelper;
-            _kleConverterHelper = kleConverterHelper;
         }
 
         public KLEStatus GetKLEStatus(Maybe<DateTime> lastUpdated)

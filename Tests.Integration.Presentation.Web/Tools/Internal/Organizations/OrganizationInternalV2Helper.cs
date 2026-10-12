@@ -42,14 +42,14 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
         }
 
         public static async Task<OrganizationResponseDTO> CreateOrganization(OrganizationCreateRequestDTO dto,
-            Cookie cookie = null)
+            Cookie? cookie = null)
         {
             using var response = await SendCreateOrganization(dto, cookie);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<OrganizationResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendCreateOrganization(OrganizationCreateRequestDTO dto, Cookie cookie = null)
+        public static async Task<HttpResponseMessage> SendCreateOrganization(OrganizationCreateRequestDTO dto, Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"{ApiPrefix}/create");
@@ -82,7 +82,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
             return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/{UiCustomizationSuffix}/{moduleName}"), cookie);
         }
 
-        public static async Task<HttpResponseMessage> PutUIModuleCustomization(Guid organizationUuid, string moduleName, UIModuleCustomizationRequestDTO dto, Cookie cookie = null)
+        public static async Task<HttpResponseMessage> PutUIModuleCustomization(Guid organizationUuid, string moduleName, UIModuleCustomizationRequestDTO dto, Cookie? cookie = null)
         {
             cookie ??= await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.PutWithCookieAsync(TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/{UiCustomizationSuffix}/{moduleName}"), cookie, dto);
@@ -100,6 +100,13 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Organizations
             var cookie = await HttpApi.GetCookieAsync(role);
             var url = TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/delete?enforceDeletion={enforceDeletion}");
             return await HttpApi.DeleteWithCookieAsync(url, cookie);
+        }
+
+        public static async Task<HttpResponseMessage> ChangeOrganizationDisabledState(Guid organizationUuid, bool disabled)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"{ApiPrefix}/{organizationUuid}/disabled-status");
+            return await HttpApi.PatchWithCookieAsync(url, cookie, new OrganizationDisabledStatusRequestDTO{ Disabled = disabled});
         }
     }
 }

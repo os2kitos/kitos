@@ -1,7 +1,5 @@
-﻿using System;
+using System;
 using System.Net;
-using System.Net.Http;
-using System.Web.Http;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Model.Authentication.Commands;
 using Core.DomainModel;
@@ -9,7 +7,8 @@ using Core.DomainModel.Commands;
 using Core.DomainModel.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
-using Swashbuckle.Swagger.Annotations;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using AuthenticationScheme = Core.DomainModel.Users.AuthenticationScheme;
 
 namespace Presentation.Web.Controllers.API.V1.Auth
@@ -40,12 +39,9 @@ namespace Presentation.Web.Controllers.API.V1.Auth
         [HttpPost]
         [AllowAnonymous]
         [Route("api/authorize/GetToken")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<GetTokenResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
         [IgnoreCSRFProtection]
         [AllowRightsHoldersAccess]
-        public HttpResponseMessage GetToken(UserCredentialsDTO loginDto)
+        public IActionResult GetToken([FromBody] UserCredentialsDTO loginDto)
         {
             if (!ModelState.IsValid)
             {
@@ -73,15 +69,18 @@ namespace Presentation.Web.Controllers.API.V1.Auth
                     Expires = token.Expiration
                 };
 
-                Logger.Info($"Created token for user with Id {user.Id}");
+                Logger?.Information($"Created token for user with Id {user.Id}");
 
                 return Ok(response);
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Failed to create token");
+                Logger?.Error(e, "Failed to create token");
                 return LogError(e);
             }
         }
     }
 }
+
+
+

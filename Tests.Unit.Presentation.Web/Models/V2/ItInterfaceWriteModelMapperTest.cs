@@ -39,12 +39,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         [Theory]
         [InlineData("")]
-        [InlineData(null)]
         [InlineData("test")]
         public void Can_Map_Name_From_RightsHolder_Post(string name)
         {
             //Arrange
-            var requestDto = new RightsHolderCreateItInterfaceRequestDTO() { Name = name };
+            var requestDto = new RightsHolderCreateItInterfaceRequestDTO()
+            {
+                Name = name,
+                Description = A<string>(),
+                UrlReference = A<string>()
+            };
 
             //Act
             var modificationParameters = _sut.FromPOST(requestDto);
@@ -55,12 +59,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         [Theory]
         [InlineData("")]
-        [InlineData(null)]
         [InlineData("test")]
         public void Can_Map_Name_From_RightsHolder_Put(string name)
         {
             //Arrange
-            var requestDto = new RightsHolderWritableItInterfacePropertiesDTO() { Name = name };
+            var requestDto = new RightsHolderWritableItInterfacePropertiesDTO()
+            {
+                Name = name,
+                Description = A<string>(),
+                UrlReference = A<string>()
+            };
 
             //Act
             var modificationParameters = _sut.FromPUT(requestDto);
@@ -70,12 +78,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
         [Theory]
         [InlineData("")]
-        [InlineData(null)]
         [InlineData("test")]
         public void Can_Map_Name_From_RightsHolder_Patch(string name)
         {
             //Arrange
-            var requestDto = new RightsHolderPartialUpdateItInterfaceRequestDTO() { Name = name };
+            var requestDto = new RightsHolderPartialUpdateItInterfaceRequestDTO()
+            {
+                Name = name,
+                Description = A<string>(),
+                UrlReference = A<string>()
+            };
 
             //Act
             var modificationParameters = _sut.FromPATCH(requestDto);
@@ -108,7 +120,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noDescription) rootProperties.Remove(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Description));
             if (noUrlReference) rootProperties.Remove(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.UrlReference));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(rootProperties);
-            var emptyInput = new RightsHolderPartialUpdateItInterfaceRequestDTO();
+            var emptyInput = new RightsHolderPartialUpdateItInterfaceRequestDTO
+            {
+                Name = string.Empty,
+                Description = string.Empty,
+                UrlReference = string.Empty
+            };
 
             //Act
             var output = _sut.FromPATCH(emptyInput);
@@ -141,7 +158,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noDescription) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.Description));
             if (noUrlReference) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.UrlReference));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(rootProperties);
-            var emptyInput = new RightsHolderWritableItInterfacePropertiesDTO();
+            var emptyInput = new RightsHolderWritableItInterfacePropertiesDTO
+            {
+                Name = A<string>(),
+                Description = A<string>(),
+                UrlReference = A<string>()
+            };
 
             //Act
             var output = _sut.FromPUT(emptyInput);
@@ -174,7 +196,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noDescription) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.Description));
             if (noUrlReference) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.UrlReference));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(rootProperties);
-            var input = new RightsHolderCreateItInterfaceRequestDTO();
+            var input = new RightsHolderCreateItInterfaceRequestDTO
+            {
+                Name = A<string>(),
+                Description = A<string>(),
+                UrlReference = A<string>()
+            };
 
             //Act
             var output = _sut.FromPOST(input);
@@ -195,7 +222,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Arrange
             var input = new RightsHolderCreateItInterfaceRequestDTO
             {
-                Uuid = A<Guid>()
+                Uuid = A<Guid>(),
+                Name = A<string>(),
+                Description = A<string>(),
+                UrlReference = A<string>()
             };
 
             //Act
@@ -225,7 +255,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(requestDto.InterfaceId, AssertPropertyContainsDataChange(modificationParameters.InterfaceId));
             Assert.Equal(requestDto.UrlReference, AssertPropertyContainsDataChange(modificationParameters.UrlReference));
             Assert.Equal(requestDto.Version, AssertPropertyContainsDataChange(modificationParameters.Version));
-            Assert.Equivalent(requestDto.Data.Select(x => new ItInterfaceDataWriteModel(x.Description, x.DataTypeUuid)), AssertPropertyContainsDataChange(modificationParameters.Data));
+            Assert.Equivalent(requestDto.Data!.Select(x => new ItInterfaceDataWriteModel(x.Description!, x.DataTypeUuid)), AssertPropertyContainsDataChange(modificationParameters.Data));
         }
 
         [Fact]
@@ -248,7 +278,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(requestDto.InterfaceId, AssertPropertyContainsDataChange(modificationParameters.InterfaceId));
             Assert.Equal(requestDto.UrlReference, AssertPropertyContainsDataChange(modificationParameters.UrlReference));
             Assert.Equal(requestDto.Version, AssertPropertyContainsDataChange(modificationParameters.Version));
-            Assert.Equivalent(requestDto.Data.Select(x => new ItInterfaceDataWriteModel(x.Description, x.DataTypeUuid)), AssertPropertyContainsDataChange(modificationParameters.Data));
+            Assert.Equivalent(requestDto.Data!.Select(x => new ItInterfaceDataWriteModel(x.Description!, x.DataTypeUuid)), AssertPropertyContainsDataChange(modificationParameters.Data));
         }
 
         public static IEnumerable<object[]> GetUndefinedSectionsInput()
@@ -285,7 +315,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noScope) rootProperties.Remove(nameof(UpdateItInterfaceRequestDTO.Scope));
             if (noDeactivated) rootProperties.Remove(nameof(UpdateItInterfaceRequestDTO.Deactivated));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(rootProperties);
-            var emptyInput = new UpdateItInterfaceRequestDTO();
+            var emptyInput = new UpdateItInterfaceRequestDTO
+            {
+                Name = string.Empty,
+                Description = string.Empty,
+                UrlReference = string.Empty
+            };
 
             //Act
             var output = _sut.FromPATCH(emptyInput);
@@ -333,7 +368,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noScope) rootProperties.Remove(nameof(UpdateItInterfaceRequestDTO.Scope));
             if (noDeactivated) rootProperties.Remove(nameof(UpdateItInterfaceRequestDTO.Deactivated));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(rootProperties);
-            var emptyInput = new CreateItInterfaceRequestDTO();
+            var emptyInput = new CreateItInterfaceRequestDTO
+            {
+                Name = string.Empty,
+                Description = string.Empty,
+                UrlReference = string.Empty
+            };
 
             //Act
             var output = _sut.FromPOST(emptyInput);

@@ -13,11 +13,11 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// Inherited KLE which have been removed locally
         /// </summary>
         [Required]
-        public IEnumerable<IdentityNamePairResponseDTO> RemovedKLE { get; set; }
+        public required IEnumerable<IdentityNamePairResponseDTO> RemovedKLE { get; set; }
         /// <summary>
         /// KLE which has been added locally
         /// </summary>
         [Required]
-        public IEnumerable<IdentityNamePairResponseDTO> AddedKLE { get; set; }
+        public required IEnumerable<IdentityNamePairResponseDTO> AddedKLE { get; set; }
     }
 }

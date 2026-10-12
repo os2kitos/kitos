@@ -1,7 +1,7 @@
-﻿using System.Net;
-using System.Net.Http;
-using System.Web.Http;
+using System.Net;
 using Core.Abstractions.Types;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 
@@ -9,31 +9,29 @@ namespace Presentation.Web.Controllers.API.V2.Common
 {
     [Authorize]
     [V2StyleJsonResponseSerialization]
-    public abstract class ApiV2Controller : ApiController
+    public abstract class ApiV2Controller : ControllerBase
     {
-        protected IHttpActionResult FromOperationFailure(OperationFailure failure)
+        protected IActionResult FromOperationFailure(OperationFailure failure)
         {
             return FromOperationError(failure);
         }
 
-        protected IHttpActionResult FromOperationError(OperationError failure)
+        protected IActionResult FromOperationError(OperationError failure)
         {
             var statusCode = failure.FailureType.ToHttpStatusCode();
-
-            return ResponseMessage(new HttpResponseMessage(statusCode) { Content = new StringContent(failure.Message.GetValueOrFallback(statusCode.ToString("G"))) });
+            var message = failure.Message.GetValueOrFallback(((HttpStatusCode)statusCode).ToString("G"));
+            return StatusCode((int)statusCode, message);
         }
 
-        protected IHttpActionResult NoContent()
+        protected new IActionResult NoContent()
         {
-            return StatusCode(HttpStatusCode.NoContent);
+            return base.NoContent();
         }
 
         /// <summary>
         /// Convenience wrapper for <see cref="NoContent()"/>
         /// </summary>
-        /// <param name="ignored"></param>
-        /// <returns></returns>
-        protected IHttpActionResult NoContent(object ignored)
+        protected IActionResult NoContent(object ignored)
         {
             return NoContent();
         }

@@ -86,7 +86,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         }
 
 
-        private DataProcessingRegistration CreateDpa(DataProcessingDataResponsibleOption dataResponsible = null)
+        private DataProcessingRegistration CreateDpa(DataProcessingDataResponsibleOption? dataResponsible = null)
         {
             var registration = new DataProcessingRegistration
             {

@@ -9,6 +9,6 @@ namespace Digst.OioIdws.Common.Logging
     /// </summary>
     public interface ILogger
     {
-        void WriteCore(TraceEventType eventType, int eventId, object state, Exception exception, Func<object, Exception, string> formatter);
+        void WriteCore(TraceEventType eventType, int eventId, object state, Exception? exception, Func<object, Exception, string> formatter);
     }
 }

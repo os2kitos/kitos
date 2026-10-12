@@ -7,14 +7,14 @@ namespace Infrastructure.DataAccess.Extensions
 {
     public class EntityPropertyProxyValueLoader<T>
     {
-        private readonly Lazy<IReadOnlyList<MethodInfo>> _entityTypeVirtualGetters =
+        private readonly Lazy<IReadOnlyList<MethodInfo?>> _entityTypeVirtualGetters =
             new(
                 () =>
                     typeof(T)
                         .GetProperties()
                         .Where(property => property.CanRead)
                         .Select(property => property.GetMethod)
-                        .Where(getMethod => getMethod.IsVirtual && getMethod.IsPublic)
+                        .Where(getMethod => getMethod?.IsVirtual == true && getMethod.IsPublic)
                         .ToList()
                         .AsReadOnly()
             );
@@ -22,9 +22,9 @@ namespace Infrastructure.DataAccess.Extensions
         public T LoadReferencedEntities(T entity)
         {
             //Invoke getters of all reference properties. This solves the issue of EF not cascading on optional foreign keys in reference objects which may reference either one or many of the different root elements. Example: TaskRef
-            _entityTypeVirtualGetters
+            _ = _entityTypeVirtualGetters
                 .Value
-                .Select(methodInfo => methodInfo.Invoke(entity, new object[0]))
+                .Select(methodInfo => methodInfo?.Invoke(entity, new object[0]))
                 .ToList();
             return entity;
         }

@@ -100,7 +100,13 @@ namespace Tests.Unit.Core.BackgroundJobs
             dynamic bodyArgument = body.Arguments[0];
             ConstantExpression arg = bodyArgument.Expression;
             var actualOrgId = arg.Value;
-            var actualUuid = (Guid)actualOrgId.GetType().GetField("uuid").GetValue(actualOrgId);
+            if(actualOrgId == null)
+                return false;
+            var actualOrgFieldInfo = actualOrgId.GetType().GetField("uuid");
+            if (actualOrgFieldInfo == null)
+                return false;
+
+            var actualUuid = (Guid)(actualOrgFieldInfo.GetValue(actualOrgId) ?? Guid.Empty);
 
             return actualUuid == expectedResult1.Uuid;
         }

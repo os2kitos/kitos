@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Core.Abstractions.Extensions;
+﻿using Core.Abstractions.Extensions;
+using Core.Abstractions.Helpers;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
@@ -21,6 +20,9 @@ using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -41,6 +43,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IGenericRepository<ArchivePeriod>> _archivePeriodRepositoryMock;
         private readonly Mock<IGenericRepository<ItSystemUsagePersonalData>> _personalDataOptionsRepository;
         private readonly Mock<IOrganizationService> _organizationService;
+        private readonly Mock<IFieldAuthorizationModel> _fieldAuthorizationModelMock;
 
         public ItSystemUsageServiceTest()
         {
@@ -55,6 +58,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _archivePeriodRepositoryMock = new Mock<IGenericRepository<ArchivePeriod>>();
             _personalDataOptionsRepository = new Mock<IGenericRepository<ItSystemUsagePersonalData>>();
             _organizationService = new Mock<IOrganizationService>();
+            _fieldAuthorizationModelMock = new Mock<IFieldAuthorizationModel>();
             _sut = new ItSystemUsageService(
                 _usageRepository.Object,
                 _authorizationContext.Object,
@@ -67,7 +71,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 new Mock<IItSystemUsageAttachedOptionRepository>().Object,
                 _archivePeriodRepositoryMock.Object,
                 _personalDataOptionsRepository.Object,
-                _organizationService.Object);
+                _organizationService.Object,
+                _fieldAuthorizationModelMock.Object);
         }
 
         [Fact]
@@ -139,7 +144,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectAllowReadReturns(itSystemUsage, true);
 
             //Act
-            var result = _sut.GetReadableItSystemUsageByUuid(uuid);
+            var result = _sut.GetItSystemUsageByUuidAndAuthorizeRead(uuid);
 
             //Assert
             Assert.True(result.Ok);
@@ -155,7 +160,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectUsageRepositoryAsQueryable(itSystemUsage);
 
             //Act
-            var result = _sut.GetReadableItSystemUsageByUuid(uuid);
+            var result = _sut.GetItSystemUsageByUuidAndAuthorizeRead(uuid);
 
             //Assert
             Assert.True(result.Failed);
@@ -172,7 +177,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectAllowReadReturns(itSystemUsage, false);
 
             //Act
-            var result = _sut.GetReadableItSystemUsageByUuid(uuid);
+            var result = _sut.GetItSystemUsageByUuidAndAuthorizeRead(uuid);
 
             //Assert
             Assert.True(result.Failed);
@@ -356,28 +361,27 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Fact]
-        public void Delete_Returns_Ok()
+        public void Delete_CanDelete_WithPopulatedUsedBy()
         {
-            //Arrange
-            var id = A<int>();
-            var itSystemUsage = new ItSystemUsage();
-            var transaction = new Mock<IDatabaseTransaction>();
-            ExpectGetUsageByKeyReturns(id, itSystemUsage);
-            _authorizationContext.Setup(x => x.AllowDelete(itSystemUsage)).Returns(true);
-            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
-            _referenceService.Setup(x => x.DeleteBySystemUsageId(id)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
+            var (itSystemUsage, id, transaction) = SetupDeleteSuccess();
+            itSystemUsage.UsedBy = new List<ItSystemUsageOrgUnitUsage>()
+            {
+                new ItSystemUsageOrgUnitUsage()
+            };
 
-            //Act
             var result = _sut.Delete(id);
 
-            //Assert
-            Assert.True(result.Ok);
-            Assert.Same(itSystemUsage, result.Value);
-            _usageRepository.Verify(x => x.DeleteByKeyWithReferencePreload(id), Times.Once);
-            _usageRepository.Verify(x => x.Save(), Times.Once);
-            _referenceService.Verify(x => x.DeleteBySystemUsageId(id), Times.Once);
-            transaction.Verify(x => x.Commit(), Times.Once);
-            _domainEvents.Verify(x => x.Raise(It.Is<EntityLifeCycleEvent<ItSystemUsage>>(ev => ev.Entity == itSystemUsage && ev.ChangeType == LifeCycleEventType.Deleting)));
+            AssertDeleteSuccess(result, itSystemUsage, transaction, id);
+        }
+
+        [Fact]
+        public void Delete_Returns_Ok()
+        {
+            var (itSystemUsage, id, transaction) = SetupDeleteSuccess();
+
+            var result = _sut.Delete(id);
+
+            AssertDeleteSuccess(result, itSystemUsage, transaction, id);
         }
 
         [Fact]
@@ -1207,10 +1211,31 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var uuid = A<Guid>();
-            var itSystemUsage = new ItSystemUsage { Uuid = uuid };
+            var orgUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage 
+            { 
+                Uuid = uuid,
+                Organization = new Organization { Id = A<int>(), Uuid = orgUuid } 
+            };
+            var aiFieldKey =
+                ObjectHelper.GetPropertyPath<ItSystemUsage>(x =>
+                    x.ContainsAITechnology);
+            var criticalityFieldKey =
+                ObjectHelper.GetPropertyPath<ItSystemUsage>(x =>
+                    x.SystemUsageCriticalityLevel);
+            var riskFieldKey =
+                ObjectHelper.GetPropertyPath<ItSystemUsage>(x =>
+                    x.preriskAssessment);
+            var isAiFieldEnabled = A<bool>();
+            var isCriticalityFieldEnabled = A<bool>();
+            var isRiskFieldEnabled = A<bool>();
+
             ExpectUsageRepositoryAsQueryable(itSystemUsage);
             ExpectAllowReadReturns(itSystemUsage, read);
             ExpectAllowModifyReturns(itSystemUsage, modify);
+            ExpectGetFieldPermissionsReturns(itSystemUsage, aiFieldKey, isAiFieldEnabled);
+            ExpectGetFieldPermissionsReturns(itSystemUsage, criticalityFieldKey, isCriticalityFieldEnabled);
+            ExpectGetFieldPermissionsReturns(itSystemUsage, riskFieldKey, isRiskFieldEnabled);
             _authorizationContext.Setup(x => x.AllowDelete(itSystemUsage)).Returns(delete);
 
             //Act
@@ -1219,7 +1244,34 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(result.Ok);
             var permissions = result.Value;
-            Assert.Equivalent(new ResourcePermissionsResult(read, modify, delete), permissions);
+
+            if (!permissions.BasePermissions.Read)
+            {
+                Assert.Empty(permissions.FieldPermissions.Fields);
+                return;
+            }
+
+            Assert.Equivalent(new CombinedPermissionsResult(new ResourcePermissionsResult(read, modify, delete), new ModuleFieldsPermissionsResult
+            {
+                Fields = new List<FieldPermissionsResult>
+                {
+                    new()
+                    {
+                        Enabled = isAiFieldEnabled,
+                        Key = aiFieldKey
+                    },
+                    new()
+                    {
+                        Enabled = isRiskFieldEnabled,
+                        Key = riskFieldKey
+                    },
+                    new()
+                    {
+                        Enabled = isCriticalityFieldEnabled,
+                        Key = criticalityFieldKey
+                    }
+                }
+            }), permissions);
         }
 
         [Fact]
@@ -1367,13 +1419,13 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             return itSystemUsage;
         }
 
-        private void SetupRepositoryQueryWith(IEnumerable<ItSystemUsage> response = null)
+        private void SetupRepositoryQueryWith(IEnumerable<ItSystemUsage>? response = null)
         {
             response = response ?? new ItSystemUsage[0];
             _usageRepository.Setup(x => x.AsQueryable()).Returns(response.AsQueryable());
         }
 
-        private void ExpectGetUsageByKeyReturns(int id, ItSystemUsage itSystemUsage)
+        private void ExpectGetUsageByKeyReturns(int id, ItSystemUsage? itSystemUsage)
         {
             _usageRepository.Setup(x => x.GetByKey(id)).Returns(itSystemUsage);
         }
@@ -1381,6 +1433,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private void ExpectAllowModifyReturns(ItSystemUsage source, bool value)
         {
             _authorizationContext.Setup(x => x.AllowModify(source)).Returns(value);
+        }
+
+        private void ExpectGetFieldPermissionsReturns(ItSystemUsage source, string key, bool result)
+        {
+            _fieldAuthorizationModelMock.Setup(x => x.GetFieldPermissions(source, key, It.IsAny<Guid>())).Returns(new FieldPermissionsResult { Enabled = result, Key = key });
         }
 
         private void ExpectAllowCreateReturns(int orgId, bool value)
@@ -1439,6 +1496,29 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
+        }
+
+        private (ItSystemUsage itSystemUsage, int id, Mock<IDatabaseTransaction> transaction) SetupDeleteSuccess()
+        {
+            var id = A<int>();
+            var itSystemUsage = new ItSystemUsage();
+            var transaction = new Mock<IDatabaseTransaction>();
+            ExpectGetUsageByKeyReturns(id, itSystemUsage);
+            _authorizationContext.Setup(x => x.AllowDelete(itSystemUsage)).Returns(true);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+            _referenceService.Setup(x => x.DeleteBySystemUsageId(id)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
+            return (itSystemUsage, id, transaction);
+        }
+
+        private void AssertDeleteSuccess(Result<ItSystemUsage, OperationError> result, ItSystemUsage expected, Mock<IDatabaseTransaction> transaction, int id)
+        {
+            Assert.True(result.Ok);
+            Assert.Same(expected, result.Value);
+            _usageRepository.Verify(x => x.DeleteByKeyWithReferencePreload(id), Times.Once);
+            _usageRepository.Verify(x => x.Save(), Times.Once);
+            _referenceService.Verify(x => x.DeleteBySystemUsageId(id), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Once);
+            _domainEvents.Verify(x => x.Raise(It.Is<EntityLifeCycleEvent<ItSystemUsage>>(ev => ev.Entity == expected && ev.ChangeType == LifeCycleEventType.Deleting)));
         }
 
         private void VerifyChangesNotSaved(Mock<IDatabaseTransaction> transaction, bool expectRollback = true)

@@ -134,16 +134,17 @@ namespace Core.DomainServices.Extensions
             return new QueryByIds<T>(ids).Apply(result);
         }
 
-        public static T ById<T>(this IQueryable<T> result, int id) where T :
+        public static T? ById<T>(this IQueryable<T> result, int id) where T :
             class, IHasId
         {
             return new QueryById<T>(id).Apply(result).SingleOrDefault();
         }
 
-        public static T ByUuid<T>(this IQueryable<T> result, Guid id) where T :
+        public static T? ByUuid<T>(this IQueryable<T> result, Guid id) where T :
             class, IHasUuid
         {
-            return new QueryByUuid<T>(id).Apply(result).SingleOrDefault();
+            var x = new QueryByUuid<T>(id).Apply(result).SingleOrDefault();
+            return x;
         }
     }
 }

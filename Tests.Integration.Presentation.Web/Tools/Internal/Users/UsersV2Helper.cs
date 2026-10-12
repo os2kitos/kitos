@@ -17,7 +17,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
 {
     public static class UsersV2Helper
     {
-        public static async Task<UserResponseDTO> CreateUser(Guid organizationUuid, CreateUserRequestDTO request, Cookie cookie = null)
+        public static async Task<UserResponseDTO> CreateUser(Guid organizationUuid, CreateUserRequestDTO request, Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             using var response = await HttpApi.PostWithCookieAsync(
@@ -30,7 +30,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
         }
 
         public static async Task<UserResponseDTO> UpdateUser(Guid organizationUuid, Guid userUuid,
-            object request, Cookie cookie = null)
+            object request, Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             using var response = await HttpApi.PatchWithCookieAsync(
@@ -43,14 +43,14 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
         }
 
         public static async Task<HttpResponseMessage> SendNotification(Guid organizationUuid, Guid userUuid,
-            Cookie cookie = null)
+            Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"{ControllerPrefix(organizationUuid)}/{userUuid}/notifications/send");
             return await HttpApi.PostWithCookieAsync(url, requestCookie, null);
         }
 
-        public static async Task<HttpStatusCode> DeleteUserAndVerifyStatusCode(Guid organizationUuid, Guid userUuid, Cookie cookie = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
+        public static async Task<HttpStatusCode> DeleteUserAndVerifyStatusCode(Guid organizationUuid, Guid userUuid, Cookie? cookie = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl(
@@ -63,7 +63,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return statusCode;
         }
 
-        public static async Task DeleteUserGlobally(Guid userUuid, Cookie cookie = null)
+        public static async Task DeleteUserGlobally(Guid userUuid, Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl(
@@ -74,7 +74,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        public static async Task<UserCollectionPermissionsResponseDTO> GetUserCollectionPermissions(Guid organizationUuid, Cookie cookie = null)
+        public static async Task<UserCollectionPermissionsResponseDTO> GetUserCollectionPermissions(Guid organizationUuid, Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             using var response = await HttpApi.GetWithCookieAsync(
@@ -86,7 +86,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return await response.ReadResponseBodyAsAsync<UserCollectionPermissionsResponseDTO>();
         }
 
-        public static async Task<UserIsPartOfCurrentOrgResponseDTO> GetUserByEmail(Guid organizationUuid, string email, Cookie cookie = null)
+        public static async Task<UserIsPartOfCurrentOrgResponseDTO> GetUserByEmail(Guid organizationUuid, string email, Cookie? cookie = null)
         {
             using var response = await SendGetUserByEmail(organizationUuid, email, cookie);
 
@@ -95,7 +95,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return await response.ReadResponseBodyAsAsync<UserIsPartOfCurrentOrgResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetUserByEmail(Guid organizationUuid, string email, Cookie cookie = null)
+        public static async Task<HttpResponseMessage> SendGetUserByEmail(Guid organizationUuid, string email, Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.GetWithCookieAsync(
@@ -169,7 +169,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return await HttpApi.PostWithCookieAsync(url, cookie, null);
         }
 
-        public static async Task<HttpResponseMessage> RemoveGlobalAdmin(Guid userUuid, Cookie cookie = null)
+        public static async Task<HttpResponseMessage> RemoveGlobalAdmin(Guid userUuid, Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"{GlobalUserControllerPrefix()}/global-admins/{userUuid}");
@@ -247,7 +247,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             return await response.ReadResponseBodyAsAsync<IdentityNamePairResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> PatchUserAsync(Guid organizationUuid, Guid userUuid, Cookie cookie = null, params KeyValuePair<string, object>[] kvpPairs)
+        public static async Task<HttpResponseMessage> PatchUserAsync(Guid organizationUuid, Guid userUuid, Cookie? cookie = null, params KeyValuePair<string, object>[] kvpPairs)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"{ControllerPrefix(organizationUuid)}/{userUuid}/patch");
@@ -258,14 +258,14 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.Users
             Guid organizationUuid,
             Guid userUuid,
             Expression<Func<UpdateUserRequestDTO, T>> propertySelector,
-            T value, Cookie cookie = null)
+            T value, Cookie? cookie = null)
         {
             if (!(propertySelector.Body is MemberExpression m))
                 throw new ArgumentException("Selector must be a simple member access", nameof(propertySelector));
 
             var propertyName = m.Member.Name;
-            var kvp = new KeyValuePair<string, object>(propertyName, value);
-            return await PatchUserAsync(organizationUuid, userUuid, cookie, kvp);
+            var kvp = new KeyValuePair<string, object>(propertyName, value!);
+            return await PatchUserAsync(organizationUuid, userUuid, cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin), kvp);
         }
 
         private static string ControllerPrefix(Guid organizationUuid)

@@ -1,8 +1,5 @@
-﻿using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Core.Abstractions.Types;
-using Infrastructure.STS.Common.Model.Token;
 using Kombit.InfrastructureSamples.AdresseService;
 using Kombit.InfrastructureSamples.BrugerService;
 using Kombit.InfrastructureSamples.PersonService;
@@ -16,35 +13,27 @@ namespace Core.DomainServices.SSO
 
         public static Result<BrugerPortType, string> CreateBrugerPort(TokenFetcher tokenFetcher, StsOrganisationIntegrationConfiguration configuration, string cvrNumber)
         {
-            return ChannelWithIssuedToken(tokenFetcher, configuration, new BrugerPortTypeClient(), cvrNumber);
+            return ChannelWithIssuedToken<BrugerPortType>(tokenFetcher, configuration,
+                configuration.BrugerServiceUrl, cvrNumber);
         }
 
-        public static Result<AdressePortType,string> CreateAdressePort(TokenFetcher tokenFetcher, StsOrganisationIntegrationConfiguration configuration, string cvrNumber)
+        public static Result<AdressePortType, string> CreateAdressePort(TokenFetcher tokenFetcher, StsOrganisationIntegrationConfiguration configuration, string cvrNumber)
         {
-            return ChannelWithIssuedToken(tokenFetcher, configuration, new AdressePortTypeClient(), cvrNumber);
+            return ChannelWithIssuedToken<AdressePortType>(tokenFetcher, configuration,
+                configuration.AdresseServiceUrl, cvrNumber);
         }
 
-        public static Result<PersonPortType,string> CreatePersonPort(TokenFetcher tokenFetcher, StsOrganisationIntegrationConfiguration configuration, string cvrNumber)
+        public static Result<PersonPortType, string> CreatePersonPort(TokenFetcher tokenFetcher, StsOrganisationIntegrationConfiguration configuration, string cvrNumber)
         {
-            return ChannelWithIssuedToken(tokenFetcher, configuration, new PersonPortTypeClient(), cvrNumber);
+            return ChannelWithIssuedToken<PersonPortType>(tokenFetcher, configuration,
+                configuration.PersonServiceUrl, cvrNumber);
         }
 
-        private static Result<T, string> ChannelWithIssuedToken<T>(TokenFetcher tokenFetcher, StsOrganisationIntegrationConfiguration configuration, ClientBase<T> client, string cvrNumber) where T: class
+        private static Result<T, string> ChannelWithIssuedToken<T>(TokenFetcher tokenFetcher, StsOrganisationIntegrationConfiguration configuration, string serviceEndpointUrl, string cvrNumber) where T : class
         {
             try
             {
-                var token = tokenFetcher.IssueToken(configuration.OrgService6EntityId, cvrNumber);
-                var identity = EndpointIdentity.CreateDnsIdentity(configuration.ServiceCertificateAliasOrg);
-                var endpointAddress = new EndpointAddress(client.Endpoint.ListenUri, identity);
-                client.Endpoint.Address = endpointAddress;
-                var certificate = CertificateLoader.LoadCertificate(
-                    StoreName.My,
-                    StoreLocation.LocalMachine, configuration.ClientCertificateThumbprint
-                );
-                client.ClientCredentials.ClientCertificate.Certificate = certificate;
-                client.Endpoint.Contract.ProtectionLevel = ProtectionLevel.None;
-
-                return client.ChannelFactory.CreateChannelWithIssuedToken(token);
+                return tokenFetcher.CreateChannel<T>(configuration.OrgService6EntityId, serviceEndpointUrl, cvrNumber);
             }
             catch (FaultException e)
             {

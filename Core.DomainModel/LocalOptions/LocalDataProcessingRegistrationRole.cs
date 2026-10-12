@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.LocalOptions
 {
-    public class LocalDataProcessingRegistrationRole : LocalOptionEntity<DataProcessingRegistrationRole>
+    public class LocalDataProcessingRegistrationRole : LocalRoleOptionEntity<DataProcessingRegistrationRole>
     {
     }
 }

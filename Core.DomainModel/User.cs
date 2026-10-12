@@ -35,7 +35,10 @@ namespace Core.DomainModel
             Uuid = Guid.NewGuid();
             DataProcessingRegistrationRights = new List<DataProcessingRegistrationRight>();
             StsOrganizationChangeLogs = new List<StsOrganizationChangeLog>();
+           CreatedAt = DateTime.UtcNow;
         }
+        public DateTime? CreatedAt { get; init;  }
+        public DateTime? LastLogin { get; set; }
 
         public string Name { get; set; }
         public string LastName { get; set; }

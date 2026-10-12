@@ -1,26 +1,25 @@
-﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.KendoConfig;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class KendoOrganizationalConfigurationMap : EntityTypeConfiguration<KendoOrganizationalConfiguration>
+    public class KendoOrganizationalConfigurationMap : IEntityTypeConfiguration<KendoOrganizationalConfiguration>
     {
-        public KendoOrganizationalConfigurationMap()
+        public void Configure(EntityTypeBuilder<KendoOrganizationalConfiguration> builder)
         {
-            
-            Property(x => x.OverviewType)
+            builder.Property(x => x.OverviewType).IsRequired();
+            builder.HasIndex(x => x.OverviewType).HasDatabaseName("KendoOrganizationalConfiguration_OverviewType");
+
+            builder.Property(x => x.Version).IsRequired();
+
+            builder.Property(x => x.OrganizationId).IsRequired();
+
+            builder.HasMany(x => x.VisibleColumns)
+                .WithOne(x => x.KendoOrganizationalConfiguration)
+                .HasForeignKey(x => x.KendoOrganizationalConfigurationId)
                 .IsRequired()
-                .HasIndexAnnotation("KendoOrganizationalConfiguration_OverviewType", 0);
-
-            Property(x => x.Version)
-                .IsRequired();
-
-            Property(x => x.OrganizationId)
-                .IsRequired();
-
-            HasMany(x => x.VisibleColumns)
-                .WithRequired(x => x.KendoOrganizationalConfiguration)
-                .HasForeignKey(x => x.KendoOrganizationalConfigurationId);
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

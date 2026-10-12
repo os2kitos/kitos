@@ -19,6 +19,6 @@ namespace Core.ApplicationServices
 
     public class ExcelImportException : Exception
     {
-        public IEnumerable<ExcelImportError> Errors { get; set; }
+        public required IEnumerable<ExcelImportError> Errors { get; set; }
     }
 }

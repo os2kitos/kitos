@@ -24,7 +24,7 @@ namespace Core.ApplicationServices.Generic.Write
             Func<TDestination, IEnumerable<TAssignmentState>> getExistingState,
             Func<TDestination, TAssignmentInput, Maybe<OperationError>> assign,
             Func<TDestination, TAssignmentState, Maybe<OperationError>> unAssign,
-            Func<TDestination, TAssignmentState, Maybe<OperationError>> update = null)
+            Func<TDestination, TAssignmentState, Maybe<OperationError>>? update = null)
                 where TAssignmentState : class, IHasId, IHasUuid;
     }
 }

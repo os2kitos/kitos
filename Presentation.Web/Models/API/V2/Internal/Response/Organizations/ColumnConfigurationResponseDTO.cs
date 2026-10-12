@@ -2,7 +2,7 @@
 {
     public class ColumnConfigurationResponseDTO
     {
-        public string PersistId { get; set; }
+        public string? PersistId { get; set; }
         public int Index { get; set; }
     }
 }

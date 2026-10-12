@@ -7,7 +7,7 @@ using Core.DomainServices.Model.Options;
 
 namespace Core.DomainServices.Options
 {
-    public interface IOptionsService<TReference, TOption> where TOption : OptionEntity<TReference>
+    public interface IOptionsService<TReference, TOption> where TOption : OptionEntity<TReference>?
     {
         /// <summary>
         /// Returns a list of options available to the organization

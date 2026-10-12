@@ -114,13 +114,15 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertMainContractSuppliers(src, mapped.MainContractSuppliers);
         }
 
-        private static void AssertMainContractSuppliers(ItSystem src, IEnumerable<IdentityNamePairResponseDTO> mainContractSuppliers)
+        private static void AssertMainContractSuppliers(ItSystem src, IEnumerable<IdentityNamePairResponseDTO>? mainContractSuppliers)
         {
             var firstUsage = src.Usages.First();
             var secondUsage = src.Usages.Skip(1).First();
-            Assert.Equal(2, mainContractSuppliers.Count());
-            Assert.Contains(mainContractSuppliers, x => MainContractSupplierMatches(firstUsage, x));
-            Assert.Contains(mainContractSuppliers, x => MainContractSupplierMatches(secondUsage, x));
+            Assert.NotNull(mainContractSuppliers);
+            var mainContractSuppliersList = mainContractSuppliers.ToList();
+            Assert.Equal(2, mainContractSuppliersList.Count);
+            Assert.Contains(mainContractSuppliersList, x => MainContractSupplierMatches(firstUsage, x));
+            Assert.Contains(mainContractSuppliersList, x => MainContractSupplierMatches(secondUsage, x));
         }
 
         private static bool MainContractSupplierMatches(ItSystemUsage usage, IdentityNamePairResponseDTO mapped)
@@ -129,7 +131,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             return mapped.Name == supplier.Name && mapped.Uuid == supplier.Uuid;
         }
 
-        private static void AssertArchiveDuty(ItSystem src, RecommendedArchiveDutyResponseDTO mappedRecommendedArchiveDuty)
+        private static void AssertArchiveDuty(ItSystem src, RecommendedArchiveDutyResponseDTO? mappedRecommendedArchiveDuty)
         {
             Assert.Equal(src.ArchiveDuty?.ToChoice(), mappedRecommendedArchiveDuty?.Id);
             Assert.Equal(src.ArchiveDutyComment, mappedRecommendedArchiveDuty?.Comment);

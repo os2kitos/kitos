@@ -1,14 +1,20 @@
-﻿using Core.DomainModel.GDPR;
+using Core.DomainModel.GDPR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.DataAccess.Mapping
 {
     public class DataProcessingRegistrationRightMap : RightMap<DataProcessingRegistration, DataProcessingRegistrationRight, DataProcessingRegistrationRole>
     {
-        public DataProcessingRegistrationRightMap()
+        public override void Configure(EntityTypeBuilder<DataProcessingRegistrationRight> builder)
         {
-            this.HasRequired(x => x.User)
+            base.Configure(builder);
+
+            builder.HasOne(x => x.User)
                 .WithMany(x => x.DataProcessingRegistrationRights)
-                .HasForeignKey(x => x.UserId);
+                .HasForeignKey(x => x.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

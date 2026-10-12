@@ -7,10 +7,10 @@ namespace Core.DomainServices.Queries.ItSystem
 {
     public class QueryByTaskRef : IDomainQuery<DomainModel.ItSystem.ItSystem>
     {
-        private readonly string _key;
+        private readonly string? _key;
         private readonly Guid? _uuid;
 
-        public QueryByTaskRef(string key = null, Guid? uuid = null)
+        public QueryByTaskRef(string? key = null, Guid? uuid = null)
         {
             if (key == null && uuid == null)
                 throw new ArgumentException("No constraints provided");

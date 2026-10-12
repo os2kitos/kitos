@@ -1,24 +1,26 @@
-﻿using System;
-using Core.ApplicationServices.Organizations;
+﻿using Core.Abstractions.Types;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Model.Users.Write;
-using Core.ApplicationServices.Users.Write;
-using Core.DomainModel;
-using Infrastructure.Services.DataAccess;
-using Moq;
-using Tests.Toolkit.Patterns;
-using Xunit;
-using Core.DomainModel.Organization;
-using System.Collections.Generic;
-using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Extensions;
-using Core.ApplicationServices.Rights;
-using Core.DomainServices.Generic;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Users;
+using Core.ApplicationServices.Model.Users.Write;
+using Core.ApplicationServices.Organizations;
+using Core.ApplicationServices.Rights;
+using Core.ApplicationServices.Users.Write;
+using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Generic;
+using Infrastructure.Services.DataAccess;
+using Moq;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Tests.Toolkit.Patterns;
+using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.Users
 {
@@ -218,11 +220,16 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             var orgUuid = A<Guid>();
             var orgId = A<int>();
             var org = new Organization { Id = orgId };
+            var user = new User
+            {
+                Uuid = A<Guid>()
+            };
 
             ExpectGetOrganizationReturns(orgUuid, org);
             ExpectCreatePermissionReturns(orgId, canCreate);
             ExpectModifyPermissionReturns(org, canEdit);
             ExpectDeletePermissionReturns(orgId, canDelete);
+            ExpectGetUserByUuid(user.Uuid, user);
 
             //Act
             var result = _sut.GetCollectionPermissions(orgUuid);
@@ -231,8 +238,43 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             Assert.True(result.Ok);
             var permissions = result.Value;
             Assert.Equal(canCreate, permissions.Create);
-            Assert.Equal(canEdit, permissions.Edit);
+            Assert.Equal(canEdit, permissions.Edit.EditProperties);
             Assert.Equal(canDelete, permissions.Delete);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.ContractModuleAdmin)]
+        [InlineData(OrganizationRole.SystemModuleAdmin)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin)]
+        public void Can_Get_User_Role_Edit_Permissions(OrganizationRole roleToEdit)
+        {
+            //Arrange
+            var orgUuid = A<Guid>();
+            var orgId = A<int>();
+            var org = new Organization { Id = orgId };
+            var user = new User
+            {
+                Uuid = A<Guid>(),
+                OrganizationRights = new List<OrganizationRight>
+                    { new () { Organization = org, Role = roleToEdit } }
+            };
+
+            ExpectGetOrganizationReturns(orgUuid, org);
+            ExpectCreatePermissionReturns(orgId, false);
+            ExpectModifyPermissionReturns(org, false);
+            ExpectDeletePermissionReturns(orgId, false);
+            ExpectGetUserByUuid(user.Uuid, user);
+            _organizationalUserContextMock.Setup(x => x.HasRole(orgId, roleToEdit)).Returns(true);
+
+            //Act
+            var result = _sut.GetCollectionPermissions(orgUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var permissions = result.Value;
+            Assert.Equal(roleToEdit == OrganizationRole.ContractModuleAdmin, permissions.Edit.EditContractRole);
+            Assert.Equal(roleToEdit == OrganizationRole.SystemModuleAdmin, permissions.Edit.EditSystemRole);
+            Assert.Equal(roleToEdit == OrganizationRole.OrganizationModuleAdmin, permissions.Edit.EditOrganizationRole);
         }
 
         [Fact]
@@ -270,6 +312,61 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             Assert.Equal(updateParameters.HasStakeHolderAccess.NewValue, updatedUser.HasStakeHolderAccess);
             Assert.Equal(updateParameters.DefaultUserStartPreference.NewValue, updatedUser.DefaultUserStartPreference);
             transaction.Verify(x => x.Commit(), Times.AtLeastOnce);
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.LocalAdmin)]
+        [InlineData(OrganizationRole.SystemModuleAdmin)]
+        [InlineData(OrganizationRole.ContractModuleAdmin)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin)]
+        [InlineData(OrganizationRole.GlobalAdmin)]
+        public void Cannot_Update_User_Roles_Without_Permission(OrganizationRole role)
+        {
+            //Arrange
+            var user = SetupUser();
+            user.IsGlobalAdmin = false;
+            var organization = new Organization {Id = A<int>(), Uuid = A<Guid>()};
+            var defaultUnit = new OrganizationUnit {Id = A<int>(), Uuid = A<Guid>()};
+            var updateParameters = new UpdateUserParameters
+            {
+                Roles = new List<OrganizationRole>
+                    {
+                        role
+                    }.AsEnumerable()
+                    .AsChangedValue(),
+                Email = OptionalValueChange<string>.None,
+                FirstName = OptionalValueChange<string>.None,
+                LastName = OptionalValueChange<string>.None,
+                PhoneNumber = OptionalValueChange<string>.None,
+                DefaultUserStartPreference = OptionalValueChange<string>.None,
+                HasApiAccess = OptionalValueChange<bool>.None,
+                HasStakeHolderAccess = OptionalValueChange<bool>.None,
+                DefaultOrganizationUnitUuid = OptionalValueChange<Guid>.None,
+            };
+
+            ExpectGetUserByUuid(user.Uuid, user);
+            ExpectModifyPermissionsForUserReturns(user, true);
+            ExpectGetOrganizationReturns(organization.Uuid, organization);
+            ExpectResolveOrgUuidReturns(organization.Uuid, organization.Id);
+            ExpectResolveOrgUnitUuidReturns(defaultUnit.Uuid, defaultUnit.Id);
+            ExpectHasStakeHolderAccessReturns(true);
+            ExpectAssignRolesReturn(updateParameters.Roles.NewValue, user, organization);
+            ExpectRemoveRolesReturn(user.GetRolesInOrganization(organization.Uuid), user, organization);
+            _organizationServiceMock.Setup(x => x.SetDefaultOrgUnit(user, organization.Id, defaultUnit.Id));
+
+            ExpectCreatePermissionReturns(organization.Id, false);
+            ExpectModifyPermissionReturns(organization, false);
+            ExpectDeletePermissionReturns(organization.Id, false);
+            _organizationalUserContextMock.Setup(x => x.HasRole(organization.Id, role)).Returns(false);
+
+            var transaction = ExpectTransactionBegins();
+
+            //Act
+            var updatedUserResult = _sut.Update(organization.Uuid, user.Uuid, updateParameters);
+
+            //Assert
+            Assert.True(updatedUserResult.Failed);
+            Assert.Equal(OperationFailure.Forbidden, updatedUserResult.Error.FailureType);
         }
 
         [Fact]
@@ -553,7 +650,7 @@ namespace Tests.Unit.Core.ApplicationServices.Users
             _userServiceMock.Verify(x => x.IssuePasswordReset(It.IsAny<User>(), null, null), Times.Never());
         }
 
-        private void ExpectGetUserByEmailReturns(string email, User user)
+        private void ExpectGetUserByEmailReturns(string email, User? user)
         {
             _userRepositoryMock.Setup(x => x.GetByEmail(email)).Returns(user);
         }

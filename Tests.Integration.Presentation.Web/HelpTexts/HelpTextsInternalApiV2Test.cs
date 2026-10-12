@@ -20,7 +20,7 @@ namespace Tests.Integration.Presentation.Web.HelpTexts
             var createResponse = await HelpTextsInternalV2Helper.Create(expected);
             Assert.Equal(HttpStatusCode.OK, createResponse.StatusCode);
 
-            var response = await HelpTextsInternalV2Helper.GetSingle(expected.Key);
+            var response = await HelpTextsInternalV2Helper.GetSingle(expected.Key!);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var actual = await response.ReadResponseBodyAsAsync<HelpTextResponseDTO>();
@@ -65,7 +65,7 @@ namespace Tests.Integration.Presentation.Web.HelpTexts
             var createResponse = await HelpTextsInternalV2Helper.Create(dto);
             Assert.Equal(HttpStatusCode.OK, createResponse.StatusCode);
 
-            var response = await HelpTextsInternalV2Helper.Delete(dto.Key);
+            var response = await HelpTextsInternalV2Helper.Delete(dto.Key!);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var allHelpTextsResponse = await HelpTextsInternalV2Helper.GetAll();
@@ -82,7 +82,7 @@ namespace Tests.Integration.Presentation.Web.HelpTexts
             Assert.Equal(HttpStatusCode.OK, createResponse.StatusCode);
             var updateDto = A<HelpTextUpdateRequestDTO>();
 
-            var response = await HelpTextsInternalV2Helper.Patch(createRequestDto.Key, updateDto);
+            var response = await HelpTextsInternalV2Helper.Patch(createRequestDto.Key!, updateDto);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var allHelpTextsResponse = await HelpTextsInternalV2Helper.GetAll();

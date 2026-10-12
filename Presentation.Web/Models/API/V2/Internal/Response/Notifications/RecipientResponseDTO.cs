@@ -7,10 +7,10 @@ namespace Presentation.Web.Models.API.V2.Internal.Response.Notifications
         /// <summary>
         /// List of recipient emails
         /// </summary>
-        public IEnumerable<EmailRecipientResponseDTO> EmailRecipients { get; set; }
+        public IEnumerable<EmailRecipientResponseDTO>? EmailRecipients { get; set; }
         /// <summary>
         /// List of recipient roles
         /// </summary>
-        public IEnumerable<RoleRecipientResponseDTO> RoleRecipients { get; set; }
+        public IEnumerable<RoleRecipientResponseDTO>? RoleRecipients { get; set; }
     }
 }

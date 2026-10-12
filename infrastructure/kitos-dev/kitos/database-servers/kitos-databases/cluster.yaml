@@ -1,0 +1,36 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: kitos-databases
+  namespace: kitos
+  labels:
+    app.kubernetes.io/managed-by: easyhosting
+    easyhosting.io/resource-kind: database-server
+    easyhosting.io/resource-id: "3d41c24a0af84c85a86d77591cf3a563"
+    easyhosting.io/application-id: "kitos"
+  annotations:
+    easyhosting.io/display-name: "kitos-databases"
+    easyhosting.io/manifest-path: "infrastructure/kitos-dev/kitos/database-servers/kitos-databases/cluster.yaml"
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17
+  bootstrap:
+    initdb:
+      database: postgres
+      owner: postgres
+  storage:
+    size: 5Gi
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      enabled: true
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: kitos-databases-backup-store
+  managed:
+    roles:
+      - name: kitos
+        ensure: present
+        login: true
+        createdb: true
+        passwordSecret:
+          name: db-role-secret-kitos

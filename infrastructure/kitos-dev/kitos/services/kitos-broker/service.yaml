@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kitos-broker
+  namespace: kitos
+spec:
+  ports:
+  - appProtocol: http
+    name: http
+    port: 5672
+    protocol: TCP
+    targetPort: 5672
+  selector:
+    app: kitos-broker
+  type: ClusterIP

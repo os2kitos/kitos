@@ -106,7 +106,7 @@ namespace Core.DomainServices.SSO
                     //No organization uuid
                     continue;
                 }
-                string emailUuid = null;
+                string? emailUuid = null;
                 var adresses = registreringType5
                     .RelationListe
                     ?.Adresser

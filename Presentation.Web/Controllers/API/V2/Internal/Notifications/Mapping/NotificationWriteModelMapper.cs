@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Presentation.Web.Models.API.V2.Internal.Request.Notifications;
 using Presentation.Web.Models.API.V2.Types.Notifications;
 using Core.ApplicationServices.Model.Notification.Write;
 using System;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
 {
@@ -64,7 +65,7 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
                 MapRootRecipients(dto.BaseProperties.Receivers));
         }
 
-        private RootRecipientModificationParameters MapRootRecipients(RecipientWriteRequestDTO dto)
+        private RootRecipientModificationParameters MapRootRecipients(RecipientWriteRequestDTO? dto)
         {
             return dto != null ? new RootRecipientModificationParameters
             (
@@ -73,12 +74,12 @@ namespace Presentation.Web.Controllers.API.V2.Internal.Notifications.Mapping
             ) : RootRecipientModificationParameters.Empty();
         }
 
-        private static IEnumerable<EmailRecipientModificationParameters> MapEmailRecipients(IEnumerable<EmailRecipientWriteRequestDTO> dtos)
+        private static IEnumerable<EmailRecipientModificationParameters> MapEmailRecipients(IEnumerable<EmailRecipientWriteRequestDTO>? dtos)
         {
             return (dtos ?? new List<EmailRecipientWriteRequestDTO>()).Select(x => new EmailRecipientModificationParameters(x.Email)).ToList();
         }
 
-        public IEnumerable<RoleRecipientModificationParameters> MapRoleRecipients(IEnumerable<RoleRecipientWriteRequestDTO> dtos)
+        public IEnumerable<RoleRecipientModificationParameters> MapRoleRecipients(IEnumerable<RoleRecipientWriteRequestDTO>? dtos)
         {
             return (dtos ?? new List<RoleRecipientWriteRequestDTO>()).Select(x => new RoleRecipientModificationParameters(x.RoleUuid)).ToList();
         }

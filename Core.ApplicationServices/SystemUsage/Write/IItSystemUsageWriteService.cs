@@ -1,10 +1,12 @@
-﻿using System;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared.Write;
+using Core.ApplicationServices.Model.SystemUsage;
 using Core.ApplicationServices.Model.SystemUsage.Write;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel;
+using Core.DomainModel.Archive;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using System;
 using System.Collections.Generic;
 
 namespace Core.ApplicationServices.SystemUsage.Write
@@ -17,6 +19,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         Result<ItSystemUsage, OperationError> RemoveRole(Guid systemUsageUuid, UserRolePair assignment);
         Maybe<OperationError> Delete(Guid itSystemUsageUuid);
         Result<SystemRelation, OperationError> CreateSystemRelation(Guid fromSystemUsageUuid, SystemRelationParameters parameters);
+        Result<IEnumerable<SystemRelation>, OperationError> CreateSystemRelations(Guid fromSystemUsageUuid, IEnumerable<SystemRelationParameters> parametersCollection);
         Result<SystemRelation, OperationError> UpdateSystemRelation(Guid fromSystemUsageUuid, Guid relationUuid, SystemRelationParameters parameters);
         Maybe<OperationError> DeleteSystemRelation(Guid itSystemUsageUuid, Guid itSystemUsageRelationUuid);
         Result<ArchivePeriod, OperationError> CreateJournalPeriod(Guid systemUsageUuid, SystemUsageJournalPeriodProperties parameters);
@@ -26,5 +29,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         Result<ExternalReference, OperationError> UpdateExternalReference(Guid usageUuid, Guid externalReferenceUuid, ExternalReferenceProperties externalReferenceProperties);
         Result<ExternalReference, OperationError> DeleteExternalReference(Guid usageUuid, Guid externalReferenceUuid);
         Maybe<OperationError> DeleteByItSystemAndOrganizationUuids(Guid itSystemUuid, Guid organizationUuid);
+
+        Result<ItSystemUsageArchive, OperationError> Archive(Guid systemUsageUuid, ArchiveItSystemUsageParameters parameters);
     }
 }

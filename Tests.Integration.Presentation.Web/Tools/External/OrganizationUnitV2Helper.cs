@@ -15,15 +15,15 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public static class OrganizationUnitV2Helper
     {
-        public static async Task<IEnumerable<OrganizationUnitResponseDTO>> GetOrganizationUnitsAsync(string token, Guid organizationUuid, int page = 0, int pageSize = 10, string nameQuery = null)
+        public static async Task<IEnumerable<ExternalOrganizationUnitResponseDTO>> GetOrganizationUnitsAsync(string token, Guid organizationUuid, int page = 0, int pageSize = 10, string? nameQuery = null)
         {
             using var response = await SendGetOrganizationUnitsAsync(token, organizationUuid, page, pageSize, nameQuery);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<IEnumerable<OrganizationUnitResponseDTO>>();
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ExternalOrganizationUnitResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetOrganizationUnitsAsync(string token, Guid organizationUuid, int page = 0, int pageSize = 10, string nameQuery = null)
+        public static async Task<HttpResponseMessage> SendGetOrganizationUnitsAsync(string token, Guid organizationUuid, int page = 0, int pageSize = 10, string? nameQuery = null)
         {
             var queryParameters = new List<KeyValuePair<string, string>>
             {
@@ -40,12 +40,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         }
 
 
-        public static async Task<OrganizationUnitResponseDTO> GetOrganizationUnitAsync(string token, Guid organizationUuid, Guid organizationUnitId)
+        public static async Task<ExternalOrganizationUnitResponseDTO> GetOrganizationUnitAsync(string token, Guid organizationUuid, Guid organizationUnitId)
         {
             using var response = await SendGetOrganizationUnitAsync(token, organizationUuid, organizationUnitId);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<OrganizationUnitResponseDTO>();
+            return await response.ReadResponseBodyAsAsync<ExternalOrganizationUnitResponseDTO>();
         }
         public static async Task<HttpResponseMessage> SendGetOrganizationUnitAsync(string token, Guid organizationUuid, Guid organizationUnitId)
         {
@@ -53,7 +53,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         }
 
         public static async Task<OrganizationUnitResponseDTO> CreateUnitAsync(Guid organizationUuid,
-            CreateOrganizationUnitRequestDTO request, Cookie cookie = null)
+            CreateOrganizationUnitRequestDTO request, Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             using var response = await HttpApi.PostWithCookieAsync(
@@ -65,7 +65,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         }
 
         public static async Task<OrganizationUnitResponseDTO> PatchUnitAsync(Guid organizationUuid, Guid unitUuid,
-            UpdateOrganizationUnitRequestDTO request, Cookie cookie = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
+            UpdateOrganizationUnitRequestDTO request, Cookie? cookie = null, HttpStatusCode expectedStatusCode = HttpStatusCode.OK)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             using var response = await HttpApi.PatchWithCookieAsync(
@@ -76,7 +76,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<OrganizationUnitResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendDeleteUnitAsync(Guid organizationUuid, Guid unitUuid, Cookie cookie = null)
+        public static async Task<HttpResponseMessage> SendDeleteUnitAsync(Guid organizationUuid, Guid unitUuid, Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl(
@@ -85,7 +85,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         }
 
         public static async Task<IEnumerable<OrganizationUnitRolesResponseDTO>> GetUnitRolesAsync(Guid organizationUuid, Guid unitUuid,
-            Cookie cookie = null)
+            Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl(RolesRoutePrefix(organizationUuid, unitUuid));
@@ -95,7 +95,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         }
 
         public static async Task<HttpResponseMessage> SendCreateRoleAssignmentAsync(Guid organizationUuid, Guid unitUuid, CreateOrganizationUnitRoleAssignmentRequestDTO request,
-            Cookie cookie = null)
+            Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"{RolesRoutePrefix(organizationUuid, unitUuid)}/create");
@@ -103,7 +103,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         }
 
         public static async Task<HttpResponseMessage> SendCreateBulkRoleAssignmentAsync(Guid organizationUuid, Guid unitUuid, BulkRoleAssignmentRequestDTO request,
-            Cookie cookie = null)
+            Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"{RolesRoutePrefix(organizationUuid, unitUuid)}/bulk/create");
@@ -111,7 +111,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         }
 
         public static async Task<HttpResponseMessage> SendDeleteRoleAssignmentAsync(Guid organizationUuid, Guid unitUuid, DeleteOrganizationUnitRoleAssignmentRequestDTO request,
-            Cookie cookie = null)
+            Cookie? cookie = null)
         {
             var requestCookie = cookie ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"{RolesRoutePrefix(organizationUuid, unitUuid)}/delete");

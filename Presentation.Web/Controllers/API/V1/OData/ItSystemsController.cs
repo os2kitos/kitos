@@ -1,19 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Web.Http;
 using Core.ApplicationServices.System;
 using Core.DomainModel.Events;
-using Microsoft.AspNet.OData;
-using Microsoft.AspNet.OData.Routing;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Swashbuckle.OData;
-using Swashbuckle.Swagger.Annotations;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Deltas;
+using Microsoft.AspNetCore.OData.Routing.Controllers;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
@@ -35,11 +34,9 @@ namespace Presentation.Web.Controllers.API.V1.OData
         /// <param name="orgKey"></param>
         /// <returns></returns>
         [EnableQuery]
-        [ODataRoute("Organizations({orgKey})/ItSystems")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystem>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [Route("odata/Organizations({orgKey})/ItSystems")]
         [RequireTopOnOdataThroughKitosToken]
-        public IHttpActionResult GetItSystems(int orgKey)
+        public IActionResult GetOrganizationItSystems(int orgKey)
         {
             var readAccessLevel = GetOrganizationReadAccessLevel(orgKey);
             if (readAccessLevel == OrganizationDataReadAccessLevel.None)
@@ -51,10 +48,10 @@ namespace Presentation.Web.Controllers.API.V1.OData
                     .AsQueryable()
                     .ByOrganizationDataAndPublicDataFromOtherOrganizations(orgKey, readAccessLevel, GetCrossOrganizationReadAccessLevel());
 
-            return Ok(result);
+            return Ok(result.ToList());
         }
 
-        public override IHttpActionResult Patch(int key, Delta<ItSystem> delta)
+        public override IActionResult Patch(int key, Delta<ItSystem> delta)
         {
             var itSystem = Repository.GetByKey(key);
 
@@ -95,18 +92,21 @@ namespace Presentation.Web.Controllers.API.V1.OData
         }
 
 
-        [ODataRoute("ItSystems")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystem>>))]
+        [Route("odata/ItSystems")]
         [RequireTopOnOdataThroughKitosToken]
-        public override IHttpActionResult Get()
+        public override IActionResult Get()
         {
             return base.Get();
         }
 
         [NonAction]
-        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
+        public override IActionResult Delete(int key) => throw new NotSupportedException();
 
         [NonAction]
-        public override IHttpActionResult Post(int organizationId, ItSystem entity) => throw new NotSupportedException();
+        public override IActionResult Post(int organizationId, ItSystem entity) => throw new NotSupportedException();
     }
 }
+
+
+
+

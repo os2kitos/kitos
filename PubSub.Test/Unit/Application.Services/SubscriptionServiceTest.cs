@@ -27,7 +27,7 @@ namespace PubSub.Test.Unit.Application.Services
         [Theory]
         [InlineData(false)]
         [InlineData(true)]
-        public async void Can_Only_Delete_Subscription_If_User_Owns_It(bool userOwnsSubscription)
+        public async Task Can_Only_Delete_Subscription_If_User_Owns_It(bool userOwnsSubscription)
         {
             var currentUserId = ExpectCurrentUserIs();
             var subscriptionOwnerId = userOwnsSubscription ? currentUserId : A<string>();
@@ -43,7 +43,7 @@ namespace PubSub.Test.Unit.Application.Services
         }
 
         [Fact]
-        public async void Can_Delete_Returns_Not_Found_When_Subscription_Does_Not_Exist()
+        public async Task Can_Delete_Returns_Not_Found_When_Subscription_Does_Not_Exist()
         {
             var uuid = A<Guid>();
             _repository.Setup(x => x.GetAsync(uuid)).ReturnsAsync(Maybe.None);
@@ -54,7 +54,7 @@ namespace PubSub.Test.Unit.Application.Services
         }
 
         [Fact]
-        public async void Does_Not_Create_Subscriptions_For_Duplicates()
+        public async Task Does_Not_Create_Subscriptions_For_Duplicates()
         {
             var request = A<CreateSubscriptionParameters>();
             ExpectCurrentUserIs();

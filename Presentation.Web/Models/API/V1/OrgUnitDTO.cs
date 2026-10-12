@@ -3,9 +3,9 @@
     public class OrgUnitSimpleDTO
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
         public int OrganizationId { get; set; }
-        public string OrganizationName { get; set; }
+        public required string OrganizationName { get; set; }
 
         public string QualifiedName => $"{Name}, {OrganizationName}";
     }

@@ -14,7 +14,7 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// Organizations using this IT-System
         /// </summary>
         [Required]
-        public IEnumerable<ShallowOrganizationResponseDTO> UsingOrganizations { get; set; }
+        public required IEnumerable<ShallowOrganizationResponseDTO> UsingOrganizations { get; set; }
 
         /// <summary>
         /// UTC timestamp of latest modification
@@ -26,7 +26,7 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// Responsible for last modification
         /// </summary>
         [Required]
-        public IdentityNamePairResponseDTO LastModifiedBy { get; set; }
+        public IdentityNamePairResponseDTO? LastModifiedBy { get; set; }
         /// <summary>
         /// Scope of the registration
         /// - Local: The scope of the registration is local to the organization in which is was created
@@ -38,10 +38,10 @@ namespace Presentation.Web.Models.API.V2.Response.System
         /// Organization in which this it-system master data was created
         /// </summary>
         [Required]
-        public ShallowOrganizationResponseDTO OrganizationContext { get; set; }
+        public ShallowOrganizationResponseDTO? OrganizationContext { get; set; }
 
-        public string LegalName { get; set; }
-        public string LegalDataProcessorName { get; set; }
+        public string? LegalName { get; set; }
+        public string? LegalDataProcessorName { get; set; }
 
     }
 }

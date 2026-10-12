@@ -1,4 +1,4 @@
-﻿version: "2.2"
+version: "2.2"
 
 services:
   rabbitmq:
@@ -38,5 +38,4 @@ networks:
     driver: bridge
 
 volumes:
-  rabbitmq_data:    
-    
+  rabbitmq_data:
