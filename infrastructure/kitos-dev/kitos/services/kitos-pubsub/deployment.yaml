@@ -46,7 +46,7 @@ spec:
               name: user-secret
         - name: ASPNETCORE_ENVIRONMENT
           value: Development
-        image: ghcr.io/strongminds/kitos-kitos-pubsub:sha-351beb3bf6143af3912765e5e32e25f147d2d994
+        image: ghcr.io/strongminds/kitos-kitos-pubsub:sha-65ed1c8c9ad8ee85811715457df70584a6bd50be
         name: kitos-pubsub
         ports:
         - containerPort: 8080

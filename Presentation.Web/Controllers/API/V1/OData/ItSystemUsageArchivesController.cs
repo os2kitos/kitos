@@ -57,6 +57,9 @@ namespace Presentation.Web.Controllers.API.V1.OData
         }
 
         [NonAction]
+        public override IActionResult Get() => throw new NotSupportedException();
+
+        [NonAction]
         public override IActionResult Get(int key) => throw new NotSupportedException();
 
         [NonAction]
