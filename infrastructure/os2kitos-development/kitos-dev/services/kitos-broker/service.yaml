@@ -10,6 +10,11 @@ spec:
     port: 5672
     protocol: TCP
     targetPort: 5672
+  - appProtocol: http
+    name: http
+    port: 15672
+    protocol: TCP
+    targetPort: 15672
   selector:
     app: kitos-broker
   type: ClusterIP

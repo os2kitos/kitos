@@ -42,6 +42,9 @@ spec:
         - containerPort: 5672
           name: ampq
           protocol: TCP
+        - containerPort: 15672
+          name: http
+          protocol: TCP
         resources:
           limits:
             memory: 2Gi
