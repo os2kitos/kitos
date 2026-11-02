@@ -58,6 +58,11 @@ spec:
             configMapKeyRef:
               key: JwtValidation__ValidationEndpoint
               name: user-variables
+        - name: RabbitMQ__HostName
+          valueFrom:
+            configMapKeyRef:
+              key: RabbitMQ__HostName
+              name: user-variables
         image: ghcr.io/strongminds/kitos-kitos-pubsub@sha256:3c4b3e5be6e720f6b96ee9aeae00b638ccaef3b33fde6b29c431e1d70f28fba5
         name: kitos-pubsub
         ports:
