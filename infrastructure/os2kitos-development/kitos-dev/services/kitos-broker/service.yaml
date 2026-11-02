@@ -6,7 +6,7 @@ metadata:
 spec:
   ports:
   - appProtocol: http
-    name: http
+    name: ampq
     port: 5672
     protocol: TCP
     targetPort: 5672

@@ -40,7 +40,7 @@ spec:
         name: kitos-broker
         ports:
         - containerPort: 5672
-          name: http
+          name: ampq
           protocol: TCP
         resources:
           limits:
