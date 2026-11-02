@@ -51,7 +51,7 @@ spec:
         - name: JwtValidation__ApiUrl
           valueFrom:
             configMapKeyRef:
-              key: JwtValidation__ApiUrl
+              key: KitosApiBaseUrlInternal
               name: user-variables
         - name: JwtValidation__ValidationEndpoint
           valueFrom:
