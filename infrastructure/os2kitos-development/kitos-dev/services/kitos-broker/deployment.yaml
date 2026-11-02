@@ -38,7 +38,10 @@ spec:
               name: user-secret
         image: ghcr.io/strongminds/kitos-kitos-broker@sha256:4a00f43046c82489a5de54248c49537380f46fb48236ea7a7602db0b7333e866
         name: kitos-broker
-        ports: []
+        ports:
+        - containerPort: 5672
+          name: http
+          protocol: TCP
         resources:
           limits:
             memory: 2Gi
