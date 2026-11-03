@@ -37,7 +37,7 @@ spec:
               key: PickupDirectoryLocation
               name: user-variables
         - name: Smtp__DeliveryMethod
-          value: SpecifiedPickupDirectory
+          value: Network
         - name: ASPNETCORE_ENVIRONMENT
           value: Dev
         - name: Database__Provider
@@ -69,17 +69,22 @@ spec:
         - name: Smtp__Host
           valueFrom:
             configMapKeyRef:
-              key: SmtpNetworkHost
+              key: AwsSmtpNetworkHost
               name: user-variables
         - name: Smtp__Port
           valueFrom:
             configMapKeyRef:
-              key: SmtpNetworkPort
+              key: AwsSmtpNetworkPort
               name: user-variables
         - name: Smtp__Password
           valueFrom:
             secretKeyRef:
-              key: SmtpPassword
+              key: AwsSmtpPassword
+              name: user-secret
+        - name: Smtp__UserName
+          valueFrom:
+            secretKeyRef:
+              key: AwsSmtpUsername
               name: user-secret
         image: ghcr.io/strongminds/kitos-kitos-api@sha256:1f37f2dcb170810986d9b54f38b50978194e9763e0311b0b836e3b9ded87e1e1
         name: kitos-api
