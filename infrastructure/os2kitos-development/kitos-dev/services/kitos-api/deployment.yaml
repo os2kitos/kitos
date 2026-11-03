@@ -86,6 +86,8 @@ spec:
             secretKeyRef:
               key: AwsSmtpUsername
               name: user-secret
+        - name: Smtp__EnableSsl
+          value: "true"
         image: ghcr.io/strongminds/kitos-kitos-api@sha256:1f37f2dcb170810986d9b54f38b50978194e9763e0311b0b836e3b9ded87e1e1
         name: kitos-api
         ports:
