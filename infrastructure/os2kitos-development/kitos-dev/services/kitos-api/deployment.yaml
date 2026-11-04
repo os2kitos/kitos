@@ -107,7 +107,7 @@ spec:
             cpu: 2
           requests:
             memory: 768Mi
-            cpu: 1
+            cpu: 500m
         volumeMounts:
         - mountPath: /temp
           name: kitos-api-volume
