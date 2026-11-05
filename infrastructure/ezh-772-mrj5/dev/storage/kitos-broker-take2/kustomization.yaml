@@ -1,0 +1,5 @@
+# [storage:032b94f1-b05f-48aa-8c39-c6c190a4f7ea]
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - pvc.yaml
