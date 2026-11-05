@@ -1,0 +1,51 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: kitos-db-server-restore
+  namespace: dev
+  labels:
+    app.kubernetes.io/managed-by: easyhosting
+    easyhosting.io/resource-kind: database-server
+    easyhosting.io/resource-id: "3f509e14d61440c18bbe958a139f9009"
+    easyhosting.io/application-id: "dev"
+  annotations:
+    easyhosting.io/display-name: "kitos-db-server-restore"
+    easyhosting.io/manifest-path: "infrastructure/ezh-772-mrj5/dev/database-servers/kitos-db-server-restore/cluster.yaml"
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17
+  bootstrap:
+    recovery:
+      source: origin
+      recoveryTarget:
+        backupID: "20261105T124525"
+        targetImmediate: true
+  externalClusters:
+    - name: origin
+      plugin:
+        name: barman-cloud.cloudnative-pg.io
+        parameters:
+          barmanObjectName: kitos-db-server-restore-recovery-store
+          serverName: kitos-db-server
+  storage:
+    size: 10Gi
+  managed:
+    roles:
+      - name: hangfire_user
+        ensure: present
+        login: true
+        createdb: true
+        passwordSecret:
+          name: db-role-secret-hangfire-user-dbe1308c735d
+      - name: user
+        ensure: present
+        login: true
+        createdb: true
+        passwordSecret:
+          name: db-role-secret-user
+      - name: user_pubsub
+        ensure: present
+        login: true
+        createdb: true
+        passwordSecret:
+          name: db-role-secret-user-pubsub-6661ec476650

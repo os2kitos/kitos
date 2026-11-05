@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/name: kitos-db-server-restore
+    app.kubernetes.io/component: database-server
+    app.kubernetes.io/part-of: dev
+    app.kubernetes.io/managed-by: easy-hosting
+    network-policy.kubernetes.io/type: ingress
+    network-policy.kubernetes.io/purpose: allow-namespace
+  name: kitos-db-server-restore-allow-from-namespace-deny-egress
+  namespace: dev
+spec:
+  egress: []
+  ingress:
+  - from:
+    - podSelector: {}
+    ports:
+    - port: 5432
+      protocol: TCP
+  podSelector:
+    matchLabels:
+      app: kitos-db-server-restore
+  policyTypes:
+  - Ingress
+  - Egress
