@@ -5,4 +5,3 @@ resources:
   - scheduled-backup.yaml
   - network-policy.yaml
   - databases/kitos
-  - databases/pubsub

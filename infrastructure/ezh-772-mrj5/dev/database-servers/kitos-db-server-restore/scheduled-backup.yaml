@@ -9,7 +9,7 @@ metadata:
     easyhosting.io/resource-id: "3f509e14d61440c18bbe958a139f9009"
     easyhosting.io/application-id: "dev"
   annotations:
-    easyhosting.io/database-catalog: "[{\"DatabaseId\":\"e5fb4fd8-ebfb-4df0-b00f-dd41862966a5\",\"Name\":\"kitos\",\"DatabaseName\":\"kitos\",\"OwnerRoleName\":\"user\",\"Type\":0},{\"DatabaseId\":\"aa012993-c513-4591-8a78-26dfb7405256\",\"Name\":\"pubsub\",\"DatabaseName\":\"pubsub\",\"OwnerRoleName\":\"user_pubsub\",\"Type\":0}]"
+    easyhosting.io/database-catalog: "[{\"DatabaseId\":\"e5fb4fd8-ebfb-4df0-b00f-dd41862966a5\",\"Name\":\"kitos\",\"DatabaseName\":\"kitos\",\"OwnerRoleName\":\"user\",\"Type\":0}]"
 spec:
   suspend: true
   schedule: "0 0 0 * * *"
