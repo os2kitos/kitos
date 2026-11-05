@@ -57,7 +57,7 @@ spec:
               key: HangfireDbConnectionString
               name: user-secret
         - name: AppSettings__BaseUrl
-          value: https://7fcc0d41-b180-4016-888c-9e12d9311298.ezh-772-mrj5.strongminds.easyhosting.strongminds.dev/
+          value: https://4143ee7d-ae59-4800-a032-78a8b79495e3.ezh-772-mrj5.strongminds.easyhosting.strongminds.dev/
         - name: AppSettings__PubSubBaseUrl
           valueFrom:
             configMapKeyRef:
