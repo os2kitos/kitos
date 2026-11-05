@@ -38,7 +38,7 @@ spec:
             secretKeyRef:
               key: RabbitMqPassword
               name: user-secret
-        image: '{will be replaced by build pipeline}'
+        image: ghcr.io/strongminds/kitos-kitos-broker@sha256:772fbbac8a505b344df5f49660420fec569c1e00278e81cf23423fd2a5708d86
         name: kitos-broker
         ports:
         - containerPort: 15672
