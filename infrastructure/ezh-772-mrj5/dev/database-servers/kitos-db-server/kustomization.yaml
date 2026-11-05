@@ -6,5 +6,4 @@ resources:
   - object-store.yaml
   - network-policy.yaml
   - databases/hangfiredb
-  - databases/kitos
   - databases/pubsub
