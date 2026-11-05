@@ -16,7 +16,10 @@ spec:
     matchLabels:
       app: kitos-broker
   strategy:
-    type: Recreate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
   template:
     metadata:
       annotations:
@@ -54,14 +57,5 @@ spec:
           requests:
             memory: 1Gi
             cpu: 1
-        volumeMounts:
-        - mountPath: /var/lib/rabbitmq
-          name: kitos-broker
-          readOnly: false
       imagePullSecrets:
       - name: b9abd9f7-4fbb-4871-a9d7-6aef45cb79bd
-      volumes:
-      - name: kitos-broker
-        persistentVolumeClaim:
-          claimName: kitos-broker
-          readOnly: false
