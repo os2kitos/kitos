@@ -49,7 +49,7 @@ spec:
         - name: ConnectionStrings__KitosContext
           valueFrom:
             secretKeyRef:
-              key: KitosDbConnectionString
+              key: RestoredKitosDbConnectionString
               name: user-secret
         - name: ConnectionStrings__kitos_HangfireDB
           valueFrom:
