@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    easyhosting.io/service-reference: Presentation.Web/Dockerfile
+    easyhosting.io/service-unique-id: 7fcc0d41-b180-4016-888c-9e12d9311298
+    easyhosting.io/easy-hosting-domain-name: 7fcc0d41-b180-4016-888c-9e12d9311298.ezh-772-mrj5.strongminds.easyhosting.strongminds.dev
+  labels:
+    app: kitos-api
+  name: kitos-api
+  namespace: dev
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: kitos-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        sidecar.opentelemetry.io/inject: monitoring/sidecar-otel-collector
+        easyhosting.io/otlp-logs: "true"
+      labels:
+        app: kitos-api
+        app.kubernetes.io/name: kitos-api
+    spec:
+      containers:
+      - env:
+        - name: AppSettings__LogFilePath
+          valueFrom:
+            configMapKeyRef:
+              key: LogFilePath
+              name: user-variables
+        - name: Smtp__PickupDirectoryLocation
+          valueFrom:
+            configMapKeyRef:
+              key: SmtpPickupDirectoryLocation
+              name: user-variables
+        - name: Smtp__DeliveryMethod
+          value: SpecifiedPickupDirectory
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Dev
+        - name: Database__Provider
+          value: PostgreSql
+        - name: Hangfire__Provider
+          value: PostgreSql
+        - name: ConnectionStrings__KitosContext
+          valueFrom:
+            secretKeyRef:
+              key: KitosDbConnectionString
+              name: user-secret
+        - name: ConnectionStrings__kitos_HangfireDB
+          valueFrom:
+            secretKeyRef:
+              key: HangfireDbConnectionString
+              name: user-secret
+        - name: AppSettings__BaseUrl
+          value: https://TODO.strongminds.tech/
+        - name: AppSettings__PubSubBaseUrl
+          valueFrom:
+            configMapKeyRef:
+              key: PubSubBaseUrl
+              name: user-variables
+        - name: AppSettings__SecurityKeyString
+          valueFrom:
+            secretKeyRef:
+              key: SecurityKeyString
+              name: user-secret
+        - name: Smtp__Host
+          valueFrom:
+            configMapKeyRef:
+              key: AwsSmtpNetworkHost
+              name: user-variables
+        - name: Smtp__Port
+          valueFrom:
+            configMapKeyRef:
+              key: AwsSmtpNetworkPort
+              name: user-variables
+        - name: Smtp__Password
+          valueFrom:
+            secretKeyRef:
+              key: AwsSmtpPassword
+              name: user-secret
+        - name: Smtp__UserName
+          valueFrom:
+            secretKeyRef:
+              key: AwsSmtpUsername
+              name: user-secret
+        - name: Smtp__EnableSsl
+          value: "true"
+        - name: Smtp__From
+          valueFrom:
+            configMapKeyRef:
+              key: AwsSmtpFromEmail
+              name: user-variables
+        image: '{will be replaced by build pipeline}'
+        name: kitos-api
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            memory: 6Gi
+            cpu: 2
+          requests:
+            memory: 768Mi
+            cpu: 500m
+      imagePullSecrets:
+      - name: b9abd9f7-4fbb-4871-a9d7-6aef45cb79bd
