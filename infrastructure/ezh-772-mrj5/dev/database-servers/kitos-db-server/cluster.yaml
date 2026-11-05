@@ -40,3 +40,9 @@ spec:
         createdb: true
         passwordSecret:
           name: db-role-secret-user-pubsub-6661ec476650
+      - name: user
+        ensure: present
+        login: true
+        createdb: true
+        passwordSecret:
+          name: db-role-secret-user
