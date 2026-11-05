@@ -34,3 +34,9 @@ spec:
         createdb: true
         passwordSecret:
           name: db-role-secret-user
+      - name: hangfire_user
+        ensure: present
+        login: true
+        createdb: true
+        passwordSecret:
+          name: db-role-secret-hangfire-user-dbe1308c735d

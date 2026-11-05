@@ -9,7 +9,7 @@ metadata:
     easyhosting.io/resource-id: "0c9b9a1d07df4f23ab8f3c06006a5772"
     easyhosting.io/application-id: "dev"
   annotations:
-    easyhosting.io/database-catalog: "[{\"DatabaseId\":\"d5755d16-e754-4926-b871-dc720209867b\",\"Name\":\"kitos\",\"DatabaseName\":\"kitos\",\"OwnerRoleName\":\"user\",\"Type\":0}]"
+    easyhosting.io/database-catalog: "[{\"DatabaseId\":\"0cc629d2-71e1-4b98-9b35-409886763c4d\",\"Name\":\"hangfiredb\",\"DatabaseName\":\"hangfiredb\",\"OwnerRoleName\":\"hangfire_user\",\"Type\":0},{\"DatabaseId\":\"d5755d16-e754-4926-b871-dc720209867b\",\"Name\":\"kitos\",\"DatabaseName\":\"kitos\",\"OwnerRoleName\":\"user\",\"Type\":0}]"
 spec:
   schedule: "0 0 0 * * *"
   backupOwnerReference: cluster

@@ -1,0 +1,70 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: provision-database-0cc629d271e14b989b35409886763c4d
+  namespace: dev
+  labels:
+    app.kubernetes.io/managed-by: easyhosting
+    easyhosting.io/resource-kind: database-provisioning
+    easyhosting.io/resource-id: "0cc629d271e14b989b35409886763c4d"
+    easyhosting.io/database-server-id: "0c9b9a1d07df4f23ab8f3c06006a5772"
+    easyhosting.io/application-id: "dev"
+  annotations:
+    easyhosting.io/display-name: "hangfiredb"
+    easyhosting.io/manifest-path: "infrastructure/ezh-772-mrj5/dev/database-servers/kitos-db-server/databases/hangfiredb/provisioning-job.yaml"
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  backoffLimit: 6
+  activeDeadlineSeconds: 900
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/managed-by: easyhosting
+        easyhosting.io/resource-kind: database-provisioning
+        easyhosting.io/resource-id: "0cc629d271e14b989b35409886763c4d"
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: provision-database
+          image: ghcr.io/cloudnative-pg/postgresql:17
+          env:
+            - name: PGHOST
+              value: "kitos-db-server-rw"
+            - name: PGDATABASE
+              value: "postgres"
+            - name: PGUSER
+              valueFrom:
+                secretKeyRef:
+                  name: db-role-secret-hangfire-user-dbe1308c735d
+                  key: username
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-role-secret-hangfire-user-dbe1308c735d
+                  key: password
+            - name: TARGET_DATABASE
+              value: "hangfiredb"
+          command:
+            - /bin/sh
+            - -ec
+          args:
+            - |
+              attempt=0
+              until psql --set=ON_ERROR_STOP=1 -c 'SELECT 1' >/dev/null 2>&1; do
+                attempt=$((attempt + 1))
+                if [ "$attempt" -ge 150 ]; then
+                  echo "Timed out waiting for the PostgreSQL cluster and application role" >&2
+                  exit 1
+                fi
+                sleep 2
+              done
+
+              psql --set=ON_ERROR_STOP=1 \
+                --set=target_database="$TARGET_DATABASE" \
+                --set=target_owner="$PGUSER" <<'SQL'
+              SELECT format('CREATE DATABASE %I OWNER %I', :'target_database', :'target_owner')
+              WHERE NOT EXISTS (
+                SELECT 1 FROM pg_database WHERE datname = :'target_database'
+              )
+              \gexec
+              SQL
