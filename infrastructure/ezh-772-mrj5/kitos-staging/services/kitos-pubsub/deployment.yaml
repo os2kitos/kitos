@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    easyhosting.io/service-reference: PubSub.Application.Api/Dockerfile
+    easyhosting.io/service-unique-id: 08fae0b9-4f79-49a8-ac0d-5321862860fa
+    easyhosting.io/easy-hosting-domain-name: 08fae0b9-4f79-49a8-ac0d-5321862860fa.ezh-772-mrj5.strongminds.easyhosting.strongminds.dev
+  labels:
+    app: kitos-pubsub
+  name: kitos-pubsub
+  namespace: kitos-staging
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: kitos-pubsub
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        sidecar.opentelemetry.io/inject: monitoring/sidecar-otel-collector
+        easyhosting.io/otlp-logs: "true"
+      labels:
+        app: kitos-pubsub
+        app.kubernetes.io/name: kitos-pubsub
+    spec:
+      containers:
+      - env:
+        - name: PUBSUB_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: PubSubApiKey
+              name: user-secret
+        - name: RABBIT_MQ_USER
+          valueFrom:
+            secretKeyRef:
+              key: RabbitMqUsername
+              name: user-secret
+        - name: RABBIT_MQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: RabbitMqPassword
+              name: user-secret
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              key: PubSubConnectionString
+              name: user-secret
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        - name: JwtValidation__ApiUrl
+          valueFrom:
+            configMapKeyRef:
+              key: KitosApiBaseUrlInternal
+              name: user-variables
+        - name: JwtValidation__ValidationEndpoint
+          valueFrom:
+            configMapKeyRef:
+              key: JwtValidation__ValidationEndpoint
+              name: user-variables
+        - name: RabbitMQ__HostName
+          valueFrom:
+            configMapKeyRef:
+              key: RabbitMQ__HostName
+              name: user-variables
+        image: '{will be replaced by build pipeline}'
+        name: kitos-pubsub
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: 500m
+          requests:
+            memory: 128Mi
+            cpu: 100m
+      imagePullSecrets:
+      - name: b9abd9f7-4fbb-4871-a9d7-6aef45cb79bd
