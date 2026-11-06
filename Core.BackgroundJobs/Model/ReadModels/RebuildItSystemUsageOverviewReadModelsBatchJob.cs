@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -64,7 +65,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 var pendingReadModelUpdates = _pendingReadModelUpdateRepository.GetMany(PendingReadModelUpdateSourceCategory.ItSystemUsage, BatchSize).ToList();
                 var sourceIds = pendingReadModelUpdates.Select(x => x.SourceId).ToList();
                 var sourcesById = _batchLoadRepository.GetForReadModelRebuild(sourceIds);
-                var existingReadModelsById = _readModelRepository.GetBySourceIds(sourceIds);
+                var existingReadModelsById = new Dictionary<int, ItSystemUsageOverviewReadModel>(_readModelRepository.GetBySourceIds(sourceIds));
 
                 foreach (var pendingReadModelUpdate in pendingReadModelUpdates)
                 {
@@ -80,7 +81,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     {
                         var sourceValue = source.Value;
 
-                        ApplyUpdate(readModelResult, sourceValue);
+                        existingReadModelsById[pendingReadModelUpdate.SourceId] = ApplyUpdate(readModelResult, sourceValue);
                     }
                     else
                     {
@@ -89,6 +90,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                         {
                             _logger.Information("Deleting orphaned read model with id {id}.", readModelResult.Value.Id);
                             _lowLevelReadModelRepository.Delete(readModelResult.Value);
+                            existingReadModelsById.Remove(pendingReadModelUpdate.SourceId);
                         }
 
                     }
@@ -107,7 +109,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
             return Task.FromResult(Result<string, OperationError>.Success($"Completed {completedUpdates} updates"));
         }
 
-        private void ApplyUpdate(Maybe<ItSystemUsageOverviewReadModel> readModelResult, ItSystemUsage sourceValue)
+        private ItSystemUsageOverviewReadModel ApplyUpdate(Maybe<ItSystemUsageOverviewReadModel> readModelResult, ItSystemUsage sourceValue)
         {
             var readModel = readModelResult.GetValueOrFallback(new ItSystemUsageOverviewReadModel());
             _updater.Apply(sourceValue, readModel);
@@ -115,6 +117,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
             {
                 _lowLevelReadModelRepository.Insert(readModel);
             }
+            return readModel;
         }
     }
 }
