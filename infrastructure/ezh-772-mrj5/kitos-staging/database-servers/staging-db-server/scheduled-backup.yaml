@@ -9,7 +9,7 @@ metadata:
     easyhosting.io/resource-id: "fba2bf1dcc0c4ba5a01cd13f9e0abd6b"
     easyhosting.io/application-id: "kitos-staging"
   annotations:
-    easyhosting.io/database-catalog: "[{\"DatabaseId\":\"fc5c4ec1-884d-472a-b2fb-353fa5bcd13f\",\"Name\":\"hangfiredb\",\"DatabaseName\":\"hangfiredb\",\"OwnerRoleName\":\"hangfireuser\",\"Type\":0},{\"DatabaseId\":\"352d6612-a67d-4f20-8290-bd3477bbe9e3\",\"Name\":\"kitos\",\"DatabaseName\":\"kitos\",\"OwnerRoleName\":\"user\",\"Type\":0}]"
+    easyhosting.io/database-catalog: "[{\"DatabaseId\":\"fc5c4ec1-884d-472a-b2fb-353fa5bcd13f\",\"Name\":\"hangfiredb\",\"DatabaseName\":\"hangfiredb\",\"OwnerRoleName\":\"hangfireuser\",\"Type\":0},{\"DatabaseId\":\"352d6612-a67d-4f20-8290-bd3477bbe9e3\",\"Name\":\"kitos\",\"DatabaseName\":\"kitos\",\"OwnerRoleName\":\"user\",\"Type\":0},{\"DatabaseId\":\"04753a77-c157-4eaa-a605-ea92d63b76ca\",\"Name\":\"pubsubdb\",\"DatabaseName\":\"pubsubdb\",\"OwnerRoleName\":\"psuser\",\"Type\":0}]"
 spec:
   suspend: true
   schedule: "0 0 0 * * *"

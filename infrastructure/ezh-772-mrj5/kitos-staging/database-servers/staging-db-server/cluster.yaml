@@ -22,15 +22,21 @@ spec:
     size: 10Gi
   managed:
     roles:
-      - name: user
-        ensure: present
-        login: true
-        createdb: true
-        passwordSecret:
-          name: db-role-secret-user
       - name: hangfireuser
         ensure: present
         login: true
         createdb: true
         passwordSecret:
           name: db-role-secret-hangfireuser
+      - name: user
+        ensure: present
+        login: true
+        createdb: true
+        passwordSecret:
+          name: db-role-secret-user
+      - name: psuser
+        ensure: present
+        login: true
+        createdb: true
+        passwordSecret:
+          name: db-role-secret-psuser
