@@ -1,0 +1,20 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: staging-db-server-daily
+  namespace: kitos-staging
+  labels:
+    app.kubernetes.io/managed-by: easyhosting
+    easyhosting.io/resource-kind: database-server
+    easyhosting.io/resource-id: "fba2bf1dcc0c4ba5a01cd13f9e0abd6b"
+    easyhosting.io/application-id: "kitos-staging"
+  annotations:
+    easyhosting.io/database-catalog: "[{\"DatabaseId\":\"352d6612-a67d-4f20-8290-bd3477bbe9e3\",\"Name\":\"kitos\",\"DatabaseName\":\"kitos\",\"OwnerRoleName\":\"user\",\"Type\":0}]"
+spec:
+  schedule: "0 0 0 * * *"
+  backupOwnerReference: cluster
+  cluster:
+    name: staging-db-server
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io

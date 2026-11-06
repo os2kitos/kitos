@@ -1,0 +1,36 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: staging-db-server
+  namespace: kitos-staging
+  labels:
+    app.kubernetes.io/managed-by: easyhosting
+    easyhosting.io/resource-kind: database-server
+    easyhosting.io/resource-id: "fba2bf1dcc0c4ba5a01cd13f9e0abd6b"
+    easyhosting.io/application-id: "kitos-staging"
+  annotations:
+    easyhosting.io/display-name: "staging-db-server"
+    easyhosting.io/manifest-path: "infrastructure/ezh-772-mrj5/kitos-staging/database-servers/staging-db-server/cluster.yaml"
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17
+  bootstrap:
+    initdb:
+      database: postgres
+      owner: postgres
+  storage:
+    size: 10Gi
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      enabled: true
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: staging-db-server-backup-store
+  managed:
+    roles:
+      - name: user
+        ensure: present
+        login: true
+        createdb: true
+        passwordSecret:
+          name: db-role-secret-user
