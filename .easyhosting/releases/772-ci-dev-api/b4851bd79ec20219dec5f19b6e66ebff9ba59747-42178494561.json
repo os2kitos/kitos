@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "releaseId": "sha256:8fa13d3ae5b4ff360a0055d74c089fe0fd978213f23b764050c83342723aaf9b",
+  "applicationId": "dev",
+  "serviceName": "kitos-api",
+  "repositoryUrl": "https://github.com/Strongminds/kitos",
+  "releaseStream": "772-ci-dev-api",
+  "sourceRevision": {
+    "requestedKind": "DefaultBranch",
+    "requestedValue": "",
+    "resolvedCommitSha": "b4851bd79ec20219dec5f19b6e66ebff9ba59747"
+  },
+  "image": {
+    "repository": "ghcr.io/strongminds/kitos-kitos-api",
+    "digest": "sha256:8fa13d3ae5b4ff360a0055d74c089fe0fd978213f23b764050c83342723aaf9b"
+  },
+  "build": {
+    "createdAt": "2026-11-06T07:07:08Z",
+    "runUrl": "https://github.com/Strongminds/kitos/actions/runs/42178494561"
+  }
+}
