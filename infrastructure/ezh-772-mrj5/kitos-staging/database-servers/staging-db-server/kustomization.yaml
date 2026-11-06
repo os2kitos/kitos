@@ -3,6 +3,6 @@ kind: Kustomization
 resources:
   - cluster.yaml
   - scheduled-backup.yaml
-  - object-store.yaml
   - network-policy.yaml
+  - databases/hangfiredb
   - databases/kitos
