@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    easyhosting.io/service-reference: PubSub.Broker/Dockerfile
+    easyhosting.io/service-unique-id: 386615d7-3fea-4c3b-99b5-71c0dd6cc2e3
+    easyhosting.io/easy-hosting-domain-name: 386615d7-3fea-4c3b-99b5-71c0dd6cc2e3.ezh-772-mrj5.strongminds.easyhosting.strongminds.dev
+  labels:
+    app: kitos-broker
+  name: kitos-broker
+  namespace: kitos-staging
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: kitos-broker
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        sidecar.opentelemetry.io/inject: monitoring/sidecar-otel-collector
+        easyhosting.io/otlp-logs: "true"
+      labels:
+        app: kitos-broker
+        app.kubernetes.io/name: kitos-broker
+    spec:
+      containers:
+      - env:
+        - name: RABBITMQ_DEFAULT_USER
+          valueFrom:
+            secretKeyRef:
+              key: RabbitMqUsername
+              name: user-secret
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              key: RabbitMqPassword
+              name: user-secret
+        image: '{will be replaced by build pipeline}'
+        name: kitos-broker
+        ports:
+        - containerPort: 15672
+          name: http
+          protocol: TCP
+        - containerPort: 5672
+          name: amqp
+          protocol: TCP
+        resources:
+          limits:
+            memory: 2Gi
+            cpu: 2
+          requests:
+            memory: 1Gi
+            cpu: 1
+      imagePullSecrets:
+      - name: b9abd9f7-4fbb-4871-a9d7-6aef45cb79bd
