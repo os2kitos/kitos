@@ -1,4 +1,4 @@
-﻿using Core.Abstractions.Extensions;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
@@ -40,6 +40,63 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.OrganizationUsage).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<OrganizationUsageWriteRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<IEnumerable<string>>())).Returns(Maybe<JToken>.None);
             _sut = new ItSystemUsageWriteModelMapper(_currentHttpRequestMock.Object);
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void PersonalDataDeletion_PATCH_Distinguishes_Omitted_And_Cleared(bool supplied)
+        {
+            var fields = new[] { "PersonalDataDeletionCapability", "PersonalDataDeletionMethod", "PersonalDataDeletionDeadlineTypeUuid",
+                "PersonalDataDeletionProcedureDocumentation", "PersonalDataDeletionResponsibleUserUuid", "PersonalDataDeletionVerifiedDate",
+                "PersonalDataDeletionVerificationDocumentation" };
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { "GDPR" }.AsParameterMatch()))
+                .Returns((supplied ? fields : Array.Empty<string>()).ToHashSet());
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO { GDPR = new GDPRWriteRequestDTO() }).GDPR.Value;
+            Assert.Equal(supplied, output.PersonalDataDeletionCapability.HasChange);
+            Assert.Equal(supplied, output.PersonalDataDeletionMethod.HasChange);
+            Assert.Equal(supplied, output.PersonalDataDeletionDeadlineTypeUuid.HasChange);
+            Assert.Equal(supplied, output.PersonalDataDeletionProcedureDocumentation.HasChange);
+            Assert.Equal(supplied, output.PersonalDataDeletionResponsibleUserUuid.HasChange);
+            Assert.Equal(supplied, output.PersonalDataDeletionVerifiedDate.HasChange);
+            Assert.Equal(supplied, output.PersonalDataDeletionVerificationDocumentation.HasChange);
+            if (supplied)
+            {
+                Assert.Null(output.PersonalDataDeletionCapability.NewValue);
+                Assert.Null(output.PersonalDataDeletionMethod.NewValue);
+                Assert.True(output.PersonalDataDeletionDeadlineTypeUuid.NewValue.IsNone);
+                Assert.True(output.PersonalDataDeletionProcedureDocumentation.NewValue.IsNone);
+                Assert.Null(output.PersonalDataDeletionResponsibleUserUuid.NewValue);
+                Assert.Null(output.PersonalDataDeletionVerifiedDate.NewValue);
+                Assert.True(output.PersonalDataDeletionVerificationDocumentation.NewValue.IsNone);
+            }
+        }
+
+        [Fact]
+        public void PersonalDataDeletion_Maps_All_Values_And_Tracks_Changes()
+        {
+            var input = new GDPRWriteRequestDTO
+            {
+                PersonalDataDeletionCapability = PersonalDataDeletionCapabilityChoice.BulkDeletion,
+                PersonalDataDeletionMethod = PersonalDataDeletionMethodChoice.BySupplierOnRequest,
+                PersonalDataDeletionDeadlineTypeUuid = A<Guid>(),
+                PersonalDataDeletionResponsibleUserUuid = A<Guid>(),
+                PersonalDataDeletionVerifiedDate = A<DateTime>(),
+                PersonalDataDeletionProcedureDocumentation = new SimpleLinkDTO { Name = "Procedure", Url = "https://procedure" },
+                PersonalDataDeletionVerificationDocumentation = new SimpleLinkDTO { Name = "Check", Url = "https://check" }
+            };
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO { GDPR = input });
+            var gdpr = output.GDPR.Value;
+            Assert.Equal(Core.DomainModel.ItSystemUsage.GDPR.PersonalDataDeletionCapability.BulkDeletion, gdpr.PersonalDataDeletionCapability.NewValue);
+            Assert.Equal(Core.DomainModel.ItSystemUsage.GDPR.PersonalDataDeletionMethod.BySupplierOnRequest, gdpr.PersonalDataDeletionMethod.NewValue);
+            Assert.Equal(input.PersonalDataDeletionDeadlineTypeUuid, gdpr.PersonalDataDeletionDeadlineTypeUuid.NewValue.Value);
+            Assert.Equal(input.PersonalDataDeletionResponsibleUserUuid, gdpr.PersonalDataDeletionResponsibleUserUuid.NewValue);
+            Assert.Equal(input.PersonalDataDeletionVerifiedDate, gdpr.PersonalDataDeletionVerifiedDate.NewValue);
+            Assert.Equal("Procedure", gdpr.PersonalDataDeletionProcedureDocumentation.NewValue.Value.Name);
+            Assert.Equal("https://procedure", gdpr.PersonalDataDeletionProcedureDocumentation.NewValue.Value.Url);
+            Assert.Equal("Check", gdpr.PersonalDataDeletionVerificationDocumentation.NewValue.Value.Name);
+            Assert.Equal("https://check", gdpr.PersonalDataDeletionVerificationDocumentation.NewValue.Value.Url);
+            Assert.Equal(7, output.GetChangedPropertyKeys().Count(x => x.StartsWith("PersonalDataDeletion")));
         }
 
         [Fact]
@@ -261,11 +318,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertPropertyContainsResetDataChange(mappedGeneralSection.MainContractUuid);
         }
 
-        [Fact]
-        public void Can_Map_GDPR_Data_Properties()
+        [Theory]
+        [InlineData(RiskAssessmentConductedChoice.Yes, DpiaConductedChoice.Yes)]
+        [InlineData(RiskAssessmentConductedChoice.NoMustBePrepared, DpiaConductedChoice.NoMustBePrepared)]
+        [InlineData(RiskAssessmentConductedChoice.NoMustNotBePrepared, DpiaConductedChoice.NoMustNotBePrepared)]
+        public void Can_Map_GDPR_Data_Properties(RiskAssessmentConductedChoice riskAssessment, DpiaConductedChoice dpia)
         {
             //Arrange
             var input = A<GDPRWriteRequestDTO>();
+            input.RiskAssessmentConducted = riskAssessment;
+            input.DPIAConducted = dpia;
 
             //Act
             var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { GDPR = input });
@@ -301,7 +363,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertLinkMapping(input.RiskAssessmentDocumentation, mappedGdpr.RiskAssessmentDocumentation);
             Assert.Equal(input.RiskAssessmentResult, AssertPropertyContainsDataChange(mappedGdpr.RiskAssessmentResult)?.ToRiskLevelChoice());
             Assert.Equal(input.PlannedRiskAssessmentDate, AssertPropertyContainsDataChange(mappedGdpr.PlannedRiskAssessmentDate));
-            Assert.Equal(input.DPIAConducted, AssertPropertyContainsDataChange(mappedGdpr.DPIAConducted)?.ToYesNoDontKnowChoice());
+            Assert.Equal(input.DPIAConducted, AssertPropertyContainsDataChange(mappedGdpr.DPIAConducted)?.ToChoice());
             Assert.Equal(input.DPIADate, AssertPropertyContainsDataChange(mappedGdpr.DPIADate));
             Assert.Equal(input.NextDataRetentionEvaluationDate, AssertPropertyContainsDataChange(mappedGdpr.NextDataRetentionEvaluationDate));
             Assert.Equal(input.DataRetentionEvaluationFrequencyInMonths, AssertPropertyContainsDataChange(mappedGdpr.DataRetentionEvaluationFrequencyInMonths));
@@ -592,6 +654,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var input = A<SystemRelationWriteRequestDTO>();
+            input.SystemRelationDirection = SystemRelationDirectionChoice.OutgoingData;
 
             //Act
             var output = _sut.MapRelation(input);
@@ -603,6 +666,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.RelationInterfaceUuid, output.UsingInterfaceUuid);
             Assert.Equal(input.Description, output.Description);
             Assert.Equal(input.UrlReference, output.UrlReference);
+            Assert.Equal(Core.DomainModel.ItSystemUsage.SystemRelationDirection.OutgoingData, output.SystemRelationDirection);
         }
 
         [Theory]

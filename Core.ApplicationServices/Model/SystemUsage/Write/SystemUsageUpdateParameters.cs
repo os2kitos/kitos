@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Shared.Write;
 
 
 namespace Core.ApplicationServices.Model.SystemUsage.Write
 {
-    public class SystemUsageUpdateParameters: ISupplierAssociatedEntityUpdateParameters
+    public class SystemUsageUpdateParameters : ISupplierAssociatedEntityUpdateParameters
     {
         public Maybe<UpdatedSystemUsageGeneralProperties> GeneralProperties { get; set; } = Maybe<UpdatedSystemUsageGeneralProperties>.None;
         public Maybe<UpdatedSystemUsageOrganizationalUseParameters> OrganizationalUsage { get; set; } = Maybe<UpdatedSystemUsageOrganizationalUseParameters>.None;
@@ -47,48 +48,27 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         {
             var changed = new List<string>();
             var general = GeneralProperties.Value;
-            if (general.LocalSystemId.HasChange)
-                changed.Add(nameof(general.LocalSystemId));
-            if (general.LocalCallName.HasChange)
-                changed.Add(nameof(general.LocalCallName));
-            if (general.DataClassificationUuid.HasChange)
-                changed.Add(nameof(general.DataClassificationUuid));
-            if (general.Notes.HasChange)
-                changed.Add(nameof(general.Notes));
-            if (general.SystemVersion.HasChange)
-                changed.Add(nameof(general.SystemVersion));
-            if (general.NumberOfExpectedUsersInterval.HasChange)
-                changed.Add(nameof(general.NumberOfExpectedUsersInterval));
-            if (general.LifeCycleStatus.HasChange)
-                changed.Add(nameof(general.LifeCycleStatus));
-            if (general.ValidFrom.HasChange)
-                changed.Add(nameof(general.ValidFrom));
-            if (general.ValidTo.HasChange)
-                changed.Add(nameof(general.ValidTo));
-            if (general.MainContractUuid.HasChange)
-                changed.Add(nameof(general.MainContractUuid));
-            if (general.ContainsAITechnology.HasChange)
-                changed.Add(nameof(general.ContainsAITechnology));
-            if (general.WebAccessibilityCompliance.HasChange)
-                changed.Add(nameof(general.WebAccessibilityCompliance));
-            if (general.LastWebAccessibilityCheck.HasChange)
-                changed.Add(nameof(general.LastWebAccessibilityCheck));
-            if (general.WebAccessibilityNotes.HasChange)
-                changed.Add(nameof(general.WebAccessibilityNotes));
-            if (general.IsSociallyCritical.HasChange)
-                changed.Add(nameof(general.IsSociallyCritical));
-            if (general.BusinessCritical.HasChange)
-                changed.Add(nameof(general.BusinessCritical));
-            if (general.SystemUsageCriticalityLevelUuid.HasChange)
-                changed.Add(nameof(general.SystemUsageCriticalityLevelUuid));
-            if (general.CriticalityLevelDocumentation.HasChange)
-                changed.Add(nameof(general.CriticalityLevelDocumentation));
-            if (general.Purpose.HasChange)
-                changed.Add(nameof(general.Purpose));
-            if (general.TechnicalSystemTypeUuids.HasChange)
-                changed.Add(nameof(general.TechnicalSystemTypeUuids));
-            if (general.HostedAt.HasChange)
-                changed.Add(nameof(general.HostedAt));
+            general.LocalSystemId.AddIfChanged(changed, nameof(general.LocalSystemId));
+            general.LocalCallName.AddIfChanged(changed, nameof(general.LocalCallName));
+            general.DataClassificationUuid.AddIfChanged(changed, nameof(general.DataClassificationUuid));
+            general.Notes.AddIfChanged(changed, nameof(general.Notes));
+            general.SystemVersion.AddIfChanged(changed, nameof(general.SystemVersion));
+            general.NumberOfExpectedUsersInterval.AddIfChanged(changed, nameof(general.NumberOfExpectedUsersInterval));
+            general.LifeCycleStatus.AddIfChanged(changed, nameof(general.LifeCycleStatus));
+            general.ValidFrom.AddIfChanged(changed, nameof(general.ValidFrom));
+            general.ValidTo.AddIfChanged(changed, nameof(general.ValidTo));
+            general.MainContractUuid.AddIfChanged(changed, nameof(general.MainContractUuid));
+            general.ContainsAITechnology.AddIfChanged(changed, nameof(general.ContainsAITechnology));
+            general.WebAccessibilityCompliance.AddIfChanged(changed, nameof(general.WebAccessibilityCompliance));
+            general.LastWebAccessibilityCheck.AddIfChanged(changed, nameof(general.LastWebAccessibilityCheck));
+            general.WebAccessibilityNotes.AddIfChanged(changed, nameof(general.WebAccessibilityNotes));
+            general.IsSociallyCritical.AddIfChanged(changed, nameof(general.IsSociallyCritical));
+            general.BusinessCritical.AddIfChanged(changed, nameof(general.BusinessCritical));
+            general.SystemUsageCriticalityLevelUuid.AddIfChanged(changed, nameof(general.SystemUsageCriticalityLevelUuid));
+            general.CriticalityLevelDocumentation.AddIfChanged(changed, nameof(general.CriticalityLevelDocumentation));
+            general.Purpose.AddIfChanged(changed, nameof(general.Purpose));
+            general.TechnicalSystemTypeUuids.AddIfChanged(changed, nameof(general.TechnicalSystemTypeUuids));
+            general.HostedAt.AddIfChanged(changed, nameof(general.HostedAt));
             return changed;
         }
 
@@ -96,10 +76,8 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         {
             var changed = new List<string>();
             var org = OrganizationalUsage.Value;
-            if (org.UsingOrganizationUnitUuids.HasChange)
-                changed.Add(nameof(org.UsingOrganizationUnitUuids));
-            if (org.ResponsibleOrganizationUnitUuid.HasChange)
-                changed.Add(nameof(org.ResponsibleOrganizationUnitUuid));
+            org.UsingOrganizationUnitUuids.AddIfChanged(changed, nameof(org.UsingOrganizationUnitUuids));
+            org.ResponsibleOrganizationUnitUuid.AddIfChanged(changed, nameof(org.ResponsibleOrganizationUnitUuid));
             return changed;
         }
 
@@ -107,10 +85,8 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         {
             var changed = new List<string>();
             var kle = KLE.Value;
-            if (kle.AddedKLEUuids.HasChange)
-                changed.Add(nameof(kle.AddedKLEUuids));
-            if (kle.RemovedKLEUuids.HasChange)
-                changed.Add(nameof(kle.RemovedKLEUuids));
+            kle.AddedKLEUuids.AddIfChanged(changed, nameof(kle.AddedKLEUuids));
+            kle.RemovedKLEUuids.AddIfChanged(changed, nameof(kle.RemovedKLEUuids));
             return changed;
         }
 
@@ -118,8 +94,7 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         {
             var changed = new List<string>();
             var roles = Roles.Value;
-            if (roles.UserRolePairs.HasChange)
-                changed.Add(nameof(roles.UserRolePairs));
+            roles.UserRolePairs.AddIfChanged(changed, nameof(roles.UserRolePairs));
             return changed;
         }
 
@@ -127,54 +102,37 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         {
             var changed = new List<string>();
             var gdpr = GDPR.Value;
-            if (gdpr.ProcessingPurpose.HasChange)
-                changed.Add(nameof(gdpr.ProcessingPurpose));
-            if (gdpr.DirectoryDocumentation.HasChange)
-                changed.Add(nameof(gdpr.DirectoryDocumentation));
-            if (gdpr.DataSensitivityLevels.HasChange)
-                changed.Add(nameof(gdpr.DataSensitivityLevels));
-            if (gdpr.SensitivePersonDataUuids.HasChange)
-                changed.Add(nameof(gdpr.SensitivePersonDataUuids));
-            if (gdpr.PersonalDataOptions.HasChange)
-                changed.Add(nameof(gdpr.PersonalDataOptions));
-            if (gdpr.RegisteredDataCategoryUuids.HasChange)
-                changed.Add(nameof(gdpr.RegisteredDataCategoryUuids));
-            if (gdpr.TechnicalPrecautionsInPlace.HasChange)
-                changed.Add(nameof(gdpr.TechnicalPrecautionsInPlace));
-            if (gdpr.TechnicalPrecautionsApplied.HasChange)
-                changed.Add(nameof(gdpr.TechnicalPrecautionsApplied));
-            if (gdpr.TechnicalPrecautionsDocumentation.HasChange)
-                changed.Add(nameof(gdpr.TechnicalPrecautionsDocumentation));
-            if (gdpr.UserSupervision.HasChange)
-                changed.Add(nameof(gdpr.UserSupervision));
-            if (gdpr.UserSupervisionDate.HasChange)
-                changed.Add(nameof(gdpr.UserSupervisionDate));
-            if (gdpr.UserSupervisionDocumentation.HasChange)
-                changed.Add(nameof(gdpr.UserSupervisionDocumentation));
-            if (gdpr.RiskAssessmentConducted.HasChange)
-                changed.Add(nameof(gdpr.RiskAssessmentConducted));
-            if (gdpr.RiskAssessmentConductedDate.HasChange)
-                changed.Add(nameof(gdpr.RiskAssessmentConductedDate));
-            if (gdpr.RiskAssessmentResult.HasChange)
-                changed.Add(nameof(gdpr.RiskAssessmentResult));
-            if (gdpr.RiskAssessmentDocumentation.HasChange)
-                changed.Add(nameof(gdpr.RiskAssessmentDocumentation));
-            if (gdpr.PlannedRiskAssessmentDate.HasChange)
-                changed.Add(nameof(gdpr.PlannedRiskAssessmentDate));
-            if (gdpr.RiskAssessmentNotes.HasChange)
-                changed.Add(nameof(gdpr.RiskAssessmentNotes));
-            if (gdpr.DPIAConducted.HasChange)
-                changed.Add(nameof(gdpr.DPIAConducted));
-            if (gdpr.DPIADate.HasChange)
-                changed.Add(nameof(gdpr.DPIADate));
-            if (gdpr.DPIADocumentation.HasChange)
-                changed.Add(nameof(gdpr.DPIADocumentation));
-            if (gdpr.RetentionPeriodDefined.HasChange)
-                changed.Add(nameof(gdpr.RetentionPeriodDefined));
-            if (gdpr.NextDataRetentionEvaluationDate.HasChange)
-                changed.Add(nameof(gdpr.NextDataRetentionEvaluationDate));
-            if (gdpr.DataRetentionEvaluationFrequencyInMonths.HasChange)
-                changed.Add(nameof(gdpr.DataRetentionEvaluationFrequencyInMonths));
+            gdpr.PersonalDataDeletionCapability.AddIfChanged(changed, nameof(gdpr.PersonalDataDeletionCapability));
+            gdpr.PersonalDataDeletionMethod.AddIfChanged(changed, nameof(gdpr.PersonalDataDeletionMethod));
+            gdpr.PersonalDataDeletionDeadlineTypeUuid.AddIfChanged(changed, nameof(gdpr.PersonalDataDeletionDeadlineTypeUuid));
+            gdpr.PersonalDataDeletionProcedureDocumentation.AddIfChanged(changed, nameof(gdpr.PersonalDataDeletionProcedureDocumentation));
+            gdpr.PersonalDataDeletionResponsibleUserUuid.AddIfChanged(changed, nameof(gdpr.PersonalDataDeletionResponsibleUserUuid));
+            gdpr.PersonalDataDeletionVerifiedDate.AddIfChanged(changed, nameof(gdpr.PersonalDataDeletionVerifiedDate));
+            gdpr.PersonalDataDeletionVerificationDocumentation.AddIfChanged(changed, nameof(gdpr.PersonalDataDeletionVerificationDocumentation));
+            gdpr.ProcessingPurpose.AddIfChanged(changed, nameof(gdpr.ProcessingPurpose));
+            gdpr.DirectoryDocumentation.AddIfChanged(changed, nameof(gdpr.DirectoryDocumentation));
+            gdpr.DataSensitivityLevels.AddIfChanged(changed, nameof(gdpr.DataSensitivityLevels));
+            gdpr.SensitivePersonDataUuids.AddIfChanged(changed, nameof(gdpr.SensitivePersonDataUuids));
+            gdpr.PersonalDataOptions.AddIfChanged(changed, nameof(gdpr.PersonalDataOptions));
+            gdpr.RegisteredDataCategoryUuids.AddIfChanged(changed, nameof(gdpr.RegisteredDataCategoryUuids));
+            gdpr.TechnicalPrecautionsInPlace.AddIfChanged(changed, nameof(gdpr.TechnicalPrecautionsInPlace));
+            gdpr.TechnicalPrecautionsApplied.AddIfChanged(changed, nameof(gdpr.TechnicalPrecautionsApplied));
+            gdpr.TechnicalPrecautionsDocumentation.AddIfChanged(changed, nameof(gdpr.TechnicalPrecautionsDocumentation));
+            gdpr.UserSupervision.AddIfChanged(changed, nameof(gdpr.UserSupervision));
+            gdpr.UserSupervisionDate.AddIfChanged(changed, nameof(gdpr.UserSupervisionDate));
+            gdpr.UserSupervisionDocumentation.AddIfChanged(changed, nameof(gdpr.UserSupervisionDocumentation));
+            gdpr.RiskAssessmentConducted.AddIfChanged(changed, nameof(gdpr.RiskAssessmentConducted));
+            gdpr.RiskAssessmentConductedDate.AddIfChanged(changed, nameof(gdpr.RiskAssessmentConductedDate));
+            gdpr.RiskAssessmentResult.AddIfChanged(changed, nameof(gdpr.RiskAssessmentResult));
+            gdpr.RiskAssessmentDocumentation.AddIfChanged(changed, nameof(gdpr.RiskAssessmentDocumentation));
+            gdpr.PlannedRiskAssessmentDate.AddIfChanged(changed, nameof(gdpr.PlannedRiskAssessmentDate));
+            gdpr.RiskAssessmentNotes.AddIfChanged(changed, nameof(gdpr.RiskAssessmentNotes));
+            gdpr.DPIAConducted.AddIfChanged(changed, nameof(gdpr.DPIAConducted));
+            gdpr.DPIADate.AddIfChanged(changed, nameof(gdpr.DPIADate));
+            gdpr.DPIADocumentation.AddIfChanged(changed, nameof(gdpr.DPIADocumentation));
+            gdpr.RetentionPeriodDefined.AddIfChanged(changed, nameof(gdpr.RetentionPeriodDefined));
+            gdpr.NextDataRetentionEvaluationDate.AddIfChanged(changed, nameof(gdpr.NextDataRetentionEvaluationDate));
+            gdpr.DataRetentionEvaluationFrequencyInMonths.AddIfChanged(changed, nameof(gdpr.DataRetentionEvaluationFrequencyInMonths));
             return changed;
         }
 
@@ -182,26 +140,16 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         {
             var changed = new List<string>();
             var arch = Archiving.Value;
-            if (arch.ArchiveDuty.HasChange)
-                changed.Add(nameof(arch.ArchiveDuty));
-            if (arch.ArchiveTypeUuid.HasChange)
-                changed.Add(nameof(arch.ArchiveTypeUuid));
-            if (arch.ArchiveLocationUuid.HasChange)
-                changed.Add(nameof(arch.ArchiveLocationUuid));
-            if (arch.ArchiveTestLocationUuid.HasChange)
-                changed.Add(nameof(arch.ArchiveTestLocationUuid));
-            if (arch.ArchiveSupplierOrganizationUuid.HasChange)
-                changed.Add(nameof(arch.ArchiveSupplierOrganizationUuid));
-            if (arch.ArchiveActive.HasChange)
-                changed.Add(nameof(arch.ArchiveActive));
-            if (arch.ArchiveNotes.HasChange)
-                changed.Add(nameof(arch.ArchiveNotes));
-            if (arch.ArchiveFrequencyInMonths.HasChange)
-                changed.Add(nameof(arch.ArchiveFrequencyInMonths));
-            if (arch.ArchiveDocumentBearing.HasChange)
-                changed.Add(nameof(arch.ArchiveDocumentBearing));
-            if (arch.ArchiveJournalPeriods.HasChange)
-                changed.Add(nameof(arch.ArchiveJournalPeriods));
+            arch.ArchiveDuty.AddIfChanged(changed, nameof(arch.ArchiveDuty));
+            arch.ArchiveTypeUuid.AddIfChanged(changed, nameof(arch.ArchiveTypeUuid));
+            arch.ArchiveLocationUuid.AddIfChanged(changed, nameof(arch.ArchiveLocationUuid));
+            arch.ArchiveTestLocationUuid.AddIfChanged(changed, nameof(arch.ArchiveTestLocationUuid));
+            arch.ArchiveSupplierOrganizationUuid.AddIfChanged(changed, nameof(arch.ArchiveSupplierOrganizationUuid));
+            arch.ArchiveActive.AddIfChanged(changed, nameof(arch.ArchiveActive));
+            arch.ArchiveNotes.AddIfChanged(changed, nameof(arch.ArchiveNotes));
+            arch.ArchiveFrequencyInMonths.AddIfChanged(changed, nameof(arch.ArchiveFrequencyInMonths));
+            arch.ArchiveDocumentBearing.AddIfChanged(changed, nameof(arch.ArchiveDocumentBearing));
+            arch.ArchiveJournalPeriods.AddIfChanged(changed, nameof(arch.ArchiveJournalPeriods));
             return changed;
         }
 

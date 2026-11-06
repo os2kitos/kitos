@@ -79,6 +79,22 @@ namespace Infrastructure.DataAccess
             AddOptions<SystemUsageCriticalityLevel, ItSystemUsage>(context, context.SystemUsageCriticalityLevelTypes, globalAdmin,
                 "TestCriticality1", "TestCriticality2", "TestCriticality3");
 
+            AddOptions<PersonalDataDeletionDeadlineType, ItSystemUsage>(context, context.PersonalDataDeletionDeadlineTypes, globalAdmin,
+                "Der er ikke fastlagt slettefrister",
+                "30 dage",
+                "3 måneder",
+                "1 år",
+                "5 år",
+                "6 år",
+                "9 år",
+                "10 år",
+                "11 år",
+                "15 år",
+                "35 år",
+                "45 år",
+                "Flere forskellige slettefrister i samme system",
+                "Slettes aldrig (se sletteprocedure for argumentation)");
+
             AddOptions<TechnicalSystemType, ItSystemUsage>(context, context.TechnicalSystemTypes, globalAdmin,
                 "Teknisk systemtype 1", "Teknisk systemtype 2", "Teknisk systemtype 3");
 
@@ -151,19 +167,19 @@ namespace Infrastructure.DataAccess
             Console.Out.WriteLine("Initializing org roles");
 
             AddRoleIfMissing<OrganizationUnitRole, OrganizationUnitRight>(context.OrganizationUnitRoles, globalAdmin,
-                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "Chef",                    Description = "Lederen af en organisationsenhed", HasWriteAccess = true,  Priority = 7 });
+                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "Chef", Description = "Lederen af en organisationsenhed", HasWriteAccess = true, Priority = 7 });
             AddRoleIfMissing<OrganizationUnitRole, OrganizationUnitRight>(context.OrganizationUnitRoles, globalAdmin,
-                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "Ressourceperson",         Description = "...", HasWriteAccess = true,  Priority = 6 });
+                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "Ressourceperson", Description = "...", HasWriteAccess = true, Priority = 6 });
             AddRoleIfMissing<OrganizationUnitRole, OrganizationUnitRight>(context.OrganizationUnitRoles, globalAdmin,
-                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "Medarbejder",             Description = "...", HasWriteAccess = false, Priority = 5 });
+                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "Medarbejder", Description = "...", HasWriteAccess = false, Priority = 5 });
             AddRoleIfMissing<OrganizationUnitRole, OrganizationUnitRight>(context.OrganizationUnitRoles, globalAdmin,
-                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "Digitaliseringskonsulent", Description = "...", HasWriteAccess = true,  Priority = 4 });
+                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "Digitaliseringskonsulent", Description = "...", HasWriteAccess = true, Priority = 4 });
             AddRoleIfMissing<OrganizationUnitRole, OrganizationUnitRight>(context.OrganizationUnitRoles, globalAdmin,
-                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "IT konsulent",            Description = "...", HasWriteAccess = true,  Priority = 3 });
+                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "IT konsulent", Description = "...", HasWriteAccess = true, Priority = 3 });
             AddRoleIfMissing<OrganizationUnitRole, OrganizationUnitRight>(context.OrganizationUnitRoles, globalAdmin,
-                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "Leder",                   Description = "...", HasWriteAccess = true,  Priority = 2 });
+                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "Leder", Description = "...", HasWriteAccess = true, Priority = 2 });
             AddRoleIfMissing<OrganizationUnitRole, OrganizationUnitRight>(context.OrganizationUnitRoles, globalAdmin,
-                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "Direktør",                Description = "...", HasWriteAccess = false, Priority = 1 });
+                new OrganizationUnitRole { IsLocallyAvailable = true, Name = "Direktør", Description = "...", HasWriteAccess = false, Priority = 1 });
 
             context.SaveChanges();
 
@@ -174,23 +190,23 @@ namespace Infrastructure.DataAccess
             Console.Out.WriteLine("Initializing system roles");
 
             AddRoleIfMissing<ItSystemRole, ItSystemRight>(context.ItSystemRoles, globalAdmin,
-                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Systemejer",            Priority = 9 });
+                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Systemejer", Priority = 9 });
             AddRoleIfMissing<ItSystemRole, ItSystemRight>(context.ItSystemRoles, globalAdmin,
-                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Systemansvarlig",        Priority = 8 });
+                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Systemansvarlig", Priority = 8 });
             AddRoleIfMissing<ItSystemRole, ItSystemRight>(context.ItSystemRoles, globalAdmin,
-                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Forretningsejer",        Priority = 7 });
+                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Forretningsejer", Priority = 7 });
             AddRoleIfMissing<ItSystemRole, ItSystemRight>(context.ItSystemRoles, globalAdmin,
-                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Superbrugeransvarlig",   Priority = 6 });
+                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Superbrugeransvarlig", Priority = 6 });
             AddRoleIfMissing<ItSystemRole, ItSystemRight>(context.ItSystemRoles, globalAdmin,
-                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Superbruger",            Priority = 5 });
+                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Superbruger", Priority = 5 });
             AddRoleIfMissing<ItSystemRole, ItSystemRight>(context.ItSystemRoles, globalAdmin,
-                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Sikkerhedsansvarlig",    Priority = 4 });
+                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Sikkerhedsansvarlig", Priority = 4 });
             AddRoleIfMissing<ItSystemRole, ItSystemRight>(context.ItSystemRoles, globalAdmin,
-                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Changemanager",          Priority = 3 });
+                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Changemanager", Priority = 3 });
             AddRoleIfMissing<ItSystemRole, ItSystemRight>(context.ItSystemRoles, globalAdmin,
-                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Dataejer",               Priority = 2 });
+                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Dataejer", Priority = 2 });
             AddRoleIfMissing<ItSystemRole, ItSystemRight>(context.ItSystemRoles, globalAdmin,
-                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Systemadminstrator",     Priority = 1 });
+                new ItSystemRole { HasReadAccess = true, HasWriteAccess = true, IsLocallyAvailable = true, Name = "Systemadminstrator", Priority = 1 });
 
             context.SaveChanges();
 
@@ -201,17 +217,17 @@ namespace Infrastructure.DataAccess
             Console.Out.WriteLine("Initializing contract roles");
 
             AddRoleIfMissing<ItContractRole, ItContractRight>(context.ItContractRoles, globalAdmin,
-                new ItContractRole { HasWriteAccess = true, Name = "Kontraktejer",       IsObligatory = false, IsLocallyAvailable = true, Priority = 6 });
+                new ItContractRole { HasWriteAccess = true, Name = "Kontraktejer", IsObligatory = false, IsLocallyAvailable = true, Priority = 6 });
             AddRoleIfMissing<ItContractRole, ItContractRight>(context.ItContractRoles, globalAdmin,
-                new ItContractRole { HasWriteAccess = true, Name = "Kontraktmanager",    IsObligatory = false, IsLocallyAvailable = true, Priority = 5 });
+                new ItContractRole { HasWriteAccess = true, Name = "Kontraktmanager", IsObligatory = false, IsLocallyAvailable = true, Priority = 5 });
             AddRoleIfMissing<ItContractRole, ItContractRight>(context.ItContractRoles, globalAdmin,
-                new ItContractRole { HasWriteAccess = true, Name = "Juridisk rådgiver",  IsObligatory = false, IsLocallyAvailable = true, Priority = 4 });
+                new ItContractRole { HasWriteAccess = true, Name = "Juridisk rådgiver", IsObligatory = false, IsLocallyAvailable = true, Priority = 4 });
             AddRoleIfMissing<ItContractRole, ItContractRight>(context.ItContractRoles, globalAdmin,
-                new ItContractRole { HasWriteAccess = true, Name = "Konsulent",          IsObligatory = false, IsLocallyAvailable = true, Priority = 3 });
+                new ItContractRole { HasWriteAccess = true, Name = "Konsulent", IsObligatory = false, IsLocallyAvailable = true, Priority = 3 });
             AddRoleIfMissing<ItContractRole, ItContractRight>(context.ItContractRoles, globalAdmin,
-                new ItContractRole { HasWriteAccess = true, Name = "Fakturamodtager",    IsObligatory = false, IsLocallyAvailable = true, Priority = 2 });
+                new ItContractRole { HasWriteAccess = true, Name = "Fakturamodtager", IsObligatory = false, IsLocallyAvailable = true, Priority = 2 });
             AddRoleIfMissing<ItContractRole, ItContractRight>(context.ItContractRoles, globalAdmin,
-                new ItContractRole { HasWriteAccess = true, Name = "Budgetansvarlig",    IsObligatory = false, IsLocallyAvailable = true, Priority = 1 });
+                new ItContractRole { HasWriteAccess = true, Name = "Budgetansvarlig", IsObligatory = false, IsLocallyAvailable = true, Priority = 1 });
 
             context.SaveChanges();
 
@@ -222,9 +238,9 @@ namespace Infrastructure.DataAccess
             Console.Out.WriteLine("Initializing dpa roles");
 
             AddRoleIfMissing<DataProcessingRegistrationRole, DataProcessingRegistrationRight>(context.DataProcessingRegistrationRoles, globalAdmin,
-                new DataProcessingRegistrationRole { HasWriteAccess = true,  Name = "Standard Skriverolle", IsObligatory = true, IsLocallyAvailable = true, Priority = 1 });
+                new DataProcessingRegistrationRole { HasWriteAccess = true, Name = "Standard Skriverolle", IsObligatory = true, IsLocallyAvailable = true, Priority = 1 });
             AddRoleIfMissing<DataProcessingRegistrationRole, DataProcessingRegistrationRight>(context.DataProcessingRegistrationRoles, globalAdmin,
-                new DataProcessingRegistrationRole { HasWriteAccess = false, Name = "Standard Læserolle",   IsObligatory = true, IsLocallyAvailable = true, Priority = 2 });
+                new DataProcessingRegistrationRole { HasWriteAccess = false, Name = "Standard Læserolle", IsObligatory = true, IsLocallyAvailable = true, Priority = 2 });
 
             context.SaveChanges();
 
@@ -234,10 +250,10 @@ namespace Infrastructure.DataAccess
 
             Console.Out.WriteLine("Initializing organizations");
 
-            AddOrganizationTypeIfMissing(context, "Kommune",                     OrganizationCategory.Municipality);
-            AddOrganizationTypeIfMissing(context, "Interessefællesskab",         OrganizationCategory.Municipality);
-            AddOrganizationTypeIfMissing(context, "Virksomhed",                  OrganizationCategory.Other);
-            AddOrganizationTypeIfMissing(context, "Anden offentlig myndighed",   OrganizationCategory.Other);
+            AddOrganizationTypeIfMissing(context, "Kommune", OrganizationCategory.Municipality);
+            AddOrganizationTypeIfMissing(context, "Interessefællesskab", OrganizationCategory.Municipality);
+            AddOrganizationTypeIfMissing(context, "Virksomhed", OrganizationCategory.Other);
+            AddOrganizationTypeIfMissing(context, "Anden offentlig myndighed", OrganizationCategory.Other);
 
             context.SaveChanges();
 

@@ -65,10 +65,11 @@ namespace Core.ApplicationServices.SystemUsage.Relations
             string description,
             string reference,
             int? frequencyId,
-            int? contractId)
+            int? contractId,
+            SystemRelationDirection? systemRelationDirection = null)
         {
             var operationContext = new SystemRelationOperationContext(
-                new SystemRelationOperationParameters(fromSystemUsageId, toSystemUsageId, interfaceId, frequencyId, contractId),
+                new SystemRelationOperationParameters(fromSystemUsageId, toSystemUsageId, interfaceId, frequencyId, contractId, systemRelationDirection),
                 new SystemRelationOperationEntities());
 
             return
@@ -88,7 +89,14 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                             var contract = context.Entities.Contract;
                             var relationInterface = context.Entities.Interface;
                             return fromSystemUsage!
-                                .AddUsageRelationTo(toSystemUsage, relationInterface, description, reference, frequency, contract)
+                                .AddUsageRelationTo(
+                                    toSystemUsage,
+                                    relationInterface,
+                                    description,
+                                    reference,
+                                    frequency,
+                                    contract,
+                                    context.Input.SystemRelationDirection)
                                 .Match<Result<SystemRelation, OperationError>>
                                 (
                                     onSuccess: createdRelation =>
@@ -113,10 +121,11 @@ namespace Core.ApplicationServices.SystemUsage.Relations
             string? changedReference,
             int? toInterfaceId,
             int? toContractId,
-            int? toFrequencyId)
+            int? toFrequencyId,
+            SystemRelationDirection? systemRelationDirection = null)
         {
             var operationContext = new SystemRelationOperationContext(
-                new SystemRelationOperationParameters(fromSystemUsageId, toSystemUsageId, toInterfaceId, toFrequencyId, toContractId),
+                new SystemRelationOperationParameters(fromSystemUsageId, toSystemUsageId, toInterfaceId, toFrequencyId, toContractId, systemRelationDirection),
                 new SystemRelationOperationEntities());
 
             var originalToSystemUsage = _relationRepository.GetByKey(relationId)?.ToSystemUsage;
@@ -149,6 +158,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                                 (
                                     onSuccess: modifiedRelation =>
                                     {
+                                        modifiedRelation.SystemRelationDirection = context.Input.SystemRelationDirection;
                                         if (originalToSystemUsage.Id != toSystemUsageId)
                                         {
                                             _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(originalToSystemUsage));
@@ -378,18 +388,20 @@ namespace Core.ApplicationServices.SystemUsage.Relations
             public int? InterfaceId { get; set; }
             public int? FrequencyId { get; set; }
             public int? ContractId { get; set; }
+            public SystemRelationDirection? SystemRelationDirection { get; set; }
 
             public SystemRelationOperationParameters()
             {
             }
 
-            public SystemRelationOperationParameters(int fromSystemUsageId, int systemUsageId, int? interfaceId, int? frequencyId, int? contractId)
+            public SystemRelationOperationParameters(int fromSystemUsageId, int systemUsageId, int? interfaceId, int? frequencyId, int? contractId, SystemRelationDirection? systemRelationDirection)
             {
                 FromSystemUsageId = fromSystemUsageId;
                 ToSystemUsageId = systemUsageId;
                 InterfaceId = interfaceId;
                 FrequencyId = frequencyId;
                 ContractId = contractId;
+                SystemRelationDirection = systemRelationDirection;
             }
         }
 

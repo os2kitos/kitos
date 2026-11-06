@@ -117,6 +117,7 @@ namespace Core.DomainServices.SystemUsage
             destination.ItInterfaceVersionsAsCsv = interfaces.Select(x => x.Version).Where(x => !x.IsWhiteSpace()).ToStringWithDelimiter();
             destination.LicensingAndCodeModels = source.LicensingAndCodeModels;
 
+            PatchPersonalDataDeletion(source, destination);
             PatchParentSystemInformation(source, destination);
             PatchRoleAssignments(source, destination);
             PatchOrganizationUnits(source, destination);
@@ -291,7 +292,7 @@ namespace Core.DomainServices.SystemUsage
         private static void PatchGeneralPurposeRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
             var generalPurpose = source.GeneralPurpose?.TrimEnd();
-            destination.GeneralPurpose = generalPurpose?.Substring(0, Math.Min(generalPurpose.Length, ItSystemUsage.LongProperyMaxLength));
+            destination.GeneralPurpose = generalPurpose?.Substring(0, Math.Min(generalPurpose.Length, ItSystemUsage.PurposeMaxLength));
         }
 
         private static void PatchProcessingPurposeRegistrations(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
@@ -347,9 +348,25 @@ namespace Core.DomainServices.SystemUsage
             }
         }
 
+        private static void PatchPersonalDataDeletion(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        {
+            destination.PersonalDataDeletionCapability = source.PersonalDataDeletionCapability;
+            destination.PersonalDataDeletionMethod = source.PersonalDataDeletionMethod;
+            destination.PersonalDataDeletionDeadlineTypeUuid = source.PersonalDataDeletionDeadlineType?.Uuid;
+            destination.PersonalDataDeletionDeadlineTypeName = source.PersonalDataDeletionDeadlineType?.Name;
+            destination.PersonalDataDeletionResponsibleUserId = source.PersonalDataDeletionResponsibleUserId;
+            destination.PersonalDataDeletionResponsibleUserUuid = source.PersonalDataDeletionResponsibleUser?.Uuid;
+            destination.PersonalDataDeletionResponsibleUserName = source.PersonalDataDeletionResponsibleUser?.GetFullName();
+            destination.PersonalDataDeletionVerifiedDate = source.PersonalDataDeletionVerifiedDate;
+            destination.PersonalDataDeletionProcedureDocumentationName = source.PersonalDataDeletionProcedureDocumentationUrlName;
+            destination.PersonalDataDeletionProcedureDocumentationUrl = source.PersonalDataDeletionProcedureDocumentationUrl;
+            destination.PersonalDataDeletionVerificationDocumentationName = source.PersonalDataDeletionVerificationDocumentationUrlName;
+            destination.PersonalDataDeletionVerificationDocumentationUrl = source.PersonalDataDeletionVerificationDocumentationUrl;
+        }
+
         private static void PatchRiskSupervisionDocumentation(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
-            if (source.riskAssessment == YesNoDontKnowIrrelevant.Yes)
+            if (source.riskAssessment == RiskAssessmentConducted.Yes)
             {
                 destination.RiskSupervisionDocumentationName = source.RiskSupervisionDocumentationUrlName;
                 destination.RiskSupervisionDocumentationUrl = source.RiskSupervisionDocumentationUrl;
@@ -459,7 +476,7 @@ namespace Core.DomainServices.SystemUsage
             destination.MainContractId = source.MainContract?.ItContractId;
             destination.MainContractSupplierId = source.MainContract?.ItContract?.Supplier?.Id;
             destination.MainContractSupplierName = source.MainContract?.ItContract?.Supplier?.Name;
-            
+
             // Map the contract state to the new enum
             if (source.MainContract == null)
             {
@@ -467,8 +484,8 @@ namespace Core.DomainServices.SystemUsage
             }
             else
             {
-                destination.MainContractIsActive = source.IsActiveAccordingToMainContract 
-                    ? MainContractState.Active 
+                destination.MainContractIsActive = source.IsActiveAccordingToMainContract
+                    ? MainContractState.Active
                     : MainContractState.Inactive;
             }
         }

@@ -24,6 +24,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string ItSystemUsageArchiveLocations = "it-system-usage-archive-location-types";
             public const string ItSystemUsageRoles = "it-system-usage-role-types";
             public const string ItSystemUsageCriticalityTypes = "it-system-usage-criticality-level-types";
+            public const string PersonalDataDeletionDeadlineTypes = "it-system-usage-personal-data-deletion-deadline-types";
 
             public const string ItContractContractTypes = "it-contract-contract-types";
             public const string ItContractContractTemplateTypes = "it-contract-contract-template-types";
@@ -65,7 +66,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/v2/{resource}/{optionTypeUuid}?organizationUuid={organizationUuid}");
-            
+
             using var response = await HttpApi.GetWithTokenAsync(url, token.Token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<RegularOptionExtendedResponseDTO>();

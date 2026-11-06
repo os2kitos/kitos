@@ -25,6 +25,7 @@ namespace Core.DomainServices.SystemUsage
     IDomainEventHandler<EntityBeingDeletedEvent<OrganizationUnit>>,
     IDomainEventHandler<EntityUpdatedEvent<Organization>>,
     IDomainEventHandler<EntityBeingDeletedEvent<Organization>>,
+    IDomainEventHandler<EntityUpdatedEvent<PersonalDataDeletionDeadlineType>>,
     IDomainEventHandler<EntityUpdatedEvent<BusinessType>>,
     IDomainEventHandler<EntityCreatedEvent<LocalBusinessType>>,
     IDomainEventHandler<EntityUpdatedEvent<LocalBusinessType>>,
@@ -56,7 +57,7 @@ namespace Core.DomainServices.SystemUsage
         public void Handle(EntityBeingDeletedEvent<ItSystemUsage> domainEvent)
         {
             _readModelRepository.DeleteBySourceId(domainEvent.Entity.Id);
-         
+
             //Related overview models are also affected
             foreach (var entityUsageRelation in domainEvent.Entity.UsageRelations)
             {
@@ -114,6 +115,14 @@ namespace Core.DomainServices.SystemUsage
         public void Handle(EntityBeingDeletedEvent<Organization> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_Organization));
+        }
+
+        public void Handle(EntityUpdatedEvent<PersonalDataDeletionDeadlineType> domainEvent)
+        {
+            foreach (var usage in domainEvent.Entity.References)
+            {
+                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(usage, PendingReadModelUpdateSourceCategory.ItSystemUsage));
+            }
         }
 
         public void Handle(EntityUpdatedEvent<BusinessType> domainEvent)

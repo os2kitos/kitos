@@ -11,11 +11,6 @@ namespace Tests.Unit.Core.Infrastructure
 {
     public class EndpointValidationServiceTest
     {
-        public EndpointValidationServiceTest()
-        {
-            ServiceEndpointConfiguration.ConfigureValidationOfOutgoingConnections();
-        }
-
         [Fact]
         public async Task ValidateAsync_Skips_Urls_With_Ignored_Protocols()
         {

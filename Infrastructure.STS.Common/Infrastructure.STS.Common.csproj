@@ -9,7 +9,7 @@
     <PackageReference Include="Polly" Version="8.6.6" />
     <PackageReference Include="Serilog" Version="4.3.1" />
     <PackageReference Include="System.Runtime.Caching" Version="10.0.7" />
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.13" />
     <!--
       Kombit.OioIdws.WscCore 4.0.71 was compiled against System.ServiceModel.Security 4.10.2,
       where SecurityKeyType was in System.ServiceModel.Security (via type-forward). In WCF 6.0+,

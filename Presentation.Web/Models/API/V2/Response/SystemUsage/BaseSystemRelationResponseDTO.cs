@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.SharedProperties;
+using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Models.API.V2.Response.SystemUsage
 {
@@ -12,6 +13,12 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// </summary>
         [Required]
         public Guid Uuid { get; set; }
+
+        /// <summary>
+        /// Direction of the data flow for the relation
+        /// </summary>
+        public SystemRelationDirectionChoice? SystemRelationDirection { get; set; }
+
         /// <summary>
         /// The relation uses the interface
         /// </summary>
@@ -27,6 +34,6 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
 
         public string? Description { get; set; }
         public string? UrlReference { get; set; }
-        
+
     }
 }

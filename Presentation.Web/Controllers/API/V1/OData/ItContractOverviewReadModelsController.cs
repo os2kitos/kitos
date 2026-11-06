@@ -70,7 +70,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 : _readModelsService.GetByOrganizationIdOrUnitIdInSubTree(organizationId,
                     responsibleOrganizationUnitId.Value);
 
-            return query.Match(onSuccess: q => Ok(q.ToList()), onFailure: FromOperationError);
+            return query.Match(onSuccess: q => Ok(q), onFailure: FromOperationError);
         }
     }
 }

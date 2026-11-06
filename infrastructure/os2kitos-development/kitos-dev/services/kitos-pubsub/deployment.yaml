@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    easyhosting.io/service-reference: PubSub.Application.Api/Dockerfile
+    easyhosting.io/service-unique-id: 27f1f094-582c-4777-88c3-dc8341941dbc
+    easyhosting.io/easy-hosting-domain-name: 27f1f094-582c-4777-88c3-dc8341941dbc.os2kitos-development.strongminds.easyhosting.strongminds.dev
+  labels:
+    app: kitos-pubsub
+  name: kitos-pubsub
+  namespace: kitos-dev
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: kitos-pubsub
+  template:
+    metadata:
+      annotations:
+        sidecar.opentelemetry.io/inject: monitoring/sidecar-otel-collector
+        easyhosting.io/otlp-logs: "true"
+      labels:
+        app: kitos-pubsub
+        app.kubernetes.io/name: kitos-pubsub
+    spec:
+      containers:
+      - env:
+        - name: PUBSUB_API_KEY
+          valueFrom:
+            secretKeyRef:
+              key: PubSubApiKey
+              name: user-secret
+        - name: RABBIT_MQ_USER
+          valueFrom:
+            secretKeyRef:
+              key: RabbitMqUsername
+              name: user-secret
+        - name: RABBIT_MQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: RabbitMqPassword
+              name: user-secret
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              key: PubSubConnectionString
+              name: user-secret
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        image: ghcr.io/strongminds/kitos-kitos-pubsub@sha256:3c4b3e5be6e720f6b96ee9aeae00b638ccaef3b33fde6b29c431e1d70f28fba5
+        name: kitos-pubsub
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: 1
+          requests:
+            memory: 128Mi
+            cpu: 100m
+      imagePullSecrets:
+      - name: ac6379be-068d-4385-a6c6-6a13c7f5f2e6

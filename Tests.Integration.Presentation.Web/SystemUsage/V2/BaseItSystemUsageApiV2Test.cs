@@ -22,6 +22,9 @@ public class BaseItSystemUsageApiV2Test : BaseTest
                 organization.Uuid, 10, 0);
 
         var gdprInput = A<GDPRWriteRequestDTO>(); //Start with random values and then correct the ones where values matter
+        gdprInput.PersonalDataDeletionCapability = PersonalDataDeletionCapabilityChoice.BulkDeletion;
+        gdprInput.PersonalDataDeletionResponsibleUserUuid = null;
+        gdprInput.PersonalDataDeletionDeadlineTypeUuid = null;
         var sensitivityLevels = Many<DataSensitivityLevelChoice>().Distinct().ToList();
         if (sensitivityLevels.Contains(DataSensitivityLevelChoice.PersonData) == false)
             sensitivityLevels.Add(DataSensitivityLevelChoice.PersonData);
@@ -34,7 +37,7 @@ public class BaseItSystemUsageApiV2Test : BaseTest
         gdprInput.PlannedRiskAssessmentDate = A<DateTime>();
         gdprInput.IsDataProcessingAgreementRequired = A<IsDataProcessingAgreementRequiredChoice?>();
 
-        if (gdprInput.RiskAssessmentConducted != YesNoDontKnowIrrelevantChoice.Yes)
+        if (gdprInput.RiskAssessmentConducted != RiskAssessmentConductedChoice.Yes)
         {
             gdprInput.RiskAssessmentConductedDate = null;
             gdprInput.RiskAssessmentDocumentation = null;
@@ -48,7 +51,7 @@ public class BaseItSystemUsageApiV2Test : BaseTest
             gdprInput.TechnicalPrecautionsDocumentation = null;
         }
 
-        if (gdprInput.DPIAConducted != YesNoDontKnowChoice.Yes)
+        if (gdprInput.DPIAConducted != DpiaConductedChoice.Yes)
         {
             gdprInput.DPIADate = null;
             gdprInput.DPIADocumentation = null;

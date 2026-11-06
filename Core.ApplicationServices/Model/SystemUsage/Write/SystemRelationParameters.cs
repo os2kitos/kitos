@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.DomainModel.ItSystemUsage;
 
 namespace Core.ApplicationServices.Model.SystemUsage.Write
 {
@@ -10,6 +11,7 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         public Guid? RelationFrequencyUuid { get; }
         public string Description { get; }
         public string UrlReference { get; }
+        public SystemRelationDirection? SystemRelationDirection { get; }
 
         public SystemRelationParameters(
             Guid toSystemUsageUuid,
@@ -17,7 +19,8 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
             Guid? associatedContractUuid,
             Guid? relationFrequencyUuid,
             string description,
-            string urlReference)
+            string urlReference,
+            SystemRelationDirection? systemRelationDirection = null)
         {
             ToSystemUsageUuid = toSystemUsageUuid;
             UsingInterfaceUuid = usingInterfaceUuid;
@@ -25,6 +28,7 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
             RelationFrequencyUuid = relationFrequencyUuid;
             Description = description;
             UrlReference = urlReference;
+            SystemRelationDirection = systemRelationDirection;
         }
     }
 }

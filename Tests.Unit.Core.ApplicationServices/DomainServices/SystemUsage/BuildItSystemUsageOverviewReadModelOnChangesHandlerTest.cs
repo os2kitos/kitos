@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
@@ -27,6 +28,20 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _sut = new BuildItSystemUsageOverviewReadModelOnChangesHandler(_pendingUpdatesRepository.Object,
                 _repository.Object,
                 _readModelUpdate.Object);
+        }
+
+        [Fact]
+        public void Handle_Deadline_Change_Schedules_Referencing_Usages()
+        {
+            var usage = new ItSystemUsage { Id = A<int>() };
+            var deadline = new PersonalDataDeletionDeadlineType();
+            deadline.References.Add(usage);
+
+            _sut.Handle(new EntityUpdatedEvent<PersonalDataDeletionDeadlineType>(deadline));
+
+            _pendingUpdatesRepository.Verify(x => x.Add(It.Is<PendingReadModelUpdate>(update =>
+                update.Category == PendingReadModelUpdateSourceCategory.ItSystemUsage &&
+                update.SourceId == usage.Id)), Times.Once);
         }
 
         [Fact]

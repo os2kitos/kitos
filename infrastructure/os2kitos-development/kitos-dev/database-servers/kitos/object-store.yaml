@@ -1,0 +1,24 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: kitos-backup-store
+  namespace: kitos-dev
+  labels:
+    app.kubernetes.io/managed-by: easyhosting
+    easyhosting.io/resource-kind: database-server
+    easyhosting.io/resource-id: "edef42cfc8144b8fa70bb186e406dbf5"
+    easyhosting.io/application-id: "kitos-dev"
+spec:
+  configuration:
+    destinationPath: s3://strongminds-os2kitos-development-kitos-dev/kitos-dev/kitos
+    endpointURL: https://fsn1.your-objectstorage.com
+    s3Credentials:
+      accessKeyId:
+        name: easyhosting-postgres-backup-credentials-023337e8-0151-481d-8e6f-1f986b9fb11e
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: easyhosting-postgres-backup-credentials-023337e8-0151-481d-8e6f-1f986b9fb11e
+        key: ACCESS_SECRET_KEY
+    wal:
+      compression: gzip
+  retentionPolicy: "31d"

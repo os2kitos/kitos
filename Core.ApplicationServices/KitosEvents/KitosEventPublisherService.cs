@@ -19,21 +19,31 @@ public class KitosEventPublisherService : IKitosEventPublisherService
     }
     public void PublishEvent(KitosEvent kitosEvent)
     {
-        var dto = _kitosEventMapper.MapKitosEventToDTO(kitosEvent);
-        PostEventDTO(dto);
+        try
+        {
+            var dto = _kitosEventMapper.MapKitosEventToDTO(kitosEvent);
+            PostEventDTO(dto);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error(ex, "Failed to publish event for topic {Topic}", kitosEvent.Topic);
+        }
     }
 
     private void PostEventDTO(KitosEventDTO dto)
     {
         var postMethod = Task.Run(async () =>
         {
-            try
+            var result = await _httpEventPublisher.PostEventAsync(dto);
+            if (result.Failed)
             {
-                await _httpEventPublisher.PostEventAsync(dto);
+                _logger.Error("Failed to publish event for topic {Topic}: {Error}", dto.Topic, result.Error);
+                return;
             }
-            catch (Exception ex)
+            using var response = result.Value;
+            if (!response.IsSuccessStatusCode)
             {
-                _logger.Fatal($"Failed to post events. Exception: {ex}");
+                _logger.Error("Failed to publish event for topic {Topic}: HTTP {StatusCode}", dto.Topic, response.StatusCode);
             }
         });
         postMethod.Wait();

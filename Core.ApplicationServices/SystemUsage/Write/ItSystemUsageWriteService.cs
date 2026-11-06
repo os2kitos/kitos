@@ -59,7 +59,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
         IGenericRepository<ItSystemUsagePersonalData> personalDataOptionsRepository,
         IOptionsService<ItSystemUsage, SystemUsageCriticalityLevel> systemUsageCriticalityLevelOptionsService,
         IOptionsService<ItSystemUsage, TechnicalSystemType> technicalSystemTypeOptionsService,
-        IItSystemUsageArchiveService itSystemArchiveService)
+        IItSystemUsageArchiveService itSystemArchiveService,
+        IGenericRepository<User> userRepository,
+        IOptionsService<ItSystemUsage, PersonalDataDeletionDeadlineType> personalDataDeletionDeadlineOptionsService)
         : IItSystemUsageWriteService
     {
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
@@ -236,10 +238,74 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => usage.WithOptionalUpdate(parameters.DPIADocumentation, (systemUsage, newLink) =>
                    systemUsage.UpdateDPIADocumentation(newLink.Select(x => x.Url).GetValueOrDefault(), newLink.Select(x => x.Name).GetValueOrDefault())))
 
+                .Bind(usage => UpdatePersonalDataDeletion(usage, parameters))
+
                 //Data retention
                 .Bind(usage => usage.WithOptionalUpdate(parameters.RetentionPeriodDefined, (systemUsage, retentionPeriodDefined) => systemUsage.UpdateRetentionPeriodDefined(retentionPeriodDefined)))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.NextDataRetentionEvaluationDate, (systemUsage, date) => systemUsage.UpdateNextDataRetentionEvaluationDate(date)))
                 .Bind(usage => usage.WithOptionalUpdate(parameters.DataRetentionEvaluationFrequencyInMonths, (systemUsage, frequencyInMonths) => systemUsage.UpdateDataRetentionEvaluationFrequencyInMonths(frequencyInMonths.GetValueOrDefault())));
+        }
+
+        private Result<ItSystemUsage, OperationError> UpdatePersonalDataDeletion(ItSystemUsage usage, UpdatedSystemUsageGDPRProperties parameters)
+        {
+            var capability = parameters.PersonalDataDeletionCapability.Match(value => value, () => usage.PersonalDataDeletionCapability);
+            var clearDetails = parameters.PersonalDataDeletionCapability.HasChange &&
+                capability is not (PersonalDataDeletionCapability.IndividualRecords or PersonalDataDeletionCapability.BulkDeletion);
+            return ResolvePersonalDataDeletionResponsibleUser(usage, parameters, clearDetails)
+                .Bind(user => ResolvePersonalDataDeletionDeadline(usage, parameters, clearDetails)
+                    .Bind(deadline => ApplyPersonalDataDeletion(usage, parameters, capability, clearDetails,
+                        user.GetValueOrDefault(), deadline.GetValueOrDefault())));
+        }
+
+        private Result<Maybe<PersonalDataDeletionDeadlineType>, OperationError> ResolvePersonalDataDeletionDeadline(
+            ItSystemUsage usage, UpdatedSystemUsageGDPRProperties parameters, bool clearDetails)
+        {
+            if (parameters.PersonalDataDeletionDeadlineTypeUuid.IsUnchanged)
+                return (clearDetails ? null : usage.PersonalDataDeletionDeadlineType).FromNullable();
+            var uuid = parameters.PersonalDataDeletionDeadlineTypeUuid.NewValue;
+            if (uuid.IsNone)
+                return Maybe<PersonalDataDeletionDeadlineType>.None;
+            var option = personalDataDeletionDeadlineOptionsService.GetOptionByUuid(usage.OrganizationId, uuid.Value);
+            if (option.IsNone)
+                return new OperationError("Invalid PersonalDataDeletionDeadlineType Uuid", OperationFailure.BadInput);
+            if (usage.PersonalDataDeletionDeadlineTypeId != option.Value.option.Id && !option.Value.available)
+                return new OperationError("PersonalDataDeletionDeadlineType is not available in this organization", OperationFailure.BadInput);
+            return option.Value.option.FromNullable();
+        }
+
+        private Result<Maybe<User>, OperationError> ResolvePersonalDataDeletionResponsibleUser(
+            ItSystemUsage usage, UpdatedSystemUsageGDPRProperties parameters, bool clearDetails)
+        {
+            if (parameters.PersonalDataDeletionResponsibleUserUuid.IsUnchanged)
+                return (clearDetails ? null : usage.PersonalDataDeletionResponsibleUser).FromNullable();
+            var uuid = parameters.PersonalDataDeletionResponsibleUserUuid.NewValue;
+            if (!uuid.HasValue)
+                return Maybe<User>.None;
+            if (usage.PersonalDataDeletionResponsibleUser?.Uuid == uuid.Value)
+                return usage.PersonalDataDeletionResponsibleUser.FromNullable();
+            var user = userRepository.AsQueryable().SingleOrDefault(x => x.Uuid == uuid.Value);
+            if (user == null)
+                return new OperationError("Responsible user was not found", OperationFailure.BadInput);
+            if (user.Deleted || !user.OrganizationRights.Any(x => x.OrganizationId == usage.OrganizationId))
+                return new OperationError("Responsible user must be an active member of the usage organization", OperationFailure.BadInput);
+            return user.FromNullable();
+        }
+
+        private static Result<ItSystemUsage, OperationError> ApplyPersonalDataDeletion(ItSystemUsage usage,
+            UpdatedSystemUsageGDPRProperties parameters, PersonalDataDeletionCapability? capability, bool clearDetails,
+            User? user, PersonalDataDeletionDeadlineType? deadline)
+        {
+            var procedure = parameters.PersonalDataDeletionProcedureDocumentation.Match(value => value.GetValueOrDefault(),
+                () => clearDetails ? null : new NamedLink(usage.PersonalDataDeletionProcedureDocumentationUrlName, usage.PersonalDataDeletionProcedureDocumentationUrl));
+            var verification = parameters.PersonalDataDeletionVerificationDocumentation.Match(value => value.GetValueOrDefault(),
+                () => clearDetails ? null : new NamedLink(usage.PersonalDataDeletionVerificationDocumentationUrlName, usage.PersonalDataDeletionVerificationDocumentationUrl));
+            var error = usage.UpdatePersonalDataDeletion(capability,
+                parameters.PersonalDataDeletionMethod.Match(value => value, () => clearDetails ? null : usage.PersonalDataDeletionMethod),
+                deadline,
+                procedure?.Url, procedure?.Name, user,
+                parameters.PersonalDataDeletionVerifiedDate.Match(value => value, () => clearDetails ? null : usage.PersonalDataDeletionVerifiedDate),
+                verification?.Url, verification?.Name);
+            return error.HasValue ? error.Value : usage;
         }
 
         private Maybe<OperationError> UpdateSensitivityLevels(Maybe<IEnumerable<SensitiveDataLevel>> levels, ItSystemUsage systemUsage)
@@ -662,11 +728,13 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => usage.WithOptionalUpdate(generalProperties.LicensingAndCodeModels, (systemUsage, newModels) => systemUsage.SetLicensingAndCodeModels(newModels)));
         }
 
-        private void RaiseValidityUpdatedEvent(ItSystemUsage usage) {
+        private void RaiseValidityUpdatedEvent(ItSystemUsage usage)
+        {
             domainEvents.Raise(new ItSystemUsageValidityUpdated(usage));
         }
 
-        private ItSystemUsage UpdateLifecycleStatus(ItSystemUsage usage, LifeCycleStatusType? lifeCycleStatus) {
+        private ItSystemUsage UpdateLifecycleStatus(ItSystemUsage usage, LifeCycleStatusType? lifeCycleStatus)
+        {
             usage.LifeCycleStatus = lifeCycleStatus;
             RaiseValidityUpdatedEvent(usage);
             return usage;
@@ -816,11 +884,12 @@ namespace Core.ApplicationServices.SystemUsage.Write
                             parameters.Description,
                             parameters.UrlReference,
                             usageAndIds.ids.frequencyId.Match<int?>(id => id, () => null),
-                            usageAndIds.ids.contractId.Match<int?>(id => id, () => null)
+                            usageAndIds.ids.contractId.Match<int?>(id => id, () => null),
+                            parameters.SystemRelationDirection
                         )
                 );
         }
-        
+
         public Result<IEnumerable<SystemRelation>, OperationError> CreateSystemRelations(Guid fromSystemUsageUuid, IEnumerable<SystemRelationParameters> parametersCollection)
         {
             using var transaction = transactionManager.Begin();
@@ -861,7 +930,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
                         parameters.UrlReference,
                         usageAndIds.ids.interfaceId.Match<int?>(id => id, () => null),
                         usageAndIds.ids.contractId.Match<int?>(id => id, () => null),
-                        usageAndIds.ids.frequencyId.Match<int?>(id => id, () => null)
+                        usageAndIds.ids.frequencyId.Match<int?>(id => id, () => null),
+                        parameters.SystemRelationDirection
                     )
                 );
         }

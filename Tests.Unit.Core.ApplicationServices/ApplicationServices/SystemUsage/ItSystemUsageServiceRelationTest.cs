@@ -180,6 +180,40 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Fact]
+        public void ModifyRelation_GivenDirection_UpdatesDirectionWithoutAdditionalRestrictions()
+        {
+            var systemUsages = SetupSystemRelationWithIngredients(out var mockFromSystemUsage);
+            SetupSystemUsageRepository(systemUsages);
+
+            var result = _sut.ModifyRelation(
+                FromSystemUsageId,
+                FromSystemRelationId,
+                ToSystemUsageId,
+                null,
+                null,
+                null,
+                null,
+                null,
+                SystemRelationDirection.OutgoingData);
+
+            Assert.True(result.Ok);
+            Assert.Equal(SystemRelationDirection.OutgoingData, GetModifiedSystemRelation(mockFromSystemUsage).SystemRelationDirection);
+        }
+
+        [Fact]
+        public void ModifyRelation_WithoutDirection_ClearsExistingDirection()
+        {
+            var systemUsages = SetupSystemRelationWithIngredients(out var mockFromSystemUsage);
+            SetupSystemUsageRepository(systemUsages);
+            GetModifiedSystemRelation(mockFromSystemUsage).SystemRelationDirection = SystemRelationDirection.BidirectionalData;
+
+            var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, null, null, null, null, null);
+
+            Assert.True(result.Ok);
+            Assert.Null(GetModifiedSystemRelation(mockFromSystemUsage).SystemRelationDirection);
+        }
+
+        [Fact]
         public void AddRelation_Returns_Error_If_Source_Is_Not_Found()
         {
             //Arrange
@@ -305,6 +339,31 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(result.Ok);
             _mockSystemUsageRepository.Verify(x => x.Save(), Times.Once);
+        }
+
+        [Fact]
+        public void AddRelation_GivenDirection_PersistsDirectionWithoutAdditionalRestrictions()
+        {
+            var sourceId = A<int>();
+            var destinationId = A<int>();
+            var source = new ItSystemUsage { Id = sourceId, OrganizationId = A<int>() };
+            var destination = new ItSystemUsage { Id = destinationId, OrganizationId = source.OrganizationId };
+            ExpectGetUsageByKeyReturns(sourceId, source);
+            ExpectGetUsageByKeyReturns(destinationId, destination);
+            ExpectAllowModifyReturns(source, true);
+
+            var result = _sut.AddRelation(
+                sourceId,
+                destinationId,
+                null,
+                A<string>(),
+                A<string>(),
+                null,
+                null,
+                SystemRelationDirection.IncomingData);
+
+            Assert.True(result.Ok);
+            Assert.Equal(SystemRelationDirection.IncomingData, result.Value.SystemRelationDirection);
         }
 
         [Fact]

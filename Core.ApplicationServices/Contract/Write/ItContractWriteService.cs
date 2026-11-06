@@ -513,6 +513,13 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Result<ItContract, OperationError> UpdatePaymentModelParameters(ItContract contract, ItContractPaymentModelModificationParameters parameters)
         {
+            var frequency = parameters.InvoiceFrequency.Match(value => value, () => contract.InvoiceFrequency);
+            var dates = parameters.InvoiceDates.Match(value => value,
+                () => frequency == contract.InvoiceFrequency ? contract.InvoiceDates : Enumerable.Empty<ItContractInvoiceDate>());
+            var error = contract.UpdateInvoiceSchedule(frequency, dates);
+            if (error.HasValue)
+                return error.Value;
+
             return contract
                 .WithOptionalUpdate(parameters.OperationsRemunerationStartedAt, (c, newValue) => c.OperationRemunerationBegun = newValue.Match(val => val, () => (DateTime?)null))
                 .Bind(itContract => itContract.WithOptionalUpdate(parameters.PaymentFrequencyUuid, UpdatePaymentFrequency))
@@ -768,7 +775,7 @@ namespace Core.ApplicationServices.Contract.Write
             {
                 return new OperationError("Role assignment exists", OperationFailure.Conflict);
             }
-            
+
             return CreateRoleAssignmentUpdate(existingRoles.Concat(newRoles));
         }
 

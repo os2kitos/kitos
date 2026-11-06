@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
@@ -11,6 +11,13 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
 {
     public class UpdatedSystemUsageGDPRProperties
     {
+        public OptionalValueChange<PersonalDataDeletionCapability?> PersonalDataDeletionCapability { get; set; } = OptionalValueChange<PersonalDataDeletionCapability?>.None;
+        public OptionalValueChange<PersonalDataDeletionMethod?> PersonalDataDeletionMethod { get; set; } = OptionalValueChange<PersonalDataDeletionMethod?>.None;
+        public OptionalValueChange<Maybe<Guid>> PersonalDataDeletionDeadlineTypeUuid { get; set; } = OptionalValueChange<Maybe<Guid>>.None;
+        public OptionalValueChange<Maybe<NamedLink>> PersonalDataDeletionProcedureDocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
+        public OptionalValueChange<Guid?> PersonalDataDeletionResponsibleUserUuid { get; set; } = OptionalValueChange<Guid?>.None;
+        public OptionalValueChange<DateTime?> PersonalDataDeletionVerifiedDate { get; set; } = OptionalValueChange<DateTime?>.None;
+        public OptionalValueChange<Maybe<NamedLink>> PersonalDataDeletionVerificationDocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
         public OptionalValueChange<string> ProcessingPurpose { get; set; } = OptionalValueChange<string>.None;
         public OptionalValueChange<Maybe<NamedLink>> DirectoryDocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
         public OptionalValueChange<Maybe<IEnumerable<SensitiveDataLevel>>> DataSensitivityLevels { get; set; } = OptionalValueChange<Maybe<IEnumerable<SensitiveDataLevel>>>.None;
@@ -23,13 +30,13 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         public OptionalValueChange<DataOptions?> UserSupervision { get; set; } = OptionalValueChange<DataOptions?>.None;
         public OptionalValueChange<DateTime?> UserSupervisionDate { get; set; } = OptionalValueChange<DateTime?>.None;
         public OptionalValueChange<Maybe<NamedLink>> UserSupervisionDocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
-        public OptionalValueChange<YesNoDontKnowIrrelevant?> RiskAssessmentConducted { get; set; } = OptionalValueChange<YesNoDontKnowIrrelevant?>.None;
+        public OptionalValueChange<RiskAssessmentConducted?> RiskAssessmentConducted { get; set; } = OptionalValueChange<RiskAssessmentConducted?>.None;
         public OptionalValueChange<DateTime?> RiskAssessmentConductedDate { get; set; } = OptionalValueChange<DateTime?>.None;
         public OptionalValueChange<RiskLevel?> RiskAssessmentResult { get; set; } = OptionalValueChange<RiskLevel?>.None;
         public OptionalValueChange<Maybe<NamedLink>> RiskAssessmentDocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
         public OptionalValueChange<DateTime?> PlannedRiskAssessmentDate { get; set; } = OptionalValueChange<DateTime?>.None;
         public OptionalValueChange<string> RiskAssessmentNotes { get; set; } = OptionalValueChange<string>.None;
-        public OptionalValueChange<DataOptions?> DPIAConducted { get; set; } = OptionalValueChange<DataOptions?>.None;
+        public OptionalValueChange<DpiaConducted?> DPIAConducted { get; set; } = OptionalValueChange<DpiaConducted?>.None;
         public OptionalValueChange<DateTime?> DPIADate { get; set; } = OptionalValueChange<DateTime?>.None;
         public OptionalValueChange<Maybe<NamedLink>> DPIADocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
         public OptionalValueChange<DataOptions?> RetentionPeriodDefined { get; set; } = OptionalValueChange<DataOptions?>.None;

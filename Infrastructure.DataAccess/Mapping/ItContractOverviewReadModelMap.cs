@@ -86,6 +86,11 @@ namespace Infrastructure.DataAccess.Mapping
             builder.HasIndex(x => x.AccumulatedOtherCost).HasDatabaseName("IX_AccumulatedOtherCost");
 
             builder.Property(x => x.ExternalPaymentOrganizationUnitsCsv);
+            builder.Property(x => x.InvoiceFrequency);
+            builder.Property(x => x.InvoiceDate1).HasColumnType("timestamp without time zone");
+            builder.Property(x => x.InvoiceDate2).HasColumnType("timestamp without time zone");
+            builder.Property(x => x.InvoiceDate3).HasColumnType("timestamp without time zone");
+            builder.Property(x => x.InvoiceDate4).HasColumnType("timestamp without time zone");
             builder.Property(x => x.InternalPaymentOrganizationUnitsCsv);
             builder.Property(x => x.ItSystemUsagesSystemUuidCsv);
 

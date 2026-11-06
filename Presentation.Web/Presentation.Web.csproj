@@ -20,6 +20,7 @@
   <ItemGroup>
     <!-- Core packages -->
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.4.1" />
     <!-- Pin transitive dependency to 8.4.0 to prevent newer versions from breaking nested $expand/$select queries -->
     <PackageReference Include="Microsoft.OData.Core" Version="8.4.0" />

@@ -66,8 +66,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
             return new GDPRRegistrationsResponseDTO
             {
+                PersonalDataDeletionCapability = systemUsage.PersonalDataDeletionCapability?.ToChoice(),
+                PersonalDataDeletionMethod = systemUsage.PersonalDataDeletionMethod?.ToChoice(),
+                PersonalDataDeletionDeadlineType = systemUsage.PersonalDataDeletionDeadlineType?.MapIdentityNamePairDTO(),
+                PersonalDataDeletionProcedureDocumentation = MapSimpleLink(systemUsage.PersonalDataDeletionProcedureDocumentationUrlName, systemUsage.PersonalDataDeletionProcedureDocumentationUrl),
+                PersonalDataDeletionResponsibleUser = systemUsage.PersonalDataDeletionResponsibleUser?.MapIdentityNamePairDTO(),
+                PersonalDataDeletionVerifiedDate = systemUsage.PersonalDataDeletionVerifiedDate,
+                PersonalDataDeletionVerificationDocumentation = MapSimpleLink(systemUsage.PersonalDataDeletionVerificationDocumentationUrlName, systemUsage.PersonalDataDeletionVerificationDocumentationUrl),
                 ProcessingPurpose = systemUsage.ProcessingPurpose,
-                DPIAConducted = MapYesNoDontKnow(systemUsage.DPIA),
+                DPIAConducted = systemUsage.DPIA?.ToChoice(),
                 DPIADate = systemUsage.DPIADateFor,
                 DPIADocumentation = MapSimpleLink(systemUsage.DPIASupervisionDocumentationUrlName, systemUsage.DPIASupervisionDocumentationUrl),
                 DirectoryDocumentation = MapSimpleLink(systemUsage.LinkToDirectoryUrlName, systemUsage.LinkToDirectoryUrl),
@@ -107,7 +114,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private IsDataProcessingAgreementRequiredChoice? MapIsDataProcessingAgreementRequired(IsDataProcessingAgreementRequired? source) {
+        private IsDataProcessingAgreementRequiredChoice? MapIsDataProcessingAgreementRequired(IsDataProcessingAgreementRequired? source)
+        {
             if (source is null) return null;
             return source.Value.ToChoice();
         }
@@ -287,6 +295,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         private static T MapSharedRelationProperties<T>(SystemRelation systemRelation, T dto) where T : BaseSystemRelationResponseDTO
         {
             dto.Uuid = systemRelation.Uuid;
+            dto.SystemRelationDirection = systemRelation.SystemRelationDirection?.ToSystemRelationDirectionChoice();
             dto.Description = systemRelation.Description;
             dto.UrlReference = systemRelation.Reference;
             dto.AssociatedContract = systemRelation.AssociatedContract?.MapIdentityNamePairDTO();
@@ -313,7 +322,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 UserCount.TENTOFORTYNINE => new ExpectedUsersIntervalDTO { LowerBound = 10, UpperBound = 49 },
                 UserCount.FIFTYTONINETYNINE => new ExpectedUsersIntervalDTO { LowerBound = 50, UpperBound = 99 },
                 UserCount.HUNDREDTOFOURHUNDREDNINETYNINE => new ExpectedUsersIntervalDTO { LowerBound = 100, UpperBound = 499 },
-                UserCount.FIVEHUNDREDPLUS => new ExpectedUsersIntervalDTO { LowerBound = 500},
+                UserCount.FIVEHUNDREDPLUS => new ExpectedUsersIntervalDTO { LowerBound = 500 },
                 _ => throw new ArgumentOutOfRangeException(nameof(systemUsage.UserCount))
             };
         }

@@ -107,6 +107,8 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal
             return await update.ReadResponseBodyAsAsync<GlobalRegularOptionResponseDTO>();
         }
 
+        public const string PersonalDataDeletionDeadlineTypes = "personal-data-deletion-deadline-types";
+
         private static string GetPrefix(string optionTypeName)
         {
             switch (optionTypeName)
@@ -114,6 +116,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal
                 // — it-systems prefixes —
                 case ItSystemRoles:
                 case BusinessTypes:
+                case PersonalDataDeletionDeadlineTypes:
                 case ArchiveTypes:
                 case ArchiveLocationTypes:
                 case ArchiveTestLocationTypes:

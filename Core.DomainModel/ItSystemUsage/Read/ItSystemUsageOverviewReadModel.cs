@@ -96,7 +96,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public DateTime? RiskAssessmentDate { get; set; }
         public DateTime? PlannedRiskAssessmentDate { get; set; }
         public RiskLevel? RiskAssessmentResult { get; set; }
-        public YesNoDontKnowIrrelevant? RiskAssessmentConducted { get; set; }
+        public RiskAssessmentConducted? RiskAssessmentConducted { get; set; }
         public virtual ICollection<ItSystemUsageOverviewSensitiveDataLevelReadModel> SensitiveDataLevels { get; set; } = [];
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
         public bool IsHoldingDocument { get; set; }
@@ -130,7 +130,19 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string AssociatedContractsNamesCsv { get; set; }
         public virtual ICollection<ItSystemUsageOverviewItContractReadModel> AssociatedContracts { get; set; } = [];
 
-        public DataOptions? DPIAConducted { get; set; }
+        public PersonalDataDeletionCapability? PersonalDataDeletionCapability { get; set; }
+        public PersonalDataDeletionMethod? PersonalDataDeletionMethod { get; set; }
+        public Guid? PersonalDataDeletionDeadlineTypeUuid { get; set; }
+        public string PersonalDataDeletionDeadlineTypeName { get; set; }
+        public int? PersonalDataDeletionResponsibleUserId { get; set; }
+        public Guid? PersonalDataDeletionResponsibleUserUuid { get; set; }
+        public string PersonalDataDeletionResponsibleUserName { get; set; }
+        public DateTime? PersonalDataDeletionVerifiedDate { get; set; }
+        public string PersonalDataDeletionProcedureDocumentationName { get; set; }
+        public string PersonalDataDeletionProcedureDocumentationUrl { get; set; }
+        public string PersonalDataDeletionVerificationDocumentationName { get; set; }
+        public string PersonalDataDeletionVerificationDocumentationUrl { get; set; }
+        public DpiaConducted? DPIAConducted { get; set; }
 
         public DataOptions? IsBusinessCritical { get; set; }
 

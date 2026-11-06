@@ -25,6 +25,17 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
         }
 
         [Fact]
+        public void GetByUserId_Includes_Personal_Data_Deletion_Responsible_User()
+        {
+            var userId = A<int>();
+            var assigned = new ItSystemUsageOverviewReadModel { PersonalDataDeletionResponsibleUserId = userId };
+            var unassigned = new ItSystemUsageOverviewReadModel();
+            _repositoryMock.Setup(x => x.AsQueryable()).Returns(new[] { assigned, unassigned }.AsQueryable());
+
+            Assert.Equal(assigned, Assert.Single(_sut.GetByUserId(userId)));
+        }
+
+        [Fact]
         public void GetReadModelsMustUpdateToChangeActiveState_Returns_ReadModels_Where_Active_State_Is_Stale()
         {
             var inactiveMainContract = new ItContractItSystemUsage
@@ -46,7 +57,7 @@ namespace Tests.Unit.Presentation.Web.DomainServices.SystemUsage
             var includedSinceConcludedHasPassedAndNotExpired = CreateReadModel(false, _now.Date, _now.Date.AddDays(1), null);
             var excludedSinceConcludedSinceExpired = CreateReadModel(false, _now.Date.AddDays(-2), _now.Date.AddDays(-1), inactiveMainContract);
             var excludedBecauseExpirationDateHasNotPassed = CreateReadModel(true, _now.AddDays(-2), _now, null);
-            var includedSinceMainContractIsActive= CreateReadModel(false, null, null, activeMainContract);
+            var includedSinceMainContractIsActive = CreateReadModel(false, null, null, activeMainContract);
 
             _repositoryMock.Setup(x => x.AsQueryable()).Returns(new[]
             {

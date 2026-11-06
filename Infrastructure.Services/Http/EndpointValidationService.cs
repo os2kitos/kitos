@@ -125,7 +125,7 @@ namespace Infrastructure.Services.Http
             return EndpointValidationErrorType.CommunicationError;
         }
 
-        private Task<HttpResponseMessage> LoadEndpointWithBackOffRetryAsync(Uri uri)
+        protected virtual Task<HttpResponseMessage> LoadEndpointWithBackOffRetryAsync(Uri uri)
         {
             return Policy
                 .Handle<Exception>(ShouldRetryException) //outer policy handles transient protocol errors, connection timeouts, task cancellations and so on
@@ -188,7 +188,7 @@ namespace Infrastructure.Services.Http
             return statuses.Contains(message.StatusCode);
         }
 
-        private static async Task<bool> CanResolveHostAsync(Uri uri)
+        protected virtual async Task<bool> CanResolveHostAsync(Uri uri)
         {
             try
             {

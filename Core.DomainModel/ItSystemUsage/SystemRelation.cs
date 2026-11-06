@@ -22,6 +22,12 @@ namespace Core.DomainModel.ItSystemUsage
         /// UUID for the relation
         /// </summary>
         public Guid Uuid { get; set; }
+
+        /// <summary>
+        /// Gets or sets the direction of the system relation.
+        /// </summary>
+        public SystemRelationDirection? SystemRelationDirection { get; set; }
+
         /// <summary>
         /// Mandatory relation "from"
         /// </summary>

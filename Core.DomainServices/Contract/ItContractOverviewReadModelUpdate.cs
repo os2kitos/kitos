@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Globalization;
 using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
@@ -17,6 +18,11 @@ namespace Core.DomainServices.Contract
 {
     public class ItContractOverviewReadModelUpdate : IReadModelUpdate<ItContract, ItContractOverviewReadModel>
     {
+        private const int FirstInvoicePeriod = 1;
+        private const int SecondInvoicePeriod = 2;
+        private const int ThirdInvoicePeriod = 3;
+        private const int FourthInvoicePeriod = 4;
+
         private readonly IGenericRepository<ItContractOverviewRoleAssignmentReadModel> _contractRoleAssignmentRepository;
         private readonly IGenericRepository<ItContractOverviewReadModelDataProcessingAgreement> _contractDataProcessingAgreementRepository;
         private readonly IGenericRepository<ItContractOverviewReadModelItSystemUsage> _contractSystemUsageReadModelRepository;
@@ -124,6 +130,8 @@ namespace Core.DomainServices.Contract
             destination.PaymentFrequencyId = source.PaymentFreqency?.Id;
             destination.PaymentFrequencyUuid = source.PaymentFreqency?.Uuid;
             destination.PaymentFrequencyName = source.PaymentFreqency?.Name;
+            destination.InvoiceFrequency = source.InvoiceFrequency;
+            MapInvoiceDates(source, destination);
 
             //Payment organization units
             destination.ExternalPaymentOrganizationUnitsCsv = ToCommaSeparatedOrganizationUnitNames(source.ExternEconomyStreams);
@@ -142,6 +150,17 @@ namespace Core.DomainServices.Contract
             destination.TerminationDeadlineUuid = source.TerminationDeadline?.Uuid;
             destination.TerminationDeadlineName = source.TerminationDeadline?.Name;
         }
+
+        private static void MapInvoiceDates(ItContract source, ItContractOverviewReadModel destination)
+        {
+            destination.InvoiceDate1 = GetInvoiceDate(source, FirstInvoicePeriod);
+            destination.InvoiceDate2 = GetInvoiceDate(source, SecondInvoicePeriod);
+            destination.InvoiceDate3 = GetInvoiceDate(source, ThirdInvoicePeriod);
+            destination.InvoiceDate4 = GetInvoiceDate(source, FourthInvoicePeriod);
+        }
+
+        private static DateTime? GetInvoiceDate(ItContract source, int period) =>
+            source.InvoiceDates.SingleOrDefault(x => x.Period == period)?.Date;
 
         private void MapSystemRelations(ItContract source, ItContractOverviewReadModel destination)
         {

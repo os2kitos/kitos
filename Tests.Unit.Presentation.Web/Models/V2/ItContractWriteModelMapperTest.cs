@@ -17,6 +17,7 @@ using Tests.Toolkit.Extensions;
 using Xunit;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Models.API.V2.Request.Generic.ExternalReferences;
+using Core.DomainModel.ItContract;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
 {
@@ -56,6 +57,75 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             Assert.Equal(requestDto.Name, AssertPropertyContainsDataChange(modificationParameters.Name));
+        }
+
+        [Theory]
+        [InlineData("POST")]
+        [InlineData("PUT")]
+        [InlineData("PATCH")]
+        public void Map_InvoiceSchedule_RoundTrips_Frequency_And_Dates(string method)
+        {
+            foreach (var frequency in Enum.GetValues<InvoiceFrequencyChoice>())
+            {
+                var input = new ContractPaymentModelDataWriteRequestDTO
+                {
+                    InvoiceFrequency = frequency,
+                    InvoiceDates = new[] { new ContractInvoiceDateDTO { Period = 1, Date = new DateTime(2026, 2, 28, 13, 45, 0) } }
+                };
+
+                var output = MapInvoicePaymentModel(method, input);
+
+                Assert.Equal((InvoiceFrequencyOptions)frequency, output.InvoiceFrequency.NewValue);
+                var invoiceDate = Assert.Single(output.InvoiceDates.NewValue);
+                Assert.Equal(1, invoiceDate.Period);
+                Assert.Equal(new DateTime(2026, 2, 28, 13, 45, 0), invoiceDate.Date);
+            }
+        }
+
+        [Theory]
+        [InlineData("POST", false)]
+        [InlineData("PATCH", false)]
+        [InlineData("PUT", true)]
+        public void Map_InvoiceSchedule_Omitted_Dates_Are_Preserved(string method, bool frequencyReset)
+        {
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(
+                nameof(UpdateContractRequestDTO.PaymentModel).WrapAsEnumerable().AsParameterMatch()))
+                .Returns(new HashSet<string>());
+
+            var output = MapInvoicePaymentModel(method, new ContractPaymentModelDataWriteRequestDTO());
+
+            Assert.Equal(frequencyReset, output.InvoiceFrequency.HasChange);
+            Assert.True(output.InvoiceDates.IsUnchanged);
+        }
+
+        [Theory]
+        [InlineData("POST", false)]
+        [InlineData("PATCH", false)]
+        [InlineData("PUT", false)]
+        [InlineData("POST", true)]
+        [InlineData("PATCH", true)]
+        [InlineData("PUT", true)]
+        public void Map_InvoiceSchedule_Null_Or_Empty_Dates_Clear(string method, bool empty)
+        {
+            var output = MapInvoicePaymentModel(method, new ContractPaymentModelDataWriteRequestDTO
+            {
+                InvoiceFrequency = null,
+                InvoiceDates = empty ? Array.Empty<ContractInvoiceDateDTO>() : null
+            });
+
+            Assert.Null(output.InvoiceFrequency.NewValue);
+            Assert.Empty(output.InvoiceDates.NewValue);
+        }
+
+        private ItContractPaymentModelModificationParameters MapInvoicePaymentModel(string method, ContractPaymentModelDataWriteRequestDTO paymentModel)
+        {
+            return (method switch
+            {
+                "POST" => _sut.FromPOST(new CreateNewContractRequestDTO { Name = A<string>(), PaymentModel = paymentModel }),
+                "PUT" => _sut.FromPUT(new UpdateContractRequestDTO { PaymentModel = paymentModel }),
+                "PATCH" => _sut.FromPATCH(new UpdateContractRequestDTO { PaymentModel = paymentModel }),
+                _ => throw new ArgumentOutOfRangeException(nameof(method))
+            }).PaymentModel.Value;
         }
 
         [Theory]
@@ -755,7 +825,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void FromPost_Maps_General()
         {
             //Arrange
-            var input = new CreateNewContractRequestDTO { Name = A<string>(),
+            var input = new CreateNewContractRequestDTO
+            {
+                Name = A<string>(),
                 General = A<ContractGeneralDataWriteRequestDTO>()
             };
 

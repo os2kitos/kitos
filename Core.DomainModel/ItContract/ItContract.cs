@@ -36,6 +36,7 @@ namespace Core.DomainModel.ItContract
             MarkAsDirty();
             AssociatedSystemRelations = new List<SystemRelation>();
             DataProcessingRegistrationsWhereContractIsMainContract = new List<DataProcessingRegistration>();
+            InvoiceDates = new List<ItContractInvoiceDate>();
         }
 
         public Guid Uuid { get; set; }
@@ -499,6 +500,84 @@ namespace Core.DomainModel.ItContract
         public virtual PaymentModelType PaymentModel { get; set; }
         public int? PriceRegulationId { get; set; }
         public virtual PriceRegulationType PriceRegulation { get; set; }
+
+        public InvoiceFrequencyOptions? InvoiceFrequency { get; private set; }
+        public virtual ICollection<ItContractInvoiceDate> InvoiceDates { get; set; }
+
+        public Maybe<OperationError> UpdateInvoiceSchedule(InvoiceFrequencyOptions? frequency, IEnumerable<ItContractInvoiceDate> dates)
+        {
+            var newDates = dates.ToList();
+            var validationError = ValidateInvoiceSchedule(frequency, newDates);
+            if (validationError.HasValue)
+                return validationError;
+
+            UpdateInvoiceDates(newDates);
+            InvoiceFrequency = frequency;
+
+            return Maybe<OperationError>.None;
+        }
+
+        private static Maybe<OperationError> ValidateInvoiceSchedule(InvoiceFrequencyOptions? frequency, IReadOnlyCollection<ItContractInvoiceDate> newDates)
+        {
+            if (frequency.HasValue && !Enum.IsDefined(frequency.Value))
+                return new OperationError("Invalid invoice frequency", OperationFailure.BadInput);
+
+            if (!frequency.HasValue && newDates.Count > 0)
+                return new OperationError("Invoice dates require an invoice frequency", OperationFailure.BadInput);
+
+            var periods = frequency switch
+            {
+                InvoiceFrequencyOptions.Yearly => 1,
+                InvoiceFrequencyOptions.HalfYearly => 2,
+                InvoiceFrequencyOptions.Quarterly => 4,
+                _ => 0
+            };
+            if (newDates.Any(x => x == null || x.Date == default || x.Period < 1 || x.Period > periods))
+                return new OperationError("Invoice dates must have a date and a period within the selected frequency", OperationFailure.BadInput);
+
+            if (newDates.Select(x => x.Period).Distinct().Count() != newDates.Count)
+                return new OperationError("Invoice date periods must be unique", OperationFailure.BadInput);
+
+            return ValidateInvoiceDateRangeAndOrder(newDates);
+        }
+
+        private static Maybe<OperationError> ValidateInvoiceDateRangeAndOrder(IEnumerable<ItContractInvoiceDate> dates)
+        {
+            const int maximumInvoiceYearsInFuture = 100;
+            var latestInvoiceDate = DateTime.Today.AddYears(maximumInvoiceYearsInFuture);
+            DateTime? previousDate = null;
+            foreach (var invoiceDate in dates.OrderBy(x => x.Period))
+            {
+                if (invoiceDate.Date.Date > latestInvoiceDate)
+                    return new OperationError("Invoice dates must not be more than 100 years in the future", OperationFailure.BadInput);
+
+                if (previousDate.HasValue && invoiceDate.Date.Date < previousDate.Value)
+                    return new OperationError("Invoice dates must not precede dates in earlier periods", OperationFailure.BadInput);
+
+                previousDate = invoiceDate.Date.Date;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        private void UpdateInvoiceDates(IReadOnlyCollection<ItContractInvoiceDate> newDates)
+        {
+            // Reuse tracked rows for retained periods to avoid duplicate EF keys during replacement.
+            foreach (var existing in InvoiceDates.ToList())
+            {
+                var replacement = newDates.SingleOrDefault(x => x.Period == existing.Period);
+                if (replacement == null)
+                    InvoiceDates.Remove(existing);
+                else
+                {
+                    existing.Date = replacement.Date;
+                }
+            }
+            foreach (var date in newDates.Where(x => InvoiceDates.All(existing => existing.Period != x.Period)))
+            {
+                InvoiceDates.Add(new ItContractInvoiceDate { ItContract = this, Period = date.Period, Date = date.Date });
+            }
+        }
 
         #endregion
 

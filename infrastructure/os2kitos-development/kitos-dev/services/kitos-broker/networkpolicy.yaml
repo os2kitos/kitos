@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  labels:
+    app.kubernetes.io/name: kitos-broker
+    app.kubernetes.io/component: service
+    app.kubernetes.io/part-of: kitos-dev
+    app.kubernetes.io/managed-by: easy-hosting
+    network-policy.kubernetes.io/type: egress
+    network-policy.kubernetes.io/purpose: allow-egress
+  name: kitos-broker-allow-all-egress
+  namespace: kitos-dev
+spec:
+  egress:
+  - {}
+  podSelector:
+    matchLabels:
+      app: kitos-broker
+  policyTypes:
+  - Egress

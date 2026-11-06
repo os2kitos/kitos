@@ -21,6 +21,8 @@ namespace Tests.Integration.Presentation.Web.Options.V2
         [Theory, MemberData(nameof(GetV2ResourceNames))]
         public async Task Can_Get_AvailableOptions(string apiv2OptionResource)
         {
+            if (apiv2OptionResource == OptionV2ApiHelper.ResourceName.PersonalDataDeletionDeadlineTypes)
+                await CreateAndActivateOption(A<string>(), A<string>(), GlobalOptionTypeV2Helper.PersonalDataDeletionDeadlineTypes);
             //Arrange
             var orgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
             var pageSize = Math.Max(1, A<int>() % 2); //Minimum is 1;
@@ -196,6 +198,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             yield return new[] { OptionV2ApiHelper.ResourceName.ItContractAgreementExtensionOptionTypes, GlobalOptionTypeV2Helper.OptionExtendTypes };
             yield return new[] { OptionV2ApiHelper.ResourceName.ItContractNoticePeriodMonthTypes, GlobalOptionTypeV2Helper.TerminationDeadlineTypes };
             yield return new[] { OptionV2ApiHelper.ResourceName.CriticalityTypes, GlobalOptionTypeV2Helper.CriticalityTypes };
+            yield return new[] { OptionV2ApiHelper.ResourceName.PersonalDataDeletionDeadlineTypes, GlobalOptionTypeV2Helper.PersonalDataDeletionDeadlineTypes };
 
             yield return new[] { OptionV2ApiHelper.ResourceName.ItInterfaceTypes, GlobalOptionTypeV2Helper.InterfaceTypes };
             yield return new[] { OptionV2ApiHelper.ResourceName.ItInterfaceDataTypes, GlobalOptionTypeV2Helper.DataTypes };

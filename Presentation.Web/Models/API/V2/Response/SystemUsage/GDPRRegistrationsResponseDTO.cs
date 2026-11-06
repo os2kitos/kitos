@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Infrastructure.Attributes;
@@ -10,6 +10,14 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
 {
     public class GDPRRegistrationsResponseDTO
     {
+        /// <summary>Optional. No or null clears all deletion details. Populated details require IndividualRecords or BulkDeletion.</summary>
+        public PersonalDataDeletionCapabilityChoice? PersonalDataDeletionCapability { get; set; }
+        public PersonalDataDeletionMethodChoice? PersonalDataDeletionMethod { get; set; }
+        public IdentityNamePairResponseDTO? PersonalDataDeletionDeadlineType { get; set; }
+        public SimpleLinkDTO? PersonalDataDeletionProcedureDocumentation { get; set; }
+        public IdentityNamePairResponseDTO? PersonalDataDeletionResponsibleUser { get; set; }
+        public DateTime? PersonalDataDeletionVerifiedDate { get; set; }
+        public SimpleLinkDTO? PersonalDataDeletionVerificationDocumentation { get; set; }
         public string? ProcessingPurpose { get; set; }
         public SimpleLinkDTO? DirectoryDocumentation { get; set; }
         [Required]
@@ -30,14 +38,14 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// <summary>
         /// (Shared Supplier Field)
         /// </summary>
-        public YesNoDontKnowIrrelevantChoice? RiskAssessmentConducted { get; set; }
+        public RiskAssessmentConductedChoice? RiskAssessmentConducted { get; set; }
         public DateTime? RiskAssessmentConductedDate { get; set; }
         [SupplierField]
         public RiskLevelChoice? RiskAssessmentResult { get; set; }
         public SimpleLinkDTO? RiskAssessmentDocumentation { get; set; }
         public string? RiskAssessmentNotes { get; set; }
         public DateTime? PlannedRiskAssessmentDate { get; set; }
-        public YesNoDontKnowChoice? DPIAConducted { get; set; }
+        public DpiaConductedChoice? DPIAConducted { get; set; }
         public DateTime? DPIADate { get; set; }
         public SimpleLinkDTO? DPIADocumentation { get; set; }
         public YesNoDontKnowChoice? RetentionPeriodDefined { get; set; }

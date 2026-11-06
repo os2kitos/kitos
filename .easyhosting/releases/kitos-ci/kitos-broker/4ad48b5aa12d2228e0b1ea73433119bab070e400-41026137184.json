@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "releaseId": "sha256:4a00f43046c82489a5de54248c49537380f46fb48236ea7a7602db0b7333e866",
+  "applicationId": "kitos-dev",
+  "serviceName": "kitos-broker",
+  "repositoryUrl": "https://github.com/Strongminds/kitos",
+  "releaseStream": "kitos-ci/kitos-broker",
+  "sourceRevision": {
+    "requestedKind": "DefaultBranch",
+    "requestedValue": "",
+    "resolvedCommitSha": "4ad48b5aa12d2228e0b1ea73433119bab070e400"
+  },
+  "image": {
+    "repository": "ghcr.io/strongminds/kitos-kitos-broker",
+    "digest": "sha256:4a00f43046c82489a5de54248c49537380f46fb48236ea7a7602db0b7333e866"
+  },
+  "build": {
+    "createdAt": "2026-10-30T08:26:43Z",
+    "runUrl": "https://github.com/Strongminds/kitos/actions/runs/41026137184"
+  }
+}

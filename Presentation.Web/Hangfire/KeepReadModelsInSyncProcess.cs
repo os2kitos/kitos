@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Hangfire.Server;
+using Hangfire.Storage;
 using Infrastructure.Services.BackgroundJobs;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -10,6 +11,9 @@ namespace Presentation.Web.Hangfire
     public class KeepReadModelsInSyncProcess : IBackgroundProcess
     {
         private readonly IServiceProvider _serviceProvider;
+        private const string SyncLockResource = "kitos:read-model-sync";
+        private static readonly TimeSpan LockWaitTimeout = TimeSpan.FromSeconds(1);
+        private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(1);
 
         public KeepReadModelsInSyncProcess(IServiceProvider serviceProvider)
         {
@@ -23,17 +27,40 @@ namespace Presentation.Web.Hangfire
             var logger = scope.ServiceProvider.GetRequiredService<ILogger>();
             try
             {
-                var backgroundJobLauncher = scope.ServiceProvider.GetRequiredService<IBackgroundJobLauncher>();
-                PurgeDuplicateUpdates(backgroundJobLauncher, combinedTokenSource);
-                ScheduleUpdatesCausedByDependencyChanges(backgroundJobLauncher, combinedTokenSource);
-                ProcessPendingUpdates(backgroundJobLauncher, combinedTokenSource);
+                using var connection = context.Storage.GetConnection();
+                using var syncLock = TryAcquireSyncLock(connection);
+                if (syncLock != null && !combinedTokenSource.IsCancellationRequested)
+                {
+                    RunSyncCycle(scope.ServiceProvider, combinedTokenSource);
+                }
             }
             catch (Exception e)
             {
                 logger.Error(e, "Error in KeepReadModelsInSyncProcess");
             }
 
-            CoolDown();
+            combinedTokenSource.Token.WaitHandle.WaitOne(PollInterval);
+        }
+
+        private static IDisposable? TryAcquireSyncLock(IStorageConnection connection)
+        {
+            try
+            {
+                // Purging and consuming must share a lock across all application instances.
+                return connection.AcquireDistributedLock(SyncLockResource, LockWaitTimeout);
+            }
+            catch (DistributedLockTimeoutException)
+            {
+                return null; // Another server is already processing the queue.
+            }
+        }
+
+        private static void RunSyncCycle(IServiceProvider serviceProvider, CancellationTokenSource tokenSource)
+        {
+            var backgroundJobLauncher = serviceProvider.GetRequiredService<IBackgroundJobLauncher>();
+            PurgeDuplicateUpdates(backgroundJobLauncher, tokenSource);
+            ScheduleUpdatesCausedByDependencyChanges(backgroundJobLauncher, tokenSource);
+            ProcessPendingUpdates(backgroundJobLauncher, tokenSource);
         }
 
         private static void ProcessPendingUpdates(IBackgroundJobLauncher backgroundJobLauncher, CancellationTokenSource combinedTokenSource)
@@ -58,9 +85,5 @@ namespace Presentation.Web.Hangfire
             backgroundJobLauncher.LaunchScheduleItContractSupplierOverviewReadModelUpdates(combinedTokenSource.Token).Wait(CancellationToken.None);
         }
 
-        private static void CoolDown()
-        {
-            Thread.Sleep(TimeSpan.FromSeconds(1));
-        }
     }
 }

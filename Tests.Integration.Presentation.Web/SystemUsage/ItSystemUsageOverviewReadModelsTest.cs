@@ -115,12 +115,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemUsageExpirationDate = DateTime.UtcNow.AddDays(A<int>());
             var archiveDuty = A<ArchiveDutyChoice>();
 
-            var riskAssessment = A<YesNoDontKnowIrrelevantChoice>();
-            var hasRiskAssessment = riskAssessment == YesNoDontKnowIrrelevantChoice.Yes;
-            var riskAssessmentDate = hasRiskAssessment ? A<DateTime?>(): null;
+            var riskAssessment = A<RiskAssessmentConductedChoice>();
+            var hasRiskAssessment = riskAssessment == RiskAssessmentConductedChoice.Yes;
+            var riskAssessmentDate = hasRiskAssessment ? A<DateTime?>() : null;
             var riskAssessmentResult = hasRiskAssessment ? A<RiskLevel?>() : null;
-            var riskSupervisionDocumentationUrl = hasRiskAssessment ? A<string>(): null;
-            var riskSupervisionDocumentationUrlName = hasRiskAssessment ? A<string>(): null;
+            var riskSupervisionDocumentationUrl = hasRiskAssessment ? A<string>() : null;
+            var riskSupervisionDocumentationUrlName = hasRiskAssessment ? A<string>() : null;
 
             var linkToDirectoryUrl = A<string>();
             var linkToDirectoryUrlName = A<string>();
@@ -336,7 +336,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(criticalityLevel.Name, readModel.SystemUsageCriticalityLevelName);
             Assert.Equal(riskAssessment.FromChoice(), readModel.RiskAssessmentConducted);
 
-            if (riskAssessment == YesNoDontKnowIrrelevantChoice.Yes)
+            if (riskAssessment == RiskAssessmentConductedChoice.Yes)
             {
                 Assert.Equal(riskSupervisionDocumentationUrlName, readModel.RiskSupervisionDocumentationName);
                 Assert.Equal(riskSupervisionDocumentationUrl, readModel.RiskSupervisionDocumentationUrl);
@@ -368,7 +368,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(dataClassification.Name, readModel.ItSystemCategoriesName);
             Assert.Equal(organizationId, readModel.ItSystemRightsHolderId);
             Assert.Equal(newRightsHolder.Name, readModel.ItSystemRightsHolderName);
-           Assert.Equal(newRightsHolder.Cvr, readModel.ItSystemRightsHolderCvr);
+            Assert.Equal(newRightsHolder.Cvr, readModel.ItSystemRightsHolderCvr);
             Assert.Equal(taskRef.Description, readModel.ItSystemKLENamesAsCsv);
             var readTaskRef = Assert.Single(readModel.ItSystemTaskRefs);
             Assert.Equal(taskRef.KleNumber, readTaskRef.KLEId);

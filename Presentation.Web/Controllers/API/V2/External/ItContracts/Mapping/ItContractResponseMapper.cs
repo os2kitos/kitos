@@ -61,7 +61,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static ContractAgreementPeriodDataResponseDTO MapAgreementPeriod(ItContract contract)
         {
-            return new ()
+            return new()
             {
                 DurationYears = contract.DurationYears,
                 DurationMonths = contract.DurationMonths,
@@ -86,7 +86,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             return new ContractTerminationTermsResponseDTO
             {
                 NoticePeriodMonths = contract.TerminationDeadline?.MapIdentityNamePairDTO(),
-                NoticeByEndOf = contract.ByEnding?.ToYearSegmentChoice(), 
+                NoticeByEndOf = contract.ByEnding?.ToYearSegmentChoice(),
                 NoticePeriodExtendsCurrent = contract.Running?.ToYearSegmentChoice()
             };
         }
@@ -125,6 +125,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         {
             return new ContractPaymentModelDataResponseDTO
             {
+                InvoiceFrequency = (InvoiceFrequencyChoice?)contract.InvoiceFrequency,
+                InvoiceDates = contract.InvoiceDates.OrderBy(x => x.Period)
+                    .Select(x => new ContractInvoiceDateDTO { Period = x.Period, Date = x.Date }).ToList(),
                 OperationsRemunerationStartedAt = contract.OperationRemunerationBegun,
                 PaymentModel = contract.PaymentModel?.MapIdentityNamePairDTO(),
                 PaymentFrequency = contract.PaymentFreqency?.MapIdentityNamePairDTO(),

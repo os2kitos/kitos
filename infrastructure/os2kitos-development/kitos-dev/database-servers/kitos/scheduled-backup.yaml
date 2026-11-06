@@ -1,0 +1,20 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: kitos-daily
+  namespace: kitos-dev
+  labels:
+    app.kubernetes.io/managed-by: easyhosting
+    easyhosting.io/resource-kind: database-server
+    easyhosting.io/resource-id: "edef42cfc8144b8fa70bb186e406dbf5"
+    easyhosting.io/application-id: "kitos-dev"
+  annotations:
+    easyhosting.io/database-catalog: "[{\"DatabaseId\":\"40c42a62-d9a5-4d4a-ad91-3d53a0b09058\",\"Name\":\"dev-db\",\"DatabaseName\":\"dev-db\",\"OwnerRoleName\":\"kitos\",\"Type\":0},{\"DatabaseId\":\"81423431-59b2-4889-87cc-c79c0219aa8c\",\"Name\":\"hangfire-dev-db\",\"DatabaseName\":\"hangfire-dev-db\",\"OwnerRoleName\":\"hangfire\",\"Type\":0},{\"DatabaseId\":\"c7ca8ff2-2113-49ef-a43a-619a8ed02034\",\"Name\":\"pubsub-dev-db\",\"DatabaseName\":\"pubsub-dev-db\",\"OwnerRoleName\":\"pubsub\",\"Type\":0}]"
+spec:
+  schedule: "0 0 0 * * *"
+  backupOwnerReference: cluster
+  cluster:
+    name: kitos
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io

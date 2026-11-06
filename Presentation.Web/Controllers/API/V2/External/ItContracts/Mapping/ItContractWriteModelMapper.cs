@@ -190,10 +190,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         }
 
 
-        private static ItContractPaymentModelModificationParameters MapPaymentModel<TRootDto>(ContractPaymentModelDataWriteRequestDTO dto, IPropertyUpdateRule<TRootDto> rule) where TRootDto : ContractWriteRequestDTO
+        private ItContractPaymentModelModificationParameters MapPaymentModel<TRootDto>(ContractPaymentModelDataWriteRequestDTO dto, IPropertyUpdateRule<TRootDto> rule) where TRootDto : ContractWriteRequestDTO
         {
             return new ItContractPaymentModelModificationParameters
             {
+                InvoiceFrequency = rule.MustUpdate(x => x.PaymentModel!.InvoiceFrequency)
+                    ? ((InvoiceFrequencyOptions?)dto.InvoiceFrequency).AsChangedValue()
+                    : OptionalValueChange<InvoiceFrequencyOptions?>.None,
+
+                InvoiceDates = ClientRequestsChangeTo<TRootDto>(x => x.PaymentModel!.InvoiceDates!)
+                    ? (dto.InvoiceDates ?? []).Select(x => new ItContractInvoiceDate { Period = x?.Period ?? 0, Date = x?.Date ?? default })
+                        .ToList().AsChangedValue<IEnumerable<ItContractInvoiceDate>>()
+                    : OptionalValueChange<IEnumerable<ItContractInvoiceDate>>.None,
+
                 OperationsRemunerationStartedAt = rule.MustUpdate(x => x.PaymentModel!.OperationsRemunerationStartedAt)
                     ? (dto.OperationsRemunerationStartedAt?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<DateTime>>.None,

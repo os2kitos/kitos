@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.13" />
     <PackageReference Include="System.ServiceModel.Http" Version="10.0.652802" />
     <!-- System.ServiceModel.Primitives ref assemblies omit MessagePartSpecification and
          SecurityTokenReferenceStyle; reference the implementation (lib) DLL directly. -->

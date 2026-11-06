@@ -92,6 +92,27 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
             return new UpdatedSystemUsageGDPRProperties
             {
+                PersonalDataDeletionCapability = rule.MustUpdate(x => x.GDPR!.PersonalDataDeletionCapability)
+                    ? MapEnumChoice(source.PersonalDataDeletionCapability, PersonalDataDeletionCapabilityMappingExtensions.ToDomain)
+                    : OptionalValueChange<PersonalDataDeletionCapability?>.None,
+                PersonalDataDeletionMethod = rule.MustUpdate(x => x.GDPR!.PersonalDataDeletionMethod)
+                    ? MapEnumChoice(source.PersonalDataDeletionMethod, PersonalDataDeletionMethodMappingExtensions.ToDomain)
+                    : OptionalValueChange<PersonalDataDeletionMethod?>.None,
+                PersonalDataDeletionDeadlineTypeUuid = rule.MustUpdate(x => x.GDPR!.PersonalDataDeletionDeadlineTypeUuid)
+                    ? (source.PersonalDataDeletionDeadlineTypeUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
+                    : OptionalValueChange<Maybe<Guid>>.None,
+                PersonalDataDeletionProcedureDocumentation = rule.MustUpdate(x => x.GDPR!.PersonalDataDeletionProcedureDocumentation)
+                    ? MapLink(source.PersonalDataDeletionProcedureDocumentation)
+                    : OptionalValueChange<Maybe<NamedLink>>.None,
+                PersonalDataDeletionResponsibleUserUuid = rule.MustUpdate(x => x.GDPR!.PersonalDataDeletionResponsibleUserUuid)
+                    ? source.PersonalDataDeletionResponsibleUserUuid!.AsChangedValue()
+                    : OptionalValueChange<Guid?>.None,
+                PersonalDataDeletionVerifiedDate = rule.MustUpdate(x => x.GDPR!.PersonalDataDeletionVerifiedDate)
+                    ? source.PersonalDataDeletionVerifiedDate!.AsChangedValue()
+                    : OptionalValueChange<DateTime?>.None,
+                PersonalDataDeletionVerificationDocumentation = rule.MustUpdate(x => x.GDPR!.PersonalDataDeletionVerificationDocumentation)
+                    ? MapLink(source.PersonalDataDeletionVerificationDocumentation)
+                    : OptionalValueChange<Maybe<NamedLink>>.None,
                 ProcessingPurpose = rule.MustUpdate(x => x.GDPR!.ProcessingPurpose)
                     ? source.ProcessingPurpose!.AsChangedValue()
                     : OptionalValueChange<string>.None,
@@ -141,8 +162,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                     : OptionalValueChange<Maybe<NamedLink>>.None,
 
                 RiskAssessmentConducted = rule.MustUpdate(x => x.GDPR!.RiskAssessmentConducted)
-                    ? MapYesNoDontKnowIrrelevant(source.RiskAssessmentConducted)
-                    : OptionalValueChange<YesNoDontKnowIrrelevant?>.None,
+                    ? MapRiskAssessmentConducted(source.RiskAssessmentConducted)
+                    : OptionalValueChange<RiskAssessmentConducted?>.None,
 
                 RiskAssessmentConductedDate = rule.MustUpdate(x => x.GDPR!.RiskAssessmentConductedDate)
                     ? source.RiskAssessmentConductedDate.AsChangedValue()
@@ -165,8 +186,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                     : OptionalValueChange<DateTime?>.None,
 
                 DPIAConducted = rule.MustUpdate(x => x.GDPR!.DPIAConducted)
-                    ? MapYesNoDontKnow(source.DPIAConducted)
-                    : OptionalValueChange<DataOptions?>.None,
+                    ? MapEnumChoice(source.DPIAConducted, DpiaConductedMappingExtensions.FromChoice)
+                    : OptionalValueChange<DpiaConducted?>.None,
 
                 DPIADate = rule.MustUpdate(x => x.GDPR!.DPIADate)
                     ? source.DPIADate.AsChangedValue()
@@ -459,8 +480,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                     ? MapEnumChoice(source.HostedAt, HostedAtMappingExtensions.ToHostedAt)
                     : OptionalValueChange<HostedAt?>.None,
 
-                LicensingAndCodeModels = rule.MustUpdate(x => x.General!.LicensingAndCodeModels) 
-                    ? (MapLicensingAndCodeModels(source?.LicensingAndCodeModels) ?? []).AsChangedValue() 
+                LicensingAndCodeModels = rule.MustUpdate(x => x.General!.LicensingAndCodeModels)
+                    ? (MapLicensingAndCodeModels(source?.LicensingAndCodeModels) ?? []).AsChangedValue()
                     : OptionalValueChange<IEnumerable<LicensingAndCodeModel>>.None
             };
         }
@@ -476,7 +497,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 relationData.AssociatedContractUuid,
                 relationData.RelationFrequencyUuid,
                 relationData.Description!,
-                relationData.UrlReference!
+                relationData.UrlReference!,
+                relationData.SystemRelationDirection?.ToSystemRelationDirection()
                 );
         }
 
@@ -518,9 +540,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return MapEnumChoice(choice, DataOptionsMappingExtensions.ToDataOptions);
         }
 
-        private static ChangedValue<YesNoDontKnowIrrelevant?> MapYesNoDontKnowIrrelevant(YesNoDontKnowIrrelevantChoice? choice)
+        private static ChangedValue<RiskAssessmentConducted?> MapRiskAssessmentConducted(RiskAssessmentConductedChoice? choice)
         {
-            return MapEnumChoice(choice, YesNoDontKnowIrrelevantMappingExtensions.FromChoice);
+            return MapEnumChoice(choice, RiskAssessmentConductedMappingExtensions.FromChoice);
         }
 
         private static ChangedValue<Maybe<NamedLink>> MapLink(SimpleLinkDTO? simpleLinkDto)

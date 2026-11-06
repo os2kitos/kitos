@@ -247,7 +247,8 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     relation.Reference,
                     null,
                     relation.AssociatedContractId,
-                    relation.UsageFrequencyId);
+                    relation.UsageFrequencyId,
+                    relation.SystemRelationDirection);
 
                 if (modifyStatus.Failed)
                 {

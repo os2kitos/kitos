@@ -436,8 +436,12 @@ namespace Tests.Unit.Presentation.Web.Services
             transaction.Verify(x => x.Commit(), Times.Never);
         }
 
-        [Fact]
-        public void ExecuteMigration_Returns_Ok_And_Resets_RelationInterface_From_UsedByRelation_With_Interface()
+        [Theory]
+        [InlineData(null)]
+        [InlineData(SystemRelationDirection.IncomingData)]
+        [InlineData(SystemRelationDirection.OutgoingData)]
+        [InlineData(SystemRelationDirection.BidirectionalData)]
+        public void ExecuteMigration_Resets_RelationInterface_And_Preserves_Direction(SystemRelationDirection? direction)
         {
             //Arrange
             var fromSystemUsage = CreateSystemUsage();
@@ -456,6 +460,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 RelationInterface = relationInterface,
                 UsageFrequencyId = relationFrequenceType.Id,
                 UsageFrequency = relationFrequenceType,
+                SystemRelationDirection = direction,
                 Description = A<string>()
             };
 
@@ -632,7 +637,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 relation.Reference,
                 null,
                 relation.AssociatedContractId,
-                relation.UsageFrequencyId), numberOfTimesCalled);
+                relation.UsageFrequencyId,
+                relation.SystemRelationDirection), numberOfTimesCalled);
         }
 
 
@@ -749,7 +755,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 UsageFrequency = relation.UsageFrequency,
                 UsageFrequencyId = relation.UsageFrequencyId,
                 RelationInterfaceId = null,
-                RelationInterface = null
+                RelationInterface = null,
+                SystemRelationDirection = relation.SystemRelationDirection
             };
 
             _itSystemUsageRelationService
@@ -761,7 +768,8 @@ namespace Tests.Unit.Presentation.Web.Services
                     relation.Reference,
                     null,
                     relation.AssociatedContractId,
-                    relation.UsageFrequencyId))
+                    relation.UsageFrequencyId,
+                    relation.SystemRelationDirection))
                 .Returns(
                     shouldSucceed
                     ? Result<SystemRelation, OperationError>.Success(newRelation)

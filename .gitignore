@@ -212,3 +212,4 @@ tmp/
 certs/
 MigrationsBundle/
 /.env
+/Tools.Beskedfordeler/sts-config.local.json

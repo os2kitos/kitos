@@ -12,6 +12,15 @@ namespace Infrastructure.DataAccess.Mapping
             base.Configure(builder);
             builder.ToTable("ItSystemUsage");
 
+            builder.HasOne(x => x.PersonalDataDeletionResponsibleUser)
+                .WithMany()
+                .HasForeignKey(x => x.PersonalDataDeletionResponsibleUserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(x => x.PersonalDataDeletionDeadlineType)
+                .WithMany(x => x.References)
+                .HasForeignKey(x => x.PersonalDataDeletionDeadlineTypeId);
+            builder.Property(x => x.PersonalDataDeletionProcedureDocumentationUrlName).HasMaxLength(ItSystemUsage.LinkNameMaxLength);
+            builder.Property(x => x.PersonalDataDeletionVerificationDocumentationUrlName).HasMaxLength(ItSystemUsage.LinkNameMaxLength);
             builder.HasMany(t => t.ExternalReferences)
                 .WithOne(d => d.ItSystemUsage)
                 .HasForeignKey(d => d.ItSystemUsage_Id)

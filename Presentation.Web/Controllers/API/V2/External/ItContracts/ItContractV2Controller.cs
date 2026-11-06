@@ -113,7 +113,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (!string.IsNullOrWhiteSpace(nameContent))
                 conditions.Add(new QueryByPartOfName<ItContract>(nameContent));
 
-            if(!string.IsNullOrWhiteSpace(nameEquals))
+            if (!string.IsNullOrWhiteSpace(nameEquals))
                 conditions.Add(new QueryByName<ItContract>(nameEquals));
 
             if (changedSinceGtEq.HasValue)
@@ -155,6 +155,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
                     .ThenInclude(stream => stream.OrganizationUnit)
                         .ThenInclude(unit => unit.Parent)
                 .Include(contract => contract.ExternalReferences)
+                .Include(contract => contract.InvoiceDates)
                 .AsSplitQuery()
                 .OrderApiResultsByDefaultConventions(changedSinceGtEq.HasValue, orderByProperty)
                 .Page(paginationQuery)

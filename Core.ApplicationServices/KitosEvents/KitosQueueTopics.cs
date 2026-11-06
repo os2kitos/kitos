@@ -4,5 +4,6 @@
     {
         public const string SystemChangedEventTopic = "KitosITSystemChangedEvent";
         public const string KitosItSystemUsageCreatedEvent = "KitosItSystemUsageCreatedEvent";
+        public const string KitosItSystemUsageDeletedEvent = "KitosItSystemUsageDeletedEvent";
     }
 }

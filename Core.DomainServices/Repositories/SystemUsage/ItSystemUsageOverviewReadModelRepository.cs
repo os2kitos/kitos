@@ -75,7 +75,7 @@ namespace Core.DomainServices.Repositories.SystemUsage
             //Gets all read models that have dependencies on the user
             return _repository
                 .AsQueryable()
-                .Where(x => x.RoleAssignments.Any(assignment => assignment.UserId == userId) || x.ObjectOwnerId == userId || x.LastChangedById == userId)
+                .Where(x => x.RoleAssignments.Any(assignment => assignment.UserId == userId) || x.ObjectOwnerId == userId || x.LastChangedById == userId || x.PersonalDataDeletionResponsibleUserId == userId)
                 .Distinct();
         }
 
@@ -84,7 +84,7 @@ namespace Core.DomainServices.Repositories.SystemUsage
             //Gets all read models that have dependencies on the organization unit
             return _repository
                 .AsQueryable()
-                .Where(x => x.ResponsibleOrganizationUnitId == organizationUnitId || x.RelevantOrganizationUnits.Any(ru=>ru.OrganizationUnitId == organizationUnitId));
+                .Where(x => x.ResponsibleOrganizationUnitId == organizationUnitId || x.RelevantOrganizationUnits.Any(ru => ru.OrganizationUnitId == organizationUnitId));
         }
 
         public IQueryable<ItSystemUsageOverviewReadModel> GetByDependentOrganizationId(int organizationId)
@@ -106,7 +106,7 @@ namespace Core.DomainServices.Repositories.SystemUsage
         {
             return _repository
                 .AsQueryable()
-                .Where(x => x.AssociatedContracts.Any(ac=>ac.ItContractId == contractId));
+                .Where(x => x.AssociatedContracts.Any(ac => ac.ItContractId == contractId));
         }
 
         public IQueryable<ItSystemUsageOverviewReadModel> GetByDataProcessingRegistrationId(int dataProcessingRegistrationId)

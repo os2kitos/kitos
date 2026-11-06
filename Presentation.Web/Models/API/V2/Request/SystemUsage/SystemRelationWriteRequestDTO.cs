@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {
@@ -33,5 +34,6 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 
         public string? Description { get; set; }
         public string? UrlReference { get; set; }
+        public SystemRelationDirectionChoice? SystemRelationDirection { get; set; }
     }
 }

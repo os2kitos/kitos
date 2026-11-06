@@ -88,7 +88,7 @@ namespace Infrastructure.DataAccess.Mapping
             builder.Property(x => x.LinkToDirectoryName).HasMaxLength(ItSystemUsage.LinkNameMaxLength);
             builder.HasIndex(x => x.LinkToDirectoryName).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_LinkToDirectoryName");
 
-            builder.Property(x => x.GeneralPurpose).HasMaxLength(ItSystemUsage.LongProperyMaxLength);
+            builder.Property(x => x.GeneralPurpose).HasMaxLength(ItSystemUsage.PurposeMaxLength);
             builder.HasIndex(x => x.GeneralPurpose).HasDatabaseName("ItSystemUsageOverviewReadModel_Index_GeneralPurpose");
 
             builder.Property(x => x.ProcessingPurpose).HasMaxLength(ItSystemUsage.LongProperyMaxLength);

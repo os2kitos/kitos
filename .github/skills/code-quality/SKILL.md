@@ -55,6 +55,7 @@ Run `git diff origin/master...HEAD` (plus uncommitted changes) and check each ch
 
 ### Structure & naming
 - [ ] Layering respected: `Core.DomainModel` ← `Core.DomainServices` ← `Core.ApplicationServices` ← `Presentation.Web`.
+- [ ] Domain-field changes follow `kitos-domain-models`: creation/update methods own assignments, fields are propagated end to end, and internal callers preserve unrelated metadata.
 - [ ] Controllers are thin; mapping in `IXxxResponseMapper` / `IXxxWriteModelMapper`.
 - [ ] Naming: `{Domain}V2Controller`, `{Domain}InternalV2Controller`, `I{Domain}Service`, `I{Domain}WriteService`, private fields `_camelCase`.
 - [ ] Dependencies injected via constructor and registered in `Infrastructure.Ninject` / DI setup.

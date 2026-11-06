@@ -56,7 +56,7 @@ namespace Tests.Unit.Core.Model
         [Fact]
         public void ResetSystemUsageCriticalityLevel_SetsLastChanged_AndSetsValueToNull()
         {
-            _sut.UpdateSystemUsageCriticalityLevel(new SystemUsageCriticalityLevel() { Uuid = A<Guid>(), Name = A<string>()});
+            _sut.UpdateSystemUsageCriticalityLevel(new SystemUsageCriticalityLevel() { Uuid = A<Guid>(), Name = A<string>() });
             var beforeChange = _sut.CriticalityFieldsLastChanged;
             Assert.NotNull(_sut.SystemUsageCriticalityLevel);
 
@@ -100,7 +100,7 @@ namespace Tests.Unit.Core.Model
         {
             var existingValue = A<string?>();
             _sut.UpdateCriticalityLevelDocumentationUrl(existingValue);
-            
+
             var beforeChange = _sut.CriticalityFieldsLastChanged;
 
             _sut.UpdateCriticalityLevelDocumentationUrl(existingValue);
@@ -268,11 +268,13 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
-        [InlineData(DataOptions.YES)]
-        [InlineData(DataOptions.DONTKNOW)]
-        [InlineData(DataOptions.NO)]
-        [InlineData(DataOptions.UNDECIDED)]
-        public void UpdateDPIADocumentation_Updates_If_DPIA_Is_Yes(DataOptions dpia)
+        [InlineData(DpiaConducted.NoMustBePrepared)]
+        [InlineData(DpiaConducted.NoMustNotBePrepared)]
+        [InlineData(DpiaConducted.Yes)]
+        [InlineData(DpiaConducted.DontKnow)]
+        [InlineData(DpiaConducted.No)]
+        [InlineData(DpiaConducted.Undecided)]
+        public void UpdateDPIADocumentation_Updates_If_DPIA_Is_Yes(DpiaConducted dpia)
         {
             _sut.UpdateDPIAConducted(dpia);
             var url = A<string>();
@@ -280,7 +282,7 @@ namespace Tests.Unit.Core.Model
 
             _sut.UpdateDPIADocumentation(url, name);
 
-            if (dpia == DataOptions.YES)
+            if (dpia == DpiaConducted.Yes)
             {
                 Assert.Equal(url, _sut.DPIASupervisionDocumentationUrl);
                 Assert.Equal(name, _sut.DPIASupervisionDocumentationUrlName);
@@ -293,18 +295,20 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
-        [InlineData(DataOptions.YES)]
-        [InlineData(DataOptions.DONTKNOW)]
-        [InlineData(DataOptions.NO)]
-        [InlineData(DataOptions.UNDECIDED)]
-        public void UpdateDPIADate_Updates_If_DPIA_Is_Yes(DataOptions dpia)
+        [InlineData(DpiaConducted.NoMustBePrepared)]
+        [InlineData(DpiaConducted.NoMustNotBePrepared)]
+        [InlineData(DpiaConducted.Yes)]
+        [InlineData(DpiaConducted.DontKnow)]
+        [InlineData(DpiaConducted.No)]
+        [InlineData(DpiaConducted.Undecided)]
+        public void UpdateDPIADate_Updates_If_DPIA_Is_Yes(DpiaConducted dpia)
         {
             _sut.UpdateDPIAConducted(dpia);
             var date = A<DateTime>();
 
             _sut.UpdateDPIADate(date);
 
-            if (dpia == DataOptions.YES)
+            if (dpia == DpiaConducted.Yes)
             {
                 Assert.Equal(date, _sut.DPIADateFor);
             }
@@ -316,23 +320,25 @@ namespace Tests.Unit.Core.Model
 
 
         [Theory]
-        [InlineData(DataOptions.DONTKNOW)]
-        [InlineData(DataOptions.NO)]
-        [InlineData(DataOptions.UNDECIDED)]
-        [InlineData(DataOptions.YES)]
-        public void UpdateDPIAConducted_Only_Clears_Related_Fields_If_Not_Yes(DataOptions dpia)
+        [InlineData(DpiaConducted.NoMustBePrepared)]
+        [InlineData(DpiaConducted.NoMustNotBePrepared)]
+        [InlineData(DpiaConducted.DontKnow)]
+        [InlineData(DpiaConducted.No)]
+        [InlineData(DpiaConducted.Undecided)]
+        [InlineData(DpiaConducted.Yes)]
+        public void UpdateDPIAConducted_Only_Clears_Related_Fields_If_Not_Yes(DpiaConducted dpia)
         {
             var dpiaDateFor = A<DateTime>();
             var dpiaSupervisionDocumentationUrl = A<string>();
             var dpiaSupervisionDocumentationUrlName = A<string>();
-            _sut.UpdateDPIAConducted(DataOptions.YES);
+            _sut.UpdateDPIAConducted(DpiaConducted.Yes);
             _sut.UpdateDPIADate(dpiaDateFor);
             _sut.UpdateDPIADocumentation(dpiaSupervisionDocumentationUrl, dpiaSupervisionDocumentationUrlName);
 
             _sut.UpdateDPIAConducted(dpia);
 
             Assert.Equal(dpia, _sut.DPIA);
-            if (dpia == DataOptions.YES)
+            if (dpia == DpiaConducted.Yes)
             {
                 Assert.Equal(dpiaDateFor, _sut.DPIADateFor);
                 Assert.Equal(dpiaSupervisionDocumentationUrl, _sut.DPIASupervisionDocumentationUrl);
@@ -347,19 +353,21 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
-        [InlineData(YesNoDontKnowIrrelevant.Yes)]
-        [InlineData(YesNoDontKnowIrrelevant.DontKnow)]
-        [InlineData(YesNoDontKnowIrrelevant.No)]
-        [InlineData(YesNoDontKnowIrrelevant.Undecided)]
-        [InlineData(YesNoDontKnowIrrelevant.Irrelevant)]
-        public void UpdateRiskAssessmentDate_Updates_If_RiskAssessment_Is_Yes(YesNoDontKnowIrrelevant riskAssessment)
+        [InlineData(RiskAssessmentConducted.Yes)]
+        [InlineData(RiskAssessmentConducted.DontKnow)]
+        [InlineData(RiskAssessmentConducted.No)]
+        [InlineData(RiskAssessmentConducted.Undecided)]
+        [InlineData(RiskAssessmentConducted.Irrelevant)]
+        [InlineData(RiskAssessmentConducted.NoMustBePrepared)]
+        [InlineData(RiskAssessmentConducted.NoMustNotBePrepared)]
+        public void UpdateRiskAssessmentDate_Updates_If_RiskAssessment_Is_Yes(RiskAssessmentConducted riskAssessment)
         {
             _sut.UpdateRiskAssessment(riskAssessment);
             var date = A<DateTime>();
 
             _sut.UpdateRiskAssessmentDate(date);
 
-            if (riskAssessment == YesNoDontKnowIrrelevant.Yes)
+            if (riskAssessment == RiskAssessmentConducted.Yes)
             {
                 Assert.Equal(date, _sut.riskAssesmentDate);
             }
@@ -370,19 +378,21 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
-        [InlineData(YesNoDontKnowIrrelevant.Yes)]
-        [InlineData(YesNoDontKnowIrrelevant.DontKnow)]
-        [InlineData(YesNoDontKnowIrrelevant.No)]
-        [InlineData(YesNoDontKnowIrrelevant.Undecided)]
-        [InlineData(YesNoDontKnowIrrelevant.Irrelevant)]
-        public void UpdateRiskAssessmentNotes_Updates_If_RiskAssessment_Is_Yes(YesNoDontKnowIrrelevant riskAssessment)
+        [InlineData(RiskAssessmentConducted.Yes)]
+        [InlineData(RiskAssessmentConducted.DontKnow)]
+        [InlineData(RiskAssessmentConducted.No)]
+        [InlineData(RiskAssessmentConducted.Undecided)]
+        [InlineData(RiskAssessmentConducted.Irrelevant)]
+        [InlineData(RiskAssessmentConducted.NoMustBePrepared)]
+        [InlineData(RiskAssessmentConducted.NoMustNotBePrepared)]
+        public void UpdateRiskAssessmentNotes_Updates_If_RiskAssessment_Is_Yes(RiskAssessmentConducted riskAssessment)
         {
             _sut.UpdateRiskAssessment(riskAssessment);
             var notes = A<string>();
 
             _sut.UpdateRiskAssessmentNotes(notes);
 
-            if (riskAssessment == YesNoDontKnowIrrelevant.Yes)
+            if (riskAssessment == RiskAssessmentConducted.Yes)
             {
                 Assert.Equal(notes, _sut.noteRisks);
             }
@@ -403,19 +413,21 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
-        [InlineData(YesNoDontKnowIrrelevant.Yes)]
-        [InlineData(YesNoDontKnowIrrelevant.DontKnow)]
-        [InlineData(YesNoDontKnowIrrelevant.No)]
-        [InlineData(YesNoDontKnowIrrelevant.Undecided)]
-        [InlineData(YesNoDontKnowIrrelevant.Irrelevant)]
-        public void UpdateRiskAssessmentLevel_Updates_If_RiskAssessment_Is_Yes(YesNoDontKnowIrrelevant riskAssessment)
+        [InlineData(RiskAssessmentConducted.Yes)]
+        [InlineData(RiskAssessmentConducted.DontKnow)]
+        [InlineData(RiskAssessmentConducted.No)]
+        [InlineData(RiskAssessmentConducted.Undecided)]
+        [InlineData(RiskAssessmentConducted.Irrelevant)]
+        [InlineData(RiskAssessmentConducted.NoMustBePrepared)]
+        [InlineData(RiskAssessmentConducted.NoMustNotBePrepared)]
+        public void UpdateRiskAssessmentLevel_Updates_If_RiskAssessment_Is_Yes(RiskAssessmentConducted riskAssessment)
         {
             _sut.UpdateRiskAssessment(riskAssessment);
             var level = A<RiskLevel>();
 
             _sut.UpdateRiskAssessmentLevel(level);
 
-            if (riskAssessment == YesNoDontKnowIrrelevant.Yes)
+            if (riskAssessment == RiskAssessmentConducted.Yes)
             {
                 Assert.Equal(level, _sut.preriskAssessment);
             }
@@ -426,19 +438,21 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
-        [InlineData(YesNoDontKnowIrrelevant.Yes)]
-        [InlineData(YesNoDontKnowIrrelevant.DontKnow)]
-        [InlineData(YesNoDontKnowIrrelevant.No)]
-        [InlineData(YesNoDontKnowIrrelevant.Undecided)]
-        [InlineData(YesNoDontKnowIrrelevant.Irrelevant)]
-        public void UpdateRiskAssessmentNote_Updates_If_RiskAssessment_Is_Yes(YesNoDontKnowIrrelevant riskAssessment)
+        [InlineData(RiskAssessmentConducted.Yes)]
+        [InlineData(RiskAssessmentConducted.DontKnow)]
+        [InlineData(RiskAssessmentConducted.No)]
+        [InlineData(RiskAssessmentConducted.Undecided)]
+        [InlineData(RiskAssessmentConducted.Irrelevant)]
+        [InlineData(RiskAssessmentConducted.NoMustBePrepared)]
+        [InlineData(RiskAssessmentConducted.NoMustNotBePrepared)]
+        public void UpdateRiskAssessmentNote_Updates_If_RiskAssessment_Is_Yes(RiskAssessmentConducted riskAssessment)
         {
             _sut.UpdateRiskAssessment(riskAssessment);
             var note = A<string>();
 
             _sut.UpdateRiskAssessmentNotes(note);
 
-            if (riskAssessment == YesNoDontKnowIrrelevant.Yes)
+            if (riskAssessment == RiskAssessmentConducted.Yes)
             {
                 Assert.Equal(note, _sut.noteRisks);
             }
@@ -449,12 +463,14 @@ namespace Tests.Unit.Core.Model
         }
 
         [Theory]
-        [InlineData(YesNoDontKnowIrrelevant.Yes)]
-        [InlineData(YesNoDontKnowIrrelevant.DontKnow)]
-        [InlineData(YesNoDontKnowIrrelevant.No)]
-        [InlineData(YesNoDontKnowIrrelevant.Undecided)]
-        [InlineData(YesNoDontKnowIrrelevant.Irrelevant)]
-        public void UpdateRiskAssessmentDocumentation_Updates_If_RiskAssessment_Is_Yes(YesNoDontKnowIrrelevant riskAssessment)
+        [InlineData(RiskAssessmentConducted.Yes)]
+        [InlineData(RiskAssessmentConducted.DontKnow)]
+        [InlineData(RiskAssessmentConducted.No)]
+        [InlineData(RiskAssessmentConducted.Undecided)]
+        [InlineData(RiskAssessmentConducted.Irrelevant)]
+        [InlineData(RiskAssessmentConducted.NoMustBePrepared)]
+        [InlineData(RiskAssessmentConducted.NoMustNotBePrepared)]
+        public void UpdateRiskAssessmentDocumentation_Updates_If_RiskAssessment_Is_Yes(RiskAssessmentConducted riskAssessment)
         {
             _sut.UpdateRiskAssessment(riskAssessment);
             var url = A<string>();
@@ -463,7 +479,7 @@ namespace Tests.Unit.Core.Model
 
             _sut.UpdateRiskAssessmentDocumentation(url, name);
 
-            if (riskAssessment == YesNoDontKnowIrrelevant.Yes)
+            if (riskAssessment == RiskAssessmentConducted.Yes)
             {
                 Assert.Equal(url, _sut.RiskSupervisionDocumentationUrl);
                 Assert.Equal(name, _sut.RiskSupervisionDocumentationUrlName);
@@ -477,12 +493,14 @@ namespace Tests.Unit.Core.Model
 
 
         [Theory]
-        [InlineData(YesNoDontKnowIrrelevant.No)]
-        [InlineData(YesNoDontKnowIrrelevant.DontKnow)]
-        [InlineData(YesNoDontKnowIrrelevant.Irrelevant)]
-        [InlineData(YesNoDontKnowIrrelevant.Undecided)]
-        [InlineData(YesNoDontKnowIrrelevant.Yes)]
-        public void UpdateRiskAssessment_Only_Clears_Related_Fields_If_Not_Yes(YesNoDontKnowIrrelevant riskAssessment)
+        [InlineData(RiskAssessmentConducted.No)]
+        [InlineData(RiskAssessmentConducted.DontKnow)]
+        [InlineData(RiskAssessmentConducted.Irrelevant)]
+        [InlineData(RiskAssessmentConducted.NoMustBePrepared)]
+        [InlineData(RiskAssessmentConducted.NoMustNotBePrepared)]
+        [InlineData(RiskAssessmentConducted.Undecided)]
+        [InlineData(RiskAssessmentConducted.Yes)]
+        public void UpdateRiskAssessment_Only_Clears_Related_Fields_If_Not_Yes(RiskAssessmentConducted riskAssessment)
         {
             var level = A<RiskLevel>();
             var riskAssessmentDate = A<DateTime>();
@@ -490,7 +508,7 @@ namespace Tests.Unit.Core.Model
             var urlName = A<string>();
             var notes = A<string>();
 
-            _sut.UpdateRiskAssessment(YesNoDontKnowIrrelevant.Yes);
+            _sut.UpdateRiskAssessment(RiskAssessmentConducted.Yes);
             _sut.UpdateRiskAssessmentLevel(level);
             _sut.UpdateRiskAssessmentDate(riskAssessmentDate);
             _sut.UpdateRiskAssessmentDocumentation(url, urlName);
@@ -499,7 +517,7 @@ namespace Tests.Unit.Core.Model
             _sut.UpdateRiskAssessment(riskAssessment);
 
             Assert.Equal(riskAssessment, _sut.riskAssessment);
-            if (riskAssessment == YesNoDontKnowIrrelevant.Yes)
+            if (riskAssessment == RiskAssessmentConducted.Yes)
             {
                 Assert.Equal(level, _sut.preriskAssessment);
                 Assert.Equal(riskAssessmentDate, _sut.riskAssesmentDate);

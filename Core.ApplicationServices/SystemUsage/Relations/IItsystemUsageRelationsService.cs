@@ -18,8 +18,9 @@ namespace Core.ApplicationServices.SystemUsage.Relations
         /// <param name="reference">Optional reference</param>
         /// <param name="frequencyId">Optional frequency id</param>
         /// <param name="contractId">Optional contract Id</param>
+        /// <param name="systemRelationDirection">Optional data flow direction</param>
         /// <returns></returns>
-        Result<SystemRelation, OperationError> AddRelation(int fromSystemUsageId, int toSystemUsageId, int? interfaceId, string description, string reference, int? frequencyId, int? contractId);
+        Result<SystemRelation, OperationError> AddRelation(int fromSystemUsageId, int toSystemUsageId, int? interfaceId, string description, string reference, int? frequencyId, int? contractId, SystemRelationDirection? systemRelationDirection = null);
         /// <summary>
         /// Gets all relations FROM the target system usage
         /// </summary>
@@ -72,8 +73,9 @@ namespace Core.ApplicationServices.SystemUsage.Relations
         /// <param name="toInterfaceId">Id of the specific "to" system usage interface to be used from the "from" system usage list of available interfaces</param>
         /// <param name="toContractId">Id of the specific "to" system usage contract to replace the existing system relation value</param>
         /// <param name="toFrequencyTypeId">Id of the specific "to" system frequency type to replace the existing system relation value</param>
+        /// <param name="systemRelationDirection">Optional data flow direction</param>
         /// <returns></returns>
-        Result<SystemRelation, OperationError> ModifyRelation(int fromSystemUsageId, int relationId, int toSystemUsageId, string description, string reference, int? toInterfaceId, int? toContractId, int? toFrequencyTypeId);
+        Result<SystemRelation, OperationError> ModifyRelation(int fromSystemUsageId, int relationId, int toSystemUsageId, string description, string reference, int? toInterfaceId, int? toContractId, int? toFrequencyTypeId, SystemRelationDirection? systemRelationDirection = null);
         /// <summary>
         /// Gets a list of relations which are associated with the provided contract
         /// </summary>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
 
@@ -7,6 +8,12 @@ namespace Core.ApplicationServices.Extensions
 {
     public static class OptionalValueChangeExtensions
     {
+        public static void AddIfChanged<T>(this OptionalValueChange<T> change, ICollection<string> changed, string propertyName)
+        {
+            if (change.HasChange)
+                changed.Add(propertyName);
+        }
+
         public static DateTime? MapDateTimeOptionalChangeWithFallback(this OptionalValueChange<Maybe<DateTime>> optionalChange, DateTime? fallback)
         {
             return optionalChange

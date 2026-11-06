@@ -88,8 +88,9 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         public SimpleLinkDTO? CriticalityLevelDocumentation { get; set; }
         /// <summary>
         /// The general purpose of this system usage.
+        /// Max length: 1000
         /// </summary>
-        [MaxLength(ItSystemUsage.LongProperyMaxLength)]
+        [MaxLength(ItSystemUsage.PurposeMaxLength)]
         public string? Purpose { get; set; }
         /// <summary>
         /// The technical system type classifications of this system usage (multi-choice).

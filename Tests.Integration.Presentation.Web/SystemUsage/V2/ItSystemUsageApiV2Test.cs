@@ -32,6 +32,7 @@ using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.Internal;
 using Tests.Toolkit.Extensions;
 using Xunit;
 using OrganizationType = Presentation.Web.Models.API.V2.Types.Organization.OrganizationType;
@@ -122,11 +123,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 {
                     ToSystemUsageUuid = systemUsage1.Uuid,
                     RelationInterfaceUuid = interface1.Uuid,
+                    SystemRelationDirection = SystemRelationDirectionChoice.IncomingData
                 },
                 new ()
                 {
                     ToSystemUsageUuid = systemUsage1.Uuid,
                     RelationInterfaceUuid = interface2.Uuid,
+                    SystemRelationDirection = SystemRelationDirectionChoice.BidirectionalData
+                },
+                new ()
+                {
+                    ToSystemUsageUuid = systemUsage1.Uuid
                 }
             };
 
@@ -134,9 +141,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var result = (await response.ReadResponseBodyAsAsync<IEnumerable<OutgoingSystemRelationResponseDTO>>()).ToList();
 
-            Assert.Equal(2, result.Count);
+            Assert.Equal(3, result.Count);
             Assert.Contains(result, x => x.RelationInterface?.Uuid == interface1.Uuid);
             Assert.Contains(result, x => x.RelationInterface?.Uuid == interface2.Uuid);
+            Assert.Contains(result, x => x.SystemRelationDirection == SystemRelationDirectionChoice.IncomingData);
+            Assert.Contains(result, x => x.SystemRelationDirection == SystemRelationDirectionChoice.BidirectionalData);
+            Assert.Contains(result, x => x.SystemRelationDirection == null);
         }
 
         [Fact]
@@ -1188,6 +1198,94 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var updatedDto = await removeAssignment.ReadResponseBodyAsAsync<ItSystemUsageResponseDTO>();
             var roleAssignment = Assert.Single(updatedDto.Roles);
             MatchExpectedAssignment(roleAssignment, assignment2);
+        }
+
+        [Fact]
+        public async Task PersonalDataDeletion_Rejects_Conflicts_And_Clears_Dependents()
+        {
+            var (token, _, organization, system) = await CreatePrerequisitesAsync();
+            var user = await CreateUser(organization);
+            var deadline = await GlobalOptionTypeV2Helper.CreateAndActivateGlobalOption(GlobalOptionTypeV2Helper.PersonalDataDeletionDeadlineTypes, "30 days");
+            var updatedDeadline = await GlobalOptionTypeV2Helper.CreateAndActivateGlobalOption(GlobalOptionTypeV2Helper.PersonalDataDeletionDeadlineTypes, "60 days");
+            var input = new GDPRWriteRequestDTO
+            {
+                PersonalDataDeletionCapability = PersonalDataDeletionCapabilityChoice.IndividualRecords,
+                PersonalDataDeletionMethod = PersonalDataDeletionMethodChoice.ManuallyByOrganization,
+                PersonalDataDeletionDeadlineTypeUuid = deadline.Uuid,
+                PersonalDataDeletionResponsibleUserUuid = user.Uuid,
+                PersonalDataDeletionVerifiedDate = new DateTime(2026, 10, 22),
+                PersonalDataDeletionProcedureDocumentation = new SimpleLinkDTO { Name = "Procedure", Url = "https://example.com/procedure" },
+                PersonalDataDeletionVerificationDocumentation = new SimpleLinkDTO { Name = "Check", Url = "https://example.com/check" }
+            };
+            var created = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid, gdpr: input));
+            AssertGdpr(input, (await ItSystemUsageV2Helper.GetSingleAsync(token, created.Uuid)).GDPR);
+
+            await ItSystemUsageV2Helper.SendPatchGDPR(token, created.Uuid, new
+            {
+                PersonalDataDeletionCapability = PersonalDataDeletionCapabilityChoice.No,
+                PersonalDataDeletionMethod = PersonalDataDeletionMethodChoice.BySupplierOnRequest
+            }).WithExpectedResponseCode(HttpStatusCode.BadRequest).DisposeAsync();
+            AssertGdpr(input, (await ItSystemUsageV2Helper.GetSingleAsync(token, created.Uuid)).GDPR);
+
+            await ItSystemUsageV2Helper.SendPatchGDPR(token, created.Uuid, new { PersonalDataDeletionResponsibleUserUuid = Guid.NewGuid() })
+                .WithExpectedResponseCode(HttpStatusCode.BadRequest).DisposeAsync();
+            var (_, _, otherOrganization, _) = await CreatePrerequisitesAsync();
+            var otherUser = await CreateUser(otherOrganization);
+            await ItSystemUsageV2Helper.SendPatchGDPR(token, created.Uuid, new { PersonalDataDeletionResponsibleUserUuid = otherUser.Uuid })
+                .WithExpectedResponseCode(HttpStatusCode.BadRequest).DisposeAsync();
+            await ItSystemUsageV2Helper.SendPatchGDPR(token, created.Uuid, new
+            {
+                PersonalDataDeletionProcedureDocumentation = new SimpleLinkDTO { Name = new string('x', 151), Url = "https://example.com" }
+            }).WithExpectedResponseCode(HttpStatusCode.BadRequest).DisposeAsync();
+            var otherToken = await CreateUserInNewOrgAndGetToken();
+            await ItSystemUsageV2Helper.SendPatchGDPR(otherToken, created.Uuid, new { PersonalDataDeletionDeadlineTypeUuid = updatedDeadline.Uuid })
+                .WithExpectedResponseCode(HttpStatusCode.Forbidden).DisposeAsync();
+
+            await ItSystemUsageV2Helper.SendPatchGDPR(token, created.Uuid, new { PersonalDataDeletionDeadlineTypeUuid = updatedDeadline.Uuid })
+                .WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            input.PersonalDataDeletionDeadlineTypeUuid = updatedDeadline.Uuid;
+            AssertGdpr(input, (await ItSystemUsageV2Helper.GetSingleAsync(token, created.Uuid)).GDPR);
+
+            await ItSystemUsageV2Helper.SendPatchGDPR(token, created.Uuid, new { PersonalDataDeletionCapability = PersonalDataDeletionCapabilityChoice.No })
+                .WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            AssertGdpr(new GDPRWriteRequestDTO { PersonalDataDeletionCapability = PersonalDataDeletionCapabilityChoice.No },
+                (await ItSystemUsageV2Helper.GetSingleAsync(token, created.Uuid)).GDPR);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Cannot_Write_GDPR_With_Undefined_PersonalDataDeletion_Enum(bool invalidCapability)
+        {
+            var (token, _, organization, system) = await CreatePrerequisitesAsync();
+            var gdpr = CreateGdprWithUndefinedDeletionEnum(invalidCapability);
+
+            await ItSystemUsageV2Helper.SendPostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid, gdpr: gdpr))
+                .WithExpectedResponseCode(HttpStatusCode.BadRequest).DisposeAsync();
+
+            var created = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            await ItSystemUsageV2Helper.SendPutAsync(token, created.Uuid, CreatePutRequest(gdpr: gdpr))
+                .WithExpectedResponseCode(HttpStatusCode.BadRequest).DisposeAsync();
+            await ItSystemUsageV2Helper.SendPatchGDPR(token, created.Uuid, gdpr)
+                .WithExpectedResponseCode(HttpStatusCode.BadRequest).DisposeAsync();
+
+            var persisted = await ItSystemUsageV2Helper.GetSingleAsync(token, created.Uuid);
+            Assert.Null(persisted.GDPR.PersonalDataDeletionCapability);
+            Assert.Null(persisted.GDPR.PersonalDataDeletionMethod);
+        }
+
+        private static GDPRWriteRequestDTO CreateGdprWithUndefinedDeletionEnum(bool invalidCapability)
+        {
+            const int undefinedEnumValue = 99;
+            return new GDPRWriteRequestDTO
+            {
+                PersonalDataDeletionCapability = invalidCapability
+                    ? (PersonalDataDeletionCapabilityChoice)undefinedEnumValue
+                    : PersonalDataDeletionCapabilityChoice.IndividualRecords,
+                PersonalDataDeletionMethod = invalidCapability
+                    ? PersonalDataDeletionMethodChoice.ManuallyByOrganization
+                    : (PersonalDataDeletionMethodChoice)undefinedEnumValue
+            };
         }
 
         [Fact]
@@ -2337,8 +2435,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var nonYesValues = new List<YesNoDontKnowChoice?>
                 { YesNoDontKnowChoice.No, YesNoDontKnowChoice.Undecided, YesNoDontKnowChoice.DontKnow, null };
 
-            var nonYesValuesWithIrrelevant = new List<YesNoDontKnowIrrelevantChoice?>
-                { YesNoDontKnowIrrelevantChoice.No, YesNoDontKnowIrrelevantChoice.Undecided, YesNoDontKnowIrrelevantChoice.DontKnow, YesNoDontKnowIrrelevantChoice.Irrelevant , null };
+            var nonYesValuesWithIrrelevant = new List<RiskAssessmentConductedChoice?>
+                { RiskAssessmentConductedChoice.No, RiskAssessmentConductedChoice.Undecided, RiskAssessmentConductedChoice.DontKnow, RiskAssessmentConductedChoice.Irrelevant , null };
 
 
             return new List<object[]>
@@ -2363,7 +2461,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 {
                     new GDPRWriteRequestDTO
                     {
-                        DPIAConducted = nonYesValues.RandomItem(),
+                        DPIAConducted = (DpiaConductedChoice?)nonYesValues.RandomItem(),
                         DPIADate = fixture.Create<DateTime>()
                     }
                 },
@@ -2407,14 +2505,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var token = await GetGlobalToken();
             var patchBefore = new GDPRWriteRequestDTO
             {
-                RiskAssessmentConducted = YesNoDontKnowIrrelevantChoice.Yes,
+                RiskAssessmentConducted = RiskAssessmentConductedChoice.Yes,
                 RiskAssessmentConductedDate = A<DateTime>(),
                 RiskAssessmentNotes = A<string>(),
                 RiskAssessmentDocumentation = A<SimpleLinkDTO>(),
                 RiskAssessmentResult = A<RiskLevelChoice>()
             };
             await ItSystemUsageV2Helper.SendPatchGDPR(token, usage.Uuid, patchBefore).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
-            var resetRequest = new GDPRWriteRequestDTO { RiskAssessmentConducted = YesNoDontKnowIrrelevantChoice.No };
+            var resetRequest = new GDPRWriteRequestDTO { RiskAssessmentConducted = RiskAssessmentConductedChoice.No };
 
             var response = await ItSystemUsageV2Helper.SendPatchGDPR(token, usage.Uuid, resetRequest);
 
@@ -2694,7 +2792,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         {
             var expectedList = expected.ToList();
             var actualList = actual.ToList();
-            
+
             Assert.Equal(expectedList.Count, actualList.Count);
             foreach (var expectedRight in expectedList)
             {
@@ -2800,6 +2898,13 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
         private static void AssertGdpr(GDPRWriteRequestDTO gdprInput, GDPRRegistrationsResponseDTO gdprResponse)
         {
+            Assert.Equal(gdprInput.PersonalDataDeletionCapability, gdprResponse.PersonalDataDeletionCapability);
+            Assert.Equal(gdprInput.PersonalDataDeletionMethod, gdprResponse.PersonalDataDeletionMethod);
+            Assert.Equal(gdprInput.PersonalDataDeletionDeadlineTypeUuid, gdprResponse.PersonalDataDeletionDeadlineType?.Uuid);
+            Assert.Equal(gdprInput.PersonalDataDeletionResponsibleUserUuid, gdprResponse.PersonalDataDeletionResponsibleUser?.Uuid);
+            AssertTimestampEqual(gdprInput.PersonalDataDeletionVerifiedDate, gdprResponse.PersonalDataDeletionVerifiedDate);
+            (gdprInput.PersonalDataDeletionProcedureDocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.PersonalDataDeletionProcedureDocumentation);
+            (gdprInput.PersonalDataDeletionVerificationDocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.PersonalDataDeletionVerificationDocumentation);
             Assert.NotNull(gdprResponse.DataSensitivityLevels);
             Assert.NotNull(gdprResponse.SensitivePersonData);
             Assert.NotNull(gdprResponse.RegisteredDataCategories);

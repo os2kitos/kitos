@@ -357,11 +357,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             };
             usage.UpdateRetentionPeriodDefined(DataOptions.YES);
             usage.UpdateNextDataRetentionEvaluationDate(A<DateTime>());
-            usage.UpdateDPIAConducted(DataOptions.YES);
+            usage.UpdateDPIAConducted(DpiaConducted.Yes);
             usage.UpdateDPIADate(A<DateTime>());
             usage.UpdateUserSupervisionDocumentation(A<string>(), A<string>());
             usage.UpdateTechnicalPrecautionsDocumentation(A<string>(), A<string>());
-            usage.UpdateRiskAssessment(YesNoDontKnowIrrelevant.Yes);
+            usage.UpdateRiskAssessment(RiskAssessmentConducted.Yes);
             usage.UpdateRiskAssessmentDate(A<DateTime>());
             usage.UpdatePlannedRiskAssessmentDate(A<DateTime>());
             usage.UpdateRiskAssessmentLevel(A<RiskLevel>());

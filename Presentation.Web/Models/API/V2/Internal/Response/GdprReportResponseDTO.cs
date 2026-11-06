@@ -16,15 +16,15 @@ namespace Presentation.Web.Models.API.V2.Internal.Response
         public bool DataProcessingAgreementConcluded { get; set; }
         public bool LinkToDirectory { get; set; }
         public required IEnumerable<string> SensitiveDataTypes { get; set; }
-        public YesNoDontKnowIrrelevantChoice? RiskAssessment { get; set; } 
+        public RiskAssessmentConductedChoice? RiskAssessment { get; set; }
         public DateTime? RiskAssessmentDate { get; set; }
         public DateTime? PlannedRiskAssessmentDate { get; set; }
-        public RiskLevelChoice? PreRiskAssessment { get; set; } 
+        public RiskLevelChoice? PreRiskAssessment { get; set; }
         public string? RiskAssessmentNotes { get; set; }
         public bool PersonalDataCpr { get; set; }
         public bool PersonalDataSocialProblems { get; set; }
         public bool PersonalDataSocialOtherPrivateMatters { get; set; }
-        public YesNoDontKnowChoice? DPIA { get; set; }
+        public DpiaConductedChoice? DPIA { get; set; }
         public DateTime? DPIADate { get; set; }
         public required string TechnicalSupervisionDocumentationUrlName { get; set; }
         public string? TechnicalSupervisionDocumentationUrl { get; set; }
