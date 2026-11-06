@@ -68,7 +68,7 @@ spec:
             configMapKeyRef:
               key: RabbitMQ__HostName
               name: user-variables
-        image: '{will be replaced by build pipeline}'
+        image: ghcr.io/strongminds/kitos-kitos-pubsub@sha256:af4ae3be37e79f34f562a34839fd8fd4f25ac516eeeb7c5276e4764ddfc88f7c
         name: kitos-pubsub
         ports:
         - containerPort: 8080
