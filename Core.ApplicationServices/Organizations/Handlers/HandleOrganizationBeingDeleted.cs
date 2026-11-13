@@ -19,6 +19,7 @@ using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Context;
+using Core.DomainServices.Repositories.Contract;
 
 namespace Core.ApplicationServices.Organizations.Handlers
 {
@@ -32,6 +33,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
         private readonly IOrganizationService _organizationService;
         private readonly IDefaultOrganizationResolver _defaultOrganizationResolver;
         private readonly IDomainEvents _domainEvents;
+        private readonly IItContractSupplierOverviewReadModelRepository _supplierOverviewReadModelRepository;
 
         public HandleOrganizationBeingDeleted(
             IItContractWriteService contractService,
@@ -41,7 +43,8 @@ namespace Core.ApplicationServices.Organizations.Handlers
             IItInterfaceService interfaceService,
             IOrganizationService organizationService,
             IDefaultOrganizationResolver defaultOrganizationResolver,
-            IDomainEvents domainEvents)
+            IDomainEvents domainEvents,
+            IItContractSupplierOverviewReadModelRepository supplierOverviewReadModelRepository)
         {
             _contractService = contractService;
             _itSystemUsageService = itSystemUsageService;
@@ -51,6 +54,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
             _organizationService = organizationService;
             _defaultOrganizationResolver = defaultOrganizationResolver;
             _domainEvents = domainEvents;
+            _supplierOverviewReadModelRepository = supplierOverviewReadModelRepository;
         }
 
         public void Handle(EntityBeingDeletedEvent<Organization> domainEvent)
@@ -66,6 +70,8 @@ namespace Core.ApplicationServices.Organizations.Handlers
             ResolveRightsHolderConflicts(conflicts, organization);
 
             ResolveArchiveSupplierConflicts(conflicts, organization);
+
+            ClearSupplierOverviewReadModels(organization);
 
             ClearLocalRegistrations(organization);
 
@@ -136,6 +142,15 @@ namespace Core.ApplicationServices.Organizations.Handlers
             return systemsToBeMovedToDefaultOrganization;
         }
 
+        private void ClearSupplierOverviewReadModels(Organization organization)
+        {
+            var readModels = _supplierOverviewReadModelRepository.GetByOrganizationId(organization.Id).ToList();
+            foreach (var readModel in readModels)
+            {
+                _supplierOverviewReadModelRepository.Delete(readModel);
+            }
+        }
+
         private void ClearLocalRegistrations(Organization organization)
         {
             //Removing contracts created in the org
@@ -184,7 +199,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 {
                     Supplier = new ItContractSupplierModificationParameters()
                     { OrganizationUuid = OptionalValueChange<Guid?>.With(null) }
-                }).ThrowOnFailure()); 
+                }).ThrowOnFailure());
             organization.Supplier.Clear();
         }
 
@@ -199,7 +214,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
                     {
                         ArchiveSupplierOrganizationUuid = Maybe<Guid>.None.AsChangedValue()
                     }
-                }).ThrowOnFailure()); 
+                }).ThrowOnFailure());
         }
     }
 }

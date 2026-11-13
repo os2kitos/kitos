@@ -1,13 +1,16 @@
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItContract.Read;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.Internal.Organizations;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Xunit;
 
@@ -83,7 +86,7 @@ namespace Tests.Integration.Presentation.Web.Contract
             Assert.Contains(supplierARow.ContractsAtHighestCriticality, x => x.ContractName == highContractName1);
             Assert.Contains(supplierARow.ContractsAtHighestCriticality, x => x.ContractName == highContractName2);
 
-            var supplierBRow = Assert.Single(queryResult,x => x.SupplierUuid == supplierB.Uuid);
+            var supplierBRow = Assert.Single(queryResult, x => x.SupplierUuid == supplierB.Uuid);
             Assert.Equal(supplierSharedName, supplierBRow.SupplierName);
             Assert.Equal(otherSupplierContractName, supplierBRow.ContractsAtHighestCriticality.Single().ContractName);
             Assert.Equal(medium.Name, supplierBRow.HighestCriticalityName);
@@ -159,10 +162,43 @@ namespace Tests.Integration.Presentation.Web.Contract
             await ReadModelTestTools.WaitForReadModelQueueDepletion(before);
 
             var queryResult = (await ItContractV2Helper.QuerySupplierOverviewReadModel(organizationUuid)).ToList();
-            var supplierRow = Assert.Single(queryResult,x => x.SupplierUuid == supplier.Uuid);
+            var supplierRow = Assert.Single(queryResult, x => x.SupplierUuid == supplier.Uuid);
 
             Assert.Null(supplierRow.SupplierCvr);
             Assert.Equal($"F-{suffix}", supplierRow.SupplierForeignCvr);
+        }
+
+        [Fact]
+        public async Task Can_Delete_Organization_With_Supplier_Overview_Read_Models()
+        {
+            var organizationUuid = _organization.Uuid;
+            var organizationId = DatabaseAccess.GetEntityId<Organization>(organizationUuid);
+            var supplier = await CreateOrganizationAsync(cvr: CreateCvr());
+            var criticality = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.CriticalityTypes, organizationUuid, 25, 0)).First();
+            var before = DateTime.UtcNow;
+
+            await CreateContractWithSupplierAndCriticality(organizationUuid, supplier.Uuid, criticality.Uuid, A<string>());
+            await ReadModelTestTools.WaitForReadModelQueueDepletion(before);
+
+            var readModel = Assert.Single(await ItContractV2Helper.QuerySupplierOverviewReadModel(organizationUuid));
+            Assert.Single(readModel.ContractsAtHighestCriticality);
+            var readModelId = DatabaseAccess.MapFromEntitySet<ItContractSupplierOverviewReadModel, int>(repository =>
+                repository.AsQueryable().Single(model => model.OrganizationId == organizationId).Id);
+
+            using var disableResponse = await OrganizationInternalV2Helper.ChangeOrganizationDisabledState(organizationUuid, true);
+            Assert.Equal(HttpStatusCode.NoContent, disableResponse.StatusCode);
+
+            using var response = await OrganizationInternalV2Helper.DeleteOrganization(organizationUuid, true);
+
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            Assert.False(DatabaseAccess.MapFromEntitySet<Organization, bool>(repository =>
+                repository.AsQueryable().Any(organization => organization.Id == organizationId)));
+            Assert.False(DatabaseAccess.MapFromEntitySet<ItContractSupplierOverviewReadModel, bool>(repository =>
+                repository.AsQueryable().Any(model => model.OrganizationId == organizationId)));
+            Assert.False(DatabaseAccess.MapFromEntitySet<ItContractSupplierOverviewAtCriticalityContractReadModel, bool>(repository =>
+                repository.AsQueryable().Any(model => model.ParentId == readModelId)));
+            Assert.True(DatabaseAccess.MapFromEntitySet<Organization, bool>(repository =>
+                repository.AsQueryable().Any(organization => organization.Uuid == supplier.Uuid)));
         }
 
         private async Task CreateContractWithSupplierAndCriticality(
